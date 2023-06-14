@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppseducationandworkplanapi
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

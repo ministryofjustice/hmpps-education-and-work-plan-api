@@ -1,8 +1,8 @@
-package uk.gov.justice.digital.hmpps.hmppseducationandworkplanapi.integration.health
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.integration.health
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppseducationandworkplanapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.integration.IntegrationTestBase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
