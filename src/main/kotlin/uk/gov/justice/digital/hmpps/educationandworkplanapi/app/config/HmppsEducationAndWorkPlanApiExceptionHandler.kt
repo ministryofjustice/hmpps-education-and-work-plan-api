@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppseducationandworkplanapi.config
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
