@@ -23,7 +23,9 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew check
+          command: ./gradlew --daemon check
+      - run:
+          command: ./gradlew --daemon combineJacocoReports
       - save_cache:
           paths:
             - ~/.gradle
@@ -32,6 +34,8 @@ jobs:
           path: build/test-results
       - store_artifacts:
           path: build/reports/tests
+      - store_artifacts:
+          path: build/reports/jacoco
 
 workflows:
   version: 2
