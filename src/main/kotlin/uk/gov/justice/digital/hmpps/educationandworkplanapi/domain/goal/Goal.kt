@@ -28,9 +28,9 @@ data class Goal(
 ) {
 
   init {
-      if (steps.isEmpty()) {
-        throw InvalidGoalException("Cannot create Goal with reference [$reference]. At least one Step is required.")
-      }
+    if (steps.isEmpty()) {
+      throw InvalidGoalException("Cannot create Goal with reference [$reference]. At least one Step is required.")
+    }
   }
 
   fun complete() {
