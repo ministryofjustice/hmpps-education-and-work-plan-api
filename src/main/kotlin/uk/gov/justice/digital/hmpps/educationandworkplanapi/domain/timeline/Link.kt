@@ -5,7 +5,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
  *
  * For example a given [TimelineEvent] may be pertaining to something that happened in Application-A; but it may be
  * that Application-B is retrieving and processing the [Timeline]. The [Link] can be used to provide a link from
- * Application-B back to the specific event in Application-B
+ * Application-B back to the specific event in Application-A
  *
  * When we talk about 'links' we typically think of web anchor tag links, and it is acknowledged that will be the
  * primary use case.
