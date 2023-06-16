@@ -20,7 +20,7 @@ class TimelineServiceTest {
   private lateinit var service: TimelineService
 
   @Mock
-  private lateinit var persistenceService: TimelinePersistenceService
+  private lateinit var persistenceAdapter: TimelinePersistenceAdapter
 
   companion object {
     private const val prisonNumber = "A1234AB"
@@ -42,7 +42,7 @@ class TimelineServiceTest {
   @Test
   fun `should get timeline for prisoner`() {
     // Given
-    given(persistenceService.getTimelineEventsForPrisoner(any())).willReturn(
+    given(persistenceAdapter.getTimelineEventsForPrisoner(any())).willReturn(
       listOf(
         earliestEvent,
         middleEvent,
@@ -63,6 +63,6 @@ class TimelineServiceTest {
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
-    verify(persistenceService).getTimelineEventsForPrisoner(prisonNumber)
+    verify(persistenceAdapter).getTimelineEventsForPrisoner(prisonNumber)
   }
 }
