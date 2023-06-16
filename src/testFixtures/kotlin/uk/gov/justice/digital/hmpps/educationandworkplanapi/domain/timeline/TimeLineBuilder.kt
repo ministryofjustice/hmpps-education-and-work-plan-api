@@ -1,8 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.testfixtures.domain.timeline
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Link
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import java.time.Instant
 
 fun aValidTimeline(

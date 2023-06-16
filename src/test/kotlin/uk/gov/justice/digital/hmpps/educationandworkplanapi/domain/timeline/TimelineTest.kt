@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.testfixtures.domain.timeline.aValidTimelineEvent
 import java.time.Instant
 
 class TimelineTest {
