@@ -27,8 +27,8 @@ fun aValidTimelineEvent(
 
 fun aValidLink(
   title: String = "Click here to see the Goal",
-  href: String = "http://localhost/the-goal",
+  location: String = "http://localhost/the-goal",
 ) = Link(
   title = title,
-  href = href,
+  location = location,
 )
