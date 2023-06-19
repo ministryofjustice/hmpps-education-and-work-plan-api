@@ -6,8 +6,7 @@ CREATE TABLE goal
     review_date  DATE         NOT NULL,
     category     VARCHAR(50)  NOT NULL,
     status       VARCHAR(50)  NOT NULL,
-    notes        TEXT,
-    version      SMALLINT     NOT NULL
+    notes        TEXT
 );
 
 CREATE UNIQUE INDEX goal_reference_idx ON goal

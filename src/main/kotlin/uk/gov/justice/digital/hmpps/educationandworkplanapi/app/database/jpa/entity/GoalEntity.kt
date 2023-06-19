@@ -7,7 +7,6 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.persistence.Version
 import org.hibernate.Hibernate
 import org.hibernate.annotations.UuidGenerator
 import java.time.LocalDate
@@ -40,10 +39,6 @@ class GoalEntity(
 
   @Column
   var notes: String? = null,
-
-  @Column
-  @Version
-  var version: Int? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {
