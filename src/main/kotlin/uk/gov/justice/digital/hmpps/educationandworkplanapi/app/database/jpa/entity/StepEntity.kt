@@ -6,17 +6,15 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
 import org.hibernate.annotations.UuidGenerator
 import java.time.LocalDate
 import java.util.UUID
 
-@Table(name = "goal")
+@Table(name = "step")
 @Entity
-class GoalEntity(
+class StepEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -29,28 +27,20 @@ class GoalEntity(
   var title: String? = null,
 
   @Column
-  var reviewDate: LocalDate? = null,
+  var targetDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  var category: GoalCategory? = null,
+  var status: StepStatus? = null,
 
   @Column
-  @Enumerated(value = EnumType.STRING)
-  var status: GoalStatus? = null,
-
-  @Column
-  var notes: String? = null,
-
-  @OneToMany
-  @JoinColumn(name = "goal_id")
-  var steps: List<StepEntity>? = null,
+  var sequenceNumber: Int? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as GoalEntity
+    other as StepEntity
 
     return id != null && id == other.id
   }
@@ -62,15 +52,8 @@ class GoalEntity(
   }
 }
 
-enum class GoalCategory {
-  WORK,
-  PERSONAL_DEVELOPMENT,
-  EDUCATION,
-  RESETTLEMENT,
-}
-
-enum class GoalStatus {
+enum class StepStatus {
+  NOT_STARTED,
   ACTIVE,
-  COMPLETED,
-  ARCHIVED,
+  COMPLETE,
 }

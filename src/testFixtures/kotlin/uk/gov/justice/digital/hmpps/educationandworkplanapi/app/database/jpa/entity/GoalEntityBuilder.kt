@@ -13,6 +13,7 @@ fun aValidGoalEntity(
   category: GoalCategory = PERSONAL_DEVELOPMENT,
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
+  steps: List<StepEntity> = listOf(aValidStepEntity()),
 ): GoalEntity =
   GoalEntity(
     id = id,
@@ -22,4 +23,5 @@ fun aValidGoalEntity(
     category = category,
     status = status,
     notes = notes,
+    steps = steps,
   )

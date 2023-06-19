@@ -11,7 +11,7 @@ fun aValidGoal(
   title: String = "Improve communication skills",
   reviewDate: LocalDate = LocalDate.now().plusMonths(6),
   category: GoalCategory = PERSONAL_DEVELOPMENT,
-  steps: List<Step> = mutableListOf(aValidStep(), anotherValidStep()),
+  steps: List<Step> = listOf(aValidStep(), anotherValidStep()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
   createdBy: String = "",
