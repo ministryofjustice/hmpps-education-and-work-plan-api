@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ARCHIVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.COMPLETED
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -13,31 +15,44 @@ import java.util.UUID
  * Each goal has its own lifecycle (such as active or completed) and a prisoner can have many goals at the same time
  * (e.g. more than one active goal), thereby creating a "Action Plan".
  */
-data class Goal(
+class Goal(
   val reference: UUID,
   val title: String,
   val reviewDate: LocalDate,
   val category: GoalCategory,
-  val steps: List<Step>,
   var status: GoalStatus = GoalStatus.ACTIVE,
-  val notes: String?,
+  val notes: String? = null,
   val createdBy: String,
   val createdAt: Instant,
   val lastUpdatedBy: String,
   val lastUpdatedAt: Instant,
+  steps: List<Step>,
 ) {
+
+  /**
+   * Returns the Goal's [Step]s, ordered by their sequence number (ascending).
+   */
+  val steps: MutableList<Step>
+    get() = field.also { steps -> steps.sortBy { it.sequenceNumber } }
 
   init {
     if (steps.isEmpty()) {
       throw InvalidGoalException("Cannot create Goal with reference [$reference]. At least one Step is required.")
     }
+    this.steps = steps.toMutableList()
   }
 
+  /**
+   * Adds a [Step] to this Goal.
+   */
+  fun addStep(step: Step) =
+    steps.add(step)
+
   fun complete() {
-    status = GoalStatus.COMPLETED
+    status = COMPLETED
   }
 
   fun archive() {
-    status = GoalStatus.ARCHIVED
+    status = ARCHIVED
   }
 }
