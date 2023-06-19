@@ -1,6 +1,7 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.0"
   kotlin("plugin.spring") version "1.8.21"
+  kotlin("plugin.jpa") version "1.8.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.0"
@@ -14,6 +15,15 @@ configurations {
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
+  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+  implementation("io.github.microutils:kotlin-logging:3.0.5")
+
+  runtimeOnly("org.flywaydb:flyway-core")
+  runtimeOnly("org.postgresql:postgresql:42.6.0")
+
+  // Integration test dependencies
+  integrationTestImplementation("com.h2database:h2")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")
