@@ -1,0 +1,16 @@
+server:
+  shutdown: immediate
+
+management.endpoint:
+  health.cache.time-to-live: 0
+  info.cache.time-to-live: 0
+
+spring:
+  datasource:
+    url: 'jdbc:h2:mem:education_and_work_plan_api_db;MODE=PostgreSQL'
+    username: admin
+    password: admin_password
+
+  h2:
+    console:
+      enabled: true

@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 abstract class IntegrationTestBase {
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
