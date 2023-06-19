@@ -1,0 +1,278 @@
+openapi: 3.0.0
+info:
+  title: Education and Work Plan API
+  version: '1.0.0'
+  description: Education and Work Plan API
+  contact:
+    name: Matt Wills
+    email: matt.wills@digital.justice.gov.uk
+servers:
+  - url: 'http://localhost:3000'
+#
+# --------------------------------------------------------------------------------
+#
+paths:
+  #
+  # --------------------------------------------------------------------------------
+  # RESTful style endpoints start here
+  # --------------------------------------------------------------------------------
+  #
+
+  #
+  # Goals
+  # --------------------------------------------------------------------------------
+  '/prisoners/{prisonNumber}/action-plan':
+    parameters:
+      - name: prisonNumber
+        description: The ID of the Prisoner (confusingly not the prison) who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals.
+        schema:
+          type: string
+        example: 'A1234BC'
+        in: path
+        required: true
+    get:
+      summary: Return a Prisoner's Action Plan
+      description: Return a Prisoner's Action Plan
+      tags:
+        - Action Plan
+      responses:
+        '200':
+          $ref: '#/components/responses/ActionPlan'
+      operationId: get-action-plan-by-prison-number
+
+  '/prisoners/{prisonNumber}/action-plan/goals':
+    parameters:
+      - name: prisonNumber
+        description: The ID of the Prisoner (confusingly not the prison) who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals.
+        schema:
+          type: string
+        example: 'A1234BC'
+        in: path
+        required: true
+    post:
+      summary: Creates a Goal.
+      description: Creates a Goal and saves it to the Prisoner's Action Plan (which will be created if it doesn't already exist).
+      tags:
+        - Action Plan - Single Goal
+      responses:
+        '201':
+          $ref: '#/components/responses/Goal'
+      operationId: create-goal
+      requestBody:
+        $ref: '#/components/requestBodies/CreateGoal'
+
+#
+# --------------------------------------------------------------------------------
+#
+components:
+  #
+  # Schema and Enum Definitions
+  # --------------------------------------------------------------------------------
+  schemas:
+    ActionPlanResponse:
+      title: GoalsResponse
+      type: object
+      description: A Prisoner's Action Plan containing a list of one or more Goals.
+      properties:
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
+        goals:
+          type: array
+          description: A List of at least one or more Goals.
+          items:
+            $ref: '#/components/schemas/GoalResponse'
+      required:
+        - prisonNumber
+        - goals
+    GoalResponse:
+      title: Goal
+      type: object
+      description: An individual Goal that a Prisoner aims to complete as part of their Action Plan. The goal will be active to start with.
+      properties:
+        goalReference:
+          type: string
+          description: The Goal's unique reference
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        title:
+          type: string
+          description: A title explaining the aim of the goal.
+          example: Improve communication skills
+        reviewDate:
+          type: string
+          format: date
+          description: An ISO-8601 date representing when the Goal is up for review.
+          example: '2023-12-19'
+        status:
+          $ref: '#/components/schemas/GoalStatus'
+        steps:
+          type: array
+          description: A List of at least one Step.
+          items:
+            $ref: '#/components/schemas/StepResponse'
+        notes:
+          type: string
+          description: Some additional notes related to the Goal.
+          example: Pay close attention to Peter's behaviour.
+        createdBy:
+          type: string
+          description: The name/ID of the person who created the goal. **Note that this is a placeholder for now currently not populated.**
+          example: 'TBD'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Goal was created.
+          example: '2023-06-19T09:39:44Z'
+        updatedBy:
+          type: string
+          description: The name/ID of the person who last updated the goal. **Note that this is a placeholder for now currently not populated.**
+          example: 'TBD'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - goalReference
+        - title
+        - reviewDate
+        - status
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
+    StepResponse:
+      title: StepResponse
+      type: object
+      description: A Step within a Goal that must be completed in order for the overall Goal to be completed.
+      properties:
+        stepReference:
+          type: string
+          description: A unique reference for the Step
+          example: d38a6c41-13d1-1d05-13c2-24619966119b
+        title:
+          type: string
+          description: A title describing the step
+          example: Book communication skills course
+        targetDate:
+          type: string
+          format: date
+          description: A date by which the prisoner should aim to complete the step.
+          example: '2023-08-19'
+        status:
+          $ref: '#/components/schemas/StepStatus'
+        sequenceNumber:
+          type: integer
+          description: The number (position) of the Step within the overall Goal.
+          example: 1
+
+    CreateGoalRequest:
+      title: Goal
+      type: object
+      description: A request to create an individual Goal that a Prisoner aims to complete as part of their Action Plan. The goal's status will be set to 'ACTIVE'.
+      properties:
+        title:
+          type: string
+          description: A title explaining the aim of the goal.
+          example: Improve communication skills
+        reviewDate:
+          type: string
+          format: date
+          description: An ISO-8601 date representing when the Goal is up for review. Defaults to 6 months.
+          example: '2023-12-19'
+        steps:
+          type: array
+          description: A List of at least one Step.
+          items:
+            $ref: '#/components/schemas/CreateStepRequest'
+        notes:
+          type: string
+          description: Some additional notes related to the Goal.
+          example: Pay close attention to Peter's behaviour.
+      required:
+        - title
+        - reviewDate
+    CreateStepRequest:
+      title: CreateStepRequest
+      type: object
+      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED.
+      properties:
+        title:
+          type: string
+          description: A title describing the step
+          example: Book first aid course
+        targetDate:
+          type: string
+          format: date
+          description: A date by which the prisoner should aim to complete the step.
+          example: '2023-12-19'
+        sequenceNumber:
+          type: integer
+          description: The number (position) of the Step within the overall Goal.
+          example: 1
+
+    GoalStatus:
+      title: GoalStatus
+      description: Enum describing the various statuses of a Goal's lifecyle.
+      type: string
+      enum:
+        - ACTIVE
+        - COMPLETE
+        - ARCHIVED
+    StepStatus:
+      title: StepStatus
+      description: Enum describing the various statuses of a Step's lifecyle.
+      type: string
+      enum:
+        - NOT_STARTED
+        - ACTIVE
+        - COMPLETE
+
+  #
+  # Response Body Definitions
+  # --------------------------------------------------------------------------------
+  responses:
+    ActionPlan:
+      description: Response body containing the Goals that make up a Prisoner's Action Plan.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ActionPlanResponse'
+    Goal:
+      description: Response body containing the Goals that make up a Prisoner's Action Plan.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GoalResponse'
+
+  #
+  # Request Body Definitions
+  # --------------------------------------------------------------------------------
+  requestBodies:
+    CreateGoal:
+      description: Request body to create a single Goal.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateGoalRequest'

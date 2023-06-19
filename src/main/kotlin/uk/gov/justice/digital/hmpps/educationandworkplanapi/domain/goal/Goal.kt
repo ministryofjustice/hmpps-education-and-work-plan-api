@@ -55,4 +55,8 @@ class Goal(
   fun archive() {
     status = ARCHIVED
   }
+
+  override fun toString(): String {
+    return "Goal(reference=$reference, title='$title', reviewDate=$reviewDate, status=$status, createdBy='$createdBy', createdAt=$createdAt, lastUpdatedBy='$lastUpdatedBy', lastUpdatedAt=$lastUpdatedAt, steps=$steps)"
+  }
 }

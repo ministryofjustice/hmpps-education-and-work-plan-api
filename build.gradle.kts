@@ -1,6 +1,11 @@
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.0"
-  kotlin("plugin.spring") version "1.8.21"
+  id("org.openapi.generator") version "6.6.0"
+  kotlin("plugin.spring") version "1.8.22"
   kotlin("plugin.jpa") version "1.8.21"
 
   id("jacoco")
@@ -8,6 +13,8 @@ plugins {
 
   `java-test-fixtures`
 }
+
+apply(plugin = "org.openapi.generator")
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
@@ -24,6 +31,8 @@ dependencies {
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
+
+  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")
@@ -56,6 +65,7 @@ tasks {
 tasks.named("jar") {
   enabled = true
 }
+
 tasks.named("assemble") {
   // `assemble` task assembles the classes and dependencies into a fat jar
   // Beforehand we need to remove the plain jar and test-fixtures jars if they exist
@@ -97,5 +107,51 @@ tasks.register<JacocoReport>("combineJacocoReports") {
   sourceDirectories.setFrom(files(project.sourceSets.main.get().allSource))
   reports {
     html.required.set(true)
+  }
+}
+
+tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
+  generatorName.set("kotlin")
+  inputSpec.set("$projectDir/src/main/resources/openapi/EducationAndWorkPlanAPI.yml")
+  outputDir.set("$buildDir/generated")
+  modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.model")
+  configOptions.set(
+    mapOf(
+      "dateLibrary" to "java8",
+      "serializationLibrary" to "jackson"
+    )
+  )
+  globalProperties.set(
+    mapOf(
+      "models" to ""
+    )
+  )
+}
+
+tasks {
+  withType<KtLintCheckTask> {
+    // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
+    mustRunAfter("buildEducationAndWorkPlanModel")
+  }
+  withType<KtLintFormatTask> {
+    // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
+    mustRunAfter("buildEducationAndWorkPlanModel")
+  }
+}
+
+tasks.named("compileKotlin") {
+  dependsOn("buildEducationAndWorkPlanModel")
+}
+
+kotlin {
+  sourceSets["main"].apply {
+    kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+  }
+}
+
+// Exclude generated code from linting
+ktlint {
+  filter {
+    exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated/") }
   }
 }
