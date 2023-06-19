@@ -50,11 +50,11 @@ tasks.named("assemble") {
   // `assemble` task assembles the classes and dependencies into a fat jar
   // Beforehand we need to remove the plain jar and test-fixtures jars if they exist
   doFirst {
-    files(
+    delete(
       fileTree(project.buildDir.absolutePath)
         .include("libs/*-plain.jar")
         .include("libs/*-test-fixtures.jar")
-    ).forEach { delete(it) }
+    )
   }
 }
 
