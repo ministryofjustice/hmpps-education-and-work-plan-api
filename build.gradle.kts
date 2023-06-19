@@ -7,6 +7,7 @@ plugins {
   id("org.openapi.generator") version "6.6.0"
   kotlin("plugin.spring") version "1.8.22"
   kotlin("plugin.jpa") version "1.8.22"
+  kotlin("kapt") version "1.8.22"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.0"
@@ -15,6 +16,25 @@ plugins {
 }
 
 apply(plugin = "org.openapi.generator")
+
+ext["mapstruct.version"] = "1.5.5.Final"
+ext["postgresql.version"] = "42.6.0"
+ext["kotlin.logging.version"] = "3.0.5"
+
+allOpen {
+  annotations(
+    "javax.persistence.Entity",
+    "javax.persistence.MappedSuperclass",
+    "javax.persistence.Embeddable"
+  )
+}
+
+kapt {
+  arguments {
+    arg("mapstruct.defaultComponentModel", "spring")
+    arg("mapstruct.unmappedTargetPolicy", "IGNORE")
+  }
+}
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
@@ -26,15 +46,17 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  implementation("org.springframework.boot:spring-boot-starter-validation")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
-  implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
+  kapt("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
 
-  implementation("io.github.microutils:kotlin-logging:3.0.5")
+  implementation("io.github.microutils:kotlin-logging:${property("kotlin.logging.version")}")
 
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:42.6.0")
+  runtimeOnly("org.postgresql:postgresql:${property("postgresql.version")}")
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
