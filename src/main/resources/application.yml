@@ -63,3 +63,8 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+springdoc:
+  # swagger specification file served via /swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
+  swagger-ui:
+    url: '/openapi/EducationAndWorkPlanAPI.yml'

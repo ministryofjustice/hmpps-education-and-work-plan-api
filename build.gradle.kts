@@ -24,7 +24,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
-  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
   implementation("org.springframework.boot:spring-boot-starter-validation")
 
   implementation("io.github.microutils:kotlin-logging:3.0.5")
@@ -114,7 +115,7 @@ tasks.register<JacocoReport>("combineJacocoReports") {
 tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
   validateSpec.set(true)
   generatorName.set("kotlin-spring")
-  inputSpec.set("$projectDir/src/main/resources/openapi/EducationAndWorkPlanAPI.yml")
+  inputSpec.set("$projectDir/src/main/resources/static/openapi/EducationAndWorkPlanAPI.yml")
   outputDir.set("$buildDir/generated")
   modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model")
   configOptions.set(
