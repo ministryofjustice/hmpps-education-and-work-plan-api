@@ -51,7 +51,7 @@ paths:
         required: true
     post:
       summary: Creates a Goal.
-      description: Creates a Goal and saves it to the Prisoner's Action Plan (which will be created if it doesn't already exist).
+      description: Creates a Goal and saves it to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
       tags:
         - Action Plan - Single Goal
       responses:
@@ -139,6 +139,7 @@ components:
         - title
         - reviewDate
         - status
+        - steps
         - createdBy
         - createdAt
         - updatedBy
