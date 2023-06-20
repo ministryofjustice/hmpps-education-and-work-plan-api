@@ -6,7 +6,7 @@ plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.0"
   id("org.openapi.generator") version "6.6.0"
   kotlin("plugin.spring") version "1.8.22"
-  kotlin("plugin.jpa") version "1.8.21"
+  kotlin("plugin.jpa") version "1.8.22"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.0"
@@ -24,6 +24,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
+  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
+
   implementation("io.github.microutils:kotlin-logging:3.0.5")
 
   runtimeOnly("org.flywaydb:flyway-core")
@@ -31,8 +33,6 @@ dependencies {
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
-
-  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")
