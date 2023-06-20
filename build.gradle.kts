@@ -116,7 +116,7 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
   generatorName.set("kotlin-spring")
   inputSpec.set("$projectDir/src/main/resources/openapi/EducationAndWorkPlanAPI.yml")
   outputDir.set("$buildDir/generated")
-  modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.model")
+  modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model")
   configOptions.set(
     mapOf(
       "dateLibrary" to "java8",
