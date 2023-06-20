@@ -1,13 +1,20 @@
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.0"
-  kotlin("plugin.spring") version "1.8.21"
-  kotlin("plugin.jpa") version "1.8.21"
+  id("org.openapi.generator") version "6.6.0"
+  kotlin("plugin.spring") version "1.8.22"
+  kotlin("plugin.jpa") version "1.8.22"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.0"
 
   `java-test-fixtures`
 }
+
+apply(plugin = "org.openapi.generator")
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
@@ -16,6 +23,9 @@ configurations {
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
+  implementation("org.springframework.boot:spring-boot-starter-validation")
 
   implementation("io.github.microutils:kotlin-logging:3.0.5")
 
@@ -56,6 +66,7 @@ tasks {
 tasks.named("jar") {
   enabled = true
 }
+
 tasks.named("assemble") {
   // `assemble` task assembles the classes and dependencies into a fat jar
   // Beforehand we need to remove the plain jar and test-fixtures jars if they exist
@@ -97,5 +108,54 @@ tasks.register<JacocoReport>("combineJacocoReports") {
   sourceDirectories.setFrom(files(project.sourceSets.main.get().allSource))
   reports {
     html.required.set(true)
+  }
+}
+
+tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
+  validateSpec.set(true)
+  generatorName.set("kotlin-spring")
+  inputSpec.set("$projectDir/src/main/resources/openapi/EducationAndWorkPlanAPI.yml")
+  outputDir.set("$buildDir/generated")
+  modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.model")
+  configOptions.set(
+    mapOf(
+      "dateLibrary" to "java8",
+      "serializationLibrary" to "jackson",
+      "useBeanValidation" to "true",
+      "useSpringBoot3" to "true"
+    )
+  )
+  globalProperties.set(
+    mapOf(
+      "models" to ""
+    )
+  )
+}
+
+tasks {
+  withType<KtLintCheckTask> {
+    // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
+    mustRunAfter("buildEducationAndWorkPlanModel")
+  }
+  withType<KtLintFormatTask> {
+    // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
+    mustRunAfter("buildEducationAndWorkPlanModel")
+  }
+}
+
+tasks.named("compileKotlin") {
+  dependsOn("buildEducationAndWorkPlanModel")
+}
+
+kotlin {
+  sourceSets["main"].apply {
+    kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+  }
+}
+
+// Exclude generated code from linting
+ktlint {
+  filter {
+    exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated/") }
   }
 }
