@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus.NOT_STARTED
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -11,6 +12,8 @@ fun aValidStepEntity(
   targetDate: LocalDate = LocalDate.now().plusMonths(1),
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
+  createdAt: Instant? = Instant.now(),
+  updatedAt: Instant? = Instant.now(),
 ): StepEntity =
   StepEntity(
     id = id,
@@ -19,4 +22,6 @@ fun aValidStepEntity(
     targetDate = targetDate,
     status = status,
     sequenceNumber = sequenceNumber,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
   )

@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalCategory as EntityCategory
@@ -32,11 +33,13 @@ class GoalEntityMapperTest {
   @Test
   fun `should map from domain to entity`() {
     // Given
+    val reviewDate = LocalDate.now().plusMonths(6)
+
     val domainStep = aValidStep()
     val domainGoal = aValidGoal(
       reference = UUID.randomUUID(),
       title = "Improve communication skills",
-      reviewDate = LocalDate.now().plusMonths(6),
+      reviewDate = reviewDate,
       category = DomainCategory.PERSONAL_DEVELOPMENT,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -47,14 +50,17 @@ class GoalEntityMapperTest {
     given(stepMapper.fromDomainToEntity(any())).willReturn(expectedEntityStep)
 
     val expected = aValidGoalEntity(
-      id = null,
       reference = domainGoal.reference,
       title = "Improve communication skills",
-      reviewDate = LocalDate.now().plusMonths(6),
+      reviewDate = reviewDate,
       category = EntityCategory.PERSONAL_DEVELOPMENT,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(expectedEntityStep),
+      // JPA managed fields - expect these all to be null, implying a new db entity
+      id = null,
+      createdAt = null,
+      updatedAt = null,
     )
 
     // When
@@ -68,16 +74,22 @@ class GoalEntityMapperTest {
   @Test
   fun `should map from entity to domain`() {
     // Given
+    val createdAt = Instant.now()
+    val updatedAt = Instant.now()
+    val reviewDate = LocalDate.now().plusMonths(6)
+
     val entityStep = aValidStepEntity()
     val entityGoal = aValidGoalEntity(
       id = UUID.randomUUID(),
       reference = UUID.randomUUID(),
       title = "Improve communication skills",
-      reviewDate = LocalDate.now().plusMonths(6),
+      reviewDate = reviewDate,
       category = EntityCategory.PERSONAL_DEVELOPMENT,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(entityStep),
+      createdAt = createdAt,
+      updatedAt = updatedAt,
     )
 
     val domainStep = aValidStep()
@@ -86,11 +98,13 @@ class GoalEntityMapperTest {
     val expected = aValidGoal(
       reference = entityGoal.reference!!,
       title = "Improve communication skills",
-      reviewDate = LocalDate.now().plusMonths(6),
+      reviewDate = reviewDate,
       category = DomainCategory.PERSONAL_DEVELOPMENT,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
+      createdAt = createdAt,
+      lastUpdatedAt = updatedAt,
     )
 
     // When

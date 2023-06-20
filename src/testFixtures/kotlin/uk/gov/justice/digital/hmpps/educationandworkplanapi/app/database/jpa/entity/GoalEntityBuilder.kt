@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalCategory.PERSONAL_DEVELOPMENT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalStatus.ACTIVE
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -14,6 +15,8 @@ fun aValidGoalEntity(
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
   steps: List<StepEntity> = listOf(aValidStepEntity()),
+  createdAt: Instant? = Instant.now(),
+  updatedAt: Instant? = Instant.now(),
 ): GoalEntity =
   GoalEntity(
     id = id,
@@ -24,4 +27,6 @@ fun aValidGoalEntity(
     status = status,
     notes = notes,
     steps = steps,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
   )

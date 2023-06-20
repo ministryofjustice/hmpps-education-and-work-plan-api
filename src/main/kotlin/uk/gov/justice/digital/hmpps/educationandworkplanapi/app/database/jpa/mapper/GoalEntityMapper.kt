@@ -17,11 +17,12 @@ import java.time.Instant
 interface GoalEntityMapper {
 
   @Mapping(target = "id", expression = "java( null )")
+  @Mapping(target = "createdAt", expression = "java( null )")
+  @Mapping(target = "updatedAt", expression = "java( null )")
   fun fromDomainToEntity(goal: Goal): GoalEntity
 
   @Mapping(target = "createdBy", expression = "java( \"\" )")
-  @Mapping(target = "createdAt", expression = "java( Instant.EPOCH )")
   @Mapping(target = "lastUpdatedBy", expression = "java( \"\" )")
-  @Mapping(target = "lastUpdatedAt", expression = "java( Instant.EPOCH )")
+  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   fun fromEntityToDomain(goalEntity: GoalEntity): Goal
 }

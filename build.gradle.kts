@@ -20,6 +20,7 @@ apply(plugin = "org.openapi.generator")
 ext["mapstruct.version"] = "1.5.5.Final"
 ext["postgresql.version"] = "42.6.0"
 ext["kotlin.logging.version"] = "3.0.5"
+ext["springdoc.openapi.version"] = "2.1.0"
 
 allOpen {
   annotations(
@@ -47,7 +48,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
 
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdoc.openapi.version")}")
 
   implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
   kapt("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")

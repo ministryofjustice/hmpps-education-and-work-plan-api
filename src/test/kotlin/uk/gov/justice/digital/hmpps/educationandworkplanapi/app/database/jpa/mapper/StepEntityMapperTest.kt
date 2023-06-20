@@ -16,21 +16,26 @@ class StepEntityMapperTest {
   @Test
   fun `should map from domain to entity`() {
     // Given
+    val targetDate = LocalDate.now().plusMonths(6)
+
     val domainStep = aValidStep(
       reference = UUID.randomUUID(),
       title = "Book communication skills course",
-      targetDate = LocalDate.now().plusMonths(6),
+      targetDate = targetDate,
       status = DomainStatus.ACTIVE,
       sequenceNumber = 1,
     )
 
     val expected = aValidStepEntity(
-      id = null,
       reference = domainStep.reference,
       title = "Book communication skills course",
-      targetDate = LocalDate.now().plusMonths(6),
+      targetDate = targetDate,
       status = EntityStatus.ACTIVE,
       sequenceNumber = 1,
+      // JPA managed fields - expect these all to be null, implying a new db entity
+      id = null,
+      createdAt = null,
+      updatedAt = null,
     )
 
     // When

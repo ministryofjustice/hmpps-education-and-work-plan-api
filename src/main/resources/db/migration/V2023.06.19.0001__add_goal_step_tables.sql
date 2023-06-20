@@ -6,7 +6,9 @@ CREATE TABLE goal
     review_date DATE         NOT NULL,
     category    VARCHAR(50)  NOT NULL,
     status      VARCHAR(50)  NOT NULL,
-    notes       TEXT
+    notes       TEXT,
+    created_at  TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+    updated_at  TIMESTAMP(3) WITH TIME ZONE NOT NULL
 );
 
 CREATE UNIQUE INDEX goal_reference_idx ON goal
@@ -24,6 +26,9 @@ CREATE TABLE step
     target_date     DATE         NOT NULL,
     status          VARCHAR(50)  NOT NULL,
     sequence_number SMALLINT     NOT NULL,
+    created_at      TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+    updated_at      TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+
     CONSTRAINT fk_goalSteps FOREIGN KEY (goal_id) REFERENCES goal(id)
 );
 

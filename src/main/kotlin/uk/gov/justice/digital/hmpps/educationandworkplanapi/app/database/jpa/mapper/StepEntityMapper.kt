@@ -14,6 +14,8 @@ import java.time.Instant
 interface StepEntityMapper {
 
   @Mapping(target = "id", expression = "java( null )")
+  @Mapping(target = "createdAt", expression = "java( null )")
+  @Mapping(target = "updatedAt", expression = "java( null )")
   fun fromDomainToEntity(step: Step): StepEntity
 
   fun fromEntityToDomain(stepEntity: StepEntity): Step

@@ -9,8 +9,12 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -20,23 +24,29 @@ class GoalEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
+  @NotNull
   var id: UUID? = null,
 
   @Column
+  @NotNull
   var reference: UUID? = null,
 
   @Column
+  @NotNull
   var title: String? = null,
 
   @Column
+  @NotNull
   var reviewDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
+  @NotNull
   var category: GoalCategory? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
+  @NotNull
   var status: GoalStatus? = null,
 
   @Column
@@ -44,7 +54,18 @@ class GoalEntity(
 
   @OneToMany
   @JoinColumn(name = "goal_id")
+  @NotNull
   var steps: List<StepEntity>? = null,
+
+  @Column
+  @CreationTimestamp
+  @NotNull
+  var createdAt: Instant? = null,
+
+  @Column
+  @UpdateTimestamp
+  @NotNull
+  var updatedAt: Instant? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {

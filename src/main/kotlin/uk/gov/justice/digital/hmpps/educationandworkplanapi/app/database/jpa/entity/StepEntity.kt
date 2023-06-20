@@ -7,8 +7,12 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -18,23 +22,39 @@ class StepEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
+  @NotNull
   var id: UUID? = null,
 
   @Column
+  @NotNull
   var reference: UUID? = null,
 
   @Column
+  @NotNull
   var title: String? = null,
 
   @Column
+  @NotNull
   var targetDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
+  @NotNull
   var status: StepStatus? = null,
 
   @Column
+  @NotNull
   var sequenceNumber: Int? = null,
+
+  @Column
+  @CreationTimestamp
+  @NotNull
+  var createdAt: Instant? = null,
+
+  @Column
+  @UpdateTimestamp
+  @NotNull
+  var updatedAt: Instant? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {
