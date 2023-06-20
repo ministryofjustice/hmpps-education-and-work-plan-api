@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
@@ -37,8 +38,10 @@ class JpaGoalPersistenceAdapterTest {
     given(goalRepository.save(any<GoalEntity>())).willReturn(entityGoal)
     given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
+    val prisonNumber = aValidPrisonNumber()
+
     // When
-    val actual = persistenceAdapter.saveGoal(domainGoal)
+    val actual = persistenceAdapter.saveGoal(domainGoal, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(domainGoal)

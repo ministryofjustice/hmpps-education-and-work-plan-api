@@ -14,9 +14,11 @@ fun aValidGoalEntity(
   category: GoalCategory = PERSONAL_DEVELOPMENT,
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
-  steps: List<StepEntity> = listOf(aValidStepEntity()),
+  steps: MutableList<StepEntity> = mutableListOf(aValidStepEntity()),
   createdAt: Instant? = Instant.now(),
+  createdBy: String? = "a.user.id",
   updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "another.user.id",
 ): GoalEntity =
   GoalEntity(
     id = id,
@@ -28,5 +30,7 @@ fun aValidGoalEntity(
     notes = notes,
     steps = steps,
     createdAt = createdAt,
+    createdBy = createdBy,
     updatedAt = updatedAt,
+    updatedBy = updatedBy,
   )

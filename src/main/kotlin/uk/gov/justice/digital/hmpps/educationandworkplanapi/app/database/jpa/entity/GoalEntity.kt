@@ -14,6 +14,8 @@ import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
+import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.LastModifiedBy
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -27,7 +29,7 @@ class GoalEntity(
   @NotNull
   var id: UUID? = null,
 
-  @Column
+  @Column(updatable = false)
   @NotNull
   var reference: UUID? = null,
 
@@ -55,17 +57,27 @@ class GoalEntity(
   @OneToMany
   @JoinColumn(name = "goal_id")
   @NotNull
-  var steps: List<StepEntity>? = null,
+  var steps: MutableList<StepEntity>? = null,
 
-  @Column
+  @Column(updatable = false)
   @CreationTimestamp
   @NotNull
   var createdAt: Instant? = null,
+
+  @Column(updatable = false)
+  @CreatedBy
+  @NotNull
+  var createdBy: String? = null,
 
   @Column
   @UpdateTimestamp
   @NotNull
   var updatedAt: Instant? = null,
+
+  @Column
+  @LastModifiedBy
+  @NotNull
+  var updatedBy: String? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {

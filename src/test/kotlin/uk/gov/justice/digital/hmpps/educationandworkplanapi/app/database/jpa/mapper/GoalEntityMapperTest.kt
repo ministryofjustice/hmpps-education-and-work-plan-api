@@ -44,6 +44,10 @@ class GoalEntityMapperTest {
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
+      createdBy = "a.user.id",
+      createdAt = Instant.now(),
+      lastUpdatedBy = "another.user.id",
+      lastUpdatedAt = Instant.now(),
     )
 
     val expectedEntityStep = aValidStepEntity()
@@ -56,11 +60,13 @@ class GoalEntityMapperTest {
       category = EntityCategory.PERSONAL_DEVELOPMENT,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
-      steps = listOf(expectedEntityStep),
+      steps = mutableListOf(expectedEntityStep),
       // JPA managed fields - expect these all to be null, implying a new db entity
       id = null,
       createdAt = null,
+      createdBy = null,
       updatedAt = null,
+      updatedBy = null,
     )
 
     // When
@@ -87,9 +93,11 @@ class GoalEntityMapperTest {
       category = EntityCategory.PERSONAL_DEVELOPMENT,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
-      steps = listOf(entityStep),
+      steps = mutableListOf(entityStep),
       createdAt = createdAt,
+      createdBy = "a.user.id",
       updatedAt = updatedAt,
+      updatedBy = "another.user.id",
     )
 
     val domainStep = aValidStep()
@@ -104,7 +112,9 @@ class GoalEntityMapperTest {
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
       createdAt = createdAt,
+      createdBy = "a.user.id",
       lastUpdatedAt = updatedAt,
+      lastUpdatedBy = "another.user.id",
     )
 
     // When

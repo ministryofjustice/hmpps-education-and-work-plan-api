@@ -16,13 +16,10 @@ import java.time.Instant
 )
 interface GoalEntityMapper {
 
-  @Mapping(target = "id", expression = "java( null )")
-  @Mapping(target = "createdAt", expression = "java( null )")
-  @Mapping(target = "updatedAt", expression = "java( null )")
+  @DoNotMapEntityJpaManagedFieldsFromDomain
   fun fromDomainToEntity(goal: Goal): GoalEntity
 
-  @Mapping(target = "createdBy", expression = "java( \"\" )")
-  @Mapping(target = "lastUpdatedBy", expression = "java( \"\" )")
+  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   fun fromEntityToDomain(goalEntity: GoalEntity): Goal
 }

@@ -13,7 +13,9 @@ fun aValidStepEntity(
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
   createdAt: Instant? = Instant.now(),
+  createdBy: String? = "a.user.id",
   updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "another.user.id",
 ): StepEntity =
   StepEntity(
     id = id,
@@ -23,5 +25,7 @@ fun aValidStepEntity(
     status = status,
     sequenceNumber = sequenceNumber,
     createdAt = createdAt,
+    createdBy = createdBy,
     updatedAt = updatedAt,
+    updatedBy = updatedBy,
   )

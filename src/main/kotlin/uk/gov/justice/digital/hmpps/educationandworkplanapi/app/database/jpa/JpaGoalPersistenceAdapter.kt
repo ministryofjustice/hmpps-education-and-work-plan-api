@@ -11,7 +11,7 @@ class JpaGoalPersistenceAdapter(
   private val goalRepository: GoalRepository,
   private val goalMapper: GoalEntityMapper,
 ) : GoalPersistenceAdapter {
-  override fun saveGoal(goal: Goal): Goal {
+  override fun saveGoal(goal: Goal, prisonNumber: String): Goal {
     var entity = goalMapper.fromDomainToEntity(goal)
     entity = goalRepository.save(entity)
     return goalMapper.fromEntityToDomain(entity)

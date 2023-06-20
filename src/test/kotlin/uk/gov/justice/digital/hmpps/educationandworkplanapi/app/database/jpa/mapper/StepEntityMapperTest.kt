@@ -35,7 +35,9 @@ class StepEntityMapperTest {
       // JPA managed fields - expect these all to be null, implying a new db entity
       id = null,
       createdAt = null,
+      createdBy = null,
       updatedAt = null,
+      updatedBy = null,
     )
 
     // When
