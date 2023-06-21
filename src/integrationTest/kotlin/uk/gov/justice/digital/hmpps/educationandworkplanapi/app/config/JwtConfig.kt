@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
