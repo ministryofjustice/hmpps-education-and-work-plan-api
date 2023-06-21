@@ -2,7 +2,11 @@
 CREATE TABLE action_plan
 (
     id            VARCHAR(36)  PRIMARY KEY,
-    prison_number VARCHAR(10) NOT NULL
+    prison_number VARCHAR(10) NOT NULL,
+    created_at    TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+    created_by    VARCHAR(50)  NOT NULL,
+    updated_at    TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+    updated_by    VARCHAR(50)  NOT NULL
 );
 
 CREATE UNIQUE INDEX action_plan_prison_number_idx ON action_plan
