@@ -8,18 +8,20 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.mapper.ActionPlanDomainMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.mapper.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 
 @RestController
 @RequestMapping(value = ["/action-plans"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class ActionPlanController(
   private val actionPlanService: ActionPlanService,
-  private val actionPlanDomainMapper: ActionPlanDomainMapper,
+  private val actionPlanResourceMapper: ActionPlanResourceMapper,
 ) {
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   fun getActionPlan(@PathVariable prisonNumber: String): ActionPlanResponse =
-    actionPlanDomainMapper.fromDomainToModel(actionPlanService.getActionPlan(prisonNumber))
+    with(actionPlanService.getActionPlan(prisonNumber)) {
+      actionPlanResourceMapper.fromDomainToModel(this)
+    }
 }

@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Mapper(
   uses = [
-    StepDomainMapper::class,
+    StepResourceMapper::class,
     InstantMapper::class,
   ],
   imports = [
@@ -18,7 +18,7 @@ import java.util.UUID
     UUID::class,
   ],
 )
-interface GoalDomainMapper {
+interface GoalResourceMapper {
   @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
   @Mapping(target = "status", constant = "ACTIVE")
   fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal

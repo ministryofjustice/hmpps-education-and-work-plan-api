@@ -23,13 +23,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalC
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus as GoalStatusApi
 
 @ExtendWith(MockitoExtension::class)
-internal class GoalDomainMapperTest {
+internal class GoalResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: GoalDomainMapperImpl
+  private lateinit var mapper: GoalResourceMapperImpl
 
   @Mock
-  private lateinit var stepMapper: StepDomainMapper
+  private lateinit var stepMapper: StepResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper

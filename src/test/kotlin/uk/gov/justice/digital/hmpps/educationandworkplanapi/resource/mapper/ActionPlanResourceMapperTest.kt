@@ -14,12 +14,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
 
 @ExtendWith(MockitoExtension::class)
-internal class ActionPlanDomainMapperTest {
+internal class ActionPlanResourceMapperTest {
   @InjectMocks
-  private lateinit var mapper: ActionPlanDomainMapperImpl
+  private lateinit var mapper: ActionPlanResourceMapperImpl
 
   @Mock
-  private lateinit var goalMapper: GoalDomainMapper
+  private lateinit var goalMapper: GoalResourceMapper
 
   @Test
   fun `should map from domain to model`() {

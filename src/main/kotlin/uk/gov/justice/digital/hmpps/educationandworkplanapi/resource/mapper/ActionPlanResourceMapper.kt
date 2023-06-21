@@ -6,9 +6,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 
 @Mapper(
   uses = [
-    GoalDomainMapper::class,
+    GoalResourceMapper::class,
   ],
 )
-interface ActionPlanDomainMapper {
+interface ActionPlanResourceMapper {
   fun fromDomainToModel(actionPlan: ActionPlan): ActionPlanResponse
 }

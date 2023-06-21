@@ -12,7 +12,7 @@ import java.util.UUID
     UUID::class,
   ],
 )
-interface StepDomainMapper {
+interface StepResourceMapper {
   @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
   @Mapping(target = "status", constant = "NOT_STARTED")
   fun fromModelToDomain(createStepRequest: CreateStepRequest): Step

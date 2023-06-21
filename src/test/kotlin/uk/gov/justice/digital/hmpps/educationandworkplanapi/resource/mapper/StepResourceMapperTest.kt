@@ -12,10 +12,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus as StepStatusApi
 
 @ExtendWith(MockitoExtension::class)
-internal class StepDomainMapperTest {
+internal class StepResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: StepDomainMapperImpl
+  private lateinit var mapper: StepResourceMapperImpl
 
   @Test
   fun `should map from model to domain`() {
