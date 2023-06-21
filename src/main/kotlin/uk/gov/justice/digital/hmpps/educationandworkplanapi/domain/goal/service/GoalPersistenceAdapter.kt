@@ -14,6 +14,10 @@ interface GoalPersistenceAdapter {
 
   /**
    * Saves the [Goal] for the prisoner identified by their prison number.
+   *
+   * It is up to the implementation to determine whether to save a new entity or update an existing entity, as this logic
+   * is not a concern of the domain, but likely to be a concern/implementation detail of the underlying persistence
+   * technology.
    */
   fun saveGoal(goal: Goal, prisonNumber: String): Goal
 }

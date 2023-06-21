@@ -8,3 +8,6 @@ import org.mapstruct.Mapping
 @Mapping(target = "updatedAt", ignore = true)
 @Mapping(target = "updatedBy", ignore = true)
 annotation class ExcludeJpaManagedFields
+
+@Mapping(target = "reference", ignore = true)
+annotation class ExcludeReferenceField

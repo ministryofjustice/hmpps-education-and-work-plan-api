@@ -3,7 +3,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus as EntityStatus
@@ -72,5 +74,45 @@ class StepEntityMapperTest {
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+  }
+
+  @Test
+  fun `should update entity from domain without updating JPA managed fields`() {
+    // Given
+    val id = UUID.randomUUID()
+    val createdAt = Instant.now().minusSeconds(60)
+    val createdBy = "a.user.id"
+    val updatedAt = Instant.now()
+    val updatedBy = "another.user.id"
+
+    val existingEntity = aValidStepEntity(
+      id = id,
+      createdAt = createdAt,
+      createdBy = createdBy,
+      updatedAt = updatedAt,
+      updatedBy = updatedBy,
+      title = "Improve communication skills",
+      targetDate = LocalDate.now().plusMonths(6),
+    )
+
+    val updateTitle = "Improve communication skills within 3 months"
+    val updatedTargetDate = LocalDate.now().plusMonths(3)
+    val domainGoal = aValidStep(
+      title = updateTitle,
+      targetDate = updatedTargetDate,
+    )
+
+    // When
+    val actual = mapper.updateEntityFromDomain(existingEntity, domainGoal)
+
+    // Then
+    assertThat(actual)
+      .hasId(id)
+      .wasCreatedBy(createdBy)
+      .wasCreatedAt(createdAt)
+      .wasUpdatedBy(updatedBy)
+      .wasUpdatedAt(updatedAt)
+      .hasTitle(updateTitle)
+      .hasTargetDate(updatedTargetDate)
   }
 }
