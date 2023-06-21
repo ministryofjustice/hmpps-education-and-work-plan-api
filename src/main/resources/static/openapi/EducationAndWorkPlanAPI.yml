@@ -21,10 +21,10 @@ paths:
   #
   # Goals
   # --------------------------------------------------------------------------------
-  '/prisoners/{prisonNumber}/action-plan':
+  '/action-plan/{prisonNumber}':
     parameters:
       - name: prisonNumber
-        description: The ID of the Prisoner who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals.
+        description: The number of the Prisoner who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals. The prisonNumber is the unique identifier of the Action Plan.
         schema:
           type: string
         example: 'A1234BC'
@@ -42,10 +42,10 @@ paths:
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-action-plan-by-prison-number
 
-  '/prisoners/{prisonNumber}/action-plan/goals':
+  '/action-plan/{prisonNumber}/goals':
     parameters:
       - name: prisonNumber
-        description: The ID of the Prisoner who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals.
+        description: The number of the Prisoner who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals. The prisonNumber is the unique identifier of the Action Plan.
         schema:
           type: string
         example: 'A1234BC'
