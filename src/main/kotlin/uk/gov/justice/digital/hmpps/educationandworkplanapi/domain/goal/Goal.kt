@@ -22,10 +22,10 @@ class Goal(
   val category: GoalCategory,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
-  val createdBy: String,
-  val createdAt: Instant,
-  val lastUpdatedBy: String,
-  val lastUpdatedAt: Instant,
+  val createdBy: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedAt: Instant?,
   steps: List<Step>,
 ) {
 
