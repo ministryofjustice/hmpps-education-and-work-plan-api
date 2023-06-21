@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
@@ -14,12 +15,14 @@ import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
 @Table(name = "step")
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 class StepEntity(
   @Id
   @GeneratedValue
