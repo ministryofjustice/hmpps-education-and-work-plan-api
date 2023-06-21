@@ -7,4 +7,4 @@ import org.mapstruct.Mapping
 @Mapping(target = "createdBy", ignore = true)
 @Mapping(target = "updatedAt", ignore = true)
 @Mapping(target = "updatedBy", ignore = true)
-annotation class DoNotMapEntityJpaManagedFieldsFromDomain
+annotation class ExcludeJpaManagedFields

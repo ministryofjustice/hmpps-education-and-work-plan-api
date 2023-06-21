@@ -16,7 +16,7 @@ import java.time.Instant
 )
 interface GoalEntityMapper {
 
-  @DoNotMapEntityJpaManagedFieldsFromDomain
+  @ExcludeJpaManagedFields
   fun fromDomainToEntity(goal: Goal): GoalEntity
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")

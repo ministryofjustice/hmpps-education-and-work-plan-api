@@ -12,7 +12,7 @@ import java.time.Instant
 )
 interface StepEntityMapper {
 
-  @DoNotMapEntityJpaManagedFieldsFromDomain
+  @ExcludeJpaManagedFields
   fun fromDomainToEntity(step: Step): StepEntity
 
   fun fromEntityToDomain(stepEntity: StepEntity): Step
