@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 interface GoalPersistenceAdapter {
 
   /**
-   * Creates a [Goal].
+   * Saves the [Goal] for the prisoner identified by their prison number.
    */
-  fun saveGoal(goal: Goal): Goal
+  fun saveGoal(goal: Goal, prisonNumber: String): Goal
 }

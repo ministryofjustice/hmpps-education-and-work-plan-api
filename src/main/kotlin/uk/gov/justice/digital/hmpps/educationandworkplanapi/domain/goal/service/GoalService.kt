@@ -16,6 +16,9 @@ class GoalService(
   private val persistenceAdapter: GoalPersistenceAdapter,
 ) {
 
-  fun saveGoal(goal: Goal): Goal =
-    persistenceAdapter.saveGoal(goal)
+  /**
+   * Saves the [Goal] for the prisoner identified by their prison number.
+   */
+  fun saveGoal(goal: Goal, prisonNumber: String): Goal =
+    persistenceAdapter.saveGoal(goal, prisonNumber)
 }

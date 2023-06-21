@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 
 @ExtendWith(MockitoExtension::class)
@@ -19,15 +20,17 @@ class GoalServiceTest {
   private lateinit var persistenceAdapter: GoalPersistenceAdapter
 
   @Test
-  fun `should create goal`() {
+  fun `should save goal for a prison number`() {
     // Given
     val goal = aValidGoal()
-    given(persistenceAdapter.saveGoal(any())).willReturn(goal)
+    given(persistenceAdapter.saveGoal(any(), any())).willReturn(goal)
+
+    val prisonNumber = aValidPrisonNumber()
 
     // When
-    service.saveGoal(goal)
+    service.saveGoal(goal, prisonNumber)
 
     // Then
-    verify(persistenceAdapter).saveGoal(goal)
+    verify(persistenceAdapter).saveGoal(goal, prisonNumber)
   }
 }
