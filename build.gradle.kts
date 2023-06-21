@@ -148,7 +148,8 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
       "dateLibrary" to "java8",
       "serializationLibrary" to "jackson",
       "useBeanValidation" to "true",
-      "useSpringBoot3" to "true"
+      "useSpringBoot3" to "true",
+      "enumPropertyNaming" to "UPPERCASE"
     )
   )
   globalProperties.set(

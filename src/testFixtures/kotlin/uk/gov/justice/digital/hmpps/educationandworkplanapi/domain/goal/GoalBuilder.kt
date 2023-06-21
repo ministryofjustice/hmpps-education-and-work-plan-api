@@ -14,10 +14,10 @@ fun aValidGoal(
   steps: List<Step> = listOf(aValidStep(), anotherValidStep()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
-  createdBy: String = "",
-  createdAt: Instant = Instant.now(),
-  lastUpdatedBy: String = "",
-  lastUpdatedAt: Instant = Instant.now(),
+  createdBy: String? = "",
+  createdAt: Instant? = Instant.now(),
+  lastUpdatedBy: String? = "",
+  lastUpdatedAt: Instant? = Instant.now(),
 ): Goal =
   Goal(
     reference = reference,
