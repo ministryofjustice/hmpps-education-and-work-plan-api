@@ -18,7 +18,7 @@ fun aValidCreateGoalRequest(
   )
 
 fun anotherValidCreateGoalRequest(
-  title: String = "Learn French",
+  title: String = "Learn bricklaying",
   reviewDate: LocalDate = LocalDate.now().plusMonths(6),
   category: GoalCategory = GoalCategory.WORK,
   steps: List<CreateStepRequest> = listOf(aValidCreateStepRequest("Attend in house bricklaying course")),
