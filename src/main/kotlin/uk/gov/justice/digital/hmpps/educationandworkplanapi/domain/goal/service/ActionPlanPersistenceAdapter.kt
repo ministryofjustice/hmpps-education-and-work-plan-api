@@ -12,5 +12,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPl
  */
 interface ActionPlanPersistenceAdapter {
 
-  fun getActionPlan(prisonNumber: String): ActionPlan
+  /**
+   * Returns an [ActionPlan] if found, otherwise `null`.
+   */
+  fun getActionPlan(prisonNumber: String): ActionPlan?
 }
