@@ -30,6 +30,7 @@ class ResourceServerConfiguration {
           "/v3/api-docs/**",
           "/swagger-ui/**",
           "/swagger-ui.html",
+          "/openapi/**",
           "/h2-console/**",
         ).forEach { authorize(it, permitAll) }
         authorize(anyRequest, authenticated)

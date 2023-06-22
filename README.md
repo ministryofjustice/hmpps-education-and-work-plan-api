@@ -40,4 +40,5 @@ The easiest (and slowest) way to run the app is to use docker compose to create 
 
 `docker-compose up`
 
-See `http://localhost:8080/health` to check the app is running.
+* See `http://localhost:8081/health` to check the app is running.
+* See `http://localhost:8081/swagger-ui/index.html?configUrl=/v3/api-docs` to explore the OpenAPI spec document.
