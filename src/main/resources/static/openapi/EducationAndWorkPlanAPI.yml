@@ -81,30 +81,25 @@ components:
         A generic response body object describing errors in a web request, and can be used to communicate several
         different types of error condition such as (but not limited to) `400 BAD REQUEST`, `409 CONFLICT` etc.
       properties:
-        timestamp:
-          type: string
-          format: date-time
-          example: '2022-09-28T18:01:42.105Z'
         status:
+          description: The HTTP status code.
           type: integer
           example: 400
-        error:
+        errorCode:
+          description: An optional application specific error code.
           type: string
-          example: 'Bad Request'
-        message:
+        userMessage:
+          description: An optional human readable description of the error.
           type: string
-          example: 'Validation failed for object=createGoalRequest. Error count: 1'
-        validationErrors:
-          description: Validation errors are only present if the error being described is a `400 BAD REQUEST`.
-          type: array
-          items:
-            type: string
-          example: 'Error on field goal.reviewDate: rejected value [2023-06-01] cannot be in the past'
+          example: 'No Action Plan found for prisoner [A1234BC]'
+        developerMessage:
+          description: An optional error message that may have more technical information for developers.
+          type: string
+        moreInfo:
+          description: Optional more detailed information about the error.
+          type: string
       required:
-        - timestamp
         - status
-        - error
-        - message
     ActionPlanResponse:
       title: ActionPlanResponse
       type: object
@@ -313,11 +308,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
-            timestamp: '2023-06-20T18:01:42.105Z'
             status: 400
-            error: 'Bad Request'
-            message: 'Validation failed for object=createGoalRequest. Error count: 1'
-            validationErrors: 'Error on field goal.reviewDate: rejected value [2023-06-01] cannot be in the past'
+            userMessage: 'Error on field goal.reviewDate: rejected value [2023-06-01] cannot be in the past'
     404ErrorResponse:
       description: |
         Error response for a HTTP 404 describing the problem with the request.
@@ -336,10 +328,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
-            timestamp: '2023-06-20T18:01:42.105Z'
             status: 404
-            error: 'Not Found'
-            message: 'The prisoner with prisonNumber=[A1234BC] not found'
+            userMessage: 'The prisoner with prisonNumber=[A1234BC] not found'
     409ErrorResponse:
       description: |
         Error response for a HTTP 409 describing the problem with the request.
@@ -358,10 +348,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
           example:
-            timestamp: '2022-09-28T18:01:42.105Z'
             status: 409
-            error: 'Conflict'
-            message: 'A Goal with reference [c88a6c48-97e2-4c04-93b5-98619966447b] has an unexpected status = ARCHIVED'
+            userMessage: 'A Goal with reference [c88a6c48-97e2-4c04-93b5-98619966447b] has an unexpected status = ARCHIVED'
     ActionPlan:
       description: Response body containing the Goals that make up a Prisoner's Action Plan.
       headers:
