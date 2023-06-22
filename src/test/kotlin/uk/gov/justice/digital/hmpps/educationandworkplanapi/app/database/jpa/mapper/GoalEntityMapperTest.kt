@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
-import org.mockito.Spy
+import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
@@ -28,8 +28,8 @@ class GoalEntityMapperTest {
   @InjectMocks
   private lateinit var mapper: GoalEntityMapperImpl
 
-  @Spy
-  private val stepMapper = StepEntityMapperImpl()
+  @Mock
+  private lateinit var stepMapper: StepEntityMapper
 
   @Test
   fun `should map from domain to entity`() {
