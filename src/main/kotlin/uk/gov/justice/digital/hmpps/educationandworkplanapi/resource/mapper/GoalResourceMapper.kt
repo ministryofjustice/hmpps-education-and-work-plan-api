@@ -21,6 +21,10 @@ import java.util.UUID
 interface GoalResourceMapper {
   @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
   @Mapping(target = "status", constant = "ACTIVE")
+  @Mapping(target = "createdBy", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "lastUpdatedBy", ignore = true)
+  @Mapping(target = "lastUpdatedAt", ignore = true)
   fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal
 
   @Mapping(target = "goalReference", source = "reference")
