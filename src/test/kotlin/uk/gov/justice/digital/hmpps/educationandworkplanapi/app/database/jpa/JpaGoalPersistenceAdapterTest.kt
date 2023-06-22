@@ -10,11 +10,13 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.GoalRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class JpaGoalPersistenceAdapterTest {
@@ -23,30 +25,80 @@ class JpaGoalPersistenceAdapterTest {
   private lateinit var persistenceAdapter: JpaGoalPersistenceAdapter
 
   @Mock
-  private lateinit var goalRepository: GoalRepository
+  private lateinit var actionPlanRepository: ActionPlanRepository
 
   @Mock
   private lateinit var goalMapper: GoalEntityMapper
 
   @Test
-  fun `should save goal`() {
+  fun `should create goal given action plan does not already exist`() {
     // Given
-    val domainGoal = aValidGoal()
+    val prisonNumber = aValidPrisonNumber()
+    val reference = UUID.randomUUID()
+    val domainGoal = aValidGoal(
+      reference = reference,
+    )
 
-    val entityGoal = aValidGoalEntity()
+    given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
+
+    val entityGoal = aValidGoalEntity(
+      reference = reference,
+    )
     given(goalMapper.fromDomainToEntity(any())).willReturn(entityGoal)
-    given(goalRepository.save(any<GoalEntity>())).willReturn(entityGoal)
+
+    val actionPlanEntity = aValidActionPlanEntity(
+      prisonNumber = prisonNumber,
+      goals = mutableListOf(entityGoal),
+    )
+    given(actionPlanRepository.saveAndFlush(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
+
     given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
-    val prisonNumber = aValidPrisonNumber()
-
     // When
-    val actual = persistenceAdapter.saveGoal(domainGoal, prisonNumber)
+    val actual = persistenceAdapter.createGoal(domainGoal, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(domainGoal)
+    verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
     verify(goalMapper).fromDomainToEntity(domainGoal)
-    verify(goalRepository).save(entityGoal)
+    verify(goalMapper).fromEntityToDomain(entityGoal)
+  }
+
+  @Test
+  fun `should create goal given action plan already exists`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val reference = UUID.randomUUID()
+    val domainGoal = aValidGoal(
+      reference = reference,
+    )
+
+    val initialActionPlan = aValidActionPlanEntity(
+      prisonNumber = prisonNumber,
+      goals = mutableListOf(),
+    )
+    given(actionPlanRepository.findByPrisonNumber(any())).willReturn(initialActionPlan)
+
+    val entityGoal = aValidGoalEntity(
+      reference = reference,
+    )
+    given(goalMapper.fromDomainToEntity(any())).willReturn(entityGoal)
+
+    val actionPlanEntity = aValidActionPlanEntity(
+      prisonNumber = prisonNumber,
+      goals = mutableListOf(entityGoal),
+    )
+    given(actionPlanRepository.saveAndFlush(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
+
+    given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
+
+    // When
+    val actual = persistenceAdapter.createGoal(domainGoal, prisonNumber)
+
+    // Then
+    assertThat(actual).isEqualTo(domainGoal)
+    verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+    verify(goalMapper).fromDomainToEntity(domainGoal)
     verify(goalMapper).fromEntityToDomain(entityGoal)
   }
 }

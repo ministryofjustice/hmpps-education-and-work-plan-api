@@ -11,6 +11,7 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import java.time.Instant

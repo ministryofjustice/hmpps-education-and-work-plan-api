@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -57,7 +58,7 @@ class GoalEntity(
   @Column
   var notes: String? = null,
 
-  @OneToMany
+  @OneToMany(cascade = [CascadeType.ALL])
   @JoinColumn(name = "goal_id")
   @NotNull
   var steps: MutableList<StepEntity>? = null,

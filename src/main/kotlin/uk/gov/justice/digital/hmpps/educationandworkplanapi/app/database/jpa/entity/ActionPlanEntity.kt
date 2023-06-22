@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -33,7 +34,7 @@ class ActionPlanEntity(
   @NotNull
   var prisonNumber: String? = null,
 
-  @OneToMany
+  @OneToMany(cascade = [CascadeType.ALL])
   @JoinColumn(name = "action_plan_id")
   @NotNull
   var goals: MutableList<GoalEntity>? = null,
@@ -58,6 +59,30 @@ class ActionPlanEntity(
   @NotNull
   var updatedBy: String? = null,
 ) {
+
+  companion object {
+
+    /**
+     * Returns new un-persisted [ActionPlanEntity] for the specified prisoner with an empty collection of [GoalEntity]s
+     */
+    fun newActionPlanForPrisoner(prisonNumber: String): ActionPlanEntity =
+      ActionPlanEntity(prisonNumber = prisonNumber, goals = mutableListOf())
+  }
+
+  /**
+   * Returns the [GoalEntity] identified by its reference from this [ActionPlanEntity] instance.
+   * Returns null if the Goal Entity cannot be found.
+   */
+  fun getGoalByReference(goalReference: UUID): GoalEntity? =
+    goals?.find { it.reference == goalReference }
+
+  /**
+   * Adds a [GoalEntity] to this [ActionPlanEntity]
+   */
+  fun addGoal(goalEntity: GoalEntity): ActionPlanEntity {
+    goals!!.add(goalEntity)
+    return this
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

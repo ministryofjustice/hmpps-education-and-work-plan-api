@@ -20,17 +20,17 @@ class GoalServiceTest {
   private lateinit var persistenceAdapter: GoalPersistenceAdapter
 
   @Test
-  fun `should save goal for a prison number`() {
+  fun `should create new goal for a prison number`() {
     // Given
     val goal = aValidGoal()
-    given(persistenceAdapter.saveGoal(any(), any())).willReturn(goal)
+    given(persistenceAdapter.createGoal(any(), any())).willReturn(goal)
 
     val prisonNumber = aValidPrisonNumber()
 
     // When
-    service.saveGoal(goal, prisonNumber)
+    service.createGoal(goal, prisonNumber)
 
     // Then
-    verify(persistenceAdapter).saveGoal(goal, prisonNumber)
+    verify(persistenceAdapter).createGoal(goal, prisonNumber)
   }
 }
