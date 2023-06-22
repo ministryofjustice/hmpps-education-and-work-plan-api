@@ -31,7 +31,7 @@ class JpaGoalPersistenceAdapterTest {
   private lateinit var goalMapper: GoalEntityMapper
 
   @Test
-  fun `should save goal given action plan does not already exist`() {
+  fun `should create goal given action plan does not already exist`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val reference = UUID.randomUUID()
@@ -55,7 +55,7 @@ class JpaGoalPersistenceAdapterTest {
     given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
     // When
-    val actual = persistenceAdapter.saveGoal(domainGoal, prisonNumber)
+    val actual = persistenceAdapter.createGoal(domainGoal, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(domainGoal)
@@ -65,7 +65,7 @@ class JpaGoalPersistenceAdapterTest {
   }
 
   @Test
-  fun `should save goal given action plan already exists`() {
+  fun `should create goal given action plan already exists`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val reference = UUID.randomUUID()
@@ -93,55 +93,12 @@ class JpaGoalPersistenceAdapterTest {
     given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
     // When
-    val actual = persistenceAdapter.saveGoal(domainGoal, prisonNumber)
+    val actual = persistenceAdapter.createGoal(domainGoal, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(domainGoal)
     verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
     verify(goalMapper).fromDomainToEntity(domainGoal)
     verify(goalMapper).fromEntityToDomain(entityGoal)
-  }
-
-  @Test
-  fun `should save goal given goal already exists on action plan`() {
-    // Given
-    val prisonNumber = aValidPrisonNumber()
-    val reference = UUID.randomUUID()
-
-    val entityGoal = aValidGoalEntity(
-      title = "Initial goal title",
-      reference = reference,
-    )
-    val initialActionPlan = aValidActionPlanEntity(
-      prisonNumber = prisonNumber,
-      goals = mutableListOf(entityGoal),
-    )
-    given(actionPlanRepository.findByPrisonNumber(any())).willReturn(initialActionPlan)
-
-    val updatedEntityGoal = aValidGoalEntity(
-      title = "Updated goal title",
-      reference = reference,
-    )
-    val actionPlanEntity = aValidActionPlanEntity(
-      prisonNumber = prisonNumber,
-      goals = mutableListOf(updatedEntityGoal),
-    )
-    given(actionPlanRepository.saveAndFlush(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
-
-    val updatedDomainGoal = aValidGoal(
-      title = "Updated goal title",
-      reference = reference,
-    )
-
-    given(goalMapper.fromEntityToDomain(any())).willReturn(updatedDomainGoal)
-
-    // When
-    val actual = persistenceAdapter.saveGoal(updatedDomainGoal, prisonNumber)
-
-    // Then
-    assertThat(actual).isEqualTo(updatedDomainGoal)
-    verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-    verify(goalMapper).updateEntityFromDomain(entityGoal, updatedDomainGoal)
-    verify(goalMapper).fromEntityToDomain(updatedEntityGoal)
   }
 }

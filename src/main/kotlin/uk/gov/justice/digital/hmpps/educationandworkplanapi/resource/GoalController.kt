@@ -22,7 +22,7 @@ class GoalController(
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   fun createGoal(@PathVariable prisonNumber: String, @RequestBody request: CreateGoalRequest) {
-    goalService.saveGoal(
+    goalService.createGoal(
       prisonNumber = prisonNumber,
       goal = goalResourceMapper.fromModelToDomain(request),
     )

@@ -15,22 +15,17 @@ class JpaGoalPersistenceAdapter(
 ) : GoalPersistenceAdapter {
 
   @Transactional
-  override fun saveGoal(goal: Goal, prisonNumber: String): Goal {
-    var actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
+  override fun createGoal(goal: Goal, prisonNumber: String): Goal {
+    val actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
       ?: newActionPlanForPrisoner(prisonNumber)
 
-    val goalEntity = actionPlanEntity.getGoalByReference(goal.reference)
-    if (goalEntity != null) {
-      // Goal already exists - we need to update the existing Goal entity
-      goalMapper.updateEntityFromDomain(goalEntity, goal)
-    } else {
-      // Goal does not already exist - map to a new Goal entity and add to the action plan
-      val newGoal = goalMapper.fromDomainToEntity(goal)
-      actionPlanEntity.addGoal(newGoal)
+    val goalEntity = goalMapper.fromDomainToEntity(goal)
+
+    with(actionPlanEntity) {
+      addGoal(goalEntity)
+      actionPlanRepository.saveAndFlush(this)
     }
 
-    actionPlanEntity = actionPlanRepository.saveAndFlush(actionPlanEntity)
-    val savedGoalEntity = actionPlanEntity.getGoalByReference(goal.reference)!!
-    return goalMapper.fromEntityToDomain(savedGoalEntity)
+    return goalMapper.fromEntityToDomain(goalEntity)
   }
 }
