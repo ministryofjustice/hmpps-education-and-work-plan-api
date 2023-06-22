@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.mapper.Acti
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 
 @RestController
-@RequestMapping(value = ["/action-plans"], produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(value = ["/action-plans/{prisonNumber}"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class ActionPlanController(
   private val actionPlanService: ActionPlanService,
   private val actionPlanResourceMapper: ActionPlanResourceMapper,
