@@ -69,6 +69,21 @@ class ActionPlanEntity(
       ActionPlanEntity(prisonNumber = prisonNumber, goals = mutableListOf())
   }
 
+  /**
+   * Returns the [GoalEntity] identified by its reference from this [ActionPlanEntity] instance.
+   * Returns null if the Goal Entity cannot be found.
+   */
+  fun getGoalByReference(goalReference: UUID): GoalEntity? =
+    goals?.find { it.reference == goalReference }
+
+  /**
+   * Adds a [GoalEntity] to this [ActionPlanEntity]
+   */
+  fun addGoal(goalEntity: GoalEntity): ActionPlanEntity {
+    goals!!.add(goalEntity)
+    return this
+  }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
