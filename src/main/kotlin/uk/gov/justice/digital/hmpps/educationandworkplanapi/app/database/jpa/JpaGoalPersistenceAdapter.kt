@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanEntity.Companion.newActionPlanForPrisoner
@@ -7,6 +8,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
+import kotlin.math.log
+
+private val log = KotlinLogging.logger {}
 
 @Component
 class JpaGoalPersistenceAdapter(
@@ -16,8 +20,11 @@ class JpaGoalPersistenceAdapter(
 
   @Transactional
   override fun createGoal(goal: Goal, prisonNumber: String): Goal {
-    val actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
-      ?: newActionPlanForPrisoner(prisonNumber)
+    var actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    if (actionPlanEntity == null) {
+      log.info { "Creating new Action Plan for prisoner [$prisonNumber]" }
+      actionPlanEntity = newActionPlanForPrisoner(prisonNumber)
+    }
 
     val goalEntity = goalMapper.fromDomainToEntity(goal)
 

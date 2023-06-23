@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
+import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Service class exposing methods that implement the business rules for the Goal domain, and is how applications
@@ -19,6 +22,8 @@ class GoalService(
   /**
    * Creates a new [Goal] for the prisoner identified by their prison number.
    */
-  fun createGoal(goal: Goal, prisonNumber: String): Goal =
-    persistenceAdapter.createGoal(goal, prisonNumber)
+  fun createGoal(goal: Goal, prisonNumber: String): Goal {
+    log.info { "Saving Goal [${goal.reference}] for prisoner [$prisonNumber]" }
+    return persistenceAdapter.createGoal(goal, prisonNumber)
+  }
 }
