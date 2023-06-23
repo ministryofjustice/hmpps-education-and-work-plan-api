@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
@@ -27,36 +28,31 @@ class ActionPlanEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
-  @NotNull
   var id: UUID? = null,
 
   @Column(updatable = false)
-  @NotNull
+  @field:NotNull
   var prisonNumber: String? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL])
-  @JoinColumn(name = "action_plan_id")
-  @NotNull
+  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "action_plan_id", nullable = false)
+  @field:NotNull
   var goals: MutableList<GoalEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp
-  @NotNull
   var createdAt: Instant? = null,
 
   @Column(updatable = false)
   @CreatedBy
-  @NotNull
   var createdBy: String? = null,
 
   @Column
   @UpdateTimestamp
-  @NotNull
   var updatedAt: Instant? = null,
 
   @Column
   @LastModifiedBy
-  @NotNull
   var updatedBy: String? = null,
 ) {
 
