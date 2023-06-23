@@ -27,28 +27,28 @@ class StepEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
-  @NotNull
+  @field:NotNull
   var id: UUID? = null,
 
   @Column(updatable = false)
-  @NotNull
+  @field:NotNull
   var reference: UUID? = null,
 
   @Column
-  @NotNull
+  @field:NotNull
   var title: String? = null,
 
   @Column
-  @NotNull
+  @field:NotNull
   var targetDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @NotNull
+  @field:NotNull
   var status: StepStatus? = null,
 
   @Column
-  @NotNull
+  @field:NotNull
   var sequenceNumber: Int? = null,
 
   @Column(updatable = false)
@@ -58,7 +58,7 @@ class StepEntity(
 
   @Column(updatable = false)
   @CreatedBy
-  @NotNull
+  @field:NotNull
   var createdBy: String? = null,
 
   @Column
@@ -68,7 +68,7 @@ class StepEntity(
 
   @Column
   @LastModifiedBy
-  @NotNull
+  @field:NotNull
   var updatedBy: String? = null,
 ) {
 

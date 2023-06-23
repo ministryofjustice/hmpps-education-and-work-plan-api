@@ -6,6 +6,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
@@ -30,37 +31,37 @@ class GoalEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
-  @NotNull
+  @field:NotNull
   var id: UUID? = null,
 
   @Column(updatable = false)
-  @NotNull
+  @field:NotNull
   var reference: UUID? = null,
 
   @Column
-  @NotNull
+  @field:NotNull
   var title: String? = null,
 
   @Column
-  @NotNull
+  @field:NotNull
   var reviewDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @NotNull
+  @field:NotNull
   var category: GoalCategory? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @NotNull
+  @field:NotNull
   var status: GoalStatus? = null,
 
   @Column
   var notes: String? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL])
-  @JoinColumn(name = "goal_id")
-  @NotNull
+  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "goal_id", nullable = false)
+  @field:NotNull
   var steps: MutableList<StepEntity>? = null,
 
   @Column(updatable = false)
@@ -70,7 +71,7 @@ class GoalEntity(
 
   @Column(updatable = false)
   @CreatedBy
-  @NotNull
+  @field:NotNull
   var createdBy: String? = null,
 
   @Column
@@ -80,7 +81,7 @@ class GoalEntity(
 
   @Column
   @LastModifiedBy
-  @NotNull
+  @field:NotNull
   var updatedBy: String? = null,
 ) {
 
