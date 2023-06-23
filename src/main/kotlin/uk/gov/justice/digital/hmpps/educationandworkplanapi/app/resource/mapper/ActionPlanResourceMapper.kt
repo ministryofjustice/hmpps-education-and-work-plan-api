@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.mapper
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.mapstruct.Mapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan

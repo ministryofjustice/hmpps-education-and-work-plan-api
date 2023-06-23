@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.mapper.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 
 @RestController
