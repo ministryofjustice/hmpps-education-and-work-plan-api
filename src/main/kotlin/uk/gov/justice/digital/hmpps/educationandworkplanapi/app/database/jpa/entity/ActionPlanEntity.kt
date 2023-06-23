@@ -28,7 +28,6 @@ class ActionPlanEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
-  @field:NotNull
   var id: UUID? = null,
 
   @Column(updatable = false)
@@ -42,22 +41,18 @@ class ActionPlanEntity(
 
   @Column(updatable = false)
   @CreationTimestamp
-  @NotNull
   var createdAt: Instant? = null,
 
   @Column(updatable = false)
   @CreatedBy
-  @field:NotNull
   var createdBy: String? = null,
 
   @Column
   @UpdateTimestamp
-  @NotNull
   var updatedAt: Instant? = null,
 
   @Column
   @LastModifiedBy
-  @field:NotNull
   var updatedBy: String? = null,
 ) {
 
