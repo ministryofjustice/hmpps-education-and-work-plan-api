@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.mapper
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.springframework.stereotype.Component
 import java.time.Instant
