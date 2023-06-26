@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import java.security.KeyPair
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("integration-test")
@@ -18,6 +19,9 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var actionPlanRepository: ActionPlanRepository
+
+  @Autowired
+  lateinit var keyPair: KeyPair
 
   @BeforeEach
   fun clearDatabase() {
