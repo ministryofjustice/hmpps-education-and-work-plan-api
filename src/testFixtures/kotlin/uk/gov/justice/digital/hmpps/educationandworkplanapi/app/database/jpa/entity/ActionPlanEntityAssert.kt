@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 fun assertThat(actual: ActionPlanEntity?) = ActionPlanEntityAssert(actual)
@@ -97,6 +98,16 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
     with(actual!!) {
       if (goals!!.isNotEmpty()) {
         failWithMessage("Expected ActionPlan to be have no goals set, but has $goals")
+      }
+    }
+    return this
+  }
+
+  fun hasNumberOfGoals(numberOfGoals: Int): ActionPlanEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (goals!!.size != numberOfGoals) {
+        failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals!!.size}")
       }
     }
     return this
