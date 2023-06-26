@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 fun assertThat(actual: ActionPlanEntity?) = ActionPlanEntityAssert(actual)

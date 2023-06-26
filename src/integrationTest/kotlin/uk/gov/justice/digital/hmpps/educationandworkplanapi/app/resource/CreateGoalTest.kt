@@ -1,9 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.transaction.TestTransaction
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
@@ -33,12 +34,11 @@ class CreateGoalTest : IntegrationTestBase() {
       .isUnauthorized
   }
 
-  // TODO The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed
   @Test
-  @Disabled("The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed")
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .body(Mono.just(aValidCreateGoalRequest()), CreateGoalRequest::class.java)
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -47,7 +47,7 @@ class CreateGoalTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should fail to create goal given goal with no steps`() {
+  fun `should fail to create goal given no steps provided`() {
     val prisonNumber = aValidPrisonNumber()
     val createRequest = aValidCreateGoalRequest(steps = emptyList())
 
@@ -69,10 +69,9 @@ class CreateGoalTest : IntegrationTestBase() {
       .hasUserMessageContaining("At least one Step is required.")
   }
 
-  // TODO The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed
   @Test
-  @Disabled("The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed")
-  fun `should create goal and action plan given prisoner does not have an action plan`() {
+  @Transactional
+  fun `should add goal and to a new action plan given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createRequest = aValidCreateGoalRequest()
@@ -88,23 +87,27 @@ class CreateGoalTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actual).isForPrisonNumber(prisonNumber)
-    assertThat(actual).hasNumberOfGoals(1)
-    assertThat(actual!!.goals!![1])
-      .usingRecursiveComparison()
-      .ignoringFields("id", "reference", "createdAt", "createdBy", "updatedAt", "updatedBy")
-      .isEqualTo(createRequest)
+    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    assertThat(actionPlan).isForPrisonNumber(prisonNumber)
+    assertThat(actionPlan).hasNumberOfGoals(1)
+    val goal = actionPlan!!.goals!![0]
+    assertThat(goal).hasTitle(createRequest.title)
+    assertThat(goal).hasReviewDate(createRequest.reviewDate)
+    assertThat(goal).hasNumberOfSteps(createRequest.steps.size)
   }
 
-  // TODO The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed
   @Test
-  @Disabled("The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed")
-  fun `should create goal given existing action plan for prisoner`() {
+  @Transactional
+  fun `should add goal to prisoner's existing action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
     actionPlanRepository.save(actionPlan)
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
+    assertThat(actionPlan).hasNumberOfGoals(1)
+
     val createRequest = aValidCreateGoalRequest()
 
     // When
