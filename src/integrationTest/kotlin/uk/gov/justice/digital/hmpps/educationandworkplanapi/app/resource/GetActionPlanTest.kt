@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
@@ -28,16 +28,26 @@ class GetActionPlanTest : IntegrationTestBase() {
       .isUnauthorized
   }
 
-  // TODO The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed
   @Test
-  @Disabled("The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed")
   fun `should return forbidden given bearer token without required role`() {
-    webTestClient.get()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    // When
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber)
       .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
       .exchange()
       .expectStatus()
       .isForbidden
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(FORBIDDEN.value())
+      .hasUserMessage("Access Denied")
+      .hasDeveloperMessage("Access denied on uri=/action-plans/$prisonNumber")
   }
 
   @Test

@@ -3,11 +3,15 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import jakarta.validation.ValidationException
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.InvalidGoalException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -15,10 +19,24 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 private val log = KotlinLogging.logger {}
 
 @RestControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
+
+  @ExceptionHandler(AccessDeniedException::class)
+  fun handleAccessDeniedException(e: AccessDeniedException, request: WebRequest): ResponseEntity<ErrorResponse> {
+    log.info("Access denied exception: {}", e.message)
+    return ResponseEntity
+      .status(FORBIDDEN)
+      .body(
+        ErrorResponse(
+          status = FORBIDDEN.value(),
+          userMessage = e.message,
+          developerMessage = "Access denied on ${request.getDescription(false)}",
+        ),
+      )
+  }
 
   @ExceptionHandler(ActionPlanNotFoundException::class)
-  fun handleNotFoundException(e: Exception): ResponseEntity<ErrorResponse> {
+  fun handleNotFoundException(e: ActionPlanNotFoundException): ResponseEntity<ErrorResponse> {
     log.info("Not found exception: {}", e.message)
     return ResponseEntity
       .status(NOT_FOUND)
@@ -31,7 +49,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(InvalidGoalException::class)
-  fun handleInvalidGoalException(e: Exception): ResponseEntity<ErrorResponse> {
+  fun handleInvalidGoalException(e: InvalidGoalException): ResponseEntity<ErrorResponse> {
     log.info("Invalid goal: {}", e.message)
     return ResponseEntity
       .status(BAD_REQUEST)
@@ -44,7 +62,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ValidationException::class)
-  fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
+  fun handleValidationException(e: ValidationException): ResponseEntity<ErrorResponse> {
     log.info("Validation exception: {}", e.message)
     return ResponseEntity
       .status(BAD_REQUEST)
@@ -57,8 +75,8 @@ class GlobalExceptionHandler {
       )
   }
 
-  @ExceptionHandler(java.lang.Exception::class)
-  fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {
+  @ExceptionHandler(Exception::class)
+  fun handleException(e: Exception): ResponseEntity<ErrorResponse?>? {
     log.error("Unexpected exception", e)
     return ResponseEntity
       .status(INTERNAL_SERVER_ERROR)
