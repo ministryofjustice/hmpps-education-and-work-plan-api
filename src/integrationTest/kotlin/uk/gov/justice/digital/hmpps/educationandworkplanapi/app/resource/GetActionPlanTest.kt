@@ -28,9 +28,9 @@ class GetActionPlanTest : IntegrationTestBase() {
       .isUnauthorized
   }
 
+  // TODO The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed
   @Test
   @Disabled("The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed")
-  // TODO The current implementation returns a 500 instead of a 403. Re-enable this test when the implementation has been fixed
   fun `should return forbidden given bearer token without required role`() {
     webTestClient.get()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
