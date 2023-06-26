@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,6 +21,7 @@ class ActionPlanController(
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_VIEW_AUTHORITY)
   fun getActionPlan(@PathVariable prisonNumber: String): ActionPlanResponse =
     with(actionPlanService.getActionPlan(prisonNumber)) {
       actionPlanResourceMapper.fromDomainToModel(this)
