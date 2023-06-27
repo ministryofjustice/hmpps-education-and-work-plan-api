@@ -101,4 +101,14 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
     }
     return this
   }
+
+  fun hasNumberOfGoals(numberOfGoals: Int): ActionPlanEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (goals!!.size != numberOfGoals) {
+        failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals!!.size}")
+      }
+    }
+    return this
+  }
 }

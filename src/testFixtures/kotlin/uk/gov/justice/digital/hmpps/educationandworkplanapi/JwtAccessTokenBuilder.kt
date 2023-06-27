@@ -45,7 +45,7 @@ fun buildAccessToken(
 ): String =
   Jwts.builder()
     .setSubject(dpsUsername)
-    .setClaims(
+    .addClaims(
       mapOf(
         "authorities" to roles,
         "user_name" to dpsUsername,
