@@ -13,7 +13,7 @@ import java.util.UUID
 data class Step(
   val reference: UUID,
   val title: String,
-  val targetDate: LocalDate,
+  val targetDate: LocalDate?,
   val status: StepStatus = NOT_STARTED,
   val sequenceNumber: Int,
 )

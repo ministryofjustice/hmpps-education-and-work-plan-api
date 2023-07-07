@@ -9,7 +9,7 @@ fun aValidStepEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   title: String = "Book communication skills course",
-  targetDate: LocalDate = LocalDate.now().plusMonths(1),
+  targetDate: LocalDate? = LocalDate.now().plusMonths(1),
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
   createdAt: Instant? = Instant.now(),
