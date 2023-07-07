@@ -6,7 +6,7 @@ import java.util.UUID
 fun aValidStepResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Book communication skills course",
-  targetDate: LocalDate = LocalDate.now().plusMonths(1),
+  targetDate: LocalDate? = LocalDate.now().plusMonths(1),
   status: StepStatus = StepStatus.NOT_STARTED,
   sequenceNumber: Int = 1,
 ): StepResponse =
@@ -21,7 +21,7 @@ fun aValidStepResponse(
 fun anotherValidStepResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Complete communication skills course",
-  targetDate: LocalDate = LocalDate.now().plusMonths(6),
+  targetDate: LocalDate? = LocalDate.now().plusMonths(6),
   status: StepStatus = StepStatus.NOT_STARTED,
   sequenceNumber: Int = 2,
 ): StepResponse =

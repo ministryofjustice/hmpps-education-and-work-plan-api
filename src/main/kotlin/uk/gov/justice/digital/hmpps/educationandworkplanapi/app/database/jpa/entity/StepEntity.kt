@@ -38,7 +38,6 @@ class StepEntity(
   var title: String? = null,
 
   @Column
-  @field:NotNull
   var targetDate: LocalDate? = null,
 
   @Column

@@ -257,7 +257,6 @@ components:
           example: 1
       required:
         - title
-        - targetDate
         - sequenceNumber
 
     GoalStatus:

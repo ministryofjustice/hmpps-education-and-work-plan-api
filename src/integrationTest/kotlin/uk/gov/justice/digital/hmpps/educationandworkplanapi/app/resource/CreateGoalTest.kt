@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 
 class CreateGoalTest : IntegrationTestBase() {
@@ -71,7 +72,7 @@ class CreateGoalTest : IntegrationTestBase() {
 
   @Test
   @Transactional
-  fun `should add goal and to a new action plan given prisoner does not have an action plan`() {
+  fun `should add goal and create a new action plan given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createRequest = aValidCreateGoalRequest()
@@ -109,6 +110,36 @@ class CreateGoalTest : IntegrationTestBase() {
     assertThat(actionPlan).hasNumberOfGoals(1)
 
     val createRequest = aValidCreateGoalRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .body(Mono.just(createRequest), CreateGoalRequest::class.java)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    assertThat(actual).isForPrisonNumber(prisonNumber)
+    assertThat(actual).hasNumberOfGoals(2)
+  }
+
+  @Test
+  @Transactional
+  fun `should add goal with only mandatory fields populated`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
+    actionPlanRepository.save(actionPlan)
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
+    assertThat(actionPlan).hasNumberOfGoals(1)
+
+    val createRequest = aValidCreateGoalRequest(notes = null, steps = listOf(aValidCreateStepRequest(targetDate = null)))
 
     // When
     webTestClient.post()
