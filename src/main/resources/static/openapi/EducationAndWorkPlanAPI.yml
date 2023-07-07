@@ -204,7 +204,6 @@ components:
       required:
         - stepReference
         - title
-        - targetDate
         - status
         - sequenceNumber
 
