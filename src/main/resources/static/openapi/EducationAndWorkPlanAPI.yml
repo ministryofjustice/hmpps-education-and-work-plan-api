@@ -133,7 +133,7 @@ components:
         reviewDate:
           type: string
           format: date
-          description: An ISO-8601 date representing when the Goal is up for review.
+          description: An optional ISO-8601 date representing when the Goal is up for review.
           example: '2023-12-19'
         status:
           $ref: '#/components/schemas/GoalStatus'
@@ -170,7 +170,6 @@ components:
       required:
         - goalReference
         - title
-        - reviewDate
         - status
         - steps
         - createdBy
@@ -192,11 +191,6 @@ components:
           example: Book communication skills course
         targetDateRange:
           $ref: '#/components/schemas/TargetDateRange'
-        targetDate:
-          type: string
-          format: date
-          description: A date by which the prisoner should aim to complete the step.
-          example: '2023-08-19'
         status:
           $ref: '#/components/schemas/StepStatus'
         sequenceNumber:
@@ -206,7 +200,6 @@ components:
       required:
         - stepReference
         - title
-        - targetDate
         - targetDateRange
         - status
         - sequenceNumber
@@ -243,7 +236,7 @@ components:
     CreateStepRequest:
       title: CreateStepRequest
       type: object
-      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED. Note that either a targetDateRange or targetDate must be provided, but not both.
+      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED.
       properties:
         title:
           type: string
@@ -251,17 +244,13 @@ components:
           example: Book first aid course
         targetDateRange:
           $ref: '#/components/schemas/TargetDateRange'
-        targetDate:
-          type: string
-          format: date
-          description: A optional date by which the prisoner should aim to complete the step. Mandatory in the absence of targetDateRange.
-          example: '2023-12-19'
         sequenceNumber:
           type: integer
           description: The number (position) of the Step within the overall Goal.
           example: 1
       required:
         - title
+        - targetDateRange
         - sequenceNumber
 
     GoalStatus:
