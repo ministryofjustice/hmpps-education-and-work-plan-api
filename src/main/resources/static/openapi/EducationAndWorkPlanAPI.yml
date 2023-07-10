@@ -236,7 +236,7 @@ components:
     CreateStepRequest:
       title: CreateStepRequest
       type: object
-      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED.
+      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED. Note that either a targetDateRange or targetDate must be provided, but not both.
       properties:
         title:
           type: string
