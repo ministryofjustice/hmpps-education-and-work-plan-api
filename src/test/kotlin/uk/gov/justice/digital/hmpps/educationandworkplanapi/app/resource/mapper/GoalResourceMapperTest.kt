@@ -47,7 +47,7 @@ internal class GoalResourceMapperTest {
     val expectedGoal = aValidGoal(
       reference = UUID.randomUUID(),
       title = createGoalRequest.title,
-      reviewDate = createGoalRequest.reviewDate,
+      reviewDate = createGoalRequest.reviewDate!!,
       category = GoalCategory.PERSONAL_DEVELOPMENT,
       status = GoalStatus.ACTIVE,
       notes = createGoalRequest.notes,

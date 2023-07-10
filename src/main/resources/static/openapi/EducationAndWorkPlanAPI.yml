@@ -190,6 +190,8 @@ components:
           type: string
           description: A title describing the step
           example: Book communication skills course
+        targetDateRange:
+          $ref: '#/components/schemas/TargetDateRange'
         targetDate:
           type: string
           format: date
@@ -204,6 +206,8 @@ components:
       required:
         - stepReference
         - title
+        - targetDate
+        - targetDateRange
         - status
         - sequenceNumber
 
@@ -219,7 +223,7 @@ components:
         reviewDate:
           type: string
           format: date
-          description: An ISO-8601 date representing when the Goal is up for review.
+          description: An optional ISO-8601 date representing when the Goal is up for review.
           example: '2023-12-19'
         category:
           $ref: '#/components/schemas/GoalCategory'
@@ -235,21 +239,22 @@ components:
           example: Pay close attention to Peter's behaviour.
       required:
         - title
-        - reviewDate
         - steps
     CreateStepRequest:
       title: CreateStepRequest
       type: object
-      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED.
+      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED. Note that either a targetDateRange or targetDate must be provided, but not both.
       properties:
         title:
           type: string
           description: A title describing the step
           example: Book first aid course
+        targetDateRange:
+          $ref: '#/components/schemas/TargetDateRange'
         targetDate:
           type: string
           format: date
-          description: A date by which the prisoner should aim to complete the step.
+          description: A optional date by which the prisoner should aim to complete the step. Mandatory in the absence of targetDateRange.
           example: '2023-12-19'
         sequenceNumber:
           type: integer
@@ -284,6 +289,15 @@ components:
         - NOT_STARTED
         - ACTIVE
         - COMPLETE
+    TargetDateRange:
+      title: TargetDateRange
+      description: An enumerated set of date ranges, representing a target period for the step to be completed by.
+      type: string
+      enum:
+        - ZERO_TO_THREE_MONTHS
+        - THREE_TO_SIX_MONTHS
+        - SIX_TO_TWELVE_MONTHS
+        - MORE_THAN_TWELVE_MONTHS
 
   #
   # Response Body Definitions
