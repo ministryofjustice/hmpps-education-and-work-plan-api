@@ -1,25 +1,26 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
 
-import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange.THREE_TO_SIX_MONTHS
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange.ZERO_TO_THREE_MONTHS
 
 fun aValidCreateStepRequest(
   title: String = "Book communication skills course",
-  targetDate: LocalDate? = LocalDate.now().plusMonths(1),
+  targetDateRange: TargetDateRange = ZERO_TO_THREE_MONTHS,
   sequenceNumber: Int = 1,
 ): CreateStepRequest =
   CreateStepRequest(
     title = title,
-    targetDate = targetDate,
+    targetDateRange = targetDateRange,
     sequenceNumber = sequenceNumber,
   )
 
 fun anotherValidCreateStepRequest(
   title: String = "Complete communication skills course",
-  targetDate: LocalDate? = LocalDate.now().plusMonths(6),
+  targetDateRange: TargetDateRange = THREE_TO_SIX_MONTHS,
   sequenceNumber: Int = 2,
 ): CreateStepRequest =
   CreateStepRequest(
     title = title,
-    targetDate = targetDate,
+    targetDateRange = targetDateRange,
     sequenceNumber = sequenceNumber,
   )

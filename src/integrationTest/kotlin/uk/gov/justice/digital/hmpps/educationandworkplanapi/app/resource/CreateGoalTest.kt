@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -16,7 +17,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 
 class CreateGoalTest : IntegrationTestBase() {
@@ -93,7 +93,6 @@ class CreateGoalTest : IntegrationTestBase() {
     assertThat(actionPlan).hasNumberOfGoals(1)
     val goal = actionPlan!!.goals!![0]
     assertThat(goal).hasTitle(createRequest.title)
-    assertThat(goal).hasReviewDate(createRequest.reviewDate)
     assertThat(goal).hasNumberOfSteps(createRequest.steps.size)
   }
 
@@ -108,7 +107,6 @@ class CreateGoalTest : IntegrationTestBase() {
     TestTransaction.end()
     TestTransaction.start()
     assertThat(actionPlan).hasNumberOfGoals(1)
-
     val createRequest = aValidCreateGoalRequest()
 
     // When
@@ -138,8 +136,7 @@ class CreateGoalTest : IntegrationTestBase() {
     TestTransaction.end()
     TestTransaction.start()
     assertThat(actionPlan).hasNumberOfGoals(1)
-
-    val createRequest = aValidCreateGoalRequest(notes = null, steps = listOf(aValidCreateStepRequest(targetDate = null)))
+    val createRequest = aValidCreateGoalRequest(notes = null)
 
     // When
     webTestClient.post()
@@ -155,5 +152,9 @@ class CreateGoalTest : IntegrationTestBase() {
     val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
     assertThat(actual).isForPrisonNumber(prisonNumber)
     assertThat(actual).hasNumberOfGoals(2)
+    val goal = actual!!.goals!![1]
+    assertThat(goal).hasTitle(createRequest.title)
+    assertThat(goal).hasNumberOfSteps(createRequest.steps.size)
+    assertThat(goal.notes).isNull()
   }
 }

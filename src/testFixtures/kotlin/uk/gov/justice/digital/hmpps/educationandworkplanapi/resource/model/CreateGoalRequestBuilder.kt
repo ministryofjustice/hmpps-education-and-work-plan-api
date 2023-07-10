@@ -4,6 +4,7 @@ import java.time.LocalDate
 
 fun aValidCreateGoalRequest(
   title: String = "Improve communication skills",
+  // TODO RR-81 - set review date to null by default
   reviewDate: LocalDate = LocalDate.now().plusMonths(6),
   category: GoalCategory = GoalCategory.PERSONAL_DEVELOPMENT,
   steps: List<CreateStepRequest> = listOf(aValidCreateStepRequest(), anotherValidCreateStepRequest()),

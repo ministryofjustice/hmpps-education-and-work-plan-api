@@ -18,5 +18,7 @@ interface StepResourceMapper {
   fun fromModelToDomain(createStepRequest: CreateStepRequest): Step
 
   @Mapping(target = "stepReference", source = "reference")
+  // TODO - RR-81 - map once targetDateRange have been added to the domain model etc
+  @Mapping(target = "targetDateRange", constant = "ZERO_TO_THREE_MONTHS")
   fun fromDomainToModel(stepDomain: Step): StepResponse
 }

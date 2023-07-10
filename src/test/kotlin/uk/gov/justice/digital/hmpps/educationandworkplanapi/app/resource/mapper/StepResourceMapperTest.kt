@@ -23,7 +23,7 @@ internal class StepResourceMapperTest {
     val createStepRequest = aValidCreateStepRequest()
     val expectedStep = aValidStep(
       title = createStepRequest.title,
-      targetDate = createStepRequest.targetDate,
+      targetDate = null,
       status = StepStatus.NOT_STARTED,
       sequenceNumber = createStepRequest.sequenceNumber,
     )
@@ -43,7 +43,6 @@ internal class StepResourceMapperTest {
     val expected = aValidStepResponse(
       reference = step.reference,
       title = step.title,
-      targetDate = step.targetDate,
       status = StepStatusApi.NOT_STARTED,
       sequenceNumber = step.sequenceNumber,
     )

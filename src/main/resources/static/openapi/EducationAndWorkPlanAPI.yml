@@ -133,7 +133,7 @@ components:
         reviewDate:
           type: string
           format: date
-          description: An ISO-8601 date representing when the Goal is up for review.
+          description: An optional ISO-8601 date representing when the Goal is up for review.
           example: '2023-12-19'
         status:
           $ref: '#/components/schemas/GoalStatus'
@@ -170,7 +170,6 @@ components:
       required:
         - goalReference
         - title
-        - reviewDate
         - status
         - steps
         - createdBy
@@ -190,11 +189,8 @@ components:
           type: string
           description: A title describing the step
           example: Book communication skills course
-        targetDate:
-          type: string
-          format: date
-          description: A date by which the prisoner should aim to complete the step.
-          example: '2023-08-19'
+        targetDateRange:
+          $ref: '#/components/schemas/TargetDateRange'
         status:
           $ref: '#/components/schemas/StepStatus'
         sequenceNumber:
@@ -204,6 +200,7 @@ components:
       required:
         - stepReference
         - title
+        - targetDateRange
         - status
         - sequenceNumber
 
@@ -219,7 +216,7 @@ components:
         reviewDate:
           type: string
           format: date
-          description: An ISO-8601 date representing when the Goal is up for review.
+          description: An optional ISO-8601 date representing when the Goal is up for review.
           example: '2023-12-19'
         category:
           $ref: '#/components/schemas/GoalCategory'
@@ -235,7 +232,6 @@ components:
           example: Pay close attention to Peter's behaviour.
       required:
         - title
-        - reviewDate
         - steps
     CreateStepRequest:
       title: CreateStepRequest
@@ -246,17 +242,15 @@ components:
           type: string
           description: A title describing the step
           example: Book first aid course
-        targetDate:
-          type: string
-          format: date
-          description: A date by which the prisoner should aim to complete the step.
-          example: '2023-12-19'
+        targetDateRange:
+          $ref: '#/components/schemas/TargetDateRange'
         sequenceNumber:
           type: integer
           description: The number (position) of the Step within the overall Goal.
           example: 1
       required:
         - title
+        - targetDateRange
         - sequenceNumber
 
     GoalStatus:
@@ -284,6 +278,15 @@ components:
         - NOT_STARTED
         - ACTIVE
         - COMPLETE
+    TargetDateRange:
+      title: TargetDateRange
+      description: An enumerated set of date ranges, representing a target period for the step to be completed by.
+      type: string
+      enum:
+        - ZERO_TO_THREE_MONTHS
+        - THREE_TO_SIX_MONTHS
+        - SIX_TO_TWELVE_MONTHS
+        - MORE_THAN_TWELVE_MONTHS
 
   #
   # Response Body Definitions
