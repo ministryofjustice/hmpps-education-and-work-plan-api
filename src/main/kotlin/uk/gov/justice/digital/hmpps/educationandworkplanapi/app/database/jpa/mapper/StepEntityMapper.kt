@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper
 
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 
@@ -13,6 +14,7 @@ interface StepEntityMapper {
    * This method is suitable for creating a new [StepEntity] to be subsequently persisted to the database.
    */
   @ExcludeJpaManagedFields
+  @Mapping(target = "targetDate", ignore = true)
   fun fromDomainToEntity(step: Step): StepEntity
 
   /**
