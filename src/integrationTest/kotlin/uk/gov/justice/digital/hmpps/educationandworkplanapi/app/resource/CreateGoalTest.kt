@@ -94,15 +94,18 @@ class CreateGoalTest : IntegrationTestBase() {
 
     // Then
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actionPlan).isForPrisonNumber(prisonNumber)
-    assertThat(actionPlan).hasNumberOfGoals(1)
+    assertThat(actionPlan)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
     val goal = actionPlan!!.goals!![0]
-    assertThat(goal).hasTitle(createGoalRequest.title)
-    assertThat(goal).hasNumberOfSteps(createGoalRequest.steps.size)
+    assertThat(goal)
+      .hasTitle(createGoalRequest.title)
+      .hasNumberOfSteps(createGoalRequest.steps.size)
     val step = goal.steps!![0]
-    assertThat(step).hasTitle(createStepRequest.title)
-    assertThat(step).hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
-    assertThat(step).hasStatus(StepStatus.NOT_STARTED)
+    assertThat(step)
+      .hasTitle(createStepRequest.title)
+      .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
+      .hasStatus(StepStatus.NOT_STARTED)
   }
 
   @Test
@@ -130,8 +133,9 @@ class CreateGoalTest : IntegrationTestBase() {
 
     // Then
     val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actual).isForPrisonNumber(prisonNumber)
-    assertThat(actual).hasNumberOfGoals(2)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(2)
   }
 
   @Test
@@ -159,11 +163,13 @@ class CreateGoalTest : IntegrationTestBase() {
 
     // Then
     val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actual).isForPrisonNumber(prisonNumber)
-    assertThat(actual).hasNumberOfGoals(2)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(2)
     val goal = actual!!.goals!![1]
-    assertThat(goal).hasTitle(createRequest.title)
-    assertThat(goal).hasNumberOfSteps(createRequest.steps.size)
+    assertThat(goal)
+      .hasTitle(createRequest.title)
+      .hasNumberOfSteps(createRequest.steps.size)
     assertThat(goal.notes).isNull()
   }
 }
