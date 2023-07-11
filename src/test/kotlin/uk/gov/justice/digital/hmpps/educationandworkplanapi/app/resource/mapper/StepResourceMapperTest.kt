@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus as StepStatusApi
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange as TargetDateRangeApi
 
 @ExtendWith(MockitoExtension::class)
 internal class StepResourceMapperTest {
@@ -23,7 +25,7 @@ internal class StepResourceMapperTest {
     val createStepRequest = aValidCreateStepRequest()
     val expectedStep = aValidStep(
       title = createStepRequest.title,
-      targetDate = null,
+      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.NOT_STARTED,
       sequenceNumber = createStepRequest.sequenceNumber,
     )
@@ -43,6 +45,7 @@ internal class StepResourceMapperTest {
     val expected = aValidStepResponse(
       reference = step.reference,
       title = step.title,
+      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
       status = StepStatusApi.NOT_STARTED,
       sequenceNumber = step.sequenceNumber,
     )

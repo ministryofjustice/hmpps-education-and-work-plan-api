@@ -1,15 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus.NOT_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange.ZERO_TO_THREE_MONTHS
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 fun aValidStepEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   title: String = "Book communication skills course",
-  targetDate: LocalDate? = LocalDate.now().plusMonths(1),
+  targetDateRange: TargetDateRange = ZERO_TO_THREE_MONTHS,
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
   createdAt: Instant? = Instant.now(),
@@ -21,7 +21,7 @@ fun aValidStepEntity(
     id = id,
     reference = reference,
     title = title,
-    targetDate = targetDate,
+    targetDateRange = targetDateRange,
     status = status,
     sequenceNumber = sequenceNumber,
     createdAt = createdAt,

@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalCategory as GoalCategoryApi
@@ -40,6 +41,7 @@ internal class GoalResourceMapperTest {
     val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(
       category = GoalCategoryApi.PERSONAL_DEVELOPMENT,
+      reviewDate = LocalDate.now(),
       steps = mutableListOf(createStepRequest),
     )
     val expectedStep = aValidStep()
@@ -47,7 +49,7 @@ internal class GoalResourceMapperTest {
     val expectedGoal = aValidGoal(
       reference = UUID.randomUUID(),
       title = createGoalRequest.title,
-      reviewDate = createGoalRequest.reviewDate!!,
+      reviewDate = createGoalRequest.reviewDate,
       category = GoalCategory.PERSONAL_DEVELOPMENT,
       status = GoalStatus.ACTIVE,
       notes = createGoalRequest.notes,
@@ -75,6 +77,7 @@ internal class GoalResourceMapperTest {
     val goal = aValidGoal(
       category = GoalCategory.PERSONAL_DEVELOPMENT,
       status = GoalStatus.ACTIVE,
+      reviewDate = null,
       steps = mutableListOf(step),
       createdBy = "a.user.id",
       lastUpdatedBy = "another.user.id",
@@ -86,7 +89,7 @@ internal class GoalResourceMapperTest {
     val expected = aValidGoalResponse(
       reference = goal.reference,
       title = goal.title,
-      reviewDate = goal.reviewDate,
+      reviewDate = null,
       category = GoalCategoryApi.PERSONAL_DEVELOPMENT,
       status = GoalStatusApi.ACTIVE,
       notes = goal.notes,

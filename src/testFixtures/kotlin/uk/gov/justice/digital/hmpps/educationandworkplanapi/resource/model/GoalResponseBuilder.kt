@@ -7,7 +7,7 @@ import java.util.UUID
 fun aValidGoalResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
-  reviewDate: LocalDate = LocalDate.now().plusMonths(6),
+  reviewDate: LocalDate? = null,
   category: GoalCategory = GoalCategory.PERSONAL_DEVELOPMENT,
   steps: List<StepResponse> = listOf(aValidStepResponse(), anotherValidStepResponse()),
   status: GoalStatus = GoalStatus.ACTIVE,

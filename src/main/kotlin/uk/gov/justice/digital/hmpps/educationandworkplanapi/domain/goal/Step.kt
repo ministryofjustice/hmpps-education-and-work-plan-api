@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.NOT_STARTED
-import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -13,7 +12,7 @@ import java.util.UUID
 data class Step(
   val reference: UUID,
   val title: String,
-  val targetDate: LocalDate?,
+  val targetDateRange: TargetDateRange,
   val status: StepStatus = NOT_STARTED,
   val sequenceNumber: Int,
 )
