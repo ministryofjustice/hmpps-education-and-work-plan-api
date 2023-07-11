@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 fun assertThat(actual: StepEntity?) = StepEntityAssert(actual)
@@ -92,11 +91,21 @@ class StepEntityAssert(actual: StepEntity?) :
     return this
   }
 
-  fun hasTargetDate(expected: LocalDate): StepEntityAssert {
+  fun hasTargetDateRange(expected: TargetDateRange): StepEntityAssert {
     isNotNull
     with(actual!!) {
-      if (targetDate != expected) {
-        failWithMessage("Expected reviewDate to be $expected, but was $targetDate")
+      if (targetDateRange != expected) {
+        failWithMessage("Expected targetDateRange to be $expected, but was $targetDateRange")
+      }
+    }
+    return this
+  }
+
+  fun hasStatus(expected: StepStatus): StepEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (status != expected) {
+        failWithMessage("Expected status to be $expected, but was $status")
       }
     }
     return this

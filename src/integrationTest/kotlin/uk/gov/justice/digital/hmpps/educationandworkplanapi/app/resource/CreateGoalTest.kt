@@ -11,13 +11,17 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange as TargetDateRangeEntity
 
 class CreateGoalTest : IntegrationTestBase() {
 
@@ -75,12 +79,13 @@ class CreateGoalTest : IntegrationTestBase() {
   fun `should add goal and create a new action plan given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createRequest = aValidCreateGoalRequest()
+    val createStepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
+    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(createStepRequest))
 
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .body(Mono.just(createRequest), CreateGoalRequest::class.java)
+      .body(Mono.just(createGoalRequest), CreateGoalRequest::class.java)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -89,11 +94,18 @@ class CreateGoalTest : IntegrationTestBase() {
 
     // Then
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actionPlan).isForPrisonNumber(prisonNumber)
-    assertThat(actionPlan).hasNumberOfGoals(1)
+    assertThat(actionPlan)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
     val goal = actionPlan!!.goals!![0]
-    assertThat(goal).hasTitle(createRequest.title)
-    assertThat(goal).hasNumberOfSteps(createRequest.steps.size)
+    assertThat(goal)
+      .hasTitle(createGoalRequest.title)
+      .hasNumberOfSteps(createGoalRequest.steps.size)
+    val step = goal.steps!![0]
+    assertThat(step)
+      .hasTitle(createStepRequest.title)
+      .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
+      .hasStatus(StepStatus.NOT_STARTED)
   }
 
   @Test
@@ -121,8 +133,9 @@ class CreateGoalTest : IntegrationTestBase() {
 
     // Then
     val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actual).isForPrisonNumber(prisonNumber)
-    assertThat(actual).hasNumberOfGoals(2)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(2)
   }
 
   @Test
@@ -150,11 +163,13 @@ class CreateGoalTest : IntegrationTestBase() {
 
     // Then
     val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actual).isForPrisonNumber(prisonNumber)
-    assertThat(actual).hasNumberOfGoals(2)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(2)
     val goal = actual!!.goals!![1]
-    assertThat(goal).hasTitle(createRequest.title)
-    assertThat(goal).hasNumberOfSteps(createRequest.steps.size)
+    assertThat(goal)
+      .hasTitle(createRequest.title)
+      .hasNumberOfSteps(createRequest.steps.size)
     assertThat(goal.notes).isNull()
   }
 }

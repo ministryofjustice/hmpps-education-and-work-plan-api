@@ -9,7 +9,7 @@ import java.util.UUID
 fun aValidGoal(
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
-  reviewDate: LocalDate = LocalDate.now().plusMonths(6),
+  reviewDate: LocalDate? = null,
   category: GoalCategory = PERSONAL_DEVELOPMENT,
   steps: List<Step> = listOf(aValidStep(), anotherValidStep()),
   status: GoalStatus = ACTIVE,

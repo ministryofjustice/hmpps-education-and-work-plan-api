@@ -42,7 +42,6 @@ class GoalEntity(
   var title: String? = null,
 
   @Column
-  @field:NotNull
   var reviewDate: LocalDate? = null,
 
   @Column
