@@ -151,8 +151,12 @@ components:
           example: Pay close attention to Peter's behaviour.
         createdBy:
           type: string
-          description: The name/ID of the person who created the goal. **Note that this is a placeholder for now currently not populated.**
-          example: 'TBD'
+          description: The DPS username of the person who created the goal.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created the goal.
+          example: 'Alex Smith'
         createdAt:
           type: string
           format: date-time
@@ -160,8 +164,12 @@ components:
           example: '2023-06-19T09:39:44Z'
         updatedBy:
           type: string
-          description: The name/ID of the person who last updated the goal. **Note that this is a placeholder for now currently not populated.**
-          example: 'TBD'
+          description: The DPS username of the person who last updated the goal.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated the goal.
+          example: 'Alex Smith'
         updatedAt:
           type: string
           format: date-time
@@ -173,8 +181,10 @@ components:
         - status
         - steps
         - createdBy
+        - createdByDisplayName
         - createdAt
         - updatedBy
+        - updatedByDisplayName
         - updatedAt
     StepResponse:
       title: StepResponse

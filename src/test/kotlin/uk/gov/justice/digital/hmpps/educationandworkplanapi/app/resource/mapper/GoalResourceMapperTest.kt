@@ -96,8 +96,10 @@ internal class GoalResourceMapperTest {
       steps = listOf(expectedStepResponse),
       createdAt = expectedDateTime,
       createdBy = "a.user.id",
+      createdByDisplayName = "",
       updatedAt = expectedDateTime,
       updatedBy = "another.user.id",
+      updatedByDisplayName = "",
     )
 
     // When
