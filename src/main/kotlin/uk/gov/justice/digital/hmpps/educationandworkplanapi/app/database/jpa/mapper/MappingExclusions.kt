@@ -9,5 +9,7 @@ import org.mapstruct.Mapping
 @Mapping(target = "updatedBy", ignore = true)
 annotation class ExcludeJpaManagedFields
 
-@Mapping(target = "reference", ignore = true)
-annotation class ExcludeReferenceField
+@ExcludeJpaManagedFields
+@Mapping(target = "createdByDisplayName", ignore = true)
+@Mapping(target = "updatedByDisplayName", ignore = true)
+annotation class ExcludeJpaManagedFieldsIncludingDisplayNameFields

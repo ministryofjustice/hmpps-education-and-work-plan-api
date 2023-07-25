@@ -53,6 +53,16 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
+  fun hasCreatedByDisplayName(expected: String): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdByDisplayName != expected) {
+        failWithMessage("Expected createdByDisplayName to be $expected, but was $createdByDisplayName")
+      }
+    }
+    return this
+  }
+
   fun wasCreatedAt(expected: Instant): GoalEntityAssert {
     isNotNull
     with(actual!!) {
@@ -68,6 +78,16 @@ class GoalEntityAssert(actual: GoalEntity?) :
     with(actual!!) {
       if (updatedBy != expected) {
         failWithMessage("Expected updatedBy to be $expected, but was $updatedBy")
+      }
+    }
+    return this
+  }
+
+  fun hasUpdatedByDisplayName(expected: String): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedByDisplayName != expected) {
+        failWithMessage("Expected updatedByDisplayName to be $expected, but was $updatedByDisplayName")
       }
     }
     return this

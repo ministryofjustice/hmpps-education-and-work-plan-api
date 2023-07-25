@@ -112,6 +112,9 @@ class CreateGoalTest : IntegrationTestBase() {
       .hasTitle(createGoalRequest.title)
       .hasNumberOfSteps(createGoalRequest.steps.size)
       .wasCreatedBy(dpsUsername)
+      .hasCreatedByDisplayName(displayName)
+      .wasUpdatedBy(dpsUsername)
+      .hasUpdatedByDisplayName(displayName)
     val step = goal.steps!![0]
     assertThat(step)
       .hasTitle(createStepRequest.title)

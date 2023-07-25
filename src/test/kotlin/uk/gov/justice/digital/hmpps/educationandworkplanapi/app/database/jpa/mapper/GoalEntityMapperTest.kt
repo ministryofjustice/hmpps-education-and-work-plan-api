@@ -45,9 +45,11 @@ class GoalEntityMapperTest {
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
-      createdBy = "a.user.id",
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
       createdAt = Instant.now(),
-      lastUpdatedBy = "another.user.id",
+      lastUpdatedBy = "bjones_gen",
+      lastUpdatedByDisplayName = "Barry Jones",
       lastUpdatedAt = Instant.now(),
     )
 
@@ -66,8 +68,10 @@ class GoalEntityMapperTest {
       id = null,
       createdAt = null,
       createdBy = null,
+      createdByDisplayName = null,
       updatedAt = null,
       updatedBy = null,
+      updatedByDisplayName = null,
     )
 
     // When
@@ -96,9 +100,11 @@ class GoalEntityMapperTest {
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(entityStep),
       createdAt = createdAt,
-      createdBy = "a.user.id",
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
       updatedAt = updatedAt,
-      updatedBy = "another.user.id",
+      updatedBy = "bjones_gen",
+      updatedByDisplayName = "Barry Jones",
     )
 
     val domainStep = aValidStep()
@@ -113,9 +119,11 @@ class GoalEntityMapperTest {
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
       createdAt = createdAt,
-      createdBy = "a.user.id",
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
       lastUpdatedAt = updatedAt,
-      lastUpdatedBy = "another.user.id",
+      lastUpdatedBy = "bjones_gen",
+      lastUpdatedByDisplayName = "Barry Jones",
     )
 
     // When

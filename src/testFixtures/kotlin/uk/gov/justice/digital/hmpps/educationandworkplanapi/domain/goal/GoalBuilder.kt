@@ -14,9 +14,11 @@ fun aValidGoal(
   steps: List<Step> = listOf(aValidStep(), anotherValidStep()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
-  createdBy: String? = "",
+  createdBy: String? = "asmith_gen",
+  createdByDisplayName: String? = "Alex Smith",
   createdAt: Instant? = Instant.now(),
-  lastUpdatedBy: String? = "",
+  lastUpdatedBy: String? = "bjones_gen",
+  lastUpdatedByDisplayName: String? = "Barry Jones",
   lastUpdatedAt: Instant? = Instant.now(),
 ): Goal =
   Goal(
@@ -28,7 +30,9 @@ fun aValidGoal(
     status = status,
     notes = notes,
     createdBy = createdBy,
+    createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
     lastUpdatedBy = lastUpdatedBy,
+    lastUpdatedByDisplayName = lastUpdatedByDisplayName,
     lastUpdatedAt = lastUpdatedAt,
   )
