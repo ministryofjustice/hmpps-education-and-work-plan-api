@@ -28,7 +28,11 @@ interface GoalResourceMapper {
   fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal
 
   @Mapping(target = "goalReference", source = "reference")
+  // TODO RR-106 - map createdByDisplayName
+  @Mapping(target = "createdByDisplayName", constant = "")
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")
+  // TODO RR-106 - map updatedByDisplayName
+  @Mapping(target = "updatedByDisplayName", constant = "")
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
   fun fromDomainToModel(goalDomain: Goal): GoalResponse
 }

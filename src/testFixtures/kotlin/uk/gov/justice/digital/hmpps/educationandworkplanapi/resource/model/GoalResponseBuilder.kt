@@ -12,9 +12,11 @@ fun aValidGoalResponse(
   steps: List<StepResponse> = listOf(aValidStepResponse(), anotherValidStepResponse()),
   status: GoalStatus = GoalStatus.ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
-  createdBy: String = "",
+  createdBy: String = "asmith_gen",
+  createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
-  updatedBy: String = "",
+  updatedBy: String = "asmith_gen",
+  updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
 ): GoalResponse =
   GoalResponse(
@@ -26,8 +28,10 @@ fun aValidGoalResponse(
     status = status,
     notes = notes,
     createdBy = createdBy,
+    createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
     updatedBy = updatedBy,
+    updatedByDisplayName = updatedByDisplayName,
     updatedAt = updatedAt,
   )
 
@@ -39,9 +43,11 @@ fun anotherValidGoalResponse(
   steps: List<StepResponse> = listOf(aValidStepResponse(title = "Attend in house bricklaying course")),
   status: GoalStatus = GoalStatus.ACTIVE,
   notes: String? = null,
-  createdBy: String = "",
+  createdBy: String = "bjones_gen",
+  createdByDisplayName: String = "Barry Jones",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
-  updatedBy: String = "",
+  updatedBy: String = "bjones_gen",
+  updatedByDisplayName: String = "Barry Jones",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
 ): GoalResponse =
   GoalResponse(
@@ -53,7 +59,9 @@ fun anotherValidGoalResponse(
     status = status,
     notes = notes,
     createdBy = createdBy,
+    createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
     updatedBy = updatedBy,
     updatedAt = updatedAt,
+    updatedByDisplayName = updatedByDisplayName,
   )
