@@ -21,7 +21,8 @@ import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.AuditDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -73,7 +74,7 @@ class GoalEntity(
   var createdBy: String? = null,
 
   @Column
-  @AuditDisplayName
+  @CreatedByDisplayName
   var createdByDisplayName: String? = null,
 
   @Column
@@ -85,7 +86,7 @@ class GoalEntity(
   var updatedBy: String? = null,
 
   @Column
-  @AuditDisplayName
+  @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
 ) {
 
