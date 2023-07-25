@@ -9,48 +9,56 @@ import java.util.Date
 import java.util.UUID
 
 fun aValidTokenWithViewAuthority(
-  dpsUsername: String = "auser_gen",
+  username: String = "auser_gen",
+  displayName: String = "Albert User",
   privateKey: PrivateKey,
 ): String =
   buildAccessToken(
-    dpsUsername,
-    listOf("ROLE_EDUCATION_WORK_PLAN_VIEWER"),
-    privateKey,
+    username = username,
+    displayName = displayName,
+    roles = listOf("ROLE_EDUCATION_WORK_PLAN_VIEWER"),
+    privateKey = privateKey,
   )
 
 fun aValidTokenWithEditAuthority(
-  dpsUsername: String = "auser_gen",
+  username: String = "auser_gen",
+  displayName: String = "Albert User",
   privateKey: PrivateKey,
 ): String =
   buildAccessToken(
-    dpsUsername,
-    listOf("ROLE_EDUCATION_WORK_PLAN_EDITOR"),
-    privateKey,
+    username = username,
+    displayName = displayName,
+    roles = listOf("ROLE_EDUCATION_WORK_PLAN_EDITOR"),
+    privateKey = privateKey,
   )
 
 fun aValidTokenWithNoAuthorities(
-  dpsUsername: String = "auser_gen",
+  username: String = "auser_gen",
+  displayName: String = "Albert User",
   privateKey: PrivateKey,
 ): String =
   buildAccessToken(
-    dpsUsername,
-    emptyList(),
-    privateKey,
+    username = username,
+    displayName = displayName,
+    roles = emptyList(),
+    privateKey = privateKey,
   )
 
 fun buildAccessToken(
-  dpsUsername: String = "auser_gen",
+  username: String = "auser_gen",
+  displayName: String = "Albert User",
   roles: List<String> = emptyList(),
   privateKey: PrivateKey,
 ): String =
   Jwts.builder()
-    .setSubject(dpsUsername)
+    .setSubject(username)
     .addClaims(
       mapOf(
         "authorities" to roles,
-        "user_name" to dpsUsername,
+        "user_name" to username,
         "auth_source" to "nomis",
         "user_uuid" to UUID.randomUUID(),
+        "name" to displayName,
       ),
     )
     .setIssuedAt(Date.from(Instant.now()))
