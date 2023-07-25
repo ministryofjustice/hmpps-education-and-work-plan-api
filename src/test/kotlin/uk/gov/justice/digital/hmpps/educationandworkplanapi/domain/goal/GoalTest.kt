@@ -63,9 +63,11 @@ class GoalTest {
           reviewDate = LocalDate.now().plusMonths(6),
           category = RESETTLEMENT,
           status = ACTIVE,
-          createdBy = "",
+          createdBy = "bjones_gen",
+          createdByDisplayName = "Barry Jones",
           createdAt = Instant.now(),
-          lastUpdatedBy = "",
+          lastUpdatedBy = "bjones_gen",
+          lastUpdatedByDisplayName = "Barry Jones",
           lastUpdatedAt = Instant.now(),
           steps = steps,
         )

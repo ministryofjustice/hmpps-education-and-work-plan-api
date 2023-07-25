@@ -5,10 +5,10 @@ import java.util.UUID
 fun aValidActionPlanEntity(
   id: UUID? = UUID.randomUUID(),
   prisonNumber: String = "A1234BC",
-  goals: MutableList<GoalEntity> = mutableListOf(aValidGoalEntity()),
+  goals: List<GoalEntity> = listOf(aValidGoalEntity()),
 ): ActionPlanEntity =
   ActionPlanEntity(
     id = id,
     prisonNumber = prisonNumber,
-    goals = goals,
+    goals = goals.toMutableList(),
   )

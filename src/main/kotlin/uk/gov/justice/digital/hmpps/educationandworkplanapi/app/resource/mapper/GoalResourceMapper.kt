@@ -22,17 +22,16 @@ interface GoalResourceMapper {
   @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
   @Mapping(target = "status", constant = "ACTIVE")
   @Mapping(target = "createdBy", ignore = true)
+  @Mapping(target = "createdByDisplayName", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "lastUpdatedBy", ignore = true)
+  @Mapping(target = "lastUpdatedByDisplayName", ignore = true)
   @Mapping(target = "lastUpdatedAt", ignore = true)
   fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal
 
   @Mapping(target = "goalReference", source = "reference")
-  // TODO RR-106 - map createdByDisplayName
-  @Mapping(target = "createdByDisplayName", constant = "")
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")
-  // TODO RR-106 - map updatedByDisplayName
-  @Mapping(target = "updatedByDisplayName", constant = "")
+  @Mapping(target = "updatedByDisplayName", source = "lastUpdatedByDisplayName")
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
   fun fromDomainToModel(goalDomain: Goal): GoalResponse
 }

@@ -17,13 +17,14 @@ interface GoalEntityMapper {
    * The JPA managed fields are not mapped.
    * This method is suitable for creating a new [GoalEntity] to be subsequently persisted to the database.
    */
-  @ExcludeJpaManagedFields
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   fun fromDomainToEntity(goal: Goal): GoalEntity
 
   /**
    * Maps the supplied [GoalEntity] into the domain [Goal].
    */
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
+  @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   fun fromEntityToDomain(goalEntity: GoalEntity): Goal
 }

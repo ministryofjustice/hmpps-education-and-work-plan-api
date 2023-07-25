@@ -3,11 +3,15 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.DpsPrincipal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -77,8 +81,13 @@ class GetActionPlanTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     val actionPlanEntity = aValidActionPlanEntity(
       prisonNumber = prisonNumber,
+      goals = listOf(aValidGoalEntity()),
     )
+
+    SecurityContextHolder.getContext().authentication =
+      TestingAuthenticationToken(DpsPrincipal("asmith_gen", "Alex Smith"), null, emptyList())
     actionPlanRepository.save(actionPlanEntity)
+    SecurityContextHolder.clearContext()
 
     // When
     val response = webTestClient.get()
@@ -93,5 +102,11 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
+      .goal(0) {
+        it.wasCreatedBy("asmith_gen")
+          .hasCreatedByDisplayName("Alex Smith")
+          .wasUpdatedBy("asmith_gen")
+          .hasUpdatedByDisplayName("Alex Smith")
+      }
   }
 }

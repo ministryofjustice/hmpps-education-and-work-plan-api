@@ -23,8 +23,10 @@ class Goal(
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
   val createdBy: String?,
+  val createdByDisplayName: String?,
   val createdAt: Instant?,
   val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
   val lastUpdatedAt: Instant?,
   steps: List<Step>,
 ) {

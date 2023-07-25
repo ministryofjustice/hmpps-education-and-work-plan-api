@@ -57,8 +57,10 @@ internal class GoalResourceMapperTest {
       // JPA managed fields - expect these all to be null
       createdAt = null,
       createdBy = null,
+      createdByDisplayName = null,
       lastUpdatedAt = null,
       lastUpdatedBy = null,
+      lastUpdatedByDisplayName = null,
     )
 
     // When
@@ -79,8 +81,10 @@ internal class GoalResourceMapperTest {
       status = GoalStatus.ACTIVE,
       reviewDate = null,
       steps = mutableListOf(step),
-      createdBy = "a.user.id",
-      lastUpdatedBy = "another.user.id",
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
+      lastUpdatedBy = "bjones_gen",
+      lastUpdatedByDisplayName = "Barry Jones",
     )
     val expectedStepResponse = aValidStepResponse()
     val expectedDateTime = OffsetDateTime.now()
@@ -95,11 +99,11 @@ internal class GoalResourceMapperTest {
       notes = goal.notes,
       steps = listOf(expectedStepResponse),
       createdAt = expectedDateTime,
-      createdBy = "a.user.id",
-      createdByDisplayName = "",
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
       updatedAt = expectedDateTime,
-      updatedBy = "another.user.id",
-      updatedByDisplayName = "",
+      updatedBy = "bjones_gen",
+      updatedByDisplayName = "Barry Jones",
     )
 
     // When
