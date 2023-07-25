@@ -82,11 +82,20 @@ class CreateGoalTest : IntegrationTestBase() {
     val createStepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
     val createGoalRequest = aValidCreateGoalRequest(steps = listOf(createStepRequest))
 
+    val dpsUsername = "auser_gen"
+    val displayName = "Albert User"
+
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .body(Mono.just(createGoalRequest), CreateGoalRequest::class.java)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = dpsUsername,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -97,15 +106,18 @@ class CreateGoalTest : IntegrationTestBase() {
     assertThat(actionPlan)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(1)
+      .wasCreatedBy(dpsUsername)
     val goal = actionPlan!!.goals!![0]
     assertThat(goal)
       .hasTitle(createGoalRequest.title)
       .hasNumberOfSteps(createGoalRequest.steps.size)
+      .wasCreatedBy(dpsUsername)
     val step = goal.steps!![0]
     assertThat(step)
       .hasTitle(createStepRequest.title)
       .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.NOT_STARTED)
+      .wasCreatedBy(dpsUsername)
   }
 
   @Test
