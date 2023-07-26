@@ -26,6 +26,6 @@ class ActionPlanService(
   fun getActionPlan(prisonNumber: String): ActionPlan {
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }
     return persistenceAdapter.getActionPlan(prisonNumber)
-      ?: throw ActionPlanNotFoundException("No Action Plan found for prisoner [$prisonNumber]")
+      ?: ActionPlan(prisonNumber, emptyList())
   }
 }

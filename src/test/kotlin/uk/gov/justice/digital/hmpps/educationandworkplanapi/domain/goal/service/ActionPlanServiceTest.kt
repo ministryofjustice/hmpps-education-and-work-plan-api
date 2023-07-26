@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -11,7 +10,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 
 @ExtendWith(MockitoExtension::class)
@@ -44,12 +42,11 @@ class ActionPlanServiceTest {
     given(persistenceAdapter.getActionPlan(any())).willReturn(null)
 
     // When
-    val exception: ActionPlanNotFoundException = catchThrowableOfType(
-      { service.getActionPlan(prisonNumber) },
-      ActionPlanNotFoundException::class.java,
-    )
+    val retrievedActionPlan = service.getActionPlan(prisonNumber)
 
     // Then
-    assertThat(exception.message).isEqualTo("No Action Plan found for prisoner [$prisonNumber]")
+    assertThat(retrievedActionPlan.prisonNumber).isEqualTo(prisonNumber)
+    assertThat(retrievedActionPlan.goals).isEmpty()
+    verify(persistenceAdapter).getActionPlan(prisonNumber)
   }
 }
