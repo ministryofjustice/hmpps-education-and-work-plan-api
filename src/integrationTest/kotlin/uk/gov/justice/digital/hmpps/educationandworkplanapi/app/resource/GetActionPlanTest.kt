@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
@@ -65,14 +64,14 @@ class GetActionPlanTest : IntegrationTestBase() {
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .exchange()
       .expectStatus()
-      .isNotFound
-      .returnResult(ErrorResponse::class.java)
+      .isOk
+      .returnResult(ActionPlanResponse::class.java)
 
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .hasStatus(NOT_FOUND.value())
-      .hasUserMessage("No Action Plan found for prisoner [$prisonNumber]")
+      .isForPrisonNumber(prisonNumber)
+      .hasNoGoalsSet()
   }
 
   @Test
