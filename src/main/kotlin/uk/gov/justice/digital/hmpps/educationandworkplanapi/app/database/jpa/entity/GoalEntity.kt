@@ -50,11 +50,6 @@ class GoalEntity(
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
-  var category: GoalCategory? = null,
-
-  @Column
-  @Enumerated(value = EnumType.STRING)
-  @field:NotNull
   var status: GoalStatus? = null,
 
   @Column
@@ -103,13 +98,6 @@ class GoalEntity(
   override fun toString(): String {
     return this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
   }
-}
-
-enum class GoalCategory {
-  WORK,
-  PERSONAL_DEVELOPMENT,
-  EDUCATION,
-  RESETTLEMENT,
 }
 
 enum class GoalStatus {

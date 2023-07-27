@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalCategory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
@@ -20,7 +19,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalCategory as GoalCategoryApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus as GoalStatusApi
 
 @ExtendWith(MockitoExtension::class)
@@ -40,7 +38,6 @@ internal class GoalResourceMapperTest {
     // Given
     val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(
-      category = GoalCategoryApi.PERSONAL_DEVELOPMENT,
       reviewDate = LocalDate.now(),
       steps = mutableListOf(createStepRequest),
     )
@@ -50,7 +47,6 @@ internal class GoalResourceMapperTest {
       reference = UUID.randomUUID(),
       title = createGoalRequest.title,
       reviewDate = createGoalRequest.reviewDate,
-      category = GoalCategory.PERSONAL_DEVELOPMENT,
       status = GoalStatus.ACTIVE,
       notes = createGoalRequest.notes,
       steps = mutableListOf(expectedStep),
@@ -77,7 +73,6 @@ internal class GoalResourceMapperTest {
     // Given
     val step = aValidStep()
     val goal = aValidGoal(
-      category = GoalCategory.PERSONAL_DEVELOPMENT,
       status = GoalStatus.ACTIVE,
       reviewDate = null,
       steps = mutableListOf(step),
@@ -94,7 +89,6 @@ internal class GoalResourceMapperTest {
       reference = goal.reference,
       title = goal.title,
       reviewDate = null,
-      category = GoalCategoryApi.PERSONAL_DEVELOPMENT,
       status = GoalStatusApi.ACTIVE,
       notes = goal.notes,
       steps = listOf(expectedStepResponse),

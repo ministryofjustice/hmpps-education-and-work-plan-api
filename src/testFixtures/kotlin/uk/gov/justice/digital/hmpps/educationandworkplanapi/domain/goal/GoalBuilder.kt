@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalCategory.PERSONAL_DEVELOPMENT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE
 import java.time.Instant
 import java.time.LocalDate
@@ -10,7 +9,6 @@ fun aValidGoal(
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
   reviewDate: LocalDate? = null,
-  category: GoalCategory = PERSONAL_DEVELOPMENT,
   steps: List<Step> = listOf(aValidStep(), anotherValidStep()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -25,7 +23,6 @@ fun aValidGoal(
     reference = reference,
     title = title,
     reviewDate = reviewDate,
-    category = category,
     steps = steps,
     status = status,
     notes = notes,

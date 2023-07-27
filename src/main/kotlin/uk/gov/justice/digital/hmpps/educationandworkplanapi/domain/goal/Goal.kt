@@ -9,7 +9,7 @@ import java.util.UUID
 /**
  * Represents a prisoner's Goal in their Education and Work Plan (or so-called "Action Plan").
  *
- * The goals have different categories and may be personal development based (e.g. improving communication) or related
+ * The goals vary significantly and may be personal development based (e.g. improving communication) or related
  * to a future job/career and consist of one or more [Step Steps] (at least one).
  *
  * Each goal has its own lifecycle (such as active or completed) and a prisoner can have many goals at the same time
@@ -19,7 +19,6 @@ class Goal(
   val reference: UUID,
   val title: String,
   val reviewDate: LocalDate?,
-  val category: GoalCategory,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
   val createdBy: String?,

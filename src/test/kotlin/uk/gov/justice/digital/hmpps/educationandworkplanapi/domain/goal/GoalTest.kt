@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalCategory.RESETTLEMENT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE
 import java.time.Instant
 import java.time.LocalDate
@@ -61,7 +60,6 @@ class GoalTest {
           reference = goalReference,
           title = "Improve woodworking skills",
           reviewDate = LocalDate.now().plusMonths(6),
-          category = RESETTLEMENT,
           status = ACTIVE,
           createdBy = "bjones_gen",
           createdByDisplayName = "Barry Jones",

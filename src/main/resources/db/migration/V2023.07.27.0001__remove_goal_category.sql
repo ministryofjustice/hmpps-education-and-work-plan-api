@@ -1,0 +1,1 @@
+ALTER TABLE goal DROP COLUMN category;

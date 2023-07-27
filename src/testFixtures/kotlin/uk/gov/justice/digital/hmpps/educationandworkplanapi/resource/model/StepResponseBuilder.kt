@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange.THREE_TO_SIX_MONTHS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange.ZERO_TO_THREE_MONTHS
-import java.util.*
+import java.util.UUID
 
 fun aValidStepResponse(
   reference: UUID = UUID.randomUUID(),
@@ -12,7 +12,7 @@ fun aValidStepResponse(
   sequenceNumber: Int = 1,
 ): StepResponse =
   StepResponse(
-    stepReference = reference.toString(),
+    stepReference = reference,
     title = title,
     targetDateRange = targetDateRange,
     status = status,
@@ -27,7 +27,7 @@ fun anotherValidStepResponse(
   sequenceNumber: Int = 2,
 ): StepResponse =
   StepResponse(
-    stepReference = reference.toString(),
+    stepReference = reference,
     title = title,
     targetDateRange = targetDateRange,
     status = status,
