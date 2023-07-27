@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.0.3'
+  version: '1.1.0'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -122,6 +122,7 @@ components:
       properties:
         goalReference:
           type: string
+          format: uuid
           description: The Goal's unique reference
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         title:
@@ -135,8 +136,6 @@ components:
           example: '2023-12-19'
         status:
           $ref: '#/components/schemas/GoalStatus'
-        category:
-          $ref: '#/components/schemas/GoalCategory'
         steps:
           type: array
           minItems: 1
@@ -191,6 +190,7 @@ components:
       properties:
         stepReference:
           type: string
+          format: uuid
           description: A unique reference for the Step
           example: d38a6c41-13d1-1d05-13c2-24619966119b
         title:
@@ -226,8 +226,6 @@ components:
           format: date
           description: An optional ISO-8601 date representing when the Goal is up for review.
           example: '2023-12-19'
-        category:
-          $ref: '#/components/schemas/GoalCategory'
         steps:
           type: array
           minItems: 1
@@ -269,15 +267,6 @@ components:
         - ACTIVE
         - COMPLETED
         - ARCHIVED
-    GoalCategory:
-      title: GoalCategory
-      description: Enum describing the category of a Goal.
-      type: string
-      enum:
-        - WORK
-        - PERSONAL_DEVELOPMENT
-        - EDUCATION
-        - RESETTLEMENT
     StepStatus:
       title: StepStatus
       description: Enum describing the various statuses of a Step's lifecycle.

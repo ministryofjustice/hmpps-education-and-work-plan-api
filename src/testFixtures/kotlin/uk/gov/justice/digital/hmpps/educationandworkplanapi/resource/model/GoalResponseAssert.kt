@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.util.UUID
 
 fun assertThat(actual: GoalResponse?) = GoalResponseAssert(actual)
 
@@ -102,7 +103,7 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
-  fun hasReference(expected: String): GoalResponseAssert {
+  fun hasReference(expected: UUID): GoalResponseAssert {
     isNotNull
     with(actual!!) {
       if (goalReference != expected) {

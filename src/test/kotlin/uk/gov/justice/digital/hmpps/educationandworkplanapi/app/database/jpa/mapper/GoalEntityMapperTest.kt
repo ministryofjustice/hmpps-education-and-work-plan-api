@@ -17,9 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidSt
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalCategory as EntityCategory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalStatus as EntityStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalCategory as DomainCategory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus as DomainStatus
 
 @ExtendWith(MockitoExtension::class)
@@ -41,7 +39,6 @@ class GoalEntityMapperTest {
       reference = UUID.randomUUID(),
       title = "Improve communication skills",
       reviewDate = reviewDate,
-      category = DomainCategory.PERSONAL_DEVELOPMENT,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
@@ -60,7 +57,6 @@ class GoalEntityMapperTest {
       reference = domainGoal.reference,
       title = "Improve communication skills",
       reviewDate = reviewDate,
-      category = EntityCategory.PERSONAL_DEVELOPMENT,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(expectedEntityStep),
@@ -95,7 +91,6 @@ class GoalEntityMapperTest {
       reference = UUID.randomUUID(),
       title = "Improve communication skills",
       reviewDate = reviewDate,
-      category = EntityCategory.PERSONAL_DEVELOPMENT,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(entityStep),
@@ -114,7 +109,6 @@ class GoalEntityMapperTest {
       reference = entityGoal.reference!!,
       title = "Improve communication skills",
       reviewDate = reviewDate,
-      category = DomainCategory.PERSONAL_DEVELOPMENT,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
