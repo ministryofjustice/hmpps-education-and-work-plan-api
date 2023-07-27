@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.0.2'
+  version: '1.0.3'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -32,7 +32,7 @@ paths:
         required: true
     get:
       summary: Return a Prisoner's Action Plan
-      description: Return a Prisoner's Action Plan. If the prisoner does not yet have any goals set, then an Action Plan with no goals (empty array) is returned.
+      description: Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, then an Action Plan with no goals (empty array) is returned.
       tags:
         - Action Plan
       responses:
