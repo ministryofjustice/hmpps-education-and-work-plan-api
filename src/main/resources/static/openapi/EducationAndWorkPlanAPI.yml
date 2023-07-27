@@ -84,7 +84,7 @@ paths:
         required: true
     put:
       summary: Updates a Goal
-      description: Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will be result in it being removed.
+      description: Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will result in it being removed.
       tags:
         - Action Plan - Single Goal
       responses:
