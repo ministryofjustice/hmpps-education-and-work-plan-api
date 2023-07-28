@@ -22,16 +22,16 @@ internal class StepResourceMapperTest {
   @Test
   fun `should map from model to domain`() {
     // Given
-    val createStepRequest = aValidCreateStepRequest()
+    val stepRequest = aValidCreateStepRequest()
     val expectedStep = aValidStep(
-      title = createStepRequest.title,
+      title = stepRequest.title,
       targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.NOT_STARTED,
-      sequenceNumber = createStepRequest.sequenceNumber,
+      sequenceNumber = stepRequest.sequenceNumber,
     )
 
     // When
-    val actual = mapper.fromModelToDomain(createStepRequest)
+    val actual = mapper.fromModelToDomain(stepRequest)
 
     // Then
     assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedStep)

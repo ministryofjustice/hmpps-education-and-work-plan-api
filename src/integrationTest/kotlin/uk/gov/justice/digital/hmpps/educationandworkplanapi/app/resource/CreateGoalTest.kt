@@ -79,8 +79,8 @@ class CreateGoalTest : IntegrationTestBase() {
   fun `should add goal and create a new action plan given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createStepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
-    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(createStepRequest))
+    val stepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
+    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(stepRequest))
 
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
@@ -117,7 +117,7 @@ class CreateGoalTest : IntegrationTestBase() {
       .hasUpdatedByDisplayName(displayName)
     val step = goal.steps!![0]
     assertThat(step)
-      .hasTitle(createStepRequest.title)
+      .hasTitle(stepRequest.title)
       .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.NOT_STARTED)
       .wasCreatedBy(dpsUsername)

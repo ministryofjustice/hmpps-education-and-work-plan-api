@@ -263,7 +263,7 @@ components:
           minItems: 1
           description: A List of at least one Step.
           items:
-            $ref: '#/components/schemas/CreateStepRequest'
+            $ref: '#/components/schemas/StepRequest'
         notes:
           type: string
           description: Some additional notes related to the Goal.
@@ -271,25 +271,6 @@ components:
       required:
         - title
         - steps
-    CreateStepRequest:
-      title: CreateStepRequest
-      type: object
-      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED.
-      properties:
-        title:
-          type: string
-          description: A title describing the step
-          example: Book first aid course
-        targetDateRange:
-          $ref: '#/components/schemas/TargetDateRange'
-        sequenceNumber:
-          type: integer
-          description: The number (position) of the Step within the overall Goal.
-          example: 1
-      required:
-        - title
-        - targetDateRange
-        - sequenceNumber
 
     UpdateGoalRequest:
       title: UpdateGoalRequest
@@ -315,7 +296,7 @@ components:
           minItems: 1
           description: A List of at least one Step.
           items:
-            $ref: '#/components/schemas/UpdateStepRequest'
+            $ref: '#/components/schemas/StepRequest'
         notes:
           type: string
           description: Some additional notes related to the Goal.
@@ -324,15 +305,16 @@ components:
         - goalReference
         - title
         - steps
-    UpdateStepRequest:
-      title: UpdateStepRequest
+
+    StepRequest:
+      title: StepRequest
       type: object
-      description: A request to create a Step within a Goal.
+      description: A request to create or update a Step within a Goal (determined by the existence of the 'stepReference' field - see below). Note that new Steps are created with a status of NOT_STARTED.
       properties:
         stepReference:
           type: string
           format: uuid
-          description: A unique reference for the Step
+          description: A unique reference for the Step, which should only be provided when updating an existing known Step. This should be null when creating a new Step, otherwise a 404 ('Not found') error will be returned.
           example: d38a6c41-13d1-1d05-13c2-24619966119b
         title:
           type: string
@@ -345,7 +327,6 @@ components:
           description: The number (position) of the Step within the overall Goal.
           example: 1
       required:
-        - stepReference
         - title
         - targetDateRange
         - sequenceNumber
