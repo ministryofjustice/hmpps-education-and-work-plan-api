@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.transaction.annotation.Transactional
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
@@ -15,12 +14,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange as TargetDateRangeEntity
 
 class CreateGoalTest : IntegrationTestBase() {
@@ -43,7 +42,7 @@ class CreateGoalTest : IntegrationTestBase() {
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
-      .body(Mono.just(aValidCreateGoalRequest()), CreateGoalRequest::class.java)
+      .withBody(aValidCreateGoalRequest())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -59,7 +58,7 @@ class CreateGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .body(Mono.just(createRequest), CreateGoalRequest::class.java)
+      .withBody(createRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -88,7 +87,7 @@ class CreateGoalTest : IntegrationTestBase() {
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .body(Mono.just(createGoalRequest), CreateGoalRequest::class.java)
+      .withBody(createGoalRequest)
       .bearerToken(
         aValidTokenWithEditAuthority(
           username = dpsUsername,
@@ -139,7 +138,7 @@ class CreateGoalTest : IntegrationTestBase() {
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .body(Mono.just(createRequest), CreateGoalRequest::class.java)
+      .withBody(createRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -169,7 +168,7 @@ class CreateGoalTest : IntegrationTestBase() {
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .body(Mono.just(createRequest), CreateGoalRequest::class.java)
+      .withBody(createRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
