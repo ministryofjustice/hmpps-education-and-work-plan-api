@@ -36,10 +36,10 @@ internal class GoalResourceMapperTest {
   @Test
   fun `should map from model to domain`() {
     // Given
-    val createStepRequest = aValidCreateStepRequest()
+    val stepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(
       reviewDate = LocalDate.now(),
-      steps = mutableListOf(createStepRequest),
+      steps = mutableListOf(stepRequest),
     )
     val expectedStep = aValidStep()
     given(stepMapper.fromModelToDomain(any())).willReturn(expectedStep)
@@ -65,7 +65,7 @@ internal class GoalResourceMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedGoal)
     assertThat(actual.reference).isNotNull()
-    verify(stepMapper).fromModelToDomain(createStepRequest)
+    verify(stepMapper).fromModelToDomain(stepRequest)
   }
 
   @Test

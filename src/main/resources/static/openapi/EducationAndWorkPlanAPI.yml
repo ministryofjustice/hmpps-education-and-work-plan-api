@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.1.0'
+  version: '1.1.1'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -65,6 +65,38 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/CreateGoal'
 
+  '/action-plans/{prisonNumber}/goals/{goalReference}':
+    parameters:
+      - name: prisonNumber
+        description: The number of the Prisoner who owns the Goal.
+        schema:
+          type: string
+        example: 'A1234BC'
+        in: path
+        required: true
+      - name: goalReference
+        description: The Goal's unique reference
+        schema:
+          type: string
+          format: uuid
+        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
+        in: path
+        required: true
+    put:
+      summary: Updates a Goal
+      description: Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will result in it being removed.
+      tags:
+        - Action Plan - Single Goal
+      responses:
+        '204':
+          description: The Goal was updated successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: update-goal
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateGoal'
 #
 # --------------------------------------------------------------------------------
 #
@@ -231,7 +263,7 @@ components:
           minItems: 1
           description: A List of at least one Step.
           items:
-            $ref: '#/components/schemas/CreateStepRequest'
+            $ref: '#/components/schemas/StepRequest'
         notes:
           type: string
           description: Some additional notes related to the Goal.
@@ -239,11 +271,51 @@ components:
       required:
         - title
         - steps
-    CreateStepRequest:
-      title: CreateStepRequest
+
+    UpdateGoalRequest:
+      title: UpdateGoalRequest
       type: object
-      description: A request to create a Step within a Goal. The Step is created a status of NOT_STARTED.
+      description: A request to update an individual Goal that a Prisoner aims to complete as part of their Action Plan.
       properties:
+        goalReference:
+          type: string
+          format: uuid
+          description: The Goal's unique reference
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        title:
+          type: string
+          description: A title explaining the aim of the goal.
+          example: Improve communication skills
+        reviewDate:
+          type: string
+          format: date
+          description: An optional ISO-8601 date representing when the Goal is up for review.
+          example: '2023-12-19'
+        steps:
+          type: array
+          minItems: 1
+          description: A List of at least one Step.
+          items:
+            $ref: '#/components/schemas/StepRequest'
+        notes:
+          type: string
+          description: Some additional notes related to the Goal.
+          example: Pay close attention to Peter's behaviour.
+      required:
+        - goalReference
+        - title
+        - steps
+
+    StepRequest:
+      title: StepRequest
+      type: object
+      description: A request to create or update a Step within a Goal (determined by the existence of the 'stepReference' field - see below). Note that new Steps are created with a status of NOT_STARTED.
+      properties:
+        stepReference:
+          type: string
+          format: uuid
+          description: A unique reference for the Step, which should only be provided when updating an existing known Step. This should be null when creating a new Step, otherwise a 404 ('Not found') error will be returned.
+          example: d38a6c41-13d1-1d05-13c2-24619966119b
         title:
           type: string
           description: A title describing the step
@@ -391,3 +463,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateGoalRequest'
+    UpdateGoal:
+      description: Request body to update a single Goal.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateGoalRequest'
