@@ -40,7 +40,7 @@ class ErrorResponseAssert(actual: ErrorResponse?) :
   fun hasUserMessageContaining(expected: String): ErrorResponseAssert {
     isNotNull
     with(actual!!) {
-      if (userMessage?.contains(expected) == false) {
+      if (userMessage == null || !userMessage!!.contains(expected)) {
         failWithMessage("Expected message to contain $expected, but was $userMessage")
       }
     }
@@ -60,7 +60,7 @@ class ErrorResponseAssert(actual: ErrorResponse?) :
   fun hasDeveloperMessageContaining(expected: String): ErrorResponseAssert {
     isNotNull
     with(actual!!) {
-      if (developerMessage?.contains(expected) == false) {
+      if (developerMessage == null || !developerMessage!!.contains(expected)) {
         failWithMessage("Expected message to contain $expected, but was $developerMessage")
       }
     }
