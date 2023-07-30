@@ -97,4 +97,30 @@ class UpdateGoalTest : IntegrationTestBase() {
       .hasUserMessageContaining("JSON parse error")
       .hasUserMessageContaining("value failed for JSON property goalReference due to missing (therefore NULL) value for creator parameter goalReference")
   }
+
+  @Test
+  fun `should fail to update goal given goal does not exist`() {
+    val prisonNumber = aValidPrisonNumber()
+    val goalReference = aValidReference()
+    val updateRequest = aValidUpdateGoalRequest(
+      goalReference = goalReference,
+    )
+
+    // When
+    val response = webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber, goalReference)
+      .withBody(updateRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNotFound
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(HttpStatus.NOT_FOUND.value())
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
+  }
 }

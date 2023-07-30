@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import java.util.UUID
 
 /**
  * Persistence Adapter for [Goal] instances.
@@ -16,4 +17,9 @@ interface GoalPersistenceAdapter {
    * Creates a new [Goal] for the prisoner identified by their prison number.
    */
   fun createGoal(goal: Goal, prisonNumber: String): Goal
+
+  /**
+   * Returns a [Goal] identified by its `prisonNumber` and `goalReference` if found, otherwise `null`.
+   */
+  fun getGoal(prisonNumber: String, goalReference: UUID): Goal?
 }

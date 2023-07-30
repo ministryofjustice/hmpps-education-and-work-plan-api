@@ -49,6 +49,6 @@ class GoalController(
     @PathVariable prisonNumber: String,
     @PathVariable goalReference: UUID,
   ) {
-    TODO("not yet implemented")
+    goalService.updateGoal(prisonNumber, goalReference)
   }
 }
