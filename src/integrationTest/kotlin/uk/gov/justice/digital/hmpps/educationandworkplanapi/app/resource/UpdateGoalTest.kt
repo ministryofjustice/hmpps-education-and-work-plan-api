@@ -123,4 +123,31 @@ class UpdateGoalTest : IntegrationTestBase() {
       .hasStatus(HttpStatus.NOT_FOUND.value())
       .hasUserMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
   }
+
+  @Test
+  fun `should fail to update goal given goal references in URI path and request body do not match`() {
+    val prisonNumber = aValidPrisonNumber()
+    val goalReference = aValidReference()
+    val someOtherGoalReference = aValidReference()
+    val updateRequest = aValidUpdateGoalRequest(
+      goalReference = someOtherGoalReference,
+    )
+
+    // When
+    val response = webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber, goalReference)
+      .withBody(updateRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(HttpStatus.BAD_REQUEST.value())
+      .hasUserMessage("Goal reference in URI path must match the Goal reference in the request body")
+  }
 }
