@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import jakarta.servlet.RequestDispatcher.ERROR_MESSAGE
 import jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.ConstraintViolationException
 import mu.KotlinLogging
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -93,6 +96,28 @@ class GlobalExceptionHandler(
           userMessage = e.message,
         ),
       )
+  }
+
+  /**
+   * Exception handler to return a 400 Bad Request ErrorResponse, specifically for a ConstraintViolationException.
+   *
+   * This is because the message property of ConstraintViolationException does not contain sufficient/formatted details
+   * as to the nature of the constraint violations. This handler constructs the error message from each violation in the
+   * exception, before using it to create the ErrorResponse which is rendered through the REST API.
+   */
+  @ExceptionHandler(ConstraintViolationException::class)
+  fun handleConstraintViolationException(
+    e: ConstraintViolationException,
+    request: WebRequest,
+  ): ResponseEntity<Any>? {
+    val violations: Set<ConstraintViolation<*>> = e.constraintViolations
+    val errorMessage = if (violations.isNotEmpty()) {
+      violations.joinToString(" ") { it.message }
+    } else {
+      "Validation error"
+    }
+    request.setAttribute(ERROR_MESSAGE, errorMessage, SCOPE_REQUEST)
+    return populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
   }
 
   /**
