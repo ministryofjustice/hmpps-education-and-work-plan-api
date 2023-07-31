@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -26,7 +27,12 @@ class GoalController(
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
-  fun createGoal(@PathVariable prisonNumber: String, @RequestBody request: CreateGoalRequest) {
+  fun createGoal(
+    @Valid
+    @RequestBody
+    request: CreateGoalRequest,
+    @PathVariable prisonNumber: String,
+  ) {
     goalService.createGoal(
       prisonNumber = prisonNumber,
       goal = goalResourceMapper.fromModelToDomain(request),
@@ -36,7 +42,13 @@ class GoalController(
   @PutMapping("{goalReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
-  fun updateGoal(@PathVariable prisonNumber: String, @PathVariable goalReference: UUID, @RequestBody updateGoalRequest: UpdateGoalRequest) {
+  fun updateGoal(
+    @Valid
+    @RequestBody
+    updateGoalRequest: UpdateGoalRequest,
+    @PathVariable prisonNumber: String,
+    @PathVariable goalReference: UUID,
+  ) {
     TODO("not yet implemented")
   }
 }

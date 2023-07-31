@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.transaction.TestTransaction
@@ -70,7 +71,35 @@ class CreateGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
-      .hasUserMessageContaining("At least one Step is required.")
+      .hasUserMessage("Validation failed for object='createGoalRequest'. Error count: 1")
+      .hasDeveloperMessageContaining("Steps cannot be empty when creating a Goal")
+  }
+
+  @Test
+  fun `should fail to create goal given null fields`() {
+    val prisonNumber = aValidPrisonNumber()
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .bodyValue(
+        """
+          { }
+        """.trimIndent(),
+      )
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(HttpStatus.BAD_REQUEST.value())
+      .hasUserMessageContaining("JSON parse error")
+      .hasUserMessageContaining("value failed for JSON property title due to missing (therefore NULL) value for creator parameter title")
   }
 
   @Test
