@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 
 private val log = KotlinLogging.logger {}
 
@@ -21,7 +20,7 @@ class ActionPlanService(
 
   /**
    * Retrieves a Prisoner's [ActionPlan] based on their prison number.
-   * Throws [ActionPlanNotFoundException] if the [ActionPlan] cannot be found.
+   * Returns a new [ActionPlan] if the [ActionPlan] cannot be found.
    */
   fun getActionPlan(prisonNumber: String): ActionPlan {
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }

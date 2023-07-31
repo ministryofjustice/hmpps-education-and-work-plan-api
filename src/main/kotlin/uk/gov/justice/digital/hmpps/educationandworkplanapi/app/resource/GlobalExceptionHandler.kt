@@ -19,6 +19,7 @@ import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
 private val log = KotlinLogging.logger {}
@@ -46,8 +47,18 @@ class GlobalExceptionHandler(
   private val errorAttributes: ApiRequestErrorAttributes,
 ) : ResponseEntityExceptionHandler() {
 
-  @ExceptionHandler(AccessDeniedException::class)
-  fun handleAccessDeniedException(e: AccessDeniedException, request: WebRequest): ResponseEntity<ErrorResponse> {
+  /**
+   * Exception handler to return a 403 Forbidden ErrorResponse
+   */
+  @ExceptionHandler(
+    value = [
+      AccessDeniedException::class,
+    ],
+  )
+  protected fun handleExceptionReturnForbiddenErrorResponse(
+    e: RuntimeException,
+    request: WebRequest,
+  ): ResponseEntity<Any> {
     log.info("Access denied exception: {}", e.message)
     return ResponseEntity
       .status(FORBIDDEN)
@@ -60,8 +71,19 @@ class GlobalExceptionHandler(
       )
   }
 
-  @ExceptionHandler(ActionPlanNotFoundException::class)
-  fun handleNotFoundException(e: ActionPlanNotFoundException): ResponseEntity<ErrorResponse> {
+  /**
+   * Exception handler to return a 404 Not Found ErrorResponse
+   */
+  @ExceptionHandler(
+    value = [
+      ActionPlanNotFoundException::class,
+      GoalNotFoundException::class,
+    ],
+  )
+  fun handleExceptionReturnNotFoundErrorResponse(
+    e: RuntimeException,
+    request: WebRequest,
+  ): ResponseEntity<ErrorResponse> {
     log.info("Not found exception: {}", e.message)
     return ResponseEntity
       .status(NOT_FOUND)

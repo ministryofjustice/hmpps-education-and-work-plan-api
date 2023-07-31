@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
-import kotlin.math.log
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -34,5 +34,16 @@ class JpaGoalPersistenceAdapter(
     }
 
     return goalMapper.fromEntityToDomain(goalEntity)
+  }
+
+  override fun getGoal(prisonNumber: String, goalReference: UUID): Goal? {
+    val goalEntity =
+      actionPlanRepository.findByPrisonNumber(prisonNumber)?.goals?.firstOrNull { goal -> goal.reference == goalReference }
+
+    return if (goalEntity != null) {
+      goalMapper.fromEntityToDomain(goalEntity)
+    } else {
+      null
+    }
   }
 }
