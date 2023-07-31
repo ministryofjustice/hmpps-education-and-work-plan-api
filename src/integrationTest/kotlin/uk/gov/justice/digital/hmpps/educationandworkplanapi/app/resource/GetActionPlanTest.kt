@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
-import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
@@ -15,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class GetActionPlanTest : IntegrationTestBase() {
 
@@ -137,7 +137,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   private fun createGoal(prisonNumber: String, createGoalRequest: CreateGoalRequest) {
     webTestClient.post()
       .uri("$URI_TEMPLATE/goals", prisonNumber)
-      .body(Mono.just(createGoalRequest), CreateGoalRequest::class.java)
+      .withBody(createGoalRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
