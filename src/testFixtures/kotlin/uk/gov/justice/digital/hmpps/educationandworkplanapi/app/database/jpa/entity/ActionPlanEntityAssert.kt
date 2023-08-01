@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
 import java.util.UUID
+import java.util.function.Consumer
 
 fun assertThat(actual: ActionPlanEntity?) = ActionPlanEntityAssert(actual)
 
@@ -107,6 +108,36 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
     with(actual!!) {
       if (goals!!.size != numberOfGoals) {
         failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals!!.size}")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [GoalEntity]. Takes a lambda as the method argument
+   * to call assertion methods provided by [GoalEntityAssert].
+   * Returns this [ActionPlanEntityAssert] to allow further chained assertions on the parent [ActionPlanEntity]
+   */
+  fun goal(goalNumber: Int, consumer: Consumer<GoalEntityAssert>): ActionPlanEntityAssert {
+    isNotNull
+    with(actual!!) {
+      val goal = goals!![goalNumber]
+      consumer.accept(assertThat(goal))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into all child [GoalEntity]s. Takes a lambda as the method argument
+   * to call assertion methods provided by [GoalEntityAssert].
+   * Returns this [ActionPlanEntityAssert] to allow further chained assertions on the parent [ActionPlanEntity]
+   * The assertions on all [GoalEntity]s must pass as true.
+   */
+  fun allGoals(consumer: Consumer<GoalEntityAssert>): ActionPlanEntityAssert {
+    isNotNull
+    with(actual!!) {
+      goals!!.onEach {
+        consumer.accept(assertThat(it))
       }
     }
     return this
