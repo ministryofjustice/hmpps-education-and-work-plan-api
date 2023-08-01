@@ -80,6 +80,7 @@ internal class GoalResourceMapperTest {
     val updateStepRequest = aValidUpdateStepRequest()
     val updateGoalRequest = aValidUpdateGoalRequest(
       reviewDate = LocalDate.now(),
+      status = GoalStatusApi.COMPLETED,
       steps = mutableListOf(updateStepRequest),
     )
 
@@ -90,7 +91,7 @@ internal class GoalResourceMapperTest {
       reference = updateGoalRequest.goalReference,
       title = updateGoalRequest.title,
       reviewDate = updateGoalRequest.reviewDate,
-      status = GoalStatus.ACTIVE,
+      status = GoalStatus.COMPLETED,
       notes = updateGoalRequest.notes,
       steps = mutableListOf(expectedStep),
       // JPA managed fields - expect these all to be null

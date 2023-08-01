@@ -31,7 +31,6 @@ interface GoalResourceMapper {
   fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal
 
   @Mapping(target = "reference", source = "goalReference")
-  @Mapping(target = "status", constant = "ACTIVE") // TODO - change when we support updating a Goal's status
   @Mapping(target = "createdBy", ignore = true)
   @Mapping(target = "createdByDisplayName", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
