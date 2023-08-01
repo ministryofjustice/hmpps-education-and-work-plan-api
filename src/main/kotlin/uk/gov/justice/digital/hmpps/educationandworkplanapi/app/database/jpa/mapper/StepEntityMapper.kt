@@ -2,11 +2,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.MappingTarget
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 
 @Mapper
-interface StepEntityMapper {
+abstract class StepEntityMapper {
 
   /**
    * Maps the supplied [Step] into a new un-persisted [StepEntity].
@@ -15,10 +16,15 @@ interface StepEntityMapper {
    */
   @ExcludeJpaManagedFields
   @Mapping(target = "targetDate", ignore = true)
-  fun fromDomainToEntity(step: Step): StepEntity
+  abstract fun fromDomainToEntity(step: Step): StepEntity
 
   /**
    * Maps the supplied [StepEntity] into the domain [Step].
    */
-  fun fromEntityToDomain(stepEntity: StepEntity): Step
+  abstract fun fromEntityToDomain(stepEntity: StepEntity): Step
+
+  @ExcludeJpaManagedFields
+  @ExcludeReferenceField
+  @Mapping(target = "targetDate", ignore = true)
+  abstract fun updateEntityFromDomain(@MappingTarget stepEntity: StepEntity, updatedStep: Step)
 }

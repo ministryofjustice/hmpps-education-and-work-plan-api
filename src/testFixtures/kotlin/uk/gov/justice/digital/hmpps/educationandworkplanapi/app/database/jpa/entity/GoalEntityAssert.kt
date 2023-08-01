@@ -13,11 +13,15 @@ fun assertThat(actual: GoalEntity?) = GoalEntityAssert(actual)
 class GoalEntityAssert(actual: GoalEntity?) :
   AbstractObjectAssert<GoalEntityAssert, GoalEntity?>(actual, GoalEntityAssert::class.java) {
 
+  companion object {
+    private val JPA_MANAGED_FIELDS = arrayOf("id", "createdAt", "createdBy", "createdByDisplayName", "updatedAt", "updatedBy", "updatedByDisplayName")
+  }
+
   fun hasJpaManagedFieldsPopulated(): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id == null || createdAt == null || createdBy == null || updatedAt == null || updatedBy == null) {
-        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
+      if (id == null || createdAt == null || createdBy == null || createdByDisplayName == null || updatedAt == null || updatedBy == null || updatedByDisplayName == null) {
+        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, createdByDisplayName = $createdByDisplayName, updatedAt = $updatedAt, updatedBy = $updatedBy, updatedByDisplayName = $updatedByDisplayName")
       }
     }
     return this
@@ -26,10 +30,33 @@ class GoalEntityAssert(actual: GoalEntity?) :
   fun doesNotHaveJpaManagedFieldsPopulated(): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id != null || createdAt != null || createdBy != null || updatedAt != null || updatedBy != null) {
-        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
+      if (id != null || createdAt != null || createdBy != null || createdByDisplayName != null || updatedAt != null || updatedBy != null || updatedByDisplayName != null) {
+        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, createdByDisplayName = $createdByDisplayName, updatedAt = $updatedAt, updatedBy = $updatedBy, updatedByDisplayName = $updatedByDisplayName")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: GoalEntity): GoalEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringJpaManagedFields(expected: GoalEntity): GoalEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields(*JPA_MANAGED_FIELDS)
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringSteps(expected: GoalEntity): GoalEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields("steps")
+      .isEqualTo(expected)
     return this
   }
 
