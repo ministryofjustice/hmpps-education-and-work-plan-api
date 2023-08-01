@@ -32,9 +32,16 @@ class Goal(
 
   /**
    * Returns the Goal's [Step]s, ordered by their sequence number (ascending).
+   * The sequence number is enforced to be sequential starting from 1 with no gaps.
    */
   val steps: MutableList<Step>
-    get() = field.also { steps -> steps.sortBy { it.sequenceNumber } }
+    get() = field.also { steps ->
+      val sortedSequencedSteps = steps
+        .sortedBy { it.sequenceNumber } // sort by current sequence number (that may include gaps if steps have been removed)
+        .mapIndexed { idx, step -> step.copy(sequenceNumber = idx + 1) } // map each step to a copy of itself with the sequential sequence number
+      steps.clear() // empty and replace the steps list with the new sorted sequenced steps
+      steps.addAll(sortedSequencedSteps)
+    }
 
   init {
     if (steps.isEmpty()) {
@@ -44,10 +51,22 @@ class Goal(
   }
 
   /**
-   * Adds a [Step] to this Goal.
+   * Adds a [Step] to this Goal, observing it's sequenceNumber relative to the existing list of [Step]s
    */
   fun addStep(step: Step) =
-    steps.add(step)
+    steps.apply {
+      // Current steps list is ordered with sequential sequenceNumbers by virtue of steps getter
+      // Work out where to insert this new step based on it's sequenceNumber
+      val insertionIndex =
+        if (step.sequenceNumber > this.size) {
+          this.size
+        } else if (step.sequenceNumber < 1) {
+          0
+        } else {
+          step.sequenceNumber - 1
+        }
+      add(insertionIndex, step)
+    }
 
   fun complete() {
     status = COMPLETED
