@@ -5,6 +5,7 @@ import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.time.Instant
 import java.util.UUID
 
@@ -28,6 +29,16 @@ interface GoalResourceMapper {
   @Mapping(target = "lastUpdatedByDisplayName", ignore = true)
   @Mapping(target = "lastUpdatedAt", ignore = true)
   fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal
+
+  @Mapping(target = "reference", source = "goalReference")
+  @Mapping(target = "status", constant = "ACTIVE") // TODO - change when we support updating a Goal's status
+  @Mapping(target = "createdBy", ignore = true)
+  @Mapping(target = "createdByDisplayName", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "lastUpdatedBy", ignore = true)
+  @Mapping(target = "lastUpdatedByDisplayName", ignore = true)
+  @Mapping(target = "lastUpdatedAt", ignore = true)
+  fun fromModelToDomain(updateGoalRequest: UpdateGoalRequest): Goal
 
   @Mapping(target = "goalReference", source = "reference")
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")

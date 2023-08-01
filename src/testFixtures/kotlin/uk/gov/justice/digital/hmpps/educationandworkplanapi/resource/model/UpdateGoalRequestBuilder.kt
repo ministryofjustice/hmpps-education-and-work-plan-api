@@ -8,7 +8,7 @@ fun aValidUpdateGoalRequest(
   goalReference: UUID = aValidReference(),
   title: String = "Improve communication skills",
   reviewDate: LocalDate? = null,
-  steps: List<StepRequest> = listOf(aValidUpdateStepRequest()),
+  steps: List<UpdateStepRequest> = listOf(aValidUpdateStepRequest()),
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
 ): UpdateGoalRequest =
   UpdateGoalRequest(

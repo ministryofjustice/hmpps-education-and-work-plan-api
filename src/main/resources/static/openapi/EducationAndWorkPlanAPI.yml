@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.1.1'
+  version: '1.1.2'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -263,7 +263,7 @@ components:
           minItems: 1
           description: A List of at least one Step.
           items:
-            $ref: '#/components/schemas/StepRequest'
+            $ref: '#/components/schemas/CreateStepRequest'
         notes:
           type: string
           description: Some additional notes related to the Goal.
@@ -280,7 +280,7 @@ components:
         goalReference:
           type: string
           format: uuid
-          description: The Goal's unique reference
+          description: The Goal's unique reference. This is used as an identifier to update the required Goal. It is not possible or supported to update the `goalReference`.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         title:
           type: string
@@ -296,7 +296,7 @@ components:
           minItems: 1
           description: A List of at least one Step.
           items:
-            $ref: '#/components/schemas/StepRequest'
+            $ref: '#/components/schemas/UpdateStepRequest'
         notes:
           type: string
           description: Some additional notes related to the Goal.
@@ -306,16 +306,11 @@ components:
         - title
         - steps
 
-    StepRequest:
-      title: StepRequest
+    CreateStepRequest:
+      title: CreateStepRequest
       type: object
-      description: A request to create or update a Step within a Goal (determined by the existence of the 'stepReference' field - see below). Note that new Steps are created with a status of NOT_STARTED.
+      description: A request to create a Step within a Goal. Note that new Steps are created with an implicit status of NOT_STARTED.
       properties:
-        stepReference:
-          type: string
-          format: uuid
-          description: A unique reference for the Step, which should only be provided when updating an existing known Step. This should be null when creating a new Step, otherwise a 404 ('Not found') error will be returned.
-          example: d38a6c41-13d1-1d05-13c2-24619966119b
         title:
           type: string
           description: A title describing the step
@@ -330,6 +325,24 @@ components:
         - title
         - targetDateRange
         - sequenceNumber
+
+    UpdateStepRequest:
+      title: UpdateStepRequest
+      type: object
+      description: A request to update a Step within a Goal.
+      allOf:
+        - $ref: '#/components/schemas/CreateStepRequest'
+      properties:
+        stepReference:
+          type: string
+          format: uuid
+          description: The Step's unique reference. This is used as an identifier to update the required Step. It is not possible or supported to update the `stepReference`.
+          example: d38a6c41-13d1-1d05-13c2-24619966119b
+        status:
+          $ref: '#/components/schemas/StepStatus'
+      required:
+        - stepReference
+        - status
 
     GoalStatus:
       title: GoalStatus
