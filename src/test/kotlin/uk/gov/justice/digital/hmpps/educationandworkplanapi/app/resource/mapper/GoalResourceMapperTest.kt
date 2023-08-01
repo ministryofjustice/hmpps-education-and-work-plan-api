@@ -12,10 +12,14 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -34,15 +38,17 @@ internal class GoalResourceMapperTest {
   private lateinit var instantMapper: InstantMapper
 
   @Test
-  fun `should map from model to domain`() {
+  fun `should map from CreateStepRequest model to domain`() {
     // Given
-    val stepRequest = aValidCreateStepRequest()
+    val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(
       reviewDate = LocalDate.now(),
-      steps = mutableListOf(stepRequest),
+      steps = mutableListOf(createStepRequest),
     )
+
     val expectedStep = aValidStep()
-    given(stepMapper.fromModelToDomain(any())).willReturn(expectedStep)
+    given(stepMapper.fromModelToDomain(any<CreateStepRequest>())).willReturn(expectedStep)
+
     val expectedGoal = aValidGoal(
       reference = UUID.randomUUID(),
       title = createGoalRequest.title,
@@ -65,7 +71,44 @@ internal class GoalResourceMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedGoal)
     assertThat(actual.reference).isNotNull()
-    verify(stepMapper).fromModelToDomain(stepRequest)
+    verify(stepMapper).fromModelToDomain(createStepRequest)
+  }
+
+  @Test
+  fun `should map from UpdateStepRequest model to domain`() {
+    // Given
+    val updateStepRequest = aValidUpdateStepRequest()
+    val updateGoalRequest = aValidUpdateGoalRequest(
+      reviewDate = LocalDate.now(),
+      status = GoalStatusApi.COMPLETED,
+      steps = mutableListOf(updateStepRequest),
+    )
+
+    val expectedStep = aValidStep()
+    given(stepMapper.fromModelToDomain(any<UpdateStepRequest>())).willReturn(expectedStep)
+
+    val expectedGoal = aValidGoal(
+      reference = updateGoalRequest.goalReference,
+      title = updateGoalRequest.title,
+      reviewDate = updateGoalRequest.reviewDate,
+      status = GoalStatus.COMPLETED,
+      notes = updateGoalRequest.notes,
+      steps = mutableListOf(expectedStep),
+      // JPA managed fields - expect these all to be null
+      createdAt = null,
+      createdBy = null,
+      createdByDisplayName = null,
+      lastUpdatedAt = null,
+      lastUpdatedBy = null,
+      lastUpdatedByDisplayName = null,
+    )
+
+    // When
+    val actual = mapper.fromModelToDomain(updateGoalRequest)
+
+    // Then
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expectedGoal)
+    verify(stepMapper).fromModelToDomain(updateStepRequest)
   }
 
   @Test

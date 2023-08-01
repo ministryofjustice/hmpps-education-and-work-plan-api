@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus as StepStatusApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange as TargetDateRangeApi
 
@@ -20,22 +21,48 @@ internal class StepResourceMapperTest {
   private lateinit var mapper: StepResourceMapperImpl
 
   @Test
-  fun `should map from model to domain`() {
+  fun `should map from CreateStepRequest model to domain`() {
     // Given
-    val stepRequest = aValidCreateStepRequest()
+    val createStepRequest = aValidCreateStepRequest(
+      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
+    )
+
     val expectedStep = aValidStep(
-      title = stepRequest.title,
+      title = createStepRequest.title,
       targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.NOT_STARTED,
-      sequenceNumber = stepRequest.sequenceNumber,
+      sequenceNumber = createStepRequest.sequenceNumber,
     )
 
     // When
-    val actual = mapper.fromModelToDomain(stepRequest)
+    val actual = mapper.fromModelToDomain(createStepRequest)
 
     // Then
     assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedStep)
     assertThat(actual.reference).isNotNull()
+  }
+
+  @Test
+  fun `should map from UpdateStepRequest model to domain`() {
+    // Given
+    val updateStepRequest = aValidUpdateStepRequest(
+      targetDateRange = TargetDateRangeApi.SIX_TO_TWELVE_MONTHS,
+      status = StepStatusApi.COMPLETE,
+    )
+
+    val expectedStep = aValidStep(
+      reference = updateStepRequest.stepReference,
+      title = updateStepRequest.title,
+      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
+      status = StepStatus.COMPLETE,
+      sequenceNumber = updateStepRequest.sequenceNumber,
+    )
+
+    // When
+    val actual = mapper.fromModelToDomain(updateStepRequest)
+
+    // Then
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expectedStep)
   }
 
   @Test
