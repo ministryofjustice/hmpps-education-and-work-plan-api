@@ -75,4 +75,46 @@ class GoalServiceTest {
     assertThat(exception.goalReference).isEqualTo(goalReference)
     verify(persistenceAdapter).getGoal(prisonNumber, goalReference)
   }
+
+  @Test
+  fun `should update goal given goal exists`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val goalReference = aValidReference()
+
+    val goal = aValidGoal(reference = goalReference)
+    given(persistenceAdapter.updateGoal(any(), any(), any())).willReturn(goal)
+
+    val updatedGoal = aValidGoal()
+
+    // When
+    val actual = service.updateGoal(prisonNumber, goalReference, updatedGoal)
+
+    // Then
+    assertThat(actual).isEqualTo(goal)
+    verify(persistenceAdapter).updateGoal(prisonNumber, goalReference, updatedGoal)
+  }
+
+  @Test
+  fun `should not update goal given goal does not exist`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val goalReference = aValidReference()
+
+    given(persistenceAdapter.updateGoal(any(), any(), any())).willReturn(null)
+
+    val updatedGoal = aValidGoal()
+
+    // When
+    val exception = catchThrowableOfType(
+      { service.updateGoal(prisonNumber, goalReference, updatedGoal) },
+      GoalNotFoundException::class.java,
+    )
+
+    // Then
+    assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
+    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+    assertThat(exception.goalReference).isEqualTo(goalReference)
+    verify(persistenceAdapter).updateGoal(prisonNumber, goalReference, updatedGoal)
+  }
 }

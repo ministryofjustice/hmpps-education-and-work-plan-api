@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanEntity.Companion.newActionPlanForPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
@@ -37,8 +38,7 @@ class JpaGoalPersistenceAdapter(
   }
 
   override fun getGoal(prisonNumber: String, goalReference: UUID): Goal? {
-    val goalEntity =
-      actionPlanRepository.findByPrisonNumber(prisonNumber)?.goals?.firstOrNull { goal -> goal.reference == goalReference }
+    val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, goalReference)
 
     return if (goalEntity != null) {
       goalMapper.fromEntityToDomain(goalEntity)
@@ -46,4 +46,18 @@ class JpaGoalPersistenceAdapter(
       null
     }
   }
+
+  @Transactional
+  override fun updateGoal(prisonNumber: String, goalReference: UUID, updatedGoal: Goal): Goal? {
+    val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, goalReference)
+    return if (goalEntity != null) {
+      goalMapper.updateEntityFromDomain(goalEntity, updatedGoal)
+      goalMapper.fromEntityToDomain(goalEntity)
+    } else {
+      null
+    }
+  }
+
+  private fun getGoalEntityByPrisonNumberAndGoalReference(prisonNumber: String, goalReference: UUID): GoalEntity? =
+    actionPlanRepository.findByPrisonNumber(prisonNumber)?.goals?.firstOrNull { goal -> goal.reference == goalReference }
 }
