@@ -12,6 +12,10 @@ fun assertThat(actual: StepEntity?) = StepEntityAssert(actual)
 class StepEntityAssert(actual: StepEntity?) :
   AbstractObjectAssert<StepEntityAssert, StepEntity?>(actual, StepEntityAssert::class.java) {
 
+  companion object {
+    private val JPA_MANAGED_FIELDS = arrayOf("id", "createdAt", "createdBy", "updatedAt", "updatedBy")
+  }
+
   fun hasJpaManagedFieldsPopulated(): StepEntityAssert {
     isNotNull
     with(actual!!) {
@@ -29,6 +33,19 @@ class StepEntityAssert(actual: StepEntity?) :
         failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: StepEntity): StepEntityAssert {
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringJpaManagedFields(expected: StepEntity): StepEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields(*JPA_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 
@@ -116,6 +133,16 @@ class StepEntityAssert(actual: StepEntity?) :
     with(actual!!) {
       if (reference != expected) {
         failWithMessage("Expected reference to be $expected, but was $reference")
+      }
+    }
+    return this
+  }
+
+  fun hasSequenceNumber(expected: Int): StepEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (sequenceNumber != expected) {
+        failWithMessage("Expected sequenceNumber to be $expected, but was $sequenceNumber")
       }
     }
     return this

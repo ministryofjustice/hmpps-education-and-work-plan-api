@@ -13,3 +13,6 @@ annotation class ExcludeJpaManagedFields
 @Mapping(target = "createdByDisplayName", ignore = true)
 @Mapping(target = "updatedByDisplayName", ignore = true)
 annotation class ExcludeJpaManagedFieldsIncludingDisplayNameFields
+
+@Mapping(target = "reference", ignore = true)
+annotation class ExcludeReferenceField

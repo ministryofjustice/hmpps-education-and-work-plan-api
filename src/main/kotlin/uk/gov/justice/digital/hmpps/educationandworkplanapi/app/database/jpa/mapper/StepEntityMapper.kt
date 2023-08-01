@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.MappingTarget
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 
@@ -21,4 +22,9 @@ interface StepEntityMapper {
    * Maps the supplied [StepEntity] into the domain [Step].
    */
   fun fromEntityToDomain(stepEntity: StepEntity): Step
+
+  @ExcludeJpaManagedFields
+  @ExcludeReferenceField
+  @Mapping(target = "targetDate", ignore = true)
+  fun updateEntityFromDomain(@MappingTarget stepEntity: StepEntity, updatedStep: Step)
 }

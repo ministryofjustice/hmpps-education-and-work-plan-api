@@ -74,7 +74,7 @@ class GoalEntityMapperTest {
     val actual = mapper.fromDomainToEntity(domainGoal)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+    assertThat(actual).isEqualToComparingAllFields(expected)
     verify(stepMapper).fromDomainToEntity(domainStep)
   }
 

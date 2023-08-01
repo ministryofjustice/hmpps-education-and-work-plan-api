@@ -65,6 +65,7 @@ dependencies {
   testFixturesImplementation("org.assertj:assertj-core")
   testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
   testFixturesImplementation("io.projectreactor:reactor-core")
+  testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
   // Libraries to support creating JWTs in test fixtures
   testFixturesImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testFixturesImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
