@@ -167,4 +167,72 @@ class JpaGoalPersistenceAdapterTest {
       verifyNoInteractions(goalMapper)
     }
   }
+
+  @Nested
+  inner class UpdateGoal {
+    @Test
+    fun `should update goal given goal exists in prisoners action plan`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      val goalEntity = aValidGoalEntity(reference = reference, title = "Original goal title")
+      val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+
+      val goalWithProposedUpdates = aValidGoal(reference = reference, title = "Updated goal title")
+
+      val expectedDomainGoal = aValidGoal(reference = reference, title = "Updated goal title")
+      given(goalMapper.fromEntityToDomain(any())).willReturn(expectedDomainGoal)
+
+      // When
+      val actual = persistenceAdapter.updateGoal(prisonNumber, reference, goalWithProposedUpdates)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedDomainGoal)
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verify(goalMapper).updateEntityFromDomain(goalEntity, goalWithProposedUpdates)
+      verify(goalMapper).fromEntityToDomain(goalEntity)
+    }
+
+    @Test
+    fun `should not update goal given goal does not exist in prisoners action plan`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      val goalEntity = aValidGoalEntity(reference = UUID.randomUUID())
+      val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+
+      val goalWithProposedUpdates = aValidGoal()
+
+      // When
+      val actual = persistenceAdapter.updateGoal(prisonNumber, reference, goalWithProposedUpdates)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verifyNoInteractions(goalMapper)
+    }
+
+    @Test
+    fun `should not update goal given prisoners action plan does not exist`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
+
+      val goalWithProposedUpdates = aValidGoal()
+
+      // When
+      val actual = persistenceAdapter.updateGoal(prisonNumber, reference, goalWithProposedUpdates)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verifyNoInteractions(goalMapper)
+    }
+  }
 }

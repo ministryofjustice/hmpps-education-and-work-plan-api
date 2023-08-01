@@ -42,12 +42,14 @@ class GoalService(
   }
 
   /**
-   * Updates a [Goal] identified by its `prisonNumber` and `goalReference`.
-   * Throws [GoalNotFoundException] if the [Goal] cannot be found.
+   * Updates a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified `updatedGoal`.
+   * Throws [GoalNotFoundException] if the [Goal] to be updated cannot be found.
    */
-  fun updateGoal(prisonNumber: String, goalReference: UUID): Goal {
+  fun updateGoal(prisonNumber: String, goalReference: UUID, updatedGoal: Goal): Goal {
     log.info { "Updating Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
-    return getGoal(prisonNumber, goalReference)
-    // TODO - RR-3 - implement logic to update and return updated goal; write unit tests
+    return persistenceAdapter.updateGoal(prisonNumber, goalReference, updatedGoal)
+      ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+      }
   }
 }

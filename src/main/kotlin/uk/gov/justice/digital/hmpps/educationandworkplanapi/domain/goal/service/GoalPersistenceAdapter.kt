@@ -22,4 +22,9 @@ interface GoalPersistenceAdapter {
    * Returns a [Goal] identified by its `prisonNumber` and `goalReference` if found, otherwise `null`.
    */
   fun getGoal(prisonNumber: String, goalReference: UUID): Goal?
+
+  /**
+   * Updates a [Goal] identified by its `prisonNumber` and `goalReference`
+   */
+  fun updateGoal(prisonNumber: String, goalReference: UUID, updatedGoal: Goal): Goal?
 }

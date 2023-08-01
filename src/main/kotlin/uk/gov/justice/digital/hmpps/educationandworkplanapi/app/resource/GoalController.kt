@@ -53,6 +53,10 @@ class GoalController(
     @PathVariable prisonNumber: String,
     @PathVariable goalReference: UUID,
   ) {
-    goalService.updateGoal(prisonNumber, goalReference)
+    goalService.updateGoal(
+      prisonNumber = prisonNumber,
+      goalReference = goalReference,
+      updatedGoal = goalResourceMapper.fromModelToDomain(updateGoalRequest),
+    )
   }
 }
