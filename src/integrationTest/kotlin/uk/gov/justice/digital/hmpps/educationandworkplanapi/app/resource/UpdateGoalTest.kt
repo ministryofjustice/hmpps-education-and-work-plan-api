@@ -3,14 +3,21 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.transaction.TestTransaction
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -149,5 +156,77 @@ class UpdateGoalTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessage("Goal reference in URI path must match the Goal reference in the request body")
+  }
+
+  @Test
+  @Transactional
+  fun `should update goal`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    val actionPlan = aValidActionPlanEntity(
+      prisonNumber = prisonNumber,
+      goals = listOf(
+        aValidGoalEntity(
+          title = "Learn French",
+          steps = listOf(
+            aValidStepEntity(
+              title = "Book course",
+            ),
+          ),
+        ),
+      ),
+    )
+    actionPlanRepository.save(actionPlan)
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+
+    val goalReference = actionPlan.goals!![0].reference!!
+    val stepReference = actionPlan.goals!![0].steps!![0].reference!!
+
+    val updateGoalRequest = aValidUpdateGoalRequest(
+      goalReference = goalReference,
+      title = "Learn French to GCSE standard",
+      steps = listOf(
+        aValidUpdateStepRequest(
+          stepReference = stepReference,
+          title = "Book course before December 2023",
+          sequenceNumber = 1,
+        ),
+        aValidUpdateStepRequest(
+          title = "Attend course before March 2024",
+          sequenceNumber = 2,
+        ),
+      ),
+    )
+
+    TestTransaction.start()
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber, goalReference)
+      .withBody(updateGoalRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent()
+
+    // Then
+    val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(0) { goal ->
+        goal
+          .hasTitle("Learn French to GCSE standard")
+          .hasNumberOfSteps(2)
+          .stepWithSequenceNumber(1) { step ->
+            step.hasTitle("Book course before December 2023")
+          }
+          .stepWithSequenceNumber(2) { step ->
+            step.hasTitle("Attend course before March 2024")
+          }
+      }
   }
 }

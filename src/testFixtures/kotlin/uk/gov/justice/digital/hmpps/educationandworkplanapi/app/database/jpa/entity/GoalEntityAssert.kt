@@ -4,6 +4,7 @@ import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
+import java.util.function.Consumer
 
 fun assertThat(actual: GoalEntity?) = GoalEntityAssert(actual)
 
@@ -165,6 +166,36 @@ class GoalEntityAssert(actual: GoalEntity?) :
     with(actual!!) {
       if (reference != expected) {
         failWithMessage("Expected reference to be $expected, but was $reference")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [StepEntity]. Takes a lambda as the method argument
+   * to call assertion methods provided by [StepEntityAssert].
+   * Returns this [GoalEntityAssert] to allow further chained assertions on the parent [GoalEntity]
+   */
+  fun stepWithSequenceNumber(sequenceNumber: Int, consumer: Consumer<StepEntityAssert>): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      val step = steps!!.find { it.sequenceNumber == sequenceNumber }
+      consumer.accept(assertThat(step))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into all child [StepEntity]s. Takes a lambda as the method argument
+   * to call assertion methods provided by [StepEntityAssert].
+   * Returns this [GoalEntityAssert] to allow further chained assertions on the parent [GoalEntity]
+   * The assertions on all [StepEntity]s must pass as true.
+   */
+  fun allSteps(consumer: Consumer<StepEntityAssert>): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      steps!!.onEach {
+        consumer.accept(assertThat(it))
       }
     }
     return this
