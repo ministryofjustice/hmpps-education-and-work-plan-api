@@ -194,6 +194,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           sequenceNumber = 1,
         ),
         aValidUpdateStepRequest(
+          stepReference = null,
           title = "Attend course before March 2024",
           sequenceNumber = 2,
         ),
