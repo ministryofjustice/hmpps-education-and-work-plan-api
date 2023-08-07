@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.1.2'
+  version: '1.1.3'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -339,12 +339,14 @@ components:
         stepReference:
           type: string
           format: uuid
-          description: The Step's unique reference. This is used as an identifier to update the required Step. It is not possible or supported to update the `stepReference`.
+          description: |
+            Optional reference number for the Step.
+            The Step's unique reference. This is used as an identifier to update the required Step. It is not possible or supported to update the `stepReference` for an existing step.
+            If the Step reference is not supplied this will be treated as a new Step and will be added to the Goal.
           example: d38a6c41-13d1-1d05-13c2-24619966119b
         status:
           $ref: '#/components/schemas/StepStatus'
       required:
-        - stepReference
         - status
 
     GoalStatus:

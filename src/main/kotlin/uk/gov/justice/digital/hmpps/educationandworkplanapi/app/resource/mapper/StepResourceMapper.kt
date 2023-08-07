@@ -13,14 +13,19 @@ import java.util.UUID
     UUID::class,
   ],
 )
-interface StepResourceMapper {
-  @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
+abstract class StepResourceMapper {
+  @Mapping(target = "reference", expression = "java( generateNewReference() )")
   @Mapping(target = "status", constant = "NOT_STARTED")
-  fun fromModelToDomain(createStepRequest: CreateStepRequest): Step
+  abstract fun fromModelToDomain(createStepRequest: CreateStepRequest): Step
 
-  @Mapping(target = "reference", source = "stepReference")
-  fun fromModelToDomain(updateStepRequest: UpdateStepRequest): Step
+  @Mapping(target = "reference", expression = "java( existingReferenceElseNewReference(updateStepRequest) )")
+  abstract fun fromModelToDomain(updateStepRequest: UpdateStepRequest): Step
 
   @Mapping(target = "stepReference", source = "reference")
-  fun fromDomainToModel(stepDomain: Step): StepResponse
+  abstract fun fromDomainToModel(stepDomain: Step): StepResponse
+
+  protected fun generateNewReference(): UUID = UUID.randomUUID()
+
+  protected fun existingReferenceElseNewReference(updateStepRequest: UpdateStepRequest): UUID =
+    updateStepRequest.stepReference ?: generateNewReference()
 }
