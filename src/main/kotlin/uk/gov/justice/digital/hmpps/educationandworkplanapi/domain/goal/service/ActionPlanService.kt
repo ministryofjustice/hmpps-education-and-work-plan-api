@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -24,7 +25,8 @@ class ActionPlanService(
    */
   fun getActionPlan(prisonNumber: String): ActionPlan {
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }
+    // RR-227 - return 404 if not found
     return persistenceAdapter.getActionPlan(prisonNumber)
-      ?: ActionPlan(prisonNumber, emptyList())
+      ?: ActionPlan(reference = UUID.randomUUID(), prisonNumber = prisonNumber, reviewDate = null, goals = emptyList())
   }
 }

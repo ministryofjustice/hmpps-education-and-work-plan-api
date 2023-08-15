@@ -123,14 +123,14 @@ class GetActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .goal(0) {
-        it.hasTitle("Learn German")
+        it.hasTitle("Learn Spanish")
       }
       // verify order of remaining goals
       .goal(1) {
         it.hasTitle("Learn French")
       }
       .goal(2) {
-        it.hasTitle("Learn Spanish")
+        it.hasTitle("Learn German")
       }
   }
 

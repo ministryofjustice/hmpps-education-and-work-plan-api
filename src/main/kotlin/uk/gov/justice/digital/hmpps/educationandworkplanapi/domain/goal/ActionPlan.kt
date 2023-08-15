@@ -1,18 +1,23 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 
+import java.time.LocalDate
+import java.util.UUID
+
 /**
  * Represents a Prisoner's 'Action Plan', which consists of one or more [Goal]s.
  */
 class ActionPlan(
+  val reference: UUID,
   val prisonNumber: String,
+  val reviewDate: LocalDate?,
   goals: List<Goal> = emptyList(),
 ) {
 
   /**
-   * Returns the [Goal]s, ordered by their review date.
+   * Returns the [Goal]s, ordered by their created date descending (most recent ones first).
    */
   val goals: MutableList<Goal>
-    get() = field.also { goals -> goals.sortBy { it.reviewDate } }
+    get() = field.also { goals -> goals.sortByDescending { it.createdAt } }
 
   init {
     this.goals = goals.toMutableList()
@@ -25,6 +30,6 @@ class ActionPlan(
     goals.add(goal)
 
   override fun toString(): String {
-    return "ActionPlan(prisonNumber='$prisonNumber', goals=$goals)"
+    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', reviewDate='$reviewDate', goals=$goals)"
   }
 }
