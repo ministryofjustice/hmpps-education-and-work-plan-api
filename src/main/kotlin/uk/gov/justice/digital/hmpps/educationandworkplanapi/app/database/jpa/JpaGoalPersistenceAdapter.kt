@@ -25,7 +25,7 @@ class JpaGoalPersistenceAdapter(
     // TODO RR-227 - throw 404 instead?
     if (actionPlanEntity == null) {
       log.info { "Creating new Action Plan for prisoner [$prisonNumber]" }
-      actionPlanEntity = newActionPlanForPrisoner(prisonNumber = prisonNumber, reviewDate = null)
+      actionPlanEntity = newActionPlanForPrisoner(reference = UUID.randomUUID(), prisonNumber = prisonNumber, reviewDate = null)
     }
 
     val goalEntity = goalMapper.fromDomainToEntity(goal)

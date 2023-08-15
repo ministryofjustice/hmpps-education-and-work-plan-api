@@ -13,7 +13,7 @@ class ActionPlanEntityTest {
     val prisonNumber = aValidPrisonNumber()
 
     // When
-    val actual = ActionPlanEntity.newActionPlanForPrisoner(prisonNumber = prisonNumber, reviewDate = null)
+    val actual = ActionPlanEntity.newActionPlanForPrisoner(reference = UUID.randomUUID(), prisonNumber = prisonNumber, reviewDate = null)
 
     // Then
     assertThat(actual)

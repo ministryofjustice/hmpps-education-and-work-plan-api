@@ -71,8 +71,8 @@ class ActionPlanEntity(
     /**
      * Returns new un-persisted [ActionPlanEntity] for the specified prisoner with an empty collection of [GoalEntity]s
      */
-    fun newActionPlanForPrisoner(prisonNumber: String, reviewDate: LocalDate?): ActionPlanEntity =
-      ActionPlanEntity(reference = UUID.randomUUID(), prisonNumber = prisonNumber, reviewDate = reviewDate, goals = mutableListOf())
+    fun newActionPlanForPrisoner(reference: UUID, prisonNumber: String, reviewDate: LocalDate?): ActionPlanEntity =
+      ActionPlanEntity(reference = reference, prisonNumber = prisonNumber, reviewDate = reviewDate, goals = mutableListOf())
   }
 
   /**
