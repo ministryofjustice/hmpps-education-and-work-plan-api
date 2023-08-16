@@ -13,6 +13,11 @@ class InvalidGoalException(message: String) : RuntimeException(message)
 class ActionPlanNotFoundException(message: String) : RuntimeException(message)
 
 /**
+ * Thrown when an Attempt is made to create an ActionPlan for a prisoner who already has one.
+ */
+class ActionPlanAlreadyExistsException(message: String) : RuntimeException(message)
+
+/**
  * Thrown when a specified Goal cannot be found.
  */
 class GoalNotFoundException(val prisonNumber: String, val goalReference: UUID) :
