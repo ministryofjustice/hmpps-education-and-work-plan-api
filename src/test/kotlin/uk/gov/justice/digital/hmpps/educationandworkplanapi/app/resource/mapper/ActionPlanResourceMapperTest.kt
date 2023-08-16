@@ -27,7 +27,9 @@ internal class ActionPlanResourceMapperTest {
     val actionPlan = aValidActionPlan()
     val expectedGoal = aValidGoalResponse()
     val expectedActionPlan = aValidActionPlanResponse(
+      reference = actionPlan.reference,
       prisonNumber = actionPlan.prisonNumber,
+      reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoal),
     )
     given(goalMapper.fromDomainToModel(any())).willReturn(expectedGoal)
