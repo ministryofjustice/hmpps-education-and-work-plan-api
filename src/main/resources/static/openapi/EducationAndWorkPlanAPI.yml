@@ -275,10 +275,6 @@ components:
       type: object
       description: A request to create an  Action Plan with at least one or more Goals that a Prisoner aims to complete.
       properties:
-        prisonNumber:
-          type: string
-          description: The ID of the prisoner
-          example: 'A1234BC'
         reviewDate:
           type: string
           format: date
@@ -290,7 +286,6 @@ components:
           items:
             $ref: '#/components/schemas/CreateGoalRequest'
       required:
-        - prisonNumber
         - goals
 
     CreateGoalRequest:
