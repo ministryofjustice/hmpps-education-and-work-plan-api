@@ -20,6 +20,7 @@ import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 @Table(name = "action_plan")
@@ -33,7 +34,14 @@ class ActionPlanEntity(
 
   @Column(updatable = false)
   @field:NotNull
+  var reference: UUID? = null,
+
+  @Column(updatable = false)
+  @field:NotNull
   var prisonNumber: String? = null,
+
+  @Column
+  var reviewDate: LocalDate? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "action_plan_id", nullable = false)
@@ -63,8 +71,8 @@ class ActionPlanEntity(
     /**
      * Returns new un-persisted [ActionPlanEntity] for the specified prisoner with an empty collection of [GoalEntity]s
      */
-    fun newActionPlanForPrisoner(prisonNumber: String): ActionPlanEntity =
-      ActionPlanEntity(prisonNumber = prisonNumber, goals = mutableListOf())
+    fun newActionPlanForPrisoner(reference: UUID, prisonNumber: String, reviewDate: LocalDate?): ActionPlanEntity =
+      ActionPlanEntity(reference = reference, prisonNumber = prisonNumber, reviewDate = reviewDate, goals = mutableListOf())
   }
 
   /**

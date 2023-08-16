@@ -38,6 +38,7 @@ spring:
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
     validateMigrationNaming: true
+    locations: classpath:/db/migration,classpath:/db/postgres
 
 server:
   port: 8080

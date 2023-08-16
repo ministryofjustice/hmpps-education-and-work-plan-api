@@ -30,7 +30,12 @@ class ActionPlanEntityMapperTest {
     val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber)
     val goalDomain = aValidGoal()
     given(goalMapper.fromEntityToDomain(any())).willReturn(goalDomain)
-    val expected = aValidActionPlan(prisonNumber = prisonNumber, goals = mutableListOf(goalDomain))
+    val expected = aValidActionPlan(
+      reference = actionPlanEntity.reference!!,
+      prisonNumber = prisonNumber,
+      reviewDate = actionPlanEntity.reviewDate,
+      goals = mutableListOf(goalDomain),
+    )
 
     // When
     val actual = mapper.fromEntityToDomain(actionPlanEntity)

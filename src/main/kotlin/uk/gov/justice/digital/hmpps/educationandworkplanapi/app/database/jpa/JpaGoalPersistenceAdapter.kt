@@ -22,9 +22,10 @@ class JpaGoalPersistenceAdapter(
   @Transactional
   override fun createGoal(goal: Goal, prisonNumber: String): Goal {
     var actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    // TODO RR-227 - throw 404 instead?
     if (actionPlanEntity == null) {
       log.info { "Creating new Action Plan for prisoner [$prisonNumber]" }
-      actionPlanEntity = newActionPlanForPrisoner(prisonNumber)
+      actionPlanEntity = newActionPlanForPrisoner(reference = UUID.randomUUID(), prisonNumber = prisonNumber, reviewDate = null)
     }
 
     val goalEntity = goalMapper.fromDomainToEntity(goal)
