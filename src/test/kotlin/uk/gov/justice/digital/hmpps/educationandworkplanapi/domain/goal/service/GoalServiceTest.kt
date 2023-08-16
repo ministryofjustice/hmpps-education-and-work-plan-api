@@ -32,7 +32,7 @@ class GoalServiceTest {
     val prisonNumber = aValidPrisonNumber()
 
     // When
-    service.createGoal(goal, prisonNumber)
+    service.createGoal(prisonNumber, goal)
 
     // Then
     verify(persistenceAdapter).createGoal(goal, prisonNumber)

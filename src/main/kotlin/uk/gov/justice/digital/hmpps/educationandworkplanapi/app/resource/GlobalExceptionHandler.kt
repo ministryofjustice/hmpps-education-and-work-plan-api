@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -51,14 +52,14 @@ class GlobalExceptionHandler(
 ) : ResponseEntityExceptionHandler() {
 
   /**
-   * Exception handler to return a 403 Forbidden ErrorResponse
+   * Exception handler to return a 403 Forbidden ErrorResponse for an AccessDeniedException.
    */
   @ExceptionHandler(
     value = [
       AccessDeniedException::class,
     ],
   )
-  protected fun handleExceptionReturnForbiddenErrorResponse(
+  protected fun handleAccessDeniedExceptionReturnForbiddenErrorResponse(
     e: RuntimeException,
     request: WebRequest,
   ): ResponseEntity<Any> {
@@ -70,6 +71,29 @@ class GlobalExceptionHandler(
           status = FORBIDDEN.value(),
           userMessage = e.message,
           developerMessage = "Access denied on ${request.getDescription(false)}",
+        ),
+      )
+  }
+
+  /**
+   * Exception handler to return a 403 Forbidden ErrorResponse for a prohibited action (e.g. a business rule violation).
+   */
+  @ExceptionHandler(
+    value = [
+      ActionPlanAlreadyExistsException::class,
+    ],
+  )
+  protected fun handleExceptionReturnForbiddenErrorResponse(
+    e: RuntimeException,
+    request: WebRequest,
+  ): ResponseEntity<Any> {
+    log.info("Forbidden request: {}", e.message)
+    return ResponseEntity
+      .status(FORBIDDEN)
+      .body(
+        ErrorResponse(
+          status = FORBIDDEN.value(),
+          userMessage = e.message,
         ),
       )
   }
