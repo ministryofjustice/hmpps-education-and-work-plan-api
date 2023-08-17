@@ -1,7 +1,9 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import com.microsoft.applicationinsights.TelemetryClient
+import io.opentelemetry.api.trace.Span
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 
 /**
@@ -18,6 +20,10 @@ class TelemetryService(
 
   fun trackGoalCreateEvent(goal: Goal) {
     telemetryClient.trackEvent(GOAL_CREATE_EVENT, goal.goalCreateEventCustomDimensions())
+    with(Span.current()) {
+      goal.goalCreateEventCustomDimensions().forEach { (key, value) -> setAttribute(key, value) }
+      addEvent("$GOAL_CREATE_EVENT-via-span")
+    }
   }
 
   private fun Goal.goalCreateEventCustomDimensions(): Map<String, String> =
