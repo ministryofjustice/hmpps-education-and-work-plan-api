@@ -282,7 +282,8 @@ components:
           example: '2023-12-19'
         goals:
           type: array
-          description: A List of at least one or more Goals.
+          minItems: 1
+          description: A List of at least one Goal.
           items:
             $ref: '#/components/schemas/CreateGoalRequest'
       required:
