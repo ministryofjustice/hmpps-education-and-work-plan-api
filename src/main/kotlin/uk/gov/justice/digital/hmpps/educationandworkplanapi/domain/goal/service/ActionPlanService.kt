@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ReviewDateCategory
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -43,6 +44,12 @@ class ActionPlanService(
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }
     // RR-227 - return 404 if not found
     return persistenceAdapter.getActionPlan(prisonNumber)
-      ?: ActionPlan(reference = UUID.randomUUID(), prisonNumber = prisonNumber, reviewDate = null, goals = emptyList())
+      ?: ActionPlan(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        reviewDateCategory = ReviewDateCategory.NO_DATE,
+        reviewDate = null,
+        goals = emptyList(),
+      )
   }
 }

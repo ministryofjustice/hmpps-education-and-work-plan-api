@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.NOT_STARTED
 import java.util.UUID
 
 /**
@@ -13,6 +12,19 @@ data class Step(
   val reference: UUID,
   val title: String,
   val targetDateRange: TargetDateRange,
-  val status: StepStatus = NOT_STARTED,
+  val status: StepStatus = StepStatus.NOT_STARTED,
   val sequenceNumber: Int,
 )
+
+enum class TargetDateRange {
+  ZERO_TO_THREE_MONTHS,
+  THREE_TO_SIX_MONTHS,
+  SIX_TO_TWELVE_MONTHS,
+  MORE_THAN_TWELVE_MONTHS,
+}
+
+enum class StepStatus {
+  NOT_STARTED,
+  ACTIVE,
+  COMPLETE,
+}
