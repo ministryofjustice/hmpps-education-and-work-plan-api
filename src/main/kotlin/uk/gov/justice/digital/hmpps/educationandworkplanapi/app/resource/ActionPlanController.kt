@@ -31,7 +31,9 @@ class ActionPlanController(
     @RequestBody
     request: CreateActionPlanRequest,
     @PathVariable prisonNumber: String,
-  ) = actionPlanService.createActionPlan(actionPlanMapper.fromModelToDomain(prisonNumber, request))
+  ) {
+    actionPlanService.createActionPlan(actionPlanMapper.fromModelToDomain(prisonNumber, request))
+  }
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
