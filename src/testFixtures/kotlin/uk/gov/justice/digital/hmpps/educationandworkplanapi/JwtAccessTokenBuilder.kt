@@ -48,6 +48,7 @@ fun buildAccessToken(
   username: String = "auser_gen",
   displayName: String = "Albert User",
   roles: List<String> = emptyList(),
+  clientId: UUID = UUID.randomUUID(),
   privateKey: PrivateKey,
 ): String =
   Jwts.builder()
@@ -59,6 +60,7 @@ fun buildAccessToken(
         "auth_source" to "nomis",
         "user_uuid" to UUID.randomUUID(),
         "name" to displayName,
+        "client_id" to clientId,
       ),
     )
     .setIssuedAt(Date.from(Instant.now()))

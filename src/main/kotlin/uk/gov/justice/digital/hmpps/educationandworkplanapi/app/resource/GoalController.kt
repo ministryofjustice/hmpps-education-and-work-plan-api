@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.TelemetryService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
@@ -25,6 +26,7 @@ import java.util.UUID
 class GoalController(
   private val goalService: GoalService,
   private val goalResourceMapper: GoalResourceMapper,
+  private val telemetryService: TelemetryService,
 ) {
 
   @PostMapping
@@ -39,7 +41,9 @@ class GoalController(
     goalService.createGoal(
       prisonNumber = prisonNumber,
       goal = goalResourceMapper.fromModelToDomain(request),
-    )
+    ).apply {
+      telemetryService.trackGoalCreateEvent(this)
+    }
   }
 
   @PutMapping("{goalReference}")
