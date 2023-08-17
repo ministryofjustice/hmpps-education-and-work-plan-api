@@ -124,7 +124,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessageContaining("JSON parse error")
-      .hasUserMessageContaining("value failed for JSON property goals due to missing (therefore NULL) value for creator parameter goals")
+      .hasUserMessageContaining("value failed for JSON property reviewDateCategory due to missing (therefore NULL) value for creator parameter reviewDateCategory")
   }
 
   @Test

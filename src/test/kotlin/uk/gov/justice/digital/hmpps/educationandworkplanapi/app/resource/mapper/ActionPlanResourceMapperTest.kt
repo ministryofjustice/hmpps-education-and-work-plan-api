@@ -16,7 +16,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
-import java.util.*
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ReviewDateCategory as ReviewDateCategoryDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewDateCategory as ReviewDateCategoryModel
 
 @ExtendWith(MockitoExtension::class)
 internal class ActionPlanResourceMapperTest {
@@ -30,10 +31,12 @@ internal class ActionPlanResourceMapperTest {
   fun `should map from model to domain`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val request = aValidCreateActionPlanRequest()
+    val request = aValidCreateActionPlanRequest(reviewDateCategory = ReviewDateCategoryModel.NO_DATE, reviewDate = null)
     val expectedGoal = aValidGoal()
     val expectedActionPlan = aValidActionPlan(
       prisonNumber = prisonNumber,
+      reviewDateCategory = ReviewDateCategoryDomain.NO_DATE,
+      reviewDate = null,
       goals = listOf(expectedGoal),
     )
     given(goalMapper.fromModelToDomain(any<CreateGoalRequest>())).willReturn(expectedGoal)
@@ -54,6 +57,7 @@ internal class ActionPlanResourceMapperTest {
     val expectedActionPlan = aValidActionPlanResponse(
       reference = actionPlan.reference,
       prisonNumber = actionPlan.prisonNumber,
+      reviewDateCategory = ReviewDateCategoryModel.SPECIFIC_DATE,
       reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoal),
     )
