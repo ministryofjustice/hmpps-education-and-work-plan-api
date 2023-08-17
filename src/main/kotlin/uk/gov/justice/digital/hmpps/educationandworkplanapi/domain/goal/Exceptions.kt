@@ -3,6 +3,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal
 import java.util.UUID
 
 /**
+ * Thrown when an Action Plan cannot be created, for example because it is missing mandatory data.
+ */
+class InvalidActionPlanException(message: String) : RuntimeException(message)
+
+/**
  * Thrown when a Goal cannot be created, for example because it is missing mandatory data.
  */
 class InvalidGoalException(message: String) : RuntimeException(message)
