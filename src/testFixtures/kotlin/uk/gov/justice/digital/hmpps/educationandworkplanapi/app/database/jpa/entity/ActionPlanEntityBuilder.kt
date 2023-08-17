@@ -7,6 +7,7 @@ fun aValidActionPlanEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID? = UUID.randomUUID(),
   prisonNumber: String = "A1234BC",
+  reviewDateCategory: ReviewDateCategory = ReviewDateCategory.SPECIFIC_DATE,
   reviewDate: LocalDate? = LocalDate.now().plusMonths(6),
   goals: List<GoalEntity> = listOf(aValidGoalEntity()),
 ): ActionPlanEntity =
@@ -14,6 +15,7 @@ fun aValidActionPlanEntity(
     id = id,
     reference = reference,
     prisonNumber = prisonNumber,
+    reviewDateCategory = reviewDateCategory,
     reviewDate = reviewDate,
     goals = goals.toMutableList(),
   )

@@ -14,6 +14,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ReviewDateCategory as ReviewDateCategoryEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ReviewDateCategory as ReviewDateCategoryDomain
 
 @ExtendWith(MockitoExtension::class)
 class ActionPlanEntityMapperTest {
@@ -35,6 +37,7 @@ class ActionPlanEntityMapperTest {
     val expected = aValidActionPlanEntity(
       reference = actionPlan.reference,
       prisonNumber = prisonNumber,
+      reviewDateCategory = ReviewDateCategoryEntity.SPECIFIC_DATE,
       reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoalEntity),
     )
@@ -58,6 +61,7 @@ class ActionPlanEntityMapperTest {
     val expected = aValidActionPlan(
       reference = actionPlanEntity.reference!!,
       prisonNumber = prisonNumber,
+      reviewDateCategory = ReviewDateCategoryDomain.SPECIFIC_DATE,
       reviewDate = actionPlanEntity.reviewDate,
       goals = mutableListOf(goalDomain),
     )
