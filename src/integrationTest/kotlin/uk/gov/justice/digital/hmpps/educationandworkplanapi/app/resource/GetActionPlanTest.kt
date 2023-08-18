@@ -10,8 +10,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewDateCategory
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -78,7 +81,10 @@ class GetActionPlanTest : IntegrationTestBase() {
   fun `should get action plan for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createGoal(prisonNumber, aValidCreateGoalRequest())
+    val createActionPlanRequest = aValidCreateActionPlanRequest()
+    createActionPlan(prisonNumber, createActionPlanRequest)
+    val expectedReviewDateCategory = createActionPlanRequest.reviewDateCategory
+    val expectedReviewDate = createActionPlanRequest.reviewDate!!
 
     // When
     val response = webTestClient.get()
@@ -93,6 +99,8 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
+      .hasReviewDateCategory(expectedReviewDateCategory)
+      .hasReviewDate(expectedReviewDate)
       .goal(0) {
         it.wasCreatedBy("auser_gen")
           .hasCreatedByDisplayName("Albert User")
@@ -105,7 +113,12 @@ class GetActionPlanTest : IntegrationTestBase() {
   fun `should get action plan with multiple goals in order`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn German"))
+    val createActionPlanRequest = aValidCreateActionPlanRequest(
+      reviewDateCategory = ReviewDateCategory.SIX_MONTHS,
+      reviewDate = null,
+      goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
+    )
+    createActionPlan(prisonNumber, createActionPlanRequest)
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn Spanish"))
 
@@ -122,6 +135,8 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
+      .hasReviewDateCategory(ReviewDateCategory.SIX_MONTHS)
+      .hasNoReviewDate()
       .goal(0) {
         it.hasTitle("Learn Spanish")
       }
@@ -132,6 +147,17 @@ class GetActionPlanTest : IntegrationTestBase() {
       .goal(2) {
         it.hasTitle("Learn German")
       }
+  }
+
+  private fun createActionPlan(prisonNumber: String, createActionPlanRequest: CreateActionPlanRequest) {
+    webTestClient.post()
+      .uri("$URI_TEMPLATE", prisonNumber)
+      .withBody(createActionPlanRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
   }
 
   private fun createGoal(prisonNumber: String, createGoalRequest: CreateGoalRequest) {
