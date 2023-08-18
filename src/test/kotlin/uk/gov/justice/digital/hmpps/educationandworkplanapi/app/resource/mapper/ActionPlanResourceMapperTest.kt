@@ -9,8 +9,12 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
 
 @ExtendWith(MockitoExtension::class)
@@ -20,6 +24,27 @@ internal class ActionPlanResourceMapperTest {
 
   @Mock
   private lateinit var goalMapper: GoalResourceMapper
+
+  @Test
+  fun `should map from model to domain`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val request = aValidCreateActionPlanRequest()
+    val expectedGoal = aValidGoal()
+    val expectedActionPlan = aValidActionPlan(
+      prisonNumber = prisonNumber,
+      reviewDate = request.reviewDate,
+      goals = listOf(expectedGoal),
+    )
+    given(goalMapper.fromModelToDomain(any<CreateGoalRequest>())).willReturn(expectedGoal)
+
+    // When
+    val actual = mapper.fromModelToDomain(prisonNumber, request)
+
+    // Then
+    assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedActionPlan)
+    verify(goalMapper).fromModelToDomain(request.goals[0])
+  }
 
   @Test
   fun `should map from domain to model`() {

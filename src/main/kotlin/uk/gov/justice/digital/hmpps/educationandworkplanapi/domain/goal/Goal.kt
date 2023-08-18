@@ -80,3 +80,9 @@ class Goal(
     return "Goal(reference=$reference, title='$title', reviewDate=$reviewDate, status=$status, createdBy='$createdBy', createdAt=$createdAt, lastUpdatedBy='$lastUpdatedBy', lastUpdatedAt=$lastUpdatedAt, steps=$steps)"
   }
 }
+
+enum class GoalStatus {
+  ACTIVE,
+  COMPLETED,
+  ARCHIVED,
+}

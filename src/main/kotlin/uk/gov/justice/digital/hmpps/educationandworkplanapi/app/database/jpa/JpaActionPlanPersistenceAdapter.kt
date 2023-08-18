@@ -11,6 +11,12 @@ class JpaActionPlanPersistenceAdapter(
   private val actionPlanRepository: ActionPlanRepository,
   private val actionPlanMapper: ActionPlanEntityMapper,
 ) : ActionPlanPersistenceAdapter {
+
+  override fun createActionPlan(actionPlan: ActionPlan): ActionPlan {
+    val persistedEntity = actionPlanRepository.save(actionPlanMapper.fromDomainToEntity(actionPlan))
+    return actionPlanMapper.fromEntityToDomain(persistedEntity)
+  }
+
   override fun getActionPlan(prisonNumber: String): ActionPlan? =
     actionPlanRepository.findByPrisonNumber(prisonNumber)?.let {
       actionPlanMapper.fromEntityToDomain(it)

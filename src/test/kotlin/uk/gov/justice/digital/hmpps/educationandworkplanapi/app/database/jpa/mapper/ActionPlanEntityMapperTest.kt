@@ -11,6 +11,7 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 
@@ -22,6 +23,30 @@ class ActionPlanEntityMapperTest {
 
   @Mock
   private lateinit var goalMapper: GoalEntityMapper
+
+  @Test
+  fun `should map from domain to entity`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val actionPlan = aValidActionPlan(
+      prisonNumber = prisonNumber,
+    )
+    val expectedGoalEntity = aValidGoalEntity()
+    val expected = aValidActionPlanEntity(
+      reference = actionPlan.reference,
+      prisonNumber = prisonNumber,
+      reviewDate = actionPlan.reviewDate,
+      goals = mutableListOf(expectedGoalEntity),
+    )
+    given(goalMapper.fromDomainToEntity(any())).willReturn(expectedGoalEntity)
+
+    // When
+    val actual = mapper.fromDomainToEntity(actionPlan)
+
+    // Then
+    assertThat(actual).usingRecursiveComparison().ignoringFields("id").isEqualTo(expected)
+    verify(goalMapper).fromDomainToEntity(actionPlan.goals[0])
+  }
 
   @Test
   fun `should map from entity to domain`() {

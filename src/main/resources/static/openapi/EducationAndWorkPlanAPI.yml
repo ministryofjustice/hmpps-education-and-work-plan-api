@@ -37,7 +37,7 @@ paths:
         - Action Plan
       responses:
         '201':
-          $ref: '#/components/responses/ActionPlan'
+          description: The Action Plan was created successfully.
         '400':
           $ref: '#/components/responses/400ErrorResponse'
         '404':
@@ -71,7 +71,7 @@ paths:
         - Action Plan - Single Goal
       responses:
         '201':
-          $ref: '#/components/responses/Goal'
+          description: The Goal was created successfully.
         '400':
           $ref: '#/components/responses/400ErrorResponse'
         '404':
@@ -282,7 +282,8 @@ components:
           example: '2023-12-19'
         goals:
           type: array
-          description: A List of at least one or more Goals.
+          minItems: 1
+          description: A List of at least one Goal.
           items:
             $ref: '#/components/schemas/CreateGoalRequest'
       required:
