@@ -42,3 +42,100 @@ The easiest (and slowest) way to run the app is to use docker compose to create 
 
 * See `http://localhost:8081/health` to check the app is running.
 * See `http://localhost:8081/swagger-ui/index.html?configUrl=/v3/api-docs` to explore the OpenAPI spec document.
+
+
+## Monitoring, tracing and event reporting
+The API is instrumented with the opentelemetry and Application Insights java agent. Useful data can be found and reported
+on via the Azure Application Insights console, all under the `cloud_RoleName` property of `hmpps-education-and-work-plan-api`
+
+The Application Insights console and the Kusto Query Language will be your friend here, but some example queries are
+described below.
+
+All example query links below are for `nomisapi-t3` (dev) - you will need to change the scope in order to target
+preprod or prod.
+
+### HTTP requests
+Each HTTP request is logged in Application Insights. These can be [queried](https://portal.azure.com#@747381f4-e81f-4a43-bf68-ced6a1e14edf/blade/Microsoft_OperationsManagementSuite_Workspace/Logs.ReactView/resourceId/%2Fsubscriptions%2Fc27cfedb-f5e9-45e6-9642-0fad1a5c94e7%2FresourceGroups%2Fnomisapi-t3-rg%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fnomisapi-t3/source/LogsBlade.AnalyticsShareLinkToQuery/q/H4sIAAAAAAAAAz3NMQrDMAyF4b2n0ObJ5AS5QoZeoKi2wCa2pUo2IdDDN87Q8cH385Q%252Bg6zb4wtHIiUIhUd8PbnQhpVgXcGlKmKe4gjYMzePLfqDdfdS8FqS3b9us0lo4BYMN57GJmCNpPA%252Boed6PWKVHzlVQVF8AAAA/timespan/P1D) as follows:
+
+The `where name` clause is significant, otherwise the query will also return hits to the `/health` and `/info` endpoints.
+```Kusto Query Language
+requests
+| where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+| where name has '/action-plans'
+| order by timestamp 
+```
+
+### Custom events
+A number of custom events are triggered at various points in the API. The custom event names can be discovered with the
+following [query](https://portal.azure.com#@747381f4-e81f-4a43-bf68-ced6a1e14edf/blade/Microsoft_OperationsManagementSuite_Workspace/Logs.ReactView/resourceId/%2Fsubscriptions%2Fc27cfedb-f5e9-45e6-9642-0fad1a5c94e7%2FresourceGroups%2Fnomisapi-t3-rg%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fnomisapi-t3/source/LogsBlade.AnalyticsShareLinkToQuery/q/H4sIAAAAAAAAAw3LMQ6AIAwAwN1XdGPqExhdHfyAIdDERmgJFFl8vIw3XBzdtOwvifXtg3lTI4hZR7pOzXSEQuA9uLvU2pHSiMFYBYMknNoerDksVXZrJ%252B7GEg1ktR98jn%252FGWgAAAA%253D%253D/timespan/P1D)
+```Kusto Query Language
+customEvents
+| where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+| distinct name
+```
+
+### Projecting fields from custom dimensions
+A query can include field projections, including projecting named fields from within the custom dimensions data.  
+[For example](https://portal.azure.com#@747381f4-e81f-4a43-bf68-ced6a1e14edf/blade/Microsoft_OperationsManagementSuite_Workspace/Logs.ReactView/resourceId/%2Fsubscriptions%2Fc27cfedb-f5e9-45e6-9642-0fad1a5c94e7%2FresourceGroups%2Fnomisapi-t3-rg%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fnomisapi-t3/source/LogsBlade.AnalyticsShareLinkToQuery/q/H4sIAAAAAAAAA22OOw7CMAyG957CW5eGG3QCVgYugEJiaCGJI8dphcThCS0tSz3Z%252Bvw%252FTE5C%252FjhgkFS9YeyQEYyjbC9ncnjSHqFtoe58jEmhzUZLT0HpYNVI%252FFTR6XLFvl7VYdHcSTtlGLXgl0amBxqBCspI7zGJ9rGZzrJKTtCCmfocCg2p5KTdTJpZxXgrCcHg1ucKF0uMe8pBtl1%252FsPQitshwff07fQB3NsotFQEAAA%253D%253D/timespan/P1D)
+```Kusto Query Language
+customEvents
+| where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+| where name == 'goal-create'
+| project 
+    timestamp,
+    status = customDimensions.status, 
+    reference = customDimensions.reference,
+    stepCount = customDimensions.stepCount
+| order by timestamp  
+```
+
+#### Charting data
+Queries can contain aggregate functions, and the results rendered in charts. For example, [this query](https://portal.azure.com#@747381f4-e81f-4a43-bf68-ced6a1e14edf/blade/Microsoft_OperationsManagementSuite_Workspace/Logs.ReactView/resourceId/%2Fsubscriptions%2Fc27cfedb-f5e9-45e6-9642-0fad1a5c94e7%2FresourceGroups%2Fnomisapi-t3-rg%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fnomisapi-t3/source/LogsBlade.AnalyticsShareLinkToQuery/q/H4sIAAAAAAAAA0WNMQ4CMQwEe17h7jiJIEF%252FNEBLwQeQL7G4iNiJEgcE4vEEJKD07sza1qKR91cSLbMn3CbKBDbE6k7HGOiATDAM0E2cUjHkqkX1UQyKM7eYLyYFbFfy3c%252BWr3OOGIzNhEr%252F1n4e7jyTlDZUlkUpbWMVhQ2sG1YqM2b%252FaOg7nfcw3mH0MtfmFEVOC1i5vpGZxFFuWKgsdsKsL5BxBSvOAAAA/timespan/P1D)
+produces a column chart of the number of goals created per day that were created with more than 2 steps:
+```Kusto Query Language
+customEvents
+| where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+| where name == 'goal-create'
+| where customDimensions.stepCount > 2
+| summarize count() by bin(timestamp, 1d)
+| render columnchart
+```
+
+### Joining data
+Several objects within the Application Insights "tables" contain an `operation_Id` field which is effectively a correlation ID
+between objects. For example, [this query](https://portal.azure.com#@747381f4-e81f-4a43-bf68-ced6a1e14edf/blade/Microsoft_OperationsManagementSuite_Workspace/Logs.ReactView/resourceId/%2Fsubscriptions%2Fc27cfedb-f5e9-45e6-9642-0fad1a5c94e7%2FresourceGroups%2Fnomisapi-t3-rg%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fnomisapi-t3/source/LogsBlade.AnalyticsShareLinkToQuery/q/H4sIAAAAAAAAA6WPsU4DMQyG93sKbwdSw9D9WICBhYEXqEJi0bQXO9hOKyQenhDolYqRf4iS%252FP5%252B26GqcX44IJkOH3DcoiCEmWvcPPOMTz4jTBOM21yKOow1eEtMzlN0R5a9K7Nvr5LGhR6giU7gK%252FvZBUFvOHankRB61%252FuUkbSl6Y0aljuuZHAL65a040SwTxSnRIRSKb1V7PiVYLtqmxZ%252B9L%252BpzylFeIfBYPn6EheUzm4e4%252BrSqoryvebffU5eB677yXQRNiwNu2uNVfO5rIbf2a2KJaLAy%252Fu5BCJq%252BAQVaps8uQEAAA%253D%253D/timespan/P1D)
+produces a report of usernames who have created goals with more than 2 steps. It does this by querying the `customEvents`
+table for records whose name is `goal-create` and whose custom dimension field `stepCount` is greater than 2. It then joins
+on the `requests` table on the `operation_Id` field, projecting out the custom dimension field `username` back out to the
+outer query.
+```Kusto Query Language
+customEvents
+| where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+| where 
+    name == 'goal-create'
+    and customDimensions.stepCount > 2
+| join kind=innerunique
+    (requests
+        | where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+        | project 
+            operation_Id, 
+            username = customDimensions.username
+    )
+    on operation_Id
+| project
+    timestamp,
+    username
+| order by timestamp desc 
+```
+
+#### JVM problems
+There could be problems with the JVM used in the API, such as running out of threads or memory.
+
+Various JVM related metrics are pushed to Application Insights by Spring/Micrometer. Run the following [query](https://portal.azure.com#@747381f4-e81f-4a43-bf68-ced6a1e14edf/blade/Microsoft_OperationsManagementSuite_Workspace/Logs.ReactView/resourceId/%2Fsubscriptions%2Fc27cfedb-f5e9-45e6-9642-0fad1a5c94e7%2FresourceGroups%2Fnomisapi-t3-rg%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fnomisapi-t3/source/LogsBlade.AnalyticsShareLinkToQuery/q/H4sIAAAAAAAAAz3LsQ0CMQxA0Z4p3KXKCDcCFCyAQmIphjiObIcIieHvrqH8evp5mgtf0ZWyXX6wKipCbjLL4y4Nb4kRtg1C5TEsYpk5OUmPqZe4RN9xtHTUoPC%252F%252B%252FmYJ3Vb5BXC68OnihZUeH7BifFwHlDQ8g5UsB%252BLgwAAAA%253D%253D/timespan/P1D) to see what metrics are available:
+```Kusto Query Language
+customMetrics
+| where cloud_RoleName == 'hmpps-education-and-work-plan-api'
+| where name startswith 'jvm'
+| order by timestamp desc 
+```
+For example, if the memory usage is consistently high you may need to increase the memory allocated in the `helm_dploy/hmpps-education-and-work-plan-api/values.yaml` file env var `JAVA_OPTS`.
