@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanEntity.Companion.newActionPlanForPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ReviewDateCategory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
@@ -29,7 +28,6 @@ class JpaGoalPersistenceAdapter(
       actionPlanEntity = newActionPlanForPrisoner(
         reference = UUID.randomUUID(),
         prisonNumber = prisonNumber,
-        reviewDateCategory = ReviewDateCategory.NO_DATE,
         reviewDate = null,
       )
     }

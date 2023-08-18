@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ReviewDateCategory
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -47,7 +46,6 @@ class ActionPlanService(
       ?: ActionPlan(
         reference = UUID.randomUUID(),
         prisonNumber = prisonNumber,
-        reviewDateCategory = ReviewDateCategory.NO_DATE,
         reviewDate = null,
         goals = emptyList(),
       )
