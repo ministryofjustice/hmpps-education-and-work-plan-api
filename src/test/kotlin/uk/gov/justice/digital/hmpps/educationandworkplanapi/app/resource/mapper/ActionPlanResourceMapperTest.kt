@@ -3,6 +3,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -16,6 +19,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
+import java.time.LocalDate
+import java.util.stream.Stream
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ReviewDateCategory as ReviewDateCategoryDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewDateCategory as ReviewDateCategoryModel
 
@@ -27,16 +32,22 @@ internal class ActionPlanResourceMapperTest {
   @Mock
   private lateinit var goalMapper: GoalResourceMapper
 
-  @Test
-  fun `should map from model to domain`() {
+  @ParameterizedTest
+  @MethodSource("reviewDateCriteria")
+  fun `should map from model to domain`(
+    sourceReviewDateCategory: ReviewDateCategoryModel,
+    sourceReviewDate: LocalDate?,
+    expectedReviewDateCategory: ReviewDateCategoryDomain,
+    expectedReviewDate: LocalDate?,
+  ) {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val request = aValidCreateActionPlanRequest(reviewDateCategory = ReviewDateCategoryModel.NO_DATE, reviewDate = null)
+    val request = aValidCreateActionPlanRequest(reviewDateCategory = sourceReviewDateCategory, reviewDate = sourceReviewDate)
     val expectedGoal = aValidGoal()
     val expectedActionPlan = aValidActionPlan(
       prisonNumber = prisonNumber,
-      reviewDateCategory = ReviewDateCategoryDomain.NO_DATE,
-      reviewDate = null,
+      reviewDateCategory = expectedReviewDateCategory,
+      reviewDate = expectedReviewDate,
       goals = listOf(expectedGoal),
     )
     given(goalMapper.fromModelToDomain(any<CreateGoalRequest>())).willReturn(expectedGoal)
@@ -69,5 +80,19 @@ internal class ActionPlanResourceMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expectedActionPlan)
     verify(goalMapper).fromDomainToModel(actionPlan.goals[0])
+  }
+
+  companion object {
+    @JvmStatic
+    private fun reviewDateCriteria(): Stream<Arguments> {
+      val now = LocalDate.now()
+      return Stream.of(
+        Arguments.of(ReviewDateCategoryModel.THREE_MONTHS, null, ReviewDateCategoryDomain.THREE_MONTHS, now.plusMonths(3)),
+        Arguments.of(ReviewDateCategoryModel.SIX_MONTHS, null, ReviewDateCategoryDomain.SIX_MONTHS, now.plusMonths(6)),
+        Arguments.of(ReviewDateCategoryModel.TWELVE_MONTHS, null, ReviewDateCategoryDomain.TWELVE_MONTHS, now.plusMonths(12)),
+        Arguments.of(ReviewDateCategoryModel.NO_DATE, null, ReviewDateCategoryDomain.NO_DATE, null),
+        Arguments.of(ReviewDateCategoryModel.SPECIFIC_DATE, now.plusMonths(3), ReviewDateCategoryDomain.SPECIFIC_DATE, now.plusMonths(3)),
+      )
+    }
   }
 }
