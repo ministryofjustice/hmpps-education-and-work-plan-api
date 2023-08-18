@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ReviewDateCategory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
@@ -125,7 +124,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessageContaining("JSON parse error")
-      .hasUserMessageContaining("value failed for JSON property reviewDateCategory due to missing (therefore NULL) value for creator parameter reviewDateCategory")
+      .hasUserMessageContaining("value failed for JSON property goals due to missing (therefore NULL) value for creator parameter goals")
   }
 
   @Test
@@ -136,7 +135,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(steps = listOf(createStepRequest))
     val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest))
-    val expectedReviewDateCategory = ReviewDateCategory.SPECIFIC_DATE
     val expectedReviewDate = createActionPlanRequest.reviewDate!!
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
@@ -161,7 +159,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
     assertThat(actionPlan)
       .isForPrisonNumber(prisonNumber)
-      .hasReviewDateCategory(expectedReviewDateCategory)
       .hasReviewDate(expectedReviewDate)
       .hasNumberOfGoals(1)
       .wasCreatedBy(dpsUsername)

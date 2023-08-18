@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewDateCategory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -82,8 +81,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   fun `should get action plan for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createActionPlanRequest =
-      aValidCreateActionPlanRequest(reviewDateCategory = ReviewDateCategory.NO_DATE, reviewDate = null)
+    val createActionPlanRequest = aValidCreateActionPlanRequest(reviewDate = null)
     createActionPlan(prisonNumber, createActionPlanRequest)
 
     // When
@@ -99,7 +97,6 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .hasReviewDateCategory(ReviewDateCategory.NO_DATE)
       .hasNoReviewDate()
       .goal(0) {
         it.wasCreatedBy("auser_gen")
@@ -114,15 +111,13 @@ class GetActionPlanTest : IntegrationTestBase() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createActionPlanRequest = aValidCreateActionPlanRequest(
-      reviewDateCategory = ReviewDateCategory.SIX_MONTHS,
-      reviewDate = null,
+      reviewDate = LocalDate.now(),
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn Spanish"))
-    val expectedReviewDateCategory = ReviewDateCategory.SIX_MONTHS
-    val expectedReviewDate = LocalDate.now().plusMonths(6)
+    val expectedReviewDate = LocalDate.now()
 
     // When
     val response = webTestClient.get()
@@ -137,7 +132,6 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .hasReviewDateCategory(expectedReviewDateCategory)
       .hasReviewDate(expectedReviewDate)
       .goal(0) {
         it.hasTitle("Learn Spanish")

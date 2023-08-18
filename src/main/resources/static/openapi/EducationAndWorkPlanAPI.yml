@@ -159,8 +159,6 @@ components:
           type: string
           description: The ID of the prisoner
           example: 'A1234BC'
-        reviewDateCategory:
-          $ref: '#/components/schemas/ReviewDateCategory'
         reviewDate:
           type: string
           format: date
@@ -174,7 +172,6 @@ components:
       required:
         - reference
         - prisonNumber
-        - reviewDateCategory
         - goals
     GoalResponse:
       title: GoalResponse
@@ -278,8 +275,6 @@ components:
       type: object
       description: A request to create an  Action Plan with at least one or more Goals that a Prisoner aims to complete.
       properties:
-        reviewDateCategory:
-          $ref: '#/components/schemas/ReviewDateCategory'
         reviewDate:
           type: string
           format: date
@@ -292,7 +287,6 @@ components:
           items:
             $ref: '#/components/schemas/CreateGoalRequest'
       required:
-        - reviewDateCategory
         - goals
 
     CreateGoalRequest:
@@ -400,16 +394,6 @@ components:
       required:
         - status
 
-    ReviewDateCategory:
-      title: ReviewDateCategory
-      description: An enumerated set of values representing the chosen category for an Action Plan's review date.
-      type: string
-      enum:
-        - THREE_MONTHS
-        - SIX_MONTHS
-        - TWELVE_MONTHS
-        - NO_DATE
-        - SPECIFIC_DATE
     GoalStatus:
       title: GoalStatus
       description: Enum describing the various statuses of a Goal's lifecycle.

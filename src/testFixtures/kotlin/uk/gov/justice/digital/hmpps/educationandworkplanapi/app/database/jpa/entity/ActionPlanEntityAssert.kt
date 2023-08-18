@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 import java.util.function.Consumer
 
 fun assertThat(actual: ActionPlanEntity?) = ActionPlanEntityAssert(actual)
@@ -89,16 +89,6 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
     with(actual!!) {
       if (prisonNumber != expected) {
         failWithMessage("Expected prisonNumber to be $expected, but was $prisonNumber")
-      }
-    }
-    return this
-  }
-
-  fun hasReviewDateCategory(expected: ReviewDateCategory): ActionPlanEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reviewDateCategory != expected) {
-        failWithMessage("Expected reviewDateCategory to be $expected, but was $reviewDateCategory")
       }
     }
     return this

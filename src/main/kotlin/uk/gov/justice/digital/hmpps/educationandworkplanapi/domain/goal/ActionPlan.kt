@@ -9,7 +9,6 @@ import java.util.UUID
 class ActionPlan(
   val reference: UUID,
   val prisonNumber: String,
-  val reviewDateCategory: ReviewDateCategory,
   val reviewDate: LocalDate?,
   goals: List<Goal> = emptyList(),
 ) {
@@ -35,14 +34,6 @@ class ActionPlan(
     goals.add(goal)
 
   override fun toString(): String {
-    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', reviewDateCategory='$reviewDateCategory', reviewDate='$reviewDate', goals=$goals)"
+    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', reviewDate='$reviewDate', goals=$goals)"
   }
-}
-
-enum class ReviewDateCategory {
-  THREE_MONTHS,
-  SIX_MONTHS,
-  TWELVE_MONTHS,
-  NO_DATE,
-  SPECIFIC_DATE,
 }

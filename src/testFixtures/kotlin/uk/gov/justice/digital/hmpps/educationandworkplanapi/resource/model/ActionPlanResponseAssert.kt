@@ -22,16 +22,6 @@ class ActionPlanResponseAssert(actual: ActionPlanResponse?) :
     return this
   }
 
-  fun hasReviewDateCategory(expected: ReviewDateCategory): ActionPlanResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (reviewDateCategory != expected) {
-        failWithMessage("Expected reviewDateCategory to be $expected, but was $reviewDateCategory")
-      }
-    }
-    return this
-  }
-
   fun hasReviewDate(expected: LocalDate): ActionPlanResponseAssert {
     isNotNull
     with(actual!!) {

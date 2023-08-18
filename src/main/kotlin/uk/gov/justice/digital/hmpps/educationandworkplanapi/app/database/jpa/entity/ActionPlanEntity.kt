@@ -4,8 +4,6 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
@@ -43,11 +41,6 @@ class ActionPlanEntity(
   var prisonNumber: String? = null,
 
   @Column
-  @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var reviewDateCategory: ReviewDateCategory? = null,
-
-  @Column
   var reviewDate: LocalDate? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
@@ -78,11 +71,10 @@ class ActionPlanEntity(
     /**
      * Returns new un-persisted [ActionPlanEntity] for the specified prisoner with an empty collection of [GoalEntity]s
      */
-    fun newActionPlanForPrisoner(reference: UUID, prisonNumber: String, reviewDateCategory: ReviewDateCategory, reviewDate: LocalDate?): ActionPlanEntity =
+    fun newActionPlanForPrisoner(reference: UUID, prisonNumber: String, reviewDate: LocalDate?): ActionPlanEntity =
       ActionPlanEntity(
         reference = reference,
         prisonNumber = prisonNumber,
-        reviewDateCategory = reviewDateCategory,
         reviewDate = reviewDate,
         goals = mutableListOf(),
       )
@@ -116,12 +108,4 @@ class ActionPlanEntity(
   override fun toString(): String {
     return this::class.simpleName + "(id = $id, prisonNumber = $prisonNumber)"
   }
-}
-
-enum class ReviewDateCategory {
-  THREE_MONTHS,
-  SIX_MONTHS,
-  TWELVE_MONTHS,
-  NO_DATE,
-  SPECIFIC_DATE,
 }
