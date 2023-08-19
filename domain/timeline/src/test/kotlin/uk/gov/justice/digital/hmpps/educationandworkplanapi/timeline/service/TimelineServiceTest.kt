@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimelineEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.Timeline
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.aValidTimelineEvent
 import java.time.Instant
 
 @ExtendWith(MockitoExtension::class)
