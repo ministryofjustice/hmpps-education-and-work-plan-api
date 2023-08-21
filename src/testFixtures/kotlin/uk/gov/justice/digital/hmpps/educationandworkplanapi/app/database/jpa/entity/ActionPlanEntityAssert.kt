@@ -104,6 +104,16 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
     return this
   }
 
+  fun hasNoReviewDate(): ActionPlanEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (reviewDate != null) {
+        failWithMessage("Expected reviewDate to be null, but was $reviewDate")
+      }
+    }
+    return this
+  }
+
   fun hasNoGoalsSet(): ActionPlanEntityAssert {
     isNotNull
     with(actual!!) {

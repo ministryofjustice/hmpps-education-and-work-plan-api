@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import java.time.LocalDate
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange as TargetDateRangeEntity
 
 class CreateActionPlanTest : IntegrationTestBase() {
@@ -101,6 +102,31 @@ class CreateActionPlanTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should fail to create action plan given review date is in the past`() {
+    val prisonNumber = aValidPrisonNumber()
+    val invalidReviewDate = LocalDate.now().minusDays(1)
+    val createRequest = aValidCreateActionPlanRequest(reviewDate = invalidReviewDate)
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(BAD_REQUEST.value())
+      .hasUserMessage("Validation failed for object='createActionPlanRequest'. Error count: 1")
+      .hasDeveloperMessageContaining("Error on field 'reviewDate': rejected value [$invalidReviewDate], Cannot be in the past")
+  }
+
+  @Test
   fun `should fail to create action plan given null fields`() {
     val prisonNumber = aValidPrisonNumber()
 
@@ -125,6 +151,37 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessageContaining("JSON parse error")
       .hasUserMessageContaining("value failed for JSON property goals due to missing (therefore NULL) value for creator parameter goals")
+  }
+
+  @Test
+  @Transactional
+  fun `should fail to create action plan given action plan already exists`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
+    actionPlanRepository.save(actionPlan)
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
+    assertThat(actionPlan).hasNumberOfGoals(1)
+    val createRequest = aValidCreateActionPlanRequest()
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isForbidden
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(FORBIDDEN.value())
+      .hasUserMessage("An Action Plan already exists for prisoner $prisonNumber.")
   }
 
   @Test
@@ -180,32 +237,34 @@ class CreateActionPlanTest : IntegrationTestBase() {
 
   @Test
   @Transactional
-  fun `should fail to create action plan given action plan already exists`() {
+  fun `should create a new action plan with no review date`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
-    actionPlanRepository.save(actionPlan)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-    TestTransaction.start()
-    assertThat(actionPlan).hasNumberOfGoals(1)
-    val createRequest = aValidCreateActionPlanRequest()
+    val createActionPlanRequest = aValidCreateActionPlanRequest(reviewDate = null)
+    val dpsUsername = "auser_gen"
+    val displayName = "Albert User"
 
     // When
-    val response = webTestClient.post()
+    webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .withBody(createActionPlanRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = dpsUsername,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
-      .isForbidden
-      .returnResult(ErrorResponse::class.java)
+      .isCreated()
 
     // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasStatus(FORBIDDEN.value())
-      .hasUserMessage("An Action Plan already exists for prisoner $prisonNumber.")
+    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    assertThat(actionPlan)
+      .isForPrisonNumber(prisonNumber)
+      .hasNoReviewDate()
+      .wasCreatedBy(dpsUsername)
   }
 }
