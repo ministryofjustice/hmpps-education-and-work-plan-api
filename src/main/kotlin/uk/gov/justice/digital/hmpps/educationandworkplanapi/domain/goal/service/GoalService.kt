@@ -24,7 +24,7 @@ class GoalService(
   /**
    * Creates a new [Goal] for the prisoner identified by their prison number.
    */
-  fun createGoal(goal: Goal, prisonNumber: String): Goal {
+  fun createGoal(prisonNumber: String, goal: Goal): Goal {
     log.info { "Saving Goal [${goal.reference}] for prisoner [$prisonNumber]" }
     return persistenceAdapter.createGoal(goal, prisonNumber)
   }

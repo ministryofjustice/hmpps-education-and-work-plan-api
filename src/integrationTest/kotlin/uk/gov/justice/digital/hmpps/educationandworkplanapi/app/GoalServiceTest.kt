@@ -23,7 +23,7 @@ class GoalServiceTest : IntegrationTestBase() {
     val goal = aValidGoal()
 
     // When
-    goalService.createGoal(goal, prisonNumber)
+    goalService.createGoal(prisonNumber, goal)
 
     // Then
     TestTransaction.flagForCommit()
@@ -43,14 +43,14 @@ class GoalServiceTest : IntegrationTestBase() {
     val goal = aValidGoal(
       title = "Goal 1",
     )
-    goalService.createGoal(goal, prisonNumber)
+    goalService.createGoal(prisonNumber, goal)
 
     val newGoal = aValidGoal(
       title = "Goal 2",
     )
 
     // When
-    goalService.createGoal(newGoal, prisonNumber)
+    goalService.createGoal(prisonNumber, newGoal)
 
     // Then
     TestTransaction.flagForCommit()
