@@ -123,7 +123,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
       .hasUserMessage("Validation failed for object='createActionPlanRequest'. Error count: 1")
-      .hasDeveloperMessageContaining("Error on field 'reviewDate': rejected value [2023-08-20], Cannot be in the past")
+      .hasDeveloperMessageContaining("Error on field 'reviewDate': rejected value [$invalidReviewDate], Cannot be in the past")
   }
 
   @Test
