@@ -147,6 +147,7 @@ tasks.register<JacocoReport>("combineJacocoReports") {
 tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
   validateSpec.set(true)
   generatorName.set("kotlin-spring")
+  templateDir.set("$projectDir/src/main/resources/static/openapi/templates")
   inputSpec.set("$projectDir/src/main/resources/static/openapi/EducationAndWorkPlanAPI.yml")
   outputDir.set("$buildDir/generated")
   modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model")

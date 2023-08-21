@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.1.4'
+  version: '1.1.5'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -163,7 +163,7 @@ components:
           type: string
           format: date
           description: An optional ISO-8601 date representing when the Action Plan is up for review.
-          example: '2023-12-19'
+          example: '2024-12-19'
         goals:
           type: array
           description: A List of at least one or more Goals.
@@ -278,6 +278,7 @@ components:
         reviewDate:
           type: string
           format: date
+          x-constraints: 'NotInPast'
           description: An optional ISO-8601 date representing when the Action Plan is up for review.
           example: '2023-12-19'
         goals:
@@ -301,6 +302,7 @@ components:
         reviewDate:
           type: string
           format: date
+          x-constraints: 'NotInPast'
           description: An optional ISO-8601 date representing when the Goal is up for review.
           example: '2023-12-19'
         steps:
