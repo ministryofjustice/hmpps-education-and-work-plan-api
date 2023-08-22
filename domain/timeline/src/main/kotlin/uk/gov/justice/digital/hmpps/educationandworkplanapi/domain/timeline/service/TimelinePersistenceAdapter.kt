@@ -1,7 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.service
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.Timeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 
 /**
  * Persistence Adapter for [Timeline] instances

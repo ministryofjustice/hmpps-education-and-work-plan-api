@@ -1,6 +1,6 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.service
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline.Timeline
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
 
 /**
  * Service class exposing methods that implement the business rules for the Timeline domain, and is how applications

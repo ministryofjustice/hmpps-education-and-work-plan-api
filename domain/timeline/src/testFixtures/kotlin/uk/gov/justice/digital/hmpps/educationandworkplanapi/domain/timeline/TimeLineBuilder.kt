@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.timeline
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
 
 import java.time.Instant
 
