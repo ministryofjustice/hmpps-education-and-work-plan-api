@@ -41,6 +41,8 @@ configurations {
 }
 
 dependencies {
+  implementation(project("domain:timeline"))
+
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -58,8 +60,12 @@ dependencies {
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql:${property("postgresql.version")}")
 
+  // Test dependencies
+  testImplementation(testFixtures(project("domain:timeline")))
+
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
+  integrationTestImplementation(testFixtures(project("domain:timeline")))
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")
