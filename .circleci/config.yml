@@ -33,6 +33,8 @@ jobs:
       - store_test_results:
           path: build/test-results
       - store_test_results:
+          path: domain/goal/build/test-results
+      - store_test_results:
           path: domain/timeline/build/test-results
       - run:
           name: Compress Build Reports Artifacts
@@ -40,6 +42,8 @@ jobs:
             tar -cvzf build-reports.tar \
             build/reports/tests \
             build/reports/jacoco \
+            domain/goal/build/reports/tests \
+            domain/goal/build/reports/jacoco \
             domain/timeline/build/reports/tests \
             domain/timeline/build/reports/jacoco
       - store_artifacts:
