@@ -5,7 +5,7 @@
 [![API docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](https://hmpps-education-and-work-plan-api-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html?configUrl=/v3/api-docs)
 
 ## About
-A Kotlin application providing APIs to support managing Work Plans for prisoners.
+A Kotlin application providing APIs to support managing Education And Work Plans for prisoners.
 
 ### Team
 This application is in development by the Farsight Consulting team `Personal Learning Plans (PLP)`. They can be contacted on MOJ Slack channel `#plp-dev`.
@@ -139,3 +139,24 @@ customMetrics
 | order by timestamp desc 
 ```
 For example, if the memory usage is consistently high you may need to increase the memory allocated in the `helm_dploy/hmpps-education-and-work-plan-api/values.yaml` file env var `JAVA_OPTS`.
+
+## API external dependencies
+This API consumes, and is therefore dependent on, data from the following APIs:
+
+* `hmpps-auth` - Standard HMPPS Digital configuration; used for Spring Security.
+* `application-insights` - Standard HMPPS Digital configuration; used for telemetry and event tracing.
+
+## API consumers
+The following are the known consumers of this API. Any changes to this API - especially breaking or potentially breaking
+changes should consider the use case of these consumers.
+
+As is standard in HMPPS projects the term "service UI" specifically means the node/express service codebase; and not the
+UI running in the browser. UI's running in the browser do not make xhr/ajax style requests directly to the APIs.
+
+* `hmpps-eduction-and-work-plan-ui` - The Education and Work Plan service UI (aka PLP)  
+The REST API endpoints exposed by this API are consumed by the service UI. Roles required are `ROLE_EDUCATION_WORK_PLAN_EDITOR` or
+`ROLE_EDUCATION_WORK_PLAN_VIEWER` - see the individual controller methods and/or swagger spec for specific details.
+* `hmpps-ciag-careers-induction-ui` - The CIAG Induction service UI  
+The CIAG Induction service UI consumes the `GET` endpoint in order to retrieve action plan details for a list of prison
+numbers (prisoners). The role required is `ROLE_EDUCATION_WORK_PLAN_VIEWER`
+
