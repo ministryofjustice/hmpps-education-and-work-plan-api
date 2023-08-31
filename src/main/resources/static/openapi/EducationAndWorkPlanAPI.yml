@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.1.5'
+  version: '1.1.6'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -19,8 +19,25 @@ paths:
   #
 
   #
-  # Goals
+  # Action Plans
   # --------------------------------------------------------------------------------
+  '/action-plans/':
+    post:
+      summary: Retrieves a list of Action Plans for a given list of Prisoners.
+      description: Retrieves a list of Action Plans for a given list of Prisoners.
+      tags:
+        - Action Plan
+      responses:
+        '201':
+          $ref: '#/components/responses/ActionPlanSummaryList'
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-action-plans
+      requestBody:
+        $ref: '#/components/requestBodies/GetActionPlanSummaries'
+
   '/action-plans/{prisonNumber}':
     parameters:
       - name: prisonNumber
@@ -55,6 +72,9 @@ paths:
           $ref: '#/components/responses/ActionPlan'
       operationId: get-action-plan-by-prison-number
 
+  #
+  # Action Plans
+  # --------------------------------------------------------------------------------
   '/action-plans/{prisonNumber}/goals':
     parameters:
       - name: prisonNumber
@@ -145,6 +165,40 @@ components:
           type: string
       required:
         - status
+    ActionPlanSummaryListResponse:
+      title: ActionPlanSummaryListResponse
+      type: object
+      description: Contains a list of Action Plan summaries.
+      properties:
+        summaries:
+          type: array
+          description: A List of prisoners' Action Plan summaries. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/ActionPlanSummaryResponse'
+      required:
+        - summaries
+    ActionPlanSummaryResponse:
+      title: ActionPlanSummaryResponse
+      type: object
+      description: A subset of data regarding a prisoner's Action plan.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The Action Plan's unique reference
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
+        reviewDate:
+          type: string
+          format: date
+          description: An optional ISO-8601 date representing when the Action Plan is up for review.
+          example: '2024-12-19'
+      required:
+        - reference
+        - prisonNumber
     ActionPlanResponse:
       title: ActionPlanResponse
       type: object
@@ -270,10 +324,24 @@ components:
         - status
         - sequenceNumber
 
+    GetActionPlanSummariesRequest:
+      title: GetActionPlanSummariesRequest
+      type: object
+      description: A request to retrieve a list of Action Plan summaries for at least one prisoner.
+      properties:
+        prisonNumbers:
+          type: array
+          description: A List of at least one prison number.
+          minItems: 1
+          items:
+            type: string
+      required:
+        - prisonNumbers
+
     CreateActionPlanRequest:
       title: CreateActionPlanRequest
       type: object
-      description: A request to create an  Action Plan with at least one or more Goals that a Prisoner aims to complete.
+      description: A request to create an Action Plan with at least one or more Goals that a Prisoner aims to complete.
       properties:
         reviewDate:
           type: string
@@ -485,6 +553,22 @@ components:
           example:
             status: 409
             userMessage: 'A Goal with reference [c88a6c48-97e2-4c04-93b5-98619966447b] has an unexpected status = ARCHIVED'
+    ActionPlanSummaryList:
+      description: Response body containing the a list of Action Plan summaries that make up a Prisoner's Action Plan.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ActionPlanSummaryListResponse'
     ActionPlan:
       description: Response body containing the Goals that make up a Prisoner's Action Plan.
       headers:
@@ -522,6 +606,12 @@ components:
   # Request Body Definitions
   # --------------------------------------------------------------------------------
   requestBodies:
+    GetActionPlanSummaries:
+      description: Request body to retrieve a list of Action Plan summaries for one or more Prisoners.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetActionPlanSummariesRequest'
     CreateActionPlan:
       description: Request body to create an Action Plan with at least one or more Goals.
       content:
