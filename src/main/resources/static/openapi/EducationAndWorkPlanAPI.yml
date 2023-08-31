@@ -21,7 +21,7 @@ paths:
   #
   # Action Plans
   # --------------------------------------------------------------------------------
-  '/action-plans/':
+  '/action-plans':
     post:
       summary: Retrieves a list of Action Plans for a given list of Prisoners.
       description: Retrieves a list of Action Plans for a given list of Prisoners. This is a POST, rather than a GET, to allow a long list of prison numbers.
@@ -168,7 +168,7 @@ components:
       type: object
       description: Contains a list of Action Plan summaries.
       properties:
-        summaries:
+        actionPlanSummaries:
           type: array
           description: A List of prisoners' Action Plan summaries. Can be empty but not null.
           items:
