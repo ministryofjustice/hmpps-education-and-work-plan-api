@@ -9,9 +9,9 @@ import org.springframework.web.reactive.function.client.WebClient
 class WebClientConfiguration {
 
   @Bean
-  fun hmppsAuthWebClient(@Value("\${api.hmpps-auth.url}") eroManagementApiUrl: String): WebClient =
+  fun hmppsAuthWebClient(@Value("\${api.hmpps-auth.url}") hmppsAuthApiUrl: String): WebClient =
     WebClient.builder()
-      .baseUrl(eroManagementApiUrl)
+      .baseUrl(hmppsAuthApiUrl)
       .build()
 }
 
