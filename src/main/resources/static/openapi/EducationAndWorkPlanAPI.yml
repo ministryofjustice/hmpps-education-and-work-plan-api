@@ -24,16 +24,14 @@ paths:
   '/action-plans/':
     post:
       summary: Retrieves a list of Action Plans for a given list of Prisoners.
-      description: Retrieves a list of Action Plans for a given list of Prisoners.
+      description: Retrieves a list of Action Plans for a given list of Prisoners. This is a POST, rather than a GET, to allow a long list of prison numbers.
       tags:
         - Action Plan
       responses:
-        '201':
+        '200':
           $ref: '#/components/responses/ActionPlanSummaryList'
         '400':
           $ref: '#/components/responses/400ErrorResponse'
-        '404':
-          $ref: '#/components/responses/404ErrorResponse'
       operationId: get-action-plans
       requestBody:
         $ref: '#/components/requestBodies/GetActionPlanSummaries'
@@ -73,7 +71,7 @@ paths:
       operationId: get-action-plan-by-prison-number
 
   #
-  # Action Plans
+  # Goals
   # --------------------------------------------------------------------------------
   '/action-plans/{prisonNumber}/goals':
     parameters:
