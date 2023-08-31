@@ -11,6 +11,8 @@ class UserPrincipalAuditorAware : AuditorAware<String> {
 
   companion object {
     fun getCurrentAuditorDisplayName(): String = CurrentUser().displayName
+
+    fun getCurrentAuditorLocation(): String = CurrentUser().activeCaseLoadId
   }
 
   override fun getCurrentAuditor(): Optional<String> = Optional.of(CurrentUser().username)
@@ -23,6 +25,7 @@ class CurrentUser {
 
   val username: String
   val displayName: String
+  val activeCaseLoadId: String
 
   init {
     with(SecurityContextHolder.getContext()?.authentication) {
@@ -30,9 +33,11 @@ class CurrentUser {
         val principal = this.principal as DpsPrincipal
         username = principal.name
         displayName = principal.displayName
+        activeCaseLoadId = principal.activeCaseLoadId
       } else {
         username = SYSTEM
         displayName = SYSTEM
+        activeCaseLoadId = SYSTEM
       }
     }
   }

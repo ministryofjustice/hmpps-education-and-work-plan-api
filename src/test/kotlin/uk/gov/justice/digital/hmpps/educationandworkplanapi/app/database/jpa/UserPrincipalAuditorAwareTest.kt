@@ -14,9 +14,10 @@ class UserPrincipalAuditorAwareTest {
   companion object {
     private const val USERNAME = "auser_gen"
     private const val DISPLAY_NAME = "Albert User"
+    private const val ACTIVE_CASELOAD_ID = "BXI"
     private val ROLES = emptyList<GrantedAuthority>()
 
-    private val PRINCIPAL = DpsPrincipal(USERNAME, DISPLAY_NAME)
+    private val PRINCIPAL = DpsPrincipal(USERNAME, DISPLAY_NAME, ACTIVE_CASELOAD_ID)
     private val AUTHENTICATION = TestingAuthenticationToken(PRINCIPAL, null, ROLES)
   }
 

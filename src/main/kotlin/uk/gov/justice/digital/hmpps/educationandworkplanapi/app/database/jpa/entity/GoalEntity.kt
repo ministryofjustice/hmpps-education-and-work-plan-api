@@ -12,6 +12,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import jakarta.persistence.Transient
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
@@ -23,13 +24,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.LocationAuditingEntityListener
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.LocationAuditingEntityListener.LastModifiedLocation
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
 @Table(name = "goal")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
+@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class, LocationAuditingEntityListener::class])
 class GoalEntity(
   @Id
   @GeneratedValue
@@ -72,6 +75,10 @@ class GoalEntity(
   @CreatedByDisplayName
   var createdByDisplayName: String? = null,
 
+  @Transient
+  @LocationAuditingEntityListener.CreatedLocation
+  var createdLocation: String? = null,
+
   @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null,
@@ -83,6 +90,10 @@ class GoalEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
+
+  @Transient
+  @LastModifiedLocation
+  var updatedLocation: String? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {

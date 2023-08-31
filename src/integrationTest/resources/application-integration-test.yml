@@ -24,3 +24,7 @@ spring:
       resourceserver:
         jwt:
           public-key-location: classpath:local-public-key.pub
+
+api:
+  hmpps-auth:
+    url: http://replaced-by-wireMockServer-bean

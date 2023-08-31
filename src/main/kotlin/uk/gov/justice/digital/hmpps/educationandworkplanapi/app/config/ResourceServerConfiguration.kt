@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain
 class ResourceServerConfiguration {
 
   @Bean
-  fun filterChain(http: HttpSecurity): SecurityFilterChain {
+  fun filterChain(http: HttpSecurity, tokenConverter: AuthAwareTokenConverter): SecurityFilterChain {
     http {
       sessionManagement { SessionCreationPolicy.STATELESS }
       headers { frameOptions { sameOrigin = true } }
@@ -35,7 +35,7 @@ class ResourceServerConfiguration {
         ).forEach { authorize(it, permitAll) }
         authorize(anyRequest, authenticated)
       }
-      oauth2ResourceServer { jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() } }
+      oauth2ResourceServer { jwt { jwtAuthenticationConverter = tokenConverter } }
     }
 
     return http.build()

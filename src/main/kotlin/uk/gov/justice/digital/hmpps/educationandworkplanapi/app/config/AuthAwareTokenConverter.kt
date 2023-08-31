@@ -8,10 +8,13 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.HmppsAuthClient
 import java.security.Principal
 
 @Component
-class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
+class AuthAwareTokenConverter(
+  private val hmppsAuthClient: HmppsAuthClient,
+) : Converter<Jwt, AbstractAuthenticationToken> {
   private val jwtGrantedAuthoritiesConverter: Converter<Jwt, Collection<GrantedAuthority>> = JwtGrantedAuthoritiesConverter()
 
   override fun convert(jwt: Jwt): AbstractAuthenticationToken {
@@ -19,7 +22,8 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
 
     val username = findUsername(claims)
     val displayName = findDisplayName(claims) ?: username
-    val principal = DpsPrincipal(username, displayName)
+    val activeCaseLoadId = hmppsAuthClient.getUserActiveCaseLoadId(jwt.tokenValue) ?: "unknown"
+    val principal = DpsPrincipal(username, displayName, activeCaseLoadId)
 
     val authorities = extractAuthorities(jwt)
 
@@ -58,6 +62,7 @@ class AuthAwareAuthenticationToken(
 class DpsPrincipal(
   private val username: String,
   val displayName: String,
+  val activeCaseLoadId: String,
 ) : Principal {
 
   override fun getName(): String = username
