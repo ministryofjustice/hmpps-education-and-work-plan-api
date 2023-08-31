@@ -20,7 +20,7 @@ class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientT
   override fun addInterceptors(registry: InterceptorRegistry) {
     registry.addInterceptor(clientTrackingInterceptor)
       .addPathPatterns("/**")
-      .excludePathPatterns("/swagger-ui/**", "/v3/api-docs")
+      .excludePathPatterns("/swagger-ui/**", "/v3/api-docs/**")
   }
 }
 
