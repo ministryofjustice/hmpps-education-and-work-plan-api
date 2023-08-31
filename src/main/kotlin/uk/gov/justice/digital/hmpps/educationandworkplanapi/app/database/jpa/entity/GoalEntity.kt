@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.Dis
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.LocationAuditingEntityListener
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.LocationAuditingEntityListener.CreatedLocation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.LocationAuditingEntityListener.LastModifiedLocation
 import java.time.Instant
 import java.time.LocalDate
@@ -76,7 +77,7 @@ class GoalEntity(
   var createdByDisplayName: String? = null,
 
   @Transient
-  @LocationAuditingEntityListener.CreatedLocation
+  @CreatedLocation
   var createdLocation: String? = null,
 
   @Column
