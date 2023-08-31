@@ -18,7 +18,9 @@ private val log = KotlinLogging.logger {}
 @Configuration
 class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientTrackingInterceptor) : WebMvcConfigurer {
   override fun addInterceptors(registry: InterceptorRegistry) {
-    registry.addInterceptor(clientTrackingInterceptor).addPathPatterns("/**")
+    registry.addInterceptor(clientTrackingInterceptor)
+      .addPathPatterns("/**")
+      .excludePathPatterns("/swagger-ui/**", "/v3/api-docs")
   }
 }
 
