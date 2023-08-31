@@ -11,6 +11,7 @@ fun aValidUpdateGoalRequest(
   status: GoalStatus = GoalStatus.ACTIVE,
   steps: List<UpdateStepRequest> = listOf(aValidUpdateStepRequest()),
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
+  prisonId: String = "BXI",
 ): UpdateGoalRequest =
   UpdateGoalRequest(
     goalReference = goalReference,
@@ -19,4 +20,5 @@ fun aValidUpdateGoalRequest(
     status = status,
     steps = steps,
     notes = notes,
+    prisonId = prisonId,
   )

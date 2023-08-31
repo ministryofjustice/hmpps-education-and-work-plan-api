@@ -14,9 +14,11 @@ fun aValidGoalResponse(
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
+  createdAtPrison: String = "BXI",
   updatedBy: String = "asmith_gen",
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
+  updatedAtPrison: String = "BXI",
 ): GoalResponse =
   GoalResponse(
     goalReference = reference,
@@ -28,9 +30,11 @@ fun aValidGoalResponse(
     createdBy = createdBy,
     createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
     updatedBy = updatedBy,
     updatedByDisplayName = updatedByDisplayName,
     updatedAt = updatedAt,
+    updatedAtPrison = updatedAtPrison,
   )
 
 fun anotherValidGoalResponse(
@@ -43,9 +47,11 @@ fun anotherValidGoalResponse(
   createdBy: String = "bjones_gen",
   createdByDisplayName: String = "Barry Jones",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
+  createdAtPrison: String = "BXI",
   updatedBy: String = "bjones_gen",
   updatedByDisplayName: String = "Barry Jones",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
+  updatedAtPrison: String = "BXI",
 ): GoalResponse =
   GoalResponse(
     goalReference = reference,
@@ -57,7 +63,9 @@ fun anotherValidGoalResponse(
     createdBy = createdBy,
     createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
     updatedBy = updatedBy,
     updatedAt = updatedAt,
     updatedByDisplayName = updatedByDisplayName,
+    updatedAtPrison = updatedAtPrison,
   )

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.1.6'
+  version: '1.2.0'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -269,6 +269,10 @@ components:
           format: date-time
           description: An ISO-8601 timestamp representing when the Goal was created.
           example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Goal was created.
+          example: 'BXI'
         updatedBy:
           type: string
           description: The DPS username of the person who last updated the goal.
@@ -282,6 +286,10 @@ components:
           format: date-time
           description: An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.
           example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Goal was updated.
+          example: 'BXI'
       required:
         - goalReference
         - title
@@ -290,9 +298,11 @@ components:
         - createdBy
         - createdByDisplayName
         - createdAt
+        - createdAtPrison
         - updatedBy
         - updatedByDisplayName
         - updatedAt
+        - updatedAtPrison
     StepResponse:
       title: StepResponse
       type: object
@@ -381,9 +391,14 @@ components:
           type: string
           description: Some additional notes related to the Goal.
           example: Pay close attention to Peter's behaviour.
+        prisonId:
+          type: string
+          description: The identifier of the prison that the prisoner is currently resident at.
+          example: BXI
       required:
         - title
         - steps
+        - prisonId
 
     UpdateGoalRequest:
       title: UpdateGoalRequest
@@ -416,11 +431,16 @@ components:
           type: string
           description: Some additional notes related to the Goal.
           example: Pay close attention to Peter's behaviour.
+        prisonId:
+          type: string
+          description: The identifier of the prison that the prisoner is currently resident at.
+          example: BXI
       required:
         - goalReference
         - title
         - status
         - steps
+        - prisonId
 
     CreateStepRequest:
       title: CreateStepRequest
