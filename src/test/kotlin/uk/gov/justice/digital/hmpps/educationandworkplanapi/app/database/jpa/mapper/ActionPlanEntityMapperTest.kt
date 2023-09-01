@@ -10,9 +10,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 
 @ExtendWith(MockitoExtension::class)
@@ -68,5 +71,31 @@ class ActionPlanEntityMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     verify(goalMapper).fromEntityToDomain(actionPlanEntity.goals!![0])
+  }
+
+  @Test
+  fun `should map from entity summaries to domain summaries`() {
+    // Given
+    val summaryProjection1 = aValidActionPlanSummaryProjection(prisonNumber = aValidPrisonNumber())
+    val summaryProjection2 = aValidActionPlanSummaryProjection(prisonNumber = anotherValidPrisonNumber())
+    val expected = listOf(
+      aValidActionPlanSummary(
+        prisonNumber = summaryProjection1.prisonNumber,
+        reference = summaryProjection1.reference,
+        reviewDate = summaryProjection1.reviewDate,
+      ),
+      aValidActionPlanSummary(
+        prisonNumber = summaryProjection2.prisonNumber,
+        reference = summaryProjection2.reference,
+        reviewDate = summaryProjection2.reviewDate,
+      ),
+    )
+
+    // When
+    val actual = mapper.fromEntitySummariesToDomainSummaries(listOf(summaryProjection1, summaryProjection2))
+
+    // Then
+    assertThat(actual).hasSize(2)
+    assertThat(actual).isEqualTo(expected)
   }
 }
