@@ -21,6 +21,7 @@ ext["mapstruct.version"] = "1.5.5.Final"
 ext["postgresql.version"] = "42.6.0"
 ext["kotlin.logging.version"] = "3.0.5"
 ext["springdoc.openapi.version"] = "2.1.0"
+ext["wiremock.version"] = "3.0.0-beta-10"
 
 allOpen {
   annotations(
@@ -67,6 +68,7 @@ dependencies {
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
+  integrationTestImplementation("com.github.tomakehurst:wiremock:${property("wiremock.version")}")
   integrationTestImplementation(testFixtures(project("domain:goal")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
 
