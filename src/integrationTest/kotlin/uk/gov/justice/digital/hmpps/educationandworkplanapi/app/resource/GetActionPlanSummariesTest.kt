@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
@@ -14,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGetActionPlanSummariesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -115,6 +115,12 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
     createActionPlan(prisonNumber1, aValidCreateActionPlanRequest(reviewDate = reviewDate))
     createActionPlan(prisonNumber2, aValidCreateActionPlanRequest(reviewDate = null))
     val request = aValidGetActionPlanSummariesRequest(listOf(prisonNumber1, prisonNumber2))
+    val expectedResponse = ActionPlanSummaryListResponse(
+      actionPlanSummaries = listOf(
+        aValidActionPlanSummaryResponse(prisonNumber = prisonNumber1, reviewDate = reviewDate),
+        aValidActionPlanSummaryResponse(prisonNumber = prisonNumber2, reviewDate = null),
+      ),
+    )
 
     // When
     val response = webTestClient.post()
@@ -130,12 +136,10 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual).hasSummaryCount(2)
-    val summary1 = actual.actionPlanSummaries[0]
-    assertThat(summary1).hasPrisonNumber(prisonNumber1)
-    assertThat(summary1).hasReviewDate(reviewDate)
-    val summary2 = actual.actionPlanSummaries[1]
-    assertThat(summary2).hasPrisonNumber(prisonNumber2)
-    assertThat(summary2).hasNoReviewDate()
+    assertThat(actual).usingRecursiveComparison()
+      .ignoringCollectionOrder()
+      .ignoringFields("actionPlanSummaries.reference")
+      .isEqualTo(expectedResponse)
   }
 
   private fun createActionPlan(prisonNumber: String, createActionPlanRequest: CreateActionPlanRequest) {
