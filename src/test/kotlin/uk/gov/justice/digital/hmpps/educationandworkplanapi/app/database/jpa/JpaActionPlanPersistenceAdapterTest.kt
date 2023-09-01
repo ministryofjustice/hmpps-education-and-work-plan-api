@@ -12,9 +12,11 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ActionPlanEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
 
 @ExtendWith(MockitoExtension::class)
 class JpaActionPlanPersistenceAdapterTest {
@@ -64,5 +66,24 @@ class JpaActionPlanPersistenceAdapterTest {
     assertThat(actual).isEqualTo(expectedActionPlanDomain)
     verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
     verify(actionPlanMapper).fromEntityToDomain(actionPlanEntity)
+  }
+
+  @Test
+  fun `should retrieve Action Plan Summaries`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val prisonNumbers = listOf(prisonNumber)
+    val actionPlanSummaryProjections = listOf(aValidActionPlanSummaryProjection(prisonNumber = prisonNumber))
+    val expectedActionPlanSummaries = listOf(aValidActionPlanSummary(prisonNumber = prisonNumber))
+    given(actionPlanRepository.findByPrisonNumberIn(any())).willReturn(actionPlanSummaryProjections)
+    given(actionPlanMapper.fromEntitySummariesToDomainSummaries(any())).willReturn(expectedActionPlanSummaries)
+
+    // When
+    val actual = persistenceAdapter.getActionPlanSummaries(prisonNumbers)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedActionPlanSummaries)
+    verify(actionPlanRepository).findByPrisonNumberIn(prisonNumbers)
+    verify(actionPlanMapper).fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections)
   }
 }
