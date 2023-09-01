@@ -80,33 +80,6 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should get action plan summary for prisoner`() {
-    // Given
-    val prisonNumber = aValidPrisonNumber()
-    val reviewDate = LocalDate.now().plusMonths(3)
-    createActionPlan(prisonNumber, aValidCreateActionPlanRequest(reviewDate = reviewDate))
-    val request = aValidGetActionPlanSummariesRequest(prisonNumbers = listOf(prisonNumber))
-
-    // When
-    val response = webTestClient.post()
-      .uri(URI_TEMPLATE)
-      .withBody(request)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(ActionPlanSummaryListResponse::class.java)
-
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual).hasSummaryCount(1)
-    val summary = actual.actionPlanSummaries[0]
-    assertThat(summary).hasPrisonNumber(prisonNumber)
-    assertThat(summary).hasReviewDate(reviewDate)
-  }
-
-  @Test
   fun `should get multiple action plan summaries`() {
     // Given
     val prisonNumber1 = aValidPrisonNumber()
