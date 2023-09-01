@@ -10,10 +10,13 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
 
@@ -65,5 +68,31 @@ internal class ActionPlanResourceMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expectedActionPlan)
     verify(goalMapper).fromDomainToModel(actionPlan.goals[0])
+  }
+
+  @Test
+  fun `should map from domain summaries to model summaries`() {
+    // Given
+    val summary1 = aValidActionPlanSummary(prisonNumber = aValidPrisonNumber())
+    val summary2 = aValidActionPlanSummary(prisonNumber = anotherValidPrisonNumber())
+    val expected = listOf(
+      aValidActionPlanSummaryResponse(
+        prisonNumber = summary1.prisonNumber,
+        reference = summary1.reference,
+        reviewDate = summary1.reviewDate,
+      ),
+      aValidActionPlanSummaryResponse(
+        prisonNumber = summary2.prisonNumber,
+        reference = summary2.reference,
+        reviewDate = summary2.reviewDate,
+      ),
+    )
+
+    // When
+    val actual = mapper.fromDomainToModel(listOf(summary1, summary2))
+
+    // Then
+    assertThat(actual).hasSize(2)
+    assertThat(actual).isEqualTo(expected)
   }
 }

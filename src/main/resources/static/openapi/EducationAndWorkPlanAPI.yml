@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.2.0'
+  version: '1.2.1'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -174,7 +174,7 @@ components:
           items:
             $ref: '#/components/schemas/ActionPlanSummaryResponse'
       required:
-        - summaries
+        - actionPlanSummaries
     ActionPlanSummaryResponse:
       title: ActionPlanSummaryResponse
       type: object
