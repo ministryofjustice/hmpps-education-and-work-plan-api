@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
@@ -15,8 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 )
 interface ActionPlanResourceMapper {
 
-  @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
-  fun fromModelToDomain(prisonNumber: String, request: CreateActionPlanRequest): ActionPlan
+  fun fromModelToDomainDto(prisonNumber: String, request: CreateActionPlanRequest): CreateActionPlanDto
 
   fun fromDomainToModel(actionPlan: ActionPlan): ActionPlanResponse
 

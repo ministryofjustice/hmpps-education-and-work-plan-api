@@ -171,6 +171,16 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
+  fun hasAReference(): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (reference == null) {
+        failWithMessage("Expected reference to be populated, but was $reference")
+      }
+    }
+    return this
+  }
+
   /**
    * Allows for assertion chaining into the specified child [StepEntity]. Takes a lambda as the method argument
    * to call assertion methods provided by [StepEntityAssert].

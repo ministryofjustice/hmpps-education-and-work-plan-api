@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
 
 @ExtendWith(MockitoExtension::class)
 class JpaActionPlanPersistenceAdapterTest {
@@ -36,17 +37,19 @@ class JpaActionPlanPersistenceAdapterTest {
     val prisonNumber = aValidPrisonNumber()
     val actionPlanDomain = aValidActionPlan(prisonNumber = prisonNumber)
     val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber)
-    given(actionPlanMapper.fromDomainToEntity(any())).willReturn(actionPlanEntity)
+    given(actionPlanMapper.fromDomainDtoToEntity(any())).willReturn(actionPlanEntity)
     given(actionPlanRepository.save(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
     given(actionPlanMapper.fromEntityToDomain(any())).willReturn(actionPlanDomain)
 
+    val createActionPlanDto = aValidCreateActionPlanDto(prisonNumber = prisonNumber)
+
     // When
-    val actual = persistenceAdapter.createActionPlan(actionPlanDomain)
+    val actual = persistenceAdapter.createActionPlan(createActionPlanDto)
 
     // Then
     assertThat(actual).isEqualTo(actionPlanDomain)
     verify(actionPlanRepository).save(actionPlanEntity)
-    verify(actionPlanMapper).fromDomainToEntity(actionPlanDomain)
+    verify(actionPlanMapper).fromDomainDtoToEntity(createActionPlanDto)
     verify(actionPlanMapper).fromEntityToDomain(actionPlanEntity)
   }
 

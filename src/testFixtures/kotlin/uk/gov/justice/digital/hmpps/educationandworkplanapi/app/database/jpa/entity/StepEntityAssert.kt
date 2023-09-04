@@ -138,6 +138,16 @@ class StepEntityAssert(actual: StepEntity?) :
     return this
   }
 
+  fun hasAReference(): StepEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (reference == null) {
+        failWithMessage("Expected reference to be populated, but was $reference")
+      }
+    }
+    return this
+  }
+
   fun hasSequenceNumber(expected: Int): StepEntityAssert {
     isNotNull
     with(actual!!) {

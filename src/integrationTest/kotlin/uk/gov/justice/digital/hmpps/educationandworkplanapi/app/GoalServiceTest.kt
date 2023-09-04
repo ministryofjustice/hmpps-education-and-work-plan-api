@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
 
 @Deprecated("Remove this test when we have integration tests that hit controller endpoints and therefore exercise the GoalService")
@@ -20,10 +20,10 @@ class GoalServiceTest : IntegrationTestBase() {
   fun `should create new goal given action plan does not exist`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val goal = aValidGoal()
+    val createGoalDto = aValidCreateGoalDto()
 
     // When
-    goalService.createGoal(prisonNumber, goal)
+    goalService.createGoal(prisonNumber, createGoalDto)
 
     // Then
     TestTransaction.flagForCommit()
@@ -40,17 +40,17 @@ class GoalServiceTest : IntegrationTestBase() {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
-    val goal = aValidGoal(
+    val createGoalDto = aValidCreateGoalDto(
       title = "Goal 1",
     )
-    goalService.createGoal(prisonNumber, goal)
+    goalService.createGoal(prisonNumber, createGoalDto)
 
-    val newGoal = aValidGoal(
+    val newCreateGoalDto = aValidCreateGoalDto(
       title = "Goal 2",
     )
 
     // When
-    goalService.createGoal(prisonNumber, newGoal)
+    goalService.createGoal(prisonNumber, newCreateGoalDto)
 
     // Then
     TestTransaction.flagForCommit()

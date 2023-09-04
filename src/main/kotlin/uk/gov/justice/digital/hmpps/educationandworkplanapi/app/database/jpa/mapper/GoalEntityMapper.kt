@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 
 @Mapper(
   uses = [
@@ -20,12 +21,13 @@ abstract class GoalEntityMapper {
   private lateinit var stepEntityMapper: StepEntityMapper
 
   /**
-   * Maps the supplied [Goal] into a new un-persisted [GoalEntity].
-   * The JPA managed fields are not mapped.
+   * Maps the supplied [CreateGoalDto] into a new un-persisted [GoalEntity].
+   * A new reference number is generated and mapped. The JPA managed fields are not mapped.
    * This method is suitable for creating a new [GoalEntity] to be subsequently persisted to the database.
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  abstract fun fromDomainToEntity(goal: Goal): GoalEntity
+  @GenerateNewReference
+  abstract fun fromDomainDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity
 
   /**
    * Maps the supplied [GoalEntity] into the domain [Goal].

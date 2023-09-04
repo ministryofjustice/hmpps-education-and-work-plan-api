@@ -5,9 +5,20 @@ import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
 
 @Mapper
 interface StepEntityMapper {
+
+  /**
+   * Maps the supplied [CreateStepDto] into a new un-persisted [StepEntity].
+   * A new reference number is generated and mapped. The JPA managed fields are not mapped.
+   * This method is suitable for creating a new [StepEntity] to be subsequently persisted to the database.
+   */
+  @ExcludeJpaManagedFields
+  @GenerateNewReference
+  @Mapping(target = "targetDate", ignore = true)
+  fun fromDomainDtoToEntity(createStepDto: CreateStepDto): StepEntity
 
   /**
    * Maps the supplied [Step] into a new un-persisted [StepEntity].

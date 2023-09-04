@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
@@ -20,15 +21,8 @@ import java.util.UUID
   ],
 )
 interface GoalResourceMapper {
-  @Mapping(target = "reference", expression = "java(UUID.randomUUID())")
   @Mapping(target = "status", constant = "ACTIVE")
-  @Mapping(target = "createdBy", ignore = true)
-  @Mapping(target = "createdByDisplayName", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "lastUpdatedBy", ignore = true)
-  @Mapping(target = "lastUpdatedByDisplayName", ignore = true)
-  @Mapping(target = "lastUpdatedAt", ignore = true)
-  fun fromModelToDomain(createGoalRequest: CreateGoalRequest): Goal
+  fun fromModelToDomainDto(createGoalRequest: CreateGoalRequest): CreateGoalDto
 
   @Mapping(target = "reference", source = "goalReference")
   @Mapping(target = "createdBy", ignore = true)

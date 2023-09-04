@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
@@ -22,13 +23,13 @@ internal class StepResourceMapperTest {
   private lateinit var mapper: StepResourceMapperImpl
 
   @Test
-  fun `should map from CreateStepRequest model to domain`() {
+  fun `should map from CreateStepRequest model to domain DTO`() {
     // Given
     val createStepRequest = aValidCreateStepRequest(
       targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
     )
 
-    val expectedStep = aValidStep(
+    val expectedCreateStepDto = aValidCreateStepDto(
       title = createStepRequest.title,
       targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.NOT_STARTED,
@@ -36,11 +37,10 @@ internal class StepResourceMapperTest {
     )
 
     // When
-    val actual = mapper.fromModelToDomain(createStepRequest)
+    val actual = mapper.fromModelToDomainDto(createStepRequest)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedStep)
-    assertThat(actual.reference).isNotNull()
+    assertThat(actual).isEqualTo(expectedCreateStepDto)
   }
 
   @Test

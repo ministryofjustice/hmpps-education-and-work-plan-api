@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -22,11 +23,11 @@ class GoalService(
 ) {
 
   /**
-   * Creates a new [Goal] for the prisoner identified by their prison number.
+   * Creates a new [Goal] for the prisoner identified by their prison number, with the data in the specified [CreateGoalDto]
    */
-  fun createGoal(prisonNumber: String, goal: Goal): Goal {
-    log.info { "Saving Goal [${goal.reference}] for prisoner [$prisonNumber]" }
-    return persistenceAdapter.createGoal(goal, prisonNumber)
+  fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
+    log.info { "Creating new Goal for prisoner [$prisonNumber]" }
+    return persistenceAdapter.createGoal(prisonNumber, createGoalDto)
   }
 
   /**
