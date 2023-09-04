@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateActionPlanDto
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -24,15 +25,15 @@ class ActionPlanService(
   /**
    * Creates an [ActionPlan] for a prisoner, containing at least one or more Goals.
    */
-  fun createActionPlan(actionPlan: ActionPlan): ActionPlan {
-    with(actionPlan) {
-      log.info { "Saving ActionPlan [$reference] for prisoner [$prisonNumber]" }
+  fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
+    with(createActionPlanDto) {
+      log.info { "Creating ActionPlan for prisoner [$prisonNumber]" }
 
       if (persistenceAdapter.getActionPlan(prisonNumber) != null) {
         throw ActionPlanAlreadyExistsException("An Action Plan already exists for prisoner $prisonNumber.")
       }
 
-      return persistenceAdapter.createActionPlan(actionPlan)
+      return persistenceAdapter.createActionPlan(createActionPlanDto)
     }
   }
 

@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
 import java.util.UUID
 
@@ -20,7 +21,7 @@ class JpaGoalPersistenceAdapter(
 ) : GoalPersistenceAdapter {
 
   @Transactional
-  override fun createGoal(goal: Goal, prisonNumber: String): Goal {
+  override fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
     var actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
     // TODO RR-227 - throw 404 instead?
     if (actionPlanEntity == null) {
@@ -32,7 +33,7 @@ class JpaGoalPersistenceAdapter(
       )
     }
 
-    val goalEntity = goalMapper.fromDomainToEntity(goal)
+    val goalEntity = goalMapper.fromDtoToEntity(createGoalDto)
 
     with(actionPlanEntity) {
       addGoal(goalEntity)

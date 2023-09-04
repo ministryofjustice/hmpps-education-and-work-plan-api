@@ -14,9 +14,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNu
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
 
 @ExtendWith(MockitoExtension::class)
 class ActionPlanEntityMapperTest {
@@ -28,7 +30,7 @@ class ActionPlanEntityMapperTest {
   private lateinit var goalMapper: GoalEntityMapper
 
   @Test
-  fun `should map from domain to entity`() {
+  fun `should map from DTO to entity`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlan(
@@ -40,15 +42,24 @@ class ActionPlanEntityMapperTest {
       prisonNumber = prisonNumber,
       reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoalEntity),
+      // JPA managed fields - expect these all to be null, implying a new db entity
+      id = null,
     )
-    given(goalMapper.fromDomainToEntity(any())).willReturn(expectedGoalEntity)
+    given(goalMapper.fromDtoToEntity(any())).willReturn(expectedGoalEntity)
+
+    val createActionPlanDto = aValidCreateActionPlanDto()
 
     // When
-    val actual = mapper.fromDomainToEntity(actionPlan)
+    val actual = mapper.fromDtoToEntity(createActionPlanDto)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().ignoringFields("id").isEqualTo(expected)
-    verify(goalMapper).fromDomainToEntity(actionPlan.goals[0])
+    assertThat(actual)
+      .doesNotHaveJpaManagedFieldsPopulated()
+      .hasAReference()
+      .usingRecursiveComparison()
+      .ignoringFields("reference")
+      .isEqualTo(expected)
+    verify(goalMapper).fromDtoToEntity(createActionPlanDto.goals[0])
   }
 
   @Test

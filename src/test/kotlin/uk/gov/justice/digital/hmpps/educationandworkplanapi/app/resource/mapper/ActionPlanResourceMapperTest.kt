@@ -13,8 +13,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
@@ -29,24 +29,24 @@ internal class ActionPlanResourceMapperTest {
   private lateinit var goalMapper: GoalResourceMapper
 
   @Test
-  fun `should map from model to domain`() {
+  fun `should map from model to DTO`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val request = aValidCreateActionPlanRequest()
-    val expectedGoal = aValidGoal()
-    val expectedActionPlan = aValidActionPlan(
+    val expectedCreateGoalDto = aValidCreateGoalDto()
+    val expectedCreateActionPlanDto = aValidCreateActionPlanDto(
       prisonNumber = prisonNumber,
       reviewDate = request.reviewDate,
-      goals = listOf(expectedGoal),
+      goals = listOf(expectedCreateGoalDto),
     )
-    given(goalMapper.fromModelToDomain(any<CreateGoalRequest>())).willReturn(expectedGoal)
+    given(goalMapper.fromModelToDto(any())).willReturn(expectedCreateGoalDto)
 
     // When
-    val actual = mapper.fromModelToDomain(prisonNumber, request)
+    val actual = mapper.fromModelToDto(prisonNumber, request)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedActionPlan)
-    verify(goalMapper).fromModelToDomain(request.goals[0])
+    assertThat(actual).isEqualTo(expectedCreateActionPlanDto)
+    verify(goalMapper).fromModelToDto(request.goals[0])
   }
 
   @Test

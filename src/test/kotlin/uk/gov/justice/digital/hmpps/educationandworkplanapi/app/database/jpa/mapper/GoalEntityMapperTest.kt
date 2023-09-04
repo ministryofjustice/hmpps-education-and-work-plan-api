@@ -14,6 +14,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -34,27 +36,19 @@ class GoalEntityMapperTest {
     // Given
     val reviewDate = LocalDate.now().plusMonths(6)
 
-    val domainStep = aValidStep()
-    val domainGoal = aValidGoal(
-      reference = UUID.randomUUID(),
+    val createStepDto = aValidCreateStepDto()
+    val createGoalDto = aValidCreateGoalDto(
       title = "Improve communication skills",
       reviewDate = reviewDate,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
-      steps = listOf(domainStep),
-      createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
-      createdAt = Instant.now(),
-      lastUpdatedBy = "bjones_gen",
-      lastUpdatedByDisplayName = "Barry Jones",
-      lastUpdatedAt = Instant.now(),
+      steps = listOf(createStepDto),
     )
 
     val expectedEntityStep = aValidStepEntity()
-    given(stepMapper.fromDomainToEntity(any())).willReturn(expectedEntityStep)
+    given(stepMapper.fromDtoToEntity(any())).willReturn(expectedEntityStep)
 
     val expected = aValidGoalEntity(
-      reference = domainGoal.reference,
       title = "Improve communication skills",
       reviewDate = reviewDate,
       status = EntityStatus.ACTIVE,
@@ -71,11 +65,16 @@ class GoalEntityMapperTest {
     )
 
     // When
-    val actual = mapper.fromDomainToEntity(domainGoal)
+    val actual = mapper.fromDtoToEntity(createGoalDto)
 
     // Then
-    assertThat(actual).isEqualToComparingAllFields(expected)
-    verify(stepMapper).fromDomainToEntity(domainStep)
+    assertThat(actual)
+      .doesNotHaveJpaManagedFieldsPopulated()
+      .hasAReference()
+      .usingRecursiveComparison()
+      .ignoringFields("reference")
+      .isEqualTo(expected)
+    verify(stepMapper).fromDtoToEntity(createStepDto)
   }
 
   @Test

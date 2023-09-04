@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 
 @ExtendWith(MockitoExtension::class)
 class GoalServiceTest {
@@ -31,11 +32,14 @@ class GoalServiceTest {
 
     val prisonNumber = aValidPrisonNumber()
 
+    val createGoalDto = aValidCreateGoalDto()
+
     // When
-    service.createGoal(prisonNumber, goal)
+    val actual = service.createGoal(prisonNumber, createGoalDto)
 
     // Then
-    verify(persistenceAdapter).createGoal(goal, prisonNumber)
+    assertThat(actual).isEqualTo(goal)
+    verify(persistenceAdapter).createGoal(prisonNumber, createGoalDto)
   }
 
   @Test

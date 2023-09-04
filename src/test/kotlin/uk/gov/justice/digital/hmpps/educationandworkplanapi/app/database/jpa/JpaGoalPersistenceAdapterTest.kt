@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -42,13 +43,14 @@ class JpaGoalPersistenceAdapterTest {
       val domainGoal = aValidGoal(
         reference = reference,
       )
+      val createGoalDto = aValidCreateGoalDto()
 
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 
       val entityGoal = aValidGoalEntity(
         reference = reference,
       )
-      given(goalMapper.fromDomainToEntity(any())).willReturn(entityGoal)
+      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
 
       val actionPlanEntity = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
@@ -59,12 +61,12 @@ class JpaGoalPersistenceAdapterTest {
       given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
       // When
-      val actual = persistenceAdapter.createGoal(domainGoal, prisonNumber)
+      val actual = persistenceAdapter.createGoal(prisonNumber, createGoalDto)
 
       // Then
       assertThat(actual).isEqualTo(domainGoal)
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-      verify(goalMapper).fromDomainToEntity(domainGoal)
+      verify(goalMapper).fromDtoToEntity(createGoalDto)
       verify(goalMapper).fromEntityToDomain(entityGoal)
     }
 
@@ -76,6 +78,7 @@ class JpaGoalPersistenceAdapterTest {
       val domainGoal = aValidGoal(
         reference = reference,
       )
+      val createGoalDto = aValidCreateGoalDto()
 
       val initialActionPlan = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
@@ -86,7 +89,7 @@ class JpaGoalPersistenceAdapterTest {
       val entityGoal = aValidGoalEntity(
         reference = reference,
       )
-      given(goalMapper.fromDomainToEntity(any())).willReturn(entityGoal)
+      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
 
       val actionPlanEntity = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
@@ -97,12 +100,12 @@ class JpaGoalPersistenceAdapterTest {
       given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
       // When
-      val actual = persistenceAdapter.createGoal(domainGoal, prisonNumber)
+      val actual = persistenceAdapter.createGoal(prisonNumber, createGoalDto)
 
       // Then
       assertThat(actual).isEqualTo(domainGoal)
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-      verify(goalMapper).fromDomainToEntity(domainGoal)
+      verify(goalMapper).fromDtoToEntity(createGoalDto)
       verify(goalMapper).fromEntityToDomain(entityGoal)
     }
   }

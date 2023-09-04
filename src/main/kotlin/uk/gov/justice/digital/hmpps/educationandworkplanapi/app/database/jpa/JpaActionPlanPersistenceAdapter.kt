@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanPersistenceAdapter
 
 @Component
@@ -13,8 +14,8 @@ class JpaActionPlanPersistenceAdapter(
   private val actionPlanMapper: ActionPlanEntityMapper,
 ) : ActionPlanPersistenceAdapter {
 
-  override fun createActionPlan(actionPlan: ActionPlan): ActionPlan {
-    val persistedEntity = actionPlanRepository.save(actionPlanMapper.fromDomainToEntity(actionPlan))
+  override fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
+    val persistedEntity = actionPlanRepository.save(actionPlanMapper.fromDtoToEntity(createActionPlanDto))
     return actionPlanMapper.fromEntityToDomain(persistedEntity)
   }
 

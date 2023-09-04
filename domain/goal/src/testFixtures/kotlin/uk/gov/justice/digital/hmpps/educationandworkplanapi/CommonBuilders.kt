@@ -9,4 +9,6 @@ import java.util.UUID
 
 fun aValidPrisonNumber() = "A1234BC"
 
+fun anotherValidPrisonNumber() = "B5678CD"
+
 fun aValidReference() = UUID.randomUUID()

@@ -12,8 +12,8 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
@@ -22,7 +22,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus as GoalStatusApi
 
 @ExtendWith(MockitoExtension::class)
@@ -46,32 +45,23 @@ internal class GoalResourceMapperTest {
       steps = mutableListOf(createStepRequest),
     )
 
-    val expectedStep = aValidStep()
-    given(stepMapper.fromModelToDomain(any<CreateStepRequest>())).willReturn(expectedStep)
+    val expectedStep = aValidCreateStepDto()
+    given(stepMapper.fromModelToDto(any())).willReturn(expectedStep)
 
-    val expectedGoal = aValidGoal(
-      reference = UUID.randomUUID(),
+    val expectedGoal = aValidCreateGoalDto(
       title = createGoalRequest.title,
       reviewDate = createGoalRequest.reviewDate,
       status = GoalStatus.ACTIVE,
       notes = createGoalRequest.notes,
       steps = mutableListOf(expectedStep),
-      // JPA managed fields - expect these all to be null
-      createdAt = null,
-      createdBy = null,
-      createdByDisplayName = null,
-      lastUpdatedAt = null,
-      lastUpdatedBy = null,
-      lastUpdatedByDisplayName = null,
     )
 
     // When
-    val actual = mapper.fromModelToDomain(createGoalRequest)
+    val actual = mapper.fromModelToDto(createGoalRequest)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedGoal)
-    assertThat(actual.reference).isNotNull()
-    verify(stepMapper).fromModelToDomain(createStepRequest)
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expectedGoal)
+    verify(stepMapper).fromModelToDto(createStepRequest)
   }
 
   @Test
@@ -85,7 +75,7 @@ internal class GoalResourceMapperTest {
     )
 
     val expectedStep = aValidStep()
-    given(stepMapper.fromModelToDomain(any<UpdateStepRequest>())).willReturn(expectedStep)
+    given(stepMapper.fromModelToDomain(any())).willReturn(expectedStep)
 
     val expectedGoal = aValidGoal(
       reference = updateGoalRequest.goalReference,

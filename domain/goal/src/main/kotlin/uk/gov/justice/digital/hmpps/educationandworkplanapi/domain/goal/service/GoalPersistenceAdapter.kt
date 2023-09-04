@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import java.util.UUID
 
 /**
@@ -16,7 +17,7 @@ interface GoalPersistenceAdapter {
   /**
    * Creates a new [Goal] for the prisoner identified by their prison number.
    */
-  fun createGoal(goal: Goal, prisonNumber: String): Goal
+  fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal
 
   /**
    * Returns a [Goal] identified by its `prisonNumber` and `goalReference` if found, otherwise `null`.

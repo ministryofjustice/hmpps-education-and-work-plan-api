@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateActionPlanDto
 
 @Mapper(
   uses = [
@@ -13,7 +14,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPl
 )
 interface ActionPlanEntityMapper {
   @ExcludeJpaManagedFields
-  fun fromDomainToEntity(actionPlan: ActionPlan): ActionPlanEntity
+  @GenerateNewReference
+  fun fromDtoToEntity(createActionPlanDto: CreateActionPlanDto): ActionPlanEntity
 
   fun fromEntityToDomain(actionPlanEntity: ActionPlanEntity): ActionPlan
   fun fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections: List<ActionPlanSummaryProjection>): List<ActionPlanSummary>

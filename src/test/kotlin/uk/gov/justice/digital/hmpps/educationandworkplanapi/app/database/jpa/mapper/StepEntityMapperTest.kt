@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus as EntityStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange as EntityTargetDateRange
@@ -14,6 +15,41 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStat
 class StepEntityMapperTest {
 
   private val mapper = StepEntityMapperImpl()
+
+  @Test
+  fun `should map from DTO to entity`() {
+    // Given
+    val createStepDto = aValidCreateStepDto(
+      title = "Book communication skills course",
+      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
+      status = DomainStatus.ACTIVE,
+      sequenceNumber = 1,
+    )
+
+    val expected = aValidStepEntity(
+      title = "Book communication skills course",
+      targetDateRange = EntityTargetDateRange.ZERO_TO_THREE_MONTHS,
+      status = EntityStatus.ACTIVE,
+      sequenceNumber = 1,
+      // JPA managed fields - expect these all to be null, implying a new db entity
+      id = null,
+      createdAt = null,
+      createdBy = null,
+      updatedAt = null,
+      updatedBy = null,
+    )
+
+    // When
+    val actual = mapper.fromDtoToEntity(createStepDto)
+
+    // Then
+    assertThat(actual)
+      .doesNotHaveJpaManagedFieldsPopulated()
+      .hasAReference()
+      .usingRecursiveComparison()
+      .ignoringFields("reference")
+      .isEqualTo(expected)
+  }
 
   @Test
   fun `should map from domain to entity`() {

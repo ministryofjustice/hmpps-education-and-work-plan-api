@@ -163,4 +163,14 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
     }
     return this
   }
+
+  fun hasAReference(): ActionPlanEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (reference == null) {
+        failWithMessage("Expected reference to be populated, but was $reference")
+      }
+    }
+    return this
+  }
 }
