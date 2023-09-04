@@ -25,7 +25,6 @@ class ActionPlanService(
   /**
    * Creates an [ActionPlan] for a prisoner, containing at least one or more Goals.
    */
-  // TODO - write unit tests for this function
   fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
     with(createActionPlanDto) {
       log.info { "Creating ActionPlan for prisoner [$prisonNumber]" }
