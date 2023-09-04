@@ -61,7 +61,7 @@ class ActionPlanServiceTest {
       // When
       val exception = catchThrowableOfType(
         { service.createActionPlan(createActionPlanDto) },
-        ActionPlanAlreadyExistsException::class.java
+        ActionPlanAlreadyExistsException::class.java,
       )
 
       // Then
