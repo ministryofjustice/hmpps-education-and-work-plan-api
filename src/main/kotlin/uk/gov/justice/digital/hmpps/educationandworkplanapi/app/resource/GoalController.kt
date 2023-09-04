@@ -40,7 +40,7 @@ class GoalController(
   ) {
     goalService.createGoal(
       prisonNumber = prisonNumber,
-      createGoalDto = goalResourceMapper.fromModelToDomainDto(request),
+      createGoalDto = goalResourceMapper.fromModelToDto(request),
     ).apply {
       telemetryService.trackGoalCreateEvent(this)
     }

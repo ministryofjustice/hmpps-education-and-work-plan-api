@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 )
 interface ActionPlanResourceMapper {
 
-  fun fromModelToDomainDto(prisonNumber: String, request: CreateActionPlanRequest): CreateActionPlanDto
+  fun fromModelToDto(prisonNumber: String, request: CreateActionPlanRequest): CreateActionPlanDto
 
   fun fromDomainToModel(actionPlan: ActionPlan): ActionPlanResponse
 

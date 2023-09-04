@@ -16,7 +16,7 @@ import java.util.UUID
 )
 abstract class StepResourceMapper {
   @Mapping(target = "status", constant = "NOT_STARTED")
-  abstract fun fromModelToDomainDto(createStepRequest: CreateStepRequest): CreateStepDto
+  abstract fun fromModelToDto(createStepRequest: CreateStepRequest): CreateStepDto
 
   @Mapping(target = "reference", expression = "java( existingReferenceElseNewReference(updateStepRequest) )")
   abstract fun fromModelToDomain(updateStepRequest: UpdateStepRequest): Step

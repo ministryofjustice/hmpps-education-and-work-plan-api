@@ -30,7 +30,7 @@ class ActionPlanEntityMapperTest {
   private lateinit var goalMapper: GoalEntityMapper
 
   @Test
-  fun `should map from domain dto to entity`() {
+  fun `should map from DTO to entity`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlan(
@@ -45,12 +45,12 @@ class ActionPlanEntityMapperTest {
       // JPA managed fields - expect these all to be null, implying a new db entity
       id = null,
     )
-    given(goalMapper.fromDomainDtoToEntity(any())).willReturn(expectedGoalEntity)
+    given(goalMapper.fromDtoToEntity(any())).willReturn(expectedGoalEntity)
 
     val createActionPlanDto = aValidCreateActionPlanDto()
 
     // When
-    val actual = mapper.fromDomainDtoToEntity(createActionPlanDto)
+    val actual = mapper.fromDtoToEntity(createActionPlanDto)
 
     // Then
     assertThat(actual)
@@ -59,7 +59,7 @@ class ActionPlanEntityMapperTest {
       .usingRecursiveComparison()
       .ignoringFields("reference")
       .isEqualTo(expected)
-    verify(goalMapper).fromDomainDtoToEntity(createActionPlanDto.goals[0])
+    verify(goalMapper).fromDtoToEntity(createActionPlanDto.goals[0])
   }
 
   @Test

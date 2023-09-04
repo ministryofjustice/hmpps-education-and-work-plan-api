@@ -34,7 +34,7 @@ class ActionPlanController(
     request: CreateActionPlanRequest,
     @PathVariable prisonNumber: String,
   ) {
-    actionPlanService.createActionPlan(actionPlanMapper.fromModelToDomainDto(prisonNumber, request))
+    actionPlanService.createActionPlan(actionPlanMapper.fromModelToDto(prisonNumber, request))
   }
 
   @GetMapping("/{prisonNumber}")

@@ -46,7 +46,7 @@ internal class GoalResourceMapperTest {
     )
 
     val expectedStep = aValidCreateStepDto()
-    given(stepMapper.fromModelToDomainDto(any())).willReturn(expectedStep)
+    given(stepMapper.fromModelToDto(any())).willReturn(expectedStep)
 
     val expectedGoal = aValidCreateGoalDto(
       title = createGoalRequest.title,
@@ -57,11 +57,11 @@ internal class GoalResourceMapperTest {
     )
 
     // When
-    val actual = mapper.fromModelToDomainDto(createGoalRequest)
+    val actual = mapper.fromModelToDto(createGoalRequest)
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expectedGoal)
-    verify(stepMapper).fromModelToDomainDto(createStepRequest)
+    verify(stepMapper).fromModelToDto(createStepRequest)
   }
 
   @Test

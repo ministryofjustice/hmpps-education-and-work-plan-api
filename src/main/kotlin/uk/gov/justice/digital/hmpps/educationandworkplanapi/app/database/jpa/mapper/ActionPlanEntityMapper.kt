@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.Crea
 interface ActionPlanEntityMapper {
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  fun fromDomainDtoToEntity(createActionPlanDto: CreateActionPlanDto): ActionPlanEntity
+  fun fromDtoToEntity(createActionPlanDto: CreateActionPlanDto): ActionPlanEntity
 
   fun fromEntityToDomain(actionPlanEntity: ActionPlanEntity): ActionPlan
   fun fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections: List<ActionPlanSummaryProjection>): List<ActionPlanSummary>

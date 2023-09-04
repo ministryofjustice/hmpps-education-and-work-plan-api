@@ -15,7 +15,7 @@ class JpaActionPlanPersistenceAdapter(
 ) : ActionPlanPersistenceAdapter {
 
   override fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
-    val persistedEntity = actionPlanRepository.save(actionPlanMapper.fromDomainDtoToEntity(createActionPlanDto))
+    val persistedEntity = actionPlanRepository.save(actionPlanMapper.fromDtoToEntity(createActionPlanDto))
     return actionPlanMapper.fromEntityToDomain(persistedEntity)
   }
 

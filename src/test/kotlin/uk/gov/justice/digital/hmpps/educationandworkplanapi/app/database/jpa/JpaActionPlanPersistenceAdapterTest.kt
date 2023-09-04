@@ -37,7 +37,7 @@ class JpaActionPlanPersistenceAdapterTest {
     val prisonNumber = aValidPrisonNumber()
     val actionPlanDomain = aValidActionPlan(prisonNumber = prisonNumber)
     val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber)
-    given(actionPlanMapper.fromDomainDtoToEntity(any())).willReturn(actionPlanEntity)
+    given(actionPlanMapper.fromDtoToEntity(any())).willReturn(actionPlanEntity)
     given(actionPlanRepository.save(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
     given(actionPlanMapper.fromEntityToDomain(any())).willReturn(actionPlanDomain)
 
@@ -49,7 +49,7 @@ class JpaActionPlanPersistenceAdapterTest {
     // Then
     assertThat(actual).isEqualTo(actionPlanDomain)
     verify(actionPlanRepository).save(actionPlanEntity)
-    verify(actionPlanMapper).fromDomainDtoToEntity(createActionPlanDto)
+    verify(actionPlanMapper).fromDtoToEntity(createActionPlanDto)
     verify(actionPlanMapper).fromEntityToDomain(actionPlanEntity)
   }
 

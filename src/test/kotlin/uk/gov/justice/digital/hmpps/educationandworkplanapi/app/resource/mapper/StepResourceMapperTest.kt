@@ -23,7 +23,7 @@ internal class StepResourceMapperTest {
   private lateinit var mapper: StepResourceMapperImpl
 
   @Test
-  fun `should map from CreateStepRequest model to domain DTO`() {
+  fun `should map from CreateStepRequest model to DTO`() {
     // Given
     val createStepRequest = aValidCreateStepRequest(
       targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
@@ -37,7 +37,7 @@ internal class StepResourceMapperTest {
     )
 
     // When
-    val actual = mapper.fromModelToDomainDto(createStepRequest)
+    val actual = mapper.fromModelToDto(createStepRequest)
 
     // Then
     assertThat(actual).isEqualTo(expectedCreateStepDto)

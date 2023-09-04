@@ -50,7 +50,7 @@ class JpaGoalPersistenceAdapterTest {
       val entityGoal = aValidGoalEntity(
         reference = reference,
       )
-      given(goalMapper.fromDomainDtoToEntity(any())).willReturn(entityGoal)
+      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
 
       val actionPlanEntity = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
@@ -66,7 +66,7 @@ class JpaGoalPersistenceAdapterTest {
       // Then
       assertThat(actual).isEqualTo(domainGoal)
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-      verify(goalMapper).fromDomainDtoToEntity(createGoalDto)
+      verify(goalMapper).fromDtoToEntity(createGoalDto)
       verify(goalMapper).fromEntityToDomain(entityGoal)
     }
 
@@ -89,7 +89,7 @@ class JpaGoalPersistenceAdapterTest {
       val entityGoal = aValidGoalEntity(
         reference = reference,
       )
-      given(goalMapper.fromDomainDtoToEntity(any())).willReturn(entityGoal)
+      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
 
       val actionPlanEntity = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
@@ -105,7 +105,7 @@ class JpaGoalPersistenceAdapterTest {
       // Then
       assertThat(actual).isEqualTo(domainGoal)
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-      verify(goalMapper).fromDomainDtoToEntity(createGoalDto)
+      verify(goalMapper).fromDtoToEntity(createGoalDto)
       verify(goalMapper).fromEntityToDomain(entityGoal)
     }
   }

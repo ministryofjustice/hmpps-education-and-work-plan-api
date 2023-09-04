@@ -18,7 +18,7 @@ interface StepEntityMapper {
   @ExcludeJpaManagedFields
   @GenerateNewReference
   @Mapping(target = "targetDate", ignore = true)
-  fun fromDomainDtoToEntity(createStepDto: CreateStepDto): StepEntity
+  fun fromDtoToEntity(createStepDto: CreateStepDto): StepEntity
 
   /**
    * Maps the supplied [Step] into a new un-persisted [StepEntity].

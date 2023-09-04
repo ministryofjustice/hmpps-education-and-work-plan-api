@@ -22,7 +22,7 @@ import java.util.UUID
 )
 interface GoalResourceMapper {
   @Mapping(target = "status", constant = "ACTIVE")
-  fun fromModelToDomainDto(createGoalRequest: CreateGoalRequest): CreateGoalDto
+  fun fromModelToDto(createGoalRequest: CreateGoalRequest): CreateGoalDto
 
   @Mapping(target = "reference", source = "goalReference")
   @Mapping(target = "createdBy", ignore = true)

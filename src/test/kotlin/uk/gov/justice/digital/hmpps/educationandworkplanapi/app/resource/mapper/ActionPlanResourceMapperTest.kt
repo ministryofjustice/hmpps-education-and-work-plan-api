@@ -29,7 +29,7 @@ internal class ActionPlanResourceMapperTest {
   private lateinit var goalMapper: GoalResourceMapper
 
   @Test
-  fun `should map from model to domain dto`() {
+  fun `should map from model to DTO`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val request = aValidCreateActionPlanRequest()
@@ -39,14 +39,14 @@ internal class ActionPlanResourceMapperTest {
       reviewDate = request.reviewDate,
       goals = listOf(expectedCreateGoalDto),
     )
-    given(goalMapper.fromModelToDomainDto(any())).willReturn(expectedCreateGoalDto)
+    given(goalMapper.fromModelToDto(any())).willReturn(expectedCreateGoalDto)
 
     // When
-    val actual = mapper.fromModelToDomainDto(prisonNumber, request)
+    val actual = mapper.fromModelToDto(prisonNumber, request)
 
     // Then
     assertThat(actual).isEqualTo(expectedCreateActionPlanDto)
-    verify(goalMapper).fromModelToDomainDto(request.goals[0])
+    verify(goalMapper).fromModelToDto(request.goals[0])
   }
 
   @Test

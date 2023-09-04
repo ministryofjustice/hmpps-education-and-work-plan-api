@@ -17,7 +17,7 @@ class StepEntityMapperTest {
   private val mapper = StepEntityMapperImpl()
 
   @Test
-  fun `should map from domain dto to entity`() {
+  fun `should map from DTO to entity`() {
     // Given
     val createStepDto = aValidCreateStepDto(
       title = "Book communication skills course",
@@ -40,7 +40,7 @@ class StepEntityMapperTest {
     )
 
     // When
-    val actual = mapper.fromDomainDtoToEntity(createStepDto)
+    val actual = mapper.fromDtoToEntity(createStepDto)
 
     // Then
     assertThat(actual)

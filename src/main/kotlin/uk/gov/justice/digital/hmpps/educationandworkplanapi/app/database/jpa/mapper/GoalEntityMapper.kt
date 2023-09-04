@@ -27,7 +27,7 @@ abstract class GoalEntityMapper {
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
-  abstract fun fromDomainDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity
+  abstract fun fromDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity
 
   /**
    * Maps the supplied [GoalEntity] into the domain [Goal].

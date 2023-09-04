@@ -46,7 +46,7 @@ class GoalEntityMapperTest {
     )
 
     val expectedEntityStep = aValidStepEntity()
-    given(stepMapper.fromDomainDtoToEntity(any())).willReturn(expectedEntityStep)
+    given(stepMapper.fromDtoToEntity(any())).willReturn(expectedEntityStep)
 
     val expected = aValidGoalEntity(
       title = "Improve communication skills",
@@ -65,7 +65,7 @@ class GoalEntityMapperTest {
     )
 
     // When
-    val actual = mapper.fromDomainDtoToEntity(createGoalDto)
+    val actual = mapper.fromDtoToEntity(createGoalDto)
 
     // Then
     assertThat(actual)
@@ -74,7 +74,7 @@ class GoalEntityMapperTest {
       .usingRecursiveComparison()
       .ignoringFields("reference")
       .isEqualTo(expected)
-    verify(stepMapper).fromDomainDtoToEntity(createStepDto)
+    verify(stepMapper).fromDtoToEntity(createStepDto)
   }
 
   @Test

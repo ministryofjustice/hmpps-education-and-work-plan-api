@@ -33,7 +33,7 @@ class JpaGoalPersistenceAdapter(
       )
     }
 
-    val goalEntity = goalMapper.fromDomainDtoToEntity(createGoalDto)
+    val goalEntity = goalMapper.fromDtoToEntity(createGoalDto)
 
     with(actionPlanEntity) {
       addGoal(goalEntity)
