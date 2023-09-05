@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -43,12 +44,13 @@ class GoalService(
   }
 
   /**
-   * Updates a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified `updatedGoal`.
+   * Updates a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [UpdateGoalDto].
    * Throws [GoalNotFoundException] if the [Goal] to be updated cannot be found.
    */
-  fun updateGoal(prisonNumber: String, goalReference: UUID, updatedGoal: Goal): Goal {
+  fun updateGoal(prisonNumber: String, updatedGoalDto: UpdateGoalDto): Goal {
+    val goalReference = updatedGoalDto.reference
     log.info { "Updating Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
-    return persistenceAdapter.updateGoal(prisonNumber, goalReference, updatedGoal)
+    return persistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }

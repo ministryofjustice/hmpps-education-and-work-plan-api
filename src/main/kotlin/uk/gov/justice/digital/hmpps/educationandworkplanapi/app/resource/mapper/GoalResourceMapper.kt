@@ -4,6 +4,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
@@ -25,13 +26,7 @@ interface GoalResourceMapper {
   fun fromModelToDto(createGoalRequest: CreateGoalRequest): CreateGoalDto
 
   @Mapping(target = "reference", source = "goalReference")
-  @Mapping(target = "createdBy", ignore = true)
-  @Mapping(target = "createdByDisplayName", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "lastUpdatedBy", ignore = true)
-  @Mapping(target = "lastUpdatedByDisplayName", ignore = true)
-  @Mapping(target = "lastUpdatedAt", ignore = true)
-  fun fromModelToDomain(updateGoalRequest: UpdateGoalRequest): Goal
+  fun fromModelToDto(updateGoalRequest: UpdateGoalRequest): UpdateGoalDto
 
   @Mapping(target = "goalReference", source = "reference")
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")

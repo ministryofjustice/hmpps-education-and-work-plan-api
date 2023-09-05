@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
 import java.util.UUID
 
@@ -54,10 +55,10 @@ class JpaGoalPersistenceAdapter(
   }
 
   @Transactional
-  override fun updateGoal(prisonNumber: String, goalReference: UUID, updatedGoal: Goal): Goal? {
-    val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, goalReference)
+  override fun updateGoal(prisonNumber: String, updatedGoalDto: UpdateGoalDto): Goal? {
+    val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, updatedGoalDto.reference)
     return if (goalEntity != null) {
-      goalMapper.updateEntityFromDomain(goalEntity, updatedGoal)
+      goalMapper.updateEntityFromDto(goalEntity, updatedGoalDto)
       goalMapper.fromEntityToDomain(goalEntity)
     } else {
       null

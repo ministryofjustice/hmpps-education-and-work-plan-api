@@ -9,19 +9,19 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
 import java.time.LocalDate
 
 /**
- * Unit test class for [GoalEntityMapper] specifically for the [GoalEntityMapper.updateEntityFromDomain] method.
+ * Unit test class for [GoalEntityMapper] specifically for the [GoalEntityMapper.updateEntityFromDto] method.
  *
  * The tests in this class test the [GoalEntityMapper] but with a concrete [StepEntityMapper] rather than a mock.
- * This is because the method under test ([GoalEntityMapper.updateEntityFromDomain]) mutates the steps collection using
+ * This is because the method under test ([GoalEntityMapper.updateEntityFromDto]) mutates the steps collection using
  * the [StepEntityMapper].
  * It is set with reflection as there is no setter or constructor injection on the mapstruct generated class.
  */
-class GoalEntityMapperUpdateEntityFromDomainTest {
+class GoalEntityMapperUpdateEntityFromDtoTest {
 
   private val mapper: GoalEntityMapper = GoalEntityMapperImpl().also {
     GoalEntityMapper::class.java.getDeclaredField("stepEntityMapper").apply {
@@ -31,7 +31,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
   }
 
   @Test
-  fun `should update entity from domain given domain goal has updates to goal fields`() {
+  fun `should update entity from UpdateGoalDto given DTO has updates to goal fields`() {
     // Given
     val goalReference = aValidReference()
     val stepReference = aValidReference()
@@ -53,14 +53,14 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
       ),
     )
 
-    val domainGoal = aValidGoal(
+    val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills within first 3 months",
       reviewDate = LocalDate.now().plusMonths(3),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.COMPLETED,
       notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
@@ -78,14 +78,14 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     }
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
     assertThat(goalEntity).isEqualToComparingAllFields(expectedGoalEntity)
   }
 
   @Test
-  fun `should update entity from domain given domain step has changes to step fields`() {
+  fun `should update entity from UpdateGoalDto given DTO has changes to step fields`() {
     // Given
     val goalReference = aValidReference()
     val stepReference = aValidReference()
@@ -106,14 +106,14 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
       steps = listOf(stepEntity),
     )
 
-    val domainGoal = aValidGoal(
+    val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course within 6 months",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.THREE_TO_SIX_MONTHS,
@@ -136,14 +136,14 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     }
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
     assertThat(goalEntity).isEqualToComparingAllFields(expectedGoalEntity)
   }
 
   @Test
-  fun `should update entity from domain given new step added`() {
+  fun `should update entity from UpdateGoalDto given DTO has new step added`() {
     // Given
     val goalReference = aValidReference()
     val step1Reference = aValidReference()
@@ -165,21 +165,21 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
       steps = listOf(step1Entity),
     )
 
-    val domainGoal = aValidGoal(
+    val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
@@ -199,7 +199,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     val expectedGoalEntity = goalEntity.deepCopy()
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
     assertThat(goalEntity)
@@ -212,7 +212,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
   }
 
   @Test
-  fun `should update entity from domain given steps re-ordered and new step added in the middle`() {
+  fun `should update entity from UpdateGoalDto given DTO given steps re-ordered and new step added in the middle`() {
     // Given
     val goalReference = aValidReference()
     val step1Reference = aValidReference()
@@ -243,28 +243,28 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
 
     val newStepReference = aValidReference()
 
-    val domainGoal = aValidGoal(
+    val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
-        aValidStep(
+        aValidUpdateStepDto(
           reference = newStepReference,
           title = "Do pre-course homework and preparation",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
@@ -277,7 +277,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     val expectedGoalEntity = goalEntity.deepCopy()
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
     assertThat(goalEntity)
@@ -301,7 +301,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
   }
 
   @Test
-  fun `should update entity from domain given steps re-ordered`() {
+  fun `should update entity from UpdateGoalDto given DTO given steps re-ordered`() {
     // Given
     val goalReference = aValidReference()
     val step1Reference = aValidReference()
@@ -330,21 +330,21 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
       steps = listOf(step1Entity, step2Entity),
     )
 
-    val domainGoal = aValidGoal(
+    val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
@@ -357,7 +357,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     val expectedGoalEntity = goalEntity.deepCopy()
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
     assertThat(goalEntity)
@@ -380,7 +380,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
   }
 
   @Test
-  fun `should update entity from domain given steps removed`() {
+  fun `should update entity from UpdateGoalDto given DTO has steps removed`() {
     // Given
     val goalReference = aValidReference()
     val step1Reference = aValidReference()
@@ -409,14 +409,14 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
       steps = listOf(step1Entity, step2Entity),
     )
 
-    val domainGoal = aValidGoal(
+    val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
@@ -429,7 +429,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     val expectedGoalEntity = goalEntity.deepCopy()
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
     assertThat(goalEntity)
@@ -445,7 +445,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
   }
 
   @Test
-  fun `should update entity from domain given domain goal has no changes to entity goal`() {
+  fun `should update entity from UpdateGoalDto given DTO has no changes to entity goal`() {
     // Given
     val goalReference = aValidReference()
     val stepReference = aValidReference()
@@ -467,14 +467,14 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
       ),
     )
 
-    val domainGoal = aValidGoal(
+    val domainGoal = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
-        aValidStep(
+        aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course",
           targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
@@ -487,7 +487,7 @@ class GoalEntityMapperUpdateEntityFromDomainTest {
     val expectedGoalEntity = goalEntity.deepCopy()
 
     // When
-    mapper.updateEntityFromDomain(goalEntity, domainGoal)
+    mapper.updateEntityFromDto(goalEntity, domainGoal)
 
     // Then
     assertThat(goalEntity).usingRecursiveComparison().isEqualTo(expectedGoalEntity)

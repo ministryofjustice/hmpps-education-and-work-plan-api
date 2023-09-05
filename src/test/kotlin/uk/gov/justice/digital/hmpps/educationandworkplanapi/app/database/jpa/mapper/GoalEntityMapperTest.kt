@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import java.time.Instant
@@ -32,7 +33,7 @@ class GoalEntityMapperTest {
   private lateinit var stepMapper: StepEntityMapper
 
   @Test
-  fun `should map from domain to entity`() {
+  fun `should map from CreateGoalDto to entity`() {
     // Given
     val reviewDate = LocalDate.now().plusMonths(6)
 
@@ -46,7 +47,7 @@ class GoalEntityMapperTest {
     )
 
     val expectedEntityStep = aValidStepEntity()
-    given(stepMapper.fromDtoToEntity(any())).willReturn(expectedEntityStep)
+    given(stepMapper.fromDtoToEntity(any<CreateStepDto>())).willReturn(expectedEntityStep)
 
     val expected = aValidGoalEntity(
       title = "Improve communication skills",
@@ -78,7 +79,7 @@ class GoalEntityMapperTest {
   }
 
   @Test
-  fun `should map from entity to domain`() {
+  fun `should map from GoalEntity to domain`() {
     // Given
     val createdAt = Instant.now()
     val updatedAt = Instant.now()

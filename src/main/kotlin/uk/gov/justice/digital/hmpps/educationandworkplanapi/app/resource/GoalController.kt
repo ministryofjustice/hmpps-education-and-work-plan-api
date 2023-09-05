@@ -59,8 +59,7 @@ class GoalController(
   ) {
     goalService.updateGoal(
       prisonNumber = prisonNumber,
-      goalReference = goalReference,
-      updatedGoal = goalResourceMapper.fromModelToDomain(updateGoalRequest),
+      updatedGoalDto = goalResourceMapper.fromModelToDto(updateGoalRequest),
     )
   }
 }

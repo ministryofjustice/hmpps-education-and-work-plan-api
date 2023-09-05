@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 import java.util.UUID
 
 /**
@@ -25,7 +26,7 @@ interface GoalPersistenceAdapter {
   fun getGoal(prisonNumber: String, goalReference: UUID): Goal?
 
   /**
-   * Updates a [Goal] identified by its `prisonNumber` and `goalReference`
+   * Updates a [Goal] identified by its `prisonNumber` and [UpdateGoalDto.reference]
    */
-  fun updateGoal(prisonNumber: String, goalReference: UUID, updatedGoal: Goal): Goal?
+  fun updateGoal(prisonNumber: String, updatedGoalDto: UpdateGoalDto): Goal?
 }
