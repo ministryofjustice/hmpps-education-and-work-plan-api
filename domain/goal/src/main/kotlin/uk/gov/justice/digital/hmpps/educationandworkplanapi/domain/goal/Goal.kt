@@ -24,9 +24,11 @@ class Goal(
   val createdBy: String?,
   val createdByDisplayName: String?,
   val createdAt: Instant?,
+  val createdAtPrison: String,
   val lastUpdatedBy: String?,
   val lastUpdatedByDisplayName: String?,
   val lastUpdatedAt: Instant?,
+  val lastUpdatedAtPrison: String,
   steps: List<Step>,
 ) {
 

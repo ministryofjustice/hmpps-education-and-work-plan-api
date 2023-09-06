@@ -15,9 +15,11 @@ fun aValidGoal(
   createdBy: String? = "asmith_gen",
   createdByDisplayName: String? = "Alex Smith",
   createdAt: Instant? = Instant.now(),
+  createdAtPrison: String = "BXI",
   lastUpdatedBy: String? = "bjones_gen",
   lastUpdatedByDisplayName: String? = "Barry Jones",
   lastUpdatedAt: Instant? = Instant.now(),
+  lastUpdatedAtPrison: String = "BXI",
 ): Goal =
   Goal(
     reference = reference,
@@ -29,7 +31,9 @@ fun aValidGoal(
     createdBy = createdBy,
     createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
     lastUpdatedBy = lastUpdatedBy,
     lastUpdatedByDisplayName = lastUpdatedByDisplayName,
     lastUpdatedAt = lastUpdatedAt,
+    lastUpdatedAtPrison = lastUpdatedAtPrison,
   )

@@ -110,8 +110,10 @@ internal class GoalResourceMapperTest {
       steps = mutableListOf(step),
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
+      createdAtPrison = "BXI",
       lastUpdatedBy = "bjones_gen",
       lastUpdatedByDisplayName = "Barry Jones",
+      lastUpdatedAtPrison = "MDI",
     )
     val expectedStepResponse = aValidStepResponse()
     val expectedDateTime = OffsetDateTime.now()
@@ -125,9 +127,11 @@ internal class GoalResourceMapperTest {
       notes = goal.notes,
       steps = listOf(expectedStepResponse),
       createdAt = expectedDateTime,
+      createdAtPrison = "BXI",
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
       updatedAt = expectedDateTime,
+      updatedAtPrison = "MDI",
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
     )

@@ -109,9 +109,11 @@ class GoalTest {
           createdBy = "bjones_gen",
           createdByDisplayName = "Barry Jones",
           createdAt = Instant.now(),
+          createdAtPrison = "BXI",
           lastUpdatedBy = "bjones_gen",
           lastUpdatedByDisplayName = "Barry Jones",
           lastUpdatedAt = Instant.now(),
+          lastUpdatedAtPrison = "BXI",
           steps = steps,
         )
       },

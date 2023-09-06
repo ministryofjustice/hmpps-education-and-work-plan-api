@@ -39,6 +39,7 @@ abstract class GoalEntityMapper {
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
+  @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
   abstract fun fromEntityToDomain(goalEntity: GoalEntity): Goal
 
   /**
@@ -47,6 +48,7 @@ abstract class GoalEntityMapper {
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
+  @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "steps", expression = "java( updateSteps(goalEntity, updatedGoalDto) )")
   abstract fun updateEntityFromDto(@MappingTarget goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto)
