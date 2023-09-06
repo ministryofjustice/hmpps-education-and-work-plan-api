@@ -64,6 +64,10 @@ class GoalEntity(
   @CreationTimestamp
   var createdAt: Instant? = null,
 
+  @Column
+  @field:NotNull
+  var createdAtPrison: String? = null,
+
   @Column(updatable = false)
   @CreatedBy
   var createdBy: String? = null,
@@ -75,6 +79,10 @@ class GoalEntity(
   @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null,
+
+  @Column
+  @field:NotNull
+  var updatedAtPrison: String? = null,
 
   @Column
   @LastModifiedBy

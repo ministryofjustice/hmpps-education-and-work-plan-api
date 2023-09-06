@@ -8,6 +8,7 @@ import java.time.LocalDate
  */
 class CreateGoalDto(
   val title: String,
+  val prisonId: String,
   val reviewDate: LocalDate?,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,

@@ -139,8 +139,10 @@ class CreateGoalTest : IntegrationTestBase() {
     assertThat(goal)
       .hasTitle(createGoalRequest.title)
       .hasNumberOfSteps(createGoalRequest.steps.size)
+      .wasCreatedAtPrison(createGoalRequest.prisonId)
       .wasCreatedBy(dpsUsername)
       .hasCreatedByDisplayName(displayName)
+      .wasUpdatedAtPrison(createGoalRequest.prisonId)
       .wasUpdatedBy(dpsUsername)
       .hasUpdatedByDisplayName(displayName)
     val step = goal.steps!![0]

@@ -40,6 +40,7 @@ class GoalEntityMapperTest {
     val createStepDto = aValidCreateStepDto()
     val createGoalDto = aValidCreateGoalDto(
       title = "Improve communication skills",
+      prisonId = "BXI",
       reviewDate = reviewDate,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -55,6 +56,8 @@ class GoalEntityMapperTest {
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(expectedEntityStep),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
       // JPA managed fields - expect these all to be null, implying a new db entity
       id = null,
       createdAt = null,
@@ -94,6 +97,8 @@ class GoalEntityMapperTest {
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(entityStep),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
       createdAt = createdAt,
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
@@ -113,9 +118,11 @@ class GoalEntityMapperTest {
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
       createdAt = createdAt,
+      // createdAtPrison = "BXI", TODO - RR-282
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
       lastUpdatedAt = updatedAt,
+      // updatedAtPrison = "MDI", TODO - RR-282
       lastUpdatedBy = "bjones_gen",
       lastUpdatedByDisplayName = "Barry Jones",
     )

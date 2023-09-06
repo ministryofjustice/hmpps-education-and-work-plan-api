@@ -10,6 +10,7 @@ import java.util.UUID
 class UpdateGoalDto(
   val reference: UUID,
   val title: String,
+  val prisonId: String,
   val reviewDate: LocalDate?,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
