@@ -4,6 +4,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
@@ -14,18 +15,13 @@ import java.util.UUID
     UUID::class,
   ],
 )
-abstract class StepResourceMapper {
+interface StepResourceMapper {
   @Mapping(target = "status", constant = "NOT_STARTED")
-  abstract fun fromModelToDto(createStepRequest: CreateStepRequest): CreateStepDto
+  fun fromModelToDto(createStepRequest: CreateStepRequest): CreateStepDto
 
-  @Mapping(target = "reference", expression = "java( existingReferenceElseNewReference(updateStepRequest) )")
-  abstract fun fromModelToDomain(updateStepRequest: UpdateStepRequest): Step
+  @Mapping(target = "reference", source = "stepReference")
+  fun fromModelToDto(updateStepRequest: UpdateStepRequest): UpdateStepDto
 
   @Mapping(target = "stepReference", source = "reference")
-  abstract fun fromDomainToModel(stepDomain: Step): StepResponse
-
-  protected fun generateNewReference(): UUID = UUID.randomUUID()
-
-  protected fun existingReferenceElseNewReference(updateStepRequest: UpdateStepRequest): UUID =
-    updateStepRequest.stepReference ?: generateNewReference()
+  fun fromDomainToModel(stepDomain: Step): StepResponse
 }

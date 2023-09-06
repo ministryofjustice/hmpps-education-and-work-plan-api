@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
 
 @ExtendWith(MockitoExtension::class)
 class GoalServiceTest {
@@ -87,16 +88,16 @@ class GoalServiceTest {
     val goalReference = aValidReference()
 
     val goal = aValidGoal(reference = goalReference)
-    given(persistenceAdapter.updateGoal(any(), any(), any())).willReturn(goal)
+    given(persistenceAdapter.updateGoal(any(), any())).willReturn(goal)
 
-    val updatedGoal = aValidGoal()
+    val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
     // When
-    val actual = service.updateGoal(prisonNumber, goalReference, updatedGoal)
+    val actual = service.updateGoal(prisonNumber, updatedGoal)
 
     // Then
     assertThat(actual).isEqualTo(goal)
-    verify(persistenceAdapter).updateGoal(prisonNumber, goalReference, updatedGoal)
+    verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
   }
 
   @Test
@@ -105,13 +106,13 @@ class GoalServiceTest {
     val prisonNumber = aValidPrisonNumber()
     val goalReference = aValidReference()
 
-    given(persistenceAdapter.updateGoal(any(), any(), any())).willReturn(null)
+    given(persistenceAdapter.updateGoal(any(), any())).willReturn(null)
 
-    val updatedGoal = aValidGoal()
+    val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
     // When
     val exception = catchThrowableOfType(
-      { service.updateGoal(prisonNumber, goalReference, updatedGoal) },
+      { service.updateGoal(prisonNumber, updatedGoal) },
       GoalNotFoundException::class.java,
     )
 
@@ -119,6 +120,6 @@ class GoalServiceTest {
     assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     assertThat(exception.goalReference).isEqualTo(goalReference)
-    verify(persistenceAdapter).updateGoal(prisonNumber, goalReference, updatedGoal)
+    verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
   }
 }

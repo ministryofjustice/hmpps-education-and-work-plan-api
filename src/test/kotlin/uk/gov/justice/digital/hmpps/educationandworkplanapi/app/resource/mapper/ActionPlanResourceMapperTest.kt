@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidAc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
@@ -39,7 +40,7 @@ internal class ActionPlanResourceMapperTest {
       reviewDate = request.reviewDate,
       goals = listOf(expectedCreateGoalDto),
     )
-    given(goalMapper.fromModelToDto(any())).willReturn(expectedCreateGoalDto)
+    given(goalMapper.fromModelToDto(any<CreateGoalRequest>())).willReturn(expectedCreateGoalDto)
 
     // When
     val actual = mapper.fromModelToDto(prisonNumber, request)

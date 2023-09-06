@@ -14,6 +14,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
@@ -37,7 +41,7 @@ internal class GoalResourceMapperTest {
   private lateinit var instantMapper: InstantMapper
 
   @Test
-  fun `should map from CreateStepRequest model to domain`() {
+  fun `should map from CreateGoalRequest model to DTO`() {
     // Given
     val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(
@@ -46,7 +50,7 @@ internal class GoalResourceMapperTest {
     )
 
     val expectedStep = aValidCreateStepDto()
-    given(stepMapper.fromModelToDto(any())).willReturn(expectedStep)
+    given(stepMapper.fromModelToDto(any<CreateStepRequest>())).willReturn(expectedStep)
 
     val expectedGoal = aValidCreateGoalDto(
       title = createGoalRequest.title,
@@ -65,40 +69,33 @@ internal class GoalResourceMapperTest {
   }
 
   @Test
-  fun `should map from UpdateStepRequest model to domain`() {
+  fun `should map from UpdateGoalRequest model to DTO`() {
     // Given
     val updateStepRequest = aValidUpdateStepRequest()
     val updateGoalRequest = aValidUpdateGoalRequest(
       reviewDate = LocalDate.now(),
-      status = GoalStatusApi.COMPLETED,
       steps = mutableListOf(updateStepRequest),
+      status = GoalStatusApi.ACTIVE,
     )
 
-    val expectedStep = aValidStep()
-    given(stepMapper.fromModelToDomain(any())).willReturn(expectedStep)
+    val expectedStep = aValidUpdateStepDto()
+    given(stepMapper.fromModelToDto(any<UpdateStepRequest>())).willReturn(expectedStep)
 
-    val expectedGoal = aValidGoal(
+    val expectedGoal = aValidUpdateGoalDto(
       reference = updateGoalRequest.goalReference,
       title = updateGoalRequest.title,
       reviewDate = updateGoalRequest.reviewDate,
-      status = GoalStatus.COMPLETED,
+      status = GoalStatus.ACTIVE,
       notes = updateGoalRequest.notes,
       steps = mutableListOf(expectedStep),
-      // JPA managed fields - expect these all to be null
-      createdAt = null,
-      createdBy = null,
-      createdByDisplayName = null,
-      lastUpdatedAt = null,
-      lastUpdatedBy = null,
-      lastUpdatedByDisplayName = null,
     )
 
     // When
-    val actual = mapper.fromModelToDomain(updateGoalRequest)
+    val actual = mapper.fromModelToDto(updateGoalRequest)
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expectedGoal)
-    verify(stepMapper).fromModelToDomain(updateStepRequest)
+    verify(stepMapper).fromModelToDto(updateStepRequest)
   }
 
   @Test

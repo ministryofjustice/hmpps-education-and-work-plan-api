@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
@@ -44,52 +45,52 @@ internal class StepResourceMapperTest {
   }
 
   @Test
-  fun `should map from UpdateStepRequest model to domain given existing step with reference number`() {
+  fun `should map from UpdateStepRequest model to DTO given update step request has a reference`() {
     // Given
     val stepReference = UUID.randomUUID()
     val updateStepRequest = aValidUpdateStepRequest(
       stepReference = stepReference,
-      targetDateRange = TargetDateRangeApi.SIX_TO_TWELVE_MONTHS,
-      status = StepStatusApi.COMPLETE,
+      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
+      status = StepStatusApi.ACTIVE,
     )
 
-    val expectedStep = aValidStep(
+    val expectedUpdateStepDto = aValidUpdateStepDto(
       reference = stepReference,
       title = updateStepRequest.title,
-      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
-      status = StepStatus.COMPLETE,
+      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
+      status = StepStatus.ACTIVE,
       sequenceNumber = updateStepRequest.sequenceNumber,
     )
 
     // When
-    val actual = mapper.fromModelToDomain(updateStepRequest)
+    val actual = mapper.fromModelToDto(updateStepRequest)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().isEqualTo(expectedStep)
+    assertThat(actual).isEqualTo(expectedUpdateStepDto)
   }
 
   @Test
-  fun `should map from UpdateStepRequest model to domain given new step without reference number`() {
+  fun `should map from UpdateStepRequest model to DTO given update step request does not have a reference`() {
     // Given
     val updateStepRequest = aValidUpdateStepRequest(
       stepReference = null,
-      targetDateRange = TargetDateRangeApi.SIX_TO_TWELVE_MONTHS,
-      status = StepStatusApi.COMPLETE,
+      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
+      status = StepStatusApi.ACTIVE,
     )
 
-    val expectedStep = aValidStep(
+    val expectedUpdateStepDto = aValidUpdateStepDto(
+      reference = null,
       title = updateStepRequest.title,
-      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
-      status = StepStatus.COMPLETE,
+      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
+      status = StepStatus.ACTIVE,
       sequenceNumber = updateStepRequest.sequenceNumber,
     )
 
     // When
-    val actual = mapper.fromModelToDomain(updateStepRequest)
+    val actual = mapper.fromModelToDto(updateStepRequest)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedStep)
-    assertThat(actual.reference).isNotNull()
+    assertThat(actual).isEqualTo(expectedUpdateStepDto)
   }
 
   @Test

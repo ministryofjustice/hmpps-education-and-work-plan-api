@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateStepDto
+import java.util.UUID
 
 @Mapper(
   uses = [
@@ -38,17 +40,17 @@ abstract class GoalEntityMapper {
   abstract fun fromEntityToDomain(goalEntity: GoalEntity): Goal
 
   /**
-   * Updates the supplied [GoalEntity] with fields from the supplied [Goal]. The updated [GoalEntity] can then be
+   * Updates the supplied [GoalEntity] with fields from the supplied [UpdateGoalDtp]. The updated [GoalEntity] can then be
    * persisted to the database.
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
-  @Mapping(target = "steps", expression = "java( updateSteps(goalEntity, updatedGoal) )")
-  abstract fun updateEntityFromDomain(@MappingTarget goalEntity: GoalEntity, updatedGoal: Goal)
+  @Mapping(target = "steps", expression = "java( updateSteps(goalEntity, updatedGoalDto) )")
+  abstract fun updateEntityFromDto(@MappingTarget goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto)
 
-  protected fun updateSteps(goalEntity: GoalEntity, updatedGoal: Goal): List<StepEntity> {
+  protected fun updateSteps(goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto): List<StepEntity> {
     val stepEntities = goalEntity.steps!!
-    val updatedSteps = updatedGoal.steps
+    val updatedSteps = updatedGoalDto.steps.setReferenceOnNewSteps()
 
     updateExistingSteps(stepEntities, updatedSteps)
     addNewSteps(stepEntities, updatedSteps)
@@ -60,34 +62,48 @@ abstract class GoalEntityMapper {
   }
 
   /**
-   * Update the [StepEntity] whose reference number matches the corresponding [Step]
+   * Update the [StepEntity] whose reference number matches the corresponding [UpdateGoalDto]
    */
-  private fun updateExistingSteps(stepEntities: MutableList<StepEntity>, updatedSteps: List<Step>) {
-    val updatedStepReferences = updatedSteps.map { it.reference }
+  private fun updateExistingSteps(stepEntities: MutableList<StepEntity>, updates: List<UpdateStepDto>) {
+    val updatedStepReferences = updates.map { it.reference }
     stepEntities
       .filter { stepEntity -> updatedStepReferences.contains(stepEntity.reference) }
-      .onEach { stepEntity -> stepEntityMapper.updateEntityFromDomain(stepEntity, updatedSteps.first { updatedStep -> updatedStep.reference == stepEntity.reference }) }
+      .onEach { stepEntity ->
+        stepEntityMapper.updateEntityFromDto(
+          stepEntity,
+          updates.first { updatedStepDto -> updatedStepDto.reference == stepEntity.reference },
+        )
+      }
   }
 
   /**
-   * Add new [StepEntity]s from the list of updated [Step]s where the reference number is not present in the list of [StepEntity]s
+   * Add new [StepEntity]s from the list of updated [UpdateStepDto]s where the reference number is not present in the list of [StepEntity]s
    */
-  private fun addNewSteps(stepEntities: MutableList<StepEntity>, updatedSteps: List<Step>) {
+  private fun addNewSteps(stepEntities: MutableList<StepEntity>, updates: List<UpdateStepDto>) {
     val currentStepEntityReferences = stepEntities.map { it.reference }
     stepEntities.addAll(
-      updatedSteps
-        .filter { domainStep -> !currentStepEntityReferences.contains(domainStep.reference) }
-        .map { domainStep -> stepEntityMapper.fromDomainToEntity(domainStep) },
+      updates
+        .filter { updatedStepDto -> !currentStepEntityReferences.contains(updatedStepDto.reference) }
+        .map { newStepDto -> stepEntityMapper.fromDtoToEntity(newStepDto) },
     )
   }
 
   /**
-   * Remove any [StepEntity]s whose reference number is not in the list of updated [Step]s
+   * Remove any [StepEntity]s whose reference number is not in the list of updated [UpdateStepDto]s
    */
-  private fun removeSteps(stepEntities: MutableList<StepEntity>, updatedSteps: List<Step>) {
-    val updatedStepReferences = updatedSteps.map { it.reference }
+  private fun removeSteps(stepEntities: MutableList<StepEntity>, updates: List<UpdateStepDto>) {
+    val updatedStepReferences = updates.map { it.reference }
     stepEntities.removeIf { stepEntity ->
       !updatedStepReferences.contains(stepEntity.reference)
     }
   }
+
+  private fun List<UpdateStepDto>.setReferenceOnNewSteps(): List<UpdateStepDto> =
+    this.map {
+      if (it.reference == null) {
+        it.copy(reference = UUID.randomUUID())
+      } else {
+        it
+      }
+    }
 }
