@@ -8,6 +8,7 @@ import java.util.UUID
 fun aValidUpdateGoalDto(
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
+  prisonId: String = "BXI",
   reviewDate: LocalDate? = null,
   steps: List<UpdateStepDto> = listOf(aValidUpdateStepDto(), anotherValidUpdateStepDto()),
   status: GoalStatus = ACTIVE,
@@ -16,6 +17,7 @@ fun aValidUpdateGoalDto(
   UpdateGoalDto(
     reference = reference,
     title = title,
+    prisonId = prisonId,
     reviewDate = reviewDate,
     steps = steps,
     status = status,

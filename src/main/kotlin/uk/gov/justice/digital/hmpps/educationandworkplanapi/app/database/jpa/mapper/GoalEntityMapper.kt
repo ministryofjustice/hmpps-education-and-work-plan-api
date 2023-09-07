@@ -29,6 +29,8 @@ abstract class GoalEntityMapper {
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
   abstract fun fromDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity
 
   /**
@@ -45,6 +47,7 @@ abstract class GoalEntityMapper {
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "steps", expression = "java( updateSteps(goalEntity, updatedGoalDto) )")
   abstract fun updateEntityFromDto(@MappingTarget goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto)
 

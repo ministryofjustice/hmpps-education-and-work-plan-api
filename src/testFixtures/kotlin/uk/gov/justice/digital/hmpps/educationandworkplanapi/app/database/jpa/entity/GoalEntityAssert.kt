@@ -101,6 +101,16 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
+  fun wasCreatedAtPrison(expected: String): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdAtPrison != expected) {
+        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      }
+    }
+    return this
+  }
+
   fun wasUpdatedBy(expected: String): GoalEntityAssert {
     isNotNull
     with(actual!!) {
@@ -126,6 +136,16 @@ class GoalEntityAssert(actual: GoalEntity?) :
     with(actual!!) {
       if (updatedAt != expected) {
         failWithMessage("Expected updatedAt to be $expected, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
+  fun wasUpdatedAtPrison(expected: String): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAtPrison != expected) {
+        failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
     }
     return this

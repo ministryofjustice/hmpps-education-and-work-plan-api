@@ -174,6 +174,8 @@ class UpdateGoalTest : IntegrationTestBase() {
               title = "Book course",
             ),
           ),
+          createdAtPrison = "BXI",
+          updatedAtPrison = "BXI",
         ),
       ),
     )
@@ -199,6 +201,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           sequenceNumber = 2,
         ),
       ),
+      prisonId = "MDI",
     )
 
     TestTransaction.start()
@@ -228,6 +231,8 @@ class UpdateGoalTest : IntegrationTestBase() {
           .stepWithSequenceNumber(2) { step ->
             step.hasTitle("Attend course before March 2024")
           }
+          .wasCreatedAtPrison("BXI")
+          .wasUpdatedAtPrison("MDI")
       }
   }
 }

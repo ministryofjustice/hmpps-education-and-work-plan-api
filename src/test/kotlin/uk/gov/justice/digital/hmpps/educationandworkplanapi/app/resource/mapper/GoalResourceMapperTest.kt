@@ -54,6 +54,7 @@ internal class GoalResourceMapperTest {
 
     val expectedGoal = aValidCreateGoalDto(
       title = createGoalRequest.title,
+      prisonId = createGoalRequest.prisonId,
       reviewDate = createGoalRequest.reviewDate,
       status = GoalStatus.ACTIVE,
       notes = createGoalRequest.notes,
@@ -84,6 +85,7 @@ internal class GoalResourceMapperTest {
     val expectedGoal = aValidUpdateGoalDto(
       reference = updateGoalRequest.goalReference,
       title = updateGoalRequest.title,
+      prisonId = updateGoalRequest.prisonId,
       reviewDate = updateGoalRequest.reviewDate,
       status = GoalStatus.ACTIVE,
       notes = updateGoalRequest.notes,

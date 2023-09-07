@@ -51,11 +51,14 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
           sequenceNumber = 1,
         ),
       ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills within first 3 months",
+      prisonId = "MDI",
       reviewDate = LocalDate.now().plusMonths(3),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.COMPLETED,
       notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life",
@@ -75,6 +78,8 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       reviewDate = LocalDate.now().plusMonths(3)
       status = GoalStatus.COMPLETED
       notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life"
+      createdAtPrison = "BXI"
+      updatedAtPrison = "MDI"
     }
 
     // When
@@ -104,11 +109,14 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       status = GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(stepEntity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
+      prisonId = "BXI",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -163,12 +171,15 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       status = GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
       reviewDate = LocalDate.now().plusMonths(6),
+      prisonId = "BXI",
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
@@ -239,6 +250,8 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       status = GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity, step2Entity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val newStepReference = aValidReference()
@@ -246,6 +259,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
+      prisonId = "BXI",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -328,11 +342,14 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       status = GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity, step2Entity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
+      prisonId = "BXI",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -407,11 +424,14 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       status = GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity, step2Entity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val updateGoalDto = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
+      prisonId = "BXI",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -465,11 +485,14 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
           sequenceNumber = 1,
         ),
       ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val domainGoal = aValidUpdateGoalDto(
       reference = goalReference,
       title = "Improve communication skills",
+      prisonId = "BXI",
       reviewDate = LocalDate.now().plusMonths(6),
       status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
