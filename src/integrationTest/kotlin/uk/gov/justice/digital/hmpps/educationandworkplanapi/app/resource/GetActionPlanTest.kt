@@ -99,8 +99,10 @@ class GetActionPlanTest : IntegrationTestBase() {
       .isForPrisonNumber(prisonNumber)
       .hasNoReviewDate()
       .goal(0) {
-        it.wasCreatedBy("auser_gen")
+        it.wasCreatedAtPrison("BXI")
+          .wasCreatedBy("auser_gen")
           .hasCreatedByDisplayName("Albert User")
+          .wasUpdatedAtPrison("BXI")
           .wasUpdatedBy("auser_gen")
           .hasUpdatedByDisplayName("Albert User")
       }

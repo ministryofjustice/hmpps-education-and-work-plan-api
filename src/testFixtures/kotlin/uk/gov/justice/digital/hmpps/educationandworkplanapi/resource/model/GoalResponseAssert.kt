@@ -43,6 +43,16 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
+  fun wasCreatedAtPrison(expected: String): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdAtPrison != expected) {
+        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      }
+    }
+    return this
+  }
+
   fun wasUpdatedBy(expected: String): GoalResponseAssert {
     isNotNull
     with(actual!!) {
@@ -68,6 +78,16 @@ class GoalResponseAssert(actual: GoalResponse?) :
     with(actual!!) {
       if (updatedAt != expected) {
         failWithMessage("Expected updatedAt to be $expected, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
+  fun wasUpdatedAtPrison(expected: String): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAtPrison != expected) {
+        failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
     }
     return this

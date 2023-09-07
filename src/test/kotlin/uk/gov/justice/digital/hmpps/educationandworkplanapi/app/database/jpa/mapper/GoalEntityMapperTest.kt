@@ -118,11 +118,11 @@ class GoalEntityMapperTest {
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
       createdAt = createdAt,
-      // createdAtPrison = "BXI", TODO - RR-282
+      createdAtPrison = "BXI",
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
       lastUpdatedAt = updatedAt,
-      // updatedAtPrison = "MDI", TODO - RR-282
+      lastUpdatedAtPrison = "MDI",
       lastUpdatedBy = "bjones_gen",
       lastUpdatedByDisplayName = "Barry Jones",
     )

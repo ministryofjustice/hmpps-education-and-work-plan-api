@@ -32,7 +32,7 @@ interface GoalResourceMapper {
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")
   @Mapping(target = "updatedByDisplayName", source = "lastUpdatedByDisplayName")
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
-  @Mapping(target = "createdAtPrison", constant = "BXI") // TODO RR-236 map from the domain object
-  @Mapping(target = "updatedAtPrison", constant = "BXI") // TODO RR-236 map from the domain object
+  @Mapping(target = "createdAtPrison", source = "createdAtPrison")
+  @Mapping(target = "updatedAtPrison", source = "lastUpdatedAtPrison")
   fun fromDomainToModel(goalDomain: Goal): GoalResponse
 }
