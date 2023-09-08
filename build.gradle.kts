@@ -21,6 +21,7 @@ ext["mapstruct.version"] = "1.5.5.Final"
 ext["postgresql.version"] = "42.6.0"
 ext["kotlin.logging.version"] = "3.0.5"
 ext["springdoc.openapi.version"] = "2.1.0"
+ext["awaitility.version"] = "4.2.0"
 
 allOpen {
   annotations(
@@ -69,6 +70,7 @@ dependencies {
   integrationTestImplementation("com.h2database:h2")
   integrationTestImplementation(testFixtures(project("domain:goal")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
+  testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")

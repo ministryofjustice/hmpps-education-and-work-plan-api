@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.transaction.TestTransaction
@@ -234,5 +236,12 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasCreatedAtPrison("BXI")
           .wasUpdatedAtPrison("MDI")
       }
+
+    val expectedEventCustomDimensions = mapOf(
+      "reference" to goalReference.toString(),
+    )
+    await.untilAsserted {
+      verify(telemetryClient).trackEvent("goal-update", expectedEventCustomDimensions, null)
+    }
   }
 }

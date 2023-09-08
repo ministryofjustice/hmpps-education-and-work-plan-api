@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -151,6 +153,15 @@ class CreateGoalTest : IntegrationTestBase() {
       .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.NOT_STARTED)
       .wasCreatedBy(dpsUsername)
+
+    val expectedEventCustomDimensions = mapOf(
+      "status" to "ACTIVE",
+      "stepCount" to "1",
+      "reference" to goal.reference.toString(),
+    )
+    await.untilAsserted {
+      verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
+    }
   }
 
   @Test
@@ -181,6 +192,17 @@ class CreateGoalTest : IntegrationTestBase() {
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(2)
+
+    val goal = actual!!.goals!![1]
+
+    val expectedEventCustomDimensions = mapOf(
+      "status" to "ACTIVE",
+      "stepCount" to "2",
+      "reference" to goal.reference.toString(),
+    )
+    await.untilAsserted {
+      verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
+    }
   }
 
   @Test
@@ -216,5 +238,14 @@ class CreateGoalTest : IntegrationTestBase() {
       .hasTitle(createRequest.title)
       .hasNumberOfSteps(createRequest.steps.size)
     assertThat(goal.notes).isNull()
+
+    val expectedEventCustomDimensions = mapOf(
+      "status" to "ACTIVE",
+      "stepCount" to "2",
+      "reference" to goal.reference.toString(),
+    )
+    await.untilAsserted {
+      verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
+    }
   }
 }
