@@ -60,6 +60,8 @@ class GoalController(
     goalService.updateGoal(
       prisonNumber = prisonNumber,
       updatedGoalDto = goalResourceMapper.fromModelToDto(updateGoalRequest),
-    )
+    ).apply {
+      telemetryService.trackGoalUpdateEvent(this)
+    }
   }
 }

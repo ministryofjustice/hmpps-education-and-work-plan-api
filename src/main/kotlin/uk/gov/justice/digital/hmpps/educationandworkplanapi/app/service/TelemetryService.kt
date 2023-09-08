@@ -15,12 +15,20 @@ class TelemetryService(
 
   companion object {
     private const val GOAL_CREATE_EVENT = "goal-create"
+    private const val GOAL_UPDATE_EVENT = "goal-update"
   }
 
   fun trackGoalCreateEvent(goal: Goal) {
     telemetryClient.trackEvent(
       GOAL_CREATE_EVENT,
       createEventCustomDimensions(goal),
+    )
+  }
+
+  fun trackGoalUpdateEvent(goal: Goal) {
+    telemetryClient.trackEvent(
+      GOAL_UPDATE_EVENT,
+      updateEventCustomDimensions(goal),
     )
   }
 
@@ -32,6 +40,16 @@ class TelemetryService(
       mapOf(
         "status" to status.name,
         "stepCount" to steps.size.toString(),
+        "reference" to reference.toString(),
+      )
+    }
+
+  /**
+   * Returns a map of data representing the custom dimensions for the `goal-update` event.
+   */
+  private fun updateEventCustomDimensions(goal: Goal): Map<String, String> =
+    with(goal) {
+      mapOf(
         "reference" to reference.toString(),
       )
     }
