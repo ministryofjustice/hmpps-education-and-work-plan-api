@@ -19,9 +19,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidAc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
 
 @ExtendWith(MockitoExtension::class)
-class ActionPlanServiceTest {
+class DefaultActionPlanServiceTest {
   @InjectMocks
-  private lateinit var service: ActionPlanService
+  private lateinit var service: DefaultActionPlanService
 
   @Mock
   private lateinit var persistenceAdapter: ActionPlanPersistenceAdapter

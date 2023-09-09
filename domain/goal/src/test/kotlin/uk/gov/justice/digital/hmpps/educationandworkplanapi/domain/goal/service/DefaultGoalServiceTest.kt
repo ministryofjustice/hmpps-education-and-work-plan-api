@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
@@ -18,12 +19,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aVal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
 
 @ExtendWith(MockitoExtension::class)
-class GoalServiceTest {
+class DefaultGoalServiceTest {
   @InjectMocks
-  private lateinit var service: GoalService
+  private lateinit var service: DefaultGoalService
 
   @Mock
-  private lateinit var persistenceAdapter: GoalPersistenceAdapter
+  private var persistenceAdapter: GoalPersistenceAdapter = mock()
 
   @Test
   fun `should create new goal for a prison number`() {

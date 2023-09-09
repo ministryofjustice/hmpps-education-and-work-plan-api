@@ -14,10 +14,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aVal
 import java.time.Instant
 
 @ExtendWith(MockitoExtension::class)
-class TimelineServiceTest {
+class DefaultTimelineServiceTest {
 
   @InjectMocks
-  private lateinit var service: TimelineService
+  private lateinit var service: DefaultTimelineService
 
   @Mock
   private lateinit var persistenceAdapter: TimelinePersistenceAdapter

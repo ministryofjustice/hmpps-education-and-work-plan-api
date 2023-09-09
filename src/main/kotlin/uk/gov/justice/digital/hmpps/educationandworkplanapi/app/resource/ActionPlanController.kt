@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.Valid
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -21,7 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetAc
 @RestController
 @RequestMapping(value = ["/action-plans"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class ActionPlanController(
-  private val actionPlanService: ActionPlanService,
+  @Qualifier("domainActionPlanServiceWrapper") private val actionPlanService: ActionPlanService,
   private val actionPlanMapper: ActionPlanResourceMapper,
 ) {
 

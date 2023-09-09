@@ -3,24 +3,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.ser
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
 
 /**
- * Service class exposing methods that implement the business rules for the Timeline domain, and is how applications
- * must create and manage [Timeline]s.
- *
- * Applications using Timelines must new up an instance of this class providing an implementation of
- * [TimelinePersistenceAdapter].
- *
- * This class is deliberately final so that it cannot be subclassed, ensuring that the business rules stay within the
- * domain.
+ * Interface defining methods for how applications must create and manage [Timeline]s.
  */
-class TimelineService(
-  private val persistenceAdapter: TimelinePersistenceAdapter,
-) {
+interface TimelineService {
 
   /**
    * Returns the [Timeline] for the prisoner identified by their prison number.
    */
-  fun getTimelineForPrisoner(prisonNumber: String): Timeline {
-    val timelineEvents = persistenceAdapter.getTimelineEventsForPrisoner(prisonNumber)
-    return Timeline(prisonNumber, timelineEvents)
-  }
+  fun getTimelineForPrisoner(prisonNumber: String): Timeline
 }
