@@ -45,6 +45,7 @@ dependencies {
   implementation(project("domain:goal"))
   implementation(project("domain:timeline"))
 
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")

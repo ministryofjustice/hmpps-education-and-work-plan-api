@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalServiceDecorator
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -16,8 +17,9 @@ class DomainConfiguration {
   @Bean
   fun goalDomainService(
     goalPersistenceAdapter: GoalPersistenceAdapter,
+    goalServiceDecorator: GoalServiceDecorator,
   ): GoalService =
-    GoalService(goalPersistenceAdapter)
+    GoalService(goalPersistenceAdapter, goalServiceDecorator)
 
   @Bean
   fun actionPlanDomainService(

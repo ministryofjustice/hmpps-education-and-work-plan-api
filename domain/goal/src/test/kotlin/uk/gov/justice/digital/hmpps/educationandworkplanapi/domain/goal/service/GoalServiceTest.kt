@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
@@ -17,13 +17,18 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
 
-@ExtendWith(MockitoExtension::class)
+@TestInstance(Lifecycle.PER_CLASS)
 class GoalServiceTest {
-  @InjectMocks
   private lateinit var service: GoalService
 
-  @Mock
-  private lateinit var persistenceAdapter: GoalPersistenceAdapter
+  private var persistenceAdapter: GoalPersistenceAdapter = mock()
+
+  private var goalServiceDecorator: GoalServiceDecorator = mock()
+
+  @BeforeAll
+  fun setupService() {
+    service = GoalService(persistenceAdapter, goalServiceDecorator)
+  }
 
   @Test
   fun `should create new goal for a prison number`() {
