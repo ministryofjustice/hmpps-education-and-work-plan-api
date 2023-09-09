@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
 
@@ -16,8 +17,9 @@ class DomainConfiguration {
   @Bean
   fun goalDomainService(
     goalPersistenceAdapter: GoalPersistenceAdapter,
+    goalEventService: GoalEventService,
   ): GoalService =
-    GoalService(goalPersistenceAdapter)
+    GoalService(goalPersistenceAdapter, goalEventService)
 
   @Bean
   fun actionPlanDomainService(

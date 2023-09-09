@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
@@ -24,6 +25,9 @@ class GoalServiceTest {
 
   @Mock
   private lateinit var persistenceAdapter: GoalPersistenceAdapter
+
+  @Mock
+  private lateinit var goalEventService: GoalEventService
 
   @Test
   fun `should create new goal for a prison number`() {
@@ -41,6 +45,7 @@ class GoalServiceTest {
     // Then
     assertThat(actual).isEqualTo(goal)
     verify(persistenceAdapter).createGoal(prisonNumber, createGoalDto)
+    verify(goalEventService).goalCreated(actual)
   }
 
   @Test
@@ -98,6 +103,7 @@ class GoalServiceTest {
     // Then
     assertThat(actual).isEqualTo(goal)
     verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+    verify(goalEventService).goalUpdated(actual)
   }
 
   @Test
@@ -121,5 +127,6 @@ class GoalServiceTest {
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     assertThat(exception.goalReference).isEqualTo(goalReference)
     verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+    verifyNoInteractions(goalEventService)
   }
 }
