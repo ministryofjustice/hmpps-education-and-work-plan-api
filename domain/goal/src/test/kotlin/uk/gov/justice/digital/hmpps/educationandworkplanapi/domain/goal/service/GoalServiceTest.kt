@@ -9,6 +9,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
@@ -45,7 +46,7 @@ class GoalServiceTest {
     // Then
     assertThat(actual).isEqualTo(goal)
     verify(persistenceAdapter).createGoal(prisonNumber, createGoalDto)
-    verify(goalEventService).goalCreated(actual)
+    verify(goalEventService).goalCreated(prisonNumber, actual)
   }
 
   @Test
@@ -93,6 +94,7 @@ class GoalServiceTest {
     val goalReference = aValidReference()
 
     val goal = aValidGoal(reference = goalReference)
+    given(persistenceAdapter.getGoal(any(), any())).willReturn(goal)
     given(persistenceAdapter.updateGoal(any(), any())).willReturn(goal)
 
     val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
@@ -103,7 +105,7 @@ class GoalServiceTest {
     // Then
     assertThat(actual).isEqualTo(goal)
     verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
-    verify(goalEventService).goalUpdated(actual)
+    verify(goalEventService).goalUpdated(prisonNumber, actual, goal)
   }
 
   @Test
@@ -112,7 +114,7 @@ class GoalServiceTest {
     val prisonNumber = aValidPrisonNumber()
     val goalReference = aValidReference()
 
-    given(persistenceAdapter.updateGoal(any(), any())).willReturn(null)
+    given(persistenceAdapter.getGoal(any(), any())).willReturn(null)
 
     val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
@@ -126,7 +128,7 @@ class GoalServiceTest {
     assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     assertThat(exception.goalReference).isEqualTo(goalReference)
-    verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+    verify(persistenceAdapter, never()).updateGoal(prisonNumber, updatedGoal)
     verifyNoInteractions(goalEventService)
   }
 }

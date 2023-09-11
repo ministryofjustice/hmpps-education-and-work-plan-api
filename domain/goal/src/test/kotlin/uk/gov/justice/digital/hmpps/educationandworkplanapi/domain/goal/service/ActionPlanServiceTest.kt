@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
@@ -25,6 +26,9 @@ class ActionPlanServiceTest {
 
   @Mock
   private lateinit var persistenceAdapter: ActionPlanPersistenceAdapter
+
+  @Mock
+  private lateinit var actionPlanEventService: ActionPlanEventService
 
   @Nested
   inner class CreateActionPlan {
@@ -46,6 +50,7 @@ class ActionPlanServiceTest {
       assertThat(actual).isEqualTo(expectedActionPlan)
       verify(persistenceAdapter).getActionPlan(prisonNumber)
       verify(persistenceAdapter).createActionPlan(createActionPlanDto)
+      verify(actionPlanEventService).actionPlanCreated(expectedActionPlan)
     }
 
     @Test
@@ -68,6 +73,7 @@ class ActionPlanServiceTest {
       assertThat(exception)
         .hasMessage("An Action Plan already exists for prisoner $prisonNumber.")
       verify(persistenceAdapter).getActionPlan(prisonNumber)
+      verifyNoInteractions(actionPlanEventService)
     }
   }
 
