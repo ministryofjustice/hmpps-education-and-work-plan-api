@@ -17,10 +17,12 @@ private val log = KotlinLogging.logger {}
  * [GoalPersistenceAdapter].
  *
  * This class is deliberately final so that it cannot be subclassed, ensuring that the business rules stay within the
- * domain.
+ * domain. Service method behaviour can however be customized and extended by using the [GoalEventService].
+ *
  */
 class GoalService(
   private val persistenceAdapter: GoalPersistenceAdapter,
+  private val goalEventService: GoalEventService,
 ) {
 
   /**
@@ -29,6 +31,9 @@ class GoalService(
   fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
     log.info { "Creating new Goal for prisoner [$prisonNumber]" }
     return persistenceAdapter.createGoal(prisonNumber, createGoalDto)
+      .also {
+        goalEventService.goalCreated(it)
+      }
   }
 
   /**
@@ -51,6 +56,9 @@ class GoalService(
     val goalReference = updatedGoalDto.reference
     log.info { "Updating Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
     return persistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
+      ?.also {
+        goalEventService.goalUpdated(it)
+      }
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }
