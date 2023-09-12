@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
 
 import java.time.Instant
+import java.util.UUID
 
 fun aValidTimeline(
   prisonNumber: String = "A1234AB",
@@ -11,21 +12,21 @@ fun aValidTimeline(
 )
 
 fun aValidTimelineEvent(
-  title: String = "New Goal added",
-  summary: String = "New education Goal added by Fred Blogs",
-  eventDateTime: Instant = Instant.now(),
-  links: List<Link> = listOf(aValidLink()),
+  reference: UUID = UUID.randomUUID(),
+  sourceReference: String = UUID.randomUUID().toString(),
+  eventType: TimelineEventType = TimelineEventType.GOAL_CREATED,
+  contextualInfo: String? = null,
+  prisonId: String = "BXI",
+  createdBy: String = "asmith_gen",
+  createdByDisplayName: String = "Alex Smith",
+  timestamp: Instant = Instant.now(),
 ) = TimelineEvent(
-  title = title,
-  summary = summary,
-  eventDateTime = eventDateTime,
-  links = links,
-)
-
-fun aValidLink(
-  title: String = "Click here to see the Goal",
-  location: String = "http://localhost/the-goal",
-) = Link(
-  title = title,
-  location = location,
+  reference = reference,
+  sourceReference = sourceReference,
+  eventType = eventType,
+  contextualInfo = contextualInfo,
+  prisonId = prisonId,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  timestamp = timestamp,
 )

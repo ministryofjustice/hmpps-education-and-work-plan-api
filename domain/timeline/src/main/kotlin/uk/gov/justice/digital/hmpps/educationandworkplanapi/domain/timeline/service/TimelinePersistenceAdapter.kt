@@ -14,6 +14,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Time
 interface TimelinePersistenceAdapter {
 
   /**
+   * Records an [TimelineEvent] that has taken place for a prisoner. Creates a new Timeline for the prisoner if it does
+   * not already exist.
+   */
+  fun recordTimelineEvent(prisonNumber: String, event: TimelineEvent)
+
+  /**
    * Find and return the [TimelineEvent]s for the prisoner identified by their prison number.
    * Returns an empty collection if there are no TimelineEvents for the specified prisoner.
    */

@@ -10,16 +10,16 @@ class TimelineTest {
     private const val prisonNumber = "A1234AB"
 
     private val earliestEvent = aValidTimelineEvent(
-      title = "The first event",
-      eventDateTime = Instant.MIN,
+      eventType = TimelineEventType.ACTION_PLAN_CREATED,
+      timestamp = Instant.MIN,
     )
     private val middleEvent = aValidTimelineEvent(
-      title = "The middle event",
-      eventDateTime = Instant.now(),
+      eventType = TimelineEventType.GOAL_CREATED,
+      timestamp = Instant.now(),
     )
     private val latestEvent = aValidTimelineEvent(
-      title = "The last event",
-      eventDateTime = Instant.MAX,
+      eventType = TimelineEventType.STEP_STARTED,
+      timestamp = Instant.MAX,
     )
   }
 
@@ -33,9 +33,9 @@ class TimelineTest {
 
     // Then
     assertThat(actual.events).containsExactly(
-      latestEvent,
-      middleEvent,
       earliestEvent,
+      middleEvent,
+      latestEvent,
     )
   }
 
@@ -50,9 +50,9 @@ class TimelineTest {
 
     // Then
     assertThat(timeline.events).containsExactly(
-      latestEvent,
-      middleEvent,
       earliestEvent,
+      middleEvent,
+      latestEvent,
     )
   }
 }

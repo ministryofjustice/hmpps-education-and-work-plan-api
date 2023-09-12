@@ -10,6 +10,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimelineEvent
 import java.time.Instant
 
@@ -26,16 +27,16 @@ class TimelineServiceTest {
     private const val prisonNumber = "A1234AB"
 
     private val earliestEvent = aValidTimelineEvent(
-      title = "The first event",
-      eventDateTime = Instant.MIN,
+      eventType = TimelineEventType.ACTION_PLAN_CREATED,
+      timestamp = Instant.MIN,
     )
     private val middleEvent = aValidTimelineEvent(
-      title = "The middle event",
-      eventDateTime = Instant.now(),
+      eventType = TimelineEventType.GOAL_CREATED,
+      timestamp = Instant.now(),
     )
     private val latestEvent = aValidTimelineEvent(
-      title = "The last event",
-      eventDateTime = Instant.MAX,
+      eventType = TimelineEventType.STEP_STARTED,
+      timestamp = Instant.MAX,
     )
   }
 
@@ -47,15 +48,15 @@ class TimelineServiceTest {
         earliestEvent,
         middleEvent,
         latestEvent,
-      ).shuffled(), // there is no guarantee what order the persistenceService will return the events in
+      ),
     )
 
     val expected = Timeline(
       prisonNumber,
       listOf(
-        latestEvent,
-        middleEvent,
         earliestEvent,
+        middleEvent,
+        latestEvent,
       ),
     )
     // When

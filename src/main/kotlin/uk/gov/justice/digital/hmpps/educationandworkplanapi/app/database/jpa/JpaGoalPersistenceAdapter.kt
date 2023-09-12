@@ -41,7 +41,8 @@ class JpaGoalPersistenceAdapter(
       actionPlanRepository.saveAndFlush(this)
     }
 
-    return goalMapper.fromEntityToDomain(goalEntity)
+    val persisted = actionPlanEntity.goals!!.first { it.reference == goalEntity.reference }
+    return goalMapper.fromEntityToDomain(persisted)
   }
 
   override fun getGoal(prisonNumber: String, goalReference: UUID): Goal? {

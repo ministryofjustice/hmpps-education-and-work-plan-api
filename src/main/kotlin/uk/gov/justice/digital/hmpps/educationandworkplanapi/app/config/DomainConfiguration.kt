@@ -8,6 +8,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelinePersistenceAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -28,4 +30,8 @@ class DomainConfiguration {
     actionPlanEventService: ActionPlanEventService,
   ): ActionPlanService =
     ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService)
+
+  @Bean
+  fun timelineDomainService(timelinePersistenceAdapter: TimelinePersistenceAdapter): TimelineService =
+    TimelineService(timelinePersistenceAdapter)
 }

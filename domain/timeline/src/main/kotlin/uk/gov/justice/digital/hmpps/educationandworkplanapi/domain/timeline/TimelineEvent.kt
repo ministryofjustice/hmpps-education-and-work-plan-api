@@ -1,15 +1,82 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
 
 import java.time.Instant
+import java.util.UUID
 
 /**
- * A TimelineEvent represents a single event that occurred in the system or potentially the wider prison estate.
+ * A TimelineEvent represents a single event that occurred whilst a prisoner has been in prison.
  *
  * Once created a TimelineEvent cannot be mutated in any way. It represents a single event at a point in time.
  */
 data class TimelineEvent(
-  val title: String,
-  val summary: String,
-  val eventDateTime: Instant,
-  val links: List<Link> = emptyList(),
-)
+  /**
+   * A unique reference for each event.
+   */
+  val reference: UUID,
+  /**
+   * The reference of the entity that's being updated, such as a Goal or an individual Goal's Step. A [String] rather
+   * than a [UUID], because we cannot guarantee the format from other systems (e.g. the ciag-induction-service).
+   */
+  val sourceReference: String,
+  /**
+   * The type of the event - see [TimelineEventType].
+   */
+  val eventType: TimelineEventType,
+  /**
+   * Some useful contextual information about the event. For example a reason for the event.
+   */
+  val contextualInfo: String?,
+  /**
+   * The ID of the Prison where the Prisoner is based at the time of the event.
+   */
+  val prisonId: String,
+  /**
+   * The ID of the logged-in user who created the event
+   */
+  val createdBy: String,
+  /**
+   * The full name (for display purposes) of the logged-in user who created the event
+   */
+  val createdByDisplayName: String,
+  /**
+   * The date and time when the event occurred.
+   */
+  val timestamp: Instant,
+) {
+  companion object {
+    fun newTimelineEvent(
+      sourceReference: String,
+      eventType: TimelineEventType,
+      contextualInfo: String? = null, // TODO RR-314 - not sure how we're going to populate this?
+      prisonId: String,
+      createdBy: String,
+      createdByDisplayName: String,
+    ) = TimelineEvent(
+      reference = UUID.randomUUID(),
+      sourceReference = sourceReference,
+      eventType = eventType,
+      contextualInfo = contextualInfo,
+      prisonId = prisonId,
+      createdBy = createdBy,
+      createdByDisplayName = createdByDisplayName,
+      timestamp = Instant.now(),
+    )
+  }
+}
+
+/**
+ * The events that the business are interested in (for example to display a history of these events on screen).
+ *
+ * These are currently limited to CIAG induction and PLP related events, but could be expanded in future.
+ */
+enum class TimelineEventType {
+  ACTION_PLAN_CREATED,
+  GOAL_CREATED,
+  GOAL_UPDATED,
+  GOAL_STARTED,
+  GOAL_COMPLETED,
+  GOAL_ARCHIVED,
+  STEP_NOT_STARTED,
+  STEP_STARTED,
+  STEP_COMPLETED,
+}
