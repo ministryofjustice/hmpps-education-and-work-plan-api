@@ -21,6 +21,12 @@ class JpaTimelinePersistenceAdapter(
   }
 
   @Transactional
+  override fun recordTimelineEvents(prisonNumber: String, events: List<TimelineEvent>) {
+    log.info { "Recording [${events.size}] TimelineEvents for prisoner [$prisonNumber]" }
+    // TODO RR-317
+  }
+
+  @Transactional
   override fun getTimelineEventsForPrisoner(prisonNumber: String): List<TimelineEvent> {
     log.info { "Getting TimelineEvents for prisoner [$prisonNumber]" }
     return emptyList()

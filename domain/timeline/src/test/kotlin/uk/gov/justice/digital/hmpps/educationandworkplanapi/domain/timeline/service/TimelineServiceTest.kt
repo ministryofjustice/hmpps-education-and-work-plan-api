@@ -8,6 +8,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
@@ -38,6 +39,30 @@ class TimelineServiceTest {
       eventType = TimelineEventType.STEP_STARTED,
       timestamp = Instant.MAX,
     )
+  }
+
+  @Test
+  fun `should record timeline event`() {
+    // Given
+    val timelineEvent = aValidTimelineEvent()
+
+    // When
+    service.recordTimelineEvent(prisonNumber, timelineEvent)
+
+    // Then
+    verify(persistenceAdapter).recordTimelineEvent(prisonNumber, timelineEvent)
+  }
+
+  @Test
+  fun `should record timeline events`() {
+    // Given
+    val timelineEvents = listOf(earliestEvent, middleEvent, latestEvent)
+
+    // When
+    service.recordTimelineEvents(prisonNumber, timelineEvents)
+
+    // Then
+    verify(persistenceAdapter).recordTimelineEvents(prisonNumber, timelineEvents)
   }
 
   @Test

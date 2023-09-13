@@ -59,7 +59,7 @@ class GoalService(
     val existingGoal = getGoal(prisonNumber, updatedGoalDto.reference)
     return persistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
       ?.also {
-        goalEventService.goalUpdated(prisonNumber = prisonNumber, updatedGoal = it, existingGoal = existingGoal)
+        goalEventService.goalUpdated(prisonNumber = prisonNumber, previousGoal = existingGoal, updatedGoal = it)
       }
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }

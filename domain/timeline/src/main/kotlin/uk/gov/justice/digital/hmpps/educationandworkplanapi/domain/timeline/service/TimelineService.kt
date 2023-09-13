@@ -28,10 +28,7 @@ class TimelineService(
    * Records a collection of [TimelineEvent]s that have taken place for a prisoner.
    */
   fun recordTimelineEvents(prisonNumber: String, events: List<TimelineEvent>) {
-    // TODO RR-314 - write test
-    events.forEach {
-      persistenceAdapter.recordTimelineEvent(prisonNumber, it)
-    }
+    persistenceAdapter.recordTimelineEvents(prisonNumber, events)
   }
 
   /**

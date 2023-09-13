@@ -105,7 +105,7 @@ class GoalServiceTest {
     // Then
     assertThat(actual).isEqualTo(goal)
     verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
-    verify(goalEventService).goalUpdated(prisonNumber, actual, goal)
+    verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
   }
 
   @Test

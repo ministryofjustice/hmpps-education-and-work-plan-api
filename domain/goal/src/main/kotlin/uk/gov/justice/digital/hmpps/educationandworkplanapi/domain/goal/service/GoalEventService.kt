@@ -15,5 +15,5 @@ interface GoalEventService {
   /**
    * Implementations providing custom code for when a [Goal] is updated.
    */
-  fun goalUpdated(prisonNumber: String, updatedGoal: Goal, existingGoal: Goal)
+  fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal)
 }

@@ -7,9 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.event.TimelineEventResolver
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.anotherValidStep
@@ -18,15 +18,52 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Time
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
-class TimelineEventResolverTest {
+class TimelineEventFactoryTest {
+
   @InjectMocks
-  private lateinit var timelineEventResolver: TimelineEventResolver
+  private lateinit var timelineEventFactory: TimelineEventFactory
 
   @Test
-  fun `should resolve goal updated event`() {
+  fun `should create action plan created event`() {
+    // Given
+    val actionPlan = aValidActionPlan()
+
+    // When
+    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
+
+    // Then
+    assertThat(actual.sourceReference).isEqualTo(actionPlan.reference.toString())
+    assertThat(actual.eventType).isEqualTo(TimelineEventType.ACTION_PLAN_CREATED)
+    assertThat(actual.prisonId).isEqualTo(actionPlan.goals[0].createdAtPrison)
+    assertThat(actual.createdBy).isEqualTo(actionPlan.goals[0].lastUpdatedBy)
+    assertThat(actual.createdByDisplayName).isEqualTo(actionPlan.goals[0].lastUpdatedByDisplayName)
+    assertThat(actual.reference).isNotNull()
+    assertThat(actual.timestamp).isNotNull()
+  }
+
+  @Test
+  fun `should create goal created event`() {
+    // Given
+    val goal = aValidGoal()
+
+    // When
+    val actual = timelineEventFactory.goalCreatedTimelineEvent(goal)
+
+    // Then
+    assertThat(actual.sourceReference).isEqualTo(goal.reference.toString())
+    assertThat(actual.eventType).isEqualTo(TimelineEventType.GOAL_CREATED)
+    assertThat(actual.prisonId).isEqualTo(goal.createdAtPrison)
+    assertThat(actual.createdBy).isEqualTo(goal.lastUpdatedBy)
+    assertThat(actual.createdByDisplayName).isEqualTo(goal.lastUpdatedByDisplayName)
+    assertThat(actual.reference).isNotNull()
+    assertThat(actual.timestamp).isNotNull()
+  }
+
+  @Test
+  fun `should create goal updated event`() {
     // Given
     val reference = UUID.randomUUID()
-    val existingGoal = aValidGoal(reference = reference, title = "Learn French")
+    val previousGoal = aValidGoal(reference = reference, title = "Learn French")
     val updatedGoal = aValidGoal(reference = reference, title = "Learn Spanish")
     val expectedEvents = listOf(
       newTimelineEvent(
@@ -39,7 +76,7 @@ class TimelineEventResolverTest {
     )
 
     // When
-    val actual = timelineEventResolver.resolveGoalUpdatedEvents(updatedGoal = updatedGoal, existingGoal = existingGoal)
+    val actual = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
 
     // Then
     assertThat(actual)
@@ -58,14 +95,14 @@ class TimelineEventResolverTest {
       "ARCHIVED, ACTIVE, GOAL_STARTED",
     ],
   )
-  fun `should resolve goal completed event`(
+  fun `should create goal completed event`(
     originalStatus: GoalStatus,
     newStatus: GoalStatus,
     expectedEventType: TimelineEventType,
   ) {
     // Given
     val reference = UUID.randomUUID()
-    val existingGoal = aValidGoal(reference = reference, status = originalStatus)
+    val previousGoal = aValidGoal(reference = reference, status = originalStatus)
     val updatedGoal = aValidGoal(reference = reference, status = newStatus)
     val expectedEvents = listOf(
       newTimelineEvent(
@@ -78,7 +115,7 @@ class TimelineEventResolverTest {
     )
 
     // When
-    val actual = timelineEventResolver.resolveGoalUpdatedEvents(updatedGoal = updatedGoal, existingGoal = existingGoal)
+    val actual = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
 
     // Then
     assertThat(actual)
@@ -88,7 +125,7 @@ class TimelineEventResolverTest {
   }
 
   @Test
-  fun `should resolve step started event`() {
+  fun `should create step started event`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
@@ -101,7 +138,7 @@ class TimelineEventResolverTest {
       aValidStep(reference = step1Reference, status = StepStatus.ACTIVE),
       anotherValidStep(reference = step2Reference),
     )
-    val existingGoal = aValidGoal(reference = goalReference, steps = originalSteps)
+    val previousGoal = aValidGoal(reference = goalReference, steps = originalSteps)
     val updatedGoal = aValidGoal(reference = goalReference, steps = updatedSteps)
     val expectedEvents = listOf(
       newTimelineEvent(
@@ -114,7 +151,7 @@ class TimelineEventResolverTest {
     )
 
     // When
-    val actual = timelineEventResolver.resolveGoalUpdatedEvents(updatedGoal = updatedGoal, existingGoal = existingGoal)
+    val actual = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
 
     // Then
     assertThat(actual)
@@ -124,7 +161,7 @@ class TimelineEventResolverTest {
   }
 
   @Test
-  fun `should resolve multiple update events`() {
+  fun `should create multiple update events`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
@@ -137,8 +174,14 @@ class TimelineEventResolverTest {
       aValidStep(reference = step1Reference, status = StepStatus.COMPLETE),
       anotherValidStep(reference = step2Reference, status = StepStatus.COMPLETE),
     )
-    val existingGoal = aValidGoal(reference = goalReference, title = "Learn French", status = GoalStatus.ACTIVE, steps = originalSteps)
-    val updatedGoal = aValidGoal(reference = goalReference, title = "Learn Spanish", status = GoalStatus.COMPLETED, steps = updatedSteps)
+    val previousGoal =
+      aValidGoal(reference = goalReference, title = "Learn French", status = GoalStatus.ACTIVE, steps = originalSteps)
+    val updatedGoal = aValidGoal(
+      reference = goalReference,
+      title = "Learn Spanish",
+      status = GoalStatus.COMPLETED,
+      steps = updatedSteps,
+    )
 
     val expectedEvents = listOf(
       newTimelineEvent(
@@ -172,7 +215,7 @@ class TimelineEventResolverTest {
     )
 
     // When
-    val actual = timelineEventResolver.resolveGoalUpdatedEvents(updatedGoal = updatedGoal, existingGoal = existingGoal)
+    val actual = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
 
     // Then
     assertThat(actual)
