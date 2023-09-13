@@ -197,15 +197,23 @@ class TimelineEventFactoryTest {
     val step1Reference = UUID.randomUUID()
     val step2Reference = UUID.randomUUID()
     val originalSteps = listOf(
-      aValidStep(reference = step1Reference, status = StepStatus.ACTIVE),
+      aValidStep(reference = step1Reference, title = "Book French course", status = StepStatus.ACTIVE),
       anotherValidStep(reference = step2Reference, status = StepStatus.ACTIVE),
     )
     val updatedSteps = listOf(
-      aValidStep(reference = step1Reference, status = StepStatus.COMPLETE),
+      // title and status of first step changed
+      aValidStep(reference = step1Reference, title = "Book Spanish course", status = StepStatus.COMPLETE),
+      // status of second step changed
       anotherValidStep(reference = step2Reference, status = StepStatus.COMPLETE),
     )
     val previousGoal =
-      aValidGoal(reference = goalReference, title = "Learn French", status = GoalStatus.ACTIVE, steps = originalSteps)
+      aValidGoal(
+        reference = goalReference,
+        title = "Learn French",
+        status = GoalStatus.ACTIVE,
+        steps = originalSteps,
+      )
+    // title and status of goal changed
     val updatedGoal = aValidGoal(
       reference = goalReference,
       title = "Learn Spanish",
@@ -224,6 +232,13 @@ class TimelineEventFactoryTest {
       newTimelineEvent(
         sourceReference = goalReference.toString(),
         eventType = TimelineEventType.GOAL_COMPLETED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        createdBy = updatedGoal.lastUpdatedBy!!,
+        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+      ),
+      newTimelineEvent(
+        sourceReference = step1Reference.toString(),
+        eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         createdBy = updatedGoal.lastUpdatedBy!!,
         createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,

@@ -52,7 +52,7 @@ class TimelineEventFactory {
       )
     }
 
-    // check if the status of any steps was changed
+    // check if any steps have been changed
     updatedGoal.steps.forEach {
       val previousStep = getPreviousStep(previousGoal.steps, it)
       if (hasStepBeenUpdated(previousStep = previousStep, updatedStep = it)) {
