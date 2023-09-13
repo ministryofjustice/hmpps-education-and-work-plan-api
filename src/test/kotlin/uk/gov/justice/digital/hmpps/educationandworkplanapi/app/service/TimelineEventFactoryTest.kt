@@ -95,7 +95,7 @@ class TimelineEventFactoryTest {
       "ARCHIVED, ACTIVE, GOAL_STARTED",
     ],
   )
-  fun `should create goal completed event`(
+  fun `should create goal status change event`(
     originalStatus: GoalStatus,
     newStatus: GoalStatus,
     expectedEventType: TimelineEventType,
@@ -125,7 +125,37 @@ class TimelineEventFactoryTest {
   }
 
   @Test
-  fun `should create step started event`() {
+  fun `should create step updated event`() {
+    // Given
+    val goalReference = UUID.randomUUID()
+    val step1Reference = UUID.randomUUID()
+    val step2Reference = UUID.randomUUID()
+    val previousSteps = listOf(aValidStep(reference = step1Reference, title = "Previous step"), anotherValidStep(reference = step2Reference))
+    val updatedSteps = listOf(aValidStep(reference = step1Reference, title = "Updated step"), anotherValidStep(reference = step2Reference))
+    val previousGoal = aValidGoal(reference = goalReference, steps = previousSteps)
+    val updatedGoal = aValidGoal(reference = goalReference, steps = updatedSteps)
+    val expectedEvents = listOf(
+      newTimelineEvent(
+        sourceReference = step1Reference.toString(),
+        eventType = TimelineEventType.STEP_UPDATED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        createdBy = updatedGoal.lastUpdatedBy!!,
+        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+      ),
+    )
+
+    // When
+    val actual = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
+
+    // Then
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields("reference", "timestamp")
+      .isEqualTo(expectedEvents)
+  }
+
+  @Test
+  fun `should create step status change event`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()

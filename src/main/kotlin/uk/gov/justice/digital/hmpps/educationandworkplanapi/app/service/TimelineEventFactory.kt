@@ -55,6 +55,15 @@ class TimelineEventFactory {
     // check if the status of any steps was changed
     updatedGoal.steps.forEach {
       val previousStep = getPreviousStep(previousGoal.steps, it)
+      if (hasStepBeenUpdated(previousStep = previousStep, updatedStep = it)) {
+        events.add(
+          buildTimelineEvent(
+            goal = updatedGoal,
+            sourceReference = previousStep!!.reference,
+            eventType = TimelineEventType.STEP_UPDATED,
+          ),
+        )
+      }
       if (hasStepStatusChanged(previousStep = previousStep, updatedStep = it)) {
         val eventType = getStepStatusEventType(it)
         events.add(
@@ -78,6 +87,13 @@ class TimelineEventFactory {
 
   private fun hasGoalStatusChanged(previousGoal: Goal, updatedGoal: Goal) =
     updatedGoal.status != previousGoal.status
+
+  private fun hasStepBeenUpdated(previousStep: Step?, updatedStep: Step) =
+    previousStep != null && (
+      updatedStep.title != previousStep.title ||
+        updatedStep.targetDateRange != previousStep.targetDateRange ||
+        updatedStep.sequenceNumber != previousStep.sequenceNumber
+      )
 
   private fun hasStepStatusChanged(previousStep: Step?, updatedStep: Step) =
     previousStep != null && previousStep.status != updatedStep.status

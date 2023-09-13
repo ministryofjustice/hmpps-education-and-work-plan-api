@@ -35,9 +35,9 @@ data class TimelineEvent(
    */
   val createdBy: String,
   /**
-   * The full name (for display purposes) of the logged-in user who created the event
+   * The full name (for display purposes) of the logged-in user who created the event (optional).
    */
-  val createdByDisplayName: String,
+  val createdByDisplayName: String? = null,
   /**
    * The date and time when the event occurred.
    */
@@ -50,7 +50,7 @@ data class TimelineEvent(
       contextualInfo: String? = null, // TODO RR-314 - not sure how we're going to populate this?
       prisonId: String,
       createdBy: String,
-      createdByDisplayName: String,
+      createdByDisplayName: String? = null,
     ) = TimelineEvent(
       reference = UUID.randomUUID(),
       sourceReference = sourceReference,
@@ -76,6 +76,7 @@ enum class TimelineEventType {
   GOAL_STARTED,
   GOAL_COMPLETED,
   GOAL_ARCHIVED,
+  STEP_UPDATED,
   STEP_NOT_STARTED,
   STEP_STARTED,
   STEP_COMPLETED,
