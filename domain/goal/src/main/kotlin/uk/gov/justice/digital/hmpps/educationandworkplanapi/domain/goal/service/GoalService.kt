@@ -32,7 +32,7 @@ class GoalService(
     log.info { "Creating new Goal for prisoner [$prisonNumber]" }
     return persistenceAdapter.createGoal(prisonNumber, createGoalDto)
       .also {
-        goalEventService.goalCreated(it)
+        goalEventService.goalCreated(prisonNumber, it)
       }
   }
 
@@ -55,9 +55,11 @@ class GoalService(
   fun updateGoal(prisonNumber: String, updatedGoalDto: UpdateGoalDto): Goal {
     val goalReference = updatedGoalDto.reference
     log.info { "Updating Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
+
+    val existingGoal = getGoal(prisonNumber, updatedGoalDto.reference)
     return persistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
       ?.also {
-        goalEventService.goalUpdated(it)
+        goalEventService.goalUpdated(prisonNumber = prisonNumber, previousGoal = existingGoal, updatedGoal = it)
       }
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }

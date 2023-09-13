@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 
 /**
  * Service class exposing methods that implement the business rules for the Timeline domain, and is how applications
@@ -15,6 +16,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Time
 class TimelineService(
   private val persistenceAdapter: TimelinePersistenceAdapter,
 ) {
+
+  /**
+   * Records an [TimelineEvent] that has taken place for a prisoner.
+   */
+  fun recordTimelineEvent(prisonNumber: String, event: TimelineEvent) {
+    persistenceAdapter.recordTimelineEvent(prisonNumber, event)
+  }
+
+  /**
+   * Records a collection of [TimelineEvent]s that have taken place for a prisoner.
+   */
+  fun recordTimelineEvents(prisonNumber: String, events: List<TimelineEvent>) {
+    persistenceAdapter.recordTimelineEvents(prisonNumber, events)
+  }
 
   /**
    * Returns the [Timeline] for the prisoner identified by their prison number.

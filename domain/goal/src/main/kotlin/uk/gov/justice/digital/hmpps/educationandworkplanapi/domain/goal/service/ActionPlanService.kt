@@ -20,6 +20,7 @@ private val log = KotlinLogging.logger {}
  */
 class ActionPlanService(
   private val persistenceAdapter: ActionPlanPersistenceAdapter,
+  private val actionPlanEventService: ActionPlanEventService,
 ) {
 
   /**
@@ -34,6 +35,7 @@ class ActionPlanService(
       }
 
       return persistenceAdapter.createActionPlan(createActionPlanDto)
+        .also { actionPlanEventService.actionPlanCreated(it) }
     }
   }
 
