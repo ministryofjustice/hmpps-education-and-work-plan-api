@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
@@ -37,38 +39,21 @@ class JpaGoalPersistenceAdapterTest {
   @Nested
   inner class CreateGoal {
     @Test
-    fun `should create goal given action plan does not already exist`() {
+    fun `should fail to create goal given action plan does not already exist`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
-      val reference = UUID.randomUUID()
-      val domainGoal = aValidGoal(
-        reference = reference,
-      )
       val createGoalDto = aValidCreateGoalDto()
-
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 
-      val entityGoal = aValidGoalEntity(
-        reference = reference,
-      )
-      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
-
-      val actionPlanEntity = aValidActionPlanEntity(
-        prisonNumber = prisonNumber,
-        goals = mutableListOf(entityGoal),
-      )
-      given(actionPlanRepository.saveAndFlush(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
-
-      given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
-
       // When
-      val actual = persistenceAdapter.createGoal(prisonNumber, createGoalDto)
+      val exception = catchThrowableOfType(
+        { persistenceAdapter.createGoal(prisonNumber, createGoalDto) },
+        ActionPlanNotFoundException::class.java,
+      )
 
       // Then
-      assertThat(actual).isEqualTo(domainGoal)
-      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-      verify(goalMapper).fromDtoToEntity(createGoalDto)
-      verify(goalMapper).fromEntityToDomain(entityGoal)
+      assertThat(exception).hasMessage("Unable to find ActionPlan for prisoner [$prisonNumber]")
+      verifyNoInteractions(goalMapper)
     }
 
     @Test
@@ -80,24 +65,20 @@ class JpaGoalPersistenceAdapterTest {
         reference = reference,
       )
       val createGoalDto = aValidCreateGoalDto()
-
       val initialActionPlan = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
         goals = mutableListOf(),
       )
-      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(initialActionPlan)
-
       val entityGoal = aValidGoalEntity(
         reference = reference,
       )
-      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
-
       val actionPlanEntity = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
         goals = mutableListOf(entityGoal),
       )
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(initialActionPlan)
+      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
       given(actionPlanRepository.saveAndFlush(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
-
       given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
       // When

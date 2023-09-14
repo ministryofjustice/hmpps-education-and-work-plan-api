@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ActionPlanEntity.Companion.newActionPlanForPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
@@ -23,24 +23,16 @@ class JpaGoalPersistenceAdapter(
 
   @Transactional
   override fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
-    var actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    // TODO RR-227 - throw 404 instead?
-    if (actionPlanEntity == null) {
-      log.info { "Creating new Action Plan for prisoner [$prisonNumber]" }
-      actionPlanEntity = newActionPlanForPrisoner(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        reviewDate = null,
-      )
-    }
+    val actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
+      ?: throw ActionPlanNotFoundException("Unable to find ActionPlan for prisoner [$prisonNumber]")
 
     val goalEntity = goalMapper.fromDtoToEntity(createGoalDto)
-
     with(actionPlanEntity) {
       addGoal(goalEntity)
       actionPlanRepository.saveAndFlush(this)
     }
 
+    // use the persisted entity with the populated JPA fields, rather than the non persisted entity reference above
     val persisted = actionPlanEntity.goals!!.first { it.reference == goalEntity.reference }
     return goalMapper.fromEntityToDomain(persisted)
   }

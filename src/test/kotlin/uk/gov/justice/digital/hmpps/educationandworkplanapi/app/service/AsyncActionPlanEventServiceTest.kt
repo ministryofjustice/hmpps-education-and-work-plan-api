@@ -21,6 +21,9 @@ class AsyncActionPlanEventServiceTest {
   private lateinit var actionPlanEventService: AsyncActionPlanEventService
 
   @Mock
+  private lateinit var telemetryService: TelemetryService
+
+  @Mock
   private lateinit var timelineEventFactory: TimelineEventFactory
 
   @Mock
@@ -38,6 +41,7 @@ class AsyncActionPlanEventServiceTest {
     actionPlanEventService.actionPlanCreated(actionPlan)
 
     // Then
+    verify(telemetryService).trackGoalCreateEvent(actionPlan.goals[0])
     verify(timelineEventFactory).actionPlanCreatedEvent(actionPlan)
     verify(timelineService).recordTimelineEvent(prisonNumber, createActionPlanEvent)
   }

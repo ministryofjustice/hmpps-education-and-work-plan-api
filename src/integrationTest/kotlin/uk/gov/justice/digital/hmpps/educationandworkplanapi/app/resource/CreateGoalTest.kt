@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -162,6 +163,15 @@ class CreateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
     }
+
+    // TODO RR-319 - Add custom assertions once the GET Timeline endpoint is in place
+    // assert timeline event is created successfully
+    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
+    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
+    val events = prisonerTimeline.events!!
+    assertThat(events.size).isEqualTo(1)
+    assertThat(events[0].eventType).isEqualTo(TimelineEventType.ACTION_PLAN_CREATED)
+    assertThat(events[0].sourceReference).isEqualTo(actionPlan.reference.toString())
   }
 
   @Test

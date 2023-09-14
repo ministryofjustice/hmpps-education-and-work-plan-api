@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import java.util.UUID
 
 class TimelineTest {
 
@@ -26,10 +27,11 @@ class TimelineTest {
   @Test
   fun `should create timeline given events out of sequence`() {
     // Given
+    val reference = UUID.randomUUID()
     val events = listOf(middleEvent, earliestEvent, latestEvent)
 
     // When
-    val actual = Timeline(prisonNumber, events)
+    val actual = Timeline(reference = reference, prisonNumber = prisonNumber, events = events)
 
     // Then
     assertThat(actual.events).containsExactly(
@@ -42,8 +44,9 @@ class TimelineTest {
   @Test
   fun `should add event and maintain event order`() {
     // Given
+    val reference = UUID.randomUUID()
     val initialEvents = listOf(earliestEvent, latestEvent)
-    val timeline = Timeline(prisonNumber, initialEvents)
+    val timeline = Timeline(reference = reference, prisonNumber = prisonNumber, events = initialEvents)
 
     // When
     timeline.addEvent(middleEvent)

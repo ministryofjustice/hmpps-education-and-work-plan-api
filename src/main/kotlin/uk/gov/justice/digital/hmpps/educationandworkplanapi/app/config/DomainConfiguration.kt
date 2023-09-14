@@ -21,8 +21,10 @@ class DomainConfiguration {
   fun goalDomainService(
     goalPersistenceAdapter: GoalPersistenceAdapter,
     goalEventService: GoalEventService,
+    actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
+    actionPlanEventService: ActionPlanEventService,
   ): GoalService =
-    GoalService(goalPersistenceAdapter, goalEventService)
+    GoalService(goalPersistenceAdapter, goalEventService, actionPlanPersistenceAdapter, actionPlanEventService)
 
   @Bean
   fun actionPlanDomainService(

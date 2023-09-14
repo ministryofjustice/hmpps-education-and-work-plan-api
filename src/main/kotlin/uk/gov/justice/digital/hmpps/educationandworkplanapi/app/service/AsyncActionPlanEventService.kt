@@ -16,14 +16,22 @@ private val log = KotlinLogging.logger {}
  */
 @Component
 class AsyncActionPlanEventService(
+  private val telemetryService: TelemetryService,
   private val timelineEventFactory: TimelineEventFactory,
   private val timelineService: TimelineService,
 ) : ActionPlanEventService {
   override fun actionPlanCreated(actionPlan: ActionPlan) {
     runBlocking {
       log.info { "ActionPlan created event for prisoner [${actionPlan.prisonNumber}]" }
-      val timelineEvent = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
-      launch { timelineService.recordTimelineEvent(actionPlan.prisonNumber, timelineEvent) }
+      launch {
+        actionPlan.goals.forEach {
+          telemetryService.trackGoalCreateEvent(it)
+        }
+      }
+      launch {
+        val timelineEvent = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
+        timelineService.recordTimelineEvent(actionPlan.prisonNumber, timelineEvent)
+      }
     }
   }
 }
