@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.2.1'
+  version: '1.2.2'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -130,6 +130,31 @@ paths:
       operationId: update-goal
       requestBody:
         $ref: '#/components/requestBodies/UpdateGoal'
+
+  #
+  # Timeline
+  #
+  '/timelines/{prisonNumber}':
+    parameters:
+      - name: prisonNumber
+        description: The number of the Prisoner who may have relevant Timeline data.
+        schema:
+          type: string
+        example: 'A1234BC'
+        in: path
+        required: true
+    get:
+      summary: Return a Prisoner's Timeline.
+      description: Returns a Prisoner's Timeline data, consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
+      tags:
+        - Timeline
+      responses:
+        '200':
+          $ref: '#/components/responses/Timeline'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-timeline-by-prison-number
+
 #
 # --------------------------------------------------------------------------------
 #
@@ -331,6 +356,75 @@ components:
         - targetDateRange
         - status
         - sequenceNumber
+    TimelineResponse:
+      title: TimelineResponse
+      type: object
+      description: A Prisoner's Timeline consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or completed a Goal.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The Timeline's unique reference.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner.
+          example: 'A1234BC'
+        events:
+          type: array
+          minItems: 1
+          description: A List of at least one TimelineEventResponse.
+          items:
+            $ref: '#/components/schemas/TimelineEventResponse'
+      required:
+        - reference
+        - prisonNumber
+        - events
+    TimelineEventResponse:
+      title: TimelineEventResponse
+      type: object
+      description: An 'event' of interest that has occurred during a Prisoner's time in Prison. For example, it could be when they completed an Induction, or created a Goal.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The Timeline event's unique reference
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        sourceReference:
+          type: string
+          description: A reference to the originating entity that was created, or updated during this event, such as a Prisoner's Goal or Induction. Typically this will be a UUID, but does not have to be.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        eventType:
+          $ref: '#/components/schemas/TimelineEventType'
+        contextualInfo:
+          type: string
+          description: Contextual information that's relevant to the event in question. For example the title of a Goal that was completed.
+          example: 'Learn French'
+        prisonId:
+          type: string
+          description: The identifier of the prison that the prisoner was at when the event occurred.
+          example: BXI
+        createdBy:
+          type: string
+          description: The DPS username of the person who created the event.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created the event.
+          example: 'Alex Smith'
+        timestamp:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the event occurred.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - reference
+        - sourceReference
+        - eventType
+        - prisonId
+        - createdBy
+        - createdByDisplayName
+        - timestamp
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
@@ -507,6 +601,21 @@ components:
         - THREE_TO_SIX_MONTHS
         - SIX_TO_TWELVE_MONTHS
         - MORE_THAN_TWELVE_MONTHS
+    TimelineEventType:
+      title: TimelineEventType
+      description: The type of a Timeline Event.
+      type: string
+      enum:
+        - ACTION_PLAN_CREATED
+        - GOAL_CREATED
+        - GOAL_UPDATED
+        - GOAL_STARTED
+        - GOAL_COMPLETED
+        - GOAL_ARCHIVED
+        - STEP_UPDATED
+        - STEP_NOT_STARTED
+        - STEP_STARTED
+        - STEP_COMPLETED
 
   #
   # Response Body Definitions
@@ -619,6 +728,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GoalResponse'
+    Timeline:
+      description: Response body containing a Prisoner's Timeline.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TimelineResponse'
 
   #
   # Request Body Definitions
