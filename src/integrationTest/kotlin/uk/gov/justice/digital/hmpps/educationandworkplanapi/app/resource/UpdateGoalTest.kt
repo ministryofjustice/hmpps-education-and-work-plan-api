@@ -254,9 +254,15 @@ class UpdateGoalTest : IntegrationTestBase() {
     assertThat(events.size).isEqualTo(3)
     assertThat(events[0].eventType).isEqualTo(TimelineEventType.GOAL_UPDATED)
     assertThat(events[0].sourceReference).isEqualTo(goalReference.toString())
+    assertThat(events[0]).hasAReference()
+    assertThat(events[0]).hasJpaManagedFieldsPopulated()
     assertThat(events[1].eventType).isEqualTo(TimelineEventType.STEP_UPDATED)
     assertThat(events[1].sourceReference).isEqualTo(stepReference.toString())
+    assertThat(events[1]).hasAReference()
+    assertThat(events[1]).hasJpaManagedFieldsPopulated()
     assertThat(events[2].eventType).isEqualTo(TimelineEventType.STEP_STARTED)
     assertThat(events[2].sourceReference).isEqualTo(stepReference.toString())
+    assertThat(events[2]).hasAReference()
+    assertThat(events[2]).hasJpaManagedFieldsPopulated()
   }
 }

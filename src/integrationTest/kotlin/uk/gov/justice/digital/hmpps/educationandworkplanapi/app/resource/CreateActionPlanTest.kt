@@ -246,6 +246,8 @@ class CreateActionPlanTest : IntegrationTestBase() {
     assertThat(events.size).isEqualTo(1)
     assertThat(events[0].eventType).isEqualTo(TimelineEventType.ACTION_PLAN_CREATED)
     assertThat(events[0].sourceReference).isEqualTo(actionPlan.reference.toString())
+    assertThat(events[0]).hasAReference()
+    assertThat(events[0]).hasJpaManagedFieldsPopulated()
   }
 
   @Test
