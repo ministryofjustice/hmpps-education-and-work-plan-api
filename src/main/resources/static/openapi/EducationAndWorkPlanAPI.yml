@@ -144,8 +144,8 @@ paths:
         in: path
         required: true
     get:
-      summary: Return a Prisoner's Action Plan
-      description: Returns a Prisoner's Timeline data, consisting of one or more 'Events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
+      summary: Return a Prisoner's Timeline.
+      description: Returns a Prisoner's Timeline data, consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
       tags:
         - Timeline
       responses:
@@ -359,21 +359,21 @@ components:
     TimelineResponse:
       title: TimelineResponse
       type: object
-      description: A Prisoner's Timeline consisting of one or more 'Events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal.
+      description: A Prisoner's Timeline consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or completed a Goal.
       properties:
         reference:
           type: string
           format: uuid
-          description: The Timeline's unique reference
+          description: The Timeline's unique reference.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         prisonNumber:
           type: string
-          description: The ID of the prisoner
+          description: The ID of the prisoner.
           example: 'A1234BC'
         events:
           type: array
           minItems: 1
-          description: A List of at least one TimelineEvent.
+          description: A List of at least one TimelineEventResponse.
           items:
             $ref: '#/components/schemas/TimelineEventResponse'
       required:
@@ -383,7 +383,7 @@ components:
     TimelineEventResponse:
       title: TimelineEventResponse
       type: object
-      description: An "event" of interest that has occurred during a Prisoner's time in Prison. For example, it could be when they completed an Induction, or created a Goal.
+      description: An 'event' of interest that has occurred during a Prisoner's time in Prison. For example, it could be when they completed an Induction, or created a Goal.
       properties:
         reference:
           type: string
