@@ -164,15 +164,14 @@ class CreateGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
     }
 
-    // TODO RR-319 - Add custom assertions once the GET Timeline endpoint is in place
     // assert timeline event is created successfully
     val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
     assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
     val events = prisonerTimeline.events!!
     assertThat(events.size).isEqualTo(1)
-    assertThat(events[0].eventType).isEqualTo(TimelineEventType.ACTION_PLAN_CREATED)
-    assertThat(events[0].sourceReference).isEqualTo(actionPlan.reference.toString())
-    assertThat(events[0].contextualInfo).isNull()
+    assertThat(events[0]).hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+    assertThat(events[0]).hasSourceReference(actionPlan.reference.toString())
+    assertThat(events[0]).hasNoContextualInfo()
     assertThat(events[0]).hasAReference()
     assertThat(events[0]).hasJpaManagedFieldsPopulated()
   }
@@ -217,15 +216,14 @@ class CreateGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
     }
 
-    // TODO RR-319 - Add custom assertions once the GET Timeline endpoint is in place
     // assert timeline event is created successfully
     val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
     assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
     val events = prisonerTimeline.events!!
     assertThat(events.size).isEqualTo(1)
-    assertThat(events[0].eventType).isEqualTo(TimelineEventType.GOAL_CREATED)
-    assertThat(events[0].sourceReference).isEqualTo(goal.reference.toString())
-    assertThat(events[0].contextualInfo).isEqualTo(goal.title)
+    assertThat(events[0]).hasEventType(TimelineEventType.GOAL_CREATED)
+    assertThat(events[0]).hasSourceReference(goal.reference.toString())
+    assertThat(events[0]).hasContextualInfo(goal.title!!)
     assertThat(events[0]).hasAReference()
     assertThat(events[0]).hasJpaManagedFieldsPopulated()
   }

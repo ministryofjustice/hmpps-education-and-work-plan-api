@@ -81,4 +81,44 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     }
     return this
   }
+
+  fun hasEventType(expected: TimelineEventType): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (eventType != expected) {
+        failWithMessage("Expected eventType to be $expected, but was $eventType")
+      }
+    }
+    return this
+  }
+
+  fun hasSourceReference(expected: String): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (sourceReference != expected) {
+        failWithMessage("Expected sourceReference to be $expected, but was $sourceReference")
+      }
+    }
+    return this
+  }
+
+  fun hasContextualInfo(expected: String): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (contextualInfo != expected) {
+        failWithMessage("Expected contextualInfo to be $expected, but was $contextualInfo")
+      }
+    }
+    return this
+  }
+
+  fun hasNoContextualInfo(): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (contextualInfo != null) {
+        failWithMessage("Expected contextualInfo to be null, but was $contextualInfo")
+      }
+    }
+    return this
+  }
 }
