@@ -1,34 +1,28 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
 
 import java.time.Instant
 import java.util.UUID
 
-fun aValidTimeline(
-  reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = "A1234AB",
-  events: List<TimelineEvent> = listOf(aValidTimelineEvent()),
-) = Timeline(
-  reference = reference,
-  prisonNumber = prisonNumber,
-  events = events,
-)
-
-fun aValidTimelineEvent(
+fun aValidTimelineEventEntity(
+  id: UUID = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   sourceReference: String = UUID.randomUUID().toString(),
   eventType: TimelineEventType = TimelineEventType.GOAL_CREATED,
   contextualInfo: String? = null,
-  prisonId: String = "BXI",
+  createdAtPrison: String = "BXI",
   createdBy: String = "asmith_gen",
-  createdByDisplayName: String = "Alex Smith",
+  createdByDisplayName: String? = "Alex Smith",
   timestamp: Instant = Instant.now(),
-) = TimelineEvent(
+  createdAt: Instant = Instant.now(),
+) = TimelineEventEntity(
+  id = id,
   reference = reference,
   sourceReference = sourceReference,
   eventType = eventType,
   contextualInfo = contextualInfo,
-  prisonId = prisonId,
+  createdAtPrison = createdAtPrison,
   createdBy = createdBy,
   createdByDisplayName = createdByDisplayName,
   timestamp = timestamp,
+  createdAt = createdAt,
 )

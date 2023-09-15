@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
 private val log = KotlinLogging.logger {}
@@ -105,6 +106,7 @@ class GlobalExceptionHandler(
     value = [
       ActionPlanNotFoundException::class,
       GoalNotFoundException::class,
+      TimelineNotFoundException::class,
     ],
   )
   fun handleExceptionReturnNotFoundErrorResponse(

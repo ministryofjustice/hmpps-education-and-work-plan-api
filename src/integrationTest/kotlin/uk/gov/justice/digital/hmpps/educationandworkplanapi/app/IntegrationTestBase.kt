@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -31,6 +32,9 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var actionPlanRepository: ActionPlanRepository
 
+  @Autowired
+  lateinit var timelineRepository: TimelineRepository
+
   @SpyBean
   lateinit var telemetryClient: TelemetryClient
 
@@ -40,5 +44,6 @@ abstract class IntegrationTestBase {
   @BeforeEach
   fun clearDatabase() {
     actionPlanRepository.deleteAll() // Will also remove all Goals and Steps due to cascade
+    timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
   }
 }

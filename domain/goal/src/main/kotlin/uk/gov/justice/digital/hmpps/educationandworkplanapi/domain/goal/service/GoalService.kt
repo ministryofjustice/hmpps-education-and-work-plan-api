@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 import java.util.UUID
@@ -21,8 +22,10 @@ private val log = KotlinLogging.logger {}
  *
  */
 class GoalService(
-  private val persistenceAdapter: GoalPersistenceAdapter,
+  private val goalPersistenceAdapter: GoalPersistenceAdapter,
   private val goalEventService: GoalEventService,
+  private val actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
+  private val actionPlanEventService: ActionPlanEventService,
 ) {
 
   /**
@@ -30,10 +33,16 @@ class GoalService(
    */
   fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
     log.info { "Creating new Goal for prisoner [$prisonNumber]" }
-    return persistenceAdapter.createGoal(prisonNumber, createGoalDto)
-      .also {
-        goalEventService.goalCreated(prisonNumber, it)
-      }
+
+    // TODO RR-227 - We need to change throw a 404 once the create action plan endpoint is being called by the UI (with an optional review date)
+    return if (actionPlanDoesNotExist(prisonNumber)) {
+      actionPlanPersistenceAdapter.createActionPlan(newActionPlan(prisonNumber, createGoalDto))
+        .also { actionPlanEventService.actionPlanCreated(it) }
+        .let { it.goals[0] }
+    } else {
+      goalPersistenceAdapter.createGoal(prisonNumber, createGoalDto)
+        .also { goalEventService.goalCreated(prisonNumber, it) }
+    }
   }
 
   /**
@@ -42,7 +51,7 @@ class GoalService(
    */
   fun getGoal(prisonNumber: String, goalReference: UUID): Goal {
     log.info { "Retrieving Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
-    return persistenceAdapter.getGoal(prisonNumber, goalReference)
+    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }
@@ -57,7 +66,7 @@ class GoalService(
     log.info { "Updating Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
 
     val existingGoal = getGoal(prisonNumber, updatedGoalDto.reference)
-    return persistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
+    return goalPersistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
       ?.also {
         goalEventService.goalUpdated(prisonNumber = prisonNumber, previousGoal = existingGoal, updatedGoal = it)
       }
@@ -65,4 +74,14 @@ class GoalService(
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }
   }
+
+  private fun actionPlanDoesNotExist(prisonNumber: String) =
+    actionPlanPersistenceAdapter.getActionPlan(prisonNumber) == null
+
+  private fun newActionPlan(prisonNumber: String, createGoalDto: CreateGoalDto) =
+    CreateActionPlanDto(
+      prisonNumber = prisonNumber,
+      reviewDate = null,
+      goals = listOf(createGoalDto),
+    )
 }

@@ -15,7 +15,9 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
 
@@ -25,19 +27,24 @@ class GoalServiceTest {
   private lateinit var service: GoalService
 
   @Mock
-  private lateinit var persistenceAdapter: GoalPersistenceAdapter
+  private lateinit var goalPersistenceAdapter: GoalPersistenceAdapter
 
   @Mock
   private lateinit var goalEventService: GoalEventService
 
+  @Mock
+  private lateinit var actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter
+
+  @Mock
+  private lateinit var actionPlanEventService: ActionPlanEventService
+
   @Test
-  fun `should create new goal for a prison number`() {
+  fun `should create new goal for a prisoner`() {
     // Given
-    val goal = aValidGoal()
-    given(persistenceAdapter.createGoal(any(), any())).willReturn(goal)
-
     val prisonNumber = aValidPrisonNumber()
-
+    val goal = aValidGoal()
+    given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(aValidActionPlan())
+    given(goalPersistenceAdapter.createGoal(any(), any())).willReturn(goal)
     val createGoalDto = aValidCreateGoalDto()
 
     // When
@@ -45,8 +52,34 @@ class GoalServiceTest {
 
     // Then
     assertThat(actual).isEqualTo(goal)
-    verify(persistenceAdapter).createGoal(prisonNumber, createGoalDto)
+    verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
+    verify(goalPersistenceAdapter).createGoal(prisonNumber, createGoalDto)
     verify(goalEventService).goalCreated(prisonNumber, actual)
+    verifyNoInteractions(actionPlanEventService)
+  }
+
+  @Test
+  fun `should add goal to new action plan given prisoner does not have an action plan`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val goal = aValidGoal()
+    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal))
+    given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(null)
+    given(actionPlanPersistenceAdapter.createActionPlan(any())).willReturn(actionPlan)
+    val createGoalDto = aValidCreateGoalDto()
+    val expectedCreateActionPlanDto =
+      aValidCreateActionPlanDto(prisonNumber = prisonNumber, reviewDate = null, goals = listOf(createGoalDto))
+
+    // When
+    val actual = service.createGoal(prisonNumber, createGoalDto)
+
+    // Then
+    assertThat(actual).isEqualTo(goal)
+    verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
+    verify(actionPlanPersistenceAdapter).createActionPlan(expectedCreateActionPlanDto)
+    verify(actionPlanEventService).actionPlanCreated(actionPlan)
+    verifyNoInteractions(goalPersistenceAdapter)
+    verifyNoInteractions(goalEventService)
   }
 
   @Test
@@ -56,14 +89,14 @@ class GoalServiceTest {
     val goalReference = aValidReference()
 
     val goal = aValidGoal(reference = goalReference)
-    given(persistenceAdapter.getGoal(any(), any())).willReturn(goal)
+    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
 
     // When
     val actual = service.getGoal(prisonNumber, goalReference)
 
     // Then
     assertThat(actual).isEqualTo(goal)
-    verify(persistenceAdapter).getGoal(prisonNumber, goalReference)
+    verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
   }
 
   @Test
@@ -72,7 +105,7 @@ class GoalServiceTest {
     val prisonNumber = aValidPrisonNumber()
     val goalReference = aValidReference()
 
-    given(persistenceAdapter.getGoal(any(), any())).willReturn(null)
+    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
     // When
     val exception = catchThrowableOfType(
@@ -84,7 +117,7 @@ class GoalServiceTest {
     assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     assertThat(exception.goalReference).isEqualTo(goalReference)
-    verify(persistenceAdapter).getGoal(prisonNumber, goalReference)
+    verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
   }
 
   @Test
@@ -94,8 +127,8 @@ class GoalServiceTest {
     val goalReference = aValidReference()
 
     val goal = aValidGoal(reference = goalReference)
-    given(persistenceAdapter.getGoal(any(), any())).willReturn(goal)
-    given(persistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+    given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
 
     val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
@@ -104,7 +137,7 @@ class GoalServiceTest {
 
     // Then
     assertThat(actual).isEqualTo(goal)
-    verify(persistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+    verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
     verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
   }
 
@@ -114,7 +147,7 @@ class GoalServiceTest {
     val prisonNumber = aValidPrisonNumber()
     val goalReference = aValidReference()
 
-    given(persistenceAdapter.getGoal(any(), any())).willReturn(null)
+    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
     val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
@@ -128,7 +161,7 @@ class GoalServiceTest {
     assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     assertThat(exception.goalReference).isEqualTo(goalReference)
-    verify(persistenceAdapter, never()).updateGoal(prisonNumber, updatedGoal)
+    verify(goalPersistenceAdapter, never()).updateGoal(prisonNumber, updatedGoal)
     verifyNoInteractions(goalEventService)
   }
 }

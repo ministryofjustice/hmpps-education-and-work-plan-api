@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -235,6 +237,17 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.NOT_STARTED)
       .wasCreatedBy(dpsUsername)
+
+    // TODO RR-319 - Add custom assertions once the GET Timeline endpoint is in place
+    // assert timeline event is created successfully
+    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
+    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
+    val events = prisonerTimeline.events!!
+    assertThat(events.size).isEqualTo(1)
+    assertThat(events[0].eventType).isEqualTo(TimelineEventType.ACTION_PLAN_CREATED)
+    assertThat(events[0].sourceReference).isEqualTo(actionPlan.reference.toString())
+    assertThat(events[0]).hasAReference()
+    assertThat(events[0]).hasJpaManagedFieldsPopulated()
   }
 
   @Test

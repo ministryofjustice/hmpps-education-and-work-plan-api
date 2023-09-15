@@ -14,7 +14,6 @@ class ActionPlanEntityTest {
 
     // When
     val actual = ActionPlanEntity.newActionPlanForPrisoner(
-      reference = UUID.randomUUID(),
       prisonNumber = prisonNumber,
       reviewDate = null,
     )

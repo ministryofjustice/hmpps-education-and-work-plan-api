@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.verify
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
@@ -243,5 +245,24 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       verify(telemetryClient).trackEvent("goal-update", expectedEventCustomDimensions, null)
     }
+
+    // TODO RR-319 - Add custom assertions once the GET Timeline endpoint is in place
+    // assert timeline events are created successfully
+    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
+    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
+    val events = prisonerTimeline.events!!
+    assertThat(events.size).isEqualTo(3)
+    assertThat(events[0].eventType).isEqualTo(TimelineEventType.GOAL_UPDATED)
+    assertThat(events[0].sourceReference).isEqualTo(goalReference.toString())
+    assertThat(events[0]).hasAReference()
+    assertThat(events[0]).hasJpaManagedFieldsPopulated()
+    assertThat(events[1].eventType).isEqualTo(TimelineEventType.STEP_UPDATED)
+    assertThat(events[1].sourceReference).isEqualTo(stepReference.toString())
+    assertThat(events[1]).hasAReference()
+    assertThat(events[1]).hasJpaManagedFieldsPopulated()
+    assertThat(events[2].eventType).isEqualTo(TimelineEventType.STEP_STARTED)
+    assertThat(events[2].sourceReference).isEqualTo(stepReference.toString())
+    assertThat(events[2]).hasAReference()
+    assertThat(events[2]).hasJpaManagedFieldsPopulated()
   }
 }
