@@ -42,11 +42,11 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     return this
   }
 
-  fun wasCreatedBy(expected: String): TimelineEventEntityAssert {
+  fun wasActionedBy(expected: String): TimelineEventEntityAssert {
     isNotNull
     with(actual!!) {
-      if (createdBy != expected) {
-        failWithMessage("Expected createdBy to be $expected, but was $createdBy")
+      if (actionedBy != expected) {
+        failWithMessage("Expected createdBy to be $expected, but was $actionedBy")
       }
     }
     return this
@@ -62,11 +62,11 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     return this
   }
 
-  fun wasCreatedAtPrison(expected: String): TimelineEventEntityAssert {
+  fun hasPrisonId(expected: String): TimelineEventEntityAssert {
     isNotNull
     with(actual!!) {
-      if (createdAtPrison != expected) {
-        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      if (prisonId != expected) {
+        failWithMessage("Expected createdAtPrison to be $expected, but was $prisonId")
       }
     }
     return this

@@ -35,10 +35,11 @@ class TimelineEventFactoryTest {
     assertThat(actual.sourceReference).isEqualTo(actionPlan.reference.toString())
     assertThat(actual.eventType).isEqualTo(TimelineEventType.ACTION_PLAN_CREATED)
     assertThat(actual.prisonId).isEqualTo(actionPlan.goals[0].createdAtPrison)
-    assertThat(actual.createdBy).isEqualTo(actionPlan.goals[0].lastUpdatedBy)
-    assertThat(actual.createdByDisplayName).isEqualTo(actionPlan.goals[0].lastUpdatedByDisplayName)
+    assertThat(actual.actionedBy).isEqualTo(actionPlan.goals[0].lastUpdatedBy)
+    assertThat(actual.actionedByDisplayName).isEqualTo(actionPlan.goals[0].lastUpdatedByDisplayName)
     assertThat(actual.reference).isNotNull()
     assertThat(actual.timestamp).isNotNull()
+    assertThat(actual.contextualInfo).isNull()
   }
 
   @Test
@@ -53,10 +54,11 @@ class TimelineEventFactoryTest {
     assertThat(actual.sourceReference).isEqualTo(goal.reference.toString())
     assertThat(actual.eventType).isEqualTo(TimelineEventType.GOAL_CREATED)
     assertThat(actual.prisonId).isEqualTo(goal.createdAtPrison)
-    assertThat(actual.createdBy).isEqualTo(goal.lastUpdatedBy)
-    assertThat(actual.createdByDisplayName).isEqualTo(goal.lastUpdatedByDisplayName)
+    assertThat(actual.actionedBy).isEqualTo(goal.lastUpdatedBy)
+    assertThat(actual.actionedByDisplayName).isEqualTo(goal.lastUpdatedByDisplayName)
     assertThat(actual.reference).isNotNull()
     assertThat(actual.timestamp).isNotNull()
+    assertThat(actual.contextualInfo).isEqualTo(goal.title)
   }
 
   @Test
@@ -70,8 +72,9 @@ class TimelineEventFactoryTest {
         sourceReference = reference.toString(),
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = updatedGoal.title,
       ),
     )
 
@@ -109,8 +112,9 @@ class TimelineEventFactoryTest {
         sourceReference = reference.toString(),
         eventType = expectedEventType,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = updatedGoal.title,
       ),
     )
 
@@ -130,8 +134,8 @@ class TimelineEventFactoryTest {
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
     val step2Reference = UUID.randomUUID()
-    val previousSteps = listOf(aValidStep(reference = step1Reference, title = "Previous step"), anotherValidStep(reference = step2Reference))
-    val updatedSteps = listOf(aValidStep(reference = step1Reference, title = "Updated step"), anotherValidStep(reference = step2Reference))
+    val previousSteps = listOf(aValidStep(reference = step1Reference, title = "Book French course"), anotherValidStep(reference = step2Reference))
+    val updatedSteps = listOf(aValidStep(reference = step1Reference, title = "Book Spanish course"), anotherValidStep(reference = step2Reference))
     val previousGoal = aValidGoal(reference = goalReference, steps = previousSteps)
     val updatedGoal = aValidGoal(reference = goalReference, steps = updatedSteps)
     val expectedEvents = listOf(
@@ -139,8 +143,9 @@ class TimelineEventFactoryTest {
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book Spanish course",
       ),
     )
 
@@ -161,11 +166,11 @@ class TimelineEventFactoryTest {
     val step1Reference = UUID.randomUUID()
     val step2Reference = UUID.randomUUID()
     val originalSteps = listOf(
-      aValidStep(reference = step1Reference, status = StepStatus.NOT_STARTED),
+      aValidStep(reference = step1Reference, "Book course", status = StepStatus.NOT_STARTED),
       anotherValidStep(reference = step2Reference),
     )
     val updatedSteps = listOf(
-      aValidStep(reference = step1Reference, status = StepStatus.ACTIVE),
+      aValidStep(reference = step1Reference, "Book course", status = StepStatus.ACTIVE),
       anotherValidStep(reference = step2Reference),
     )
     val previousGoal = aValidGoal(reference = goalReference, steps = originalSteps)
@@ -175,8 +180,9 @@ class TimelineEventFactoryTest {
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_STARTED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book course",
       ),
     )
 
@@ -198,13 +204,13 @@ class TimelineEventFactoryTest {
     val step2Reference = UUID.randomUUID()
     val originalSteps = listOf(
       aValidStep(reference = step1Reference, title = "Book French course", status = StepStatus.ACTIVE),
-      anotherValidStep(reference = step2Reference, status = StepStatus.ACTIVE),
+      anotherValidStep(reference = step2Reference, title = "Complete course", status = StepStatus.ACTIVE),
     )
     val updatedSteps = listOf(
       // title and status of first step changed
       aValidStep(reference = step1Reference, title = "Book Spanish course", status = StepStatus.COMPLETE),
       // status of second step changed
-      anotherValidStep(reference = step2Reference, status = StepStatus.COMPLETE),
+      anotherValidStep(reference = step2Reference, title = "Complete course", status = StepStatus.COMPLETE),
     )
     val previousGoal =
       aValidGoal(
@@ -226,36 +232,41 @@ class TimelineEventFactoryTest {
         sourceReference = goalReference.toString(),
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Learn Spanish",
       ),
       newTimelineEvent(
         sourceReference = goalReference.toString(),
         eventType = TimelineEventType.GOAL_COMPLETED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Learn Spanish",
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book Spanish course",
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_COMPLETED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book Spanish course",
       ),
       newTimelineEvent(
         sourceReference = step2Reference.toString(),
         eventType = TimelineEventType.STEP_COMPLETED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
-        createdBy = updatedGoal.lastUpdatedBy!!,
-        createdByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Complete course",
       ),
     )
 

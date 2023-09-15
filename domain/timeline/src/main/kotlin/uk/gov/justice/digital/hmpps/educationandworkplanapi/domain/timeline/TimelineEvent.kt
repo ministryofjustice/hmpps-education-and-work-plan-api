@@ -31,13 +31,13 @@ data class TimelineEvent(
    */
   val prisonId: String,
   /**
-   * The ID of the logged-in user who created the event
+   * The username of the person who caused this event. Set to 'system' if the event was not actioned by a DPS user.
    */
-  val createdBy: String,
+  val actionedBy: String,
   /**
-   * The full name (for display purposes) of the logged-in user who created the event (optional).
+   * The name of the person who caused this event (if applicable).
    */
-  val createdByDisplayName: String? = null,
+  val actionedByDisplayName: String? = null,
   /**
    * The date and time when the event occurred.
    */
@@ -49,16 +49,16 @@ data class TimelineEvent(
       eventType: TimelineEventType,
       contextualInfo: String? = null, // TODO RR-314 - not sure how we're going to populate this?
       prisonId: String,
-      createdBy: String,
-      createdByDisplayName: String? = null,
+      actionedBy: String,
+      actionedByDisplayName: String? = null,
     ) = TimelineEvent(
       reference = UUID.randomUUID(),
       sourceReference = sourceReference,
       eventType = eventType,
       contextualInfo = contextualInfo,
       prisonId = prisonId,
-      createdBy = createdBy,
-      createdByDisplayName = createdByDisplayName,
+      actionedBy = actionedBy,
+      actionedByDisplayName = actionedByDisplayName,
       timestamp = Instant.now(),
     )
   }

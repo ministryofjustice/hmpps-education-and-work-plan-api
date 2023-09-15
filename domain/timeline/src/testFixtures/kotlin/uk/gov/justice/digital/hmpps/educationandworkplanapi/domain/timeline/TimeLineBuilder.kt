@@ -19,8 +19,8 @@ fun aValidTimelineEvent(
   eventType: TimelineEventType = TimelineEventType.GOAL_CREATED,
   contextualInfo: String? = null,
   prisonId: String = "BXI",
-  createdBy: String = "asmith_gen",
-  createdByDisplayName: String = "Alex Smith",
+  actionedBy: String = "asmith_gen",
+  actionedByDisplayName: String = "Alex Smith",
   timestamp: Instant = Instant.now(),
 ) = TimelineEvent(
   reference = reference,
@@ -28,7 +28,7 @@ fun aValidTimelineEvent(
   eventType = eventType,
   contextualInfo = contextualInfo,
   prisonId = prisonId,
-  createdBy = createdBy,
-  createdByDisplayName = createdByDisplayName,
+  actionedBy = actionedBy,
+  actionedByDisplayName = actionedByDisplayName,
   timestamp = timestamp,
 )
