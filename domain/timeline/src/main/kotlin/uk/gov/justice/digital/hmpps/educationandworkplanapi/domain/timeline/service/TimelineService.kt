@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.ser
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
 
 /**
  * Service class exposing methods that implement the business rules for the Timeline domain, and is how applications
@@ -30,8 +31,9 @@ class TimelineService(
     persistenceAdapter.recordTimelineEvents(prisonNumber, events)
 
   /**
-   * Returns the [Timeline] for the prisoner identified by their prison number.
+   * Returns the [Timeline] for the prisoner identified by their prison number. Otherwise, throws
+   * [TimelineNotFoundException] if it cannot be found.
    */
-  fun getTimelineForPrisoner(prisonNumber: String): Timeline? =
-    persistenceAdapter.getTimelineForPrisoner(prisonNumber)
+  fun getTimelineForPrisoner(prisonNumber: String): Timeline =
+    persistenceAdapter.getTimelineForPrisoner(prisonNumber) ?: throw TimelineNotFoundException(prisonNumber)
 }

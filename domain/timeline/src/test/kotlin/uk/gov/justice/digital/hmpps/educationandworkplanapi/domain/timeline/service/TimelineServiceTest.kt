@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -9,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimelineEvent
 
@@ -60,6 +62,24 @@ class TimelineServiceTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
+    verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
+  }
+
+  @Test
+  fun `should fail to get timeline for prisoner given timeline does not exist`() {
+    // Given
+    val prisonNumber = "A1234AB"
+    given(persistenceAdapter.getTimelineForPrisoner(any())).willReturn(null)
+
+    // When
+    val exception = catchThrowableOfType(
+      { service.getTimelineForPrisoner(Companion.prisonNumber) },
+      TimelineNotFoundException::class.java,
+    )
+
+    // Then
+    assertThat(exception).hasMessage("Timeline not found for prisoner [$prisonNumber]")
+    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
   }
 }
