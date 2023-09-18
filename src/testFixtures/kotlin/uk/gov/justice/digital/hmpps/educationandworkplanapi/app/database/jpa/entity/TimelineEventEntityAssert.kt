@@ -46,7 +46,7 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     isNotNull
     with(actual!!) {
       if (actionedBy != expected) {
-        failWithMessage("Expected createdBy to be $expected, but was $actionedBy")
+        failWithMessage("Expected actionedBy to be $expected, but was $actionedBy")
       }
     }
     return this
@@ -66,7 +66,7 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     isNotNull
     with(actual!!) {
       if (prisonId != expected) {
-        failWithMessage("Expected createdAtPrison to be $expected, but was $prisonId")
+        failWithMessage("Expected prisonId to be $expected, but was $prisonId")
       }
     }
     return this
