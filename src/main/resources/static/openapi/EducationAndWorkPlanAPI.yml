@@ -404,13 +404,13 @@ components:
           type: string
           description: The identifier of the prison that the prisoner was at when the event occurred.
           example: BXI
-        createdBy:
+        actionedBy:
           type: string
-          description: The DPS username of the person who created the event.
+          description: The username of the person who caused this event. Set to 'system' if the event was not actioned by a DPS user.
           example: 'asmith_gen'
-        createdByDisplayName:
+        actionedByDisplayName:
           type: string
-          description: The display name of the person who created the event.
+          description: The display name of the person who caused this event, if applicable.
           example: 'Alex Smith'
         timestamp:
           type: string
@@ -422,8 +422,7 @@ components:
         - sourceReference
         - eventType
         - prisonId
-        - createdBy
-        - createdByDisplayName
+        - actionedBy
         - timestamp
 
     GetActionPlanSummariesRequest:

@@ -39,24 +39,24 @@ class TimelineEventEntity(
   var contextualInfo: String? = null,
 
   /**
-   * The ID of the prison that the event relates to.
+   * The ID of the prison that the prisoner was at when the event occurred.
    */
   @Column(updatable = false)
   @field:NotNull
-  var createdAtPrison: String? = null,
+  var prisonId: String? = null,
 
   /**
-   * Username of the person who created the original event (not to be confused with who/what saved this entity)
+   * The username of the person who caused this event. Set to 'system' if the event was not actioned by a DPS user.
    */
   @Column(updatable = false)
   @field:NotNull
-  var createdBy: String? = null,
+  var actionedBy: String? = null,
 
   /**
-   * Name of the person who created the original event (not to be confused with who/what saved this entity)
+   * The name of the person who caused this event (if applicable).
    */
   @Column(updatable = false)
-  var createdByDisplayName: String? = null,
+  var actionedByDisplayName: String? = null,
 
   /**
    * The timestamp of the original event (not when this entity was saved to the DB - see createdAt).

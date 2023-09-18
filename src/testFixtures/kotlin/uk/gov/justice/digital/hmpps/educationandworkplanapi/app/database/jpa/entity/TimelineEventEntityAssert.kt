@@ -42,11 +42,11 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     return this
   }
 
-  fun wasCreatedBy(expected: String): TimelineEventEntityAssert {
+  fun wasActionedBy(expected: String): TimelineEventEntityAssert {
     isNotNull
     with(actual!!) {
-      if (createdBy != expected) {
-        failWithMessage("Expected createdBy to be $expected, but was $createdBy")
+      if (actionedBy != expected) {
+        failWithMessage("Expected actionedBy to be $expected, but was $actionedBy")
       }
     }
     return this
@@ -62,11 +62,11 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     return this
   }
 
-  fun wasCreatedAtPrison(expected: String): TimelineEventEntityAssert {
+  fun hasPrisonId(expected: String): TimelineEventEntityAssert {
     isNotNull
     with(actual!!) {
-      if (createdAtPrison != expected) {
-        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      if (prisonId != expected) {
+        failWithMessage("Expected prisonId to be $expected, but was $prisonId")
       }
     }
     return this
@@ -77,6 +77,46 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     with(actual!!) {
       if (reference == null) {
         failWithMessage("Expected reference to be populated, but was $reference")
+      }
+    }
+    return this
+  }
+
+  fun hasEventType(expected: TimelineEventType): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (eventType != expected) {
+        failWithMessage("Expected eventType to be $expected, but was $eventType")
+      }
+    }
+    return this
+  }
+
+  fun hasSourceReference(expected: String): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (sourceReference != expected) {
+        failWithMessage("Expected sourceReference to be $expected, but was $sourceReference")
+      }
+    }
+    return this
+  }
+
+  fun hasContextualInfo(expected: String): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (contextualInfo != expected) {
+        failWithMessage("Expected contextualInfo to be $expected, but was $contextualInfo")
+      }
+    }
+    return this
+  }
+
+  fun hasNoContextualInfo(): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (contextualInfo != null) {
+        failWithMessage("Expected contextualInfo to be null, but was $contextualInfo")
       }
     }
     return this

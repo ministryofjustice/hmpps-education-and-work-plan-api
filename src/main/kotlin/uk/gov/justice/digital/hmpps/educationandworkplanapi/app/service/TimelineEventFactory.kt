@@ -16,10 +16,15 @@ import java.util.UUID
 class TimelineEventFactory {
 
   fun actionPlanCreatedEvent(actionPlan: ActionPlan) =
-    buildTimelineEvent(actionPlan.goals[0], actionPlan.reference, TimelineEventType.ACTION_PLAN_CREATED)
+    buildTimelineEvent(
+      actionPlan.goals[0],
+      actionPlan.reference,
+      TimelineEventType.ACTION_PLAN_CREATED,
+      contextualInfo = null,
+    )
 
   fun goalCreatedTimelineEvent(goal: Goal) =
-    buildTimelineEvent(goal, goal.reference, TimelineEventType.GOAL_CREATED)
+    buildTimelineEvent(goal, goal.reference, TimelineEventType.GOAL_CREATED, contextualInfo = goal.title)
 
   /**
    * Determines what type of [TimelineEvent]s have occurred, following an update to a [Goal]. For example, whether its title
@@ -37,6 +42,7 @@ class TimelineEventFactory {
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
           eventType = TimelineEventType.GOAL_UPDATED,
+          contextualInfo = updatedGoal.title,
         ),
       )
     }
@@ -48,6 +54,7 @@ class TimelineEventFactory {
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
           eventType = eventType,
+          contextualInfo = updatedGoal.title,
         ),
       )
     }
@@ -61,6 +68,7 @@ class TimelineEventFactory {
             goal = updatedGoal,
             sourceReference = previousStep!!.reference,
             eventType = TimelineEventType.STEP_UPDATED,
+            contextualInfo = it.title,
           ),
         )
       }
@@ -71,6 +79,7 @@ class TimelineEventFactory {
             goal = updatedGoal,
             sourceReference = previousStep!!.reference,
             eventType = eventType,
+            contextualInfo = it.title,
           ),
         )
       }
@@ -119,13 +128,19 @@ class TimelineEventFactory {
     return eventType
   }
 
-  private fun buildTimelineEvent(goal: Goal, sourceReference: UUID, eventType: TimelineEventType) =
+  private fun buildTimelineEvent(
+    goal: Goal,
+    sourceReference: UUID,
+    eventType: TimelineEventType,
+    contextualInfo: String?,
+  ) =
     TimelineEvent.newTimelineEvent(
       sourceReference = sourceReference.toString(),
       eventType = eventType,
-      // we can use the lastUpdatedBy fields for create action plan/create goal events, since it will be the same as the createdBy fields initially
+      // we can use the lastUpdatedBy fields for create action plan/create goal events, since it will be the same as the actionedBy fields initially
       prisonId = goal.lastUpdatedAtPrison,
-      createdBy = goal.lastUpdatedBy!!,
-      createdByDisplayName = goal.lastUpdatedByDisplayName!!,
+      actionedBy = goal.lastUpdatedBy!!,
+      actionedByDisplayName = goal.lastUpdatedByDisplayName!!,
+      contextualInfo = contextualInfo,
     )
 }

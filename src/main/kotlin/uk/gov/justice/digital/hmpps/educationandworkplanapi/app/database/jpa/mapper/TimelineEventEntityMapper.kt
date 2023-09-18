@@ -9,9 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Time
 interface TimelineEventEntityMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "createdAtPrison", source = "prisonId")
   fun fromDomainToEntity(timelineEvent: TimelineEvent): TimelineEventEntity
 
-  @Mapping(target = "prisonId", source = "createdAtPrison")
   fun fromEntityToDomain(persisted: TimelineEventEntity): TimelineEvent
 }

@@ -29,9 +29,9 @@ class TimelineEventEntityMapperTest {
       sourceReference = sourceReference,
       eventType = TimelineEventTypeEntity.STEP_UPDATED,
       contextualInfo = null,
-      createdAtPrison = prisonId,
-      createdBy = timelineEvent.createdBy,
-      createdByDisplayName = timelineEvent.createdByDisplayName,
+      prisonId = prisonId,
+      actionedBy = timelineEvent.actionedBy,
+      actionedByDisplayName = timelineEvent.actionedByDisplayName,
       timestamp = timelineEvent.timestamp,
     )
 
@@ -58,7 +58,7 @@ class TimelineEventEntityMapperTest {
       sourceReference = sourceReference,
       eventType = TimelineEventTypeEntity.STEP_UPDATED,
       contextualInfo = null,
-      createdAtPrison = prisonId,
+      prisonId = prisonId,
     )
     val expected = aValidTimelineEvent(
       reference = reference,

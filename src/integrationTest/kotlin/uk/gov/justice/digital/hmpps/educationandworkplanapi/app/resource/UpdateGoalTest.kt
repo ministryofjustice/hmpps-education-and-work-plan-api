@@ -246,22 +246,26 @@ class UpdateGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent("goal-update", expectedEventCustomDimensions, null)
     }
 
-    // TODO RR-319 - Add custom assertions once the GET Timeline endpoint is in place
     // assert timeline events are created successfully
     val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
     assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
     val events = prisonerTimeline.events!!
     assertThat(events.size).isEqualTo(3)
-    assertThat(events[0].eventType).isEqualTo(TimelineEventType.GOAL_UPDATED)
-    assertThat(events[0].sourceReference).isEqualTo(goalReference.toString())
+    assertThat(events[0]).hasEventType(TimelineEventType.GOAL_UPDATED)
+    assertThat(events[0]).hasSourceReference(goalReference.toString())
+    assertThat(events[0]).hasContextualInfo("Learn French to GCSE standard")
     assertThat(events[0]).hasAReference()
     assertThat(events[0]).hasJpaManagedFieldsPopulated()
-    assertThat(events[1].eventType).isEqualTo(TimelineEventType.STEP_UPDATED)
-    assertThat(events[1].sourceReference).isEqualTo(stepReference.toString())
+
+    assertThat(events[1]).hasEventType(TimelineEventType.STEP_UPDATED)
+    assertThat(events[1]).hasSourceReference(stepReference.toString())
+    assertThat(events[1]).hasContextualInfo("Book course before December 2023")
     assertThat(events[1]).hasAReference()
     assertThat(events[1]).hasJpaManagedFieldsPopulated()
-    assertThat(events[2].eventType).isEqualTo(TimelineEventType.STEP_STARTED)
-    assertThat(events[2].sourceReference).isEqualTo(stepReference.toString())
+
+    assertThat(events[2]).hasEventType(TimelineEventType.STEP_STARTED)
+    assertThat(events[2]).hasSourceReference(stepReference.toString())
+    assertThat(events[2]).hasContextualInfo("Book course before December 2023")
     assertThat(events[2]).hasAReference()
     assertThat(events[2]).hasJpaManagedFieldsPopulated()
   }
