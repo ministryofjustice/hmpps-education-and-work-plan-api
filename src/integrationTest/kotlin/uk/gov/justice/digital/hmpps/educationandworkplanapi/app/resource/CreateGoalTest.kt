@@ -224,6 +224,9 @@ class CreateGoalTest : IntegrationTestBase() {
     assertThat(events[0]).hasEventType(TimelineEventType.GOAL_CREATED)
     assertThat(events[0]).hasSourceReference(goal.reference.toString())
     assertThat(events[0]).hasContextualInfo(goal.title!!)
+    assertThat(events[0]).wasActionedBy("auser_gen")
+    assertThat(events[0]).wasActionedByDisplayName("Albert User")
+    assertThat(events[0]).hasPrisonId("BXI")
     assertThat(events[0]).hasAReference()
     assertThat(events[0]).hasJpaManagedFieldsPopulated()
   }

@@ -29,7 +29,7 @@ class JpaGoalPersistenceAdapter(
     val goalEntity = goalMapper.fromDtoToEntity(createGoalDto)
     with(actionPlanEntity) {
       addGoal(goalEntity)
-      actionPlanRepository.saveAndFlush(this)
+      actionPlanRepository.save(this)
     }
 
     // use the persisted entity with the populated JPA fields, rather than the non persisted entity reference above

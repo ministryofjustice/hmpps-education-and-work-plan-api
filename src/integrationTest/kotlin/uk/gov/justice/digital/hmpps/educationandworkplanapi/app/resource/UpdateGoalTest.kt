@@ -13,17 +13,23 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.ACTION_PLAN_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.STEP_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.STEP_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import java.util.UUID
 
 class UpdateGoalTest : IntegrationTestBase() {
 
@@ -167,27 +173,18 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-
-    val actionPlan = aValidActionPlanEntity(
-      prisonNumber = prisonNumber,
-      goals = listOf(
-        aValidGoalEntity(
-          title = "Learn French",
-          steps = listOf(
-            aValidStepEntity(
-              title = "Book course",
-            ),
-          ),
-          createdAtPrison = "BXI",
-          updatedAtPrison = "BXI",
+    val createGoalRequest = aValidCreateGoalRequest(
+      title = "Learn French",
+      steps = listOf(
+        aValidCreateStepRequest(
+          title = "Book course",
         ),
       ),
     )
-    actionPlanRepository.save(actionPlan)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
+    createGoal(prisonNumber, createGoalRequest)
 
-    val goalReference = actionPlan.goals!![0].reference!!
+    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    val goalReference = actionPlan!!.goals!![0].reference!!
     val stepReference = actionPlan.goals!![0].steps!![0].reference!!
 
     val updateGoalRequest = aValidUpdateGoalRequest(
@@ -208,8 +205,6 @@ class UpdateGoalTest : IntegrationTestBase() {
       prisonId = "MDI",
     )
 
-    TestTransaction.start()
-
     // When
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
@@ -219,6 +214,9 @@ class UpdateGoalTest : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isNoContent()
+
+    TestTransaction.end()
+    TestTransaction.start()
 
     // Then
     val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
@@ -250,23 +248,69 @@ class UpdateGoalTest : IntegrationTestBase() {
     val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
     assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
     val events = prisonerTimeline.events!!
-    assertThat(events.size).isEqualTo(3)
-    assertThat(events[0]).hasEventType(TimelineEventType.GOAL_UPDATED)
-    assertThat(events[0]).hasSourceReference(goalReference.toString())
-    assertThat(events[0]).hasContextualInfo("Learn French to GCSE standard")
-    assertThat(events[0]).hasAReference()
-    assertThat(events[0]).hasJpaManagedFieldsPopulated()
+    assertThat(events.size).isEqualTo(4)
+    assertTimelineEvent(
+      event = events[0],
+      expectedEventType = ACTION_PLAN_CREATED,
+      expectedSourceReference = actionPlan.reference!!,
+      expectedPrisonId = "BXI",
+      expectedContextualInfo = null,
+    )
+    assertTimelineEvent(
+      event = events[1],
+      expectedEventType = GOAL_UPDATED,
+      expectedSourceReference = goalReference,
+      expectedPrisonId = "MDI",
+      expectedContextualInfo = "Learn French to GCSE standard",
+    )
+    assertTimelineEvent(
+      event = events[2],
+      expectedEventType = STEP_UPDATED,
+      expectedSourceReference = stepReference,
+      expectedPrisonId = "MDI",
+      expectedContextualInfo = "Book course before December 2023",
+    )
+    assertTimelineEvent(
+      event = events[3],
+      expectedEventType = STEP_STARTED,
+      expectedSourceReference = stepReference,
+      expectedPrisonId = "MDI",
+      expectedContextualInfo = "Book course before December 2023",
+    )
+  }
 
-    assertThat(events[1]).hasEventType(TimelineEventType.STEP_UPDATED)
-    assertThat(events[1]).hasSourceReference(stepReference.toString())
-    assertThat(events[1]).hasContextualInfo("Book course before December 2023")
-    assertThat(events[1]).hasAReference()
-    assertThat(events[1]).hasJpaManagedFieldsPopulated()
+  private fun createGoal(
+    prisonNumber: String,
+    createGoalRequest: CreateGoalRequest,
+  ) {
+    webTestClient.post()
+      .uri("/action-plans/{prisonNumber}/goals", prisonNumber)
+      .withBody(createGoalRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+  }
 
-    assertThat(events[2]).hasEventType(TimelineEventType.STEP_STARTED)
-    assertThat(events[2]).hasSourceReference(stepReference.toString())
-    assertThat(events[2]).hasContextualInfo("Book course before December 2023")
-    assertThat(events[2]).hasAReference()
-    assertThat(events[2]).hasJpaManagedFieldsPopulated()
+  private fun assertTimelineEvent(
+    event: TimelineEventEntity,
+    expectedEventType: TimelineEventType,
+    expectedSourceReference: UUID,
+    expectedPrisonId: String,
+    expectedContextualInfo: String?,
+  ) {
+    assertThat(event).hasEventType(expectedEventType)
+    assertThat(event).hasSourceReference(expectedSourceReference.toString())
+    assertThat(event).wasActionedBy("auser_gen")
+    assertThat(event).wasActionedByDisplayName("Albert User")
+    assertThat(event).hasPrisonId(expectedPrisonId)
+    assertThat(event).hasAReference()
+    assertThat(event).hasJpaManagedFieldsPopulated()
+    if (expectedContextualInfo == null) {
+      assertThat(event).hasNoContextualInfo()
+    } else {
+      assertThat(event).hasContextualInfo(expectedContextualInfo)
+    }
   }
 }
