@@ -111,7 +111,7 @@ class CreateGoalTest : IntegrationTestBase() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val stepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
-    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(stepRequest))
+    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(stepRequest), notes = "Notes about the goal...")
 
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
@@ -159,6 +159,7 @@ class CreateGoalTest : IntegrationTestBase() {
       "status" to "ACTIVE",
       "stepCount" to "1",
       "reference" to goal.reference.toString(),
+      "notesCharacterCount" to "23",
     )
     await.untilAsserted {
       verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
@@ -187,7 +188,9 @@ class CreateGoalTest : IntegrationTestBase() {
     TestTransaction.end()
     TestTransaction.start()
     assertThat(actionPlan).hasNumberOfGoals(1)
-    val createRequest = aValidCreateGoalRequest()
+    val createRequest = aValidCreateGoalRequest(
+      notes = "Chris would like to improve his listening skills, not just his verbal communication",
+    )
 
     // When
     webTestClient.post()
@@ -211,6 +214,7 @@ class CreateGoalTest : IntegrationTestBase() {
       "status" to "ACTIVE",
       "stepCount" to "2",
       "reference" to goal.reference.toString(),
+      "notesCharacterCount" to "83",
     )
     await.untilAsserted {
       verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
@@ -266,6 +270,7 @@ class CreateGoalTest : IntegrationTestBase() {
       "status" to "ACTIVE",
       "stepCount" to "2",
       "reference" to goal.reference.toString(),
+      "notesCharacterCount" to "0",
     )
     await.untilAsserted {
       verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)

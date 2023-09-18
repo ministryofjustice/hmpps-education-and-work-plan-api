@@ -23,7 +23,7 @@ class TelemetryServiceTest {
   private lateinit var telemetryService: TelemetryService
 
   @Test
-  fun `should track create goal event`() {
+  fun `should track create goal event given goal with no notes`() {
     // Given
     val reference = UUID.randomUUID()
     val status = GoalStatus.ACTIVE
@@ -33,12 +33,14 @@ class TelemetryServiceTest {
       reference = reference,
       status = status,
       steps = steps,
+      notes = null,
     )
 
     val expectedEventProperties = mapOf(
       "reference" to reference.toString(),
       "status" to "ACTIVE",
       "stepCount" to "3",
+      "notesCharacterCount" to "0",
     )
 
     // When
@@ -49,7 +51,7 @@ class TelemetryServiceTest {
   }
 
   @Test
-  fun `should track update goal event`() {
+  fun `should track create goal event given goal with some notes`() {
     // Given
     val reference = UUID.randomUUID()
     val status = GoalStatus.ACTIVE
@@ -59,10 +61,66 @@ class TelemetryServiceTest {
       reference = reference,
       status = status,
       steps = steps,
+      notes = "Some notes about the goal",
     )
 
     val expectedEventProperties = mapOf(
       "reference" to reference.toString(),
+      "status" to "ACTIVE",
+      "stepCount" to "3",
+      "notesCharacterCount" to "25",
+    )
+
+    // When
+    telemetryService.trackGoalCreateEvent(goal)
+
+    // Then
+    verify(telemetryClient).trackEvent("goal-create", expectedEventProperties)
+  }
+
+  @Test
+  fun `should track update goal event given goal with no notes`() {
+    // Given
+    val reference = UUID.randomUUID()
+    val status = GoalStatus.ACTIVE
+    val steps = listOf(aValidStep(), aValidStep(), aValidStep())
+
+    val goal = aValidGoal(
+      reference = reference,
+      status = status,
+      steps = steps,
+      notes = null,
+    )
+
+    val expectedEventProperties = mapOf(
+      "reference" to reference.toString(),
+      "notesCharacterCount" to "0",
+    )
+
+    // When
+    telemetryService.trackGoalUpdateEvent(goal)
+
+    // Then
+    verify(telemetryClient).trackEvent("goal-update", expectedEventProperties)
+  }
+
+  @Test
+  fun `should track update goal event given goal with notes`() {
+    // Given
+    val reference = UUID.randomUUID()
+    val status = GoalStatus.ACTIVE
+    val steps = listOf(aValidStep(), aValidStep(), aValidStep())
+
+    val goal = aValidGoal(
+      reference = reference,
+      status = status,
+      steps = steps,
+      notes = "Chris wants to become a chef on release so basic food hygiene course will be useful.",
+    )
+
+    val expectedEventProperties = mapOf(
+      "reference" to reference.toString(),
+      "notesCharacterCount" to "84",
     )
 
     // When

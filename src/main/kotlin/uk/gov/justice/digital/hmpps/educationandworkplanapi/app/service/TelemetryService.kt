@@ -41,6 +41,7 @@ class TelemetryService(
         "status" to status.name,
         "stepCount" to steps.size.toString(),
         "reference" to reference.toString(),
+        "notesCharacterCount" to (notes?.length ?: 0).toString(),
       )
     }
 
@@ -51,6 +52,7 @@ class TelemetryService(
     with(goal) {
       mapOf(
         "reference" to reference.toString(),
+        "notesCharacterCount" to (notes?.length ?: 0).toString(),
       )
     }
 }
