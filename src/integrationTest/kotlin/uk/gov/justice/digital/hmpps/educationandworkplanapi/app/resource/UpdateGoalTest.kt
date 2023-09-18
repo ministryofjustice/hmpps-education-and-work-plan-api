@@ -205,6 +205,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           sequenceNumber = 2,
         ),
       ),
+      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       prisonId = "MDI",
     )
 
@@ -241,6 +242,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
     val expectedEventCustomDimensions = mapOf(
       "reference" to goalReference.toString(),
+      "notesCharacterCount" to "83",
     )
     await.untilAsserted {
       verify(telemetryClient).trackEvent("goal-update", expectedEventCustomDimensions, null)
