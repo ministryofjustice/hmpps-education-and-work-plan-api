@@ -52,6 +52,16 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     return this
   }
 
+  fun wasActionedByDisplayName(expected: String): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (actionedByDisplayName != expected) {
+        failWithMessage("Expected actionedByDisplayName to be $expected, but was $actionedByDisplayName")
+      }
+    }
+    return this
+  }
+
   fun wasCreatedAt(expected: Instant): TimelineEventEntityAssert {
     isNotNull
     with(actual!!) {

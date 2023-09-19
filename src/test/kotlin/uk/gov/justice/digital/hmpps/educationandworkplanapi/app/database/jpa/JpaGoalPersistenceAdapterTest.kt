@@ -78,7 +78,7 @@ class JpaGoalPersistenceAdapterTest {
       )
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(initialActionPlan)
       given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
-      given(actionPlanRepository.saveAndFlush(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
+      given(actionPlanRepository.save(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
       given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
 
       // When

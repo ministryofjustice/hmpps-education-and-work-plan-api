@@ -47,7 +47,7 @@ data class TimelineEvent(
     fun newTimelineEvent(
       sourceReference: String,
       eventType: TimelineEventType,
-      contextualInfo: String? = null, // TODO RR-314 - not sure how we're going to populate this?
+      contextualInfo: String? = null,
       prisonId: String,
       actionedBy: String,
       actionedByDisplayName: String? = null,
