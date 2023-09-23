@@ -21,15 +21,28 @@ class TimelineResponseAssert(actual: TimelineResponse?) :
     return this
   }
 
+  fun hasNumberOfEvents(numberOfEvents: Int): TimelineResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (events.size != numberOfEvents) {
+        failWithMessage("Expected Timeline to be have $numberOfEvents events, but has ${events.size}")
+      }
+    }
+    return this
+  }
+
   /**
    * Allows for assertion chaining into the specified child [TimelineEventResponse]. Takes a lambda as the method argument
    * to call assertion methods provided by [TimelineEventResponseAssert].
    * Returns this [TimelineResponseAssert] to allow further chained assertions on the parent [TimelineResponse]
+   *
+   * The `eventNumber` parameter is not zero indexed to make for better readability in tests. IE. the first event
+   * should be referenced as `.event(1) { .... }`
    */
   fun event(eventNumber: Int, consumer: Consumer<TimelineEventResponseAssert>): TimelineResponseAssert {
     isNotNull
     with(actual!!) {
-      val event = events[eventNumber]
+      val event = events[eventNumber - 1]
       consumer.accept(assertThat(event))
     }
     return this

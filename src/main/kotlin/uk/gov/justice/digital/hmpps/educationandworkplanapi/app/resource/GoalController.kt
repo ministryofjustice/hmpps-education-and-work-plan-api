@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.util.UUID
 
@@ -30,15 +30,15 @@ class GoalController(
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
-  fun createGoal(
+  fun createGoals(
     @Valid
     @RequestBody
-    request: CreateGoalRequest,
+    request: CreateGoalsRequest,
     @PathVariable prisonNumber: String,
   ) {
-    goalService.createGoal(
+    goalService.createGoals(
       prisonNumber = prisonNumber,
-      createGoalDto = goalResourceMapper.fromModelToDto(request),
+      createGoalDtos = request.goals.map { goalResourceMapper.fromModelToDto(it) },
     )
   }
 

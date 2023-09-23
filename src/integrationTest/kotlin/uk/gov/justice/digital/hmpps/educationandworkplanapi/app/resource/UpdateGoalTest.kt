@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
@@ -285,9 +286,10 @@ class UpdateGoalTest : IntegrationTestBase() {
     prisonNumber: String,
     createGoalRequest: CreateGoalRequest,
   ) {
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
     webTestClient.post()
       .uri("/action-plans/{prisonNumber}/goals", prisonNumber)
-      .withBody(createGoalRequest)
+      .withBody(createGoalsRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()

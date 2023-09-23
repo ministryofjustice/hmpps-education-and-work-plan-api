@@ -52,15 +52,28 @@ class ActionPlanResponseAssert(actual: ActionPlanResponse?) :
     return this
   }
 
+  fun hasNumberOfGoals(numberOfGoals: Int): ActionPlanResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (goals.size != numberOfGoals) {
+        failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals.size}")
+      }
+    }
+    return this
+  }
+
   /**
    * Allows for assertion chaining into the specified child [GoalResponse]. Takes a lambda as the method argument
    * to call assertion methods provided by [GoalResponseAssert].
    * Returns this [ActionPlanResponseAssert] to allow further chained assertions on the parent [ActionPlanResponse]
+   *
+   * The `goalNumber` parameter is not zero indexed to make for better readability in tests. IE. the first goal
+   * should be referenced as `.goal(1) { .... }`
    */
   fun goal(goalNumber: Int, consumer: Consumer<GoalResponseAssert>): ActionPlanResponseAssert {
     isNotNull
     with(actual!!) {
-      val goal = goals[goalNumber]
+      val goal = goals[goalNumber - 1]
       consumer.accept(assertThat(goal))
     }
     return this

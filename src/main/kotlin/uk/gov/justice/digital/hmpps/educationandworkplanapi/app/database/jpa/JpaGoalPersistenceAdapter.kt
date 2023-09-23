@@ -22,21 +22,22 @@ class JpaGoalPersistenceAdapter(
 ) : GoalPersistenceAdapter {
 
   @Transactional
-  override fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
+  override fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal> {
     val actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
       ?: throw ActionPlanNotFoundException("Unable to find ActionPlan for prisoner [$prisonNumber]")
 
-    val goalEntity = goalMapper.fromDtoToEntity(createGoalDto)
+    val goalEntities = createGoalDtos.map { goalMapper.fromDtoToEntity(it) }
     with(actionPlanEntity) {
-      addGoal(goalEntity)
+      goalEntities.forEach { addGoal(it) }
       actionPlanRepository.save(this)
     }
 
-    // use the persisted entity with the populated JPA fields, rather than the non persisted entity reference above
-    val persisted = actionPlanEntity.goals!!.first { it.reference == goalEntity.reference }
-    return goalMapper.fromEntityToDomain(persisted)
+    // use the persisted entities with the populated JPA fields, rather than the non persisted entity reference above
+    val persisted = goalEntities.map { goalEntity -> actionPlanEntity.goals!!.first { it.reference == goalEntity.reference } }
+    return persisted.map { goalMapper.fromEntityToDomain(it) }
   }
 
+  @Transactional(readOnly = true)
   override fun getGoal(prisonNumber: String, goalReference: UUID): Goal? {
     val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, goalReference)
 

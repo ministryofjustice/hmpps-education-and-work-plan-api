@@ -10,11 +10,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
@@ -98,7 +98,7 @@ class GetActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNoReviewDate()
-      .goal(0) {
+      .goal(1) {
         it.wasCreatedAtPrison("BXI")
           .wasCreatedBy("auser_gen")
           .hasCreatedByDisplayName("Albert User")
@@ -135,33 +135,23 @@ class GetActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasReviewDate(expectedReviewDate)
-      .goal(0) {
+      .goal(1) {
         it.hasTitle("Learn Spanish")
       }
       // verify order of remaining goals
-      .goal(1) {
+      .goal(2) {
         it.hasTitle("Learn French")
       }
-      .goal(2) {
+      .goal(3) {
         it.hasTitle("Learn German")
       }
   }
 
-  private fun createActionPlan(prisonNumber: String, createActionPlanRequest: CreateActionPlanRequest) {
-    webTestClient.post()
-      .uri("$URI_TEMPLATE", prisonNumber)
-      .withBody(createActionPlanRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
-  }
-
   private fun createGoal(prisonNumber: String, createGoalRequest: CreateGoalRequest) {
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
     webTestClient.post()
       .uri("$URI_TEMPLATE/goals", prisonNumber)
-      .withBody(createGoalRequest)
+      .withBody(createGoalsRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()

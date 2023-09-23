@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
@@ -19,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -28,8 +28,7 @@ class GetTimelineTest : IntegrationTestBase() {
 
   companion object {
     private const val URI_TEMPLATE = "/timelines/{prisonNumber}"
-    private const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
-    private const val CREATE_GOAL_URI_TEMPLATE = "/action-plans/{prisonNumber}/goals"
+    private const val CREATE_GOALS_URI_TEMPLATE = "/action-plans/{prisonNumber}/goals"
     private const val UPDATE_GOAL_URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}"
   }
 
@@ -110,7 +109,7 @@ class GetTimelineTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .event(0) {
+      .event(1) {
         it.hasSourceReference(actionPlan!!.reference.toString())
           .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
           .hasPrisonId("BXI")
@@ -151,19 +150,19 @@ class GetTimelineTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .event(0) {
+      .event(1) {
         it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(actionPlanReference.toString())
           .hasNoContextualInfo() // creating an action plan has no contextual info
       }
-      .event(1) {
+      .event(2) {
         it.hasEventType(TimelineEventType.GOAL_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal2Reference.toString())
           .hasContextualInfo("Learn French")
       }
-      .event(2) {
+      .event(3) {
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal1Reference.toString())
@@ -171,21 +170,11 @@ class GetTimelineTest : IntegrationTestBase() {
       }
   }
 
-  private fun createActionPlan(prisonNumber: String, createActionPlanRequest: CreateActionPlanRequest) {
-    webTestClient.post()
-      .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
-      .withBody(createActionPlanRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
-  }
-
   private fun createGoal(prisonNumber: String, createGoalRequest: CreateGoalRequest) {
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
     webTestClient.post()
-      .uri(CREATE_GOAL_URI_TEMPLATE, prisonNumber)
-      .withBody(createGoalRequest)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()

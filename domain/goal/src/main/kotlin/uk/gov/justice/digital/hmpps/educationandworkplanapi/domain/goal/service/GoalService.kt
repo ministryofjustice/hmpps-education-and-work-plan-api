@@ -32,16 +32,23 @@ class GoalService(
    * Creates a new [Goal] for the prisoner identified by their prison number, with the data in the specified [CreateGoalDto]
    */
   fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
-    log.info { "Creating new Goal for prisoner [$prisonNumber]" }
+    return createGoals(prisonNumber, listOf(createGoalDto))[0]
+  }
+
+  /**
+   * Creates new [Goal]s for the prisoner identified by their prison number, with the goal data in the specified list of [CreateGoalDto]s
+   */
+  fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal> {
+    log.info { "Creating new ${if (createGoalDtos.size == 1) "Goal" else "Goals"} for prisoner [$prisonNumber]" }
 
     // TODO RR-227 - We need to change throw a 404 once the create action plan endpoint is being called by the UI (with an optional review date)
     return if (actionPlanDoesNotExist(prisonNumber)) {
-      actionPlanPersistenceAdapter.createActionPlan(newActionPlan(prisonNumber, createGoalDto))
+      actionPlanPersistenceAdapter.createActionPlan(newActionPlan(prisonNumber, createGoalDtos))
         .also { actionPlanEventService.actionPlanCreated(it) }
-        .let { it.goals[0] }
+        .let { it.goals }
     } else {
-      goalPersistenceAdapter.createGoal(prisonNumber, createGoalDto)
-        .also { goalEventService.goalCreated(prisonNumber, it) }
+      goalPersistenceAdapter.createGoals(prisonNumber, createGoalDtos)
+        .onEach { goalEventService.goalCreated(prisonNumber, it) }
     }
   }
 
@@ -78,10 +85,10 @@ class GoalService(
   private fun actionPlanDoesNotExist(prisonNumber: String) =
     actionPlanPersistenceAdapter.getActionPlan(prisonNumber) == null
 
-  private fun newActionPlan(prisonNumber: String, createGoalDto: CreateGoalDto) =
+  private fun newActionPlan(prisonNumber: String, createGoalDtos: List<CreateGoalDto>) =
     CreateActionPlanDto(
       prisonNumber = prisonNumber,
       reviewDate = null,
-      goals = listOf(createGoalDto),
+      goals = createGoalDtos,
     )
 }

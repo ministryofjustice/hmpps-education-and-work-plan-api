@@ -100,7 +100,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
       .hasUserMessage("Validation failed for object='createActionPlanRequest'. Error count: 1")
-      .hasDeveloperMessageContaining("Error on field 'goals[0].steps': rejected value [[]], size must be between 1 and 2147483647")
+      .hasDeveloperMessageContaining("Error on field 'goals[0].steps': rejected value [[]], Steps cannot be empty when creating a Goal")
   }
 
   @Test
