@@ -86,7 +86,7 @@ paths:
       summary: Creates one or more Goals.
       description: Creates one or more Goals and saves them to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
       tags:
-        - Action Plan Goals
+        - Goals
       responses:
         '201':
           description: The Goal(s) were created successfully.
@@ -119,7 +119,7 @@ paths:
       summary: Updates a Goal
       description: Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will result in it being removed.
       tags:
-        - Action Plan Goals
+        - Goals
       responses:
         '204':
           description: The Goal was updated successfully.
@@ -490,7 +490,7 @@ components:
     CreateGoalsRequest:
       title: CreateGoalsRequest
       type: object
-      description: A request to create one or more Goals that a Prisoner aims to complete as part of their Action Plan. The goal's status will be set to 'ACTIVE'.
+      description: A request to create one or more Goals that a Prisoner aims to complete as part of their Action Plan. The status of each goal will be set to 'ACTIVE'.
       properties:
         goals:
           type: array
