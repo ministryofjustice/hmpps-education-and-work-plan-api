@@ -3,14 +3,14 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.3.0"
-  id("org.openapi.generator") version "7.0.0-beta"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.4.1"
+  id("org.openapi.generator") version "7.0.1"
   kotlin("plugin.spring") version "1.8.22"
   kotlin("plugin.jpa") version "1.8.22"
   kotlin("kapt") version "1.8.22"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.0.0"
+  id("name.remal.integration-tests") version "4.0.1"
 
   `java-test-fixtures`
 }
@@ -20,7 +20,7 @@ apply(plugin = "org.openapi.generator")
 ext["mapstruct.version"] = "1.5.5.Final"
 ext["postgresql.version"] = "42.6.0"
 ext["kotlin.logging.version"] = "3.0.5"
-ext["springdoc.openapi.version"] = "2.1.0"
+ext["springdoc.openapi.version"] = "2.2.0"
 ext["awaitility.version"] = "4.2.0"
 
 allOpen {
