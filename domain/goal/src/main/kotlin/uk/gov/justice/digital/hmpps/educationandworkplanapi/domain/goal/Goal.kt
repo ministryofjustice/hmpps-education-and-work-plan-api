@@ -18,7 +18,7 @@ import java.util.UUID
 class Goal(
   val reference: UUID,
   val title: String,
-  val reviewDate: LocalDate?,
+  val targetCompletionDate: LocalDate?,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
   val createdBy: String?,
@@ -79,7 +79,7 @@ class Goal(
   }
 
   override fun toString(): String {
-    return "Goal(reference=$reference, title='$title', reviewDate=$reviewDate, status=$status, createdBy='$createdBy', createdAt=$createdAt, lastUpdatedBy='$lastUpdatedBy', lastUpdatedAt=$lastUpdatedAt, steps=$steps)"
+    return "Goal(reference=$reference, title='$title', targetCompletionDate=$targetCompletionDate, status=$status, createdBy='$createdBy', createdAt=$createdAt, lastUpdatedBy='$lastUpdatedBy', lastUpdatedAt=$lastUpdatedAt, steps=$steps)"
   }
 }
 

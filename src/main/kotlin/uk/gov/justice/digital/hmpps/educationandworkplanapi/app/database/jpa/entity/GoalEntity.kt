@@ -45,7 +45,7 @@ class GoalEntity(
   var title: String? = null,
 
   @Column
-  var reviewDate: LocalDate? = null,
+  var targetCompletionDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)

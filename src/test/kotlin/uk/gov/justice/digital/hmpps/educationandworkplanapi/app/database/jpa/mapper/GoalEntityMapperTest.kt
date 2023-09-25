@@ -35,13 +35,13 @@ class GoalEntityMapperTest {
   @Test
   fun `should map from CreateGoalDto to entity`() {
     // Given
-    val reviewDate = LocalDate.now().plusMonths(6)
+    val targetCompletionDate = LocalDate.now().plusMonths(6)
 
     val createStepDto = aValidCreateStepDto()
     val createGoalDto = aValidCreateGoalDto(
       title = "Improve communication skills",
       prisonId = "BXI",
-      reviewDate = reviewDate,
+      targetCompletionDate = targetCompletionDate,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(createStepDto),
@@ -52,7 +52,7 @@ class GoalEntityMapperTest {
 
     val expected = aValidGoalEntity(
       title = "Improve communication skills",
-      reviewDate = reviewDate,
+      targetCompletionDate = targetCompletionDate,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(expectedEntityStep),
@@ -86,14 +86,14 @@ class GoalEntityMapperTest {
     // Given
     val createdAt = Instant.now()
     val updatedAt = Instant.now()
-    val reviewDate = LocalDate.now().plusMonths(6)
+    val targetCompletionDate = LocalDate.now().plusMonths(6)
 
     val entityStep = aValidStepEntity()
     val entityGoal = aValidGoalEntity(
       id = UUID.randomUUID(),
       reference = UUID.randomUUID(),
       title = "Improve communication skills",
-      reviewDate = reviewDate,
+      targetCompletionDate = targetCompletionDate,
       status = EntityStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(entityStep),
@@ -113,7 +113,7 @@ class GoalEntityMapperTest {
     val expected = aValidGoal(
       reference = entityGoal.reference!!,
       title = "Improve communication skills",
-      reviewDate = reviewDate,
+      targetCompletionDate = targetCompletionDate,
       status = DomainStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),

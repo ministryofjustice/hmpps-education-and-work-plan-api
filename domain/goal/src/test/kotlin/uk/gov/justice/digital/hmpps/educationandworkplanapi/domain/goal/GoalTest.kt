@@ -104,7 +104,7 @@ class GoalTest {
         Goal(
           reference = goalReference,
           title = "Improve woodworking skills",
-          reviewDate = LocalDate.now().plusMonths(6),
+          targetCompletionDate = LocalDate.now().plusMonths(6),
           status = ACTIVE,
           createdBy = "bjones_gen",
           createdByDisplayName = "Barry Jones",

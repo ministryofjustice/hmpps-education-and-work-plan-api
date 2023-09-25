@@ -104,11 +104,11 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
-  fun hasReviewDate(expected: LocalDate): GoalResponseAssert {
+  fun hasTargetCompletionDate(expected: LocalDate): GoalResponseAssert {
     isNotNull
     with(actual!!) {
-      if (reviewDate != expected) {
-        failWithMessage("Expected reviewDate to be $expected, but was $reviewDate")
+      if (targetCompletionDate != expected) {
+        failWithMessage("Expected targetCompletionDate to be $expected, but was $targetCompletionDate")
       }
     }
     return this
