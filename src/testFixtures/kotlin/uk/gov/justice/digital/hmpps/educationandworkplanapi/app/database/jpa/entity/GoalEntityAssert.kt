@@ -161,11 +161,11 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
-  fun hasReviewDate(expected: LocalDate): GoalEntityAssert {
+  fun hasTargetCompletionDate(expected: LocalDate): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      if (reviewDate != expected) {
-        failWithMessage("Expected reviewDate to be $expected, but was $reviewDate")
+      if (targetCompletionDate != expected) {
+        failWithMessage("Expected targetCompletionDate to be $expected, but was $targetCompletionDate")
       }
     }
     return this

@@ -91,7 +91,7 @@ class TimelineEventFactory {
     updatedGoal.title != previousGoal.title ||
       updatedGoal.steps.size != previousGoal.steps.size ||
       updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
-      updatedGoal.reviewDate != previousGoal.reviewDate ||
+      updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
       updatedGoal.notes != previousGoal.notes
 
   private fun hasGoalStatusChanged(previousGoal: Goal, updatedGoal: Goal) =

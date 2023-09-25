@@ -45,7 +45,7 @@ internal class GoalResourceMapperTest {
     // Given
     val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(
-      reviewDate = LocalDate.now(),
+      targetCompletionDate = LocalDate.now(),
       steps = mutableListOf(createStepRequest),
     )
 
@@ -55,7 +55,7 @@ internal class GoalResourceMapperTest {
     val expectedGoal = aValidCreateGoalDto(
       title = createGoalRequest.title,
       prisonId = createGoalRequest.prisonId,
-      reviewDate = createGoalRequest.reviewDate,
+      targetCompletionDate = createGoalRequest.targetCompletionDate,
       status = GoalStatus.ACTIVE,
       notes = createGoalRequest.notes,
       steps = mutableListOf(expectedStep),
@@ -74,7 +74,7 @@ internal class GoalResourceMapperTest {
     // Given
     val updateStepRequest = aValidUpdateStepRequest()
     val updateGoalRequest = aValidUpdateGoalRequest(
-      reviewDate = LocalDate.now(),
+      targetCompletionDate = LocalDate.now(),
       steps = mutableListOf(updateStepRequest),
       status = GoalStatusApi.ACTIVE,
     )
@@ -86,7 +86,7 @@ internal class GoalResourceMapperTest {
       reference = updateGoalRequest.goalReference,
       title = updateGoalRequest.title,
       prisonId = updateGoalRequest.prisonId,
-      reviewDate = updateGoalRequest.reviewDate,
+      targetCompletionDate = updateGoalRequest.targetCompletionDate,
       status = GoalStatus.ACTIVE,
       notes = updateGoalRequest.notes,
       steps = mutableListOf(expectedStep),
@@ -106,7 +106,7 @@ internal class GoalResourceMapperTest {
     val step = aValidStep()
     val goal = aValidGoal(
       status = GoalStatus.ACTIVE,
-      reviewDate = null,
+      targetCompletionDate = null,
       steps = mutableListOf(step),
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
@@ -122,7 +122,7 @@ internal class GoalResourceMapperTest {
     val expected = aValidGoalResponse(
       reference = goal.reference,
       title = goal.title,
-      reviewDate = null,
+      targetCompletionDate = null,
       status = GoalStatusApi.ACTIVE,
       notes = goal.notes,
       steps = listOf(expectedStepResponse),

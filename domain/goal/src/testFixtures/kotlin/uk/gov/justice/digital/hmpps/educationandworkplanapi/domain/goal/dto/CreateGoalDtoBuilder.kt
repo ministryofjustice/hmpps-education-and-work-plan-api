@@ -7,7 +7,7 @@ import java.time.LocalDate
 fun aValidCreateGoalDto(
   title: String = "Improve communication skills",
   prisonId: String = "BXI",
-  reviewDate: LocalDate? = null,
+  targetCompletionDate: LocalDate? = null,
   steps: List<CreateStepDto> = listOf(aValidCreateStepDto(), anotherValidCreateStepDto()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -15,7 +15,7 @@ fun aValidCreateGoalDto(
   CreateGoalDto(
     title = title,
     prisonId = prisonId,
-    reviewDate = reviewDate,
+    targetCompletionDate = targetCompletionDate,
     steps = steps,
     status = status,
     notes = notes,

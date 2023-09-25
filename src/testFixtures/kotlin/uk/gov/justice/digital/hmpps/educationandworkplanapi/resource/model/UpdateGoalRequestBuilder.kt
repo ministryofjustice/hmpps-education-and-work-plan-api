@@ -7,7 +7,7 @@ import java.util.UUID
 fun aValidUpdateGoalRequest(
   goalReference: UUID = aValidReference(),
   title: String = "Improve communication skills",
-  reviewDate: LocalDate? = null,
+  targetCompletionDate: LocalDate? = null,
   status: GoalStatus = GoalStatus.ACTIVE,
   steps: List<UpdateStepRequest> = listOf(aValidUpdateStepRequest()),
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -16,7 +16,7 @@ fun aValidUpdateGoalRequest(
   UpdateGoalRequest(
     goalReference = goalReference,
     title = title,
-    reviewDate = reviewDate,
+    targetCompletionDate = targetCompletionDate,
     status = status,
     steps = steps,
     notes = notes,
