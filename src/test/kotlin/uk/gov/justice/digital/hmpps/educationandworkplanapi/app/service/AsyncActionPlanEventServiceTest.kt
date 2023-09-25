@@ -30,7 +30,7 @@ class AsyncActionPlanEventServiceTest {
   private lateinit var timelineService: TimelineService
 
   @Test
-  fun actionPlanCreated() {
+  fun `should handle action plan created`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlan()

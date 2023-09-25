@@ -67,9 +67,11 @@ data class TimelineEvent(
 /**
  * The events that the business are interested in (for example to display a history of these events on screen).
  *
- * These are currently limited to CIAG induction and PLP related events, but could be expanded in future.
+ * These are currently limited to CIAG induction and PLP related events, but could be expanded in the future.
  */
 enum class TimelineEventType {
+  INDUCTION_CREATED,
+  INDUCTION_UPDATED,
   ACTION_PLAN_CREATED,
   GOAL_CREATED,
   GOAL_UPDATED,

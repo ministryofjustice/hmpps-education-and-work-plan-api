@@ -1,0 +1,25 @@
+<configuration>
+    <!--
+    Logging configuration for tests.
+
+    This uses the standard Spring Boot logback configuration, including console appender and pattern.
+
+    To customise log format output, unless it is agreed as a standard by the team, it is not recommended to add an appender
+    pattern here. Instead, refer to https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration
+    and use local environment variables such as `CONSOLE_LOG_PATTERN` or `LOG_DATEFORMAT_PATTERN` etc.
+    -->
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <appender name="testLogAppender" class="uk.gov.justice.digital.hmpps.educationandworkplanapi.TestLogAppender"/>
+    <root level="info">
+        <appender-ref ref="testLogAppender"/>
+    </root>
+
+    <logger name="org.testcontainers" level="INFO"/>
+    <logger name="com.github.dockerjava" level="WARN"/>
+
+    <!-- to output SQL and params -->
+<!--    <logger name="org.hibernate.SQL" level="DEBUG"/>-->
+<!--    <logger name="org.hibernate.type.descriptor.sql" level="TRACE"/>-->
+
+</configuration>

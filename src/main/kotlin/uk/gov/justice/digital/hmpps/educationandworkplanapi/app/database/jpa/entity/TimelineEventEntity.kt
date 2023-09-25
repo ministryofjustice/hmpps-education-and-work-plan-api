@@ -88,6 +88,8 @@ class TimelineEventEntity(
 }
 
 enum class TimelineEventType {
+  INDUCTION_CREATED,
+  INDUCTION_UPDATED,
   ACTION_PLAN_CREATED,
   GOAL_CREATED,
   GOAL_UPDATED,

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.microsoft.applicationinsights.TelemetryClient
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.BeforeEach
@@ -9,17 +10,24 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.InboundEventsService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
+import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -33,6 +41,14 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
+
+    private val localStackContainer = LocalStackContainer.instance
+
+    @JvmStatic
+    @DynamicPropertySource
+    fun testcontainers(registry: DynamicPropertyRegistry) {
+      localStackContainer?.also { setLocalStackProperties(it, registry) }
+    }
   }
 
   init {
@@ -55,7 +71,23 @@ abstract class IntegrationTestBase {
   lateinit var telemetryClient: TelemetryClient
 
   @Autowired
+  protected lateinit var objectMapper: ObjectMapper
+
+  @Autowired
   lateinit var keyPair: KeyPair
+
+  @Autowired
+  protected lateinit var hmppsQueueService: HmppsQueueService
+
+  @SpyBean
+  protected lateinit var inboundEventsServiceSpy: InboundEventsService
+
+  private val inboundTopic by lazy {
+    hmppsQueueService.findByTopicId("domainevents") ?: throw MissingQueueException("HmppsTopic domainevents not found")
+  }
+
+  protected val inboundSnsClient by lazy { inboundTopic.snsClient }
+  protected val inboundTopicArn by lazy { inboundTopic.arn }
 
   @BeforeEach
   fun clearDatabase() {
