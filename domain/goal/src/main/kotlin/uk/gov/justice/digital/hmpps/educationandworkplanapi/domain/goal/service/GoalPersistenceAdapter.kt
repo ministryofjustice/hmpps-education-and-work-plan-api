@@ -16,9 +16,9 @@ import java.util.UUID
 interface GoalPersistenceAdapter {
 
   /**
-   * Creates a new [Goal] for the prisoner identified by their prison number.
+   * Creates new [Goal]s for the prisoner identified by their prison number.
    */
-  fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal
+  fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal>
 
   /**
    * Returns a [Goal] identified by its `prisonNumber` and `goalReference` if found, otherwise `null`.

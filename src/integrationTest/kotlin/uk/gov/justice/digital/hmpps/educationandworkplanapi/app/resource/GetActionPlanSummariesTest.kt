@@ -4,14 +4,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
@@ -113,16 +111,5 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
       .ignoringCollectionOrder()
       .ignoringFields("actionPlanSummaries.reference")
       .isEqualTo(expectedResponse)
-  }
-
-  private fun createActionPlan(prisonNumber: String, createActionPlanRequest: CreateActionPlanRequest) {
-    webTestClient.post()
-      .uri("$URI_TEMPLATE/{prisonNumber}", prisonNumber)
-      .withBody(createActionPlanRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
   }
 }

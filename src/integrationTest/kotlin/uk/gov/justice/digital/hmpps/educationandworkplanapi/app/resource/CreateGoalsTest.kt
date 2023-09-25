@@ -1,41 +1,31 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.verify
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.transaction.TestTransaction
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange as TargetDateRangeEntity
 
-class CreateGoalTest : IntegrationTestBase() {
-
-  companion object {
-    private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals"
-  }
+class CreateGoalsTest : IntegrationTestBase() {
 
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(CREATE_GOALS_URI_TEMPLATE, aValidPrisonNumber())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -45,8 +35,8 @@ class CreateGoalTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
-      .withBody(aValidCreateGoalRequest())
+      .uri(CREATE_GOALS_URI_TEMPLATE, aValidPrisonNumber())
+      .withBody(aValidCreateGoalsRequest())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -55,13 +45,13 @@ class CreateGoalTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should fail to create goal given no steps provided`() {
+  fun `should fail to create goals given no goals provided`() {
     val prisonNumber = aValidPrisonNumber()
-    val createRequest = aValidCreateGoalRequest(steps = emptyList())
+    val createRequest = aValidCreateGoalsRequest(goals = emptyList())
 
     // When
     val response = webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
@@ -74,17 +64,41 @@ class CreateGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
-      .hasUserMessage("Validation failed for object='createGoalRequest'. Error count: 1")
+      .hasUserMessage("Validation failed for object='createGoalsRequest'. Error count: 1")
+      .hasDeveloperMessageContaining("Goals cannot be empty when creating Goals")
+  }
+
+  @Test
+  fun `should fail to create goals given a goal with no steps provided`() {
+    val prisonNumber = aValidPrisonNumber()
+    val createRequest = aValidCreateGoalsRequest(goals = listOf(aValidCreateGoalRequest(steps = emptyList())))
+
+    // When
+    val response = webTestClient.post()
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(BAD_REQUEST.value())
+      .hasUserMessage("Validation failed for object='createGoalsRequest'. Error count: 1")
       .hasDeveloperMessageContaining("Steps cannot be empty when creating a Goal")
   }
 
   @Test
-  fun `should fail to create goal given null fields`() {
+  fun `should fail to create goals given null fields`() {
     val prisonNumber = aValidPrisonNumber()
 
     // When
     val response = webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .bodyValue(
         """
           { }
@@ -100,26 +114,28 @@ class CreateGoalTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .hasStatus(HttpStatus.BAD_REQUEST.value())
+      .hasStatus(BAD_REQUEST.value())
       .hasUserMessageContaining("JSON parse error")
-      .hasUserMessageContaining("value failed for JSON property title due to missing (therefore NULL) value for creator parameter title")
+      .hasUserMessageContaining("value failed for JSON property goals due to missing (therefore NULL) value for creator parameter goals")
   }
 
   @Test
-  @Transactional
-  fun `should add goal and create a new action plan given prisoner does not have an action plan`() {
+  fun `should add goals and create a new action plan given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val stepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
     val createGoalRequest = aValidCreateGoalRequest(steps = listOf(stepRequest), notes = "Notes about the goal...")
+    val createGoalsRequest = aValidCreateGoalsRequest(
+      goals = listOf(createGoalRequest),
+    )
 
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
 
     // When
     webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createGoalRequest)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
       .bearerToken(
         aValidTokenWithEditAuthority(
           username = dpsUsername,
@@ -133,32 +149,31 @@ class CreateGoalTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actionPlan)
+    val actionPlanResponse = getActionPlan(prisonNumber)
+    assertThat(actionPlanResponse)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(1)
-      .wasCreatedBy(dpsUsername)
-    val goal = actionPlan!!.goals!![0]
-    assertThat(goal)
-      .hasTitle(createGoalRequest.title)
-      .hasNumberOfSteps(createGoalRequest.steps.size)
-      .wasCreatedAtPrison(createGoalRequest.prisonId)
-      .wasCreatedBy(dpsUsername)
-      .hasCreatedByDisplayName(displayName)
-      .wasUpdatedAtPrison(createGoalRequest.prisonId)
-      .wasUpdatedBy(dpsUsername)
-      .hasUpdatedByDisplayName(displayName)
-    val step = goal.steps!![0]
-    assertThat(step)
-      .hasTitle(stepRequest.title)
-      .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
-      .hasStatus(StepStatus.NOT_STARTED)
-      .wasCreatedBy(dpsUsername)
+      .goal(1) { goal ->
+        goal.hasTitle(createGoalRequest.title)
+          .hasNumberOfSteps(createGoalRequest.steps.size)
+          .wasCreatedAtPrison(createGoalRequest.prisonId)
+          .wasCreatedBy(dpsUsername)
+          .hasCreatedByDisplayName(displayName)
+          .wasUpdatedAtPrison(createGoalRequest.prisonId)
+          .wasUpdatedBy(dpsUsername)
+          .hasUpdatedByDisplayName(displayName)
+          .step(1) { step ->
+            step.hasTitle(stepRequest.title)
+              .hasTargetDateRange(TargetDateRange.ZERO_TO_THREE_MONTHS)
+              .hasStatus(StepStatus.NOT_STARTED)
+          }
+      }
 
+    val goal = actionPlanResponse.goals[0]
     val expectedEventCustomDimensions = mapOf(
       "status" to "ACTIVE",
       "stepCount" to "1",
-      "reference" to goal.reference.toString(),
+      "reference" to goal.goalReference.toString(),
       "notesCharacterCount" to "23",
     )
     await.untilAsserted {
@@ -166,36 +181,32 @@ class CreateGoalTest : IntegrationTestBase() {
     }
 
     // assert timeline event is created successfully
-    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
-    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
-    val events = prisonerTimeline.events!!
-    assertThat(events.size).isEqualTo(1)
-    assertThat(events[0]).hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
-    assertThat(events[0]).hasSourceReference(actionPlan.reference.toString())
-    assertThat(events[0]).hasNoContextualInfo()
-    assertThat(events[0]).hasAReference()
-    assertThat(events[0]).hasJpaManagedFieldsPopulated()
+    val prisonerTimeline = getTimeline(prisonNumber)
+    assertThat(prisonerTimeline)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfEvents(1)
+      .event(1) { event ->
+        event.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+          .hasSourceReference(actionPlanResponse.reference.toString())
+          .hasNoContextualInfo()
+      }
   }
 
   @Test
-  @Transactional
   fun `should add goal to prisoner's existing action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
-    actionPlanRepository.save(actionPlan)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-    TestTransaction.start()
-    assertThat(actionPlan).hasNumberOfGoals(1)
-    val createRequest = aValidCreateGoalRequest(
+    createActionPlan(prisonNumber)
+
+    val createGoalRequest = aValidCreateGoalRequest(
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
     )
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
 
     // When
     webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createRequest)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -203,17 +214,16 @@ class CreateGoalTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    val actual = getActionPlan(prisonNumber)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(2)
 
-    val goal = actual!!.goals!![1]
-
+    val goal = actual.goals[0]
     val expectedEventCustomDimensions = mapOf(
       "status" to "ACTIVE",
       "stepCount" to "2",
-      "reference" to goal.reference.toString(),
+      "reference" to goal.goalReference.toString(),
       "notesCharacterCount" to "83",
     )
     await.untilAsserted {
@@ -221,37 +231,33 @@ class CreateGoalTest : IntegrationTestBase() {
     }
 
     // assert timeline event is created successfully
-    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
-    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
-    val events = prisonerTimeline.events!!
-    assertThat(events.size).isEqualTo(1)
-    assertThat(events[0]).hasEventType(TimelineEventType.GOAL_CREATED)
-    assertThat(events[0]).hasSourceReference(goal.reference.toString())
-    assertThat(events[0]).hasContextualInfo(goal.title!!)
-    assertThat(events[0]).wasActionedBy("auser_gen")
-    assertThat(events[0]).wasActionedByDisplayName("Albert User")
-    assertThat(events[0]).hasPrisonId("BXI")
-    assertThat(events[0]).hasAReference()
-    assertThat(events[0]).hasJpaManagedFieldsPopulated()
+    val prisonerTimeline = getTimeline(prisonNumber)
+    assertThat(prisonerTimeline)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfEvents(2)
+      .event(2) { event ->
+        event.hasEventType(TimelineEventType.GOAL_CREATED)
+          .hasSourceReference(goal.goalReference.toString())
+          .hasContextualInfo(goal.title)
+          .wasActionedBy("auser_gen")
+          .hasActionedByDisplayName("Albert User")
+          .hasPrisonId("BXI")
+      }
   }
 
   @Test
-  @Transactional
   fun `should add goal with only mandatory fields populated`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
-    actionPlanRepository.save(actionPlan)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-    TestTransaction.start()
-    assertThat(actionPlan).hasNumberOfGoals(1)
-    val createRequest = aValidCreateGoalRequest(notes = null)
+    createActionPlan(prisonNumber)
+
+    val createGoalRequest = aValidCreateGoalRequest(notes = null)
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
 
     // When
     webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createRequest)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -259,20 +265,21 @@ class CreateGoalTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    val actual = getActionPlan(prisonNumber)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(2)
-    val goal = actual!!.goals!![1]
-    assertThat(goal)
-      .hasTitle(createRequest.title)
-      .hasNumberOfSteps(createRequest.steps.size)
-    assertThat(goal.notes).isNull()
+      .goal(1) { goal -> // goals are returned in creation date descending order, so to get the most recently added goal we need the first goal
+        goal.hasTitle(createGoalRequest.title)
+          .hasNumberOfSteps(createGoalRequest.steps.size)
+          .hasNoNotes()
+      }
 
+    val goal = actual.goals[0]
     val expectedEventCustomDimensions = mapOf(
       "status" to "ACTIVE",
       "stepCount" to "2",
-      "reference" to goal.reference.toString(),
+      "reference" to goal.goalReference.toString(),
       "notesCharacterCount" to "0",
     )
     await.untilAsserted {

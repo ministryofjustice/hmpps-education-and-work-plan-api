@@ -4,6 +4,7 @@ import org.assertj.core.api.AbstractObjectAssert
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
+import java.util.function.Consumer
 
 fun assertThat(actual: GoalResponse?) = GoalResponseAssert(actual)
 
@@ -123,11 +124,64 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
+  fun hasNoNotes(): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (notes != null) {
+        failWithMessage("Expected goal to have no notes, but was $notes")
+      }
+    }
+    return this
+  }
+
+  fun hasNotes(expected: String): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (notes != expected) {
+        failWithMessage("Expected goal to have notes '$expected', but was $notes")
+      }
+    }
+    return this
+  }
+
   fun hasReference(expected: UUID): GoalResponseAssert {
     isNotNull
     with(actual!!) {
       if (goalReference != expected) {
         failWithMessage("Expected reference to be $expected, but was $goalReference")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [StepResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [StepResponseAssert].
+   * Returns this [GoalResponseAssert] to allow further chained assertions on the parent [GoalResponse]
+   *
+   * The `stepNumber` parameter is not zero indexed to make for better readability in tests. IE. the first step
+   * should be referenced as `.step(1) { .... }`
+   */
+  fun step(stepNumber: Int, consumer: Consumer<StepResponseAssert>): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val step = steps[stepNumber - 1]
+      consumer.accept(assertThat(step))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into all child [StepResponse]s. Takes a lambda as the method argument
+   * to call assertion methods provided by [SteoResponseAssert].
+   * Returns this [GoalResponseAssert] to allow further chained assertions on the parent [GoalResponse]
+   * The assertions on all [StepResponse]s must pass as true.
+   */
+  fun allSteps(consumer: Consumer<StepResponseAssert>): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      steps.onEach {
+        consumer.accept(assertThat(it))
       }
     }
     return this

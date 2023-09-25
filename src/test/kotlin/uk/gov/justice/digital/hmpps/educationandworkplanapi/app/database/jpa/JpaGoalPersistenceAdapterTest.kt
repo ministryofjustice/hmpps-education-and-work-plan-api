@@ -37,17 +37,17 @@ class JpaGoalPersistenceAdapterTest {
   private lateinit var goalMapper: GoalEntityMapper
 
   @Nested
-  inner class CreateGoal {
+  inner class CreateGoals {
     @Test
-    fun `should fail to create goal given action plan does not already exist`() {
+    fun `should fail to create goals given action plan does not already exist`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
-      val createGoalDto = aValidCreateGoalDto()
+      val createGoalDtos = listOf(aValidCreateGoalDto())
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 
       // When
       val exception = catchThrowableOfType(
-        { persistenceAdapter.createGoal(prisonNumber, createGoalDto) },
+        { persistenceAdapter.createGoals(prisonNumber, createGoalDtos) },
         ActionPlanNotFoundException::class.java,
       )
 
@@ -57,38 +57,53 @@ class JpaGoalPersistenceAdapterTest {
     }
 
     @Test
-    fun `should create goal given action plan already exists`() {
+    fun `should create goals given action plan already exists`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
-      val reference = UUID.randomUUID()
-      val domainGoal = aValidGoal(
-        reference = reference,
+      val reference1 = UUID.randomUUID()
+      val reference2 = UUID.randomUUID()
+
+      val domainGoal1 = aValidGoal(
+        reference = reference1,
       )
-      val createGoalDto = aValidCreateGoalDto()
+      val domainGoal2 = aValidGoal(
+        reference = reference2,
+      )
+
+      val createGoalDto1 = aValidCreateGoalDto(title = "Goal 1")
+      val createGoalDto2 = aValidCreateGoalDto(title = "Goal 2")
+      val createGoalDtos = listOf(createGoalDto1, createGoalDto2)
+
       val initialActionPlan = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
-        goals = mutableListOf(),
+        goals = emptyList(),
       )
-      val entityGoal = aValidGoalEntity(
-        reference = reference,
+
+      val entityGoal1 = aValidGoalEntity(
+        reference = reference1,
+      )
+      val entityGoal2 = aValidGoalEntity(
+        reference = reference2,
       )
       val actionPlanEntity = aValidActionPlanEntity(
         prisonNumber = prisonNumber,
-        goals = mutableListOf(entityGoal),
+        goals = mutableListOf(entityGoal1, entityGoal2),
       )
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(initialActionPlan)
-      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal)
+      given(goalMapper.fromDtoToEntity(any())).willReturn(entityGoal1, entityGoal2)
       given(actionPlanRepository.save(any<ActionPlanEntity>())).willReturn(actionPlanEntity)
-      given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal)
+      given(goalMapper.fromEntityToDomain(any())).willReturn(domainGoal1, domainGoal2)
 
       // When
-      val actual = persistenceAdapter.createGoal(prisonNumber, createGoalDto)
+      val actual = persistenceAdapter.createGoals(prisonNumber, createGoalDtos)
 
       // Then
-      assertThat(actual).isEqualTo(domainGoal)
+      assertThat(actual).containsExactlyInAnyOrder(domainGoal1, domainGoal2)
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
-      verify(goalMapper).fromDtoToEntity(createGoalDto)
-      verify(goalMapper).fromEntityToDomain(entityGoal)
+      verify(goalMapper).fromDtoToEntity(createGoalDto1)
+      verify(goalMapper).fromDtoToEntity(createGoalDto2)
+      verify(goalMapper).fromEntityToDomain(entityGoal1)
+      verify(goalMapper).fromEntityToDomain(entityGoal2)
     }
   }
 
