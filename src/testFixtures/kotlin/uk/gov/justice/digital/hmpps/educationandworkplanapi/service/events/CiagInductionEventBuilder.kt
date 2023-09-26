@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.service.events
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.CiagInductionCreatedEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.CiagInductionUpdatedEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.Identifier
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.InductionInformation
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.PersonReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.CiagInductionCreatedEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.CiagInductionUpdatedEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Identifier
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InductionInformation
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PersonReference
 import java.time.Instant
 import java.util.UUID
 

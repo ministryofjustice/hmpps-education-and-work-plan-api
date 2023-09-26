@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events.InboundEventsService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InboundEventsService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken

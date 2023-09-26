@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test

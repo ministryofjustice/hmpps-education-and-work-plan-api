@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.events
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.databind.ObjectMapper
