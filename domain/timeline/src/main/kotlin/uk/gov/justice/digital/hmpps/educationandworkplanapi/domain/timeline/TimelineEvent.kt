@@ -51,6 +51,7 @@ data class TimelineEvent(
       prisonId: String,
       actionedBy: String,
       actionedByDisplayName: String? = null,
+      timestamp: Instant = Instant.now(),
     ) = TimelineEvent(
       reference = UUID.randomUUID(),
       sourceReference = sourceReference,
@@ -59,7 +60,7 @@ data class TimelineEvent(
       prisonId = prisonId,
       actionedBy = actionedBy,
       actionedByDisplayName = actionedByDisplayName,
-      timestamp = Instant.now(),
+      timestamp = timestamp,
     )
   }
 }

@@ -25,7 +25,12 @@ internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
       PublishRequest.builder()
         .topicArn(inboundTopicArn)
         .message(objectMapper.writeValueAsString(inductionCreatedEvent))
-        .messageAttributes(mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue(inductionCreatedEvent.eventType()).build()))
+        .messageAttributes(
+          mapOf(
+            "eventType" to MessageAttributeValue.builder().dataType("String")
+              .stringValue(EventType.CIAG_INDUCTION_CREATED.eventType).build(),
+          ),
+        )
         .build(),
     )
 
@@ -53,7 +58,12 @@ internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
       PublishRequest.builder()
         .topicArn(inboundTopicArn)
         .message(objectMapper.writeValueAsString(inductionUpdatedEvent))
-        .messageAttributes(mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue(inductionUpdatedEvent.eventType()).build()))
+        .messageAttributes(
+          mapOf(
+            "eventType" to MessageAttributeValue.builder().dataType("String")
+              .stringValue(EventType.CIAG_INDUCTION_UPDATED.eventType).build(),
+          ),
+        )
         .build(),
     )
 
