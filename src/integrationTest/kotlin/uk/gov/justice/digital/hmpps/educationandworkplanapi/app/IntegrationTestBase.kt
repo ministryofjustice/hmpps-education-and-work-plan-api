@@ -82,12 +82,12 @@ abstract class IntegrationTestBase {
   @SpyBean
   protected lateinit var inboundEventsServiceSpy: InboundEventsService
 
-  private val inboundTopic by lazy {
+  private val domainEventsTopic by lazy {
     hmppsQueueService.findByTopicId("domainevents") ?: throw MissingQueueException("HmppsTopic domainevents not found")
   }
 
-  protected val inboundSnsClient by lazy { inboundTopic.snsClient }
-  protected val inboundTopicArn by lazy { inboundTopic.arn }
+  protected val snsClient by lazy { domainEventsTopic.snsClient }
+  protected val domainEventsTopicArn by lazy { domainEventsTopic.arn }
 
   @BeforeEach
   fun clearDatabase() {

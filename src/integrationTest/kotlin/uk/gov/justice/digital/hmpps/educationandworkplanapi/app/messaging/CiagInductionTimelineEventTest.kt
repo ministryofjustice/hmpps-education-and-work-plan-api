@@ -21,9 +21,9 @@ internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
     val inductionCreatedEvent = aValidCiagInductionCreatedEvent(prisonNumber = prisonNumber)
 
     // When
-    inboundSnsClient.publish(
+    snsClient.publish(
       PublishRequest.builder()
-        .topicArn(inboundTopicArn)
+        .topicArn(domainEventsTopicArn)
         .message(objectMapper.writeValueAsString(inductionCreatedEvent))
         .messageAttributes(
           mapOf(
@@ -54,9 +54,9 @@ internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
     val inductionUpdatedEvent = aValidCiagInductionUpdatedEvent(prisonNumber = prisonNumber)
 
     // When
-    inboundSnsClient.publish(
+    snsClient.publish(
       PublishRequest.builder()
-        .topicArn(inboundTopicArn)
+        .topicArn(domainEventsTopicArn)
         .message(objectMapper.writeValueAsString(inductionUpdatedEvent))
         .messageAttributes(
           mapOf(
