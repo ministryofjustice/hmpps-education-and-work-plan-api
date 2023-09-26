@@ -5,19 +5,16 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.awspring.cloud.sqs.annotation.SqsListener
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
+
+private val log = KotlinLogging.logger {}
 
 @Component
 class InboundEventsListener(
   private val mapper: ObjectMapper,
   private val inboundEventsService: InboundEventsService,
 ) {
-  companion object {
-    private val log: Logger = LoggerFactory.getLogger(this::class.java)
-  }
-
   init {
     log.info("Event listener started.")
   }

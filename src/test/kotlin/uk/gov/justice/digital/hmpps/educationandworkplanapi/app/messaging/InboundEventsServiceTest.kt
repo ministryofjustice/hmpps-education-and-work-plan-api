@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import ch.qos.logback.classic.Level
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentCaptor
@@ -45,10 +45,10 @@ internal class InboundEventsServiceTest {
 
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
-    Assertions.assertThat(timelineEventCaptor.value.sourceReference).isEqualTo(inductionCreatedEvent.reference())
-    Assertions.assertThat(timelineEventCaptor.value.eventType).isEqualTo(TimelineEventType.INDUCTION_CREATED)
-    Assertions.assertThat(timelineEventCaptor.value.prisonId).isEqualTo(inductionCreatedEvent.prisonId())
-    Assertions.assertThat(timelineEventCaptor.value.actionedBy).isEqualTo(inductionCreatedEvent.userId())
+    assertThat(timelineEventCaptor.value.sourceReference).isEqualTo(inductionCreatedEvent.reference())
+    assertThat(timelineEventCaptor.value.eventType).isEqualTo(TimelineEventType.INDUCTION_CREATED)
+    assertThat(timelineEventCaptor.value.prisonId).isEqualTo(inductionCreatedEvent.prisonId())
+    assertThat(timelineEventCaptor.value.actionedBy).isEqualTo(inductionCreatedEvent.userId())
   }
 
   @Test
@@ -62,10 +62,10 @@ internal class InboundEventsServiceTest {
 
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
-    Assertions.assertThat(timelineEventCaptor.value.sourceReference).isEqualTo(inductionUpdatedEvent.reference())
-    Assertions.assertThat(timelineEventCaptor.value.eventType).isEqualTo(TimelineEventType.INDUCTION_UPDATED)
-    Assertions.assertThat(timelineEventCaptor.value.prisonId).isEqualTo(inductionUpdatedEvent.prisonId())
-    Assertions.assertThat(timelineEventCaptor.value.actionedBy).isEqualTo(inductionUpdatedEvent.userId())
+    assertThat(timelineEventCaptor.value.sourceReference).isEqualTo(inductionUpdatedEvent.reference())
+    assertThat(timelineEventCaptor.value.eventType).isEqualTo(TimelineEventType.INDUCTION_UPDATED)
+    assertThat(timelineEventCaptor.value.prisonId).isEqualTo(inductionUpdatedEvent.prisonId())
+    assertThat(timelineEventCaptor.value.actionedBy).isEqualTo(inductionUpdatedEvent.userId())
   }
 
   @Test
@@ -77,7 +77,7 @@ internal class InboundEventsServiceTest {
     inboundEventsService.process(unrecognisedEvent)
 
     // Then
-    Assertions.assertThat(
+    assertThat(
       TestLogAppender.hasLog(
         "Unsupported event uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.UnrecognisedInboundEvent",
         Level.WARN,
