@@ -5,7 +5,7 @@ import java.util.UUID
 fun aValidUpdateStepRequest(
   stepReference: UUID? = UUID.randomUUID(),
   title: String = "Book French course",
-  targetDateRange: TargetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
+  targetDateRange: TargetDateRange? = TargetDateRange.ZERO_TO_THREE_MONTHS,
   status: StepStatus = StepStatus.ACTIVE,
   sequenceNumber: Int = 1,
 ): UpdateStepRequest =

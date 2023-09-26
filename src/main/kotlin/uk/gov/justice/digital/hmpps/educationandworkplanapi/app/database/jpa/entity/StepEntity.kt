@@ -39,7 +39,6 @@ class StepEntity(
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
   var targetDateRange: TargetDateRange? = null,
 
   // targetDate is no longer used but remains here (and in the database table) in case the business decide to use it again

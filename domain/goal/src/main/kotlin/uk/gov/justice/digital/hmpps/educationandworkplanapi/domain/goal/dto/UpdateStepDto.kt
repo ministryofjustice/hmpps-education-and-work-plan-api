@@ -10,7 +10,7 @@ import java.util.UUID
 data class UpdateStepDto(
   val reference: UUID?,
   val title: String,
-  val targetDateRange: TargetDateRange,
+  val targetDateRange: TargetDateRange?,
   val status: StepStatus = StepStatus.NOT_STARTED,
   val sequenceNumber: Int,
 )

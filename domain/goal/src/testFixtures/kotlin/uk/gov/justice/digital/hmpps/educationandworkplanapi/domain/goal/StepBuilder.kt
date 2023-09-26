@@ -8,7 +8,7 @@ import java.util.UUID
 fun aValidStep(
   reference: UUID = UUID.randomUUID(),
   title: String = "Book communication skills course",
-  targetDateRange: TargetDateRange = ZERO_TO_THREE_MONTHS,
+  targetDateRange: TargetDateRange? = ZERO_TO_THREE_MONTHS,
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
 ): Step =
@@ -23,7 +23,7 @@ fun aValidStep(
 fun anotherValidStep(
   reference: UUID = UUID.randomUUID(),
   title: String = "Complete communication skills course",
-  targetDateRange: TargetDateRange = THREE_TO_SIX_MONTHS,
+  targetDateRange: TargetDateRange? = THREE_TO_SIX_MONTHS,
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 2,
 ): Step =

@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDa
 
 fun aValidCreateStepDto(
   title: String = "Book communication skills course",
-  targetDateRange: TargetDateRange = ZERO_TO_THREE_MONTHS,
+  targetDateRange: TargetDateRange? = ZERO_TO_THREE_MONTHS,
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
 ): CreateStepDto =
@@ -21,7 +21,7 @@ fun aValidCreateStepDto(
 
 fun anotherValidCreateStepDto(
   title: String = "Complete communication skills course",
-  targetDateRange: TargetDateRange = THREE_TO_SIX_MONTHS,
+  targetDateRange: TargetDateRange? = THREE_TO_SIX_MONTHS,
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 2,
 ): CreateStepDto =

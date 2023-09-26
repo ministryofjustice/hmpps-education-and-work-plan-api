@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDa
  */
 data class CreateStepDto(
   val title: String,
-  val targetDateRange: TargetDateRange,
+  val targetDateRange: TargetDateRange?,
   val status: StepStatus = StepStatus.NOT_STARTED,
   val sequenceNumber: Int,
 )
