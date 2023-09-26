@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Targe
 
 fun aValidCreateStepRequest(
   title: String = "Book communication skills course",
-  targetDateRange: TargetDateRange = ZERO_TO_THREE_MONTHS,
+  targetDateRange: TargetDateRange? = ZERO_TO_THREE_MONTHS,
   sequenceNumber: Int = 1,
 ): CreateStepRequest =
   CreateStepRequest(
@@ -16,7 +16,7 @@ fun aValidCreateStepRequest(
 
 fun anotherValidCreateStepRequest(
   title: String = "Complete communication skills course",
-  targetDateRange: TargetDateRange = THREE_TO_SIX_MONTHS,
+  targetDateRange: TargetDateRange? = THREE_TO_SIX_MONTHS,
   sequenceNumber: Int = 2,
 ): CreateStepRequest =
   CreateStepRequest(

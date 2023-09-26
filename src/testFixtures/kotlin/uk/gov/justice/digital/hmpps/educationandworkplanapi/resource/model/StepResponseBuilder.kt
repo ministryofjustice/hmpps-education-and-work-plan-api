@@ -7,7 +7,7 @@ import java.util.UUID
 fun aValidStepResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Book communication skills course",
-  targetDateRange: TargetDateRange = ZERO_TO_THREE_MONTHS,
+  targetDateRange: TargetDateRange? = ZERO_TO_THREE_MONTHS,
   status: StepStatus = StepStatus.NOT_STARTED,
   sequenceNumber: Int = 1,
 ): StepResponse =
@@ -22,7 +22,7 @@ fun aValidStepResponse(
 fun anotherValidStepResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Complete communication skills course",
-  targetDateRange: TargetDateRange = THREE_TO_SIX_MONTHS,
+  targetDateRange: TargetDateRange? = THREE_TO_SIX_MONTHS,
   status: StepStatus = StepStatus.NOT_STARTED,
   sequenceNumber: Int = 2,
 ): StepResponse =

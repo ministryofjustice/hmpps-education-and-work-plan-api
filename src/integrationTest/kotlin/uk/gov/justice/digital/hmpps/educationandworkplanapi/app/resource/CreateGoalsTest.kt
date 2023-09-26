@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.anotherValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -251,7 +252,13 @@ class CreateGoalsTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createActionPlan(prisonNumber)
 
-    val createGoalRequest = aValidCreateGoalRequest(notes = null)
+    val createGoalRequest = aValidCreateGoalRequest(
+      notes = null,
+      steps = listOf(
+        aValidCreateStepRequest(targetDateRange = null),
+        anotherValidCreateStepRequest(targetDateRange = null),
+      ),
+    )
     val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
 
     // When

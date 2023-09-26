@@ -196,11 +196,13 @@ class UpdateGoalTest : IntegrationTestBase() {
           stepReference = stepReference,
           title = "Book course before December 2023",
           sequenceNumber = 1,
+          targetDateRange = null,
         ),
         aValidUpdateStepRequest(
           stepReference = null,
           title = "Attend course before March 2024",
           sequenceNumber = 2,
+          targetDateRange = null,
         ),
       ),
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
