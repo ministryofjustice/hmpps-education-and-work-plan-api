@@ -67,13 +67,13 @@ dependencies {
   // Test dependencies
   testImplementation(testFixtures(project("domain:goal")))
   testImplementation(testFixtures(project("domain:timeline")))
+  testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
   integrationTestImplementation(testFixtures(project("domain:goal")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
-  testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
-  testImplementation("org.testcontainers:localstack:1.18.1")
+  integrationTestImplementation("org.testcontainers:localstack:1.18.1")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")

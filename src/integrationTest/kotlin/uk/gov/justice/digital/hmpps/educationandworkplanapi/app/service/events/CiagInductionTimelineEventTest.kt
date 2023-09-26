@@ -35,11 +35,11 @@ internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
     }
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline).hasNumberOfEvents(1)
-    val timelineEvent = timeline.events[0]
-    assertThat(timelineEvent).hasEventType(TimelineEventType.INDUCTION_CREATED)
-    assertThat(timelineEvent).hasPrisonId(inductionCreatedEvent.prisonId())
-    assertThat(timelineEvent).hasSourceReference(inductionCreatedEvent.reference())
-    assertThat(timelineEvent).wasActionedBy(inductionCreatedEvent.userId())
+    assertThat(timeline.events[0])
+      .hasEventType(TimelineEventType.INDUCTION_CREATED)
+      .hasPrisonId(inductionCreatedEvent.prisonId())
+      .hasSourceReference(inductionCreatedEvent.reference())
+      .wasActionedBy(inductionCreatedEvent.userId())
   }
 
   @Test
@@ -63,10 +63,10 @@ internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
     }
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline).hasNumberOfEvents(1)
-    val timelineEvent = timeline.events[0]
-    assertThat(timelineEvent).hasEventType(TimelineEventType.INDUCTION_UPDATED)
-    assertThat(timelineEvent).hasPrisonId(inductionUpdatedEvent.prisonId())
-    assertThat(timelineEvent).hasSourceReference(inductionUpdatedEvent.reference())
-    assertThat(timelineEvent).wasActionedBy(inductionUpdatedEvent.userId())
+    assertThat(timeline.events[0])
+      .hasEventType(TimelineEventType.INDUCTION_UPDATED)
+      .hasPrisonId(inductionUpdatedEvent.prisonId())
+      .hasSourceReference(inductionUpdatedEvent.reference())
+      .wasActionedBy(inductionUpdatedEvent.userId())
   }
 }
