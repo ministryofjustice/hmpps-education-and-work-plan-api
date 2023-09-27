@@ -15,7 +15,7 @@ class InboundEventsListener(
   private val inboundEventsService: InboundEventsService,
 ) {
 
-  @SqsListener("education-and-work-plan", factory = "hmppsQueueContainerFactoryProxy")
+  @SqsListener("educationandworkplan", factory = "hmppsQueueContainerFactoryProxy")
   internal fun onMessage(sqsMessage: SqsMessage) {
     log.debug { "Inbound event message: $sqsMessage" }
 

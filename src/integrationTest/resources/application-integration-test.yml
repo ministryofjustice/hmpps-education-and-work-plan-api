@@ -28,7 +28,7 @@ spring:
 hmpps.sqs:
   provider: localstack
   queues:
-    education-and-work-plan:
+    educationandworkplan:
       queueName: education-and-work-plan-queue
       subscribeFilter: "{\"eventType\":[\"ciag-induction.created\", \"ciag-induction.updated\"]}"
       dlqName: education-and-work-plan-dead-letter-queue
