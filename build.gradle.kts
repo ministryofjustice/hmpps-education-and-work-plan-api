@@ -52,6 +52,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.0.1")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdoc.openapi.version")}")
 
@@ -66,12 +67,13 @@ dependencies {
   // Test dependencies
   testImplementation(testFixtures(project("domain:goal")))
   testImplementation(testFixtures(project("domain:timeline")))
+  testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
   integrationTestImplementation(testFixtures(project("domain:goal")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
-  testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
+  integrationTestImplementation("org.testcontainers:localstack:1.18.1")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")

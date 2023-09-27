@@ -11,11 +11,28 @@ parameters:
     type: string
     default: dps-releases
 
+executors:
+  integration-test-environment:
+    docker:
+      - image: cimg/openjdk:19.0
+      - image: localstack/localstack:0.13.1
+        environment:
+          SERVICES: sns,sqs
+          DATA_DIR: /tmp/localstack/data
+          DOCKER_HOST: unix:///var/run/docker.sock
+          AWS_EXECUTION_ENV: True
+          DEFAULT_REGION: eu-west-2
+          TMPDIR: /private
+# For future use - change ITs to use a real postgres instance rather than H2
+#        - image: cimg/postgres:13.3
+#          environment:
+#            POSTGRES_PASSWORD: admin_password
+#            POSTGRES_USER: admin
+#            POSTGRES_DB: send_legal_mail_api_db
+
 jobs:
   validate:
-    executor:
-      name: hmpps/java
-      tag: "19.0"
+    executor: integration-test-environment
     steps:
       - checkout
       - restore_cache:
@@ -149,5 +166,3 @@ workflows:
           context:
             - veracode-credentials
             - hmpps-common-vars
-
-

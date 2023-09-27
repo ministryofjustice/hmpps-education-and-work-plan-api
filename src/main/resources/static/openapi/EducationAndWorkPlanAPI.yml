@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.3.2'
+  version: '1.3.3'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -611,6 +611,8 @@ components:
       description: The type of a Timeline Event.
       type: string
       enum:
+        - INDUCTION_CREATED
+        - INDUCTION_UPDATED
         - ACTION_PLAN_CREATED
         - GOAL_CREATED
         - GOAL_UPDATED
