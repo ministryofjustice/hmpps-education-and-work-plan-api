@@ -45,9 +45,9 @@ generic-service:
     hmpps-domain-events-topic:
       HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN: "topic_arn"
     education-and-work-plan-domain-events-sqs-instance-output:
-      HMPPS_SQS_QUEUES_EDUCATION_AND_WORK_PLAN_QUEUE_NAME: "sqs_queue_name"
+      HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_QUEUE_NAME: "sqs_queue_name"
     education-and-work-plan-domain-events-sqs-dl-instance-output:
-      HMPPS_SQS_QUEUES_EDUCATION_AND_WORK_PLAN_DLQ_NAME: "sqs_queue_name"
+      HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
     office: "217.33.148.210/32"
