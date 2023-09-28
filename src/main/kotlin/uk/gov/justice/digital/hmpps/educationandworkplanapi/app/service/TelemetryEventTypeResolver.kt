@@ -43,39 +43,35 @@ class TelemetryEventTypeResolver {
       updateTypes.add(updateTypeForGoalStatusChange)
     }
 
-    val previousGoalStepReferences = previousGoal.steps.map { it.reference }
-    val updatedGoalStepReferences = updatedGoal.steps.map { it.reference }
-    val stepsReferencesInBothPreviousAndUpdatedGoal = previousGoal.steps
-      .map { it.reference }
-      .filter {
-        updatedGoalStepReferences.contains(it)
-      }
-
+    val previousStepReferences = previousGoal.steps.map { it.reference }
+    val updatedStepReferences = updatedGoal.steps.map { it.reference }
     // check for any deleted steps (steps that are in previousGoal but not in updatedGoal)
-    previousGoalStepReferences.forEach {
-      if (!updatedGoalStepReferences.contains(it)) {
+    previousStepReferences.forEach {
+      if (!updatedStepReferences.contains(it)) {
         updateTypes.add(STEP_REMOVED)
       }
     }
     // check for any added steps (steps that are in updatedGoal but not in previousGoal)
-    updatedGoalStepReferences.forEach {
-      if (!previousGoalStepReferences.contains(it)) {
+    updatedStepReferences.forEach {
+      if (!previousStepReferences.contains(it)) {
         updateTypes.add(STEP_ADDED)
       }
     }
 
-    stepsReferencesInBothPreviousAndUpdatedGoal.forEach { stepReference ->
-      val previousStep = previousGoal.steps.first { stepReference == it.reference }
-      val updatedStep = updatedGoal.steps.first { stepReference == it.reference }
+    // check for any updates to the steps, including their status
+    previousGoal.steps.forEach { previousStep ->
+      if (updatedStepReferences.contains(previousStep.reference)) {
+        val updatedStep = updatedGoal.steps.first { previousStep.reference == it.reference }
 
-      // check for any updates to steps, excluding status
-      if (hasStepBeenUpdated(previousStep, updatedStep)) {
-        updateTypes.add(STEP_UPDATED)
-      }
-      // check for any updates to step status
-      if (hasStepStatusChanged(previousStep, updatedStep)) {
-        val updateTypeForStepStatusChange = getTelemetryUpdateEventTypeForStepStatusChange(updatedStep)
-        updateTypes.add(updateTypeForStepStatusChange)
+        // check for any updates to steps, excluding status
+        if (hasStepBeenUpdated(previousStep, updatedStep)) {
+          updateTypes.add(STEP_UPDATED)
+        }
+        // check for any updates to step status
+        if (hasStepStatusChanged(previousStep, updatedStep)) {
+          val updateTypeForStepStatusChange = getTelemetryUpdateEventTypeForStepStatusChange(updatedStep)
+          updateTypes.add(updateTypeForStepStatusChange)
+        }
       }
     }
 
