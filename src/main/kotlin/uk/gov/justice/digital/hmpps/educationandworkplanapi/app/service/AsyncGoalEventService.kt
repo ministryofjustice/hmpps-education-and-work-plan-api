@@ -23,7 +23,7 @@ class AsyncGoalEventService(
   override fun goalCreated(prisonNumber: String, createdGoal: Goal) {
     runBlocking {
       log.debug { "Goal created event for prisoner [$prisonNumber]" }
-      launch { recordCreateGoalTimelineEvent(prisonNumber = prisonNumber, createdGoal = createdGoal) }
+      launch { recordGoalCreatedTimelineEvent(prisonNumber = prisonNumber, createdGoal = createdGoal) }
       launch { trackGoalCreatedTelemetryEvent(createdGoal = createdGoal) }
     }
   }
@@ -33,7 +33,7 @@ class AsyncGoalEventService(
       log.debug { "Goal updated event for prisoner [$prisonNumber]" }
 
       launch {
-        recordUpdateGoalTimelineEvents(
+        recordGoalUpdatedTimelineEvents(
           prisonNumber = prisonNumber,
           previousGoal = previousGoal,
           updatedGoal = updatedGoal,
@@ -43,14 +43,14 @@ class AsyncGoalEventService(
     }
   }
 
-  private fun recordCreateGoalTimelineEvent(prisonNumber: String, createdGoal: Goal) {
+  private fun recordGoalCreatedTimelineEvent(prisonNumber: String, createdGoal: Goal) {
     timelineService.recordTimelineEvent(
       prisonNumber,
       timelineEventFactory.goalCreatedTimelineEvent(createdGoal),
     )
   }
 
-  private fun recordUpdateGoalTimelineEvents(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
+  private fun recordGoalUpdatedTimelineEvents(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
     timelineService.recordTimelineEvents(
       prisonNumber,
       timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal),
