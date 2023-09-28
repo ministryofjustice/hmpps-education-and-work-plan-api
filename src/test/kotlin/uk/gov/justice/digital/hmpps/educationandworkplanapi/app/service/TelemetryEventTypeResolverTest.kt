@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_ADDED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
@@ -12,9 +14,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidSt
 import java.time.LocalDate
 import java.util.UUID
 
-class TelemetryUpdateEventTypeResolverTest {
+class TelemetryEventTypeResolverTest {
 
-  private val resolver = TelemetryUpdateEventTypeResolver()
+  private val resolver = TelemetryEventTypeResolver()
 
   @Test
   fun `should get goal update types given goals with no differences`() {
@@ -35,13 +37,13 @@ class TelemetryUpdateEventTypeResolverTest {
       steps = updatedSteps,
     )
 
-    val expectedTelemetryUpdateEventTypes = emptyList<TelemetryUpdateEventType>()
+    val expectedTelemetryEventTypes = emptyList<TelemetryEventType>()
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @Test
@@ -62,13 +64,13 @@ class TelemetryUpdateEventTypeResolverTest {
       title = "Learn Spanish",
       steps = updatedSteps,
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @Test
@@ -91,13 +93,13 @@ class TelemetryUpdateEventTypeResolverTest {
       steps = updatedSteps,
       notes = "A suitable course is available from May",
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @Test
@@ -120,13 +122,13 @@ class TelemetryUpdateEventTypeResolverTest {
       steps = updatedSteps,
       lastUpdatedAtPrison = "BXI",
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @Test
@@ -149,13 +151,13 @@ class TelemetryUpdateEventTypeResolverTest {
       steps = updatedSteps,
       targetCompletionDate = LocalDate.parse("2024-06-30"),
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @ParameterizedTest
@@ -169,7 +171,7 @@ class TelemetryUpdateEventTypeResolverTest {
   fun `should get goal update types given goals with different statuses`(
     previousGoalStatus: GoalStatus,
     updatedGoalStatus: GoalStatus,
-    expectedTelemetryUpdateEventType: TelemetryUpdateEventType,
+    expectedTelemetryEventType: TelemetryEventType,
   ) {
     // Given
     val goalReference = aValidReference()
@@ -189,7 +191,7 @@ class TelemetryUpdateEventTypeResolverTest {
       status = updatedGoalStatus,
       steps = updatedSteps,
     )
-    val expectedTelemetryUpdateEventTypes = listOf(expectedTelemetryUpdateEventType)
+    val expectedTelemetryUpdateEventTypes = listOf(expectedTelemetryEventType)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
@@ -220,13 +222,13 @@ class TelemetryUpdateEventTypeResolverTest {
       title = "Learn French",
       steps = updatedSteps,
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.STEP_REMOVED, TelemetryUpdateEventType.STEP_REMOVED)
+    val expectedTelemetryEventTypes = listOf(STEP_REMOVED, STEP_REMOVED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @Test
@@ -250,13 +252,13 @@ class TelemetryUpdateEventTypeResolverTest {
       title = "Learn French",
       steps = updatedSteps,
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.STEP_ADDED)
+    val expectedTelemetryEventTypes = listOf(STEP_ADDED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @Test
@@ -283,13 +285,13 @@ class TelemetryUpdateEventTypeResolverTest {
       title = "Learn French",
       steps = updatedSteps,
     )
-    val expectedTelemetryUpdateEventTypes = listOf(TelemetryUpdateEventType.STEP_REMOVED, TelemetryUpdateEventType.STEP_ADDED)
+    val expectedTelemetryEventTypes = listOf(STEP_REMOVED, STEP_ADDED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
 
     // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
+    assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
   }
 
   @ParameterizedTest
@@ -303,7 +305,7 @@ class TelemetryUpdateEventTypeResolverTest {
   fun `should get goal update types given a step with different statuses`(
     previousStepStatus: StepStatus,
     updatedStepStatus: StepStatus,
-    expectedTelemetryUpdateEventType: TelemetryUpdateEventType,
+    expectedTelemetryEventType: TelemetryEventType,
   ) {
     // Given
     val goalReference = aValidReference()
@@ -325,7 +327,7 @@ class TelemetryUpdateEventTypeResolverTest {
       title = "Learn French",
       steps = updatedSteps,
     )
-    val expectedTelemetryUpdateEventTypes = listOf(expectedTelemetryUpdateEventType)
+    val expectedTelemetryUpdateEventTypes = listOf(expectedTelemetryEventType)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)

@@ -3,6 +3,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 
 /**
@@ -11,28 +14,19 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 @Service
 class TelemetryService(
   private val telemetryClient: TelemetryClient,
-  private val telemetryUpdateEventTypeResolver: TelemetryUpdateEventTypeResolver,
+  private val telemetryEventTypeResolver: TelemetryEventTypeResolver,
 ) {
 
   fun trackGoalCreatedEvent(goal: Goal) {
-    telemetryClient.trackEvent(
-      TelemetryUpdateEventType.GOAL_CREATED.value,
-      createEventCustomDimensions(goal),
-    )
+    telemetryClient.trackEvent(GOAL_CREATED.value, createEventCustomDimensions(goal))
   }
 
   fun trackGoalUpdatedEvent(goal: Goal) {
-    telemetryClient.trackEvent(
-      TelemetryUpdateEventType.GOAL_UPDATED.value,
-      updateEventCustomDimensions(goal),
-    )
+    telemetryClient.trackEvent(GOAL_UPDATED.value, updateEventCustomDimensions(goal))
   }
 
   fun trackStepRemovedEvent(goal: Goal) {
-    telemetryClient.trackEvent(
-      TelemetryUpdateEventType.STEP_REMOVED.value,
-      stepRemoveEventCustomDimensions(goal),
-    )
+    telemetryClient.trackEvent(STEP_REMOVED.value, stepRemoveEventCustomDimensions(goal))
   }
 
   /**
@@ -41,11 +35,11 @@ class TelemetryService(
    */
   fun trackGoalUpdatedEvents(previousGoal: Goal, updatedGoal: Goal) {
     val telemetryUpdateEvents =
-      telemetryUpdateEventTypeResolver.resolveUpdateEventTypes(previousGoal = previousGoal, updatedGoal = updatedGoal)
+      telemetryEventTypeResolver.resolveUpdateEventTypes(previousGoal = previousGoal, updatedGoal = updatedGoal)
     telemetryUpdateEvents.forEach {
       when (it) {
-        TelemetryUpdateEventType.GOAL_UPDATED -> trackGoalUpdatedEvent(updatedGoal)
-        TelemetryUpdateEventType.STEP_REMOVED -> trackStepRemovedEvent(updatedGoal)
+        GOAL_UPDATED -> trackGoalUpdatedEvent(updatedGoal)
+        STEP_REMOVED -> trackStepRemovedEvent(updatedGoal)
         else -> {}
       }
     }

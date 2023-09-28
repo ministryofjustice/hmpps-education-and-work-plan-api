@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 /**
- * A granular enumeration of the type of Goal update events that can be sent to the Telemetry Service.
+ * An enumeration of the types of Goal events that can be sent to the Telemetry Service.
  */
-enum class TelemetryUpdateEventType(val value: String) {
+enum class TelemetryEventType(val value: String) {
   GOAL_CREATED("goal-created"),
   GOAL_UPDATED("goal-updated"),
   GOAL_STARTED("goal-started"),

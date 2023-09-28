@@ -14,6 +14,17 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_ARCHIVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_ADDED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_NOT_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
@@ -26,7 +37,7 @@ class TelemetryServiceTest {
   private lateinit var telemetryClient: TelemetryClient
 
   @Mock
-  private lateinit var telemetryUpdateEventTypeResolver: TelemetryUpdateEventTypeResolver
+  private lateinit var telemetryEventTypeResolver: TelemetryEventTypeResolver
 
   @InjectMocks
   private lateinit var telemetryService: TelemetryService
@@ -181,28 +192,28 @@ class TelemetryServiceTest {
       val updatedGoal = aValidGoal(reference = reference)
 
       val updateEventTypes = listOf(
-        TelemetryUpdateEventType.GOAL_UPDATED,
-        TelemetryUpdateEventType.STEP_REMOVED, // 2 STEP_REMOVED event types to trigger 2 corresponding telemetry events.
-        TelemetryUpdateEventType.STEP_REMOVED,
+        GOAL_UPDATED,
+        STEP_REMOVED, // 2 STEP_REMOVED event types to trigger 2 corresponding telemetry events.
+        STEP_REMOVED,
         // The follow event types will be supported in the future.
         // They are included here to break the test as and when the implementation handles them.
-        TelemetryUpdateEventType.GOAL_CREATED,
-        TelemetryUpdateEventType.GOAL_STARTED,
-        TelemetryUpdateEventType.GOAL_COMPLETED,
-        TelemetryUpdateEventType.GOAL_ARCHIVED,
-        TelemetryUpdateEventType.STEP_UPDATED,
-        TelemetryUpdateEventType.STEP_NOT_STARTED,
-        TelemetryUpdateEventType.STEP_STARTED,
-        TelemetryUpdateEventType.STEP_COMPLETED,
-        TelemetryUpdateEventType.STEP_ADDED,
+        GOAL_CREATED,
+        GOAL_STARTED,
+        GOAL_COMPLETED,
+        GOAL_ARCHIVED,
+        STEP_UPDATED,
+        STEP_NOT_STARTED,
+        STEP_STARTED,
+        STEP_COMPLETED,
+        STEP_ADDED,
       )
-      given(telemetryUpdateEventTypeResolver.resolveUpdateEventTypes(any(), any())).willReturn(updateEventTypes)
+      given(telemetryEventTypeResolver.resolveUpdateEventTypes(any(), any())).willReturn(updateEventTypes)
 
       // When
       telemetryService.trackGoalUpdatedEvents(previousGoal, updatedGoal)
 
       // Then
-      verify(telemetryUpdateEventTypeResolver).resolveUpdateEventTypes(previousGoal, updatedGoal)
+      verify(telemetryEventTypeResolver).resolveUpdateEventTypes(previousGoal, updatedGoal)
 
       verify(telemetryClient).trackEvent(eq("goal-updated"), any(), eq(null))
       verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), any(), eq(null))
