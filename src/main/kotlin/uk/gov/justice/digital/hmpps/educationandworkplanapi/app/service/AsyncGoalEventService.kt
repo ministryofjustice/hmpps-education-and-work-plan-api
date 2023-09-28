@@ -23,18 +23,45 @@ class AsyncGoalEventService(
   override fun goalCreated(prisonNumber: String, createdGoal: Goal) {
     runBlocking {
       log.debug { "Goal created event for prisoner [$prisonNumber]" }
-      val timelineEvent = timelineEventFactory.goalCreatedTimelineEvent(createdGoal)
-      launch { timelineService.recordTimelineEvent(prisonNumber, timelineEvent) }
-      launch { telemetryService.trackGoalCreateEvent(createdGoal) }
+      launch { recordGoalCreatedTimelineEvent(prisonNumber = prisonNumber, createdGoal = createdGoal) }
+      launch { trackGoalCreatedTelemetryEvent(createdGoal = createdGoal) }
     }
   }
 
   override fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
     runBlocking {
       log.debug { "Goal updated event for prisoner [$prisonNumber]" }
-      val timelineEvents = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
-      launch { timelineService.recordTimelineEvents(prisonNumber, timelineEvents) }
-      launch { telemetryService.trackGoalUpdateEvent(updatedGoal) }
+
+      launch {
+        recordGoalUpdatedTimelineEvents(
+          prisonNumber = prisonNumber,
+          previousGoal = previousGoal,
+          updatedGoal = updatedGoal,
+        )
+      }
+      launch { trackGoalUpdatedTelemetryEvents(previousGoal = previousGoal, updatedGoal = updatedGoal) }
     }
+  }
+
+  private fun recordGoalCreatedTimelineEvent(prisonNumber: String, createdGoal: Goal) {
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.goalCreatedTimelineEvent(createdGoal),
+    )
+  }
+
+  private fun recordGoalUpdatedTimelineEvents(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
+    timelineService.recordTimelineEvents(
+      prisonNumber,
+      timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal),
+    )
+  }
+
+  private fun trackGoalCreatedTelemetryEvent(createdGoal: Goal) {
+    telemetryService.trackGoalCreatedEvent(createdGoal)
+  }
+
+  private fun trackGoalUpdatedTelemetryEvents(previousGoal: Goal, updatedGoal: Goal) {
+    telemetryService.trackGoalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
   }
 }

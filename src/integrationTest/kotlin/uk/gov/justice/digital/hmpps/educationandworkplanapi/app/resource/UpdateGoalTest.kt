@@ -180,6 +180,9 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidCreateStepRequest(
           title = "Book course",
         ),
+        aValidCreateStepRequest(
+          title = "Attend course",
+        ),
       ),
     )
     createGoal(prisonNumber, createGoalRequest)
@@ -241,12 +244,23 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasUpdatedAtPrison("MDI")
       }
 
-    val expectedEventCustomDimensions = mapOf(
-      "reference" to goalReference.toString(),
-      "notesCharacterCount" to "83",
-    )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-update", expectedEventCustomDimensions, null)
+      verify(telemetryClient).trackEvent(
+        "goal-updated",
+        mapOf(
+          "reference" to goalReference.toString(),
+          "notesCharacterCount" to "83",
+        ),
+        null,
+      )
+      verify(telemetryClient).trackEvent(
+        "step-removed",
+        mapOf(
+          "reference" to goalReference.toString(),
+          "stepCount" to "2",
+        ),
+        null,
+      )
     }
 
     // assert timeline events are created successfully

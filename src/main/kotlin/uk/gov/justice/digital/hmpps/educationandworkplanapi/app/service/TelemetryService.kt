@@ -3,6 +3,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 
 /**
@@ -11,25 +14,35 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 @Service
 class TelemetryService(
   private val telemetryClient: TelemetryClient,
+  private val telemetryEventTypeResolver: TelemetryEventTypeResolver,
 ) {
 
-  companion object {
-    private const val GOAL_CREATE_EVENT = "goal-create"
-    private const val GOAL_UPDATE_EVENT = "goal-update"
+  fun trackGoalCreatedEvent(goal: Goal) {
+    telemetryClient.trackEvent(GOAL_CREATED.value, createEventCustomDimensions(goal))
   }
 
-  fun trackGoalCreateEvent(goal: Goal) {
-    telemetryClient.trackEvent(
-      GOAL_CREATE_EVENT,
-      createEventCustomDimensions(goal),
-    )
+  fun trackGoalUpdatedEvent(goal: Goal) {
+    telemetryClient.trackEvent(GOAL_UPDATED.value, updateEventCustomDimensions(goal))
   }
 
-  fun trackGoalUpdateEvent(goal: Goal) {
-    telemetryClient.trackEvent(
-      GOAL_UPDATE_EVENT,
-      updateEventCustomDimensions(goal),
-    )
+  fun trackStepRemovedEvent(goal: Goal) {
+    telemetryClient.trackEvent(STEP_REMOVED.value, stepRemoveEventCustomDimensions(goal))
+  }
+
+  /**
+   * Sends all goal update telemetry tracking events based on the differences between the previousGoal and the
+   * updatedGoal.
+   */
+  fun trackGoalUpdatedEvents(previousGoal: Goal, updatedGoal: Goal) {
+    val telemetryUpdateEvents =
+      telemetryEventTypeResolver.resolveUpdateEventTypes(previousGoal = previousGoal, updatedGoal = updatedGoal)
+    telemetryUpdateEvents.forEach {
+      when (it) {
+        GOAL_UPDATED -> trackGoalUpdatedEvent(updatedGoal)
+        STEP_REMOVED -> trackStepRemovedEvent(updatedGoal)
+        else -> {}
+      }
+    }
   }
 
   /**
@@ -53,6 +66,17 @@ class TelemetryService(
       mapOf(
         "reference" to reference.toString(),
         "notesCharacterCount" to (notes?.length ?: 0).toString(),
+      )
+    }
+
+  /**
+   * Returns a map of data representing the custom dimensions for the `step-remove` event.
+   */
+  private fun stepRemoveEventCustomDimensions(goal: Goal): Map<String, String> =
+    with(goal) {
+      mapOf(
+        "reference" to reference.toString(),
+        "stepCount" to steps.size.toString(),
       )
     }
 }

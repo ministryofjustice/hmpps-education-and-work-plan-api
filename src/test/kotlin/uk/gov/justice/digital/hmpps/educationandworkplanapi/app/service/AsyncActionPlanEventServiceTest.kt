@@ -41,7 +41,7 @@ class AsyncActionPlanEventServiceTest {
     actionPlanEventService.actionPlanCreated(actionPlan)
 
     // Then
-    verify(telemetryService).trackGoalCreateEvent(actionPlan.goals[0])
+    verify(telemetryService).trackGoalCreatedEvent(actionPlan.goals[0])
     verify(timelineEventFactory).actionPlanCreatedEvent(actionPlan)
     verify(timelineService).recordTimelineEvent(prisonNumber, createActionPlanEvent)
   }
