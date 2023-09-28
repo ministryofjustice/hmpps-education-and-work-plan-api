@@ -18,15 +18,15 @@ class TelemetryService(
 ) {
 
   fun trackGoalCreatedEvent(goal: Goal) {
-    telemetryClient.trackEvent(GOAL_CREATED.value, createEventCustomDimensions(goal))
+    sendTelemetryEventForGoal(goal, GOAL_CREATED)
   }
 
   fun trackGoalUpdatedEvent(goal: Goal) {
-    telemetryClient.trackEvent(GOAL_UPDATED.value, updateEventCustomDimensions(goal))
+    sendTelemetryEventForGoal(goal, GOAL_UPDATED)
   }
 
   fun trackStepRemovedEvent(goal: Goal) {
-    telemetryClient.trackEvent(STEP_REMOVED.value, stepRemoveEventCustomDimensions(goal))
+    sendTelemetryEventForGoal(goal, STEP_REMOVED)
   }
 
   /**
@@ -45,38 +45,6 @@ class TelemetryService(
     }
   }
 
-  /**
-   * Returns a map of data representing the custom dimensions for the `goal-create` event.
-   */
-  private fun createEventCustomDimensions(goal: Goal): Map<String, String> =
-    with(goal) {
-      mapOf(
-        "status" to status.name,
-        "stepCount" to steps.size.toString(),
-        "reference" to reference.toString(),
-        "notesCharacterCount" to (notes?.length ?: 0).toString(),
-      )
-    }
-
-  /**
-   * Returns a map of data representing the custom dimensions for the `goal-update` event.
-   */
-  private fun updateEventCustomDimensions(goal: Goal): Map<String, String> =
-    with(goal) {
-      mapOf(
-        "reference" to reference.toString(),
-        "notesCharacterCount" to (notes?.length ?: 0).toString(),
-      )
-    }
-
-  /**
-   * Returns a map of data representing the custom dimensions for the `step-remove` event.
-   */
-  private fun stepRemoveEventCustomDimensions(goal: Goal): Map<String, String> =
-    with(goal) {
-      mapOf(
-        "reference" to reference.toString(),
-        "stepCount" to steps.size.toString(),
-      )
-    }
+  private fun sendTelemetryEventForGoal(goal: Goal, telemetryEventType: TelemetryEventType) =
+    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal))
 }
