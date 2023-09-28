@@ -11,25 +11,44 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 @Service
 class TelemetryService(
   private val telemetryClient: TelemetryClient,
+  private val telemetryUpdateEventTypeResolver: TelemetryUpdateEventTypeResolver,
 ) {
 
-  companion object {
-    private const val GOAL_CREATE_EVENT = "goal-create"
-    private const val GOAL_UPDATE_EVENT = "goal-update"
-  }
-
-  fun trackGoalCreateEvent(goal: Goal) {
+  fun trackGoalCreatedEvent(goal: Goal) {
     telemetryClient.trackEvent(
-      GOAL_CREATE_EVENT,
+      TelemetryUpdateEventType.GOAL_CREATED.value,
       createEventCustomDimensions(goal),
     )
   }
 
-  fun trackGoalUpdateEvent(goal: Goal) {
+  fun trackGoalUpdatedEvent(goal: Goal) {
     telemetryClient.trackEvent(
-      GOAL_UPDATE_EVENT,
+      TelemetryUpdateEventType.GOAL_UPDATED.value,
       updateEventCustomDimensions(goal),
     )
+  }
+
+  fun trackStepRemovedEvent(goal: Goal) {
+    telemetryClient.trackEvent(
+      TelemetryUpdateEventType.STEP_REMOVED.value,
+      stepRemoveEventCustomDimensions(goal),
+    )
+  }
+
+  /**
+   * Sends all goal update telemetry tracking events based on the differences between the previousGoal and the
+   * updatedGoal.
+   */
+  fun trackGoalUpdatedEvents(previousGoal: Goal, updatedGoal: Goal) {
+    val telemetryUpdateEvents =
+      telemetryUpdateEventTypeResolver.resolveUpdateEventTypes(previousGoal = previousGoal, updatedGoal = updatedGoal)
+    telemetryUpdateEvents.forEach {
+      when (it) {
+        TelemetryUpdateEventType.GOAL_UPDATED -> trackGoalUpdatedEvent(updatedGoal)
+        TelemetryUpdateEventType.STEP_REMOVED -> trackStepRemovedEvent(updatedGoal)
+        else -> {}
+      }
+    }
   }
 
   /**
@@ -53,6 +72,17 @@ class TelemetryService(
       mapOf(
         "reference" to reference.toString(),
         "notesCharacterCount" to (notes?.length ?: 0).toString(),
+      )
+    }
+
+  /**
+   * Returns a map of data representing the custom dimensions for the `step-remove` event.
+   */
+  private fun stepRemoveEventCustomDimensions(goal: Goal): Map<String, String> =
+    with(goal) {
+      mapOf(
+        "reference" to reference.toString(),
+        "stepCount" to steps.size.toString(),
       )
     }
 }

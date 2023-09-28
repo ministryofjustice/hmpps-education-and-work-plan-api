@@ -25,7 +25,7 @@ class AsyncActionPlanEventService(
       log.info { "ActionPlan created event for prisoner [${actionPlan.prisonNumber}]" }
       launch {
         actionPlan.goals.forEach {
-          telemetryService.trackGoalCreateEvent(it)
+          telemetryService.trackGoalCreatedEvent(it)
         }
       }
       launch {

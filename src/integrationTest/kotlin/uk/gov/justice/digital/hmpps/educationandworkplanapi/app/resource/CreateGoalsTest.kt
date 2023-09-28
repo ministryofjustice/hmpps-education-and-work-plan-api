@@ -178,7 +178,7 @@ class CreateGoalsTest : IntegrationTestBase() {
       "notesCharacterCount" to "23",
     )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
+      verify(telemetryClient).trackEvent("goal-created", expectedEventCustomDimensions, null)
     }
 
     // assert timeline event is created successfully
@@ -228,7 +228,7 @@ class CreateGoalsTest : IntegrationTestBase() {
       "notesCharacterCount" to "83",
     )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
+      verify(telemetryClient).trackEvent("goal-created", expectedEventCustomDimensions, null)
     }
 
     // assert timeline event is created successfully
@@ -290,7 +290,7 @@ class CreateGoalsTest : IntegrationTestBase() {
       "notesCharacterCount" to "0",
     )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-create", expectedEventCustomDimensions, null)
+      verify(telemetryClient).trackEvent("goal-created", expectedEventCustomDimensions, null)
     }
   }
 }

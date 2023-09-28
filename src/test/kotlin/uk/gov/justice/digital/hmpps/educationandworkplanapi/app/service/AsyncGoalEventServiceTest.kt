@@ -43,7 +43,7 @@ class AsyncGoalEventServiceTest {
     // Then
     await.untilAsserted {
       verify(timelineEventFactory).goalCreatedTimelineEvent(createdGoal)
-      verify(telemetryService).trackGoalCreateEvent(createdGoal)
+      verify(telemetryService).trackGoalCreatedEvent(createdGoal)
       verify(timelineService).recordTimelineEvent(prisonNumber, createGoalTimelineEvent)
     }
   }
@@ -63,8 +63,8 @@ class AsyncGoalEventServiceTest {
     // Then
     await.untilAsserted {
       verify(timelineEventFactory).goalUpdatedEvents(previousGoal, updatedGoal)
-      verify(telemetryService).trackGoalUpdateEvent(updatedGoal)
       verify(timelineService).recordTimelineEvents(prisonNumber, expectedTimelineEvents)
+      verify(telemetryService).trackGoalUpdatedEvents(previousGoal, updatedGoal)
     }
   }
 }
