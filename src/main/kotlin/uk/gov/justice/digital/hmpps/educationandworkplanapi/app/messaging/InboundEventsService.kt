@@ -15,7 +15,7 @@ class InboundEventsService(
 ) {
 
   fun process(inboundEvent: InboundEvent) {
-    val timelineEventType = when (inboundEvent.eventType()) {
+    val timelineEventType = when (inboundEvent.eventType) {
       CIAG_INDUCTION_CREATED -> INDUCTION_CREATED
       CIAG_INDUCTION_UPDATED -> INDUCTION_UPDATED
     }
@@ -33,7 +33,7 @@ class InboundEventsService(
         prisonId = prisonId(),
         actionedBy = userId(),
         actionedByDisplayName = userDisplayName(),
-        timestamp = occurredAt(),
+        timestamp = occurredAt,
       )
     }
 }

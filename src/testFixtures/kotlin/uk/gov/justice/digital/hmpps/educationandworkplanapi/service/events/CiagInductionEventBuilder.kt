@@ -13,9 +13,10 @@ fun aValidCiagInductionCreatedEvent(
   prisonNumber: String = aValidPrisonNumber(),
   reference: String = UUID.randomUUID().toString(),
   prisonId: String = "MDI",
-  occurredAt: Instant = Instant.now(),
   userId: String = "rwest_gen",
   userDisplayName: String? = "Rose West",
+  occurredAt: Instant = Instant.now(),
+  version: Int = 1,
 ): InboundEvent =
   InboundEvent(
     eventType = EventType.CIAG_INDUCTION_CREATED,
@@ -23,19 +24,21 @@ fun aValidCiagInductionCreatedEvent(
     additionalInformation = AdditionalInformation(
       reference = reference,
       prisonId = prisonId,
-      occurredAt = occurredAt,
       userId = userId,
       userDisplayName = userDisplayName,
     ),
+    occurredAt = occurredAt,
+    version = version,
   )
 
 fun aValidCiagInductionUpdatedEvent(
   prisonNumber: String = aValidPrisonNumber(),
   reference: String = UUID.randomUUID().toString(),
   prisonId: String = "MDI",
-  occurredAt: Instant = Instant.now(),
   userId: String = "rwest_gen",
   userDisplayName: String? = "Rose West",
+  occurredAt: Instant = Instant.now(),
+  version: Int = 1,
 ): InboundEvent =
   InboundEvent(
     eventType = EventType.CIAG_INDUCTION_UPDATED,
@@ -43,8 +46,9 @@ fun aValidCiagInductionUpdatedEvent(
     additionalInformation = AdditionalInformation(
       reference = reference,
       prisonId = prisonId,
-      occurredAt = occurredAt,
       userId = userId,
       userDisplayName = userDisplayName,
     ),
+    occurredAt = occurredAt,
+    version = version,
   )
