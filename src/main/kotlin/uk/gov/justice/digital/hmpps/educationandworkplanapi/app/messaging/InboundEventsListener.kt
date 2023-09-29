@@ -22,7 +22,7 @@ class InboundEventsListener(
     when (sqsMessage.Type) {
       NOTIFICATION -> {
         mapper.readValue<InboundEvent>(sqsMessage.Message).let {
-          log.info { "Processing inbound event ${it.eventType()}" }
+          log.info { "Processing inbound event ${it.eventType}" }
           inboundEventsService.process(it)
         }
       }

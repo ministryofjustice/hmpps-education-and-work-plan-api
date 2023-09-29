@@ -7,11 +7,11 @@ data class InboundEvent(
   val eventType: EventType,
   val personReference: PersonReference,
   val additionalInformation: AdditionalInformation,
+  val occurredAt: Instant,
+  val version: Int,
 ) {
-  fun eventType(): EventType = eventType
   fun reference() = additionalInformation.reference
   fun prisonNumber(): String = personReference.identifiers.first { it.type == "NOMS" }.value
-  fun occurredAt() = additionalInformation.occurredAt
   fun prisonId() = additionalInformation.prisonId
   fun userId() = additionalInformation.userId
   fun userDisplayName() = additionalInformation.userDisplayName
@@ -25,7 +25,6 @@ enum class EventType(@JsonValue val eventType: String) {
 data class AdditionalInformation(
   val reference: String,
   val prisonId: String,
-  val occurredAt: Instant,
   val userId: String,
   val userDisplayName: String?,
 )
