@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange as TargetDateRangeEntity
 
 class CreateActionPlanTest : IntegrationTestBase() {
 
@@ -234,7 +233,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val step = goal.steps!![0]
     assertThat(step)
       .hasTitle(createStepRequest.title)
-      .hasTargetDateRange(TargetDateRangeEntity.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.NOT_STARTED)
       .wasCreatedBy(dpsUsername)
 

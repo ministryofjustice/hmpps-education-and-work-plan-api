@@ -100,7 +100,6 @@ class TimelineEventFactory {
   private fun hasStepBeenUpdated(previousStep: Step?, updatedStep: Step) =
     previousStep != null && (
       updatedStep.title != previousStep.title ||
-        updatedStep.targetDateRange != previousStep.targetDateRange ||
         updatedStep.sequenceNumber != previousStep.sequenceNumber
       )
 

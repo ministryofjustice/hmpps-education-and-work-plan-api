@@ -18,7 +18,7 @@ import java.util.UUID
 class Goal(
   val reference: UUID,
   val title: String,
-  val targetCompletionDate: LocalDate?,
+  val targetCompletionDate: LocalDate,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
   val createdBy: String?,

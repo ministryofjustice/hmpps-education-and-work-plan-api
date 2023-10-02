@@ -17,7 +17,6 @@ import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 @Table(name = "step")
@@ -36,14 +35,6 @@ class StepEntity(
   @Column
   @field:NotNull
   var title: String? = null,
-
-  @Column
-  @Enumerated(value = EnumType.STRING)
-  var targetDateRange: TargetDateRange? = null,
-
-  // targetDate is no longer used but remains here (and in the database table) in case the business decide to use it again
-  @Column
-  var targetDate: LocalDate? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
@@ -84,13 +75,6 @@ class StepEntity(
   override fun toString(): String {
     return this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
   }
-}
-
-enum class TargetDateRange {
-  ZERO_TO_THREE_MONTHS,
-  THREE_TO_SIX_MONTHS,
-  SIX_TO_TWELVE_MONTHS,
-  MORE_THAN_TWELVE_MONTHS,
 }
 
 enum class StepStatus {

@@ -96,7 +96,6 @@ class TelemetryEventTypeResolver {
 
   private fun hasStepBeenUpdated(previousStep: Step, updatedStep: Step) =
     updatedStep.title != previousStep.title ||
-      updatedStep.targetDateRange != previousStep.targetDateRange ||
       updatedStep.sequenceNumber != previousStep.sequenceNumber
 
   private fun hasStepStatusChanged(previousStep: Step, updatedStep: Step) =

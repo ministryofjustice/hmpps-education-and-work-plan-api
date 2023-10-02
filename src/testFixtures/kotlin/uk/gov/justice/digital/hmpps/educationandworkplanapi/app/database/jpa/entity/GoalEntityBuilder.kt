@@ -9,7 +9,7 @@ fun aValidGoalEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
-  targetCompletionDate: LocalDate? = LocalDate.now().plusMonths(6),
+  targetCompletionDate: LocalDate = LocalDate.now().plusMonths(6),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
   steps: List<StepEntity> = listOf(aValidStepEntity()),

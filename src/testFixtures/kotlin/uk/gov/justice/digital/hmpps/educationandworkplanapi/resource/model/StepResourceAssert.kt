@@ -21,16 +21,6 @@ class StepResponseAssert(actual: StepResponse?) :
     return this
   }
 
-  fun hasTargetDateRange(expected: TargetDateRange): StepResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (targetDateRange != expected) {
-        failWithMessage("Expected targetDateRange to be $expected, but was $targetDateRange")
-      }
-    }
-    return this
-  }
-
   fun hasStatus(expected: StepStatus): StepResponseAssert {
     isNotNull
     with(actual!!) {
