@@ -1,15 +1,22 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import com.microsoft.applicationinsights.TelemetryClient
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.given
+import org.mockito.kotlin.secondValue
+import org.mockito.kotlin.thirdValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -39,6 +46,9 @@ class TelemetryServiceTest {
   @Mock
   private lateinit var telemetryEventTypeResolver: TelemetryEventTypeResolver
 
+  @Captor
+  private lateinit var eventPropertiesCaptor: ArgumentCaptor<Map<String, String>>
+
   @InjectMocks
   private lateinit var telemetryService: TelemetryService
 
@@ -58,7 +68,9 @@ class TelemetryServiceTest {
         notes = null,
       )
 
+      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
         "reference" to reference.toString(),
         "status" to "ACTIVE",
         "stepCount" to "3",
@@ -66,7 +78,7 @@ class TelemetryServiceTest {
       )
 
       // When
-      telemetryService.trackGoalCreatedEvent(goal)
+      telemetryService.trackGoalCreatedEvent(goal, correlationId)
 
       // Then
       verify(telemetryClient).trackEvent("goal-created", expectedEventProperties)
@@ -86,7 +98,9 @@ class TelemetryServiceTest {
         notes = "Some notes about the goal",
       )
 
+      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
         "reference" to reference.toString(),
         "status" to "ACTIVE",
         "stepCount" to "3",
@@ -94,7 +108,7 @@ class TelemetryServiceTest {
       )
 
       // When
-      telemetryService.trackGoalCreatedEvent(goal)
+      telemetryService.trackGoalCreatedEvent(goal, correlationId)
 
       // Then
       verify(telemetryClient).trackEvent("goal-created", expectedEventProperties)
@@ -117,13 +131,15 @@ class TelemetryServiceTest {
         notes = null,
       )
 
+      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
         "reference" to reference.toString(),
         "notesCharacterCount" to "0",
       )
 
       // When
-      telemetryService.trackGoalUpdatedEvent(goal)
+      telemetryService.trackGoalUpdatedEvent(goal, correlationId)
 
       // Then
       verify(telemetryClient).trackEvent("goal-updated", expectedEventProperties)
@@ -143,13 +159,15 @@ class TelemetryServiceTest {
         notes = "Chris wants to become a chef on release so basic food hygiene course will be useful.",
       )
 
+      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
         "reference" to reference.toString(),
         "notesCharacterCount" to "84",
       )
 
       // When
-      telemetryService.trackGoalUpdatedEvent(goal)
+      telemetryService.trackGoalUpdatedEvent(goal, correlationId)
 
       // Then
       verify(telemetryClient).trackEvent("goal-updated", expectedEventProperties)
@@ -169,13 +187,15 @@ class TelemetryServiceTest {
         steps = steps,
       )
 
+      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
         "reference" to reference.toString(),
         "stepCount" to "3",
       )
 
       // When
-      telemetryService.trackStepRemovedEvent(goal)
+      telemetryService.trackStepRemovedEvent(goal, correlationId)
 
       // Then
       verify(telemetryClient).trackEvent("step-removed", expectedEventProperties)
@@ -215,9 +235,16 @@ class TelemetryServiceTest {
       // Then
       verify(telemetryEventTypeResolver).resolveUpdateEventTypes(previousGoal, updatedGoal)
 
-      verify(telemetryClient).trackEvent(eq("goal-updated"), any(), eq(null))
-      verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), any(), eq(null))
+      verify(telemetryClient).trackEvent(eq("goal-updated"), capture(eventPropertiesCaptor), eq(null))
+      verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), capture(eventPropertiesCaptor), eq(null))
       verifyNoMoreInteractions(telemetryClient)
+
+      val propertiesForGoalUpdatedEvent = eventPropertiesCaptor.firstValue
+      val propertiesForFirstStepRemovalEvent = eventPropertiesCaptor.secondValue
+      val propertiesForSecondStepRemovalEvent = eventPropertiesCaptor.thirdValue
+      assertThat(propertiesForGoalUpdatedEvent["correlationId"])
+        .isEqualTo(propertiesForFirstStepRemovalEvent["correlationId"])
+        .isEqualTo(propertiesForSecondStepRemovalEvent["correlationId"])
     }
   }
 }
