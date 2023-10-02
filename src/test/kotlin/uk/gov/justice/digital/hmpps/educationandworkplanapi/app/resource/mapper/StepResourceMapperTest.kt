@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
@@ -15,7 +14,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus as StepStatusApi
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange as TargetDateRangeApi
 
 @ExtendWith(MockitoExtension::class)
 internal class StepResourceMapperTest {
@@ -26,13 +24,10 @@ internal class StepResourceMapperTest {
   @Test
   fun `should map from CreateStepRequest model to DTO`() {
     // Given
-    val createStepRequest = aValidCreateStepRequest(
-      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
-    )
+    val createStepRequest = aValidCreateStepRequest()
 
     val expectedCreateStepDto = aValidCreateStepDto(
       title = createStepRequest.title,
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.NOT_STARTED,
       sequenceNumber = createStepRequest.sequenceNumber,
     )
@@ -50,14 +45,12 @@ internal class StepResourceMapperTest {
     val stepReference = UUID.randomUUID()
     val updateStepRequest = aValidUpdateStepRequest(
       stepReference = stepReference,
-      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
       status = StepStatusApi.ACTIVE,
     )
 
     val expectedUpdateStepDto = aValidUpdateStepDto(
       reference = stepReference,
       title = updateStepRequest.title,
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = updateStepRequest.sequenceNumber,
     )
@@ -74,14 +67,12 @@ internal class StepResourceMapperTest {
     // Given
     val updateStepRequest = aValidUpdateStepRequest(
       stepReference = null,
-      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
       status = StepStatusApi.ACTIVE,
     )
 
     val expectedUpdateStepDto = aValidUpdateStepDto(
       reference = null,
       title = updateStepRequest.title,
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = updateStepRequest.sequenceNumber,
     )
@@ -100,7 +91,6 @@ internal class StepResourceMapperTest {
     val expected = aValidStepResponse(
       reference = step.reference,
       title = step.title,
-      targetDateRange = TargetDateRangeApi.ZERO_TO_THREE_MONTHS,
       status = StepStatusApi.NOT_STARTED,
       sequenceNumber = step.sequenceNumber,
     )

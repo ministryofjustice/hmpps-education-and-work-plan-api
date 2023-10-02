@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
@@ -46,7 +45,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidStepEntity(
           reference = stepReference,
           title = "Book communication skills course",
-          targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
@@ -66,7 +64,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
@@ -98,7 +95,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val stepEntity = aValidStepEntity(
       reference = stepReference,
       title = "Book communication skills course",
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 1,
     )
@@ -124,7 +120,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course within 6 months",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.THREE_TO_SIX_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.COMPLETE,
           sequenceNumber = 1,
         ),
@@ -136,7 +131,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         stepEntity.deepCopy().apply {
           reference = stepReference
           title = "Book communication skills course within 6 months"
-          targetDateRange = TargetDateRange.THREE_TO_SIX_MONTHS
           status = StepStatus.COMPLETE
           sequenceNumber = 1
         },
@@ -160,7 +154,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val step1Entity = aValidStepEntity(
       reference = step1Reference,
       title = "Book communication skills course",
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 1,
     )
@@ -186,14 +179,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
@@ -203,7 +194,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val expectedStep2Entity = aValidStepEntity(
       reference = step2Reference,
       title = "Attend skills course",
-      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 2,
     )
@@ -232,14 +222,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val step1Entity = aValidStepEntity(
       reference = step1Reference,
       title = "Book communication skills course",
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 1,
     )
     val step2Entity = aValidStepEntity(
       reference = step2Reference,
       title = "Attend skills course",
-      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 2,
     )
@@ -267,21 +255,18 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
         aValidUpdateStepDto(
           reference = newStepReference,
           title = "Do pre-course homework and preparation",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 3,
         ),
@@ -302,14 +287,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       .doesNotHaveJpaManagedFieldsPopulated()
       .hasReference(newStepReference)
       .hasTitle("Do pre-course homework and preparation")
-      .hasTargetDateRange(TargetDateRange.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(2)
     assertThat(goalEntity.steps!![2])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
       .hasTitle("Attend skills course")
-      .hasTargetDateRange(TargetDateRange.SIX_TO_TWELVE_MONTHS)
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(3)
   }
@@ -324,14 +307,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val step1Entity = aValidStepEntity(
       reference = step1Reference,
       title = "Book communication skills course",
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 1,
     )
     val step2Entity = aValidStepEntity(
       reference = step2Reference,
       title = "Attend skills course",
-      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 2,
     )
@@ -357,14 +338,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
         aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
@@ -384,14 +363,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
       .hasTitle("Attend skills course")
-      .hasTargetDateRange(TargetDateRange.SIX_TO_TWELVE_MONTHS)
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(1)
     assertThat(goalEntity.steps!![1])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step1Reference)
       .hasTitle("Book communication skills course")
-      .hasTargetDateRange(TargetDateRange.ZERO_TO_THREE_MONTHS)
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(2)
   }
@@ -406,14 +383,12 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val step1Entity = aValidStepEntity(
       reference = step1Reference,
       title = "Book communication skills course",
-      targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 1,
     )
     val step2Entity = aValidStepEntity(
       reference = step2Reference,
       title = "Attend skills course",
-      targetDateRange = TargetDateRange.SIX_TO_TWELVE_MONTHS,
       status = StepStatus.ACTIVE,
       sequenceNumber = 2,
     )
@@ -439,7 +414,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.SIX_TO_TWELVE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
@@ -459,7 +433,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
       .hasTitle("Attend skills course")
-      .hasTargetDateRange(TargetDateRange.SIX_TO_TWELVE_MONTHS)
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(1)
   }
@@ -480,7 +453,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidStepEntity(
           reference = stepReference,
           title = "Book communication skills course",
-          targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
@@ -500,7 +472,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
         aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course",
-          targetDateRange = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange.ZERO_TO_THREE_MONTHS,
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),

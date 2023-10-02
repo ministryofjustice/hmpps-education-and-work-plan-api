@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TargetDateRange
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
@@ -124,7 +123,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   fun `should add goals and create a new action plan given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val stepRequest = aValidCreateStepRequest(targetDateRange = TargetDateRange.ZERO_TO_THREE_MONTHS)
+    val stepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(steps = listOf(stepRequest), notes = "Notes about the goal...")
     val createGoalsRequest = aValidCreateGoalsRequest(
       goals = listOf(createGoalRequest),
@@ -165,7 +164,6 @@ class CreateGoalsTest : IntegrationTestBase() {
           .hasUpdatedByDisplayName(displayName)
           .step(1) { step ->
             step.hasTitle(stepRequest.title)
-              .hasTargetDateRange(TargetDateRange.ZERO_TO_THREE_MONTHS)
               .hasStatus(StepStatus.NOT_STARTED)
           }
       }
@@ -255,8 +253,8 @@ class CreateGoalsTest : IntegrationTestBase() {
     val createGoalRequest = aValidCreateGoalRequest(
       notes = null,
       steps = listOf(
-        aValidCreateStepRequest(targetDateRange = null),
-        anotherValidCreateStepRequest(targetDateRange = null),
+        aValidCreateStepRequest(),
+        anotherValidCreateStepRequest(),
       ),
     )
     val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))

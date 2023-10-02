@@ -108,16 +108,6 @@ class StepEntityAssert(actual: StepEntity?) :
     return this
   }
 
-  fun hasTargetDateRange(expected: TargetDateRange): StepEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (targetDateRange != expected) {
-        failWithMessage("Expected targetDateRange to be $expected, but was $targetDateRange")
-      }
-    }
-    return this
-  }
-
   fun hasStatus(expected: StepStatus): StepEntityAssert {
     isNotNull
     with(actual!!) {

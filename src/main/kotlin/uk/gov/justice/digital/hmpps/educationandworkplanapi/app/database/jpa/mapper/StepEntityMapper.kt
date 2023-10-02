@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper
 
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
@@ -18,7 +17,6 @@ interface StepEntityMapper {
    */
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  @Mapping(target = "targetDate", ignore = true)
   fun fromDtoToEntity(createStepDto: CreateStepDto): StepEntity
 
   /**
@@ -27,7 +25,6 @@ interface StepEntityMapper {
    * This method is suitable for creating a new [StepEntity] to be subsequently persisted to the database.
    */
   @ExcludeJpaManagedFields
-  @Mapping(target = "targetDate", ignore = true)
   fun fromDtoToEntity(updateStepDto: UpdateStepDto): StepEntity
 
   /**
@@ -37,6 +34,5 @@ interface StepEntityMapper {
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
-  @Mapping(target = "targetDate", ignore = true)
   fun updateEntityFromDto(@MappingTarget stepEntity: StepEntity, updatedStep: UpdateStepDto)
 }

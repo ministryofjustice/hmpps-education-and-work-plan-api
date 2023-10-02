@@ -7,7 +7,7 @@ import java.util.UUID
 fun aValidGoalResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
-  targetCompletionDate: LocalDate? = null,
+  targetCompletionDate: LocalDate = LocalDate.now().plusMonths(6),
   steps: List<StepResponse> = listOf(aValidStepResponse(), anotherValidStepResponse()),
   status: GoalStatus = GoalStatus.ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
@@ -40,7 +40,7 @@ fun aValidGoalResponse(
 fun anotherValidGoalResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Learn bricklaying",
-  targetCompletionDate: LocalDate? = LocalDate.now().plusMonths(6),
+  targetCompletionDate: LocalDate = LocalDate.now().plusMonths(6),
   steps: List<StepResponse> = listOf(aValidStepResponse(title = "Attend in house bricklaying course")),
   status: GoalStatus = GoalStatus.ACTIVE,
   notes: String? = null,

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.TargetDateRange
 import java.util.UUID
 
 /**
@@ -10,7 +9,6 @@ import java.util.UUID
 data class UpdateStepDto(
   val reference: UUID?,
   val title: String,
-  val targetDateRange: TargetDateRange?,
   val status: StepStatus = StepStatus.NOT_STARTED,
   val sequenceNumber: Int,
 )

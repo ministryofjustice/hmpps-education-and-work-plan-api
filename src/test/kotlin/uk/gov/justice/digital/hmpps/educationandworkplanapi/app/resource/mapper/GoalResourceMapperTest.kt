@@ -106,7 +106,7 @@ internal class GoalResourceMapperTest {
     val step = aValidStep()
     val goal = aValidGoal(
       status = GoalStatus.ACTIVE,
-      targetCompletionDate = null,
+      targetCompletionDate = LocalDate.now().plusMonths(6),
       steps = mutableListOf(step),
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
@@ -122,7 +122,7 @@ internal class GoalResourceMapperTest {
     val expected = aValidGoalResponse(
       reference = goal.reference,
       title = goal.title,
-      targetCompletionDate = null,
+      targetCompletionDate = goal.targetCompletionDate,
       status = GoalStatusApi.ACTIVE,
       notes = goal.notes,
       steps = listOf(expectedStepResponse),

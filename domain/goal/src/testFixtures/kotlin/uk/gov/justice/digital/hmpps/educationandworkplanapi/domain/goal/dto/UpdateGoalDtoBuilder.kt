@@ -9,7 +9,7 @@ fun aValidUpdateGoalDto(
   reference: UUID = UUID.randomUUID(),
   title: String = "Improve communication skills",
   prisonId: String = "BXI",
-  targetCompletionDate: LocalDate? = null,
+  targetCompletionDate: LocalDate = LocalDate.now().plusMonths(6),
   steps: List<UpdateStepDto> = listOf(aValidUpdateStepDto(), anotherValidUpdateStepDto()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",

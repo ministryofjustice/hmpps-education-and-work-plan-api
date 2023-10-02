@@ -9,7 +9,7 @@ import java.time.LocalDate
 class CreateGoalDto(
   val title: String,
   val prisonId: String,
-  val targetCompletionDate: LocalDate?,
+  val targetCompletionDate: LocalDate,
   var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
   steps: List<CreateStepDto>,
