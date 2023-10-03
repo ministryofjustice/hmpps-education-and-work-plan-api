@@ -1,7 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.secondValue
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -169,14 +176,21 @@ class CreateGoalsTest : IntegrationTestBase() {
       }
 
     val goal = actionPlanResponse.goals[0]
-    val expectedEventCustomDimensions = mapOf(
-      "status" to "ACTIVE",
-      "stepCount" to "1",
-      "reference" to goal.goalReference.toString(),
-      "notesCharacterCount" to "23",
-    )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-created", expectedEventCustomDimensions, null)
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      // Event should be triggered only once for the new goal created
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("goal-created"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createGoalEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createGoalEventProperties)
+        .containsEntry("status", "ACTIVE")
+        .containsEntry("stepCount", "1")
+        .containsEntry("reference", goal.goalReference.toString())
+        .containsEntry("notesCharacterCount", "23")
+        .containsKey("correlationId")
     }
 
     // assert timeline event is created successfully
@@ -219,14 +233,21 @@ class CreateGoalsTest : IntegrationTestBase() {
       .hasNumberOfGoals(2)
 
     val goal = actual.goals[0]
-    val expectedEventCustomDimensions = mapOf(
-      "status" to "ACTIVE",
-      "stepCount" to "2",
-      "reference" to goal.goalReference.toString(),
-      "notesCharacterCount" to "83",
-    )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-created", expectedEventCustomDimensions, null)
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      // Event would be triggered twice - once for the original goal create, and once for the new goal created
+      verify(telemetryClient, times(2)).trackEvent(
+        eq("goal-created"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createGoalEventProperties = eventPropertiesCaptor.secondValue
+      assertThat(createGoalEventProperties)
+        .containsEntry("status", "ACTIVE")
+        .containsEntry("stepCount", "2")
+        .containsEntry("reference", goal.goalReference.toString())
+        .containsEntry("notesCharacterCount", "83")
+        .containsKey("correlationId")
     }
 
     // assert timeline event is created successfully
@@ -281,14 +302,21 @@ class CreateGoalsTest : IntegrationTestBase() {
       }
 
     val goal = actual.goals[0]
-    val expectedEventCustomDimensions = mapOf(
-      "status" to "ACTIVE",
-      "stepCount" to "2",
-      "reference" to goal.goalReference.toString(),
-      "notesCharacterCount" to "0",
-    )
     await.untilAsserted {
-      verify(telemetryClient).trackEvent("goal-created", expectedEventCustomDimensions, null)
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      // Event would be triggered twice - once for the original goal create, and once for the new goal created
+      verify(telemetryClient, times(2)).trackEvent(
+        eq("goal-created"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createGoalEventProperties = eventPropertiesCaptor.secondValue
+      assertThat(createGoalEventProperties)
+        .containsEntry("status", "ACTIVE")
+        .containsEntry("stepCount", "2")
+        .containsEntry("reference", goal.goalReference.toString())
+        .containsEntry("notesCharacterCount", "0")
+        .containsKey("correlationId")
     }
   }
 }

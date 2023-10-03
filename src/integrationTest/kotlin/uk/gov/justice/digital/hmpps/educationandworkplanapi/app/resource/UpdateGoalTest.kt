@@ -3,6 +3,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -243,22 +248,29 @@ class UpdateGoalTest : IntegrationTestBase() {
       }
 
     await.untilAsserted {
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+
       verify(telemetryClient).trackEvent(
-        "goal-updated",
-        mapOf(
-          "reference" to goalReference.toString(),
-          "notesCharacterCount" to "83",
-        ),
-        null,
+        eq("goal-updated"),
+        capture(eventPropertiesCaptor),
+        eq(null),
       )
       verify(telemetryClient).trackEvent(
-        "step-removed",
-        mapOf(
-          "reference" to goalReference.toString(),
-          "stepCount" to "2",
-        ),
-        null,
+        eq("step-removed"),
+        capture(eventPropertiesCaptor),
+        eq(null),
       )
+
+      val goalUpdatedEventProperties = eventPropertiesCaptor.firstValue
+      val stepRemovedEventProperties = eventPropertiesCaptor.secondValue
+      assertThat(goalUpdatedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+        .containsEntry("notesCharacterCount", "83")
+      assertThat(stepRemovedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+        .containsEntry("stepCount", "2")
+      assertThat(goalUpdatedEventProperties["correlationId"])
+        .isEqualTo(stepRemovedEventProperties["correlationId"])
     }
 
     // assert timeline events are created successfully

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
@@ -43,7 +44,7 @@ class AsyncGoalEventServiceTest {
     // Then
     await.untilAsserted {
       verify(timelineEventFactory).goalCreatedTimelineEvent(createdGoal)
-      verify(telemetryService).trackGoalCreatedEvent(createdGoal)
+      verify(telemetryService).trackGoalCreatedEvent(eq(createdGoal), any())
       verify(timelineService).recordTimelineEvent(prisonNumber, createGoalTimelineEvent)
     }
   }

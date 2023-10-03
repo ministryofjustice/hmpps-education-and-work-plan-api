@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.Telemetr
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import java.util.UUID
 
 /**
  * Service class exposing methods to log telemetry events to ApplicationInsights.
@@ -17,16 +18,28 @@ class TelemetryService(
   private val telemetryEventTypeResolver: TelemetryEventTypeResolver,
 ) {
 
-  fun trackGoalCreatedEvent(goal: Goal) {
-    sendTelemetryEventForGoal(goal, GOAL_CREATED)
+  fun trackGoalCreatedEvent(createdGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForGoal(
+      goal = createdGoal,
+      correlationId = correlationId,
+      telemetryEventType = GOAL_CREATED,
+    )
   }
 
-  fun trackGoalUpdatedEvent(goal: Goal) {
-    sendTelemetryEventForGoal(goal, GOAL_UPDATED)
+  fun trackGoalUpdatedEvent(updatedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForGoal(
+      goal = updatedGoal,
+      correlationId = correlationId,
+      telemetryEventType = GOAL_UPDATED,
+    )
   }
 
-  fun trackStepRemovedEvent(goal: Goal) {
-    sendTelemetryEventForGoal(goal, STEP_REMOVED)
+  fun trackStepRemovedEvent(updatedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForGoal(
+      goal = updatedGoal,
+      correlationId = correlationId,
+      telemetryEventType = STEP_REMOVED,
+    )
   }
 
   /**
@@ -34,17 +47,18 @@ class TelemetryService(
    * updatedGoal.
    */
   fun trackGoalUpdatedEvents(previousGoal: Goal, updatedGoal: Goal) {
+    val correlationId = UUID.randomUUID()
     val telemetryUpdateEvents =
       telemetryEventTypeResolver.resolveUpdateEventTypes(previousGoal = previousGoal, updatedGoal = updatedGoal)
     telemetryUpdateEvents.forEach {
       when (it) {
-        GOAL_UPDATED -> trackGoalUpdatedEvent(updatedGoal)
-        STEP_REMOVED -> trackStepRemovedEvent(updatedGoal)
+        GOAL_UPDATED -> trackGoalUpdatedEvent(updatedGoal, correlationId)
+        STEP_REMOVED -> trackStepRemovedEvent(updatedGoal, correlationId)
         else -> {}
       }
     }
   }
 
-  private fun sendTelemetryEventForGoal(goal: Goal, telemetryEventType: TelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal))
+  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: TelemetryEventType) =
+    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
 }
