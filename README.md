@@ -43,6 +43,41 @@ The easiest (and slowest) way to run the app is to use docker compose to create 
 * See `http://localhost:8081/health` to check the app is running.
 * See `http://localhost:8081/swagger-ui/index.html?configUrl=/v3/api-docs` to explore the OpenAPI spec document.
 
+## Environment variables
+The following environment variables are required in order for the app to start:
+
+### General
+
+| Name           | Description                                |
+|----------------|--------------------------------------------|
+| SERVER_PORT    | The port that the application will run on  |
+| HMPPS_AUTH_URL | The URL for OAuth 2.0 authorisation server |
+
+### Database
+
+| Name      | Description                       |
+|-----------|-----------------------------------|
+| DB_SERVER | The host of the DB server         |
+| DB_NAME   | The name of the database instance |        
+| DB_USER   | The application's DB username     |
+| DB_PASS   | The DB user's password            |
+
+### Application Insights
+
+| Name                                   | Description                              |
+|----------------------------------------|------------------------------------------|
+| APPINSIGHTS_INSTRUMENTATIONKEY         | The instrumentation key for App Insights |
+| APPLICATIONINSIGHTS_CONNECTION_STRING  | The connection string for App Insights   |
+| APPLICATIONINSIGHTS_CONFIGURATION_FILE | A configuration file for App Insights    |
+
+### SQS/SNS Topics and Queues
+
+| Name                                             | Description                                                               |
+|--------------------------------------------------|---------------------------------------------------------------------------|
+| HMPPS_SQS_USE_WEB_TOKEN                          | Set to `true` if the `DefaultAWSCredentialsProviderChain` should be used. |
+| HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN                | The AWS ARN for the shared domain-events topic.                           |
+| HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_QUEUE_NAME | The queue to receive events from the domain-events topic.                 |
+| HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_DLQ_NAME   | The dead letter queue for any failed messages.                            |
 
 ## Monitoring, tracing and event reporting
 The API is instrumented with the opentelemetry and Application Insights java agent. Useful data can be found and reported
