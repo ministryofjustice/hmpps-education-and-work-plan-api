@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.3.4'
+  version: '1.3.5'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -415,6 +415,11 @@ components:
           format: date-time
           description: An ISO-8601 timestamp representing when the event occurred.
           example: '2023-06-19T09:39:44Z'
+        correlationId:
+          type: string
+          format: uuid
+          description: An optional correlationId for this and any other TimelineEvents that occurred at the same time (i.e. within same atomic action). For example, this could be an update to a Goal, plus one or more of its child Steps. If required, this allows a client to easily group the events together.
+          example: 113d1833-0ce1-45ad-ab44-878c9d589358
       required:
         - reference
         - sourceReference

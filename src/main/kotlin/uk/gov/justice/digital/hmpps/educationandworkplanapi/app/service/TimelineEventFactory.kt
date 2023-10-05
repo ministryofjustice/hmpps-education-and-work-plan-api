@@ -35,6 +35,8 @@ class TimelineEventFactory {
    */
   fun goalUpdatedEvents(previousGoal: Goal, updatedGoal: Goal): List<TimelineEvent> {
     val events = mutableListOf<TimelineEvent>()
+    val correlationId = UUID.randomUUID()
+
     // check if the goal itself was updated, excluding its steps and status
     if (hasGoalBeenUpdated(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
       events.add(
@@ -43,6 +45,7 @@ class TimelineEventFactory {
           sourceReference = updatedGoal.reference,
           eventType = TimelineEventType.GOAL_UPDATED,
           contextualInfo = updatedGoal.title,
+          correlationId = correlationId,
         ),
       )
     }
@@ -55,6 +58,7 @@ class TimelineEventFactory {
           sourceReference = updatedGoal.reference,
           eventType = eventType,
           contextualInfo = updatedGoal.title,
+          correlationId = correlationId,
         ),
       )
     }
@@ -69,6 +73,7 @@ class TimelineEventFactory {
             sourceReference = previousStep!!.reference,
             eventType = TimelineEventType.STEP_UPDATED,
             contextualInfo = it.title,
+            correlationId = correlationId,
           ),
         )
       }
@@ -80,6 +85,7 @@ class TimelineEventFactory {
             sourceReference = previousStep!!.reference,
             eventType = eventType,
             contextualInfo = it.title,
+            correlationId = correlationId,
           ),
         )
       }
@@ -132,6 +138,7 @@ class TimelineEventFactory {
     sourceReference: UUID,
     eventType: TimelineEventType,
     contextualInfo: String?,
+    correlationId: UUID = UUID.randomUUID(),
   ) =
     TimelineEvent.newTimelineEvent(
       sourceReference = sourceReference.toString(),
@@ -141,5 +148,6 @@ class TimelineEventFactory {
       actionedBy = goal.lastUpdatedBy!!,
       actionedByDisplayName = goal.lastUpdatedByDisplayName!!,
       contextualInfo = contextualInfo,
+      correlationId = correlationId,
     )
 }

@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
@@ -135,7 +137,21 @@ class GetTimelineTest : IntegrationTestBase() {
     val actionPlanReference = actionPlan!!.reference!!
     val goal1Reference = actionPlan.goals!![0].reference!!
     val goal2Reference = actionPlan.goals!![1].reference!!
-    updateGoal(prisonNumber, aValidUpdateGoalRequest(goalReference = goal1Reference, title = "Learn Spanish"))
+    val stepToUpdate = actionPlan.goals!![0].steps!![0]
+
+    val updateGoalRequest = aValidUpdateGoalRequest(
+      goalReference = goal1Reference,
+      title = "Learn Spanish",
+      steps = listOf(
+        aValidUpdateStepRequest(
+          stepReference = stepToUpdate.reference,
+          title = "Research course options",
+          status = StepStatus.ACTIVE,
+          sequenceNumber = 1,
+        ),
+      ),
+    )
+    updateGoal(prisonNumber, updateGoalRequest)
 
     // When
     val response = webTestClient.get()
@@ -148,6 +164,7 @@ class GetTimelineTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
+    val goalUpdatedCorrelationId = actual.events[2].correlationId!!
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .event(1) {
@@ -155,18 +172,35 @@ class GetTimelineTest : IntegrationTestBase() {
           .hasPrisonId("BXI")
           .hasSourceReference(actionPlanReference.toString())
           .hasNoContextualInfo() // creating an action plan has no contextual info
+          .doesNotHaveCorrelationId(goalUpdatedCorrelationId)
       }
       .event(2) {
         it.hasEventType(TimelineEventType.GOAL_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal2Reference.toString())
           .hasContextualInfo("Learn French")
+          .doesNotHaveCorrelationId(goalUpdatedCorrelationId)
       }
       .event(3) {
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal1Reference.toString())
           .hasContextualInfo("Learn Spanish") // Learn German changed to Learn Spanish
+          .hasCorrelationId(goalUpdatedCorrelationId)
+      }
+      .event(4) {
+        it.hasEventType(TimelineEventType.STEP_UPDATED)
+          .hasPrisonId("BXI")
+          .hasSourceReference(stepToUpdate.reference.toString())
+          .hasContextualInfo("Research course options") // Learn German changed to Learn Spanish
+          .hasCorrelationId(goalUpdatedCorrelationId)
+      }
+      .event(5) {
+        it.hasEventType(TimelineEventType.STEP_STARTED)
+          .hasPrisonId("BXI")
+          .hasSourceReference(stepToUpdate.reference.toString())
+          .hasContextualInfo("Research course options") // Learn German changed to Learn Spanish
+          .hasCorrelationId(goalUpdatedCorrelationId)
       }
   }
 
