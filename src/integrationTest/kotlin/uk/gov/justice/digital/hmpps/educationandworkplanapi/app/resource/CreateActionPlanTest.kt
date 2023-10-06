@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -13,7 +12,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -235,20 +233,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .hasTitle(createStepRequest.title)
       .hasStatus(StepStatus.NOT_STARTED)
       .wasCreatedBy(dpsUsername)
-
-    // assert timeline event is created successfully
-    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
-    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
-    val events = prisonerTimeline.events!!
-    assertThat(events.size).isEqualTo(1)
-    assertThat(events[0]).hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
-    assertThat(events[0]).hasSourceReference(actionPlan.reference.toString())
-    assertThat(events[0]).hasNoContextualInfo()
-    assertThat(events[0]).wasActionedBy("auser_gen")
-    assertThat(events[0]).wasActionedByDisplayName("Albert User")
-    assertThat(events[0]).hasPrisonId("BXI")
-    assertThat(events[0]).hasAReference()
-    assertThat(events[0]).hasJpaManagedFieldsPopulated()
   }
 
   @Test

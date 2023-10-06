@@ -43,6 +43,16 @@ class TimelineEntityAssert(actual: TimelineEntity?) :
     return this
   }
 
+  fun hasPrisonNumber(expected: String): TimelineEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (prisonNumber != expected) {
+        failWithMessage("Expected prisonNumber to be $expected, but was $prisonNumber")
+      }
+    }
+    return this
+  }
+
   fun wasCreatedAt(expected: Instant): TimelineEntityAssert {
     isNotNull
     with(actual!!) {

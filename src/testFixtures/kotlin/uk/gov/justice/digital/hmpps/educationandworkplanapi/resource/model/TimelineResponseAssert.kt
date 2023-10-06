@@ -63,4 +63,16 @@ class TimelineResponseAssert(actual: TimelineResponse?) :
     }
     return this
   }
+
+  fun eventsHaveSameCorrelation(): TimelineResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val sharedCorrelationId = events[0].correlationId
+      val allMatch = events.all { it.correlationId == sharedCorrelationId }
+      if (!allMatch) {
+        failWithMessage("Expected Timeline events to have the same correlationId")
+      }
+    }
+    return this
+  }
 }

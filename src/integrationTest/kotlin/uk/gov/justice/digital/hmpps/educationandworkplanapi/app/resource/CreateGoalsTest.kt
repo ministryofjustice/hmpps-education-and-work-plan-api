@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
@@ -192,17 +191,6 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsEntry("notesCharacterCount", "23")
         .containsKey("correlationId")
     }
-
-    // assert timeline event is created successfully
-    val prisonerTimeline = getTimeline(prisonNumber)
-    assertThat(prisonerTimeline)
-      .isForPrisonNumber(prisonNumber)
-      .hasNumberOfEvents(1)
-      .event(1) { event ->
-        event.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
-          .hasSourceReference(actionPlanResponse.reference.toString())
-          .hasNoContextualInfo()
-      }
   }
 
   @Test
@@ -249,20 +237,6 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsEntry("notesCharacterCount", "83")
         .containsKey("correlationId")
     }
-
-    // assert timeline event is created successfully
-    val prisonerTimeline = getTimeline(prisonNumber)
-    assertThat(prisonerTimeline)
-      .isForPrisonNumber(prisonNumber)
-      .hasNumberOfEvents(2)
-      .event(2) { event ->
-        event.hasEventType(TimelineEventType.GOAL_CREATED)
-          .hasSourceReference(goal.goalReference.toString())
-          .hasContextualInfo(goal.title)
-          .wasActionedBy("auser_gen")
-          .hasActionedByDisplayName("Albert User")
-          .hasPrisonId("BXI")
-      }
   }
 
   @Test

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -108,9 +109,12 @@ class GetTimelineTest : IntegrationTestBase() {
 
     // Then
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    val goal = actionPlan!!.goals!![0]
     val actual = response.responseBody.blockFirst()
+    assertThat(actual.events).hasSize(2)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
+      .eventsHaveSameCorrelation()
       .event(1) {
         it.hasSourceReference(actionPlan!!.reference.toString())
           .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
@@ -118,6 +122,14 @@ class GetTimelineTest : IntegrationTestBase() {
           .wasActionedBy("auser_gen")
           .hasActionedByDisplayName("Albert User")
           .hasNoContextualInfo()
+      }
+      .event(2) {
+        it.hasSourceReference(goal.reference.toString())
+          .hasEventType(TimelineEventType.GOAL_CREATED)
+          .hasPrisonId("BXI")
+          .wasActionedBy("auser_gen")
+          .hasActionedByDisplayName("Albert User")
+          .hasContextualInfo(goal.title!!)
       }
   }
 
@@ -164,7 +176,9 @@ class GetTimelineTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-    val goalUpdatedCorrelationId = actual.events[2].correlationId!!
+    assertThat(actual.events).hasSize(6)
+    val actionPlanCreatedCorrelationId = actual.events[0].correlationId!!
+    val goalUpdatedCorrelationId = actual.events[4].correlationId!!
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .event(1) {
@@ -172,34 +186,42 @@ class GetTimelineTest : IntegrationTestBase() {
           .hasPrisonId("BXI")
           .hasSourceReference(actionPlanReference.toString())
           .hasNoContextualInfo() // creating an action plan has no contextual info
-          .doesNotHaveCorrelationId(goalUpdatedCorrelationId)
+          .hasCorrelationId(actionPlanCreatedCorrelationId)
       }
       .event(2) {
         it.hasEventType(TimelineEventType.GOAL_CREATED)
           .hasPrisonId("BXI")
-          .hasSourceReference(goal2Reference.toString())
-          .hasContextualInfo("Learn French")
-          .doesNotHaveCorrelationId(goalUpdatedCorrelationId)
+          .hasSourceReference(goal1Reference.toString())
+          .hasContextualInfo("Learn German")
+          .hasCorrelationId(actionPlanCreatedCorrelationId)
       }
       .event(3) {
+        it.hasEventType(TimelineEventType.GOAL_CREATED)
+          .hasPrisonId("BXI")
+          .hasSourceReference(goal2Reference.toString())
+          .hasContextualInfo("Learn French")
+          .doesNotHaveCorrelationId(actionPlanCreatedCorrelationId)
+          .doesNotHaveCorrelationId(goalUpdatedCorrelationId)
+      }
+      .event(4) {
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal1Reference.toString())
           .hasContextualInfo("Learn Spanish") // Learn German changed to Learn Spanish
           .hasCorrelationId(goalUpdatedCorrelationId)
       }
-      .event(4) {
+      .event(5) {
         it.hasEventType(TimelineEventType.STEP_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(stepToUpdate.reference.toString())
-          .hasContextualInfo("Research course options") // Learn German changed to Learn Spanish
+          .hasContextualInfo("Research course options")
           .hasCorrelationId(goalUpdatedCorrelationId)
       }
-      .event(5) {
+      .event(6) {
         it.hasEventType(TimelineEventType.STEP_STARTED)
           .hasPrisonId("BXI")
           .hasSourceReference(stepToUpdate.reference.toString())
-          .hasContextualInfo("Research course options") // Learn German changed to Learn Spanish
+          .hasContextualInfo("Research course options")
           .hasCorrelationId(goalUpdatedCorrelationId)
       }
   }

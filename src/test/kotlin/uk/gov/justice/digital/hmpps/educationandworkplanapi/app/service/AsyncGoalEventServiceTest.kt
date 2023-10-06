@@ -36,14 +36,14 @@ class AsyncGoalEventServiceTest {
     val prisonNumber = aValidPrisonNumber()
     val createdGoal = aValidGoal()
     val createGoalTimelineEvent = aValidTimelineEvent()
-    given(timelineEventFactory.goalCreatedTimelineEvent(any())).willReturn(createGoalTimelineEvent)
+    given(timelineEventFactory.goalCreatedTimelineEvent(any(), any())).willReturn(createGoalTimelineEvent)
 
     // When
     goalEventService.goalCreated(prisonNumber = prisonNumber, createdGoal = createdGoal)
 
     // Then
     await.untilAsserted {
-      verify(timelineEventFactory).goalCreatedTimelineEvent(createdGoal)
+      verify(timelineEventFactory).goalCreatedTimelineEvent(eq(createdGoal), any())
       verify(telemetryService).trackGoalCreatedEvent(eq(createdGoal), any())
       verify(timelineService).recordTimelineEvent(prisonNumber, createGoalTimelineEvent)
     }

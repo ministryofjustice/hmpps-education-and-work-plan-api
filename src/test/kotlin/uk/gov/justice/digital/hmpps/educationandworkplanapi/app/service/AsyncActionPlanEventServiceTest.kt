@@ -35,8 +35,11 @@ class AsyncActionPlanEventServiceTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlan()
-    val createActionPlanEvent = aValidTimelineEvent(eventType = TimelineEventType.ACTION_PLAN_CREATED)
-    given(timelineEventFactory.actionPlanCreatedEvent(any())).willReturn(createActionPlanEvent)
+    val createActionPlanEvents = listOf(
+      aValidTimelineEvent(eventType = TimelineEventType.ACTION_PLAN_CREATED),
+      aValidTimelineEvent(eventType = TimelineEventType.GOAL_CREATED),
+    )
+    given(timelineEventFactory.actionPlanCreatedEvent(any())).willReturn(createActionPlanEvents)
 
     // When
     actionPlanEventService.actionPlanCreated(actionPlan)
@@ -44,6 +47,6 @@ class AsyncActionPlanEventServiceTest {
     // Then
     verify(telemetryService).trackGoalCreatedEvent(eq(actionPlan.goals[0]), any())
     verify(timelineEventFactory).actionPlanCreatedEvent(actionPlan)
-    verify(timelineService).recordTimelineEvent(prisonNumber, createActionPlanEvent)
+    verify(timelineService).recordTimelineEvents(prisonNumber, createActionPlanEvents)
   }
 }

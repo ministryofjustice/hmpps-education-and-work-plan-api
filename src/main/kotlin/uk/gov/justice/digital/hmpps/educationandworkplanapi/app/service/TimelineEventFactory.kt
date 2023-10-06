@@ -9,22 +9,39 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import java.util.UUID
+
 /**
  * Responsible for identifying which [TimelineEvent]s have occurred, for example following an update to a [Goal].
  */
 @Component
 class TimelineEventFactory {
 
-  fun actionPlanCreatedEvent(actionPlan: ActionPlan) =
-    buildTimelineEvent(
-      actionPlan.goals[0],
-      actionPlan.reference,
-      TimelineEventType.ACTION_PLAN_CREATED,
-      contextualInfo = null,
+  fun actionPlanCreatedEvent(actionPlan: ActionPlan): List<TimelineEvent> {
+    val events = mutableListOf<TimelineEvent>()
+    val correlationId = UUID.randomUUID()
+    events.add(
+      buildTimelineEvent(
+        actionPlan.goals[0],
+        actionPlan.reference,
+        TimelineEventType.ACTION_PLAN_CREATED,
+        contextualInfo = null,
+        correlationId = correlationId,
+      ),
     )
+    actionPlan.goals.forEach {
+      events.add(goalCreatedTimelineEvent(it, correlationId))
+    }
+    return events
+  }
 
-  fun goalCreatedTimelineEvent(goal: Goal) =
-    buildTimelineEvent(goal, goal.reference, TimelineEventType.GOAL_CREATED, contextualInfo = goal.title)
+  fun goalCreatedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
+    buildTimelineEvent(
+      goal = goal,
+      sourceReference = goal.reference,
+      eventType = TimelineEventType.GOAL_CREATED,
+      contextualInfo = goal.title,
+      correlationId = correlationId,
+    )
 
   /**
    * Determines what type of [TimelineEvent]s have occurred, following an update to a [Goal]. For example, whether its title

@@ -15,9 +15,11 @@ repositories {
 dependencies {
   // Test dependencies
   testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
-  testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.mockito:mockito-junit-jupiter:5.3.1")
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+  testImplementation("org.assertj:assertj-core:3.24.2")
+
+  testFixturesImplementation("org.assertj:assertj-core:3.24.2")
 }
 
 java {
