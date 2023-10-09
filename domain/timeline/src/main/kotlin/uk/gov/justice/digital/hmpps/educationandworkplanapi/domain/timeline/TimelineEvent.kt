@@ -43,7 +43,7 @@ data class TimelineEvent(
    */
   val timestamp: Instant,
   /**
-   * An optional correlationId for this and any other TimelineEvents that occurred at the same time (i.e. within same
+   * A correlationId for this and any other TimelineEvents that occurred at the same time (i.e. within same
    * atomic action). For example, this could be an update to a Goal and one or more of its child Steps.
    */
   val correlationId: UUID,

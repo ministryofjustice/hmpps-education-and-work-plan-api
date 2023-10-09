@@ -89,14 +89,4 @@ class TimelineEventAssert(actual: TimelineEvent?) :
     }
     return this
   }
-
-  fun doesNotHaveCorrelationId(unexpected: UUID): TimelineEventAssert {
-    isNotNull
-    with(actual!!) {
-      if (correlationId == unexpected) {
-        failWithMessage("Expected correlationId NOT to be $unexpected")
-      }
-    }
-    return this
-  }
 }
