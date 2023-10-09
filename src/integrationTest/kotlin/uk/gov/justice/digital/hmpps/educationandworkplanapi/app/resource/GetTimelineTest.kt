@@ -116,7 +116,7 @@ class GetTimelineTest : IntegrationTestBase() {
       .isForPrisonNumber(prisonNumber)
       .eventsHaveSameCorrelation()
       .event(1) {
-        it.hasSourceReference(actionPlan!!.reference.toString())
+        it.hasSourceReference(actionPlan.reference.toString())
           .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
           .hasPrisonId("BXI")
           .wasActionedBy("auser_gen")
@@ -176,9 +176,9 @@ class GetTimelineTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(6)
-    val actionPlanCreatedCorrelationId = actual.events[0].correlationId!!
-    val goalUpdatedCorrelationId = actual.events[4].correlationId!!
+    assertThat(actual.events).hasSize(5)
+    val actionPlanCreatedCorrelationId = actual.events[0].correlationId
+    val goalUpdatedCorrelationId = actual.events[4].correlationId
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .event(1) {
@@ -211,13 +211,6 @@ class GetTimelineTest : IntegrationTestBase() {
           .hasCorrelationId(goalUpdatedCorrelationId)
       }
       .event(5) {
-        it.hasEventType(TimelineEventType.STEP_UPDATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(stepToUpdate.reference.toString())
-          .hasContextualInfo("Research course options")
-          .hasCorrelationId(goalUpdatedCorrelationId)
-      }
-      .event(6) {
         it.hasEventType(TimelineEventType.STEP_STARTED)
           .hasPrisonId("BXI")
           .hasSourceReference(stepToUpdate.reference.toString())
