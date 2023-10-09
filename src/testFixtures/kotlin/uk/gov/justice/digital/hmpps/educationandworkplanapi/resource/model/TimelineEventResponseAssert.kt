@@ -104,7 +104,7 @@ class TimelineEventResponseAssert(actual: TimelineEventResponse?) :
     return this
   }
 
-  fun doesNotHaveCorrelationId(unexpected: UUID): TimelineEventResponseAssert {
+  fun correlationIdIsNotEqualTo(unexpected: UUID): TimelineEventResponseAssert {
     isNotNull
     with(actual!!) {
       if (correlationId == unexpected) {

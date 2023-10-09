@@ -14,7 +14,7 @@ fun aValidTimelineEventEntity(
   actionedByDisplayName: String? = "Alex Smith",
   timestamp: Instant = Instant.now(),
   createdAt: Instant = Instant.now(),
-  correlationId: UUID? = UUID.randomUUID(),
+  correlationId: UUID = UUID.randomUUID(),
 ) = TimelineEventEntity(
   id = id,
   reference = reference,

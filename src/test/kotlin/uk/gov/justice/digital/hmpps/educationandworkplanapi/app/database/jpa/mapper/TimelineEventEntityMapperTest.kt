@@ -68,7 +68,7 @@ class TimelineEventEntityMapperTest {
       contextualInfo = null,
       prisonId = prisonId,
       timestamp = timelineEventEntity.timestamp!!,
-      correlationId = timelineEventEntity.correlationId,
+      correlationId = timelineEventEntity.correlationId!!,
     )
 
     // When

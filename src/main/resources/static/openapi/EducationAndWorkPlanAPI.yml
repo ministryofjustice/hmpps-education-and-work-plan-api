@@ -418,7 +418,7 @@ components:
         correlationId:
           type: string
           format: uuid
-          description: An optional correlationId for this and any other TimelineEvents that occurred at the same time (i.e. within same atomic action). For example, this could be an update to a Goal, plus one or more of its child Steps. If required, this allows a client to easily group the events together.
+          description: A correlationId for this and any other TimelineEvents that occurred at the same time (i.e. within same atomic action). For example, this could be an update to a Goal, plus one or more of its child Steps. If required, this allows a client to easily group the events together.
           example: 113d1833-0ce1-45ad-ab44-878c9d589358
       required:
         - reference
@@ -427,6 +427,7 @@ components:
         - prisonId
         - actionedBy
         - timestamp
+        - correlationId
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest

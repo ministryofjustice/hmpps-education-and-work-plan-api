@@ -22,7 +22,7 @@ fun aValidTimelineEvent(
   actionedBy: String = "asmith_gen",
   actionedByDisplayName: String = "Alex Smith",
   timestamp: Instant = Instant.now(),
-  correlationId: UUID? = UUID.randomUUID(),
+  correlationId: UUID = UUID.randomUUID(),
 ) = TimelineEvent(
   reference = reference,
   sourceReference = sourceReference,

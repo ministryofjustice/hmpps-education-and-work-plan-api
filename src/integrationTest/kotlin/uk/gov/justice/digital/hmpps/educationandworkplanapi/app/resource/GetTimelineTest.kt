@@ -200,8 +200,8 @@ class GetTimelineTest : IntegrationTestBase() {
           .hasPrisonId("BXI")
           .hasSourceReference(goal2Reference.toString())
           .hasContextualInfo("Learn French")
-          .doesNotHaveCorrelationId(actionPlanCreatedCorrelationId)
-          .doesNotHaveCorrelationId(goalUpdatedCorrelationId)
+          .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
+          .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
       }
       .event(4) {
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
