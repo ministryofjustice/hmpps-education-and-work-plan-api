@@ -71,6 +71,13 @@ class TimelineEventEntity(
   @Column(updatable = false)
   @CreationTimestamp
   var createdAt: Instant? = null,
+
+  /**
+   * An optional correlation ID.
+   */
+  @Column(updatable = false)
+  @field:NotNull
+  var correlationId: UUID? = null,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

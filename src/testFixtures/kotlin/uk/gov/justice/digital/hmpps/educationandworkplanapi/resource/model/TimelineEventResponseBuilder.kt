@@ -12,6 +12,7 @@ fun aValidTimelineEventResponse(
   actionedByDisplayName: String = "Alex Smith",
   timestamp: OffsetDateTime = OffsetDateTime.now(),
   contextualInfo: String? = "Learn French",
+  correlationId: UUID = UUID.randomUUID(),
 ): TimelineEventResponse =
   TimelineEventResponse(
     reference = reference,
@@ -22,4 +23,5 @@ fun aValidTimelineEventResponse(
     actionedByDisplayName = actionedByDisplayName,
     timestamp = timestamp,
     contextualInfo = contextualInfo,
+    correlationId = correlationId,
   )

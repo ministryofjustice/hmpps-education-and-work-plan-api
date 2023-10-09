@@ -42,6 +42,11 @@ data class TimelineEvent(
    * The date and time when the event occurred.
    */
   val timestamp: Instant,
+  /**
+   * A correlationId for this and any other TimelineEvents that occurred at the same time (i.e. within same
+   * atomic action). For example, this could be an update to a Goal and one or more of its child Steps.
+   */
+  val correlationId: UUID,
 ) {
   companion object {
     fun newTimelineEvent(
@@ -52,6 +57,7 @@ data class TimelineEvent(
       actionedBy: String,
       actionedByDisplayName: String? = null,
       timestamp: Instant = Instant.now(),
+      correlationId: UUID = UUID.randomUUID(),
     ) = TimelineEvent(
       reference = UUID.randomUUID(),
       sourceReference = sourceReference,
@@ -61,6 +67,7 @@ data class TimelineEvent(
       actionedBy = actionedBy,
       actionedByDisplayName = actionedByDisplayName,
       timestamp = timestamp,
+      correlationId = correlationId,
     )
   }
 }

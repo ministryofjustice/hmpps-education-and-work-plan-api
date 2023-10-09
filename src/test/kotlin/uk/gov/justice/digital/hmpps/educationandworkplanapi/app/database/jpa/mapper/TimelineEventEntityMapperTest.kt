@@ -33,6 +33,7 @@ class TimelineEventEntityMapperTest {
       actionedBy = timelineEvent.actionedBy,
       actionedByDisplayName = timelineEvent.actionedByDisplayName,
       timestamp = timelineEvent.timestamp,
+      correlationId = timelineEvent.correlationId,
     )
 
     // When
@@ -67,6 +68,7 @@ class TimelineEventEntityMapperTest {
       contextualInfo = null,
       prisonId = prisonId,
       timestamp = timelineEventEntity.timestamp!!,
+      correlationId = timelineEventEntity.correlationId!!,
     )
 
     // When

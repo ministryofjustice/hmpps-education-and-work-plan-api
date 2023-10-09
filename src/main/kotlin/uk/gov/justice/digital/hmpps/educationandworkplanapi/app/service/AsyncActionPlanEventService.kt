@@ -29,8 +29,8 @@ class AsyncActionPlanEventService(
         }
       }
       launch {
-        val timelineEvent = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
-        timelineService.recordTimelineEvent(actionPlan.prisonNumber, timelineEvent)
+        val timelineEvents = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
+        timelineService.recordTimelineEvents(actionPlan.prisonNumber, timelineEvents)
       }
     }
   }

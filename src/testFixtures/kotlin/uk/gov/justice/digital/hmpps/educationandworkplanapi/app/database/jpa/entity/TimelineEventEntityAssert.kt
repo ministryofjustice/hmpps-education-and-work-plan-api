@@ -131,4 +131,14 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     }
     return this
   }
+
+  fun hasCorrelationId(expected: UUID): TimelineEventEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (correlationId != expected) {
+        failWithMessage("Expected correlationId to be $expected, but was $correlationId")
+      }
+    }
+    return this
+  }
 }

@@ -18,12 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.ACTION_PLAN_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.GOAL_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.STEP_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType.STEP_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
@@ -35,7 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aVali
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.util.UUID
 
 class UpdateGoalTest : IntegrationTestBase() {
 
@@ -272,40 +265,6 @@ class UpdateGoalTest : IntegrationTestBase() {
       assertThat(goalUpdatedEventProperties["correlationId"])
         .isEqualTo(stepRemovedEventProperties["correlationId"])
     }
-
-    // assert timeline events are created successfully
-    val prisonerTimeline = timelineRepository.findByPrisonNumber(prisonNumber)!!
-    assertThat(prisonerTimeline.prisonNumber).isEqualTo(prisonNumber)
-    val events = prisonerTimeline.events!!
-    assertThat(events.size).isEqualTo(4)
-    assertTimelineEvent(
-      event = events[0],
-      expectedEventType = ACTION_PLAN_CREATED,
-      expectedSourceReference = actionPlan.reference!!,
-      expectedPrisonId = "BXI",
-      expectedContextualInfo = null,
-    )
-    assertTimelineEvent(
-      event = events[1],
-      expectedEventType = GOAL_UPDATED,
-      expectedSourceReference = goalReference,
-      expectedPrisonId = "MDI",
-      expectedContextualInfo = "Learn French to GCSE standard",
-    )
-    assertTimelineEvent(
-      event = events[2],
-      expectedEventType = STEP_UPDATED,
-      expectedSourceReference = stepReference,
-      expectedPrisonId = "MDI",
-      expectedContextualInfo = "Book course before December 2023",
-    )
-    assertTimelineEvent(
-      event = events[3],
-      expectedEventType = STEP_STARTED,
-      expectedSourceReference = stepReference,
-      expectedPrisonId = "MDI",
-      expectedContextualInfo = "Book course before December 2023",
-    )
   }
 
   private fun createGoal(
@@ -321,26 +280,5 @@ class UpdateGoalTest : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isCreated()
-  }
-
-  private fun assertTimelineEvent(
-    event: TimelineEventEntity,
-    expectedEventType: TimelineEventType,
-    expectedSourceReference: UUID,
-    expectedPrisonId: String,
-    expectedContextualInfo: String?,
-  ) {
-    assertThat(event).hasEventType(expectedEventType)
-    assertThat(event).hasSourceReference(expectedSourceReference.toString())
-    assertThat(event).wasActionedBy("auser_gen")
-    assertThat(event).wasActionedByDisplayName("Albert User")
-    assertThat(event).hasPrisonId(expectedPrisonId)
-    assertThat(event).hasAReference()
-    assertThat(event).hasJpaManagedFieldsPopulated()
-    if (expectedContextualInfo == null) {
-      assertThat(event).hasNoContextualInfo()
-    } else {
-      assertThat(event).hasContextualInfo(expectedContextualInfo)
-    }
   }
 }

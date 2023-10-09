@@ -33,6 +33,7 @@ class TimelineEventResourceMapperTest {
     val actionedBy = "asmith_gen"
     val actionedByDisplayName = "Alex Smith"
     val timestamp = OffsetDateTime.now()
+    val correlationId = UUID.randomUUID()
     val timelineEventDomain = aValidTimelineEvent(
       reference = reference,
       sourceReference = sourceReference,
@@ -41,6 +42,7 @@ class TimelineEventResourceMapperTest {
       prisonId = prisonId,
       actionedBy = actionedBy,
       actionedByDisplayName = actionedByDisplayName,
+      correlationId = correlationId,
     )
     val expected = TimelineEventResponse(
       reference = reference,
@@ -51,6 +53,7 @@ class TimelineEventResourceMapperTest {
       actionedBy = actionedBy,
       actionedByDisplayName = actionedByDisplayName,
       timestamp = timestamp,
+      correlationId = correlationId,
     )
     given(instantMapper.toOffsetDateTime(any())).willReturn(timestamp)
 
