@@ -176,7 +176,7 @@ class GetTimelineTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(5)
+    assertThat(actual.events).hasSize(6)
     val actionPlanCreatedCorrelationId = actual.events[0].correlationId
     val goalUpdatedCorrelationId = actual.events[4].correlationId
     assertThat(actual)
@@ -212,6 +212,13 @@ class GetTimelineTest : IntegrationTestBase() {
       }
       .event(5) {
         it.hasEventType(TimelineEventType.STEP_STARTED)
+          .hasPrisonId("BXI")
+          .hasSourceReference(stepToUpdate.reference.toString())
+          .hasContextualInfo("Research course options")
+          .hasCorrelationId(goalUpdatedCorrelationId)
+      }
+      .event(6) {
+        it.hasEventType(TimelineEventType.STEP_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(stepToUpdate.reference.toString())
           .hasContextualInfo("Research course options")

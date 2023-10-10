@@ -235,7 +235,7 @@ class TimelineEventFactoryTest {
   }
 
   @Test
-  fun `should create multiple STATUS change events, excluding GOAL_UPDATED and STEP_UPDATED events`() {
+  fun `should create multiple STATUS change events`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
@@ -276,8 +276,24 @@ class TimelineEventFactoryTest {
         contextualInfo = "Learn Spanish",
       ),
       newTimelineEvent(
+        sourceReference = goalReference.toString(),
+        eventType = TimelineEventType.GOAL_UPDATED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Learn Spanish",
+      ),
+      newTimelineEvent(
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_COMPLETED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book Spanish course",
+      ),
+      newTimelineEvent(
+        sourceReference = step1Reference.toString(),
+        eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
