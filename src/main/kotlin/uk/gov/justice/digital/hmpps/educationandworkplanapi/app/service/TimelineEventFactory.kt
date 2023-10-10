@@ -47,16 +47,31 @@ class TimelineEventFactory {
    * Determines what type of [TimelineEvent]s have occurred, following an update to a [Goal]. For example, whether its title
    * has changed, or one of its [Step]s has been completed.
    *
+   * Note that if a Goal's Step has been modified, but not the Goal itself, we record a Step changed Timeline event
+   * with some details about the Step, however we also record a Goal changed event for the parent Goal. In reality,
+   * changes to Steps may turn out to be more granular/detailed than we need, but the information is persisted in case
+   * we ever need it.
+   *
    * @param previousGoal The state of the [Goal] just before it was updated.
    * @param updatedGoal The newly updated [Goal] containing the latest changes.
    */
   fun goalUpdatedEvents(previousGoal: Goal, updatedGoal: Goal): List<TimelineEvent> {
-    val events = mutableListOf<TimelineEvent>()
+    val timelineEvents = mutableListOf<TimelineEvent>()
     val correlationId = UUID.randomUUID()
 
-    // check if the goal itself was updated, excluding its steps and status
+    if (hasGoalStatusChanged(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
+      timelineEvents.add(
+        buildTimelineEvent(
+          goal = updatedGoal,
+          sourceReference = updatedGoal.reference,
+          eventType = getGoalStatusEventType(updatedGoal),
+          contextualInfo = updatedGoal.title,
+          correlationId = correlationId,
+        ),
+      )
+    }
     if (hasGoalBeenUpdated(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
-      events.add(
+      timelineEvents.add(
         buildTimelineEvent(
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
@@ -67,47 +82,27 @@ class TimelineEventFactory {
       )
     }
 
-    if (hasGoalStatusChanged(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
-      val eventType = getGoalStatusEventType(updatedGoal)
-      events.add(
+    // check if any steps have been changed
+    val stepEvents = getStepUpdatedEvents(updatedGoal, previousGoal, correlationId)
+
+    // if one or more Steps have changed, but the Goal itself hasn't been modified, then record an overall GOAL_UPDATED event
+    if (timelineEvents.isEmpty() && stepEvents.isNotEmpty()) {
+      timelineEvents.add(
         buildTimelineEvent(
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
-          eventType = eventType,
+          eventType = TimelineEventType.GOAL_UPDATED,
           contextualInfo = updatedGoal.title,
           correlationId = correlationId,
         ),
       )
     }
-
-    // check if any steps have been changed
-    updatedGoal.steps.forEach {
-      val previousStep = getPreviousStep(previousGoal.steps, it)
-      if (hasStepBeenUpdated(previousStep = previousStep, updatedStep = it)) {
-        events.add(
-          buildTimelineEvent(
-            goal = updatedGoal,
-            sourceReference = previousStep!!.reference,
-            eventType = TimelineEventType.STEP_UPDATED,
-            contextualInfo = it.title,
-            correlationId = correlationId,
-          ),
-        )
-      }
-      if (hasStepStatusChanged(previousStep = previousStep, updatedStep = it)) {
-        val eventType = getStepStatusEventType(it)
-        events.add(
-          buildTimelineEvent(
-            goal = updatedGoal,
-            sourceReference = previousStep!!.reference,
-            eventType = eventType,
-            contextualInfo = it.title,
-            correlationId = correlationId,
-          ),
-        )
-      }
+    // if applicable, add the Step related events to the Timeline
+    if (stepEvents.isNotEmpty()) {
+      timelineEvents.addAll(stepEvents)
     }
-    return events
+
+    return timelineEvents
   }
 
   private fun hasGoalBeenUpdated(previousGoal: Goal, updatedGoal: Goal) =
@@ -119,6 +114,40 @@ class TimelineEventFactory {
 
   private fun hasGoalStatusChanged(previousGoal: Goal, updatedGoal: Goal) =
     updatedGoal.status != previousGoal.status
+
+  private fun getStepUpdatedEvents(
+    updatedGoal: Goal,
+    previousGoal: Goal,
+    correlationId: UUID,
+  ): MutableList<TimelineEvent> {
+    val stepEvents = mutableListOf<TimelineEvent>()
+    updatedGoal.steps.forEach {
+      val previousStep = getPreviousStep(previousGoal.steps, it)
+      if (hasStepStatusChanged(previousStep = previousStep, updatedStep = it)) {
+        stepEvents.add(
+          buildTimelineEvent(
+            goal = updatedGoal,
+            sourceReference = previousStep!!.reference,
+            eventType = getStepStatusEventType(it),
+            contextualInfo = it.title,
+            correlationId = correlationId,
+          ),
+        )
+      }
+      if (hasStepBeenUpdated(previousStep = previousStep, updatedStep = it)) {
+        stepEvents.add(
+          buildTimelineEvent(
+            goal = updatedGoal,
+            sourceReference = previousStep!!.reference,
+            eventType = TimelineEventType.STEP_UPDATED,
+            contextualInfo = it.title,
+            correlationId = correlationId,
+          ),
+        )
+      }
+    }
+    return stepEvents
+  }
 
   private fun hasStepBeenUpdated(previousStep: Step?, updatedStep: Step) =
     previousStep != null && (

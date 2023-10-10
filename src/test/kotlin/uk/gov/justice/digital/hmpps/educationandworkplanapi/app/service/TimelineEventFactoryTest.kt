@@ -56,7 +56,7 @@ class TimelineEventFactoryTest {
       .wasActionedBy(goal.lastUpdatedBy!!)
       .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(goal.title)
-      .hasCorrelationId(actionPlanCreatedEvent.correlationId!!)
+      .hasCorrelationId(actionPlanCreatedEvent.correlationId)
   }
 
   @Test
@@ -78,7 +78,7 @@ class TimelineEventFactoryTest {
   }
 
   @Test
-  fun `should create goal updated event`() {
+  fun `should create goal updated event given only goal changed`() {
     // Given
     val reference = UUID.randomUUID()
     val previousGoal = aValidGoal(reference = reference, title = "Learn French")
@@ -114,7 +114,7 @@ class TimelineEventFactoryTest {
       "ARCHIVED, ACTIVE, GOAL_STARTED",
     ],
   )
-  fun `should create goal status change event`(
+  fun `should create goal status change event given only goal status changed`(
     originalStatus: GoalStatus,
     newStatus: GoalStatus,
     expectedEventType: TimelineEventType,
@@ -145,7 +145,7 @@ class TimelineEventFactoryTest {
   }
 
   @Test
-  fun `should create step updated event`() {
+  fun `should create goal updated event and step updated event given only step changed`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
@@ -161,6 +161,14 @@ class TimelineEventFactoryTest {
     val previousGoal = aValidGoal(reference = goalReference, steps = previousSteps)
     val updatedGoal = aValidGoal(reference = goalReference, steps = updatedSteps)
     val expectedEvents = listOf(
+      newTimelineEvent(
+        sourceReference = goalReference.toString(),
+        eventType = TimelineEventType.GOAL_UPDATED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = previousGoal.title,
+      ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_UPDATED,
@@ -182,7 +190,7 @@ class TimelineEventFactoryTest {
   }
 
   @Test
-  fun `should create step status change event`() {
+  fun `should create goal updated event & step status change event given only step status changed`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
@@ -198,6 +206,14 @@ class TimelineEventFactoryTest {
     val previousGoal = aValidGoal(reference = goalReference, steps = originalSteps)
     val updatedGoal = aValidGoal(reference = goalReference, steps = updatedSteps)
     val expectedEvents = listOf(
+      newTimelineEvent(
+        sourceReference = goalReference.toString(),
+        eventType = TimelineEventType.GOAL_UPDATED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = previousGoal.title,
+      ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
         eventType = TimelineEventType.STEP_STARTED,
@@ -219,7 +235,7 @@ class TimelineEventFactoryTest {
   }
 
   @Test
-  fun `should create multiple update events`() {
+  fun `should create multiple STATUS change events`() {
     // Given
     val goalReference = UUID.randomUUID()
     val step1Reference = UUID.randomUUID()
@@ -249,52 +265,48 @@ class TimelineEventFactoryTest {
       steps = updatedSteps,
     )
 
-    val goalUpdatedEvent = newTimelineEvent(
-      sourceReference = goalReference.toString(),
-      eventType = TimelineEventType.GOAL_UPDATED,
-      prisonId = updatedGoal.lastUpdatedAtPrison,
-      actionedBy = updatedGoal.lastUpdatedBy!!,
-      actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-      contextualInfo = "Learn Spanish",
-    )
-    val goalCompletedEvent = newTimelineEvent(
-      sourceReference = goalReference.toString(),
-      eventType = TimelineEventType.GOAL_COMPLETED,
-      prisonId = updatedGoal.lastUpdatedAtPrison,
-      actionedBy = updatedGoal.lastUpdatedBy!!,
-      actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-      contextualInfo = "Learn Spanish",
-    )
-    val stepUpdatedEvent = newTimelineEvent(
-      sourceReference = step1Reference.toString(),
-      eventType = TimelineEventType.STEP_UPDATED,
-      prisonId = updatedGoal.lastUpdatedAtPrison,
-      actionedBy = updatedGoal.lastUpdatedBy!!,
-      actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-      contextualInfo = "Book Spanish course",
-    )
-    val stepCompletedEvent = newTimelineEvent(
-      sourceReference = step1Reference.toString(),
-      eventType = TimelineEventType.STEP_COMPLETED,
-      prisonId = updatedGoal.lastUpdatedAtPrison,
-      actionedBy = updatedGoal.lastUpdatedBy!!,
-      actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-      contextualInfo = "Book Spanish course",
-    )
-    val stepStartedEvent = newTimelineEvent(
-      sourceReference = step2Reference.toString(),
-      eventType = TimelineEventType.STEP_STARTED,
-      prisonId = updatedGoal.lastUpdatedAtPrison,
-      actionedBy = updatedGoal.lastUpdatedBy!!,
-      actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-      contextualInfo = "Complete course",
-    )
+    // changes to the status of a Goal/Step take precedence over changes to the Goal/Step themselves, so GOAL_UPDATED & STEP_UPDATED events are not returned
     val expectedEvents = listOf(
-      goalUpdatedEvent,
-      goalCompletedEvent,
-      stepUpdatedEvent,
-      stepCompletedEvent,
-      stepStartedEvent,
+      newTimelineEvent(
+        sourceReference = goalReference.toString(),
+        eventType = TimelineEventType.GOAL_COMPLETED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Learn Spanish",
+      ),
+      newTimelineEvent(
+        sourceReference = goalReference.toString(),
+        eventType = TimelineEventType.GOAL_UPDATED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Learn Spanish",
+      ),
+      newTimelineEvent(
+        sourceReference = step1Reference.toString(),
+        eventType = TimelineEventType.STEP_COMPLETED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book Spanish course",
+      ),
+      newTimelineEvent(
+        sourceReference = step1Reference.toString(),
+        eventType = TimelineEventType.STEP_UPDATED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Book Spanish course",
+      ),
+      newTimelineEvent(
+        sourceReference = step2Reference.toString(),
+        eventType = TimelineEventType.STEP_STARTED,
+        prisonId = updatedGoal.lastUpdatedAtPrison,
+        actionedBy = updatedGoal.lastUpdatedBy!!,
+        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
+        contextualInfo = "Complete course",
+      ),
     )
 
     // When
