@@ -8,8 +8,41 @@ import java.util.UUID
  * established, an Induction can be reviewed and updated periodically, depending on the practices of the Prison and
  * the needs of the Prisoner.
  */
-// TODO - RR-421 - add required fields
-class Induction(
+data class Induction(
+  /**
+   * A unique reference for the Induction that can be referred to outside of this application.
+   */
   val reference: UUID,
+  /**
+   * The identifier of the Prisoner (confusingly called "prison" number throughout HMPPS).
+   */
   val prisonNumber: String,
+  /**
+   * Details of the Prisoner's work aspirations.
+   */
+  val workOnRelease: WorkOnRelease,
+  /**
+   * Qualifications that the Prisoner may have achieved previously.
+   */
+  val previousQualifications: PreviousQualifications,
+  /**
+   * Any additional training that the Prisoner may have done previously.
+   */
+  val previousTraining: PreviousTraining,
+  /**
+   * Details of any previous work experience that the Prisoner may have had.
+   */
+  val previousWorkExperiences: PreviousWorkExperiences,
+  /**
+   * Work or training interests that the Prisoner wishes to undertake during their time in prison.
+   */
+  val inPrisonInterests: InPrisonInterests,
+  /**
+   * Any personal skills and interests that the Prisoner has.
+   */
+  val personalSkillsAndInterests: PersonalSkillsAndInterests,
+  /**
+   * Any future (post release) work interests that the Prisoner has.
+   */
+  val futureWorkInterests: FutureWorkInterests,
 )
