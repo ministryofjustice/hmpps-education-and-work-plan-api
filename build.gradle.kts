@@ -44,6 +44,7 @@ configurations {
 dependencies {
   implementation(project("domain:goal"))
   implementation(project("domain:timeline"))
+  implementation(project("domain:induction"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -67,12 +68,14 @@ dependencies {
   // Test dependencies
   testImplementation(testFixtures(project("domain:goal")))
   testImplementation(testFixtures(project("domain:timeline")))
+  testImplementation(testFixtures(project("domain:induction")))
   testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
   integrationTestImplementation(testFixtures(project("domain:goal")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
+  integrationTestImplementation(testFixtures(project("domain:induction")))
   integrationTestImplementation("org.testcontainers:localstack:1.18.1")
 
   // Test fixtures dependencies
