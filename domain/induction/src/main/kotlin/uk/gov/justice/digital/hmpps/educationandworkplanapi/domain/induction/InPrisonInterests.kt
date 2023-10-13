@@ -1,11 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
+
 /**
  * Represents any in-prison work or training interests a Prisoner might have during their time in prison.
  */
 data class InPrisonInterests(
   val inPrisonWorkInterests: List<InPrisonWorkInterest>,
   val inPrisonTrainingInterests: List<InPrisonTrainingInterest>,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
 )
 
 data class InPrisonWorkInterest(

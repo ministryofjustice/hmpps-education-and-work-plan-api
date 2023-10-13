@@ -1,12 +1,20 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
+
 /**
  * Holds details about a Prisoner's educational qualifications, including where relevant, the grades achieved in each
  * subject.
  */
 data class PreviousQualifications(
-  val educationLevel: HighestEducationLevel?,
+  val educationLevel: HighestEducationLevel,
   val qualifications: List<Qualification>,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
 )
 
 enum class HighestEducationLevel {

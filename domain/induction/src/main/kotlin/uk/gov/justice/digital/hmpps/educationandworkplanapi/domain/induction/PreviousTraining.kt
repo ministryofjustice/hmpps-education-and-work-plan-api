@@ -1,11 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
+
 /**
  * Holds details of any additional training that a Prisoner may have done.
  */
 data class PreviousTraining(
   val trainingType: List<TrainingType>,
   val trainingTypeOther: String?,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
 )
 
 enum class TrainingType {

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
 import java.util.UUID
 
 /**
@@ -22,11 +23,13 @@ data class Induction(
    */
   val workOnRelease: WorkOnRelease,
   /**
-   * Qualifications that the Prisoner may have achieved previously.
+   * Qualifications that the Prisoner may have achieved previously. Null if we do not have any qualifications for the
+   * Prisoner.
    */
   val previousQualifications: PreviousQualifications,
   /**
-   * Any additional training that the Prisoner may have done previously.
+   * Any additional training that the Prisoner may have done previously. Null if we do not have any training data for
+   * the Prisoner.
    */
   val previousTraining: PreviousTraining,
   /**
@@ -45,4 +48,36 @@ data class Induction(
    * Any future (post release) work interests that the Prisoner has.
    */
   val futureWorkInterests: FutureWorkInterests,
+  /**
+   * The user ID of the person (logged-in user) who created the Induction.
+   */
+  val createdBy: String?,
+  /**
+   * The name of the logged-in user who created the Induction.
+   */
+  val createdByDisplayName: String?,
+  /**
+   * The timestamp when this Induction was created.
+   */
+  val createdAt: Instant?,
+  /**
+   * The ID of the Prison that the Prisoner was at when this induction was created.
+   */
+  val createdAtPrison: String,
+  /**
+   * The user ID of the person (logged-in user) who updated the Induction.
+   */
+  val lastUpdatedBy: String?,
+  /**
+   * The name of the logged-in user who updated the Induction.
+   */
+  val lastUpdatedByDisplayName: String?,
+  /**
+   * The timestamp when this Induction was updated.
+   */
+  val lastUpdatedAt: Instant?,
+  /**
+   * The ID of the Prison that the Prisoner was at when this induction was updated.
+   */
+  val lastUpdatedAtPrison: String,
 )

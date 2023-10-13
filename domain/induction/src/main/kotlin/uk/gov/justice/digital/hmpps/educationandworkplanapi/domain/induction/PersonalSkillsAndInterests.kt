@@ -1,11 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
+
 /**
  * Lists the personal skills (such as communication) and interests (such as music) that a Prisoner feels they have.
  */
 data class PersonalSkillsAndInterests(
   val skills: List<PersonalSkill>,
   val interests: List<PersonalInterest>,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
 )
 
 data class PersonalSkill(

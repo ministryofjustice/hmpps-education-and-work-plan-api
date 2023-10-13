@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
 import java.util.UUID
 
 fun aValidInduction(
@@ -12,6 +13,14 @@ fun aValidInduction(
   inPrisonInterests: InPrisonInterests = aValidInPrisonInterests(),
   personalSkillsAndInterests: PersonalSkillsAndInterests = aValidPersonalSkillsAndInterests(),
   futureWorkInterests: FutureWorkInterests = aValidFutureWorkInterests(),
+  createdBy: String? = "asmith_gen",
+  createdByDisplayName: String? = "Alex Smith",
+  createdAt: Instant? = Instant.now(),
+  createdAtPrison: String = "BXI",
+  lastUpdatedBy: String? = "bjones_gen",
+  lastUpdatedByDisplayName: String? = "Barry Jones",
+  lastUpdatedAt: Instant? = Instant.now(),
+  lastUpdatedAtPrison: String = "BXI",
 ) = Induction(
   reference = reference,
   prisonNumber = prisonNumber,
@@ -22,4 +31,12 @@ fun aValidInduction(
   inPrisonInterests = inPrisonInterests,
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedByDisplayName = lastUpdatedByDisplayName,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
 )

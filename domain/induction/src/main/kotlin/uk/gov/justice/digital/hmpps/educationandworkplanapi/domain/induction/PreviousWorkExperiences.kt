@@ -1,11 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
+import java.time.Instant
+
 /**
  * Contains details of a Prisoner's work experience, if applicable.
  */
 data class PreviousWorkExperiences(
   val hasWorkBefore: Boolean,
   val experiences: List<WorkExperience>,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
 )
 
 data class WorkExperience(
