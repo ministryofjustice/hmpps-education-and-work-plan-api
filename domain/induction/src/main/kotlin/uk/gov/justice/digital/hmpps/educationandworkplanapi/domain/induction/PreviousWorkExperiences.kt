@@ -4,9 +4,11 @@ import java.time.Instant
 
 /**
  * Contains details of a Prisoner's work experience, if applicable.
+ *
+ * Note that if the list of `experiences` is empty, then the Prisoner has been asked if they have any work history,
+ * but either they do not, or they do not wish to provide details.
  */
 data class PreviousWorkExperiences(
-  val hasWorkBefore: Boolean,
   val experiences: List<WorkExperience>,
   val createdBy: String?,
   val createdByDisplayName: String?,

@@ -4,6 +4,11 @@ import java.time.Instant
 
 /**
  * Represents a Prisoner's future work aspirations, including the type/sector of work and their desired role within it.
+ *
+ * Note that this domain model allows for the list of interests to be empty, even if at least one currently has to be
+ * provided on screen. This allows us to cater for the scenario where the Prisoner has been asked if they have
+ * interests, but either they do not, or they do not wish to provide details. In other words, the domain is not
+ * modelled on the current screen behaviour.
  */
 data class FutureWorkInterests(
   val interests: List<WorkInterest>,

@@ -4,6 +4,8 @@ import java.time.Instant
 
 /**
  * Lists the personal skills (such as communication) and interests (such as music) that a Prisoner feels they have.
+ *
+ * Note that the lists of skills/interests cannot be empty, since NONE is an option in both cases.
  */
 data class PersonalSkillsAndInterests(
   val skills: List<PersonalSkill>,

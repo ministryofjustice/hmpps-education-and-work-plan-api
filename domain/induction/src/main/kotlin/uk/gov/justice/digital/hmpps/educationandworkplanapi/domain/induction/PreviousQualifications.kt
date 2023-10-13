@@ -5,6 +5,9 @@ import java.time.Instant
 /**
  * Holds details about a Prisoner's educational qualifications, including where relevant, the grades achieved in each
  * subject.
+ *
+ * Note that the list of `qualifications` can be empty, but `educationLevel` is mandatory (but only if the Prisoner has
+ * been asked about their education).
  */
 data class PreviousQualifications(
   val educationLevel: HighestEducationLevel,

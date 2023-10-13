@@ -4,6 +4,11 @@ import java.time.Instant
 
 /**
  * Represents any in-prison work or training interests a Prisoner might have during their time in prison.
+ *
+ * Note that this domain model allows for the lists of interests to be empty, even if at least one of each currently
+ * has to be provided on screen. This allows us to cater for the scenario where the Prisoner has been asked if they
+ * have any, but either they do not, or they do not wish to provide details. In other words, the domain is not
+ * modelled on the current screen behaviour.
  */
 data class InPrisonInterests(
   val inPrisonWorkInterests: List<InPrisonWorkInterest>,

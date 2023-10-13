@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 import java.time.Instant
 
 fun aValidPreviousWorkExperiences(
-  hasWorkBefore: Boolean = true,
   experiences: List<WorkExperience> = listOf(aValidWorkExperience()),
   createdBy: String? = "asmith_gen",
   createdByDisplayName: String? = "Alex Smith",
@@ -13,7 +12,6 @@ fun aValidPreviousWorkExperiences(
   lastUpdatedAt: Instant? = Instant.now(),
 ) =
   PreviousWorkExperiences(
-    hasWorkBefore = hasWorkBefore,
     experiences = experiences,
     createdBy = createdBy,
     createdByDisplayName = createdByDisplayName,

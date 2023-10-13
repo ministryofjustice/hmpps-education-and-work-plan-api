@@ -4,6 +4,8 @@ import java.time.Instant
 
 /**
  * Holds details of any additional training that a Prisoner may have done.
+ *
+ * Note that the list of training cannot be empty, since NONE is an option.
  */
 data class PreviousTraining(
   val trainingType: List<TrainingType>,

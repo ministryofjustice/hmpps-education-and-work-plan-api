@@ -19,35 +19,39 @@ data class Induction(
    */
   val prisonNumber: String,
   /**
-   * Details of the Prisoner's work aspirations.
+   * Details of the Prisoner's work aspirations. Mandatory as it is always asked as part of an Induction.
    */
   val workOnRelease: WorkOnRelease,
   /**
-   * Qualifications that the Prisoner may have achieved previously. Null if we do not have any qualifications for the
-   * Prisoner.
+   * Qualifications that the Prisoner may have achieved previously. Null if the Prisoner has not been asked about their
+   * educational history.
    */
-  val previousQualifications: PreviousQualifications,
+  val previousQualifications: PreviousQualifications?,
   /**
-   * Any additional training that the Prisoner may have done previously. Null if we do not have any training data for
-   * the Prisoner.
+   * Any additional training that the Prisoner may have done previously. Null if the Prisoner has not been asked about
+   * their additional training.
    */
-  val previousTraining: PreviousTraining,
+  val previousTraining: PreviousTraining?,
   /**
-   * Details of any previous work experience that the Prisoner may have had.
+   * Details of any previous work experience that the Prisoner may have had. Null if the Prisoner has not been asked
+   * about their work history.
    */
-  val previousWorkExperiences: PreviousWorkExperiences,
+  val previousWorkExperiences: PreviousWorkExperiences?,
   /**
-   * Work or training interests that the Prisoner wishes to undertake during their time in prison.
+   * Work or training interests that the Prisoner wishes to undertake during their time in prison. Null if the Prisoner
+   * has not been asked about their in-prison interests.
    */
-  val inPrisonInterests: InPrisonInterests,
+  val inPrisonInterests: InPrisonInterests?,
   /**
-   * Any personal skills and interests that the Prisoner has.
+   * Any personal skills and interests that the Prisoner has. Null if the Prisoner has not been asked about their
+   * skills and interests.
    */
-  val personalSkillsAndInterests: PersonalSkillsAndInterests,
+  val personalSkillsAndInterests: PersonalSkillsAndInterests?,
   /**
-   * Any future (post release) work interests that the Prisoner has.
+   * Any future (post release) work interests that the Prisoner has. Null if the Prisoner has not been asked about their
+   * future work interests.
    */
-  val futureWorkInterests: FutureWorkInterests,
+  val futureWorkInterests: FutureWorkInterests?,
   /**
    * The user ID of the person (logged-in user) who created the Induction.
    */
