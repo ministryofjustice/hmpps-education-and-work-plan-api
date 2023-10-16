@@ -2,14 +2,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidStepEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidStepEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.StepStatus as EntityStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus as EntityStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus as DomainStatus
 
 class StepEntityMapperTest {

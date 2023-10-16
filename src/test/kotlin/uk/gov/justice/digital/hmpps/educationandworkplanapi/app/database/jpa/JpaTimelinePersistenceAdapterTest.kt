@@ -15,9 +15,9 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidTimelineEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidTimelineEventEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.aValidTimelineEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.aValidTimelineEventEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.TimelineEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.TimelineEventEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository

@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.aValidTimelineEventEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.aValidTimelineEventEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimelineEvent
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.TimelineEventType as TimelineEventTypeEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEventType as TimelineEventTypeEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType as TimelineEventTypeDomain
 
 class TimelineEventEntityMapperTest {

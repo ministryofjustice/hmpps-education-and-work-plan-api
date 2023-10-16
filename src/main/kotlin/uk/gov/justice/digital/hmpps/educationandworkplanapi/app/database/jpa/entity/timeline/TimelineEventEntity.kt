@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

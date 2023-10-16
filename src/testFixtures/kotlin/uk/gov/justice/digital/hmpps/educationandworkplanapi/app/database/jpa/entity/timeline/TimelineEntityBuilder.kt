@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import java.time.Instant

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan
 
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
@@ -98,6 +98,7 @@ class StepEntityAssert(actual: StepEntity?) :
     }
     return this
   }
+
   fun hasTitle(expected: String): StepEntityAssert {
     isNotNull
     with(actual!!) {
