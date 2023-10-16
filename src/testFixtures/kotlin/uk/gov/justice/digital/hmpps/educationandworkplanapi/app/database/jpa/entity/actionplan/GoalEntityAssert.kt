@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan
 
 import org.assertj.core.api.AbstractObjectAssert
 import java.time.Instant
@@ -15,7 +15,8 @@ class GoalEntityAssert(actual: GoalEntity?) :
   AbstractObjectAssert<GoalEntityAssert, GoalEntity?>(actual, GoalEntityAssert::class.java) {
 
   companion object {
-    private val JPA_MANAGED_FIELDS = arrayOf("id", "createdAt", "createdBy", "createdByDisplayName", "updatedAt", "updatedBy", "updatedByDisplayName")
+    private val JPA_MANAGED_FIELDS =
+      arrayOf("id", "createdAt", "createdBy", "createdByDisplayName", "updatedAt", "updatedBy", "updatedByDisplayName")
   }
 
   fun hasJpaManagedFieldsPopulated(): GoalEntityAssert {

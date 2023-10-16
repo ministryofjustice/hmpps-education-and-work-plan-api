@@ -1,15 +1,16 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
-import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -19,14 +20,17 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-@Table(name = "action_plan")
+@Table(name = "goal")
 @Entity
-@EntityListeners(AuditingEntityListener::class)
-class ActionPlanEntity(
+@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
+class GoalEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -36,69 +40,64 @@ class ActionPlanEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  @Column(updatable = false)
+  @Column
   @field:NotNull
-  var prisonNumber: String? = null,
+  var title: String? = null,
 
   @Column
-  var reviewDate: LocalDate? = null,
+  @field:NotNull
+  var targetCompletionDate: LocalDate? = null,
+
+  @Column
+  @Enumerated(value = EnumType.STRING)
+  @field:NotNull
+  var status: GoalStatus? = null,
+
+  @Column
+  var notes: String? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "action_plan_id", nullable = false)
-  @OrderBy(value = "createdAt")
+  @JoinColumn(name = "goal_id", nullable = false)
   @field:NotNull
-  var goals: MutableList<GoalEntity>? = null,
+  var steps: MutableList<StepEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp
   var createdAt: Instant? = null,
+
+  @Column
+  @field:NotNull
+  var createdAtPrison: String? = null,
 
   @Column(updatable = false)
   @CreatedBy
   var createdBy: String? = null,
 
   @Column
+  @CreatedByDisplayName
+  var createdByDisplayName: String? = null,
+
+  @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
+  @field:NotNull
+  var updatedAtPrison: String? = null,
+
+  @Column
   @LastModifiedBy
   var updatedBy: String? = null,
+
+  @Column
+  @LastModifiedByDisplayName
+  var updatedByDisplayName: String? = null,
 ) {
-
-  companion object {
-
-    /**
-     * Returns new un-persisted [ActionPlanEntity] for the specified prisoner with an empty collection of [GoalEntity]s
-     */
-    fun newActionPlanForPrisoner(prisonNumber: String, reviewDate: LocalDate?): ActionPlanEntity =
-      ActionPlanEntity(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        reviewDate = reviewDate,
-        goals = mutableListOf(),
-      )
-  }
-
-  /**
-   * Returns the [GoalEntity] identified by its reference from this [ActionPlanEntity] instance.
-   * Returns null if the Goal Entity cannot be found.
-   */
-  fun getGoalByReference(goalReference: UUID): GoalEntity? =
-    goals?.find { it.reference == goalReference }
-
-  /**
-   * Adds a [GoalEntity] to this [ActionPlanEntity]
-   */
-  fun addGoal(goalEntity: GoalEntity): ActionPlanEntity {
-    goals!!.add(goalEntity)
-    return this
-  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as ActionPlanEntity
+    other as GoalEntity
 
     return id != null && id == other.id
   }
@@ -106,6 +105,12 @@ class ActionPlanEntity(
   override fun hashCode(): Int = javaClass.hashCode()
 
   override fun toString(): String {
-    return this::class.simpleName + "(id = $id, prisonNumber = $prisonNumber)"
+    return this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
   }
+}
+
+enum class GoalStatus {
+  ACTIVE,
+  COMPLETED,
+  ARCHIVED,
 }

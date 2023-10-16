@@ -1,6 +1,6 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.GoalStatus.ACTIVE
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ACTIVE
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
