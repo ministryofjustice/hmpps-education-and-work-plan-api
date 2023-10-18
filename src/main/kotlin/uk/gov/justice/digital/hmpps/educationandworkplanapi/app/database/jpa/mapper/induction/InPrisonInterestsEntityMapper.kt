@@ -1,14 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonTrainingInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonWorkInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInPrisonInterestsDto
 
 @Mapper(
   uses = [
@@ -19,7 +20,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InP
 interface InPrisonInterestsEntityMapper {
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  fun fromDomainToEntity(domain: InPrisonInterests): InPrisonInterestsEntity
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  fun fromDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity
 }
 
 @Mapper
