@@ -34,8 +34,12 @@ CREATE TABLE previous_qualifications
     education_level         VARCHAR(50)                 NOT NULL,
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX previous_qualifications_reference_idx ON previous_qualifications
@@ -46,16 +50,16 @@ CREATE UNIQUE INDEX previous_qualifications_reference_idx ON previous_qualificat
 --- Table qualification
 CREATE TABLE qualification
 (
-    id                     UUID PRIMARY KEY,
-    prev_qualifications_id UUID                        NOT NULL,
-    reference              UUID                        NOT NULL,
-    subject                VARCHAR(100)                NOT NULL,
-    level                  VARCHAR(50),
-    grade                  VARCHAR(50),
-    created_at             TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    created_by             VARCHAR(50)                 NOT NULL,
-    updated_at             TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by             VARCHAR(50)                 NOT NULL,
+    id                      UUID PRIMARY KEY,
+    prev_qualifications_id  UUID                        NOT NULL,
+    reference               UUID                        NOT NULL,
+    subject                 VARCHAR(100)                NOT NULL,
+    level                   VARCHAR(50),
+    grade                   VARCHAR(50),
+    created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+    created_by              VARCHAR(50)                 NOT NULL,
+    updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
+    updated_by              VARCHAR(50)                 NOT NULL,
 
     CONSTRAINT fk_prev_qualifications_qualification FOREIGN KEY (prev_qualifications_id) REFERENCES previous_qualifications (id)
 );
@@ -80,9 +84,12 @@ CREATE TABLE work_on_release
     affecting_work_other    VARCHAR(512),
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
-
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX work_on_release_reference_idx ON work_on_release
@@ -104,7 +111,7 @@ CREATE TABLE affecting_ability_to_work
     affect VARCHAR(50) NOT NULL
 );
 
---- Table training
+--- Table previous_training
 CREATE TABLE previous_training
 (
     id                      UUID PRIMARY KEY,
@@ -112,8 +119,12 @@ CREATE TABLE previous_training
     training_type_other     VARCHAR(512),
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX previous_training_reference_idx ON previous_training
@@ -136,8 +147,12 @@ CREATE TABLE previous_work_experiences
     reference               UUID                        NOT NULL,
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX previous_work_experiences_reference_idx ON previous_work_experiences
@@ -170,8 +185,12 @@ CREATE TABLE in_prison_interests
     reference               UUID                        NOT NULL,
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX in_prison_interests_reference_idx ON in_prison_interests
@@ -236,8 +255,12 @@ CREATE TABLE skills_and_interests
     reference               UUID                        NOT NULL,
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX skills_and_interests_reference_idx ON skills_and_interests
@@ -303,8 +326,12 @@ CREATE TABLE future_work_interests
     reference               UUID                        NOT NULL,
     created_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
     created_by              VARCHAR(50)                 NOT NULL,
+    created_by_display_name VARCHAR(100)                NOT NULL,
+    created_at_prison       VARCHAR(20),
     updated_at              TIMESTAMP(3) WITH TIME ZONE NOT NULL,
-    updated_by              VARCHAR(50)                 NOT NULL
+    updated_by              VARCHAR(50)                 NOT NULL,
+    updated_by_display_name VARCHAR(100)                NOT NULL,
+    updated_at_prison       VARCHAR(20)
 );
 
 CREATE UNIQUE INDEX future_work_interests_reference_idx ON future_work_interests

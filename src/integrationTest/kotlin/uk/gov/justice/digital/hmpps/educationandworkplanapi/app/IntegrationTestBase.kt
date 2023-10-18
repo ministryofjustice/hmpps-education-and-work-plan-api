@@ -16,6 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InboundEventsService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
@@ -66,6 +67,9 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var timelineRepository: TimelineRepository
+
+  @Autowired
+  lateinit var inductionRepository: InductionRepository
 
   @SpyBean
   lateinit var telemetryClient: TelemetryClient

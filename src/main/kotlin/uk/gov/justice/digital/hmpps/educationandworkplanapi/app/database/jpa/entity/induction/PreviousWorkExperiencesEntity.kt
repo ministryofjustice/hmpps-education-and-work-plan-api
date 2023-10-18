@@ -20,6 +20,9 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
 import java.util.UUID
 
@@ -31,7 +34,7 @@ import java.util.UUID
  */
 @Table(name = "previous_work_experiences")
 @Entity
-@EntityListeners(AuditingEntityListener::class)
+@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
 class PreviousWorkExperiencesEntity(
   @Id
   @GeneratedValue
@@ -50,17 +53,33 @@ class PreviousWorkExperiencesEntity(
   @CreationTimestamp
   var createdAt: Instant? = null,
 
+  @Column
+  @field:NotNull
+  var createdAtPrison: String? = null,
+
   @Column(updatable = false)
   @CreatedBy
   var createdBy: String? = null,
+
+  @Column
+  @CreatedByDisplayName
+  var createdByDisplayName: String? = null,
 
   @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
+  @field:NotNull
+  var updatedAtPrison: String? = null,
+
+  @Column
   @LastModifiedBy
   var updatedBy: String? = null,
+
+  @Column
+  @LastModifiedByDisplayName
+  var updatedByDisplayName: String? = null,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
