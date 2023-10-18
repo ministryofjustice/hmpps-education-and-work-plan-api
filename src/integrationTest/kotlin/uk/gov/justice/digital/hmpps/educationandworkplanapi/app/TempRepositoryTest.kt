@@ -9,9 +9,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InterestType
@@ -100,14 +100,14 @@ internal class TempRepositoryTest : IntegrationTestBase() {
       inPrisonInterests = InPrisonInterestsEntity(
         reference = UUID.randomUUID(),
         inPrisonWorkInterests = listOf(
-          InPrisonWorkInterest(
+          InPrisonWorkInterestEntity(
             reference = UUID.randomUUID(),
             workType = InPrisonWorkType.CLEANING_AND_HYGIENE,
             workTypeOther = "Test workTypeOther",
           ),
         ),
         inPrisonTrainingInterests = listOf(
-          InPrisonTrainingInterest(
+          InPrisonTrainingInterestEntity(
             reference = UUID.randomUUID(),
             trainingType = InPrisonTrainingType.OTHER,
             trainingTypeOther = "Test trainingTypeOther",
