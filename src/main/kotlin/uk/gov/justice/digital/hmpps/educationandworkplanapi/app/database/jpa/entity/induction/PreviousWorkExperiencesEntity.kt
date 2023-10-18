@@ -43,7 +43,7 @@ class PreviousWorkExperiencesEntity(
   var reference: UUID? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "work_experience_id", nullable = false)
+  @JoinColumn(name = "work_experiences_id", nullable = false)
   var experiences: List<WorkExperienceEntity>? = null,
 
   @Column(updatable = false)

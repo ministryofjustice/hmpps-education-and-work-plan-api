@@ -9,6 +9,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -41,7 +42,7 @@ class PreviousTrainingEntity(
 
   @ElementCollection(targetClass = TrainingType::class)
   @Enumerated(value = EnumType.STRING)
-  @CollectionTable(name = "training_type")
+  @CollectionTable(name = "training_type", joinColumns = [JoinColumn(name = "training_id")])
   @Column(name = "type")
   var trainingTypes: List<TrainingType>? = null,
 

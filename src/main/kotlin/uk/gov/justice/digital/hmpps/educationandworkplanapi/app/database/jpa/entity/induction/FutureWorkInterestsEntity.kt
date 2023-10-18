@@ -76,6 +76,7 @@ class FutureWorkInterestsEntity(
 
 @Table(name = "work_interest")
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 class WorkInterestEntity(
   @Id
   @GeneratedValue

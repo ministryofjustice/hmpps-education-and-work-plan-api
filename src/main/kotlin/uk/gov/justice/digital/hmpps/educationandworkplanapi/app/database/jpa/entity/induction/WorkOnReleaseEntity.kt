@@ -9,6 +9,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -44,7 +45,7 @@ class WorkOnReleaseEntity(
 
   @ElementCollection(targetClass = NotHopingToWorkReason::class)
   @Enumerated(value = EnumType.STRING)
-  @CollectionTable(name = "not_working_reasons")
+  @CollectionTable(name = "not_working_reasons", joinColumns = [JoinColumn(name = "work_on_release_id")])
   @Column(name = "reason")
   var notHopingToWorkReasons: List<NotHopingToWorkReason>? = null,
 
@@ -53,7 +54,7 @@ class WorkOnReleaseEntity(
 
   @ElementCollection(targetClass = AffectAbilityToWork::class)
   @Enumerated(value = EnumType.STRING)
-  @CollectionTable(name = "affecting_ability_to_work")
+  @CollectionTable(name = "affecting_ability_to_work", joinColumns = [JoinColumn(name = "work_on_release_id")])
   @Column(name = "affect")
   var affectAbilityToWork: List<AffectAbilityToWork>? = null,
 

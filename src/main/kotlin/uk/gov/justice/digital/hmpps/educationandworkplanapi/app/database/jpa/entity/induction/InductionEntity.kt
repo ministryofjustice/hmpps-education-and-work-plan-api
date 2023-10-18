@@ -46,32 +46,32 @@ class InductionEntity(
   var prisonNumber: String? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "work_on_release_id")
   @field:NotNull
   var workOnRelease: WorkOnReleaseEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "previous_qualifications_id")
   var previousQualifications: PreviousQualificationsEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "previous_training_id")
   var previousTraining: PreviousTrainingEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "work_experiences_id")
   var previousWorkExperiences: PreviousWorkExperiencesEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "in_prison_interests_id")
   var inPrisonInterests: InPrisonInterestsEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "skills_and_interests_id")
   var personalSkillsAndInterests: PersonalSkillsAndInterestsEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "id")
+  @JoinColumn(name = "future_work_interests_id")
   var futureWorkInterestsEntity: FutureWorkInterestsEntity? = null,
 
   @Column(updatable = false)
