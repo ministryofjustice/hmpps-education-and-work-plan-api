@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.timeline
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference

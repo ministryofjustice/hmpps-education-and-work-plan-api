@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.timeline
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
