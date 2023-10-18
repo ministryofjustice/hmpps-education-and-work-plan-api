@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
+import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
@@ -66,7 +67,21 @@ class PreviousQualificationsEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as PreviousQualificationsEntity
+
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  override fun toString(): String {
+    return this::class.simpleName + "(id = $id, reference = $reference, educationLevel = $educationLevel)"
+  }
+}
 
 @Table(name = "qualification")
 @Entity
@@ -105,7 +120,21 @@ class QualificationEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as QualificationEntity
+
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  override fun toString(): String {
+    return this::class.simpleName + "(id = $id, reference = $reference, subject = $subject, level = $level, grade = $grade)"
+  }
+}
 
 enum class HighestEducationLevel {
   PRIMARY_SCHOOL,

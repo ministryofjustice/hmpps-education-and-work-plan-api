@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
+import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
@@ -63,7 +64,21 @@ class PersonalSkillsAndInterestsEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as PersonalSkillsAndInterestsEntity
+
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  override fun toString(): String {
+    return this::class.simpleName + "(id = $id, reference = $reference)"
+  }
+}
 
 @Table(name = "personal_skill")
 @Entity
@@ -101,7 +116,21 @@ class PersonalSkillEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as PersonalSkillEntity
+
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  override fun toString(): String {
+    return this::class.simpleName + "(id = $id, reference = $reference, skillType = $skillType, skillTypeOther = $skillTypeOther)"
+  }
+}
 
 @Table(name = "personal_interest")
 @Entity
@@ -139,7 +168,21 @@ class PersonalInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as PersonalInterestEntity
+
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = javaClass.hashCode()
+
+  override fun toString(): String {
+    return this::class.simpleName + "(id = $id, reference = $reference, interestType = $interestType, interestTypeOther = $interestTypeOther)"
+  }
+}
 
 enum class SkillType {
   COMMUNICATION,
