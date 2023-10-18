@@ -48,7 +48,7 @@ class WorkOnReleaseEntity(
   @Column(name = "reason")
   var notHopingToWorkReasons: List<NotHopingToWorkReason>? = null,
 
-  @Column
+  @Column(name = "not_hoping_other")
   var notHopingToWorkOtherReason: String? = null,
 
   @ElementCollection(targetClass = AffectAbilityToWork::class)
@@ -57,7 +57,7 @@ class WorkOnReleaseEntity(
   @Column(name = "affect")
   var affectAbilityToWork: List<AffectAbilityToWork>? = null,
 
-  @Column
+  @Column(name = "affecting_work_other")
   var affectAbilityToWorkOther: String? = null,
 
   @Column(updatable = false)
