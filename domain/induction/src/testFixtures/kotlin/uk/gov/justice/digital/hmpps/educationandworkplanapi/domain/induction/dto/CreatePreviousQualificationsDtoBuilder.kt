@@ -1,0 +1,17 @@
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
+
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
+
+fun aValidCreatePreviousQualificationsDto(
+  educationLevel: HighestEducationLevel = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
+  qualifications: List<Qualification> = listOf(aValidQualification()),
+  prisonId: String = "BXI",
+) =
+  CreatePreviousQualificationsDto(
+    educationLevel = educationLevel,
+    qualifications = qualifications,
+    prisonId = prisonId,
+  )
