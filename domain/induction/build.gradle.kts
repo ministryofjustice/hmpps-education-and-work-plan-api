@@ -13,6 +13,8 @@ repositories {
 }
 
 dependencies {
+  api("io.github.microutils:kotlin-logging:${property("kotlin.logging.version")}")
+
   // Test dependencies
   testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
   testImplementation("org.mockito:mockito-junit-jupiter:5.3.1")

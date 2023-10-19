@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
 
 /**
  * Persistence Adapter for [Induction] instances.
@@ -14,9 +15,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Ind
 interface InductionPersistenceAdapter {
 
   /**
-   * Records an [Induction] that has taken place for a prisoner.
+   * Persists a new [Induction] that has taken place for a prisoner.
    *
    * @return The [Induction] with any newly generated values (if applicable).
    */
-  fun saveInduction(prisonNumber: String, induction: Induction): Induction
+  fun createInduction(induction: CreateInductionDto): Induction
+
+  /**
+   * Retrieves an [Induction] for a given Prisoner. Returns `null` if the [Induction] does not exist.
+   */
+  fun getInduction(prisonNumber: String): Induction?
 }
