@@ -1,22 +1,26 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Holds details of a Prisoner's work aspirations, including any barriers affecting their work.
  */
 data class WorkOnRelease(
+  val reference: UUID,
   val hopingToWork: HopingToWork,
   val notHopingToWorkReasons: List<NotHopingToWorkReason>,
   val notHopingToWorkOtherReason: String?,
   val affectAbilityToWork: List<AffectAbilityToWork>,
   val affectAbilityToWorkOther: String?,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val createdBy: String,
+  val createdByDisplayName: String,
+  val createdAt: Instant,
+  val createdAtPrison: String,
+  val lastUpdatedBy: String,
+  val lastUpdatedByDisplayName: String,
+  val lastUpdatedAt: Instant,
+  val lastUpdatedAtPrison: String,
 )
 
 enum class HopingToWork {

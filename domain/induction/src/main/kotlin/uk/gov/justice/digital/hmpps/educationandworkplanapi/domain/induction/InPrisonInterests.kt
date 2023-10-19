@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Represents any in-prison work or training interests a Prisoner might have during their time in prison.
@@ -11,14 +12,17 @@ import java.time.Instant
  * modelled on the current screen behaviour.
  */
 data class InPrisonInterests(
+  val reference: UUID,
   val inPrisonWorkInterests: List<InPrisonWorkInterest>,
   val inPrisonTrainingInterests: List<InPrisonTrainingInterest>,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val createdBy: String,
+  val createdByDisplayName: String,
+  val createdAt: Instant,
+  val createdAtPrison: String,
+  val lastUpdatedBy: String,
+  val lastUpdatedByDisplayName: String,
+  val lastUpdatedAt: Instant,
+  val lastUpdatedAtPrison: String,
 )
 
 data class InPrisonWorkInterest(

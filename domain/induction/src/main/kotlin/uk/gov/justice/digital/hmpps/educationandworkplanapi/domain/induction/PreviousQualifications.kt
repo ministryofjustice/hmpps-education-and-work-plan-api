@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Holds details about a Prisoner's educational qualifications, including where relevant, the grades achieved in each
@@ -10,14 +11,17 @@ import java.time.Instant
  * been asked about their education).
  */
 data class PreviousQualifications(
-  val educationLevel: HighestEducationLevel,
+  val reference: UUID,
+  val educationLevel: HighestEducationLevel?,
   val qualifications: List<Qualification>,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val createdBy: String,
+  val createdByDisplayName: String,
+  val createdAt: Instant,
+  val createdAtPrison: String,
+  val lastUpdatedBy: String,
+  val lastUpdatedByDisplayName: String,
+  val lastUpdatedAt: Instant,
+  val lastUpdatedAtPrison: String,
 )
 
 enum class HighestEducationLevel {

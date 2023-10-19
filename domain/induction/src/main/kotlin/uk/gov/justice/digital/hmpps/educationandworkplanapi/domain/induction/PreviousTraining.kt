@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Holds details of any additional training that a Prisoner may have done.
@@ -8,14 +9,17 @@ import java.time.Instant
  * Note that the list of training cannot be empty, since NONE is an option.
  */
 data class PreviousTraining(
+  val reference: UUID,
   val trainingTypes: List<TrainingType>,
   val trainingTypeOther: String?,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val createdBy: String,
+  val createdByDisplayName: String,
+  val createdAt: Instant,
+  val createdAtPrison: String,
+  val lastUpdatedBy: String,
+  val lastUpdatedByDisplayName: String,
+  val lastUpdatedAt: Instant,
+  val lastUpdatedAtPrison: String,
 )
 
 enum class TrainingType {

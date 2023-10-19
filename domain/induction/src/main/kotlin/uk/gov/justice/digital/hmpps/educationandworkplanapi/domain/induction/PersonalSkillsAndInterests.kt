@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Lists the personal skills (such as communication) and interests (such as music) that a Prisoner feels they have.
@@ -8,14 +9,17 @@ import java.time.Instant
  * Note that the lists of skills/interests cannot be empty, since NONE is an option in both cases.
  */
 data class PersonalSkillsAndInterests(
+  val reference: UUID,
   val skills: List<PersonalSkill>,
   val interests: List<PersonalInterest>,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val createdBy: String,
+  val createdByDisplayName: String,
+  val createdAt: Instant,
+  val createdAtPrison: String,
+  val lastUpdatedBy: String,
+  val lastUpdatedByDisplayName: String,
+  val lastUpdatedAt: Instant,
+  val lastUpdatedAtPrison: String,
 )
 
 data class PersonalSkill(
