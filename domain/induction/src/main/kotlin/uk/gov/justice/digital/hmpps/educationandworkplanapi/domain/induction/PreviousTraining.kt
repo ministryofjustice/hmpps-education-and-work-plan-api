@@ -8,7 +8,7 @@ import java.time.Instant
  * Note that the list of training cannot be empty, since NONE is an option.
  */
 data class PreviousTraining(
-  val trainingType: List<TrainingType>,
+  val trainingTypes: List<TrainingType>,
   val trainingTypeOther: String?,
   val createdBy: String?,
   val createdByDisplayName: String?,

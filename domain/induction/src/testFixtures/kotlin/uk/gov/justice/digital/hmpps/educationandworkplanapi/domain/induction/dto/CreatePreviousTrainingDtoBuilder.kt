@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dt
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType
 
 fun aValidCreatePreviousTrainingDto(
-  trainingType: List<TrainingType> = listOf(TrainingType.CSCS_CARD),
-  trainingTypeOther: String? = null,
+  trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
+  trainingTypeOther: String? = "Kotlin course",
   prisonId: String = "BXI",
 ) =
   CreatePreviousTrainingDto(
-    trainingType = trainingType,
+    trainingTypes = trainingTypes,
     trainingTypeOther = trainingTypeOther,
     prisonId = prisonId,
   )
