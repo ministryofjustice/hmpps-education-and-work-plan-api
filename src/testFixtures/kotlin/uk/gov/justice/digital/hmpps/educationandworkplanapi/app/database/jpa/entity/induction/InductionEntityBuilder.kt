@@ -1,0 +1,45 @@
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
+
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import java.time.Instant
+import java.util.UUID
+
+fun aValidInductionEntity(
+  id: UUID? = UUID.randomUUID(),
+  reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = aValidPrisonNumber(),
+  workOnRelease: WorkOnReleaseEntity = aValidWorkOnReleaseEntity(),
+  previousQualifications: PreviousQualificationsEntity = aValidPreviousQualificationsEntity(),
+  previousTraining: PreviousTrainingEntity = aValidPreviousTrainingEntity(),
+  previousWorkExperiences: PreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntity(),
+  inPrisonInterests: InPrisonInterestsEntity = aValidInPrisonInterestsEntity(),
+  personalSkillsAndInterests: PersonalSkillsAndInterestsEntity = aValidPersonalSkillsAndInterestsEntity(),
+  futureWorkInterestsEntity: FutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(),
+  createdAt: Instant? = Instant.now(),
+  createdAtPrison: String = "BXI",
+  createdBy: String? = "asmith_gen",
+  createdByDisplayName: String? = "Alex Smith",
+  updatedAt: Instant? = Instant.now(),
+  updatedAtPrison: String = "BXI",
+  updatedBy: String? = "bjones_gen",
+  updatedByDisplayName: String? = "Barry Jones",
+) = InductionEntity(
+  id = id,
+  reference = reference,
+  prisonNumber = prisonNumber,
+  workOnRelease = workOnRelease,
+  previousQualifications = previousQualifications,
+  previousTraining = previousTraining,
+  previousWorkExperiences = previousWorkExperiences,
+  inPrisonInterests = inPrisonInterests,
+  personalSkillsAndInterests = personalSkillsAndInterests,
+  futureWorkInterestsEntity = futureWorkInterestsEntity,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+)

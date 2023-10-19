@@ -5,33 +5,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.FutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.NotHopingToWorkReason
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalInterestEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillsAndInterestsEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousTrainingEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.SkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.TrainingType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkOnReleaseEntity
-import java.util.UUID
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
 
 @Deprecated("A temporary IT until we have the REST endpoint in place")
 internal class TempRepositoryTest : IntegrationTestBase() {
@@ -41,117 +19,9 @@ internal class TempRepositoryTest : IntegrationTestBase() {
   fun `should process CIAG induction created event`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val prisonId = "BXI"
-    // TODO - add test data builder
-    val induction = InductionEntity(
-      reference = UUID.randomUUID(),
-      prisonNumber = prisonNumber,
-      workOnRelease = WorkOnReleaseEntity(
-        reference = UUID.randomUUID(),
-        hopingToWork = HopingToWork.NO,
-        notHopingToWorkReasons = listOf(NotHopingToWorkReason.NOT_SURE),
-        notHopingToWorkOtherReason = "Test notHopingToWorkOtherReason",
-        affectAbilityToWork = listOf(AffectAbilityToWork.CARING_RESPONSIBILITIES),
-        affectAbilityToWorkOther = "Test affectAbilityToWorkOther",
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      previousQualifications = PreviousQualificationsEntity(
-        reference = UUID.randomUUID(),
-        educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
-        qualifications = listOf(
-          QualificationEntity(
-            reference = UUID.randomUUID(),
-            subject = "English",
-            level = QualificationLevel.LEVEL_3,
-            grade = "A",
-          ),
-          QualificationEntity(
-            reference = UUID.randomUUID(),
-            subject = "Maths",
-            level = QualificationLevel.LEVEL_4,
-            grade = "A",
-          ),
-        ),
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      previousTraining = PreviousTrainingEntity(
-        reference = UUID.randomUUID(),
-        trainingTypes = listOf(TrainingType.OTHER),
-        trainingTypeOther = "Test trainingTypeOther",
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      previousWorkExperiences = PreviousWorkExperiencesEntity(
-        reference = UUID.randomUUID(),
-        experiences = listOf(
-          WorkExperienceEntity(
-            reference = UUID.randomUUID(),
-            experienceType = WorkExperienceType.DRIVING,
-            experienceTypeOther = "Test experienceTypeOther",
-            role = "Chief Forklift Truck Driver",
-            details = "Forward, pick stuff up, reverse",
-          ),
-        ),
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      inPrisonInterests = InPrisonInterestsEntity(
-        reference = UUID.randomUUID(),
-        inPrisonWorkInterests = listOf(
-          InPrisonWorkInterest(
-            reference = UUID.randomUUID(),
-            workType = InPrisonWorkType.CLEANING_AND_HYGIENE,
-            workTypeOther = "Test workTypeOther",
-          ),
-        ),
-        inPrisonTrainingInterests = listOf(
-          InPrisonTrainingInterest(
-            reference = UUID.randomUUID(),
-            trainingType = InPrisonTrainingType.OTHER,
-            trainingTypeOther = "Test trainingTypeOther",
-          ),
-        ),
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      personalSkillsAndInterests = PersonalSkillsAndInterestsEntity(
-        reference = UUID.randomUUID(),
-        skills = listOf(
-          PersonalSkillEntity(
-            reference = UUID.randomUUID(),
-            skillType = SkillType.COMMUNICATION,
-            skillTypeOther = "Test skillTypeOther",
-          ),
-        ),
-        interests = listOf(
-          PersonalInterestEntity(
-            reference = UUID.randomUUID(),
-            interestType = InterestType.COMMUNITY,
-            interestTypeOther = "Test interestTypeOther",
-          ),
-        ),
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      futureWorkInterestsEntity = FutureWorkInterestsEntity(
-        reference = UUID.randomUUID(),
-        interests = listOf(
-          WorkInterestEntity(
-            reference = UUID.randomUUID(),
-            workType = WorkInterestType.BEAUTY,
-            workTypeOther = "Test workTypeOther",
-            role = "Cutting nails",
-          ),
-        ),
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-      ),
-      createdAtPrison = prisonId,
-      updatedAtPrison = prisonId,
-    )
+    val induction = aValidInductionEntity(prisonNumber = prisonNumber)
     inductionRepository.save(induction)
+    val prisonId = "BXI"
 
     // When
     val actual = inductionRepository.findByPrisonNumber(prisonNumber)
@@ -173,10 +43,10 @@ internal class TempRepositoryTest : IntegrationTestBase() {
     assertThat(actual.workOnRelease!!.id).isNotNull()
     assertThat(actual.workOnRelease!!.reference).isNotNull()
     assertThat(actual.workOnRelease!!.hopingToWork).isEqualTo(HopingToWork.NO)
-    assertThat(actual.workOnRelease!!.notHopingToWorkReasons).containsExactly(NotHopingToWorkReason.NOT_SURE)
-    assertThat(actual.workOnRelease!!.notHopingToWorkOtherReason).isEqualTo("Test notHopingToWorkOtherReason")
-    assertThat(actual.workOnRelease!!.affectAbilityToWork).containsExactly(AffectAbilityToWork.CARING_RESPONSIBILITIES)
-    assertThat(actual.workOnRelease!!.affectAbilityToWorkOther).isEqualTo("Test affectAbilityToWorkOther")
+    assertThat(actual.workOnRelease!!.notHopingToWorkReasons).containsExactly(NotHopingToWorkReason.OTHER)
+    assertThat(actual.workOnRelease!!.notHopingToWorkOtherReason).isEqualTo("No motivation")
+    assertThat(actual.workOnRelease!!.affectAbilityToWork).containsExactly(AffectAbilityToWork.OTHER)
+    assertThat(actual.workOnRelease!!.affectAbilityToWorkOther).isEqualTo("Negative attitude")
     assertThat(actual.workOnRelease!!.createdAtPrison).isEqualTo(prisonId)
     assertThat(actual.workOnRelease!!.updatedAtPrison).isEqualTo(prisonId)
 
@@ -184,7 +54,7 @@ internal class TempRepositoryTest : IntegrationTestBase() {
     assertThat(actual.previousQualifications!!.id).isNotNull()
     assertThat(actual.previousQualifications!!.reference).isNotNull()
     assertThat(actual.previousQualifications!!.educationLevel).isEqualTo(HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS)
-    assertThat(actual.previousQualifications!!.qualifications).hasSize(2)
+    assertThat(actual.previousQualifications!!.qualifications).hasSize(1)
     assertThat(actual.previousQualifications!!.createdAt).isNotNull()
     assertThat(actual.previousQualifications!!.createdAtPrison).isEqualTo(prisonId)
     assertThat(actual.previousQualifications!!.createdBy).isNotNull()
@@ -198,7 +68,7 @@ internal class TempRepositoryTest : IntegrationTestBase() {
     assertThat(actual.previousTraining!!.id).isNotNull()
     assertThat(actual.previousTraining!!.reference).isNotNull()
     assertThat(actual.previousTraining!!.trainingTypes).containsExactly(TrainingType.OTHER)
-    assertThat(actual.previousTraining!!.trainingTypeOther).isEqualTo("Test trainingTypeOther")
+    assertThat(actual.previousTraining!!.trainingTypeOther).isEqualTo("Kotlin course")
     assertThat(actual.previousTraining!!.createdAt).isNotNull()
     assertThat(actual.previousTraining!!.createdAtPrison).isEqualTo(prisonId)
     assertThat(actual.previousTraining!!.createdBy).isNotNull()

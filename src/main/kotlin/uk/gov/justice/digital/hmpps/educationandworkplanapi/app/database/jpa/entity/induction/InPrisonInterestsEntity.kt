@@ -44,11 +44,11 @@ class InPrisonInterestsEntity(
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "interests_id", nullable = false)
-  var inPrisonWorkInterests: List<InPrisonWorkInterest>? = null,
+  var inPrisonWorkInterests: List<InPrisonWorkInterestEntity>? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "interests_id", nullable = false)
-  var inPrisonTrainingInterests: List<InPrisonTrainingInterest>? = null,
+  var inPrisonTrainingInterests: List<InPrisonTrainingInterestEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp
@@ -100,7 +100,7 @@ class InPrisonInterestsEntity(
 @Table(name = "in_prison_work_interest")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class InPrisonWorkInterest(
+class InPrisonWorkInterestEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -137,7 +137,7 @@ class InPrisonWorkInterest(
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as InPrisonWorkInterest
+    other as InPrisonWorkInterestEntity
 
     return id != null && id == other.id
   }
@@ -152,7 +152,7 @@ class InPrisonWorkInterest(
 @Table(name = "in_prison_training_interest")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class InPrisonTrainingInterest(
+class InPrisonTrainingInterestEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -189,7 +189,7 @@ class InPrisonTrainingInterest(
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as InPrisonTrainingInterest
+    other as InPrisonTrainingInterestEntity
 
     return id != null && id == other.id
   }
