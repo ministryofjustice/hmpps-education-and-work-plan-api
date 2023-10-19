@@ -4,6 +4,35 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidInPrisonInterestsEntity(
+  id: UUID? = null,
+  reference: UUID = UUID.randomUUID(),
+  inPrisonWorkInterests: List<InPrisonWorkInterestEntity> = listOf(aValidInPrisonWorkInterestEntity()),
+  inPrisonTrainingInterests: List<InPrisonTrainingInterestEntity> = listOf(aValidInPrisonTrainingInterestEntity()),
+  createdAt: Instant? = null,
+  createdAtPrison: String = "BXI",
+  createdBy: String? = null,
+  createdByDisplayName: String? = null,
+  updatedAt: Instant? = null,
+  updatedAtPrison: String = "BXI",
+  updatedBy: String? = null,
+  updatedByDisplayName: String? = null,
+) =
+  InPrisonInterestsEntity(
+    id = id,
+    reference = reference,
+    inPrisonWorkInterests = inPrisonWorkInterests,
+    inPrisonTrainingInterests = inPrisonTrainingInterests,
+    createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
+    createdBy = createdBy,
+    createdByDisplayName = createdByDisplayName,
+    updatedAt = updatedAt,
+    updatedAtPrison = updatedAtPrison,
+    updatedBy = updatedBy,
+    updatedByDisplayName = updatedByDisplayName,
+  )
+
+fun aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   inPrisonWorkInterests: List<InPrisonWorkInterestEntity> = listOf(aValidInPrisonWorkInterestEntity()),

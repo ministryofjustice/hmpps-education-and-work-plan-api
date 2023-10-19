@@ -4,6 +4,35 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidPersonalSkillsAndInterestsEntity(
+  id: UUID? = null,
+  reference: UUID = UUID.randomUUID(),
+  skills: List<PersonalSkillEntity> = listOf(aValidPersonalSkillEntity()),
+  interests: List<PersonalInterestEntity> = listOf(aValidPersonalInterestEntity()),
+  createdAt: Instant? = null,
+  createdAtPrison: String = "BXI",
+  createdBy: String? = null,
+  createdByDisplayName: String? = null,
+  updatedAt: Instant? = null,
+  updatedAtPrison: String = "BXI",
+  updatedBy: String? = null,
+  updatedByDisplayName: String? = null,
+) =
+  PersonalSkillsAndInterestsEntity(
+    id = id,
+    reference = reference,
+    skills = skills,
+    interests = interests,
+    createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
+    createdBy = createdBy,
+    createdByDisplayName = createdByDisplayName,
+    updatedAt = updatedAt,
+    updatedAtPrison = updatedAtPrison,
+    updatedBy = updatedBy,
+    updatedByDisplayName = updatedByDisplayName,
+  )
+
+fun aValidPersonalSkillsAndInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   skills: List<PersonalSkillEntity> = listOf(aValidPersonalSkillEntity()),
