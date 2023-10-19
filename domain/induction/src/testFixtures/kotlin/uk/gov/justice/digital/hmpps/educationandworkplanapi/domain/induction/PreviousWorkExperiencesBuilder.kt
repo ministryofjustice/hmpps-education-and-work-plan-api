@@ -22,9 +22,9 @@ fun aValidPreviousWorkExperiences(
   )
 
 fun aValidWorkExperience(
-  experienceType: WorkExperienceType = WorkExperienceType.CONSTRUCTION,
-  experienceTypeOther: String? = null,
-  role: String = "Forklift truck driver",
+  experienceType: WorkExperienceType = WorkExperienceType.OTHER,
+  experienceTypeOther: String? = "All sorts",
+  role: String = "General dog's body",
   details: String? = null,
 ) =
   WorkExperience(

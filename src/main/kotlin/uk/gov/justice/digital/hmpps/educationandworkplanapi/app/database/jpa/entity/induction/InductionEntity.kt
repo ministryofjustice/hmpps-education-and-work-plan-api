@@ -72,7 +72,7 @@ class InductionEntity(
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "future_work_interests_id")
-  var futureWorkInterestsEntity: FutureWorkInterestsEntity? = null,
+  var futureWorkInterests: FutureWorkInterestsEntity? = null,
 
   @Column(updatable = false)
   @CreationTimestamp
