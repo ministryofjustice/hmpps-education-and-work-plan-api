@@ -12,13 +12,13 @@ import java.util.UUID
 data class PreviousWorkExperiences(
   val reference: UUID,
   val experiences: List<WorkExperience>,
-  val createdBy: String,
-  val createdByDisplayName: String,
-  val createdAt: Instant,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
   val createdAtPrison: String,
-  val lastUpdatedBy: String,
-  val lastUpdatedByDisplayName: String,
-  val lastUpdatedAt: Instant,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
   val lastUpdatedAtPrison: String,
 )
 

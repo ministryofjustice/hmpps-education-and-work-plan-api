@@ -55,15 +55,15 @@ data class Induction(
   /**
    * The user ID of the person (logged-in user) who created the Induction.
    */
-  val createdBy: String,
+  val createdBy: String?,
   /**
    * The name of the logged-in user who created the Induction.
    */
-  val createdByDisplayName: String,
+  val createdByDisplayName: String?,
   /**
    * The timestamp when this Induction was created.
    */
-  val createdAt: Instant,
+  val createdAt: Instant?,
   /**
    * The ID of the Prison that the Prisoner was at when this induction was created.
    */
@@ -71,15 +71,15 @@ data class Induction(
   /**
    * The user ID of the person (logged-in user) who updated the Induction.
    */
-  val lastUpdatedBy: String,
+  val lastUpdatedBy: String?,
   /**
    * The name of the logged-in user who updated the Induction.
    */
-  val lastUpdatedByDisplayName: String,
+  val lastUpdatedByDisplayName: String?,
   /**
    * The timestamp when this Induction was updated.
    */
-  val lastUpdatedAt: Instant,
+  val lastUpdatedAt: Instant?,
   /**
    * The ID of the Prison that the Prisoner was at when this induction was updated.
    */

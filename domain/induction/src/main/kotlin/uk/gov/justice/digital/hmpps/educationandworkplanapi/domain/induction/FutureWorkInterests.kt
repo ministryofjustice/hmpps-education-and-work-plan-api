@@ -14,13 +14,13 @@ import java.util.UUID
 data class FutureWorkInterests(
   val reference: UUID,
   val interests: List<WorkInterest>,
-  val createdBy: String,
-  val createdByDisplayName: String,
-  val createdAt: Instant,
+  val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAt: Instant?,
   val createdAtPrison: String,
-  val lastUpdatedBy: String,
-  val lastUpdatedByDisplayName: String,
-  val lastUpdatedAt: Instant,
+  val lastUpdatedBy: String?,
+  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedAt: Instant?,
   val lastUpdatedAtPrison: String,
 )
 
