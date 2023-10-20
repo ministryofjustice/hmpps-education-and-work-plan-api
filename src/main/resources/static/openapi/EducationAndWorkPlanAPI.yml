@@ -696,7 +696,6 @@ components:
         inPrisonInterests:
           $ref: '#/components/schemas/PrisonWorkAndEducationRequest'
       required:
-        - desireToWork
         - hopingToGetWork
 
     PreviousWorkRequest:
