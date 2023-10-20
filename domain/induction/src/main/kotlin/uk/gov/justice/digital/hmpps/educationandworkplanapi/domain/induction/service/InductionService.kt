@@ -1,6 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service
 
+import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Service class exposing methods that implement the business rules for the Induction domain.
@@ -18,6 +23,14 @@ class InductionService(
   /**
    * Records an [Induction] that has taken place for a prisoner.
    */
-  fun createInduction(prisonNumber: String, induction: Induction) =
-    persistenceAdapter.saveInduction(prisonNumber, induction)
+  fun createInduction(createInductionDto: CreateInductionDto): Induction =
+    with(createInductionDto) {
+      log.info { "Creating Induction for prisoner [$prisonNumber]" }
+
+      if (persistenceAdapter.getInduction(prisonNumber) != null) {
+        throw InductionAlreadyExistsException("An Induction already exists for prisoner $prisonNumber")
+      }
+
+      return persistenceAdapter.createInduction(createInductionDto)
+    }
 }
