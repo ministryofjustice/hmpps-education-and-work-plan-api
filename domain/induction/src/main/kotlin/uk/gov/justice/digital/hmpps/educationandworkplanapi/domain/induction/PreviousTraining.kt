@@ -9,7 +9,7 @@ import java.util.UUID
  * Note that the list of training cannot be empty, since NONE is an option.
  */
 data class PreviousTraining(
-  val reference: UUID,
+  val reference: UUID?,
   val trainingTypes: List<TrainingType>,
   val trainingTypeOther: String?,
   val createdBy: String?,

@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidInPrisonInterests(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   inPrisonWorkInterests: List<InPrisonWorkInterest> = listOf(aValidInPrisonWorkInterest()),
   inPrisonTrainingInterests: List<InPrisonTrainingInterest> = listOf(aValidInPrisonTrainingInterest()),
   createdBy: String? = "asmith_gen",

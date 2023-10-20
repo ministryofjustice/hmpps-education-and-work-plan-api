@@ -9,7 +9,7 @@ import java.util.UUID
  * Note that the lists of skills/interests cannot be empty, since NONE is an option in both cases.
  */
 data class PersonalSkillsAndInterests(
-  val reference: UUID,
+  val reference: UUID?,
   val skills: List<PersonalSkill>,
   val interests: List<PersonalInterest>,
   val createdBy: String?,

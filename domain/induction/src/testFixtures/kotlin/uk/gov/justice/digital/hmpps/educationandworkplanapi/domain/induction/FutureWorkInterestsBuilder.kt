@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidFutureWorkInterests(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   interests: List<WorkInterest> = listOf(aValidWorkInterest()),
   createdBy: String? = "asmith_gen",
   createdByDisplayName: String? = "Alex Smith",

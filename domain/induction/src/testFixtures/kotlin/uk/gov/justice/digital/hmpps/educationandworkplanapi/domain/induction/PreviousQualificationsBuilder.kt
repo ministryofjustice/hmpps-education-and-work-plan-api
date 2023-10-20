@@ -5,7 +5,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidPreviousQualifications(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   educationLevel: HighestEducationLevel? = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
   qualifications: List<Qualification> = listOf(aValidQualification()),
   createdBy: String? = "asmith_gen",

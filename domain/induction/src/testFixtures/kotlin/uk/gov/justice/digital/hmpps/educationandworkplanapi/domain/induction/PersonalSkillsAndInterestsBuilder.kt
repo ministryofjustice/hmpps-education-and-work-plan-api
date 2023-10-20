@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidPersonalSkillsAndInterests(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   skills: List<PersonalSkill> = listOf(aValidPersonalSkill()),
   interests: List<PersonalInterest> = listOf(aValidPersonalInterest()),
   createdBy: String? = "asmith_gen",

@@ -12,7 +12,7 @@ import java.util.UUID
  * modelled on the current screen behaviour.
  */
 data class InPrisonInterests(
-  val reference: UUID,
+  val reference: UUID?,
   val inPrisonWorkInterests: List<InPrisonWorkInterest>,
   val inPrisonTrainingInterests: List<InPrisonTrainingInterest>,
   val createdBy: String?,

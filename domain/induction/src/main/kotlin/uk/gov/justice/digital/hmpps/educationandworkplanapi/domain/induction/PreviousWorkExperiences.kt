@@ -10,7 +10,7 @@ import java.util.UUID
  * but either they do not, or they do not wish to provide details.
  */
 data class PreviousWorkExperiences(
-  val reference: UUID,
+  val reference: UUID?,
   val experiences: List<WorkExperience>,
   val createdBy: String?,
   val createdByDisplayName: String?,

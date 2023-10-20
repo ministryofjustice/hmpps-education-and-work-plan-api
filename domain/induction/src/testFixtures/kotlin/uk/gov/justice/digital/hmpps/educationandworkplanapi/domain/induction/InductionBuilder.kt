@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidInduction(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   prisonNumber: String = "A1234AB",
   workOnRelease: WorkOnRelease = aValidWorkOnRelease(),
   previousQualifications: PreviousQualifications = aValidPreviousQualifications(),

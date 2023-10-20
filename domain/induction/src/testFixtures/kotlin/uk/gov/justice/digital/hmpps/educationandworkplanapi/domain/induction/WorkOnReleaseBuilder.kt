@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidWorkOnRelease(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   hopingToWork: HopingToWork = HopingToWork.YES,
   notHopingToWorkReasons: List<NotHopingToWorkReason> = emptyList(),
   notHopingToWorkOtherReason: String? = null,

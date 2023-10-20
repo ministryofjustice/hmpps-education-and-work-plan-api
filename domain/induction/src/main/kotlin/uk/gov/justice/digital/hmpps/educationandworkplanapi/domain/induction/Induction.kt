@@ -13,7 +13,7 @@ data class Induction(
   /**
    * A unique reference for the Induction that can be referred to outside of this application.
    */
-  val reference: UUID,
+  val reference: UUID?,
   /**
    * The identifier of the Prisoner (confusingly called "prison" number throughout HMPPS).
    */

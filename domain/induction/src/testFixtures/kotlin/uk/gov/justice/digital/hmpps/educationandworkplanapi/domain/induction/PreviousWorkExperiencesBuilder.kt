@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidPreviousWorkExperiences(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   experiences: List<WorkExperience> = listOf(aValidWorkExperience()),
   createdBy: String? = "asmith_gen",
   createdByDisplayName: String? = "Alex Smith",

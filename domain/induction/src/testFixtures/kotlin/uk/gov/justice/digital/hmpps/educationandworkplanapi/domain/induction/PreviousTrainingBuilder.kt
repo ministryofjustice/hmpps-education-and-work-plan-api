@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 fun aValidPreviousTraining(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   trainingTypes: List<TrainingType> = listOf(TrainingType.CSCS_CARD),
   trainingTypeOther: String? = null,
   createdBy: String? = "asmith_gen",

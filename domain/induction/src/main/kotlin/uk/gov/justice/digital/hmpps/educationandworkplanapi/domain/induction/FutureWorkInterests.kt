@@ -12,7 +12,7 @@ import java.util.UUID
  * modelled on the current screen behaviour.
  */
 data class FutureWorkInterests(
-  val reference: UUID,
+  val reference: UUID?,
   val interests: List<WorkInterest>,
   val createdBy: String?,
   val createdByDisplayName: String?,

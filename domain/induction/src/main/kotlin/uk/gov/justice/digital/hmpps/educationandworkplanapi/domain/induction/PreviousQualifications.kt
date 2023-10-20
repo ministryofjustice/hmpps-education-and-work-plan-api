@@ -11,7 +11,7 @@ import java.util.UUID
  * been asked about their education).
  */
 data class PreviousQualifications(
-  val reference: UUID,
+  val reference: UUID?,
   val educationLevel: HighestEducationLevel?,
   val qualifications: List<Qualification>,
   val createdBy: String?,

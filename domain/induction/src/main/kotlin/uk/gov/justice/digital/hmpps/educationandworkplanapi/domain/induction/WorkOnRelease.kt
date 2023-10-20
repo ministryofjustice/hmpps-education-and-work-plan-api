@@ -7,7 +7,7 @@ import java.util.UUID
  * Holds details of a Prisoner's work aspirations, including any barriers affecting their work.
  */
 data class WorkOnRelease(
-  val reference: UUID,
+  val reference: UUID?,
   val hopingToWork: HopingToWork,
   val notHopingToWorkReasons: List<NotHopingToWorkReason>,
   val notHopingToWorkOtherReason: String?,
