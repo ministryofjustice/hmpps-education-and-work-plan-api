@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Represents a Prisoner's future work aspirations, including the type/sector of work and their desired role within it.
@@ -11,13 +12,16 @@ import java.time.Instant
  * modelled on the current screen behaviour.
  */
 data class FutureWorkInterests(
+  val reference: UUID,
   val interests: List<WorkInterest>,
   val createdBy: String?,
   val createdByDisplayName: String?,
   val createdAt: Instant?,
+  val createdAtPrison: String,
   val lastUpdatedBy: String?,
   val lastUpdatedByDisplayName: String?,
   val lastUpdatedAt: Instant?,
+  val lastUpdatedAtPrison: String,
 )
 
 data class WorkInterest(

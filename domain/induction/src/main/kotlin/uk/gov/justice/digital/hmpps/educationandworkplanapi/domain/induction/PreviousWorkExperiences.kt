@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Contains details of a Prisoner's work experience, if applicable.
@@ -9,13 +10,16 @@ import java.time.Instant
  * but either they do not, or they do not wish to provide details.
  */
 data class PreviousWorkExperiences(
+  val reference: UUID,
   val experiences: List<WorkExperience>,
   val createdBy: String?,
   val createdByDisplayName: String?,
   val createdAt: Instant?,
+  val createdAtPrison: String,
   val lastUpdatedBy: String?,
   val lastUpdatedByDisplayName: String?,
   val lastUpdatedAt: Instant?,
+  val lastUpdatedAtPrison: String,
 )
 
 data class WorkExperience(
