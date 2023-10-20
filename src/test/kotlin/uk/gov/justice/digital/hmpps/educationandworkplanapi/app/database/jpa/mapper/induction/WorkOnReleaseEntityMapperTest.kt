@@ -1,8 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork as AffectAbilityToWorkEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork as HopingToWorkEntity
@@ -43,5 +46,33 @@ class WorkOnReleaseEntityMapperTest {
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map from entity to domain`() {
+    // Given
+    val workOnReleaseEntity = aValidWorkOnReleaseEntityWithJpaFieldsPopulated()
+    val expectedWorkOnReleaseEntity = aValidWorkOnRelease(
+      reference = workOnReleaseEntity.reference!!,
+      hopingToWork = HopingToWorkDomain.NO,
+      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
+      notHopingToWorkOtherReason = "No motivation",
+      affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
+      affectAbilityToWorkOther = "Negative attitude",
+      createdAt = workOnReleaseEntity.createdAt!!,
+      createdAtPrison = workOnReleaseEntity.createdAtPrison!!,
+      createdBy = workOnReleaseEntity.createdBy!!,
+      createdByDisplayName = workOnReleaseEntity.createdByDisplayName!!,
+      lastUpdatedAt = workOnReleaseEntity.updatedAt!!,
+      lastUpdatedAtPrison = workOnReleaseEntity.updatedAtPrison!!,
+      lastUpdatedBy = workOnReleaseEntity.updatedBy!!,
+      lastUpdatedByDisplayName = workOnReleaseEntity.updatedByDisplayName!!,
+    )
+
+    // When
+    val actual = mapper.fromEntityToDomain(workOnReleaseEntity)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedWorkOnReleaseEntity)
   }
 }

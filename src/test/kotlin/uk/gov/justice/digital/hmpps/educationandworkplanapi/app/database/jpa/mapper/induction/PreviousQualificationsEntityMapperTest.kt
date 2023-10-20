@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -8,12 +9,16 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel as HighestEducationLevelEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel as QualificationLevelEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
 
 @ExtendWith(MockitoExtension::class)
 class PreviousQualificationsEntityMapperTest {
@@ -29,11 +34,11 @@ class PreviousQualificationsEntityMapperTest {
     val createQualificationsDto = aValidCreatePreviousQualificationsDto()
     val expectedQualificationEntity = aValidQualificationEntity(
       subject = "English",
-      level = QualificationLevel.LEVEL_1,
+      level = QualificationLevelEntity.LEVEL_1,
       grade = "C",
     )
     val expected = aValidPreviousQualificationsEntity(
-      educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
+      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = listOf(expectedQualificationEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -51,5 +56,33 @@ class PreviousQualificationsEntityMapperTest {
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
     verify(qualificationEntityMapper).fromDomainToEntity(createQualificationsDto.qualifications[0])
+  }
+
+  @Test
+  fun `should map from entity to domain`() {
+    // Given
+    val qualificationsEntity = aValidPreviousQualificationsEntityWithJpaFieldsPopulated()
+    val expectedQualification = aValidQualification()
+    val expectedPreviousQualifications = aValidPreviousQualifications(
+      reference = qualificationsEntity.reference!!,
+      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      qualifications = listOf(expectedQualification),
+      createdAt = qualificationsEntity.createdAt!!,
+      createdAtPrison = qualificationsEntity.createdAtPrison!!,
+      createdBy = qualificationsEntity.createdBy!!,
+      createdByDisplayName = qualificationsEntity.createdByDisplayName!!,
+      lastUpdatedAt = qualificationsEntity.updatedAt!!,
+      lastUpdatedAtPrison = qualificationsEntity.updatedAtPrison!!,
+      lastUpdatedBy = qualificationsEntity.updatedBy!!,
+      lastUpdatedByDisplayName = qualificationsEntity.updatedByDisplayName!!,
+    )
+    given(qualificationEntityMapper.fromEntityToDomain(any())).willReturn(expectedQualification)
+
+    // When
+    val actual = mapper.fromEntityToDomain(qualificationsEntity)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedPreviousQualifications)
+    verify(qualificationEntityMapper).fromEntityToDomain(qualificationsEntity.qualifications!![0])
   }
 }
