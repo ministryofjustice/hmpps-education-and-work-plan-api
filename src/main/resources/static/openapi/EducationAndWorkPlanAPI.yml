@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.3.5'
+  version: '1.4.0'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -154,6 +154,32 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-timeline-by-prison-number
+
+    #
+    # CIAG Inductions (Inherited from the CIAG Team)
+    #
+  '/ciag-inductions/{prisonNumber}':
+    parameters:
+      - name: prisonNumber
+        description: The number of the Prisoner who may have relevant Induction data.
+        schema:
+          type: string
+        example: 'A1234BC'
+        in: path
+        required: true
+    post:
+      summary: Creates an Induction for a Prisoner.
+      description: Creates an Induction for a Prisoner (if it does not already exist). This endpoint has been migrated from hmpps-ciag-careers-induction-api and the data structure has been kept the same in order to prevent breaking the UI when it is ports to this endpoint.
+      tags:
+        - Induction
+      responses:
+        '201':
+          description: The Induction was created successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+      operationId: create-prisoner-induction
+      requestBody:
+        $ref: '#/components/requestBodies/CreateCiagInduction'
 
 #
 # --------------------------------------------------------------------------------
@@ -620,6 +646,398 @@ components:
         - STEP_STARTED
         - STEP_COMPLETED
 
+    CreateCiagInductionRequest:
+      title: CreateCiagInductionRequest
+      type: object
+      description: A request to create a CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
+      properties:
+        requestDTO:
+          $ref: '#/components/schemas/CreateCiagInductionRequestData'
+        oauth2User:
+          type: string
+
+    CreateCiagInductionRequestData:
+      title: CreateCiagInductionRequestData
+      description: The request data to create a CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        prisonId:
+          type: string
+          description: The ID of the Prison that that Prisoner is currently at.
+        prisonName:
+          type: string
+          description: The name of the Prison that that Prisoner is currently at.
+        hopingToGetWork:
+          $ref: '#/components/schemas/HopingToWork'
+        reasonToNotGetWorkOther:
+          type: string
+          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'reasonToNotGetWork' is set to 'OTHER'.
+        abilityToWorkOther:
+          type: string
+          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'abilityToWork' is set to 'OTHER'.
+        abilityToWork:
+          uniqueItems: true
+          type: array
+          description: One or more factors affecting the Prisoner's ability to work.
+          items:
+            $ref: '#/components/schemas/AbilityToWorkFactor'
+        reasonToNotGetWork:
+          uniqueItems: true
+          type: array
+          description: One or more reasons the Prisoner has given not to get work after leaving Prison.
+          items:
+            $ref: '#/components/schemas/ReasonNotToWork'
+        workExperience:
+          $ref: '#/components/schemas/PreviousWorkRequest'
+        skillsAndInterests:
+          $ref: '#/components/schemas/SkillsAndInterestsRequest'
+        qualificationsAndTraining:
+          $ref: '#/components/schemas/EducationAndQualificationsRequest'
+        inPrisonInterests:
+          $ref: '#/components/schemas/PrisonWorkAndEducationRequest'
+      required:
+        - hopingToGetWork
+
+    PreviousWorkRequest:
+      description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        hasWorkedBefore:
+          type: boolean
+        typeOfWorkExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's type of previous work experience.
+          items:
+            $ref: '#/components/schemas/WorkType'
+        typeOfWorkExperienceOther:
+          type: string
+          description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
+        workExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous work experience details.
+          items:
+            $ref: '#/components/schemas/WorkExperience'
+        workInterests:
+          $ref: '#/components/schemas/WorkInterests'
+      required:
+        - hasWorkedBefore
+
+    SkillsAndInterestsRequest:
+      description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        skills:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: One or more skills that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalSkill'
+        skillsOther:
+          type: string
+          description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
+        personalInterests:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: One or more interests that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalInterest'
+        personalInterestsOther:
+          type: string
+          description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
+
+    EducationAndQualificationsRequest:
+      description: A request to persist a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
+        the inmate.
+      type: object
+      properties:
+        educationLevel:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous qualifications
+          items:
+            $ref: '#/components/schemas/AchievedQualification'
+        additionalTraining:
+          uniqueItems: true
+          type: array
+          description: Any additional training that the Prisoner has completed in the past.
+          items:
+            $ref: '#/components/schemas/TrainingType'
+        additionalTrainingOther:
+          type: string
+          description: A specific type of training that does not fit the given 'additionalTraining' types. Mandatory when 'additionalTraining' includes 'OTHER'.
+
+    PrisonWorkAndEducationRequest:
+      description: A request to persist a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        inPrisonWork:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of in-prison work that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonWorkType'
+        inPrisonWorkOther:
+          type: string
+          description: A specific type of in-prison work that does not fit the given 'inPrisonWork' types. Mandatory when 'inPrisonWork' includes 'OTHER'.
+        inPrisonEducation:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: Any potential in-prison education/training that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonTrainingType'
+        inPrisonEducationOther:
+          type: string
+          description: A specific type of in-prison education/training that does not fit the given 'inPrisonEducation' types. Mandatory when 'inPrisonEducation' includes 'OTHER'.
+
+    WorkExperience:
+      description: A Prisoner's list of work experience details. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        typeOfWorkExperience:
+          $ref: '#/components/schemas/WorkType'
+        otherWork:
+          type: string
+          description: A work experience, which is not listed in 'typeOfWorkExperience' Enum. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
+        role:
+          type: string
+          description: This is the role the Prisoner had.
+        details:
+          type: string
+          description: Additional details of the work.
+      required:
+        - typeOfWorkExperience
+
+    WorkInterests:
+      description: The Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        workInterests:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of Prisoner's future work interests.
+          items:
+            $ref: '#/components/schemas/WorkType'
+        workInterestsOther:
+          type: string
+          description: A work interest, which is not listed in 'workInterests' Enum. Mandatory when 'workInterests' includes 'OTHER'.
+        particularJobInterests:
+          uniqueItems: true
+          type: array
+          description: A detailed list of work interests that a Prisoner has.
+          items:
+            $ref: '#/components/schemas/WorkInterestDetail'
+      required:
+        - workInterests
+
+    WorkInterestDetail:
+      title: WorkInterestDetail
+      description: Detail about a Prisoner's work interest.
+      type: object
+      properties:
+        workInterest:
+          $ref: '#/components/schemas/WorkType'
+        role:
+          type: string
+          description: The role within a Prisoner's area of work interest.
+      required:
+        - role
+        - workInterest
+
+    HopingToWork:
+      type: string
+      description: Whether the Prisoner hopes to get work.
+      enum:
+        - YES
+        - NO
+        - NOT_SURE
+
+    AbilityToWorkFactor:
+      title: AbilityToWorkFactor
+      description:
+      type: string
+      enum:
+        - CARING_RESPONSIBILITIES
+        - LIMITED_BY_OFFENSE
+        - HEALTH_ISSUES
+        - NO_RIGHT_TO_WORK
+        - OTHER
+        - NONE
+
+    ReasonNotToWork:
+      title: ReasonNotToWork
+      type: string
+      description: Reasons the Prisoner has given not to get work after leaving Prison.
+      enum:
+        - LIMIT_THEIR_ABILITY
+        - FULL_TIME_CARER
+        - LACKS_CONFIDENCE_OR_MOTIVATION
+        - HEALTH
+        - RETIRED
+        - NO_RIGHT_TO_WORK
+        - NOT_SURE
+        - OTHER
+        - NO_REASON
+
+    PersonalSkill:
+      title: PersonalSkill
+      type: string
+      description: Represents a Prisoner's personal skill.
+      enum:
+        - COMMUNICATION
+        - POSITIVE_ATTITUDE
+        - RESILIENCE
+        - SELF_MANAGEMENT
+        - TEAMWORK
+        - THINKING_AND_PROBLEM_SOLVING
+        - WILLINGNESS_TO_LEARN
+        - OTHER
+        - NONE
+
+    PersonalInterest:
+      title: PersonalInterest
+      type: string
+      description: Represents a Prisoner's personal interest.
+      enum:
+        - COMMUNITY
+        - CRAFTS
+        - CREATIVE
+        - DIGITAL
+        - KNOWLEDGE_BASED
+        - MUSICAL
+        - OUTDOOR
+        - NATURE_AND_ANIMALS
+        - SOCIAL
+        - SOLO_ACTIVITIES
+        - SOLO_SPORTS
+        - TEAM_SPORTS
+        - WELLNESS
+        - OTHER
+        - NONE
+
+    HighestEducationLevel:
+      title: HighestEducationLevel
+      type: string
+      description: The highest education level of a Prisoner.
+      enum:
+        - PRIMARY_SCHOOL
+        - SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+        - SECONDARY_SCHOOL_TOOK_EXAMS
+        - FURTHER_EDUCATION_COLLEGE
+        - UNDERGRADUATE_DEGREE_AT_UNIVERSITY
+        - POSTGRADUATE_DEGREE_AT_UNIVERSITY
+        - NOT_SURE
+
+    TrainingType:
+      title: TrainingType
+      type: string
+      description: Additional training types that a Prisoner may have done.
+      enum:
+        - CSCS_CARD
+        - FIRST_AID_CERTIFICATE
+        - FOOD_HYGIENE_CERTIFICATE
+        - FULL_UK_DRIVING_LICENCE
+        - HEALTH_AND_SAFETY
+        - HGV_LICENCE
+        - MACHINERY_TICKETS
+        - MANUAL_HANDLING
+        - TRADE_COURSE
+        - OTHER
+        - NONE
+
+    InPrisonWorkType:
+      title: InPrisonWorkType
+      type: string
+      description: Types of work that can be done whilst in prison.
+      enum:
+        - CLEANING_AND_HYGIENE
+        - COMPUTERS_OR_DESK_BASED
+        - GARDENING_AND_OUTDOORS
+        - KITCHENS_AND_COOKING
+        - MAINTENANCE
+        - PRISON_LAUNDRY
+        - PRISON_LIBRARY
+        - TEXTILES_AND_SEWING
+        - WELDING_AND_METALWORK
+        - WOODWORK_AND_JOINERY
+        - OTHER
+
+    InPrisonTrainingType:
+      title: InPrisonTrainingType
+      type: string
+      description: The types of training that can be done whilst in prison.
+      enum:
+        - BARBERING_AND_HAIRDRESSING
+        - CATERING
+        - COMMUNICATION_SKILLS
+        - ENGLISH_LANGUAGE_SKILLS
+        - FORKLIFT_DRIVING
+        - INTERVIEW_SKILLS
+        - MACHINERY_TICKETS
+        - NUMERACY_SKILLS
+        - RUNNING_A_BUSINESS
+        - SOCIAL_AND_LIFE_SKILLS
+        - WELDING_AND_METALWORK
+        - WOODWORK_AND_JOINERY
+        - OTHER
+
+    WorkType:
+      title: WorkType
+      description: The various categories of work that a Prisoner may have worked in, or be interested in working in the future.
+      type: string
+      enum:
+        - OUTDOOR
+        - CONSTRUCTION
+        - DRIVING
+        - BEAUTY
+        - HOSPITALITY
+        - TECHNICAL
+        - MANUFACTURING
+        - OFFICE
+        - RETAIL
+        - SPORTS
+        - WAREHOUSING
+        - WASTE_MANAGEMENT
+        - EDUCATION_TRAINING
+        - CLEANING_AND_MAINTENANCE
+        - OTHER
+
+    AchievedQualification:
+      title: AchievedQualification
+      type: object
+      description: A qualification that a Prisoner has achieved.
+      properties:
+        subject:
+          type: string
+          description: The subject of the qualification.
+        level:
+          type: string
+          description: The level of the qualification (if known/relevant).
+          enum:
+            - ENTRY_LEVEL_2
+            - ENTRY_LEVEL_3
+            - LEVEL_1
+            - LEVEL_2
+            - LEVEL_3
+            - LEVEL_4
+            - LEVEL_5
+            - LEVEL_6
+            - LEVEL_7
+            - LEVEL_8
+        grade:
+          type: string
+          description: The grade which was achieved (if known/relevant).
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -776,3 +1194,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateGoalRequest'
+    CreateCiagInduction:
+      description: Request body to create a Prisoner's Induction.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateCiagInductionRequest'
