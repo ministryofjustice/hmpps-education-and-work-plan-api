@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Skill
 
 fun aValidCreateCiagInductionRequestData(
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
-  prisonId: String? = "BXI",
+  prisonId: String = "BXI",
   prisonName: String? = "HMP Brixton",
   reasonToNotGetWorkOther: String? = "Crime pays",
   abilityToWorkOther: String? = "Lack of interest",
