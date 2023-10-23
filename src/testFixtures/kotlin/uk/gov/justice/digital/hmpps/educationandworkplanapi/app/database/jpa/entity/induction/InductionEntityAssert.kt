@@ -45,6 +45,16 @@ class InductionEntityAssert(actual: InductionEntity?) :
     return this
   }
 
+  fun isForPrisonNumber(expected: String): InductionEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (prisonNumber != expected) {
+        failWithMessage("Expected prisonNumber to be $expected, but was $prisonNumber")
+      }
+    }
+    return this
+  }
+
   fun wasCreatedBy(expected: String): InductionEntityAssert {
     isNotNull
     with(actual!!) {
@@ -65,6 +75,16 @@ class InductionEntityAssert(actual: InductionEntity?) :
     return this
   }
 
+  fun wasCreatedAtPrison(expected: String): InductionEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdAtPrison != expected) {
+        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      }
+    }
+    return this
+  }
+
   fun wasUpdatedBy(expected: String): InductionEntityAssert {
     isNotNull
     with(actual!!) {
@@ -80,6 +100,16 @@ class InductionEntityAssert(actual: InductionEntity?) :
     with(actual!!) {
       if (updatedAt != expected) {
         failWithMessage("Expected updatedAt to be $expected, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
+  fun wasUpdatedAtPrison(expected: String): InductionEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAtPrison != expected) {
+        failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
     }
     return this

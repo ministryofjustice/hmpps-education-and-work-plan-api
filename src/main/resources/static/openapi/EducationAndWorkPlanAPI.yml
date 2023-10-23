@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.1'
+  version: '1.4.2'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -655,6 +655,8 @@ components:
           $ref: '#/components/schemas/CreateCiagInductionRequestData'
         oauth2User:
           type: string
+      required:
+        - requestDTO
 
     CreateCiagInductionRequestData:
       title: CreateCiagInductionRequestData
