@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.0'
+  version: '1.4.1'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -697,6 +697,7 @@ components:
           $ref: '#/components/schemas/PrisonWorkAndEducationRequest'
       required:
         - hopingToGetWork
+        - prisonId
 
     PreviousWorkRequest:
       description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
