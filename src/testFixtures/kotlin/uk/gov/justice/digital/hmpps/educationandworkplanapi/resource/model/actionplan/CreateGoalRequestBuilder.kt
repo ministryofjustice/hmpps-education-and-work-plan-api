@@ -1,5 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
 import java.time.LocalDate
 
 fun aValidCreateGoalRequest(

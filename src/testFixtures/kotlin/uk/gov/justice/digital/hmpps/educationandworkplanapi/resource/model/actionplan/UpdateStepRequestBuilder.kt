@@ -1,5 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
 import java.util.UUID
 
 fun aValidUpdateStepRequest(

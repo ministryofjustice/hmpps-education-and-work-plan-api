@@ -11,7 +11,7 @@ import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidTimelineEventResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.aValidTimelineEventResponse
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)

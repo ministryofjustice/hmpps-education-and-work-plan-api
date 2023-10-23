@@ -1,6 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import java.util.function.Consumer
 
 fun assertThat(actual: TimelineResponse?) = TimelineResponseAssert(actual)

@@ -1,6 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 
 fun assertThat(actual: ActionPlanSummaryListResponse?) = ActionPlanSummaryListResponseAssert(actual)
 
@@ -8,7 +9,10 @@ fun assertThat(actual: ActionPlanSummaryListResponse?) = ActionPlanSummaryListRe
  * AssertJ custom assertion for [ActionPlanSummaryListResponse]
  */
 class ActionPlanSummaryListResponseAssert(actual: ActionPlanSummaryListResponse?) :
-  AbstractObjectAssert<ActionPlanSummaryListResponseAssert, ActionPlanSummaryListResponse?>(actual, ActionPlanSummaryListResponseAssert::class.java) {
+  AbstractObjectAssert<ActionPlanSummaryListResponseAssert, ActionPlanSummaryListResponse?>(
+    actual,
+    ActionPlanSummaryListResponseAssert::class.java,
+  ) {
 
   fun hasSummaryCount(size: Int): ActionPlanSummaryListResponseAssert {
     isNotNull

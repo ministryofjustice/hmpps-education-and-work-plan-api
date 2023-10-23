@@ -1,4 +1,6 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan
+
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
 
 fun aValidCreateStepRequest(
   title: String = "Book communication skills course",

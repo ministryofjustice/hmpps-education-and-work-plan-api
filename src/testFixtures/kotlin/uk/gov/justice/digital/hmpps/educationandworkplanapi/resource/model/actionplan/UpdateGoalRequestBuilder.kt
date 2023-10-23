@@ -1,6 +1,9 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
 import java.time.LocalDate
 import java.util.UUID
 
