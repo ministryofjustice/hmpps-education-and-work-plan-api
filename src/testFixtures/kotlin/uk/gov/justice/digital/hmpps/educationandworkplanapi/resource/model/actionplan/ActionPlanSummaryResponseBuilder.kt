@@ -1,5 +1,6 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryResponse
 import java.time.LocalDate
 import java.util.UUID
 

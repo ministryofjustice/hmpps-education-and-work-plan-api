@@ -19,12 +19,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aVal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateStepRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGoalResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidStepResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidStepResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus as GoalStatusApi

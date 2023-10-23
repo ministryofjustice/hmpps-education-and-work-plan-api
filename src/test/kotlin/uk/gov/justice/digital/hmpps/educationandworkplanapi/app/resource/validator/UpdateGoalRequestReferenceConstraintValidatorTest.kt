@@ -8,7 +8,7 @@ import org.mockito.Mockito.mock
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GoalController
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
 import java.util.UUID
 
 class UpdateGoalRequestReferenceConstraintValidatorTest {

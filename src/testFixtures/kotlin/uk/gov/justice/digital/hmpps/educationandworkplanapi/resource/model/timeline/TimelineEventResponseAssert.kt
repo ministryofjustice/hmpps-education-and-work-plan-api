@@ -1,6 +1,8 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import java.util.UUID
 
 fun assertThat(actual: TimelineEventResponse?) = TimelineEventResponseAssert(actual)

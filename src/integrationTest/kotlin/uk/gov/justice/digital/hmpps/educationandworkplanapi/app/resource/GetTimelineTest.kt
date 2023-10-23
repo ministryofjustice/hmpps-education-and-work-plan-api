@@ -18,12 +18,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateGoalsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidUpdateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 

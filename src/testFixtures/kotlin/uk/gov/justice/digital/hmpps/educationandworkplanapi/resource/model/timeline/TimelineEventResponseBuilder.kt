@@ -1,5 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import java.time.OffsetDateTime
 import java.util.UUID
 

@@ -11,9 +11,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidActionPlanSummaryResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidCreateActionPlanRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.aValidGetActionPlanSummariesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidActionPlanSummaryResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGetActionPlanSummariesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
