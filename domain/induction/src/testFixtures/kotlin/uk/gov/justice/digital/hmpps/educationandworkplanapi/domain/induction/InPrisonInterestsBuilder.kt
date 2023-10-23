@@ -30,16 +30,16 @@ fun aValidInPrisonInterests(
 )
 
 fun aValidInPrisonWorkInterest(
-  workType: InPrisonWorkType = InPrisonWorkType.PRISON_LAUNDRY,
-  workTypeOther: String? = null,
+  workType: InPrisonWorkType = InPrisonWorkType.OTHER,
+  workTypeOther: String? = "Any in-prison work",
 ) = InPrisonWorkInterest(
   workType = workType,
   workTypeOther = workTypeOther,
 )
 
 fun aValidInPrisonTrainingInterest(
-  trainingType: InPrisonTrainingType = InPrisonTrainingType.CATERING,
-  trainingTypeOther: String? = null,
+  trainingType: InPrisonTrainingType = InPrisonTrainingType.OTHER,
+  trainingTypeOther: String? = "Any in-prison training",
 ) =
   InPrisonTrainingInterest(
     trainingType = trainingType,
