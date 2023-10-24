@@ -674,15 +674,15 @@ components:
         reasonToNotGetWorkOther:
           type: string
           description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'reasonToNotGetWork' is set to 'OTHER'.
-        abilityToWorkOther:
-          type: string
-          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'abilityToWork' is set to 'OTHER'.
         abilityToWork:
           uniqueItems: true
           type: array
           description: One or more factors affecting the Prisoner's ability to work.
           items:
             $ref: '#/components/schemas/AbilityToWorkFactor'
+        abilityToWorkOther:
+          type: string
+          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'abilityToWork' is set to 'OTHER'.
         reasonToNotGetWork:
           uniqueItems: true
           type: array
@@ -867,7 +867,7 @@ components:
 
     AbilityToWorkFactor:
       title: AbilityToWorkFactor
-      description:
+      description: Factors affecting a prisoner's ability to work.
       type: string
       enum:
         - CARING_RESPONSIBILITIES
