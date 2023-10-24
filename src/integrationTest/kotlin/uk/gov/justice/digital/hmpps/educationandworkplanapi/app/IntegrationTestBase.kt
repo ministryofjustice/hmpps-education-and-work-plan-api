@@ -97,6 +97,7 @@ abstract class IntegrationTestBase {
   fun clearDatabase() {
     actionPlanRepository.deleteAll() // Will also remove all Goals and Steps due to cascade
     timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
+    inductionRepository.deleteAll()
   }
 
   fun getActionPlan(prisonNumber: String): ActionPlanResponse =
