@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequestData
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 
 @Component
-class CreateCiagInductionRequestDataMapper(
+class CreateCiagInductionRequestMapper(
   private val workOnReleaseMapper: WorkOnReleaseResourceMapper,
   private val qualificationsMapper: PreviousQualificationsResourceMapper,
   private val previousTrainingMapper: PreviousTrainingResourceMapper,
@@ -15,7 +15,7 @@ class CreateCiagInductionRequestDataMapper(
   private val workInterestsMapper: FutureWorkInterestsResourceMapper,
 ) {
 
-  fun toCreateInductionDto(prisonNumber: String, request: CreateCiagInductionRequestData): CreateInductionDto {
+  fun toCreateInductionDto(prisonNumber: String, request: CreateCiagInductionRequest): CreateInductionDto {
     val prisonId = request.prisonId
     return CreateInductionDto(
       prisonNumber = prisonNumber,

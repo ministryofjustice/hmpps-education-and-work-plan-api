@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.CreateCiagInductionRequestDataMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.CreateCiagInductionRequestMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 
@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 @RequestMapping(value = ["/ciag-inductions"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class InductionController(
   private val inductionService: InductionService,
-  private val inductionRequestMapper: CreateCiagInductionRequestDataMapper,
+  private val inductionRequestMapper: CreateCiagInductionRequestMapper,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -30,6 +30,6 @@ class InductionController(
     request: CreateCiagInductionRequest,
     @PathVariable prisonNumber: String,
   ) {
-    inductionService.createInduction(inductionRequestMapper.toCreateInductionDto(prisonNumber, request.requestDTO!!))
+    inductionService.createInduction(inductionRequestMapper.toCreateInductionDto(prisonNumber, request))
   }
 }

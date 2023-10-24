@@ -70,7 +70,7 @@ class CreateInductionTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
       .hasUserMessageContaining("JSON parse error")
-      .hasUserMessageContaining("value failed for JSON property requestDTO due to missing (therefore NULL) value for creator parameter requestDTO")
+      .hasUserMessageContaining("value failed for JSON property prisonId due to missing (therefore NULL) value for creator parameter prisonId")
   }
 
   @Test
@@ -111,7 +111,7 @@ class CreateInductionTest : IntegrationTestBase() {
     val createRequest = aValidCreateCiagInductionRequest()
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
-    val prisonId = createRequest.requestDTO.prisonId
+    val prisonId = createRequest.prisonId
 
     // When
     webTestClient.post()
