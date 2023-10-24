@@ -648,19 +648,7 @@ components:
 
     CreateCiagInductionRequest:
       title: CreateCiagInductionRequest
-      type: object
       description: A request to create a CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
-      properties:
-        requestDTO:
-          $ref: '#/components/schemas/CreateCiagInductionRequestData'
-        oauth2User:
-          type: string
-      required:
-        - requestDTO
-
-    CreateCiagInductionRequestData:
-      title: CreateCiagInductionRequestData
-      description: The request data to create a CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
       type: object
       properties:
         prisonId:
@@ -858,12 +846,13 @@ components:
         - workInterest
 
     HopingToWork:
+      title: HopingToWork
       type: string
       description: Whether the Prisoner hopes to get work.
       enum:
-        - YES
-        - NO
-        - NOT_SURE
+        - "YES"
+        - "NO"
+        - "NOT_SURE"
 
     AbilityToWorkFactor:
       title: AbilityToWorkFactor

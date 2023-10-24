@@ -17,12 +17,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateWorkOnReleaseDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequestData
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
 
 @ExtendWith(MockitoExtension::class)
-class CreateCiagInductionRequestDataMapperTest {
+class CreateCiagInductionRequestMapperTest {
   @InjectMocks
-  private lateinit var mapper: CreateCiagInductionRequestDataMapper
+  private lateinit var mapper: CreateCiagInductionRequestMapper
 
   @Mock
   private lateinit var workOnReleaseMapper: WorkOnReleaseResourceMapper
@@ -50,7 +50,7 @@ class CreateCiagInductionRequestDataMapperTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val prisonId = "BXI"
-    val request = aValidCreateCiagInductionRequestData(prisonId = prisonId)
+    val request = aValidCreateCiagInductionRequest(prisonId = prisonId)
 
     given(workOnReleaseMapper.toCreateWorkOnReleaseDto(any())).willReturn(aValidCreateWorkOnReleaseDto())
     given(qualificationsMapper.toCreatePreviousQualificationsDto(any(), any())).willReturn(aValidCreatePreviousQualificationsDto())

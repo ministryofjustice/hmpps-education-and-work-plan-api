@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.AffectAbilityToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.NotHopingToWorkReason
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequestData
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
 
 class WorkOnReleaseResourceMapperTest {
   private val mapper = WorkOnReleaseResourceMapperImpl()
@@ -14,7 +14,7 @@ class WorkOnReleaseResourceMapperTest {
   fun `should map to PreviousTrainingDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidCreateCiagInductionRequestData(prisonId = prisonId)
+    val request = aValidCreateCiagInductionRequest(prisonId = prisonId)
     val expectedNotHopingToWorkReasons = listOf(NotHopingToWorkReason.OTHER)
     val expectedNotHopingToWorkOtherReason = "Crime pays"
     val expectedAffectAbilityToWork = listOf(AffectAbilityToWork.OTHER)
