@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Skill
 fun aValidCreateCiagInductionRequest(
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
   prisonId: String = "BXI",
-  prisonName: String? = "HMP Brixton",
   reasonToNotGetWorkOther: String? = "Crime pays",
   abilityToWorkOther: String? = "Lack of interest",
   abilityToWork: Set<AbilityToWorkFactor>? = setOf(AbilityToWorkFactor.OTHER),
@@ -25,7 +24,6 @@ fun aValidCreateCiagInductionRequest(
 ): CreateCiagInductionRequest = CreateCiagInductionRequest(
   hopingToGetWork = hopingToGetWork,
   prisonId = prisonId,
-  prisonName = prisonName,
   reasonToNotGetWorkOther = reasonToNotGetWorkOther,
   abilityToWorkOther = abilityToWorkOther,
   abilityToWork = abilityToWork,

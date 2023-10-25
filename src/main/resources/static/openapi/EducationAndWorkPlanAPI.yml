@@ -487,9 +487,6 @@ components:
         prisonId:
           type: string
           description: The ID of the Prison that that Prisoner is currently at.
-        prisonName:
-          type: string
-          description: The name of the Prison that that Prisoner is currently at.
         hopingToGetWork:
           $ref: '#/components/schemas/HopingToWork'
         desireToWork:
@@ -914,9 +911,6 @@ components:
         prisonId:
           type: string
           description: The ID of the Prison that that Prisoner is currently at.
-        prisonName:
-          type: string
-          description: The name of the Prison that that Prisoner is currently at.
         hopingToGetWork:
           $ref: '#/components/schemas/HopingToWork'
         reasonToNotGetWorkOther:
