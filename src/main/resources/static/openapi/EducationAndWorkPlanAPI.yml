@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.2'
+  version: '1.4.3'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -169,7 +169,10 @@ paths:
         required: true
     post:
       summary: Creates an Induction for a Prisoner.
-      description: Creates an Induction for a Prisoner (if it does not already exist). This endpoint has been migrated from hmpps-ciag-careers-induction-api and the data structure has been kept the same in order to prevent breaking the UI when it is ports to this endpoint.
+      description: |
+        Creates an Induction for a Prisoner (if it does not already exist). This endpoint has been migrated from the
+        `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
+        the UI when it is ports to this endpoint.
       tags:
         - Induction
       responses:
@@ -177,9 +180,22 @@ paths:
           description: The Induction was created successfully.
         '400':
           $ref: '#/components/responses/400ErrorResponse'
-      operationId: create-prisoner-induction
+      operationId: create-ciag-prisoner-induction
       requestBody:
         $ref: '#/components/requestBodies/CreateCiagInduction'
+    get:
+      summary: Return a Prisoner's Induction.
+      description: | 
+        Returns a Prisoner's Induction. Note that the response body (`CiagInduction`) matches the equivalent endpoint in the
+        `hmpps-ciag-careers-induction-api`. This is to maintain compatibility for when the CIAG UI migrates to use this API instead.
+      tags:
+        - Induction
+      responses:
+        '200':
+          $ref: '#/components/responses/CiagInduction'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-ciag-prisoner-induction
 
 #
 # --------------------------------------------------------------------------------
@@ -454,6 +470,250 @@ components:
         - actionedBy
         - timestamp
         - correlationId
+    CiagInductionResponse:
+      title: CiagInductionResponse
+      type: object
+      description: A Prisoner's CIAG Induction containing information, such as their education history and future work interests.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The Induction's unique reference.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        offenderId:
+          pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
+          type: string
+          description: 'The ID of the Prisoner. AKA the prison number.'
+        prisonId:
+          type: string
+          description: The ID of the Prison that that Prisoner is currently at.
+        prisonName:
+          type: string
+          description: The name of the Prison that that Prisoner is currently at.
+        hopingToGetWork:
+          $ref: '#/components/schemas/HopingToWork'
+        desireToWork:
+          type: boolean
+          description: Whether the Prisoner wishes to work or not.
+        reasonToNotGetWorkOther:
+          type: string
+          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'reasonToNotGetWork' is set to 'OTHER'.
+        abilityToWork:
+          uniqueItems: true
+          type: array
+          description: One or more factors affecting the Prisoner's ability to work.
+          items:
+            $ref: '#/components/schemas/AbilityToWorkFactor'
+        abilityToWorkOther:
+          type: string
+          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'abilityToWork' is set to 'OTHER'.
+        reasonToNotGetWork:
+          uniqueItems: true
+          type: array
+          description: One or more reasons the Prisoner has given not to get work after leaving Prison.
+          items:
+            $ref: '#/components/schemas/ReasonNotToWork'
+        workExperience:
+          "$ref": "#/components/schemas/PreviousWorkResponse"
+        skillsAndInterests:
+          "$ref": "#/components/schemas/SkillsAndInterestsResponse"
+        qualificationsAndTraining:
+          "$ref": "#/components/schemas/EducationAndQualificationResponse"
+        inPrisonInterests:
+          "$ref": "#/components/schemas/PrisonWorkAndEducationResponse"
+        createdBy:
+          type: string
+          description: The DPS username of the person who created the Induction.
+          example: 'asmith_gen'
+        createdDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Induction was created.
+          example: '2023-06-19T09:39:44Z'
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated the Induction.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - reference
+        - offenderId
+        - hopingToGetWork
+        - createdBy
+        - createdDateTime
+        - modifiedBy
+        - modifiedDateTime
+    PreviousWorkResponse:
+      title: PreviousWorkResponse
+      description: A Prisoner's previous work experience. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's previous work experience (not the database primary key).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        hasWorkedBefore:
+          type: boolean
+        typeOfWorkExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's type of previous work experience.
+          items:
+            $ref: '#/components/schemas/WorkType'
+        typeOfWorkExperienceOther:
+          type: string
+          description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
+        workExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous work experience details.
+          items:
+            $ref: '#/components/schemas/WorkExperience'
+        workInterests:
+          $ref: '#/components/schemas/WorkInterests'
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated this Prisoner's previous work.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this Prisoner's previous work was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - hasWorkedBefore
+        - modifiedBy
+        - modifiedDateTime
+    SkillsAndInterestsResponse:
+      title: SkillsAndInterestsResponse
+      description: Represents the personal skills and interests of a Prisoner. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's skills and interests (not the database primary key).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        skills:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: One or more skills that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalSkill'
+        skillsOther:
+          type: string
+          description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
+        personalInterests:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: One or more interests that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalInterest'
+        personalInterestsOther:
+          type: string
+          description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated this Prisoner's skills and interests.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this Prisoner's skills and interests was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - hasWorkedBefore
+        - modifiedBy
+        - modifiedDateTime
+    EducationAndQualificationResponse:
+      title: EducationAndQualificationResponse
+      type: object
+      description: A Prisoner's education and qualifications history. Migrated from hmpps-ciag-careers-induction-api.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's education and qualifications (not the database primary key).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        educationLevel:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous qualifications
+          items:
+            $ref: '#/components/schemas/AchievedQualification'
+        additionalTraining:
+          uniqueItems: true
+          type: array
+          description: Any additional training that the Prisoner has completed in the past.
+          items:
+            $ref: '#/components/schemas/TrainingType'
+        additionalTrainingOther:
+          type: string
+          description: A specific type of training that does not fit the given 'additionalTraining' types. Mandatory when 'additionalTraining' includes 'OTHER'.
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated this Prisoner's education and qualifications.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this Prisoner's education and qualifications was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - modifiedBy
+        - modifiedDateTime
+    PrisonWorkAndEducationResponse:
+      description: A Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's in-prison work and education interests (not the database primary key).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        inPrisonWork:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of in-prison work that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonWorkType'
+        inPrisonWorkOther:
+          type: string
+          description: A specific type of in-prison work that does not fit the given 'inPrisonWork' types. Mandatory when 'inPrisonWork' includes 'OTHER'.
+        inPrisonEducation:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: Any potential in-prison education/training that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonTrainingType'
+        inPrisonEducationOther:
+          type: string
+          description: A specific type of in-prison education/training that does not fit the given 'inPrisonEducation' types. Mandatory when 'inPrisonEducation' includes 'OTHER'.
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated this Prisoner's in-prison work and education interests.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this Prisoner's in-prison work and education interests was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - modifiedBy
+        - modifiedDateTime
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
@@ -1157,6 +1417,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/TimelineResponse'
+    CiagInduction:
+      description: Response body containing a Prisoner's CIAG Induction.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CiagInductionResponse'
 
   #
   # Request Body Definitions
