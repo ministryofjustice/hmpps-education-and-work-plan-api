@@ -1,27 +1,28 @@
+import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.4.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.7.0"
   id("org.openapi.generator") version "7.0.1"
-  kotlin("plugin.spring") version "1.8.22"
-  kotlin("plugin.jpa") version "1.8.22"
-  kotlin("kapt") version "1.8.22"
+  kotlin("plugin.spring") version "1.9.10"
+  kotlin("plugin.jpa") version "1.9.10"
+  kotlin("kapt") version "1.9.10"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.0.1"
+  id("name.remal.integration-tests") version "4.0.2"
 
   `java-test-fixtures`
 }
 
 apply(plugin = "org.openapi.generator")
 
-ext["mapstruct.version"] = "1.5.5.Final"
-ext["postgresql.version"] = "42.6.0"
-ext["kotlin.logging.version"] = "3.0.5"
-ext["springdoc.openapi.version"] = "2.2.0"
-ext["awaitility.version"] = "4.2.0"
+val mapstructVersion = "1.5.5.Final"
+val postgresqlVersion = "42.6.0"
+val kotlinLoggingVersion = "3.0.5"
+val springdocOpenapiVersion = "2.2.0"
+val awaitilityVersion = "4.2.0"
 
 allOpen {
   annotations(
@@ -55,21 +56,21 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.0.1")
 
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdoc.openapi.version")}")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion")
 
-  implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
-  kapt("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
+  implementation("org.mapstruct:mapstruct:$mapstructVersion")
+  kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
 
-  implementation("io.github.microutils:kotlin-logging:${property("kotlin.logging.version")}")
+  implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
   runtimeOnly("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql:${property("postgresql.version")}")
+  runtimeOnly("org.postgresql:postgresql:$postgresqlVersion")
 
   // Test dependencies
   testImplementation(testFixtures(project("domain:goal")))
   testImplementation(testFixtures(project("domain:timeline")))
   testImplementation(testFixtures(project("domain:induction")))
-  testImplementation("org.awaitility:awaitility-kotlin:${property("awaitility.version")}")
+  testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
 
   // Integration test dependencies
   integrationTestImplementation("com.h2database:h2")
@@ -191,6 +192,9 @@ tasks {
   }
   withType<KtLintFormatTask> {
     // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
+    mustRunAfter("buildEducationAndWorkPlanModel")
+  }
+  withType<KaptGenerateStubsTask> {
     mustRunAfter("buildEducationAndWorkPlanModel")
   }
 }
