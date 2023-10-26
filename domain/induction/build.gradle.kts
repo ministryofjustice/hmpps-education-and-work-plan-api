@@ -8,12 +8,14 @@ apply(plugin = "org.jlleitschuh.gradle.ktlint")
 apply(plugin = "jacoco")
 apply(plugin = "com.adarshr.test-logger")
 
+val kotlinLoggingVersion = "3.0.5"
+
 repositories {
   mavenCentral()
 }
 
 dependencies {
-  api("io.github.microutils:kotlin-logging:${property("kotlin.logging.version")}")
+  api("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
   // Test dependencies
   testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
