@@ -166,8 +166,7 @@ enum class HighestEducationLevel {
 }
 
 enum class QualificationLevel {
-  ENTRY_LEVEL_2,
-  ENTRY_LEVEL_3,
+  ENTRY_LEVEL,
   LEVEL_1,
   LEVEL_2,
   LEVEL_3,
