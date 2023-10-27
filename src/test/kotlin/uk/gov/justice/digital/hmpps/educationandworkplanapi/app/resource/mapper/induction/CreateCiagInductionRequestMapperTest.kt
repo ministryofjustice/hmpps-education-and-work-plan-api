@@ -28,10 +28,7 @@ class CreateCiagInductionRequestMapperTest {
   private lateinit var workOnReleaseMapper: WorkOnReleaseResourceMapper
 
   @Mock
-  private lateinit var qualificationsMapper: PreviousQualificationsResourceMapper
-
-  @Mock
-  private lateinit var previousTrainingMapper: PreviousTrainingResourceMapper
+  private lateinit var qualificationsAndTrainingMapper: QualificationsAndTrainingResourceMapper
 
   @Mock
   private lateinit var workExperiencesMapper: PreviousWorkExperiencesResourceMapper
@@ -53,12 +50,24 @@ class CreateCiagInductionRequestMapperTest {
     val request = aValidCreateCiagInductionRequest(prisonId = prisonId)
 
     given(workOnReleaseMapper.toCreateWorkOnReleaseDto(any())).willReturn(aValidCreateWorkOnReleaseDto())
-    given(qualificationsMapper.toCreatePreviousQualificationsDto(any(), any())).willReturn(aValidCreatePreviousQualificationsDto())
-    given(previousTrainingMapper.toCreatePreviousTrainingDto(any(), any())).willReturn(aValidCreatePreviousTrainingDto())
-    given(workExperiencesMapper.toCreatePreviousWorkExperiencesDto(any(), any())).willReturn(aValidCreatePreviousWorkExperiencesDto())
-    given(inPrisonInterestsMapper.toCreateInPrisonInterestsDto(any(), any())).willReturn(aValidCreateInPrisonInterestsDto())
-    given(skillsAndInterestsMapper.toCreatePersonalSkillsAndInterestsDto(any(), any())).willReturn(aValidCreatePersonalSkillsAndInterestsDto())
-    given(workInterestsMapper.toCreateFutureWorkInterestsDto(any(), any())).willReturn(aValidCreateFutureWorkInterestsDto())
+    given(qualificationsAndTrainingMapper.toCreatePreviousQualificationsDto(any(), any())).willReturn(
+      aValidCreatePreviousQualificationsDto(),
+    )
+    given(qualificationsAndTrainingMapper.toCreatePreviousTrainingDto(any(), any())).willReturn(
+      aValidCreatePreviousTrainingDto(),
+    )
+    given(workExperiencesMapper.toCreatePreviousWorkExperiencesDto(any(), any())).willReturn(
+      aValidCreatePreviousWorkExperiencesDto(),
+    )
+    given(inPrisonInterestsMapper.toCreateInPrisonInterestsDto(any(), any())).willReturn(
+      aValidCreateInPrisonInterestsDto(),
+    )
+    given(skillsAndInterestsMapper.toCreatePersonalSkillsAndInterestsDto(any(), any())).willReturn(
+      aValidCreatePersonalSkillsAndInterestsDto(),
+    )
+    given(workInterestsMapper.toCreateFutureWorkInterestsDto(any(), any())).willReturn(
+      aValidCreateFutureWorkInterestsDto(),
+    )
 
     // When
     val actual = mapper.toCreateInductionDto(prisonNumber, request)
@@ -67,8 +76,11 @@ class CreateCiagInductionRequestMapperTest {
     assertThat(actual.prisonNumber).isEqualTo(prisonNumber)
     assertThat(actual.prisonId).isEqualTo(prisonId)
     verify(workOnReleaseMapper).toCreateWorkOnReleaseDto(request)
-    verify(qualificationsMapper).toCreatePreviousQualificationsDto(request.qualificationsAndTraining, prisonId)
-    verify(previousTrainingMapper).toCreatePreviousTrainingDto(request.qualificationsAndTraining, prisonId)
+    verify(qualificationsAndTrainingMapper).toCreatePreviousQualificationsDto(
+      request.qualificationsAndTraining,
+      prisonId,
+    )
+    verify(qualificationsAndTrainingMapper).toCreatePreviousTrainingDto(request.qualificationsAndTraining, prisonId)
     verify(workExperiencesMapper).toCreatePreviousWorkExperiencesDto(request.workExperience, prisonId)
     verify(inPrisonInterestsMapper).toCreateInPrisonInterestsDto(request.inPrisonInterests, prisonId)
     verify(skillsAndInterestsMapper).toCreatePersonalSkillsAndInterestsDto(request.skillsAndInterests, prisonId)

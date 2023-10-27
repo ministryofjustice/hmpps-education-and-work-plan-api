@@ -9,7 +9,7 @@ fun aValidPreviousWorkRequest(
   hasWorkedBefore: Boolean = true,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
-  workExperience: Set<WorkExperience>? = setOf(aValidWorkExperience()),
+  workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
   workInterests: WorkInterests? = aValidWorkInterests(),
 ): PreviousWorkRequest =
   PreviousWorkRequest(
@@ -20,7 +20,7 @@ fun aValidPreviousWorkRequest(
     workInterests = workInterests,
   )
 
-fun aValidWorkExperience(
+fun aValidWorkExperienceResource(
   typeOfWorkExperience: WorkType = WorkType.OTHER,
   otherWork: String? = "Scientist",
   role: String? = "Lab Technician",

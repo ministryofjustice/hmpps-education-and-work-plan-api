@@ -12,7 +12,7 @@ fun aValidPrisonWorkAndEducationResponse(
   inPrisonWorkOther: String? = "Any in-prison work",
   inPrisonEducation: Set<InPrisonTrainingType>? = setOf(InPrisonTrainingType.OTHER),
   inPrisonEducationOther: String? = "Any in-prison training",
-  modifiedBy: String = "asmith_gen",
+  modifiedBy: String = "bjones_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): PrisonWorkAndEducationResponse =
   PrisonWorkAndEducationResponse(

@@ -12,9 +12,9 @@ fun aValidPreviousWorkResponse(
   hasWorkedBefore: Boolean = true,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
-  workExperience: Set<WorkExperience>? = setOf(aValidWorkExperience()),
+  workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
   workInterests: WorkInterests? = aValidWorkInterests(),
-  modifiedBy: String = "asmith_gen",
+  modifiedBy: String = "bjones_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): PreviousWorkResponse =
   PreviousWorkResponse(

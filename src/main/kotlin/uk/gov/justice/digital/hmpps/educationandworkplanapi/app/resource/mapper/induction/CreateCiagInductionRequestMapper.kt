@@ -7,8 +7,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 @Component
 class CreateCiagInductionRequestMapper(
   private val workOnReleaseMapper: WorkOnReleaseResourceMapper,
-  private val qualificationsMapper: PreviousQualificationsResourceMapper,
-  private val previousTrainingMapper: PreviousTrainingResourceMapper,
+  private val qualificationsAndTrainingMapper: QualificationsAndTrainingResourceMapper,
   private val workExperiencesMapper: PreviousWorkExperiencesResourceMapper,
   private val inPrisonInterestsMapper: InPrisonInterestsResourceMapper,
   private val skillsAndInterestsMapper: PersonalSkillsAndInterestsResourceMapper,
@@ -20,11 +19,11 @@ class CreateCiagInductionRequestMapper(
     return CreateInductionDto(
       prisonNumber = prisonNumber,
       workOnRelease = workOnReleaseMapper.toCreateWorkOnReleaseDto(request),
-      previousQualifications = qualificationsMapper.toCreatePreviousQualificationsDto(
+      previousQualifications = qualificationsAndTrainingMapper.toCreatePreviousQualificationsDto(
         request = request.qualificationsAndTraining,
         prisonId = prisonId,
       ),
-      previousTraining = previousTrainingMapper.toCreatePreviousTrainingDto(
+      previousTraining = qualificationsAndTrainingMapper.toCreatePreviousTrainingDto(
         request = request.qualificationsAndTraining,
         prisonId = prisonId,
       ),
