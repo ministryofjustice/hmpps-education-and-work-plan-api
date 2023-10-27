@@ -11,6 +11,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
 
@@ -56,6 +57,38 @@ class InductionServiceTest {
 
     // Then
     assertThat(exception.message).isEqualTo("An Induction already exists for prisoner $prisonNumber")
+    verify(persistenceAdapter).getInduction(prisonNumber)
+  }
+
+  @Test
+  fun `should get induction for prisoner`() {
+    // Given
+    val expected = aValidInduction()
+    given(persistenceAdapter.getInduction(any())).willReturn(expected)
+
+    // When
+    val actual = service.getInductionForPrisoner(prisonNumber)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+    verify(persistenceAdapter).getInduction(prisonNumber)
+  }
+
+  @Test
+  fun `should fail to get induction for prisoner given induction does not exist`() {
+    // Given
+    val prisonNumber = "A1234AB"
+    given(persistenceAdapter.getInduction(any())).willReturn(null)
+
+    // When
+    val exception = catchThrowableOfType(
+      { service.getInductionForPrisoner(Companion.prisonNumber) },
+      InductionNotFoundException::class.java,
+    )
+
+    // Then
+    assertThat(exception).hasMessage("Induction not found for prisoner [$prisonNumber]")
+    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     verify(persistenceAdapter).getInduction(prisonNumber)
   }
 }

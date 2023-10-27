@@ -11,8 +11,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
 import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType as TrainingTypeDomain
@@ -82,7 +82,7 @@ class QualificationsAndTrainingResourceMapperTest {
       trainingTypes = listOf(TrainingTypeDomain.CSCS_CARD),
       trainingTypeOther = null,
     )
-    val expectedResponse = aValidEducationAndQualificationResponse(
+    val expectedResponse = aValidEducationAndQualificationsResponse(
       id = training.reference,
       educationLevel = HighestEducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = setOf(
@@ -113,7 +113,7 @@ class QualificationsAndTrainingResourceMapperTest {
       trainingTypes = listOf(TrainingTypeDomain.CSCS_CARD),
       trainingTypeOther = null,
     )
-    val expectedResponse = aValidEducationAndQualificationResponse(
+    val expectedResponse = aValidEducationAndQualificationsResponse(
       id = training.reference,
       educationLevel = null,
       qualifications = null,

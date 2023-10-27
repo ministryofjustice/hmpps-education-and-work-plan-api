@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCiagInductionResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPrisonWorkAndEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
@@ -65,7 +65,7 @@ class CiagInductionResponseMapperTest {
     )
     val workExperience = aValidPreviousWorkResponse()
     val skillsAndInterests = aValidSkillsAndInterestsResponse()
-    val qualificationsAndTraining = aValidEducationAndQualificationResponse()
+    val qualificationsAndTraining = aValidEducationAndQualificationsResponse()
     val inPrisonInterests = aValidPrisonWorkAndEducationResponse()
     val expectedInductionResponse = aValidCiagInductionResponse(
       offenderId = prisonNumber,

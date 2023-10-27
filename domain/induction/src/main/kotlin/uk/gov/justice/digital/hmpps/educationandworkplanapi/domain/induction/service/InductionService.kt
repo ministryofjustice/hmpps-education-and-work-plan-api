@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.se
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
 
 private val log = KotlinLogging.logger {}
@@ -33,4 +34,11 @@ class InductionService(
 
       return persistenceAdapter.createInduction(createInductionDto)
     }
+
+  /**
+   * Returns the [Induction] for the prisoner identified by their prison number. Otherwise, throws
+   * [InductionNotFoundException] if it cannot be found.
+   */
+  fun getInductionForPrisoner(prisonNumber: String): Induction =
+    persistenceAdapter.getInduction(prisonNumber) ?: throw InductionNotFoundException(prisonNumber)
 }
