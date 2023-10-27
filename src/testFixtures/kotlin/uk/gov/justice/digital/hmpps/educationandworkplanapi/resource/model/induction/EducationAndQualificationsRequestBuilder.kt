@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType
 
-fun aValidEducationAndQualificationsRequest(
+fun aValidCreateEducationAndQualificationsRequest(
   educationLevel: HighestEducationLevel? = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: Set<AchievedQualification>? = setOf(
     aValidAchievedQualification(),
@@ -13,7 +13,7 @@ fun aValidEducationAndQualificationsRequest(
   ),
   additionalTraining: Set<TrainingType>? = setOf(TrainingType.CSCS_CARD, TrainingType.OTHER),
   additionalTrainingOther: String? = "Any training",
-): EducationAndQualificationsRequest = EducationAndQualificationsRequest(
+): CreateEducationAndQualificationsRequest = CreateEducationAndQualificationsRequest(
   educationLevel = educationLevel,
   qualifications = qualifications,
   additionalTraining = additionalTraining,

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.3'
+  version: '1.4.4'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -196,6 +196,30 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-ciag-prisoner-induction
+    put:
+      summary: Updates an Induction for a Prisoner.
+      description: |
+        Provides the ability to update a Prisoner's Induction. Completely overwrites the existing Prisoner's Induction with the
+        information provided in the update request. If a field is not included in the update request, it will be removed from the 
+        database, effectively making the update request the authoritative source of information. This endpoint has been migrated
+        from the `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
+        the CIAG UI when it is ports to this endpoint.
+      tags:
+        - Induction
+      responses:
+        '200':
+          description: CIAG Induction updated successfully.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CiagInductionResponse"
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: update-ciag-prisoner-induction
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateCiagInduction'
 
 #
 # --------------------------------------------------------------------------------
@@ -932,18 +956,18 @@ components:
           items:
             $ref: '#/components/schemas/ReasonNotToWork'
         workExperience:
-          $ref: '#/components/schemas/PreviousWorkRequest'
+          $ref: '#/components/schemas/CreatePreviousWorkRequest'
         skillsAndInterests:
-          $ref: '#/components/schemas/SkillsAndInterestsRequest'
+          $ref: '#/components/schemas/CreateSkillsAndInterestsRequest'
         qualificationsAndTraining:
-          $ref: '#/components/schemas/EducationAndQualificationsRequest'
+          $ref: '#/components/schemas/CreateEducationAndQualificationsRequest'
         inPrisonInterests:
-          $ref: '#/components/schemas/PrisonWorkAndEducationRequest'
+          $ref: '#/components/schemas/CreatePrisonWorkAndEducationRequest'
       required:
         - hopingToGetWork
         - prisonId
 
-    PreviousWorkRequest:
+    CreatePreviousWorkRequest:
       description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
       type: object
       properties:
@@ -971,7 +995,7 @@ components:
       required:
         - hasWorkedBefore
 
-    SkillsAndInterestsRequest:
+    CreateSkillsAndInterestsRequest:
       description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
       type: object
       properties:
@@ -996,7 +1020,7 @@ components:
           type: string
           description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
 
-    EducationAndQualificationsRequest:
+    CreateEducationAndQualificationsRequest:
       description: A request to persist a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
         the inmate.
       type: object
@@ -1019,7 +1043,7 @@ components:
           type: string
           description: A specific type of training that does not fit the given 'additionalTraining' types. Mandatory when 'additionalTraining' includes 'OTHER'.
 
-    PrisonWorkAndEducationRequest:
+    CreatePrisonWorkAndEducationRequest:
       description: A request to persist a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
       type: object
       properties:
@@ -1043,6 +1067,179 @@ components:
         inPrisonEducationOther:
           type: string
           description: A specific type of in-prison education/training that does not fit the given 'inPrisonEducation' types. Mandatory when 'inPrisonEducation' includes 'OTHER'.
+
+    UpdateCiagInductionRequest:
+      title: UpdateCiagInductionRequest
+      description: A request to update a CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The Induction's unique reference. Currently optional (to avoid breaking the existing CIAG API), but will be mandatory in future (and will most likely become a path variable).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        prisonId:
+          type: string
+          description: The ID of the Prison that that Prisoner is currently at.
+        hopingToGetWork:
+          $ref: '#/components/schemas/HopingToWork'
+        reasonToNotGetWorkOther:
+          type: string
+          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'reasonToNotGetWork' is set to 'OTHER'.
+        abilityToWork:
+          uniqueItems: true
+          type: array
+          description: One or more factors affecting the Prisoner's ability to work.
+          items:
+            $ref: '#/components/schemas/AbilityToWorkFactor'
+        abilityToWorkOther:
+          type: string
+          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'abilityToWork' is set to 'OTHER'.
+        reasonToNotGetWork:
+          uniqueItems: true
+          type: array
+          description: One or more reasons the Prisoner has given not to get work after leaving Prison.
+          items:
+            $ref: '#/components/schemas/ReasonNotToWork'
+        workExperience:
+          $ref: '#/components/schemas/UpdatePreviousWorkRequest'
+        skillsAndInterests:
+          $ref: '#/components/schemas/UpdateSkillsAndInterestsRequest'
+        qualificationsAndTraining:
+          $ref: '#/components/schemas/UpdateEducationAndQualificationsRequest'
+        inPrisonInterests:
+          $ref: '#/components/schemas/UpdatePrisonWorkAndEducationRequest'
+      required:
+        - hopingToGetWork
+        - prisonId
+
+    UpdatePreviousWorkRequest:
+      description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's previous work experience.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        hasWorkedBefore:
+          type: boolean
+        typeOfWorkExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's type of previous work experience.
+          items:
+            $ref: '#/components/schemas/WorkType'
+        typeOfWorkExperienceOther:
+          type: string
+          description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
+        workExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous work experience details.
+          items:
+            $ref: '#/components/schemas/WorkExperience'
+        workInterests:
+          $ref: '#/components/schemas/WorkInterests'
+      required:
+        - id
+        - hasWorkedBefore
+
+    UpdateSkillsAndInterestsRequest:
+      description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's personal skills and interests.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        skills:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: One or more skills that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalSkill'
+        skillsOther:
+          type: string
+          description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
+        personalInterests:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: One or more interests that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalInterest'
+        personalInterestsOther:
+          type: string
+          description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
+      required:
+        - id
+
+    UpdateEducationAndQualificationsRequest:
+      description: A request to persist a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
+        the inmate.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's education and qualifications.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        educationLevel:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous qualifications
+          items:
+            $ref: '#/components/schemas/AchievedQualification'
+        additionalTraining:
+          uniqueItems: true
+          type: array
+          description: Any additional training that the Prisoner has completed in the past.
+          items:
+            $ref: '#/components/schemas/TrainingType'
+        additionalTrainingOther:
+          type: string
+          description: A specific type of training that does not fit the given 'additionalTraining' types. Mandatory when 'additionalTraining' includes 'OTHER'.
+      required:
+        - id
+
+    UpdatePrisonWorkAndEducationRequest:
+      description: A request to persist a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's in-prison work and education interests.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        inPrisonWork:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of in-prison work that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonWorkType'
+        inPrisonWorkOther:
+          type: string
+          description: A specific type of in-prison work that does not fit the given 'inPrisonWork' types. Mandatory when 'inPrisonWork' includes 'OTHER'.
+        inPrisonEducation:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: Any potential in-prison education/training that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonTrainingType'
+        inPrisonEducationOther:
+          type: string
+          description: A specific type of in-prison education/training that does not fit the given 'inPrisonEducation' types. Mandatory when 'inPrisonEducation' includes 'OTHER'.
+      required:
+        - id
 
     WorkExperience:
       description: A Prisoner's list of work experience details. Migrated from hmpps-ciag-careers-induction-api.
@@ -1461,3 +1658,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateCiagInductionRequest'
+    UpdateCiagInduction:
+      description: Request body to update a Prisoner's Induction.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateCiagInductionRequest'

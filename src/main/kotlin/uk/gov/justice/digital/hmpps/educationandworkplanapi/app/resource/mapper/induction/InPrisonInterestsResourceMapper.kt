@@ -6,9 +6,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InP
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonTrainingInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePrisonWorkAndEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonTrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PrisonWorkAndEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PrisonWorkAndEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonTrainingType as InPrisonTrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonWorkType as InPrisonWorkTypeDomain
@@ -21,7 +21,7 @@ class InPrisonInterestsResourceMapper(
 ) {
 
   fun toCreateInPrisonInterestsDto(
-    request: PrisonWorkAndEducationRequest?,
+    request: CreatePrisonWorkAndEducationRequest?,
     prisonId: String,
   ): CreateInPrisonInterestsDto? {
     return request?.let {

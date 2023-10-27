@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkExperienceResource
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterests
@@ -26,7 +26,7 @@ class PreviousWorkExperiencesResourceMapperTest {
   fun `should map to PreviousTrainingDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidPreviousWorkRequest()
+    val request = aValidCreatePreviousWorkRequest()
     val expectedExperiences = listOf(
       WorkExperience(
         experienceType = WorkExperienceTypeDomain.OTHER,

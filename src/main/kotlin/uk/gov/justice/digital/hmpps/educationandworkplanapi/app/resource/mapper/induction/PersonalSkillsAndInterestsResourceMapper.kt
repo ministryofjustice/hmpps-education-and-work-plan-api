@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Per
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.SkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePersonalSkillsAndInterestsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SkillsAndInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest as PersonalInterestDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill as PersonalSkillDomain
@@ -20,7 +20,7 @@ class PersonalSkillsAndInterestsResourceMapper(
   private val instantMapper: InstantMapper,
 ) {
   fun toCreatePersonalSkillsAndInterestsDto(
-    request: SkillsAndInterestsRequest?,
+    request: CreateSkillsAndInterestsRequest?,
     prisonId: String,
   ): CreatePersonalSkillsAndInterestsDto? =
     request?.let {
