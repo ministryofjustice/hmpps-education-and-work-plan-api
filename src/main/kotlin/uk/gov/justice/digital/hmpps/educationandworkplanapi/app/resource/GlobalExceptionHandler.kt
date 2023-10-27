@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPl
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
@@ -109,6 +110,7 @@ class GlobalExceptionHandler(
       ActionPlanNotFoundException::class,
       GoalNotFoundException::class,
       TimelineNotFoundException::class,
+      InductionNotFoundException::class,
     ],
   )
   fun handleExceptionReturnNotFoundErrorResponse(

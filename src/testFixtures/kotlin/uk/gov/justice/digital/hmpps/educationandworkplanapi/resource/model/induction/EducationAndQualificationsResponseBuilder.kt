@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Train
 import java.time.OffsetDateTime
 import java.util.UUID
 
-fun aValidEducationAndQualificationResponse(
+fun aValidEducationAndQualificationsResponse(
   id: UUID? = UUID.randomUUID(),
   educationLevel: HighestEducationLevel? = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: Set<AchievedQualification>? = setOf(

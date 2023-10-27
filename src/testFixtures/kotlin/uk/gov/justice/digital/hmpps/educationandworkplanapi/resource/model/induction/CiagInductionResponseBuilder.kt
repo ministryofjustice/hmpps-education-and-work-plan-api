@@ -24,7 +24,7 @@ fun aValidCiagInductionResponse(
   reasonToNotGetWorkOther: String? = "Crime pays",
   workExperience: PreviousWorkResponse? = aValidPreviousWorkResponse(),
   skillsAndInterests: SkillsAndInterestsResponse? = aValidSkillsAndInterestsResponse(),
-  qualificationsAndTraining: EducationAndQualificationResponse? = aValidEducationAndQualificationResponse(),
+  qualificationsAndTraining: EducationAndQualificationResponse? = aValidEducationAndQualificationsResponse(),
   inPrisonInterests: PrisonWorkAndEducationResponse? = aValidPrisonWorkAndEducationResponse(),
   createdBy: String = "asmith_gen",
   createdDateTime: OffsetDateTime = OffsetDateTime.now(),
