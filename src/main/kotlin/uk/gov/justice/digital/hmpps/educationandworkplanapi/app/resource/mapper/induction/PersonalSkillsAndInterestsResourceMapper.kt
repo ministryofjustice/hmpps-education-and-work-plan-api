@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InterestType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.SkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePersonalSkillsAndInterestsDto
@@ -36,9 +34,9 @@ class PersonalSkillsAndInterestsResourceMapper(
       SkillsAndInterestsResponse(
         id = skillsAndInterests.reference,
         skills = toPersonalSkillsApi(skillsAndInterests.skills),
-        skillsOther = skillsAndInterests.skills.first { isOtherSkillType(it) }.skillTypeOther,
+        skillsOther = toSkillsTypeOther(skillsAndInterests),
         personalInterests = toPersonalInterestsApi(skillsAndInterests.interests),
-        personalInterestsOther = skillsAndInterests.interests.first { isOtherInterestType(it) }.interestTypeOther,
+        personalInterestsOther = toPersonalInterestsOther(skillsAndInterests),
         modifiedBy = skillsAndInterests.lastUpdatedBy!!,
         modifiedDateTime = instantMapper.toOffsetDateTime(skillsAndInterests.lastUpdatedAt)!!,
       )
@@ -70,15 +68,15 @@ class PersonalSkillsAndInterestsResourceMapper(
     } ?: emptyList()
   }
 
-  private fun toPersonalSkillsApi(skills: List<PersonalSkillDomain>): Set<PersonalSkillApi>? =
-    if (skills.isNotEmpty()) skills.map { PersonalSkillApi.valueOf(it.skillType.name) }.toSet() else null
+  private fun toPersonalSkillsApi(skills: List<PersonalSkillDomain>): Set<PersonalSkillApi> =
+    skills.map { PersonalSkillApi.valueOf(it.skillType.name) }.toSet()
 
-  private fun toPersonalInterestsApi(interests: List<PersonalInterestDomain>): Set<PersonalInterestApi>? =
-    if (interests.isNotEmpty()) interests.map { PersonalInterestApi.valueOf(it.interestType.name) }.toSet() else null
+  private fun toPersonalInterestsApi(interests: List<PersonalInterestDomain>): Set<PersonalInterestApi> =
+    interests.map { PersonalInterestApi.valueOf(it.interestType.name) }.toSet()
 
-  private fun isOtherSkillType(skill: PersonalSkill) =
-    skill.skillType == SkillType.OTHER
+  private fun toSkillsTypeOther(skillsAndInterests: PersonalSkillsAndInterests) =
+    skillsAndInterests.skills.firstOrNull { it.skillType == SkillType.OTHER }?.skillTypeOther
 
-  private fun isOtherInterestType(interest: PersonalInterest) =
-    interest.interestType == InterestType.OTHER
+  private fun toPersonalInterestsOther(skillsAndInterests: PersonalSkillsAndInterests) =
+    skillsAndInterests.interests.firstOrNull { it.interestType == InterestType.OTHER }?.interestTypeOther
 }
