@@ -69,10 +69,10 @@ class PersonalSkillsAndInterestsResourceMapper(
   }
 
   private fun toPersonalSkillsApi(skills: List<PersonalSkillDomain>): Set<PersonalSkillApi> =
-    if (skills.isNotEmpty()) skills.map { PersonalSkillApi.valueOf(it.skillType.name) }.toSet() else emptySet()
+    skills.map { PersonalSkillApi.valueOf(it.skillType.name) }.toSet()
 
   private fun toPersonalInterestsApi(interests: List<PersonalInterestDomain>): Set<PersonalInterestApi> =
-    if (interests.isNotEmpty()) interests.map { PersonalInterestApi.valueOf(it.interestType.name) }.toSet() else emptySet()
+    interests.map { PersonalInterestApi.valueOf(it.interestType.name) }.toSet()
 
   private fun toSkillsTypeOther(skillsAndInterests: PersonalSkillsAndInterests) =
     skillsAndInterests.skills.firstOrNull { it.skillType == SkillType.OTHER }?.skillTypeOther
