@@ -207,12 +207,8 @@ paths:
       tags:
         - Induction
       responses:
-        '200':
+        '204':
           description: CIAG Induction updated successfully.
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/CiagInductionResponse"
         '400':
           $ref: '#/components/responses/400ErrorResponse'
         '404':
@@ -1115,129 +1111,54 @@ components:
 
     UpdatePreviousWorkRequest:
       description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
-      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreatePreviousWorkRequest'
       properties:
         id:
           type: string
           format: uuid
           description: A unique reference for this Prisoner's previous work experience.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-        hasWorkedBefore:
-          type: boolean
-        typeOfWorkExperience:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: A list of the Prisoner's type of previous work experience.
-          items:
-            $ref: '#/components/schemas/WorkType'
-        typeOfWorkExperienceOther:
-          type: string
-          description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
-        workExperience:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: A list of the Prisoner's previous work experience details.
-          items:
-            $ref: '#/components/schemas/WorkExperience'
-        workInterests:
-          $ref: '#/components/schemas/WorkInterests'
       required:
         - id
-        - hasWorkedBefore
 
     UpdateSkillsAndInterestsRequest:
       description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
-      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateSkillsAndInterestsRequest'
       properties:
         id:
           type: string
           format: uuid
           description: A unique reference for this Prisoner's personal skills and interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-        skills:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: One or more skills that the Prisoner feels they have.
-          items:
-            $ref: '#/components/schemas/PersonalSkill'
-        skillsOther:
-          type: string
-          description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
-        personalInterests:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: One or more interests that the Prisoner feels they have.
-          items:
-            $ref: '#/components/schemas/PersonalInterest'
-        personalInterestsOther:
-          type: string
-          description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
       required:
         - id
 
     UpdateEducationAndQualificationsRequest:
       description: A request to persist a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
         the inmate.
-      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateEducationAndQualificationsRequest'
       properties:
         id:
           type: string
           format: uuid
           description: A unique reference for this Prisoner's education and qualifications.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-        educationLevel:
-          $ref: '#/components/schemas/HighestEducationLevel'
-        qualifications:
-          uniqueItems: true
-          type: array
-          description: A list of the Prisoner's previous qualifications
-          items:
-            $ref: '#/components/schemas/AchievedQualification'
-        additionalTraining:
-          uniqueItems: true
-          type: array
-          description: Any additional training that the Prisoner has completed in the past.
-          items:
-            $ref: '#/components/schemas/TrainingType'
-        additionalTrainingOther:
-          type: string
-          description: A specific type of training that does not fit the given 'additionalTraining' types. Mandatory when 'additionalTraining' includes 'OTHER'.
       required:
         - id
 
     UpdatePrisonWorkAndEducationRequest:
       description: A request to persist a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
-      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreatePrisonWorkAndEducationRequest'
       properties:
         id:
           type: string
           format: uuid
           description: A unique reference for this Prisoner's in-prison work and education interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-        inPrisonWork:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: A list of in-prison work that the Prisoner is interested in.
-          items:
-            $ref: '#/components/schemas/InPrisonWorkType'
-        inPrisonWorkOther:
-          type: string
-          description: A specific type of in-prison work that does not fit the given 'inPrisonWork' types. Mandatory when 'inPrisonWork' includes 'OTHER'.
-        inPrisonEducation:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: Any potential in-prison education/training that the Prisoner is interested in.
-          items:
-            $ref: '#/components/schemas/InPrisonTrainingType'
-        inPrisonEducationOther:
-          type: string
-          description: A specific type of in-prison education/training that does not fit the given 'inPrisonEducation' types. Mandatory when 'inPrisonEducation' includes 'OTHER'.
       required:
         - id
 
