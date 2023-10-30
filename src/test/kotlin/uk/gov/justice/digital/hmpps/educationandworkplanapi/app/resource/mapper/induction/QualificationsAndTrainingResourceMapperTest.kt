@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
 import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
@@ -26,7 +26,7 @@ class QualificationsAndTrainingResourceMapperTest {
   fun `should map to PreviousQualificationsDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidEducationAndQualificationsRequest()
+    val request = aValidCreateEducationAndQualificationsRequest()
     val expectedQualifications = listOf(
       Qualification(
         subject = "English",
@@ -53,7 +53,7 @@ class QualificationsAndTrainingResourceMapperTest {
   fun `should map to PreviousTrainingDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidEducationAndQualificationsRequest()
+    val request = aValidCreateEducationAndQualificationsRequest()
     val expectedTrainingTypes = listOf(TrainingTypeDomain.CSCS_CARD, TrainingTypeDomain.OTHER)
 
     // When

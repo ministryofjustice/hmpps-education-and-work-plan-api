@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Wor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousWorkExperiencesDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkE
 abstract class PreviousWorkExperiencesResourceMapper {
   @Mapping(target = "experiences", source = "request.workExperience")
   abstract fun toCreatePreviousWorkExperiencesDto(
-    request: PreviousWorkRequest?,
+    request: CreatePreviousWorkRequest?,
     prisonId: String,
   ): CreatePreviousWorkExperiencesDto?
 

@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
-import aValidPrisonWorkAndEducationRequest
+import aValidCreatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,7 +33,7 @@ class InPrisonInterestsResourceMapperTest {
   fun `should map to CreateInPrisonInterestsDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidPrisonWorkAndEducationRequest()
+    val request = aValidCreatePrisonWorkAndEducationRequest()
     val expectedInPrisonWorkInterest = listOf(aValidInPrisonWorkInterest())
     val expectedInPrisonTrainingInterest = listOf(aValidInPrisonTrainingInterest())
 

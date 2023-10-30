@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
-import aValidPrisonWorkAndEducationRequest
+import aValidCreatePrisonWorkAndEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePrisonWorkAndEducationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PrisonWorkAndEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SkillsAndInterestsRequest
 
 fun aValidCreateCiagInductionRequest(
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
@@ -17,10 +17,10 @@ fun aValidCreateCiagInductionRequest(
   abilityToWorkOther: String? = "Lack of interest",
   abilityToWork: Set<AbilityToWorkFactor>? = setOf(AbilityToWorkFactor.OTHER),
   reasonToNotGetWork: Set<ReasonNotToWork>? = setOf(ReasonNotToWork.OTHER),
-  workExperience: PreviousWorkRequest? = aValidPreviousWorkRequest(),
-  skillsAndInterests: SkillsAndInterestsRequest? = aValidSkillsAndInterestsRequest(),
-  qualificationsAndTraining: EducationAndQualificationsRequest? = aValidEducationAndQualificationsRequest(),
-  inPrisonInterests: PrisonWorkAndEducationRequest? = aValidPrisonWorkAndEducationRequest(),
+  workExperience: CreatePreviousWorkRequest? = aValidCreatePreviousWorkRequest(),
+  skillsAndInterests: CreateSkillsAndInterestsRequest? = aValidCreateSkillsAndInterestsRequest(),
+  qualificationsAndTraining: CreateEducationAndQualificationsRequest? = aValidCreateEducationAndQualificationsRequest(),
+  inPrisonInterests: CreatePrisonWorkAndEducationRequest? = aValidCreatePrisonWorkAndEducationRequest(),
 ): CreateCiagInductionRequest = CreateCiagInductionRequest(
   hopingToGetWork = hopingToGetWork,
   prisonId = prisonId,

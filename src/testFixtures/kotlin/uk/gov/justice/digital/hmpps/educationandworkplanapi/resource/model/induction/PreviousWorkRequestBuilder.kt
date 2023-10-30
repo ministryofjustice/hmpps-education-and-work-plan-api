@@ -1,18 +1,18 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 
-fun aValidPreviousWorkRequest(
+fun aValidCreatePreviousWorkRequest(
   hasWorkedBefore: Boolean = true,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
   workInterests: WorkInterests? = aValidWorkInterests(),
-): PreviousWorkRequest =
-  PreviousWorkRequest(
+): CreatePreviousWorkRequest =
+  CreatePreviousWorkRequest(
     hasWorkedBefore = hasWorkedBefore,
     typeOfWorkExperience = typeOfWorkExperience,
     typeOfWorkExperienceOther = typeOfWorkExperienceOther,

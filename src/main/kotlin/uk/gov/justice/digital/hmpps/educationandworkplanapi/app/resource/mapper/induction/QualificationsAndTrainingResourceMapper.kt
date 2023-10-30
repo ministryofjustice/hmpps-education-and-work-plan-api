@@ -9,8 +9,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Tra
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAndQualificationResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAndQualificationsRequest
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Train
 @Mapper
 abstract class QualificationsAndTrainingResourceMapper {
   abstract fun toCreatePreviousQualificationsDto(
-    request: EducationAndQualificationsRequest?,
+    request: CreateEducationAndQualificationsRequest?,
     prisonId: String,
   ): CreatePreviousQualificationsDto?
 
@@ -31,7 +31,7 @@ abstract class QualificationsAndTrainingResourceMapper {
   @Mapping(target = "trainingTypes", source = "request.additionalTraining")
   @Mapping(target = "trainingTypeOther", source = "request.additionalTrainingOther")
   abstract fun toCreatePreviousTrainingDto(
-    request: EducationAndQualificationsRequest?,
+    request: CreateEducationAndQualificationsRequest?,
     prisonId: String,
   ): CreatePreviousTrainingDto?
 

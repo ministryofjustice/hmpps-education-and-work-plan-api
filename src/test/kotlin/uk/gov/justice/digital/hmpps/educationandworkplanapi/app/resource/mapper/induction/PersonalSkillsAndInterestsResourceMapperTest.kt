@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest as PersonalInterestDomain
@@ -35,7 +35,7 @@ class PersonalSkillsAndInterestsResourceMapperTest {
   fun `should map to CreatePersonalSkillsAndInterestsDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidSkillsAndInterestsRequest()
+    val request = aValidCreateSkillsAndInterestsRequest()
     val expectedSkills = listOf(PersonalSkillDomain(SkillType.OTHER, "Hidden skills"))
     val expectedInterests = listOf(PersonalInterestDomain(InterestType.OTHER, "Secret interests"))
 
