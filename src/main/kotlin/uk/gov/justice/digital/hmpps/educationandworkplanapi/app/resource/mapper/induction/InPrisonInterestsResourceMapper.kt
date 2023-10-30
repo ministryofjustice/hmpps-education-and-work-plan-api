@@ -38,9 +38,9 @@ class InPrisonInterestsResourceMapper(
       PrisonWorkAndEducationResponse(
         id = inPrisonInterests.reference,
         inPrisonWork = toInPrisonWorkTypes(inPrisonInterests.inPrisonWorkInterests),
-        inPrisonWorkOther = inPrisonInterests.inPrisonWorkInterests.first { it.workType == InPrisonWorkTypeDomain.OTHER }.workTypeOther,
+        inPrisonWorkOther = toInPrisonWorkOther(inPrisonInterests),
         inPrisonEducation = toInPrisonTrainingTypes(inPrisonInterests.inPrisonTrainingInterests),
-        inPrisonEducationOther = inPrisonInterests.inPrisonTrainingInterests.first { it.trainingType == InPrisonTrainingTypeDomain.OTHER }.trainingTypeOther,
+        inPrisonEducationOther = toInPrisonTrainingOther(inPrisonInterests),
         modifiedBy = inPrisonInterests.lastUpdatedBy!!,
         modifiedDateTime = instantMapper.toOffsetDateTime(inPrisonInterests.lastUpdatedAt)!!,
       )
@@ -74,4 +74,10 @@ class InPrisonInterestsResourceMapper(
 
   private fun toInPrisonTrainingTypes(trainingInterests: List<InPrisonTrainingInterest>): Set<InPrisonTrainingType> =
     trainingInterests.map { InPrisonTrainingType.valueOf(it.trainingType.name) }.toSet()
+
+  private fun toInPrisonWorkOther(inPrisonInterests: InPrisonInterests) =
+    inPrisonInterests.inPrisonWorkInterests.firstOrNull { it.workType == InPrisonWorkTypeDomain.OTHER }?.workTypeOther
+
+  private fun toInPrisonTrainingOther(inPrisonInterests: InPrisonInterests) =
+    inPrisonInterests.inPrisonTrainingInterests.firstOrNull { it.trainingType == InPrisonTrainingTypeDomain.OTHER }?.trainingTypeOther
 }

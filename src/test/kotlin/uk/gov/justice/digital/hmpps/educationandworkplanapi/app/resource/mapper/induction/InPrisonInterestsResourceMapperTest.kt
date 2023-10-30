@@ -80,4 +80,29 @@ class InPrisonInterestsResourceMapperTest {
     // Then
     assertThat(actual).isEqualTo(expectedResponse)
   }
+
+  @Test
+  fun `should map to PrisonWorkAndEducationResponse given empty collections`() {
+    // Given
+    val inPrisonInterests = aValidInPrisonInterests(
+      inPrisonWorkInterests = emptyList(),
+      inPrisonTrainingInterests = emptyList(),
+    )
+    val modifiedDateTime = OffsetDateTime.now()
+    given(instantMapper.toOffsetDateTime(any())).willReturn(modifiedDateTime)
+    val expectedResponse = aValidPrisonWorkAndEducationResponse(
+      id = inPrisonInterests.reference,
+      inPrisonWork = emptySet(),
+      inPrisonWorkOther = null,
+      inPrisonEducation = emptySet(),
+      inPrisonEducationOther = null,
+      modifiedDateTime = modifiedDateTime,
+    )
+
+    // When
+    val actual = mapper.toPrisonWorkAndEducationResponse(inPrisonInterests)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedResponse)
+  }
 }

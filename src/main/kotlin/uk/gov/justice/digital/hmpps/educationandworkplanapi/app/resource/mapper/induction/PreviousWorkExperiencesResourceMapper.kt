@@ -42,7 +42,7 @@ abstract class PreviousWorkExperiencesResourceMapper {
         id = workExperiences.reference,
         hasWorkedBefore = workExperiences.experiences.isNotEmpty(),
         typeOfWorkExperience = workExperiences.experiences.map { toWorkTypeApi(it.experienceType) }.toSet(),
-        typeOfWorkExperienceOther = workExperiences.experiences.first { it.experienceType == OTHER }.experienceTypeOther,
+        typeOfWorkExperienceOther = toTypeOfWorkExperienceOther(workExperiences),
         workExperience = workExperiences.experiences.map { toWorkExperienceApi(it) }.toSet(),
         workInterests = toWorkInterestsResponse(workInterests),
         modifiedBy = workExperiences.lastUpdatedBy!!,
@@ -59,7 +59,7 @@ abstract class PreviousWorkExperiencesResourceMapper {
     return workInterests?.let {
       WorkInterests(
         workInterests = workInterests.interests.map { toWorkTypeApi(it.workType) }.toSet(),
-        workInterestsOther = workInterests.interests.first { isOtherWorkType(it) }.workTypeOther,
+        workInterestsOther = toWorkInterestsOther(workInterests),
         particularJobInterests = workInterests.interests.map { toWorkInterestDetail(it) }.toSet(),
       )
     }
@@ -77,8 +77,11 @@ abstract class PreviousWorkExperiencesResourceMapper {
 
   abstract fun toWorkTypeApi(workExperienceType: WorkExperienceType): WorkType
 
-  private fun isOtherWorkType(workInterest: WorkInterest) =
-    workInterest.workType == WorkInterestType.OTHER
+  private fun toTypeOfWorkExperienceOther(workExperiences: PreviousWorkExperiences) =
+    workExperiences.experiences.firstOrNull { it.experienceType == OTHER }?.experienceTypeOther
+
+  private fun toWorkInterestsOther(workInterests: FutureWorkInterests) =
+    workInterests.interests.firstOrNull { it.workType == WorkInterestType.OTHER }?.workTypeOther
 
   fun toOffsetDateTime(instant: Instant?): OffsetDateTime? = instant?.atOffset(ZoneOffset.UTC)
 }

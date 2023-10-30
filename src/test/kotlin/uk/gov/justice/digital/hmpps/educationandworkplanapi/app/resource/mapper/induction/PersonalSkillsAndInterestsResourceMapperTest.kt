@@ -83,4 +83,30 @@ class PersonalSkillsAndInterestsResourceMapperTest {
     // Then
     assertThat(actual).isEqualTo(expectedResponse)
   }
+
+  @Test
+  fun `should map to SkillsAndInterestsResponse given empty collections`() {
+    // Given
+    val skillsAndInterests = aValidPersonalSkillsAndInterests(
+      skills = emptyList(),
+      interests = emptyList(),
+    )
+    val modifiedDateTime = OffsetDateTime.now()
+    given(instantMapper.toOffsetDateTime(any())).willReturn(modifiedDateTime)
+    val expectedResponse = aValidSkillsAndInterestsResponse(
+      id = skillsAndInterests.reference,
+      skills = emptySet(),
+      skillsOther = null,
+      personalInterests = emptySet(),
+      personalInterestsOther = null,
+      modifiedBy = skillsAndInterests.lastUpdatedBy!!,
+      modifiedDateTime = modifiedDateTime,
+    )
+
+    // When
+    val actual = mapper.toSkillsAndInterestsResponse(skillsAndInterests)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedResponse)
+  }
 }

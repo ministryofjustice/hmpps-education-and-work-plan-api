@@ -150,4 +150,34 @@ class PreviousWorkExperiencesResourceMapperTest {
     // Then
     assertThat(actual).isNull()
   }
+
+  @Test
+  fun `should map to PreviousWorkResponse given empty collections`() {
+    // Given
+    val workExperiences = aValidPreviousWorkExperiences(
+      experiences = emptyList(),
+    )
+    val workInterests = aValidFutureWorkInterests(
+      interests = emptyList(),
+    )
+    val expectedResponse = aValidPreviousWorkResponse(
+      id = workExperiences.reference,
+      hasWorkedBefore = false,
+      typeOfWorkExperience = emptySet(),
+      typeOfWorkExperienceOther = null,
+      workExperience = emptySet(),
+      workInterests = aValidWorkInterests(
+        workInterests = emptySet(),
+        workInterestsOther = null,
+        particularJobInterests = emptySet(),
+      ),
+      modifiedDateTime = workExperiences.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+    )
+
+    // When
+    val actual = mapper.toPreviousWorkResponse(workExperiences, workInterests)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedResponse)
+  }
 }
