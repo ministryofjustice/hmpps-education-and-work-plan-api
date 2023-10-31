@@ -80,6 +80,7 @@ class PreviousWorkExperiencesResourceMapperTest {
         ),
       ),
       workInterests = aValidWorkInterests(
+        id = workInterests.reference,
         workInterests = setOf(WorkType.OTHER),
         workInterestsOther = "Varied interests",
         particularJobInterests = setOf(
@@ -167,6 +168,7 @@ class PreviousWorkExperiencesResourceMapperTest {
       typeOfWorkExperienceOther = null,
       workExperience = emptySet(),
       workInterests = aValidWorkInterests(
+        id = workInterests.reference,
         workInterests = emptySet(),
         workInterestsOther = null,
         particularJobInterests = emptySet(),
