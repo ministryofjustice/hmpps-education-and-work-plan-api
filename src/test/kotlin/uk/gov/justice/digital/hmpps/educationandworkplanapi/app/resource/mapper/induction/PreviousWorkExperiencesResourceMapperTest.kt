@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkExperienceResource
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterests
 import java.time.ZoneOffset
@@ -23,7 +24,7 @@ class PreviousWorkExperiencesResourceMapperTest {
   private val mapper = PreviousWorkExperiencesResourceMapperImpl()
 
   @Test
-  fun `should map to PreviousTrainingDto`() {
+  fun `should map to CreatePreviousWorkExperiencesDto`() {
     // Given
     val prisonId = "BXI"
     val request = aValidCreatePreviousWorkRequest()
@@ -181,5 +182,28 @@ class PreviousWorkExperiencesResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedResponse)
+  }
+
+  @Test
+  fun `should map to UpdatePreviousWorkExperiencesDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdatePreviousWorkRequest()
+    val expectedExperiences = listOf(
+      WorkExperience(
+        experienceType = WorkExperienceTypeDomain.OTHER,
+        experienceTypeOther = "Scientist",
+        role = "Lab Technician",
+        details = "Cleaning test tubes",
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdatePreviousWorkExperiencesDto(request, prisonId)
+
+    // Then
+    assertThat(actual!!.prisonId).isEqualTo(prisonId)
+    assertThat(actual.reference).isEqualTo(request.id)
+    assertThat(actual.experiences).isEqualTo(expectedExperiences)
   }
 }

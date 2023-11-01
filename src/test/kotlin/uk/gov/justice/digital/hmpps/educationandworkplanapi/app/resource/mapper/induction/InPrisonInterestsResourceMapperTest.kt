@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
 import aValidCreatePrisonWorkAndEducationRequest
+import aValidUpdatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -104,5 +105,23 @@ class InPrisonInterestsResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedResponse)
+  }
+
+  @Test
+  fun `should map to UpdateInPrisonInterestsDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdatePrisonWorkAndEducationRequest()
+    val expectedInPrisonWorkInterest = listOf(aValidInPrisonWorkInterest())
+    val expectedInPrisonTrainingInterest = listOf(aValidInPrisonTrainingInterest())
+
+    // When
+    val actual = mapper.toUpdateInPrisonInterestsDto(request, prisonId)
+
+    // Then
+    assertThat(actual!!.prisonId).isEqualTo(prisonId)
+    assertThat(actual.reference).isEqualTo(request.id)
+    assertThat(actual.inPrisonWorkInterests).isEqualTo(expectedInPrisonWorkInterest)
+    assertThat(actual.inPrisonTrainingInterests).isEqualTo(expectedInPrisonTrainingInterest)
   }
 }
