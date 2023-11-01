@@ -38,7 +38,7 @@ class PreviousWorkExperiencesEntityMapperTest {
     given(workExperienceEntityMapper.fromDomainToEntity(any())).willReturn(expectedWorkExperienceEntity)
 
     // When
-    val actual = mapper.fromDtoToEntity(createPreviousWorkExperiencesDto)
+    val actual = mapper.fromCreateDtoToEntity(createPreviousWorkExperiencesDto)
 
     // Then
     assertThat(actual)

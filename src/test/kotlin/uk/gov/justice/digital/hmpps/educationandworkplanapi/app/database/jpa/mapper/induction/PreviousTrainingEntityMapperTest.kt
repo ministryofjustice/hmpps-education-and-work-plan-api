@@ -39,7 +39,7 @@ class PreviousTrainingEntityMapperTest {
     given(trainingTypeMapper.fromDomainToEntity(any())).willReturn(listOf(expectedTrainingTypeEntity))
 
     // When
-    val actual = mapper.fromDtoToEntity(createTrainingDto)
+    val actual = mapper.fromCreateDtoToEntity(createTrainingDto)
 
     // Then
     assertThat(actual)

@@ -16,7 +16,7 @@ class JpaInductionPersistenceAdapter(
 
   @Transactional
   override fun createInduction(createInductionDto: CreateInductionDto): Induction {
-    val persistedEntity = inductionRepository.save(inductionMapper.fromDtoToEntity(createInductionDto))
+    val persistedEntity = inductionRepository.save(inductionMapper.fromCreateDtoToEntity(createInductionDto))
     return inductionMapper.fromEntityToDomain(persistedEntity)
   }
 

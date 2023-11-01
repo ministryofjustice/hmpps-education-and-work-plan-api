@@ -47,7 +47,7 @@ class PersonalSkillsAndInterestsEntityMapperTest {
     given(personalInterestEntityMapper.fromDomainToEntity(any())).willReturn(expectedPersonalInterest)
 
     // When
-    val actual = mapper.fromDtoToEntity(createPersonalSkillsAndInterestsDto)
+    val actual = mapper.fromCreateDtoToEntity(createPersonalSkillsAndInterestsDto)
 
     // Then
     assertThat(actual)

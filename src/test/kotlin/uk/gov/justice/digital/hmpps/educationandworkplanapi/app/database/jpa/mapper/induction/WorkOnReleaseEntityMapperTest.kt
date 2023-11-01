@@ -37,7 +37,7 @@ class WorkOnReleaseEntityMapperTest {
     )
 
     // When
-    val actual = mapper.fromDtoToEntity(createWorkOnReleaseDto)
+    val actual = mapper.fromCreateDtoToEntity(createWorkOnReleaseDto)
 
     // Then
     assertThat(actual)

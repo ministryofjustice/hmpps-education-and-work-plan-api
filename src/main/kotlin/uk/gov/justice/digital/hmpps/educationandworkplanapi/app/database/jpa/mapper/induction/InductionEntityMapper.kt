@@ -24,7 +24,7 @@ interface InductionEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromDtoToEntity(dto: CreateInductionDto): InductionEntity
+  fun fromCreateDtoToEntity(dto: CreateInductionDto): InductionEntity
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")

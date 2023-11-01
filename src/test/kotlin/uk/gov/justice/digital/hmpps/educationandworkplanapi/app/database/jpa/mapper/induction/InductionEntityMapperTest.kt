@@ -85,16 +85,16 @@ class InductionEntityMapperTest {
       createdAtPrison = prisonId,
       updatedAtPrison = prisonId,
     )
-    given(futureWorkInterestsEntityMapper.fromDtoToEntity(any())).willReturn(expectedFutureWorkInterestsEntity)
-    given(inPrisonInterestsEntityMapper.fromDtoToEntity(any())).willReturn(expectedInPrisonInterestsEntity)
-    given(personalSkillsAndInterestsEntityMapper.fromDtoToEntity(any())).willReturn(expectedPersonalSkillsAndInterestsEntity)
-    given(previousQualificationsEntityMapper.fromDtoToEntity(any())).willReturn(expectedPreviousQualificationsEntity)
-    given(previousTrainingEntityMapper.fromDtoToEntity(any())).willReturn(expectedPreviousTrainingEntity)
-    given(previousWorkExperiencesEntityMapper.fromDtoToEntity(any())).willReturn(expectedPreviousWorkExperiencesEntity)
-    given(workOnReleaseEntityMapper.fromDtoToEntity(any())).willReturn(expectedWorkOnReleaseEntity)
+    given(futureWorkInterestsEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedFutureWorkInterestsEntity)
+    given(inPrisonInterestsEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedInPrisonInterestsEntity)
+    given(personalSkillsAndInterestsEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedPersonalSkillsAndInterestsEntity)
+    given(previousQualificationsEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedPreviousQualificationsEntity)
+    given(previousTrainingEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedPreviousTrainingEntity)
+    given(previousWorkExperiencesEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedPreviousWorkExperiencesEntity)
+    given(workOnReleaseEntityMapper.fromCreateDtoToEntity(any())).willReturn(expectedWorkOnReleaseEntity)
 
     // When
-    val actual = mapper.fromDtoToEntity(createInductionDto)
+    val actual = mapper.fromCreateDtoToEntity(createInductionDto)
 
     // Then
     assertThat(actual)
@@ -103,13 +103,13 @@ class InductionEntityMapperTest {
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
-    verify(futureWorkInterestsEntityMapper).fromDtoToEntity(createInductionDto.futureWorkInterests!!)
-    verify(inPrisonInterestsEntityMapper).fromDtoToEntity(createInductionDto.inPrisonInterests!!)
-    verify(personalSkillsAndInterestsEntityMapper).fromDtoToEntity(createInductionDto.personalSkillsAndInterests!!)
-    verify(previousQualificationsEntityMapper).fromDtoToEntity(createInductionDto.previousQualifications!!)
-    verify(previousTrainingEntityMapper).fromDtoToEntity(createInductionDto.previousTraining!!)
-    verify(previousWorkExperiencesEntityMapper).fromDtoToEntity(createInductionDto.previousWorkExperiences!!)
-    verify(workOnReleaseEntityMapper).fromDtoToEntity(createInductionDto.workOnRelease)
+    verify(futureWorkInterestsEntityMapper).fromCreateDtoToEntity(createInductionDto.futureWorkInterests!!)
+    verify(inPrisonInterestsEntityMapper).fromCreateDtoToEntity(createInductionDto.inPrisonInterests!!)
+    verify(personalSkillsAndInterestsEntityMapper).fromCreateDtoToEntity(createInductionDto.personalSkillsAndInterests!!)
+    verify(previousQualificationsEntityMapper).fromCreateDtoToEntity(createInductionDto.previousQualifications!!)
+    verify(previousTrainingEntityMapper).fromCreateDtoToEntity(createInductionDto.previousTraining!!)
+    verify(previousWorkExperiencesEntityMapper).fromCreateDtoToEntity(createInductionDto.previousWorkExperiences!!)
+    verify(workOnReleaseEntityMapper).fromCreateDtoToEntity(createInductionDto.workOnRelease)
   }
 
   @Test
