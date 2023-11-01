@@ -55,9 +55,10 @@ abstract class PreviousWorkExperiencesResourceMapper {
   @Mapping(target = "otherWork", source = "experienceTypeOther")
   abstract fun toWorkExperienceApi(workExperience: WorkExperienceDomain): WorkExperienceApi
 
-  fun toWorkInterestsResponse(workInterests: FutureWorkInterests?): WorkInterests? {
+  private fun toWorkInterestsResponse(workInterests: FutureWorkInterests?): WorkInterests? {
     return workInterests?.let {
       WorkInterests(
+        id = workInterests.reference,
         workInterests = workInterests.interests.map { toWorkTypeApi(it.workType) }.toSet(),
         workInterestsOther = toWorkInterestsOther(workInterests),
         particularJobInterests = workInterests.interests.map { toWorkInterestDetail(it) }.toSet(),

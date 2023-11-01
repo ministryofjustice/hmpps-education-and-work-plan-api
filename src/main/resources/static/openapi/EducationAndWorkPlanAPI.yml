@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.4'
+  version: '1.4.5'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -987,9 +987,32 @@ components:
           items:
             $ref: '#/components/schemas/WorkExperience'
         workInterests:
-          $ref: '#/components/schemas/WorkInterests'
+          $ref: '#/components/schemas/CreateWorkInterestsRequest'
       required:
         - hasWorkedBefore
+
+    CreateWorkInterestsRequest:
+      description: The Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
+      properties:
+        workInterests:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of Prisoner's future work interests.
+          items:
+            $ref: '#/components/schemas/WorkType'
+        workInterestsOther:
+          type: string
+          description: A work interest, which is not listed in 'workInterests' Enum. Mandatory when 'workInterests' includes 'OTHER'.
+        particularJobInterests:
+          uniqueItems: true
+          type: array
+          description: A detailed list of work interests that a Prisoner has.
+          items:
+            $ref: '#/components/schemas/WorkInterestDetail'
+      required:
+        - workInterests
 
     CreateSkillsAndInterestsRequest:
       description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
@@ -1106,24 +1129,46 @@ components:
         inPrisonInterests:
           $ref: '#/components/schemas/UpdatePrisonWorkAndEducationRequest'
       required:
+        - reference
         - hopingToGetWork
         - prisonId
 
     UpdatePreviousWorkRequest:
-      description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
-      allOf:
-        - $ref: '#/components/schemas/CreatePreviousWorkRequest'
+      description: A request to update the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
+      type: object
       properties:
         id:
           type: string
           format: uuid
           description: A unique reference for this Prisoner's previous work experience.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
+        hasWorkedBefore:
+          type: boolean
+        typeOfWorkExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's type of previous work experience.
+          items:
+            $ref: '#/components/schemas/WorkType'
+        typeOfWorkExperienceOther:
+          type: string
+          description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
+        workExperience:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A list of the Prisoner's previous work experience details.
+          items:
+            $ref: '#/components/schemas/WorkExperience'
+        workInterests:
+          $ref: '#/components/schemas/WorkInterests'
       required:
         - id
+        - hasWorkedBefore
 
     UpdateSkillsAndInterestsRequest:
-      description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
+      description: A request to update a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
       allOf:
         - $ref: '#/components/schemas/CreateSkillsAndInterestsRequest'
       properties:
@@ -1136,7 +1181,7 @@ components:
         - id
 
     UpdateEducationAndQualificationsRequest:
-      description: A request to persist a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
+      description: A request to update a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
         the inmate.
       allOf:
         - $ref: '#/components/schemas/CreateEducationAndQualificationsRequest'
@@ -1150,7 +1195,7 @@ components:
         - id
 
     UpdatePrisonWorkAndEducationRequest:
-      description: A request to persist a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
+      description: A request to update a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
       allOf:
         - $ref: '#/components/schemas/CreatePrisonWorkAndEducationRequest'
       properties:
@@ -1182,26 +1227,16 @@ components:
 
     WorkInterests:
       description: The Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
-      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateWorkInterestsRequest'
       properties:
-        workInterests:
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: A list of Prisoner's future work interests.
-          items:
-            $ref: '#/components/schemas/WorkType'
-        workInterestsOther:
+        id:
           type: string
-          description: A work interest, which is not listed in 'workInterests' Enum. Mandatory when 'workInterests' includes 'OTHER'.
-        particularJobInterests:
-          uniqueItems: true
-          type: array
-          description: A detailed list of work interests that a Prisoner has.
-          items:
-            $ref: '#/components/schemas/WorkInterestDetail'
+          format: uuid
+          description: A unique reference for this Prisoner's education and qualifications.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
       required:
-        - workInterests
+        - id
 
     WorkInterestDetail:
       title: WorkInterestDetail

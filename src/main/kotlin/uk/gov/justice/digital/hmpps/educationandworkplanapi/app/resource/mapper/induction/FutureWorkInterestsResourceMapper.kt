@@ -4,20 +4,19 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 
 @Component
 class FutureWorkInterestsResourceMapper {
-  fun toCreateFutureWorkInterestsDto(request: WorkInterests?, prisonId: String): CreateFutureWorkInterestsDto? {
-    return request?.let {
+  fun toCreateFutureWorkInterestsDto(request: CreateWorkInterestsRequest?, prisonId: String): CreateFutureWorkInterestsDto? =
+    request?.let {
       CreateFutureWorkInterestsDto(
         interests = toWorkInterests(it.particularJobInterests, it.workInterestsOther),
         prisonId = prisonId,
       )
     }
-  }
 
   private fun toWorkInterests(
     workInterests: Set<WorkInterestDetail>?,
