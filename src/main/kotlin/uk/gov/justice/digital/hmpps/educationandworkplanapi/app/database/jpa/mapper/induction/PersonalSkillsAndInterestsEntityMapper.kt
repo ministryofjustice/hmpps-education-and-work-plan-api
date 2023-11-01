@@ -24,7 +24,7 @@ interface PersonalSkillsAndInterestsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromDtoToEntity(dto: CreatePersonalSkillsAndInterestsDto): PersonalSkillsAndInterestsEntity
+  fun fromCreateDtoToEntity(dto: CreatePersonalSkillsAndInterestsDto): PersonalSkillsAndInterestsEntity
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")

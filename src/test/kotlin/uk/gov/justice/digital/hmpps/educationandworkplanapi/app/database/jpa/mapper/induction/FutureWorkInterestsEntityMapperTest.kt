@@ -39,7 +39,7 @@ class FutureWorkInterestsEntityMapperTest {
     given(workInterestEntityMapper.fromDomainToEntity(any())).willReturn(expectedWorkInterestEntity)
 
     // When
-    val actual = mapper.fromDtoToEntity(createWorkInterestsDto)
+    val actual = mapper.fromCreateDtoToEntity(createWorkInterestsDto)
 
     // Then
     assertThat(actual)

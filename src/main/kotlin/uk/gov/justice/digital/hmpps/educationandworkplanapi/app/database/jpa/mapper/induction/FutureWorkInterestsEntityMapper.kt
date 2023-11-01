@@ -22,7 +22,7 @@ interface FutureWorkInterestsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromDtoToEntity(dto: CreateFutureWorkInterestsDto): FutureWorkInterestsEntity
+  fun fromCreateDtoToEntity(dto: CreateFutureWorkInterestsDto): FutureWorkInterestsEntity
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")

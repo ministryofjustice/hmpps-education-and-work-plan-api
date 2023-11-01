@@ -49,7 +49,7 @@ class InPrisonInterestsEntityMapperTest {
     )
 
     // When
-    val actual = mapper.fromDtoToEntity(createInPrisonInterestsDto)
+    val actual = mapper.fromCreateDtoToEntity(createInPrisonInterestsDto)
 
     // Then
     assertThat(actual)

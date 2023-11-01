@@ -24,7 +24,7 @@ interface InPrisonInterestsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity
+  fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")

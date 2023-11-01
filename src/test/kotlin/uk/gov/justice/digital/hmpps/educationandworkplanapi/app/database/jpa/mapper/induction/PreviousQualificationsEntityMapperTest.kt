@@ -46,7 +46,7 @@ class PreviousQualificationsEntityMapperTest {
     given(qualificationEntityMapper.fromDomainToEntity(any())).willReturn(expectedQualificationEntity)
 
     // When
-    val actual = mapper.fromDtoToEntity(createQualificationsDto)
+    val actual = mapper.fromCreateDtoToEntity(createQualificationsDto)
 
     // Then
     assertThat(actual)

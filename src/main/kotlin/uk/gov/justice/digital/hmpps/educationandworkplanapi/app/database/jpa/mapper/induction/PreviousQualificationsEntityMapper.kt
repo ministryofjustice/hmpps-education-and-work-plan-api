@@ -22,7 +22,7 @@ interface PreviousQualificationsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromDtoToEntity(dto: CreatePreviousQualificationsDto): PreviousQualificationsEntity
+  fun fromCreateDtoToEntity(dto: CreatePreviousQualificationsDto): PreviousQualificationsEntity
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
