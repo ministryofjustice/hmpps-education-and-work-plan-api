@@ -27,7 +27,7 @@ data class FutureWorkInterests(
 data class WorkInterest(
   val workType: WorkInterestType,
   val workTypeOther: String?,
-  val role: String,
+  val role: String?,
 )
 
 enum class WorkInterestType {

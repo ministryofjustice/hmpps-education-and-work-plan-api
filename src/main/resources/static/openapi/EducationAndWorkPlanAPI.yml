@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.5'
+  version: '1.4.6'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -1249,7 +1249,6 @@ components:
           type: string
           description: The role within a Prisoner's area of work interest.
       required:
-        - role
         - workInterest
 
     HopingToWork:
