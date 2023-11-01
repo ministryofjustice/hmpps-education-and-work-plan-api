@@ -8,9 +8,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qua
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType.OTHER
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAndQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateEducationAndQualificationsRequest
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -72,4 +75,18 @@ abstract class QualificationsAndTrainingResourceMapper {
   abstract fun toTrainingTypesApi(trainingTypesDomain: List<TrainingTypeDomain>): Set<TrainingTypeApi>
 
   fun toOffsetDateTime(instant: Instant?): OffsetDateTime? = instant?.atOffset(ZoneOffset.UTC)
+
+  @Mapping(target = "reference", source = "request.id")
+  abstract fun toUpdatePreviousQualificationsDto(
+    request: UpdateEducationAndQualificationsRequest?,
+    prisonId: String,
+  ): UpdatePreviousQualificationsDto?
+
+  @Mapping(target = "reference", source = "request.id")
+  @Mapping(target = "trainingTypes", source = "request.additionalTraining")
+  @Mapping(target = "trainingTypeOther", source = "request.additionalTrainingOther")
+  abstract fun toUpdatePreviousTrainingDto(
+    request: UpdateEducationAndQualificationsRequest?,
+    prisonId: String,
+  ): UpdatePreviousTrainingDto?
 }

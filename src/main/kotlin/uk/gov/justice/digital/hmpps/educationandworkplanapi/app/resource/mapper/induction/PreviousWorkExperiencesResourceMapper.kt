@@ -9,8 +9,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Wor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
@@ -85,4 +87,11 @@ abstract class PreviousWorkExperiencesResourceMapper {
     workInterests.interests.firstOrNull { it.workType == WorkInterestType.OTHER }?.workTypeOther
 
   fun toOffsetDateTime(instant: Instant?): OffsetDateTime? = instant?.atOffset(ZoneOffset.UTC)
+
+  @Mapping(target = "reference", source = "request.id")
+  @Mapping(target = "experiences", source = "request.workExperience")
+  abstract fun toUpdatePreviousWorkExperiencesDto(
+    request: UpdatePreviousWorkRequest?,
+    prisonId: String,
+  ): UpdatePreviousWorkExperiencesDto?
 }

@@ -6,8 +6,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Int
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.SkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SkillsAndInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest as PersonalInterestDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill as PersonalSkillDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest as PersonalInterestApi
@@ -79,4 +81,17 @@ class PersonalSkillsAndInterestsResourceMapper(
 
   private fun toPersonalInterestsOther(skillsAndInterests: PersonalSkillsAndInterests) =
     skillsAndInterests.interests.firstOrNull { it.interestType == InterestType.OTHER }?.interestTypeOther
+
+  fun toUpdatePersonalSkillsAndInterestsDto(
+    request: UpdateSkillsAndInterestsRequest?,
+    prisonId: String,
+  ): UpdatePersonalSkillsAndInterestsDto? =
+    request?.let {
+      UpdatePersonalSkillsAndInterestsDto(
+        reference = it.id,
+        skills = toPersonalSkillsDomain(request.skills, request.skillsOther),
+        interests = toPersonalInterestsDomain(request.personalInterests, request.personalInterestsOther),
+        prisonId = prisonId,
+      )
+    }
 }
