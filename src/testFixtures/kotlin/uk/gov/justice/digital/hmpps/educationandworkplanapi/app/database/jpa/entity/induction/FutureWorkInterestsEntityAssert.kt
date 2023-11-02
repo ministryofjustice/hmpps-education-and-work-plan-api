@@ -15,6 +15,12 @@ class FutureWorkInterestsEntityAssert(actual: FutureWorkInterestsEntity?) :
     FutureWorkInterestsEntityAssert::class.java,
   ) {
 
+  companion object {
+    // JPA managed fields, plus the reference field, which are all managed/generated within the API
+    private val INTERNALLY_MANAGED_FIELDS =
+      arrayOf(".*id", ".*reference", ".*createdAt", ".*createdBy", ".*createdByDisplayName", ".*updatedAt", ".*updatedBy", ".*updatedByDisplayName")
+  }
+
   fun hasJpaManagedFieldsPopulated(): FutureWorkInterestsEntityAssert {
     isNotNull
     with(actual!!) {
@@ -85,6 +91,16 @@ class FutureWorkInterestsEntityAssert(actual: FutureWorkInterestsEntity?) :
     return this
   }
 
+  fun wasUpdatedAtPrison(expected: String): FutureWorkInterestsEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAtPrison != expected) {
+        failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
+      }
+    }
+    return this
+  }
+
   fun hasAReference(): FutureWorkInterestsEntityAssert {
     isNotNull
     with(actual!!) {
@@ -92,6 +108,21 @@ class FutureWorkInterestsEntityAssert(actual: FutureWorkInterestsEntity?) :
         failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: FutureWorkInterestsEntity): FutureWorkInterestsEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringInternallyManagedFields(expected: FutureWorkInterestsEntity): FutureWorkInterestsEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 }

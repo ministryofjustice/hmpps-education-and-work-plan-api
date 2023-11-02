@@ -6,7 +6,7 @@ import java.util.UUID
 fun aValidFutureWorkInterestsEntity(
   id: UUID? = null,
   reference: UUID? = UUID.randomUUID(),
-  interests: List<WorkInterestEntity> = listOf(aValidWorkInterestEntity()),
+  interests: MutableList<WorkInterestEntity> = mutableListOf(aValidWorkInterestEntity()),
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
@@ -33,7 +33,7 @@ fun aValidFutureWorkInterestsEntity(
 fun aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID? = UUID.randomUUID(),
-  interests: List<WorkInterestEntity> = listOf(aValidWorkInterestEntity()),
+  interests: MutableList<WorkInterestEntity> = mutableListOf(aValidWorkInterestEntity()),
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",

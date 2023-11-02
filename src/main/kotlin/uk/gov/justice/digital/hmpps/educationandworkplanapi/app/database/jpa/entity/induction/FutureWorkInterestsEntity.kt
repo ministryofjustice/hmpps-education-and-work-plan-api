@@ -44,7 +44,7 @@ class FutureWorkInterestsEntity(
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "work_interests_id", nullable = false)
-  var interests: List<WorkInterestEntity>? = null,
+  var interests: MutableList<WorkInterestEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp
@@ -136,7 +136,7 @@ class WorkInterestEntity(
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as FutureWorkInterestsEntity
+    other as WorkInterestEntity
 
     return id != null && id == other.id
   }
