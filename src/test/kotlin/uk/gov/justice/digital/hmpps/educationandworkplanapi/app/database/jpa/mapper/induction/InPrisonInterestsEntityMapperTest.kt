@@ -38,8 +38,8 @@ class InPrisonInterestsEntityMapperTest {
     val expectedInPrisonWorkInterestEntity = aValidInPrisonWorkInterestEntity()
     val expectedInPrisonTrainingInterestEntity = aValidInPrisonTrainingInterestEntity()
     val expected = aValidInPrisonInterestsEntity(
-      inPrisonWorkInterests = listOf(expectedInPrisonWorkInterestEntity),
-      inPrisonTrainingInterests = listOf(expectedInPrisonTrainingInterestEntity),
+      inPrisonWorkInterests = mutableListOf(expectedInPrisonWorkInterestEntity),
+      inPrisonTrainingInterests = mutableListOf(expectedInPrisonTrainingInterestEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
@@ -70,8 +70,8 @@ class InPrisonInterestsEntityMapperTest {
     val expectedTrainingInterest = aValidInPrisonTrainingInterest()
     val expectedInPrisonInterests = aValidInPrisonInterests(
       reference = inPrisonInterestsEntity.reference!!,
-      inPrisonWorkInterests = listOf(expectedWorkInterest),
-      inPrisonTrainingInterests = listOf(expectedTrainingInterest),
+      inPrisonWorkInterests = mutableListOf(expectedWorkInterest),
+      inPrisonTrainingInterests = mutableListOf(expectedTrainingInterest),
       createdAt = inPrisonInterestsEntity.createdAt!!,
       createdAtPrison = inPrisonInterestsEntity.createdAtPrison!!,
       createdBy = inPrisonInterestsEntity.createdBy!!,

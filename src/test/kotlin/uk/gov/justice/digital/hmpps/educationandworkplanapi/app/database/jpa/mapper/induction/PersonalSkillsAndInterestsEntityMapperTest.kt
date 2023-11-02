@@ -38,8 +38,8 @@ class PersonalSkillsAndInterestsEntityMapperTest {
     val expectedPersonalSkill = aValidPersonalSkillEntity()
     val expectedPersonalInterest = aValidPersonalInterestEntity()
     val expected = aValidPersonalSkillsAndInterestsEntity(
-      skills = listOf(expectedPersonalSkill),
-      interests = listOf(expectedPersonalInterest),
+      skills = mutableListOf(expectedPersonalSkill),
+      interests = mutableListOf(expectedPersonalInterest),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
@@ -68,8 +68,8 @@ class PersonalSkillsAndInterestsEntityMapperTest {
     val expectedInterest = aValidPersonalInterest()
     val expectedSkillsAndInterests = aValidPersonalSkillsAndInterests(
       reference = personalSkillsAndInterestsEntity.reference!!,
-      skills = listOf(expectedSkill),
-      interests = listOf(expectedInterest),
+      skills = mutableListOf(expectedSkill),
+      interests = mutableListOf(expectedInterest),
       createdAt = personalSkillsAndInterestsEntity.createdAt!!,
       createdAtPrison = personalSkillsAndInterestsEntity.createdAtPrison!!,
       createdBy = personalSkillsAndInterestsEntity.createdBy!!,

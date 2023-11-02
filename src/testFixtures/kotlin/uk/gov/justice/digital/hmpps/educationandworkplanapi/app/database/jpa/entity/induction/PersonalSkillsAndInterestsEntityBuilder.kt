@@ -6,8 +6,8 @@ import java.util.UUID
 fun aValidPersonalSkillsAndInterestsEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
-  skills: List<PersonalSkillEntity> = listOf(aValidPersonalSkillEntity()),
-  interests: List<PersonalInterestEntity> = listOf(aValidPersonalInterestEntity()),
+  skills: MutableList<PersonalSkillEntity> = mutableListOf(aValidPersonalSkillEntity()),
+  interests: MutableList<PersonalInterestEntity> = mutableListOf(aValidPersonalInterestEntity()),
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
@@ -35,8 +35,8 @@ fun aValidPersonalSkillsAndInterestsEntity(
 fun aValidPersonalSkillsAndInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  skills: List<PersonalSkillEntity> = listOf(aValidPersonalSkillEntity()),
-  interests: List<PersonalInterestEntity> = listOf(aValidPersonalInterestEntity()),
+  skills: MutableList<PersonalSkillEntity> = mutableListOf(aValidPersonalSkillEntity()),
+  interests: MutableList<PersonalInterestEntity> = mutableListOf(aValidPersonalInterestEntity()),
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",

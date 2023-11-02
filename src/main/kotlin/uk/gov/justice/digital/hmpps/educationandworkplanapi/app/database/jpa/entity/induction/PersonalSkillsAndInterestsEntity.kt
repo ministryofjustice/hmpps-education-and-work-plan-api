@@ -46,11 +46,11 @@ class PersonalSkillsAndInterestsEntity(
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "skills_interests_id", nullable = false)
-  var skills: List<PersonalSkillEntity>? = null,
+  var skills: MutableList<PersonalSkillEntity>? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "skills_interests_id", nullable = false)
-  var interests: List<PersonalInterestEntity>? = null,
+  var interests: MutableList<PersonalInterestEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp

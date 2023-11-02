@@ -22,6 +22,7 @@ class UpdateFutureWorkInterestsEntityMapperTest {
 
   @Test
   fun `should update existing work interests`() {
+    // Given
     val workInterestReference = UUID.randomUUID()
     val existingEntity = aValidWorkInterestEntity(
       reference = workInterestReference,
@@ -69,6 +70,7 @@ class UpdateFutureWorkInterestsEntityMapperTest {
 
   @Test
   fun `should add new work interest`() {
+    // Given
     val workInterestReference = UUID.randomUUID()
     val existingEntity = aValidWorkInterestEntity(
       reference = workInterestReference,
