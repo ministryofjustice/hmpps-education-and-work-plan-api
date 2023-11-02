@@ -32,7 +32,7 @@ class FutureWorkInterestsEntityMapperTest {
     val createWorkInterestsDto = aValidCreateFutureWorkInterestsDto()
     val expectedWorkInterestEntity = aValidWorkInterestEntity()
     val expected = aValidFutureWorkInterestsEntity(
-      interests = listOf(expectedWorkInterestEntity),
+      interests = mutableListOf(expectedWorkInterestEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )

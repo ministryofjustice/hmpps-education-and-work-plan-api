@@ -31,7 +31,7 @@ fun aValidFutureWorkInterests(
 fun aValidWorkInterest(
   workType: WorkInterestType = WorkInterestType.CONSTRUCTION,
   workTypeOther: String? = null,
-  role: String = "Bricklaying",
+  role: String? = "Bricklaying",
 ) = WorkInterest(
   workType = workType,
   workTypeOther = workTypeOther,
