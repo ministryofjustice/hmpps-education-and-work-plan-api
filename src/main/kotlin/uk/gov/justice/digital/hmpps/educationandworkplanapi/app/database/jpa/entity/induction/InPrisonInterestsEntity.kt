@@ -44,11 +44,11 @@ class InPrisonInterestsEntity(
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "interests_id", nullable = false)
-  var inPrisonWorkInterests: List<InPrisonWorkInterestEntity>? = null,
+  var inPrisonWorkInterests: MutableList<InPrisonWorkInterestEntity>? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "interests_id", nullable = false)
-  var inPrisonTrainingInterests: List<InPrisonTrainingInterestEntity>? = null,
+  var inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp

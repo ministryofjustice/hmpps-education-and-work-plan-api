@@ -6,8 +6,8 @@ import java.util.UUID
 fun aValidInPrisonInterestsEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
-  inPrisonWorkInterests: List<InPrisonWorkInterestEntity> = listOf(aValidInPrisonWorkInterestEntity()),
-  inPrisonTrainingInterests: List<InPrisonTrainingInterestEntity> = listOf(aValidInPrisonTrainingInterestEntity()),
+  inPrisonWorkInterests: MutableList<InPrisonWorkInterestEntity> = mutableListOf(aValidInPrisonWorkInterestEntity()),
+  inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestEntity> = mutableListOf(aValidInPrisonTrainingInterestEntity()),
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
@@ -35,8 +35,8 @@ fun aValidInPrisonInterestsEntity(
 fun aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  inPrisonWorkInterests: List<InPrisonWorkInterestEntity> = listOf(aValidInPrisonWorkInterestEntity()),
-  inPrisonTrainingInterests: List<InPrisonTrainingInterestEntity> = listOf(aValidInPrisonTrainingInterestEntity()),
+  inPrisonWorkInterests: MutableList<InPrisonWorkInterestEntity> = mutableListOf(aValidInPrisonWorkInterestEntity()),
+  inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestEntity> = mutableListOf(aValidInPrisonTrainingInterestEntity()),
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",

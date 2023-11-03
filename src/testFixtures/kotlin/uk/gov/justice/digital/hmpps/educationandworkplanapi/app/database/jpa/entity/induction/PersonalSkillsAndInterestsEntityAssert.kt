@@ -15,6 +15,12 @@ class PersonalSkillsAndInterestsEntityAssert(actual: PersonalSkillsAndInterestsE
     PersonalSkillsAndInterestsEntityAssert::class.java,
   ) {
 
+  companion object {
+    // JPA managed fields, plus the reference field, which are all managed/generated within the API
+    private val INTERNALLY_MANAGED_FIELDS =
+      arrayOf(".*id", ".*reference", ".*createdAt", ".*createdBy", ".*createdByDisplayName", ".*updatedAt", ".*updatedBy", ".*updatedByDisplayName")
+  }
+
   fun hasJpaManagedFieldsPopulated(): PersonalSkillsAndInterestsEntityAssert {
     isNotNull
     with(actual!!) {
@@ -92,6 +98,21 @@ class PersonalSkillsAndInterestsEntityAssert(actual: PersonalSkillsAndInterestsE
         failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: PersonalSkillsAndInterestsEntity): PersonalSkillsAndInterestsEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringInternallyManagedFields(expected: PersonalSkillsAndInterestsEntity): PersonalSkillsAndInterestsEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 }
