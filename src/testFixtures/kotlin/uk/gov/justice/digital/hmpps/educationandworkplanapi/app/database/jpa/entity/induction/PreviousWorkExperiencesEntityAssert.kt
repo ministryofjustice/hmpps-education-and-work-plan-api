@@ -15,6 +15,21 @@ class PreviousWorkExperiencesEntityAssert(actual: PreviousWorkExperiencesEntity?
     PreviousWorkExperiencesEntityAssert::class.java,
   ) {
 
+  companion object {
+    // JPA managed fields, plus the reference field, which are all managed/generated within the API
+    private val INTERNALLY_MANAGED_FIELDS =
+      arrayOf(
+        ".*id",
+        ".*reference",
+        ".*createdAt",
+        ".*createdBy",
+        ".*createdByDisplayName",
+        ".*updatedAt",
+        ".*updatedBy",
+        ".*updatedByDisplayName",
+      )
+  }
+
   fun hasJpaManagedFieldsPopulated(): PreviousWorkExperiencesEntityAssert {
     isNotNull
     with(actual!!) {
@@ -92,6 +107,21 @@ class PreviousWorkExperiencesEntityAssert(actual: PreviousWorkExperiencesEntity?
         failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: PreviousWorkExperiencesEntity): PreviousWorkExperiencesEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringInternallyManagedFields(expected: PreviousWorkExperiencesEntity): PreviousWorkExperiencesEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 }

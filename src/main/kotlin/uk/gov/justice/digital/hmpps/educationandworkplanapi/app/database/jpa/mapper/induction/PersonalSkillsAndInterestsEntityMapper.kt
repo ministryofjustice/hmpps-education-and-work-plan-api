@@ -50,8 +50,8 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Mapping(target = "skills", expression = "java( updateSkills(entity, dto) )")
   @Mapping(target = "interests", expression = "java( updateInterests(entity, dto) )")
   abstract fun updateEntityFromDto(
-    @MappingTarget entity: PersonalSkillsAndInterestsEntity,
-    dto: UpdatePersonalSkillsAndInterestsDto,
+    @MappingTarget entity: PersonalSkillsAndInterestsEntity?,
+    dto: UpdatePersonalSkillsAndInterestsDto?,
   )
 
   fun updateSkills(

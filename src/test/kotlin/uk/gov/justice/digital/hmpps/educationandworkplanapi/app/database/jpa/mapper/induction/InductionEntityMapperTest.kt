@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidFutureWorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInPrisonInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
@@ -29,6 +30,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInductionDto
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class InductionEntityMapperTest {
@@ -156,5 +159,40 @@ class InductionEntityMapperTest {
     verify(previousTrainingEntityMapper).fromEntityToDomain(inductionEntity.previousTraining!!)
     verify(previousWorkExperiencesEntityMapper).fromEntityToDomain(inductionEntity.previousWorkExperiences!!)
     verify(workOnReleaseEntityMapper).fromEntityToDomain(inductionEntity.workOnRelease!!)
+  }
+
+  @Test
+  fun `should update induction`() {
+    // Given
+    val inductionReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
+    val existingInductionEntity = aValidInductionEntity(
+      reference = inductionReference,
+      prisonNumber = prisonNumber,
+    )
+    val updateInductionDto = aValidUpdateInductionDto(
+      reference = inductionReference,
+      prisonNumber = prisonNumber,
+      prisonId = "MDI",
+    )
+    val expectedInductionEntity = existingInductionEntity.deepCopy().apply {
+      id
+      reference = inductionReference
+      createdAtPrison = "BXI"
+      updatedAtPrison = "MDI"
+    }
+
+    // When
+    mapper.updateEntityFromDto(existingInductionEntity, updateInductionDto)
+
+    // Then
+    assertThat(existingInductionEntity).isEqualToComparingAllFields(expectedInductionEntity)
+    verify(futureWorkInterestsEntityMapper).updateEntityFromDto(existingInductionEntity.futureWorkInterests, updateInductionDto.futureWorkInterests)
+    verify(inPrisonInterestsEntityMapper).updateEntityFromDto(existingInductionEntity.inPrisonInterests, updateInductionDto.inPrisonInterests)
+    verify(personalSkillsAndInterestsEntityMapper).updateEntityFromDto(existingInductionEntity.personalSkillsAndInterests, updateInductionDto.personalSkillsAndInterests)
+    verify(previousQualificationsEntityMapper).updateEntityFromDto(existingInductionEntity.previousQualifications, updateInductionDto.previousQualifications)
+    verify(previousTrainingEntityMapper).updateEntityFromDto(existingInductionEntity.previousTraining, updateInductionDto.previousTraining)
+    verify(previousWorkExperiencesEntityMapper).updateEntityFromDto(existingInductionEntity.previousWorkExperiences, updateInductionDto.previousWorkExperiences)
+    verify(workOnReleaseEntityMapper).updateEntityFromDto(existingInductionEntity.workOnRelease, updateInductionDto.workOnRelease)
   }
 }

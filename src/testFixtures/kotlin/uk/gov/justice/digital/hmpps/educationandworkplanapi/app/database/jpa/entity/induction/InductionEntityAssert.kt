@@ -15,6 +15,21 @@ class InductionEntityAssert(actual: InductionEntity?) :
     InductionEntityAssert::class.java,
   ) {
 
+  companion object {
+    // JPA managed fields, plus the reference field, which are all managed/generated within the API
+    private val INTERNALLY_MANAGED_FIELDS =
+      arrayOf(
+        ".*id",
+        ".*reference",
+        ".*createdAt",
+        ".*createdBy",
+        ".*createdByDisplayName",
+        ".*updatedAt",
+        ".*updatedBy",
+        ".*updatedByDisplayName",
+      )
+  }
+
   fun hasJpaManagedFieldsPopulated(): InductionEntityAssert {
     isNotNull
     with(actual!!) {
@@ -122,6 +137,21 @@ class InductionEntityAssert(actual: InductionEntity?) :
         failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: InductionEntity): InductionEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringInternallyManagedFields(expected: InductionEntity): InductionEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 }

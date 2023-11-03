@@ -31,7 +31,7 @@ class PreviousWorkExperiencesEntityMapperTest {
     val createPreviousWorkExperiencesDto = aValidCreatePreviousWorkExperiencesDto()
     val expectedWorkExperienceEntity = aValidWorkExperienceEntity()
     val expected = aValidPreviousWorkExperiencesEntity(
-      experiences = listOf(expectedWorkExperienceEntity),
+      experiences = mutableListOf(expectedWorkExperienceEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
@@ -57,7 +57,7 @@ class PreviousWorkExperiencesEntityMapperTest {
     val expectedWorkExperience = aValidWorkExperience()
     val expectedPreviousWorkExperiences = aValidPreviousWorkExperiences(
       reference = workExperiencesEntity.reference!!,
-      experiences = listOf(expectedWorkExperience),
+      experiences = mutableListOf(expectedWorkExperience),
       createdAt = workExperiencesEntity.createdAt!!,
       createdAtPrison = workExperiencesEntity.createdAtPrison!!,
       createdBy = workExperiencesEntity.createdBy!!,

@@ -6,7 +6,7 @@ import java.util.UUID
 fun aValidPreviousWorkExperiencesEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
-  experiences: List<WorkExperienceEntity> = listOf(aValidWorkExperienceEntity()),
+  experiences: MutableList<WorkExperienceEntity> = mutableListOf(aValidWorkExperienceEntity()),
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
@@ -33,7 +33,7 @@ fun aValidPreviousWorkExperiencesEntity(
 fun aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  experiences: List<WorkExperienceEntity> = listOf(aValidWorkExperienceEntity()),
+  experiences: MutableList<WorkExperienceEntity> = mutableListOf(aValidWorkExperienceEntity()),
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",
@@ -60,7 +60,7 @@ fun aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
 fun aValidWorkExperienceEntity(
   reference: UUID = UUID.randomUUID(),
   experienceType: WorkExperienceType = WorkExperienceType.OTHER,
-  experienceTypeOther: String = "Warehouse work",
+  experienceTypeOther: String? = "Warehouse work",
   role: String? = "Chief Forklift Truck Driver",
   details: String? = "Forward, pick stuff up, reverse etc",
 ) =

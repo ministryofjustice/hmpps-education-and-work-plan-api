@@ -41,7 +41,7 @@ abstract class FutureWorkInterestsEntityMapper {
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "interests", expression = "java( updateInterests(entity, dto) )")
-  abstract fun updateEntityFromDto(@MappingTarget entity: FutureWorkInterestsEntity, dto: UpdateFutureWorkInterestsDto)
+  abstract fun updateEntityFromDto(@MappingTarget entity: FutureWorkInterestsEntity?, dto: UpdateFutureWorkInterestsDto?)
 
   fun updateInterests(entity: FutureWorkInterestsEntity, dto: UpdateFutureWorkInterestsDto): List<WorkInterestEntity> {
     val existingInterests = entity.interests!!

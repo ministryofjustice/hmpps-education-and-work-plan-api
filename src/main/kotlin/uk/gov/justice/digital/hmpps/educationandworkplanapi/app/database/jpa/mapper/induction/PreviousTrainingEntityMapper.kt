@@ -36,7 +36,7 @@ interface PreviousTrainingEntityMapper {
   @ExcludeReferenceField
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun updateEntityFromDto(@MappingTarget entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto)
+  fun updateEntityFromDto(@MappingTarget entity: PreviousTrainingEntity?, dto: UpdatePreviousTrainingDto?)
 }
 
 @Mapper
