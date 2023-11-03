@@ -6,7 +6,7 @@ import java.util.UUID
 fun aValidPreviousTrainingEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
-  trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
+  trainingTypes: MutableList<TrainingType> = mutableListOf(TrainingType.OTHER),
   trainingTypeOther: String = "Kotlin course",
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
@@ -35,7 +35,7 @@ fun aValidPreviousTrainingEntity(
 fun aValidPreviousTrainingEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
+  trainingTypes: MutableList<TrainingType> = mutableListOf(TrainingType.OTHER),
   trainingTypeOther: String = "Kotlin course",
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",

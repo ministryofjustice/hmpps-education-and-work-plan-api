@@ -23,16 +23,16 @@ class WorkOnReleaseEntityMapperTest {
     // Given
     val createWorkOnReleaseDto = aValidCreateWorkOnReleaseDto(
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
+      notHopingToWorkReasons = mutableListOf(NotHopingToWorkReasonDomain.OTHER),
       notHopingToWorkOtherReason = "Crime pays",
-      affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
+      affectAbilityToWork = mutableListOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Work is for fools and horses",
     )
     val expected = aValidWorkOnReleaseEntity(
       hopingToWork = HopingToWorkEntity.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonEntity.OTHER),
+      notHopingToWorkReasons = mutableListOf(NotHopingToWorkReasonEntity.OTHER),
       notHopingToWorkOtherReason = "Crime pays",
-      affectAbilityToWork = listOf(AffectAbilityToWorkEntity.OTHER),
+      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.OTHER),
       affectAbilityToWorkOther = "Work is for fools and horses",
     )
 
@@ -55,9 +55,9 @@ class WorkOnReleaseEntityMapperTest {
     val expectedWorkOnReleaseEntity = aValidWorkOnRelease(
       reference = workOnReleaseEntity.reference!!,
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
+      notHopingToWorkReasons = mutableListOf(NotHopingToWorkReasonDomain.OTHER),
       notHopingToWorkOtherReason = "No motivation",
-      affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
+      affectAbilityToWork = mutableListOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Negative attitude",
       createdAt = workOnReleaseEntity.createdAt!!,
       createdAtPrison = workOnReleaseEntity.createdAtPrison!!,

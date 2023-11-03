@@ -50,7 +50,7 @@ class WorkOnReleaseEntity(
   @Enumerated(value = EnumType.STRING)
   @CollectionTable(name = "not_working_reasons", joinColumns = [JoinColumn(name = "work_on_release_id")])
   @Column(name = "reason")
-  var notHopingToWorkReasons: List<NotHopingToWorkReason>? = null,
+  var notHopingToWorkReasons: MutableList<NotHopingToWorkReason>? = null,
 
   @Column(name = "not_hoping_other")
   var notHopingToWorkOtherReason: String? = null,
@@ -59,7 +59,7 @@ class WorkOnReleaseEntity(
   @Enumerated(value = EnumType.STRING)
   @CollectionTable(name = "affecting_ability_to_work", joinColumns = [JoinColumn(name = "work_on_release_id")])
   @Column(name = "affect")
-  var affectAbilityToWork: List<AffectAbilityToWork>? = null,
+  var affectAbilityToWork: MutableList<AffectAbilityToWork>? = null,
 
   @Column(name = "affecting_work_other")
   var affectAbilityToWorkOther: String? = null,

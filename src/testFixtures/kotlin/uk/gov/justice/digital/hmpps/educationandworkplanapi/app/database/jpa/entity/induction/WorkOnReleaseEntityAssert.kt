@@ -15,6 +15,12 @@ class WorkOnReleaseEntityAssert(actual: WorkOnReleaseEntity?) :
     WorkOnReleaseEntityAssert::class.java,
   ) {
 
+  companion object {
+    // JPA managed fields, plus the reference field, which are all managed/generated within the API
+    private val INTERNALLY_MANAGED_FIELDS =
+      arrayOf(".*id", ".*reference", ".*createdAt", ".*createdBy", ".*createdByDisplayName", ".*updatedAt", ".*updatedBy", ".*updatedByDisplayName")
+  }
+
   fun hasJpaManagedFieldsPopulated(): WorkOnReleaseEntityAssert {
     isNotNull
     with(actual!!) {
@@ -92,6 +98,21 @@ class WorkOnReleaseEntityAssert(actual: WorkOnReleaseEntity?) :
         failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: WorkOnReleaseEntity): WorkOnReleaseEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringInternallyManagedFields(expected: WorkOnReleaseEntity): WorkOnReleaseEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 }
