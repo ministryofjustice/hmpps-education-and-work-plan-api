@@ -53,7 +53,7 @@ class PreviousQualificationsEntity(
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "prev_qualifications_id", nullable = false)
-  var qualifications: List<QualificationEntity>? = null,
+  var qualifications: MutableList<QualificationEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp

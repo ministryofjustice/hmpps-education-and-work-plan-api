@@ -15,6 +15,21 @@ class PreviousQualificationsEntityAssert(actual: PreviousQualificationsEntity?) 
     PreviousQualificationsEntityAssert::class.java,
   ) {
 
+  companion object {
+    // JPA managed fields, plus the reference field, which are all managed/generated within the API
+    private val INTERNALLY_MANAGED_FIELDS =
+      arrayOf(
+        ".*id",
+        ".*reference",
+        ".*createdAt",
+        ".*createdBy",
+        ".*createdByDisplayName",
+        ".*updatedAt",
+        ".*updatedBy",
+        ".*updatedByDisplayName",
+      )
+  }
+
   fun hasJpaManagedFieldsPopulated(): PreviousQualificationsEntityAssert {
     isNotNull
     with(actual!!) {
@@ -92,6 +107,21 @@ class PreviousQualificationsEntityAssert(actual: PreviousQualificationsEntity?) 
         failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
+    return this
+  }
+
+  fun isEqualToComparingAllFields(expected: PreviousQualificationsEntity): PreviousQualificationsEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .isEqualTo(expected)
+    return this
+  }
+
+  fun isEqualToIgnoringInternallyManagedFields(expected: PreviousQualificationsEntity): PreviousQualificationsEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
+      .isEqualTo(expected)
     return this
   }
 }

@@ -39,7 +39,7 @@ class PreviousQualificationsEntityMapperTest {
     )
     val expected = aValidPreviousQualificationsEntity(
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
-      qualifications = listOf(expectedQualificationEntity),
+      qualifications = mutableListOf(expectedQualificationEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
@@ -66,7 +66,7 @@ class PreviousQualificationsEntityMapperTest {
     val expectedPreviousQualifications = aValidPreviousQualifications(
       reference = qualificationsEntity.reference!!,
       educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = listOf(expectedQualification),
+      qualifications = mutableListOf(expectedQualification),
       createdAt = qualificationsEntity.createdAt!!,
       createdAtPrison = qualificationsEntity.createdAtPrison!!,
       createdBy = qualificationsEntity.createdBy!!,
