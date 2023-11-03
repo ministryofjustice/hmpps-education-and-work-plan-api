@@ -31,12 +31,12 @@ class PreviousTrainingEntityMapperTest {
     val createTrainingDto = aValidCreatePreviousTrainingDto()
     val expectedTrainingTypeEntity = TrainingTypeEntity.OTHER
     val expected = aValidPreviousTrainingEntity(
-      trainingTypes = listOf(expectedTrainingTypeEntity),
+      trainingTypes = mutableListOf(expectedTrainingTypeEntity),
       trainingTypeOther = "Kotlin course",
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    given(trainingTypeMapper.fromDomainToEntity(any())).willReturn(listOf(expectedTrainingTypeEntity))
+    given(trainingTypeMapper.fromDomainToEntity(any())).willReturn(mutableListOf(expectedTrainingTypeEntity))
 
     // When
     val actual = mapper.fromCreateDtoToEntity(createTrainingDto)
@@ -57,7 +57,7 @@ class PreviousTrainingEntityMapperTest {
     val previousTrainingEntity = aValidPreviousTrainingEntityWithJpaFieldsPopulated()
     val expectedPreviousTraining = aValidPreviousTraining(
       reference = previousTrainingEntity.reference!!,
-      trainingTypes = listOf(TrainingTypeDomain.OTHER),
+      trainingTypes = mutableListOf(TrainingTypeDomain.OTHER),
       trainingTypeOther = "Kotlin course",
       createdAt = previousTrainingEntity.createdAt!!,
       createdAtPrison = previousTrainingEntity.createdAtPrison!!,
@@ -68,7 +68,7 @@ class PreviousTrainingEntityMapperTest {
       lastUpdatedBy = previousTrainingEntity.updatedBy!!,
       lastUpdatedByDisplayName = previousTrainingEntity.updatedByDisplayName!!,
     )
-    given(trainingTypeMapper.fromEntityToDomain(any())).willReturn(listOf(TrainingTypeDomain.OTHER))
+    given(trainingTypeMapper.fromEntityToDomain(any())).willReturn(mutableListOf(TrainingTypeDomain.OTHER))
 
     // When
     val actual = mapper.fromEntityToDomain(previousTrainingEntity)
