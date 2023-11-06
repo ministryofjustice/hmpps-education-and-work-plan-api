@@ -47,7 +47,7 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should fail to create induction no induction data provided`() {
+  fun `should fail to create induction given no induction data provided`() {
     val prisonNumber = aValidPrisonNumber()
 
     // When

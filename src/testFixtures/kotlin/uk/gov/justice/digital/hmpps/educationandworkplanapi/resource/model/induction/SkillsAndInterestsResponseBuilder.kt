@@ -12,7 +12,7 @@ fun aValidSkillsAndInterestsResponse(
   skillsOther: String? = "Hidden skills",
   personalInterests: Set<PersonalInterest>? = setOf(PersonalInterest.OTHER),
   personalInterestsOther: String? = "Secret interests",
-  modifiedBy: String = "asmith_gen",
+  modifiedBy: String = "auser_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): SkillsAndInterestsResponse =
   SkillsAndInterestsResponse(

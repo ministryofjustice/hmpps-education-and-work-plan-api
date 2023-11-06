@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Ind
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 
 private val log = KotlinLogging.logger {}
 
@@ -41,4 +42,18 @@ class InductionService(
    */
   fun getInductionForPrisoner(prisonNumber: String): Induction =
     persistenceAdapter.getInduction(prisonNumber) ?: throw InductionNotFoundException(prisonNumber)
+
+  /**
+   * Updates an [Induction], identified by its `prisonNumber`, from the specified [UpdateInductionDto].
+   * Throws [InductionNotFoundException] if the [Induction] to be updated cannot be found.
+   */
+  fun updateInduction(updateInductionDto: UpdateInductionDto): Induction {
+    val prisonNumber = updateInductionDto.prisonNumber
+    log.info { "Updating Induction for prisoner [$prisonNumber]" }
+
+    return persistenceAdapter.updateInduction(updateInductionDto)
+      ?: throw InductionNotFoundException(prisonNumber).also {
+        log.info { "Induction for prisoner [$prisonNumber] not found" }
+      }
+  }
 }

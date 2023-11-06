@@ -23,7 +23,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.L
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -42,6 +44,7 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
+    const val INDUCTION_URI_TEMPLATE = "/ciag-inductions/{prisonNumber}"
 
     private val localStackContainer = LocalStackContainer.instance
 
@@ -126,5 +129,26 @@ abstract class IntegrationTestBase {
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .exchange()
       .returnResult(TimelineResponse::class.java)
+      .responseBody.blockFirst()!!
+
+  fun createInduction(prisonNumber: String, createCiagInductionRequest: CreateCiagInductionRequest) {
+    webTestClient.post()
+      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+      .withBody(createCiagInductionRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+  }
+
+  fun getInduction(prisonNumber: String): CiagInductionResponse =
+    webTestClient.get()
+      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(CiagInductionResponse::class.java)
       .responseBody.blockFirst()!!
 }
