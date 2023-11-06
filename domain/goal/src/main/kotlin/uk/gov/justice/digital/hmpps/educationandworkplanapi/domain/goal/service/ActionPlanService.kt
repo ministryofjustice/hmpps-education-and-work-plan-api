@@ -57,6 +57,6 @@ class ActionPlanService(
 
   fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> {
     log.debug { "Retrieving Action Plan Summaries for ${prisonNumbers.size} prisoners" }
-    return persistenceAdapter.getActionPlanSummaries(prisonNumbers)
+    return if (prisonNumbers.isNotEmpty()) persistenceAdapter.getActionPlanSummaries(prisonNumbers) else emptyList()
   }
 }

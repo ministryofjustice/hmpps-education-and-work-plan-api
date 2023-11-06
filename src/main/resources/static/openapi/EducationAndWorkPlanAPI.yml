@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.6'
+  version: '1.4.7'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -735,12 +735,11 @@ components:
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
       type: object
-      description: A request to retrieve a list of Action Plan summaries for at least one prisoner.
+      description: A request to retrieve a list of prisoner Action Plan summaries.
       properties:
         prisonNumbers:
           type: array
-          description: A List of at least one prison number.
-          minItems: 1
+          description: A List of prison numbers whose Action Plans should be retrieved.
           items:
             type: string
       required:
