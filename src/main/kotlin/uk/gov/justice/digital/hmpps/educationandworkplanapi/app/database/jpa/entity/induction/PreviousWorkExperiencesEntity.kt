@@ -47,7 +47,7 @@ class PreviousWorkExperiencesEntity(
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "work_experiences_id", nullable = false)
-  var experiences: List<WorkExperienceEntity>? = null,
+  var experiences: MutableList<WorkExperienceEntity>? = null,
 
   @Column(updatable = false)
   @CreationTimestamp
