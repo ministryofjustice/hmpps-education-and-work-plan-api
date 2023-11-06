@@ -15,6 +15,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanAlreadyExistsException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateActionPlanDto
@@ -113,7 +114,7 @@ class ActionPlanServiceTest {
   @Nested
   inner class GetActionPlanSummaries {
     @Test
-    fun `should get action plan summaries`() {
+    fun `should get action plan summaries given one or more prison numbers`() {
       // Given
       val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
 
@@ -129,6 +130,21 @@ class ActionPlanServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedActionPlanSummaries)
       verify(persistenceAdapter).getActionPlanSummaries(prisonNumbers)
+    }
+
+    @Test
+    fun `should get action plan summaries given no prison numbers`() {
+      // Given
+      val prisonNumbers: List<String> = emptyList()
+
+      val expectedActionPlanSummaries: List<ActionPlanSummary> = emptyList()
+
+      // When
+      val actual = service.getActionPlanSummaries(prisonNumbers)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedActionPlanSummaries)
+      verifyNoInteractions(persistenceAdapter)
     }
   }
 }

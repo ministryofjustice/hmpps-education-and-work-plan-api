@@ -113,4 +113,25 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
       .ignoringFields("actionPlanSummaries.reference")
       .isEqualTo(expectedResponse)
   }
+
+  @Test
+  fun `should get empty list of action plan summaries given request containing no prison numbers`() {
+    // Given
+    val request = aValidGetActionPlanSummariesRequest(prisonNumbers = emptyList())
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE)
+      .withBody(request)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(ActionPlanSummaryListResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual).hasEmptySummaries()
+  }
 }
