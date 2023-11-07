@@ -13,7 +13,7 @@ fun aValidCreateEducationAndQualificationsRequest(
     aValidAchievedQualification(),
     anotherValidAchievedQualification(),
   ),
-  additionalTraining: Set<TrainingType>? = setOf(TrainingType.OTHER),
+  additionalTraining: Set<TrainingType> = setOf(TrainingType.OTHER),
   additionalTrainingOther: String? = "Any training",
 ): CreateEducationAndQualificationsRequest = CreateEducationAndQualificationsRequest(
   educationLevel = educationLevel,

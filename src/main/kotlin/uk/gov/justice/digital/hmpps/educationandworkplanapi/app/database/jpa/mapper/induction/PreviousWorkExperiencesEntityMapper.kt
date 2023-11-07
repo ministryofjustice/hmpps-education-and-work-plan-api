@@ -53,8 +53,8 @@ abstract class PreviousWorkExperiencesEntityMapper {
     entity: PreviousWorkExperiencesEntity,
     dto: UpdatePreviousWorkExperiencesDto,
   ): List<WorkExperienceEntity> {
-    val existingExperiences = entity.experiences ?: mutableListOf()
-    val updatedExperiences = dto.experiences ?: mutableListOf()
+    val existingExperiences = entity.experiences!!
+    val updatedExperiences = dto.experiences
 
     updateExistingExperiences(existingExperiences, updatedExperiences)
     addNewExperiences(existingExperiences, updatedExperiences)

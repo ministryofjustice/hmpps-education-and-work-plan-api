@@ -14,7 +14,7 @@ fun aValidEducationAndQualificationsResponse(
     aValidAchievedQualification(),
     anotherValidAchievedQualification(),
   ),
-  additionalTraining: Set<TrainingType>? = setOf(TrainingType.OTHER),
+  additionalTraining: Set<TrainingType> = setOf(TrainingType.OTHER),
   additionalTrainingOther: String? = "Any training",
   modifiedBy: String = "auser_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),

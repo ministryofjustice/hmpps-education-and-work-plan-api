@@ -26,7 +26,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Train
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 abstract class QualificationsAndTrainingResourceMapper {
 
-  @Mapping(target = "qualifications", source = "request.qualifications")
   abstract fun toCreatePreviousQualificationsDto(
     request: CreateEducationAndQualificationsRequest?,
     prisonId: String,
@@ -80,7 +79,6 @@ abstract class QualificationsAndTrainingResourceMapper {
   fun toOffsetDateTime(instant: Instant?): OffsetDateTime? = instant?.atOffset(ZoneOffset.UTC)
 
   @Mapping(target = "reference", source = "request.id")
-  @Mapping(target = "qualifications", source = "request.qualifications")
   abstract fun toUpdatePreviousQualificationsDto(
     request: UpdateEducationAndQualificationsRequest,
     prisonId: String,
