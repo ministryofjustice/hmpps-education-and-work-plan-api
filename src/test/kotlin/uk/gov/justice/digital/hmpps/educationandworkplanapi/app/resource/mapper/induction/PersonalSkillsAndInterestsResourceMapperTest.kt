@@ -96,9 +96,9 @@ class PersonalSkillsAndInterestsResourceMapperTest {
     given(instantMapper.toOffsetDateTime(any())).willReturn(modifiedDateTime)
     val expectedResponse = aValidSkillsAndInterestsResponse(
       id = skillsAndInterests.reference,
-      skills = emptySet(),
+      skills = null,
       skillsOther = null,
-      personalInterests = emptySet(),
+      personalInterests = null,
       personalInterestsOther = null,
       modifiedBy = skillsAndInterests.lastUpdatedBy!!,
       modifiedDateTime = modifiedDateTime,

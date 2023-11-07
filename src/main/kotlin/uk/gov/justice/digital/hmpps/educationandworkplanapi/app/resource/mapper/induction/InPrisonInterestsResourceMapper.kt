@@ -67,11 +67,11 @@ class InPrisonInterestsResourceMapper(
       InPrisonTrainingInterest(trainingType = trainingType, trainingTypeOther = trainingTypeOther)
     } ?: emptyList()
 
-  private fun toInPrisonWorkTypes(workInterests: List<InPrisonWorkInterest>): Set<InPrisonWorkType> =
-    workInterests.map { InPrisonWorkType.valueOf(it.workType.name) }.toSet()
+  private fun toInPrisonWorkTypes(workInterests: List<InPrisonWorkInterest>): Set<InPrisonWorkType>? =
+    workInterests.map { InPrisonWorkType.valueOf(it.workType.name) }.toSet().ifEmpty { null }
 
-  private fun toInPrisonTrainingTypes(trainingInterests: List<InPrisonTrainingInterest>): Set<InPrisonTrainingType> =
-    trainingInterests.map { InPrisonTrainingType.valueOf(it.trainingType.name) }.toSet()
+  private fun toInPrisonTrainingTypes(trainingInterests: List<InPrisonTrainingInterest>): Set<InPrisonTrainingType>? =
+    trainingInterests.map { InPrisonTrainingType.valueOf(it.trainingType.name) }.toSet().ifEmpty { null }
 
   private fun toInPrisonWorkOther(inPrisonInterests: InPrisonInterests) =
     inPrisonInterests.inPrisonWorkInterests.firstOrNull { it.workType == InPrisonWorkTypeDomain.OTHER }?.workTypeOther

@@ -13,10 +13,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Reaso
 fun aValidCreateCiagInductionRequest(
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
   prisonId: String = "BXI",
-  reasonToNotGetWorkOther: String? = "Crime pays",
-  abilityToWorkOther: String? = "Lack of interest",
   abilityToWork: Set<AbilityToWorkFactor>? = setOf(AbilityToWorkFactor.OTHER),
+  abilityToWorkOther: String? = "Lack of interest",
   reasonToNotGetWork: Set<ReasonNotToWork>? = setOf(ReasonNotToWork.OTHER),
+  reasonToNotGetWorkOther: String? = "Crime pays",
   workExperience: CreatePreviousWorkRequest? = aValidCreatePreviousWorkRequest(),
   skillsAndInterests: CreateSkillsAndInterestsRequest? = aValidCreateSkillsAndInterestsRequest(),
   qualificationsAndTraining: CreateEducationAndQualificationsRequest? = aValidCreateEducationAndQualificationsRequest(),

@@ -159,6 +159,16 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     return this
   }
 
+  fun wasLastModifiedAt(expected: OffsetDateTime): CiagInductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (modifiedDateTime != expected) {
+        failWithMessage("Expected modifiedDateTime to be $expected, but was $modifiedDateTime")
+      }
+    }
+    return this
+  }
+
   fun wasLastModifiedAfter(dateTime: OffsetDateTime): CiagInductionResponseAssert {
     isNotNull
     with(actual!!) {

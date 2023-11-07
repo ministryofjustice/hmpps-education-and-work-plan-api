@@ -55,7 +55,7 @@ class QualificationsAndTrainingResourceMapperTest {
     // Given
     val prisonId = "BXI"
     val request = aValidCreateEducationAndQualificationsRequest()
-    val expectedTrainingTypes = listOf(TrainingTypeDomain.CSCS_CARD, TrainingTypeDomain.OTHER)
+    val expectedTrainingTypes = listOf(TrainingTypeDomain.OTHER)
 
     // When
     val actual = mapper.toCreatePreviousTrainingDto(request, prisonId)
@@ -168,7 +168,7 @@ class QualificationsAndTrainingResourceMapperTest {
     val expectedResponse = aValidEducationAndQualificationsResponse(
       id = training.reference,
       educationLevel = HighestEducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = emptySet(),
+      qualifications = null,
       additionalTraining = emptySet(),
       additionalTrainingOther = null,
       modifiedBy = "bjones_gen",

@@ -48,7 +48,6 @@ class PreviousQualificationsEntity(
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
   var educationLevel: HighestEducationLevel? = null,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
