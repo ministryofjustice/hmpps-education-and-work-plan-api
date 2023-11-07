@@ -16,7 +16,7 @@ fun aValidEducationAndQualificationsResponse(
   ),
   additionalTraining: Set<TrainingType>? = setOf(TrainingType.CSCS_CARD, TrainingType.OTHER),
   additionalTrainingOther: String? = "Any training",
-  modifiedBy: String = "asmith_gen",
+  modifiedBy: String = "auser_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): EducationAndQualificationResponse =
   EducationAndQualificationResponse(

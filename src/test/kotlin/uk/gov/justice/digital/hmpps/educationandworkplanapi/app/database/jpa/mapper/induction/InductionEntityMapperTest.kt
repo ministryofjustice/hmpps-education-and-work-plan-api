@@ -162,7 +162,7 @@ class InductionEntityMapperTest {
   }
 
   @Test
-  fun `should update induction`() {
+  fun `should update induction and call related mappers`() {
     // Given
     val inductionReference = UUID.randomUUID()
     val prisonNumber = aValidPrisonNumber()

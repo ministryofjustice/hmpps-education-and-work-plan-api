@@ -9,7 +9,6 @@ private val IGNORED_FIELDS = arrayOf(
   ".*createdDateTime",
   ".*updatedAt",
   ".*modifiedDateTime",
-  ".*modifiedBy",
 )
 
 /**

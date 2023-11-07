@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Ind
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInductionDto
 
 @ExtendWith(MockitoExtension::class)
 class InductionServiceTest {
@@ -77,12 +78,11 @@ class InductionServiceTest {
   @Test
   fun `should fail to get induction for prisoner given induction does not exist`() {
     // Given
-    val prisonNumber = "A1234AB"
     given(persistenceAdapter.getInduction(any())).willReturn(null)
 
     // When
     val exception = catchThrowableOfType(
-      { service.getInductionForPrisoner(Companion.prisonNumber) },
+      { service.getInductionForPrisoner(prisonNumber) },
       InductionNotFoundException::class.java,
     )
 
@@ -90,5 +90,37 @@ class InductionServiceTest {
     assertThat(exception).hasMessage("Induction not found for prisoner [$prisonNumber]")
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     verify(persistenceAdapter).getInduction(prisonNumber)
+  }
+
+  @Test
+  fun `should update induction`() {
+    // Given
+    val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
+    val expected = aValidInduction(prisonNumber = prisonNumber)
+    given(persistenceAdapter.updateInduction(any())).willReturn(expected)
+
+    // When
+    val actual = service.updateInduction(updateInductionDto)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+    verify(persistenceAdapter).updateInduction(updateInductionDto)
+  }
+
+  @Test
+  fun `should fail to update induction given it does not exist`() {
+    // Given
+    val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
+    given(persistenceAdapter.updateInduction(any())).willReturn(null)
+
+    // When
+    val exception = catchThrowableOfType(
+      { service.updateInduction(updateInductionDto) },
+      InductionNotFoundException::class.java,
+    )
+
+    // Then
+    assertThat(exception).hasMessage("Induction not found for prisoner [$prisonNumber]")
+    verify(persistenceAdapter).updateInduction(updateInductionDto)
   }
 }

@@ -5,6 +5,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Abili
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
+import java.time.OffsetDateTime
+import java.util.UUID
 
 fun assertThat(actual: CiagInductionResponse?) = CiagInductionResponseAssert(actual)
 
@@ -22,6 +24,16 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     with(actual!!) {
       if (reference == null) {
         failWithMessage("Expected reference to have a value, but was null")
+      }
+    }
+    return this
+  }
+
+  fun hasReference(expected: UUID): CiagInductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (reference != expected) {
+        failWithMessage("Expected reference to be $expected, but was $reference")
       }
     }
     return this
@@ -67,6 +79,16 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     return this
   }
 
+  fun hasNoReasonToNotGetWorkOther(): CiagInductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (reasonToNotGetWorkOther != null) {
+        failWithMessage("Expected reasonToNotGetWorkOther to be null, but was $reasonToNotGetWorkOther")
+      }
+    }
+    return this
+  }
+
   fun hasAbilityToWork(expected: Set<AbilityToWorkFactor>): CiagInductionResponseAssert {
     isNotNull
     with(actual!!) {
@@ -82,6 +104,16 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     with(actual!!) {
       if (abilityToWorkOther != expected) {
         failWithMessage("Expected abilityToWorkOther to be $expected, but was $abilityToWorkOther")
+      }
+    }
+    return this
+  }
+
+  fun hasNoAbilityToWorkOther(): CiagInductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (abilityToWorkOther != null) {
+        failWithMessage("Expected abilityToWorkOther to be null, but was $abilityToWorkOther")
       }
     }
     return this
@@ -107,11 +139,31 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     return this
   }
 
+  fun wasCreatedAt(expected: OffsetDateTime): CiagInductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdDateTime != expected) {
+        failWithMessage("Expected createdDateTime to be $expected, but was $createdDateTime")
+      }
+    }
+    return this
+  }
+
   fun hasAModifiedDateTime(): CiagInductionResponseAssert {
     isNotNull
     with(actual!!) {
       if (modifiedDateTime == null) {
         failWithMessage("Expected modifiedDateTime to have a value, but was null")
+      }
+    }
+    return this
+  }
+
+  fun wasLastModifiedAfter(dateTime: OffsetDateTime): CiagInductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (!modifiedDateTime.isAfter(dateTime)) {
+        failWithMessage("Expected modifiedDateTime to be after $dateTime, but was $modifiedDateTime")
       }
     }
     return this

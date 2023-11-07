@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionPersistenceAdapter
 
 @Component
@@ -25,4 +26,15 @@ class JpaInductionPersistenceAdapter(
     inductionRepository.findByPrisonNumber(prisonNumber)?.let {
       inductionMapper.fromEntityToDomain(it)
     }
+
+  @Transactional
+  override fun updateInduction(updateInductionDto: UpdateInductionDto): Induction? {
+    val inductionEntity = inductionRepository.findByPrisonNumber(updateInductionDto.prisonNumber)
+    return if (inductionEntity != null) {
+      inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
+      inductionMapper.fromEntityToDomain(inductionEntity)
+    } else {
+      null
+    }
+  }
 }

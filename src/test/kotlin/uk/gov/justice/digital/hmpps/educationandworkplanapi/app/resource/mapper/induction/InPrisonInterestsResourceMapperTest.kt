@@ -73,6 +73,7 @@ class InPrisonInterestsResourceMapperTest {
       inPrisonEducation = setOf(InPrisonTrainingTypeApi.OTHER),
       inPrisonEducationOther = "Any in-prison training",
       modifiedDateTime = modifiedDateTime,
+      modifiedBy = "bjones_gen",
     )
 
     // When
@@ -98,6 +99,7 @@ class InPrisonInterestsResourceMapperTest {
       inPrisonEducation = emptySet(),
       inPrisonEducationOther = null,
       modifiedDateTime = modifiedDateTime,
+      modifiedBy = "bjones_gen",
     )
 
     // When

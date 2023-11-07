@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
@@ -11,7 +10,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -22,7 +20,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class GetInductionTest : IntegrationTestBase() {
 
@@ -95,16 +92,5 @@ class GetInductionTest : IntegrationTestBase() {
     assertThat(actual.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
     assertThat(actual.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
     assertThat(actual.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
-  }
-
-  private fun createInduction(prisonNumber: String, createCiagInductionRequest: CreateCiagInductionRequest) {
-    webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createCiagInductionRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
   }
 }

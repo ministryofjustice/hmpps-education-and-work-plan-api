@@ -14,7 +14,7 @@ fun aValidPreviousWorkResponse(
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
   workInterests: WorkInterests? = aValidWorkInterests(),
-  modifiedBy: String = "bjones_gen",
+  modifiedBy: String = "auser_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): PreviousWorkResponse =
   PreviousWorkResponse(

@@ -92,6 +92,7 @@ class PreviousWorkExperiencesResourceMapperTest {
         ),
       ),
       modifiedDateTime = workExperiences.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+      modifiedBy = "bjones_gen",
     )
 
     // When
@@ -130,6 +131,7 @@ class PreviousWorkExperiencesResourceMapperTest {
       ),
       workInterests = null,
       modifiedDateTime = workExperiences.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+      modifiedBy = "bjones_gen",
     )
 
     // When
@@ -175,6 +177,7 @@ class PreviousWorkExperiencesResourceMapperTest {
         particularJobInterests = emptySet(),
       ),
       modifiedDateTime = workExperiences.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+      modifiedBy = "bjones_gen",
     )
 
     // When

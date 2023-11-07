@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.se
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 
 /**
  * Persistence Adapter for [Induction] instances.
@@ -19,10 +20,15 @@ interface InductionPersistenceAdapter {
    *
    * @return The [Induction] with any newly generated values (if applicable).
    */
-  fun createInduction(induction: CreateInductionDto): Induction
+  fun createInduction(createInductionDto: CreateInductionDto): Induction
 
   /**
    * Retrieves an [Induction] for a given Prisoner. Returns `null` if the [Induction] does not exist.
    */
   fun getInduction(prisonNumber: String): Induction?
+
+  /**
+   * Updates an [Induction] identified by its `prisonNumber`.
+   */
+  fun updateInduction(updateInductionDto: UpdateInductionDto): Induction?
 }
