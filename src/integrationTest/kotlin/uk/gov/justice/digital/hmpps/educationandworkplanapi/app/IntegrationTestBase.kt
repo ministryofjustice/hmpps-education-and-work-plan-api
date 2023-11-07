@@ -5,6 +5,7 @@ import com.microsoft.applicationinsights.TelemetryClient
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.boot.test.mock.mockito.SpyBean
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("integration-test")
+@AutoConfigureWebTestClient(timeout = "PT1M")
 abstract class IntegrationTestBase {
 
   companion object {
