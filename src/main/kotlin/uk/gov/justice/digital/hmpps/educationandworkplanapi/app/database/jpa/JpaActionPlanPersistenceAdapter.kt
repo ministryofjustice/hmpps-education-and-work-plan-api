@@ -17,7 +17,7 @@ class JpaActionPlanPersistenceAdapter(
 
   @Transactional
   override fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
-    val persistedEntity = actionPlanRepository.save(actionPlanMapper.fromDtoToEntity(createActionPlanDto))
+    val persistedEntity = actionPlanRepository.saveAndFlush(actionPlanMapper.fromDtoToEntity(createActionPlanDto))
     return actionPlanMapper.fromEntityToDomain(persistedEntity)
   }
 

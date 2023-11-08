@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelinePersistenceAdapter
@@ -40,6 +41,9 @@ class DomainConfiguration {
     TimelineService(timelinePersistenceAdapter)
 
   @Bean
-  fun inductionDomainService(inductionPersistenceAdapter: InductionPersistenceAdapter): InductionService =
-    InductionService(inductionPersistenceAdapter)
+  fun inductionDomainService(
+    inductionPersistenceAdapter: InductionPersistenceAdapter,
+    inductionEventService: InductionEventService,
+  ): InductionService =
+    InductionService(inductionPersistenceAdapter, inductionEventService)
 }

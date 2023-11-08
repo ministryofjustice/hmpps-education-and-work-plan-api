@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
@@ -25,6 +26,9 @@ class InductionServiceTest {
   @Mock
   private lateinit var persistenceAdapter: InductionPersistenceAdapter
 
+  @Mock
+  private lateinit var inductionEventService: InductionEventService
+
   companion object {
     private const val prisonNumber = "A1234AB"
   }
@@ -33,7 +37,9 @@ class InductionServiceTest {
   fun `should create induction`() {
     // Given
     val createInductionDto = aValidCreateInductionDto()
+    val induction = aValidInduction()
     given(persistenceAdapter.getInduction(any())).willReturn(null)
+    given(persistenceAdapter.createInduction(any())).willReturn(induction)
 
     // When
     service.createInduction(createInductionDto)
@@ -41,6 +47,7 @@ class InductionServiceTest {
     // Then
     verify(persistenceAdapter).getInduction(prisonNumber)
     verify(persistenceAdapter).createInduction(createInductionDto)
+    verify(inductionEventService).inductionCreated(induction)
   }
 
   @Test
@@ -59,6 +66,7 @@ class InductionServiceTest {
     // Then
     assertThat(exception.message).isEqualTo("An Induction already exists for prisoner $prisonNumber")
     verify(persistenceAdapter).getInduction(prisonNumber)
+    verifyNoInteractions(inductionEventService)
   }
 
   @Test
@@ -105,6 +113,7 @@ class InductionServiceTest {
     // Then
     assertThat(actual).isEqualTo(expected)
     verify(persistenceAdapter).updateInduction(updateInductionDto)
+    verify(inductionEventService).inductionUpdated(expected)
   }
 
   @Test
@@ -122,5 +131,6 @@ class InductionServiceTest {
     // Then
     assertThat(exception).hasMessage("Induction not found for prisoner [$prisonNumber]")
     verify(persistenceAdapter).updateInduction(updateInductionDto)
+    verifyNoInteractions(inductionEventService)
   }
 }
