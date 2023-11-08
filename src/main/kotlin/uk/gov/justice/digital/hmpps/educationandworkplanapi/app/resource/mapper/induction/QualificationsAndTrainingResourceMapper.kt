@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.NullValueMappingStrategy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousQualifications
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousTraining
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
@@ -22,8 +23,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Tra
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel as HighestEducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType as TrainingTypeApi
 
-@Mapper
+@Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 abstract class QualificationsAndTrainingResourceMapper {
+
   abstract fun toCreatePreviousQualificationsDto(
     request: CreateEducationAndQualificationsRequest?,
     prisonId: String,
@@ -61,7 +63,7 @@ abstract class QualificationsAndTrainingResourceMapper {
   abstract fun toHighestEducationLevelApi(educationLevel: HighestEducationLevelDomain?): HighestEducationLevelApi?
 
   private fun toAchievedQualifications(qualifications: List<Qualification>?): Set<AchievedQualification>? =
-    qualifications?.map { toAchievedQualification(it) }?.toSet()
+    qualifications?.map { toAchievedQualification(it) }?.toSet()?.ifEmpty { null }
 
   private fun toAchievedQualification(qualification: Qualification): AchievedQualification =
     with(qualification) {
@@ -78,7 +80,7 @@ abstract class QualificationsAndTrainingResourceMapper {
 
   @Mapping(target = "reference", source = "request.id")
   abstract fun toUpdatePreviousQualificationsDto(
-    request: UpdateEducationAndQualificationsRequest?,
+    request: UpdateEducationAndQualificationsRequest,
     prisonId: String,
   ): UpdatePreviousQualificationsDto?
 

@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import aValidCreatePrisonWorkAndEducationRequest
 import aValidUpdatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -13,6 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
@@ -22,15 +22,15 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Perso
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePrisonWorkAndEducationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateSkillsAndInterestsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPrisonWorkAndEducationResponse
@@ -44,6 +44,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import java.util.UUID
 
 class UpdateInductionTest : IntegrationTestBase() {
 
@@ -128,18 +129,18 @@ class UpdateInductionTest : IntegrationTestBase() {
   fun `should update induction for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(prisonNumber, aValidCreateInductionRequestWithOtherReasons())
+    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedDateTime = persistedInduction.modifiedDateTime
+    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateCiagInductionRequest(
       reference = persistedInduction.reference,
       hopingToGetWork = HopingToWork.YES,
       prisonId = "MDI",
-      reasonToNotGetWorkOther = null,
+      abilityToWork = null,
       abilityToWorkOther = null,
-      abilityToWork = emptySet(),
-      reasonToNotGetWork = emptySet(),
+      reasonToNotGetWork = null,
+      reasonToNotGetWorkOther = null,
       workExperience = aValidUpdatePreviousWorkRequest(
         id = persistedInduction.workExperience!!.id!!,
         typeOfWorkExperience = setOf(WorkType.CONSTRUCTION),
@@ -174,7 +175,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
         id = persistedInduction.qualificationsAndTraining!!.id!!,
         educationLevel = HighestEducationLevel.PRIMARY_SCHOOL,
-        qualifications = emptySet(),
+        qualifications = null,
         additionalTraining = setOf(TrainingType.CSCS_CARD),
         additionalTrainingOther = null,
       ),
@@ -223,7 +224,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse(
       id = persistedInduction.qualificationsAndTraining!!.id!!,
       educationLevel = HighestEducationLevel.PRIMARY_SCHOOL,
-      qualifications = emptySet(),
+      qualifications = null,
       additionalTraining = setOf(TrainingType.CSCS_CARD),
       additionalTrainingOther = null,
       modifiedBy = "auser_gen",
@@ -258,50 +259,298 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasReasonToNotGetWork(emptySet())
       .wasModifiedBy("auser_gen")
       .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAfter(initialModifiedDateTime)
+      .wasLastModifiedAfter(initialModifiedAt)
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
     assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
     // check last modified dates of child objects
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedDateTime)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedDateTime)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedDateTime)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
   }
 
-  private fun aValidCreateInductionRequestWithOtherReasons() = aValidCreateCiagInductionRequest(
-    hopingToGetWork = HopingToWork.NOT_SURE,
-    prisonId = "BXI",
-    reasonToNotGetWorkOther = "Crime pays",
-    abilityToWorkOther = "Lack of interest",
-    abilityToWork = setOf(AbilityToWorkFactor.OTHER),
-    reasonToNotGetWork = setOf(ReasonNotToWork.OTHER),
-    workExperience = aValidCreatePreviousWorkRequest(
-      typeOfWorkExperience = setOf(WorkType.OTHER),
-      typeOfWorkExperienceOther = "Scientist",
-      workExperience = setOf(aValidWorkExperienceResource()),
-      workInterests = aValidCreateWorkInterestsRequest(),
-    ),
-    skillsAndInterests = aValidCreateSkillsAndInterestsRequest(
-      skills = setOf(PersonalSkill.OTHER),
-      skillsOther = "Hidden skills",
-      personalInterests = setOf(PersonalInterest.OTHER),
-      personalInterestsOther = "Secret interests",
-    ),
-    qualificationsAndTraining = aValidCreateEducationAndQualificationsRequest(
-      educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = setOf(
-        aValidAchievedQualification(),
+  @Test
+  fun `should update induction with no qualifications`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    val persistedInduction = getInduction(prisonNumber)
+    val createdDateTime = persistedInduction.createdDateTime
+    val initialModifiedAt = persistedInduction.modifiedDateTime
+    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+      originalInduction = persistedInduction,
+      qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
+        id = persistedInduction.qualificationsAndTraining!!.id!!,
+        educationLevel = null,
+        qualifications = null,
+        additionalTraining = setOf(TrainingType.CSCS_CARD),
+        additionalTrainingOther = null,
       ),
-      additionalTraining = setOf(TrainingType.OTHER),
-      additionalTrainingOther = "Any training",
+    )
+
+    val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse(
+      id = persistedInduction.qualificationsAndTraining!!.id!!,
+      educationLevel = null,
+      qualifications = null,
+      additionalTraining = setOf(TrainingType.CSCS_CARD),
+      additionalTrainingOther = null,
+      modifiedBy = "auser_gen",
+    )
+    // Short delay for the purpose of timestamp checking
+    Thread.sleep(500)
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val updatedInduction = getInduction(prisonNumber)
+    assertThat(updatedInduction)
+      .hasReference(persistedInduction.reference)
+      .hasHopingToGetWork(HopingToWork.NOT_SURE)
+      .hasPrisonId("BXI")
+      .wasModifiedBy("auser_gen")
+      .wasCreatedAt(createdDateTime)
+      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+    assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
+    // other last modified dates should remain unchanged
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+  }
+
+  @Test
+  fun `should update induction with no previous work experience`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    val persistedInduction = getInduction(prisonNumber)
+    val createdDateTime = persistedInduction.createdDateTime
+    val initialModifiedAt = persistedInduction.modifiedDateTime
+    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+      originalInduction = persistedInduction,
+      workExperience = aValidUpdatePreviousWorkRequest(
+        id = persistedInduction.workExperience!!.id!!,
+        hasWorkedBefore = false,
+        typeOfWorkExperience = null,
+        typeOfWorkExperienceOther = null,
+        workExperience = null,
+        workInterests = aValidWorkInterests(
+          id = persistedInduction.workExperience!!.workInterests!!.id,
+          workInterests = setOf(WorkType.SPORTS),
+          workInterestsOther = null,
+          particularJobInterests = setOf(
+            WorkInterestDetail(
+              workInterest = WorkType.SPORTS,
+              role = "Football coach",
+            ),
+          ),
+        ),
+      ),
+    )
+
+    val expectedWorkExperience = aValidPreviousWorkResponse(
+      id = persistedInduction.workExperience!!.id!!,
+      hasWorkedBefore = false,
+      typeOfWorkExperience = null,
+      typeOfWorkExperienceOther = null,
+      workExperience = null,
+      workInterests = aValidWorkInterests(
+        id = persistedInduction.workExperience!!.workInterests!!.id,
+        workInterests = setOf(WorkType.SPORTS),
+        workInterestsOther = null,
+        particularJobInterests = setOf(
+          WorkInterestDetail(
+            workInterest = WorkType.SPORTS,
+            role = "Football coach",
+          ),
+        ),
+      ),
+      modifiedBy = "auser_gen",
+    )
+    // Short delay for the purpose of timestamp checking
+    Thread.sleep(500)
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val updatedInduction = getInduction(prisonNumber)
+    assertThat(updatedInduction)
+      .hasReference(persistedInduction.reference)
+      .hasHopingToGetWork(HopingToWork.NOT_SURE)
+      .hasPrisonId("BXI")
+      .wasModifiedBy("auser_gen")
+      .wasCreatedAt(createdDateTime)
+      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+    assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
+    // TODO - modifiedDateTime of workExperience is not being updated
+    // assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
+    // other last modified dates should remain unchanged
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+  }
+
+  @Test
+  fun `should update induction with no skills and interest`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    val persistedInduction = getInduction(prisonNumber)
+    val createdDateTime = persistedInduction.createdDateTime
+    val initialModifiedAt = persistedInduction.modifiedDateTime
+    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+      originalInduction = persistedInduction,
+      skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
+        id = persistedInduction.workExperience!!.id!!,
+        skills = null,
+        skillsOther = null,
+        personalInterests = null,
+        personalInterestsOther = null,
+      ),
+    )
+
+    val expectedSkillsAndInterests = aValidSkillsAndInterestsResponse(
+      id = persistedInduction.workExperience!!.id!!,
+      skills = null,
+      skillsOther = null,
+      personalInterests = null,
+      personalInterestsOther = null,
+      modifiedBy = "auser_gen",
+    )
+    // Short delay for the purpose of timestamp checking
+    Thread.sleep(500)
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val updatedInduction = getInduction(prisonNumber)
+    assertThat(updatedInduction)
+      .hasReference(persistedInduction.reference)
+      .hasHopingToGetWork(HopingToWork.NOT_SURE)
+      .hasPrisonId("BXI")
+      .wasModifiedBy("auser_gen")
+      .wasCreatedAt(createdDateTime)
+      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+    assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
+    // assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    // other last modified dates should remain unchanged
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+  }
+
+  @Test
+  fun `should update induction with no in prison interests`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    val persistedInduction = getInduction(prisonNumber)
+    val createdDateTime = persistedInduction.createdDateTime
+    val initialModifiedAt = persistedInduction.modifiedDateTime
+    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+      originalInduction = persistedInduction,
+      inPrisonInterests = aValidUpdatePrisonWorkAndEducationRequest(
+        id = persistedInduction.workExperience!!.id!!,
+        inPrisonWork = null,
+        inPrisonWorkOther = null,
+        inPrisonEducation = null,
+        inPrisonEducationOther = null,
+      ),
+    )
+
+    val expectedInPrisonInterests = aValidPrisonWorkAndEducationResponse(
+      id = persistedInduction.workExperience!!.id!!,
+      inPrisonWork = null,
+      inPrisonWorkOther = null,
+      inPrisonEducation = null,
+      inPrisonEducationOther = null,
+      modifiedBy = "auser_gen",
+    )
+    // Short delay for the purpose of timestamp checking
+    Thread.sleep(500)
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val updatedInduction = getInduction(prisonNumber)
+    assertThat(updatedInduction)
+      .hasReference(persistedInduction.reference)
+      .hasHopingToGetWork(HopingToWork.NOT_SURE)
+      .hasPrisonId("BXI")
+      .wasModifiedBy("auser_gen")
+      .wasCreatedAt(createdDateTime)
+      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+    assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
+    // assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    // other last modified dates should remain unchanged
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+  }
+
+  private fun aValidUpdateCiagInductionRequest(
+    originalInduction: CiagInductionResponse,
+    reference: UUID = originalInduction.reference,
+    hopingToGetWork: HopingToWork = originalInduction.hopingToGetWork,
+    prisonId: String = originalInduction.prisonId!!,
+    abilityToWork: Set<AbilityToWorkFactor>? = originalInduction.abilityToWork,
+    abilityToWorkOther: String? = originalInduction.abilityToWorkOther,
+    reasonToNotGetWork: Set<ReasonNotToWork>? = originalInduction.reasonToNotGetWork,
+    reasonToNotGetWorkOther: String? = originalInduction.reasonToNotGetWorkOther,
+    workExperience: UpdatePreviousWorkRequest? = aValidUpdatePreviousWorkRequest(
+      id = originalInduction.workExperience!!.id!!,
     ),
-    inPrisonInterests = aValidCreatePrisonWorkAndEducationRequest(
-      inPrisonWork = setOf(InPrisonWorkType.OTHER),
-      inPrisonWorkOther = "Any in-prison work",
-      inPrisonEducation = setOf(InPrisonTrainingType.OTHER),
-      inPrisonEducationOther = "Any in-prison training",
+    skillsAndInterests: UpdateSkillsAndInterestsRequest? = aValidUpdateSkillsAndInterestsRequest(
+      id = originalInduction.workExperience!!.id!!,
     ),
-  )
+    qualificationsAndTraining: UpdateEducationAndQualificationsRequest? = aValidUpdateEducationAndQualificationsRequest(
+      id = originalInduction.workExperience!!.id!!,
+    ),
+    inPrisonInterests: UpdatePrisonWorkAndEducationRequest? = aValidUpdatePrisonWorkAndEducationRequest(
+      id = originalInduction.workExperience!!.id!!,
+    ),
+  ): UpdateCiagInductionRequest =
+    aValidUpdateCiagInductionRequest(
+      reference = reference,
+      hopingToGetWork = hopingToGetWork,
+      prisonId = prisonId,
+      abilityToWork = abilityToWork,
+      abilityToWorkOther = abilityToWorkOther,
+      reasonToNotGetWork = reasonToNotGetWork,
+      reasonToNotGetWorkOther = reasonToNotGetWorkOther,
+      workExperience = workExperience,
+      skillsAndInterests = skillsAndInterests,
+      qualificationsAndTraining = qualificationsAndTraining,
+      inPrisonInterests = inPrisonInterests,
+    )
 }

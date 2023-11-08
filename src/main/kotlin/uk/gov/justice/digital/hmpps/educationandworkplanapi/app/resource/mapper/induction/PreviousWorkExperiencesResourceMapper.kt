@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.NullValueMappingStrategy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.FutureWorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperienceType
@@ -22,7 +23,7 @@ import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperience as WorkExperienceDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience as WorkExperienceApi
 
-@Mapper
+@Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 abstract class PreviousWorkExperiencesResourceMapper {
   @Mapping(target = "experiences", source = "request.workExperience")
   abstract fun toCreatePreviousWorkExperiencesDto(
@@ -43,9 +44,9 @@ abstract class PreviousWorkExperiencesResourceMapper {
         // In the CIAG API, workInterests are effectively a child of workExperience, so we use the latter as the parent/primary object.
         id = workExperiences.reference,
         hasWorkedBefore = workExperiences.experiences.isNotEmpty(),
-        typeOfWorkExperience = workExperiences.experiences.map { toWorkTypeApi(it.experienceType) }.toSet(),
+        typeOfWorkExperience = workExperiences.experiences.map { toWorkTypeApi(it.experienceType) }.toSet().ifEmpty { null },
         typeOfWorkExperienceOther = toTypeOfWorkExperienceOther(workExperiences),
-        workExperience = workExperiences.experiences.map { toWorkExperienceApi(it) }.toSet(),
+        workExperience = workExperiences.experiences.map { toWorkExperienceApi(it) }.toSet().ifEmpty { null },
         workInterests = toWorkInterestsResponse(workInterests),
         modifiedBy = workExperiences.lastUpdatedBy!!,
         modifiedDateTime = toOffsetDateTime(workExperiences.lastUpdatedAt)!!,

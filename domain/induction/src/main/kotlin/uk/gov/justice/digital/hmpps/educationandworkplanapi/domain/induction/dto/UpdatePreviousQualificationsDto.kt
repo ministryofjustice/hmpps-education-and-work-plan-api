@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class UpdatePreviousQualificationsDto(
   val reference: UUID,
-  val educationLevel: HighestEducationLevel,
+  val educationLevel: HighestEducationLevel?,
   val qualifications: List<Qualification>,
   val prisonId: String,
 )
