@@ -39,7 +39,7 @@ class JpaInductionPersistenceAdapterTest {
     val inductionEntity = aValidInductionEntity(prisonNumber = prisonNumber)
     val expected = aValidInduction(prisonNumber = prisonNumber)
     given(inductionMapper.fromCreateDtoToEntity(any())).willReturn(inductionEntity)
-    given(inductionRepository.save(any<InductionEntity>())).willReturn(inductionEntity)
+    given(inductionRepository.saveAndFlush(any<InductionEntity>())).willReturn(inductionEntity)
     given(inductionMapper.fromEntityToDomain(any())).willReturn(expected)
 
     // When
@@ -48,7 +48,7 @@ class JpaInductionPersistenceAdapterTest {
     // Then
     assertThat(actual).isEqualTo(expected)
     verify(inductionMapper).fromCreateDtoToEntity(createInductionDto)
-    verify(inductionRepository).save(inductionEntity)
+    verify(inductionRepository).saveAndFlush(inductionEntity)
     verify(inductionMapper).fromEntityToDomain(inductionEntity)
   }
 

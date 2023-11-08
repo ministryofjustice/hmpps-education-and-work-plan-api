@@ -20,6 +20,7 @@ private val log = KotlinLogging.logger {}
  */
 class InductionService(
   private val persistenceAdapter: InductionPersistenceAdapter,
+  private val inductionEventService: InductionEventService,
 ) {
 
   /**
@@ -34,6 +35,9 @@ class InductionService(
       }
 
       return persistenceAdapter.createInduction(createInductionDto)
+        .also {
+          inductionEventService.inductionCreated(it)
+        }
     }
 
   /**
@@ -52,6 +56,9 @@ class InductionService(
     log.info { "Updating Induction for prisoner [$prisonNumber]" }
 
     return persistenceAdapter.updateInduction(updateInductionDto)
+      ?.also {
+        inductionEventService.inductionUpdated(it)
+      }
       ?: throw InductionNotFoundException(prisonNumber).also {
         log.info { "Induction for prisoner [$prisonNumber] not found" }
       }
