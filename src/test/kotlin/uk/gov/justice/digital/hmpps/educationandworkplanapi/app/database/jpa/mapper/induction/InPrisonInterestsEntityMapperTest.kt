@@ -23,13 +23,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 class InPrisonInterestsEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: InPrisonInterestsEntityMapperImpl
+  private val mapper = InPrisonInterestsEntityMapperImpl()
 
   @Mock
-  private lateinit var inPrisonWorkInterestEntityMapper: InPrisonWorkInterestEntityMapper
+  private lateinit var workInterestEntityMapper: InPrisonWorkInterestEntityMapper
 
   @Mock
-  private lateinit var inPrisonTrainingInterestEntityMapper: InPrisonTrainingInterestEntityMapper
+  private lateinit var trainingInterestEntityMapper: InPrisonTrainingInterestEntityMapper
 
   @Test
   fun `should map from dto to entity`() {
@@ -43,8 +43,8 @@ class InPrisonInterestsEntityMapperTest {
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    given(inPrisonWorkInterestEntityMapper.fromDomainToEntity(any())).willReturn(expectedInPrisonWorkInterestEntity)
-    given(inPrisonTrainingInterestEntityMapper.fromDomainToEntity(any())).willReturn(
+    given(workInterestEntityMapper.fromDomainToEntity(any())).willReturn(expectedInPrisonWorkInterestEntity)
+    given(trainingInterestEntityMapper.fromDomainToEntity(any())).willReturn(
       expectedInPrisonTrainingInterestEntity,
     )
 
@@ -58,8 +58,8 @@ class InPrisonInterestsEntityMapperTest {
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
-    verify(inPrisonWorkInterestEntityMapper).fromDomainToEntity(createInPrisonInterestsDto.inPrisonWorkInterests[0])
-    verify(inPrisonTrainingInterestEntityMapper).fromDomainToEntity(createInPrisonInterestsDto.inPrisonTrainingInterests[0])
+    verify(workInterestEntityMapper).fromDomainToEntity(createInPrisonInterestsDto.inPrisonWorkInterests[0])
+    verify(trainingInterestEntityMapper).fromDomainToEntity(createInPrisonInterestsDto.inPrisonTrainingInterests[0])
   }
 
   @Test
@@ -82,15 +82,15 @@ class InPrisonInterestsEntityMapperTest {
       lastUpdatedByDisplayName = inPrisonInterestsEntity.updatedByDisplayName!!,
     )
 
-    given(inPrisonWorkInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedWorkInterest)
-    given(inPrisonTrainingInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedTrainingInterest)
+    given(workInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedWorkInterest)
+    given(trainingInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedTrainingInterest)
 
     // When
     val actual = mapper.fromEntityToDomain(inPrisonInterestsEntity)
 
     // Then
     assertThat(actual).isEqualTo(expectedInPrisonInterests)
-    verify(inPrisonWorkInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonWorkInterests!![0])
-    verify(inPrisonTrainingInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonTrainingInterests!![0])
+    verify(workInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonWorkInterests!![0])
+    verify(trainingInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonTrainingInterests!![0])
   }
 }

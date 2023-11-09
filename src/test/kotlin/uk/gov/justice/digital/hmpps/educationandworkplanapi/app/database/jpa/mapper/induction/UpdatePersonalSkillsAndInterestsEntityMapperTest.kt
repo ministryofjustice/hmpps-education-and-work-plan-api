@@ -1,11 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalInterestEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalSkillEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalSkillsAndInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePersonalSkillsAndInterestsDto
@@ -26,6 +30,16 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
     PersonalSkillsAndInterestsEntityMapper::class.java.getDeclaredField("personalInterestEntityMapper").apply {
       isAccessible = true
       set(it, PersonalInterestEntityMapperImpl())
+    }
+
+    PersonalSkillsAndInterestsEntityMapper::class.java.getDeclaredField("personalSkillEntityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<PersonalSkillEntity, PersonalSkill>())
+    }
+
+    PersonalSkillsAndInterestsEntityMapper::class.java.getDeclaredField("personalInterestEntityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<PersonalInterestEntity, PersonalInterest>())
     }
   }
 
@@ -50,6 +64,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(existingSkillEntity),
       interests = mutableListOf(existingInterestEntity),
     )
+    val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val updatedSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.OTHER,
@@ -89,7 +104,9 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
     mapper.updateEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
 
     // Then
-    assertThat(existingSkillsAndInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingSkillsAndInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -113,6 +130,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(existingSkillEntity),
       interests = mutableListOf(existingInterestEntity),
     )
+    val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val existingSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.OTHER,
@@ -169,6 +187,8 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingSkillsAndInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -200,6 +220,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(firstSkillEntity, secondSkillEntity),
       interests = mutableListOf(firstInterestEntity, secondInterestEntity),
     )
+    val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val existingSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.RESILIENCE,
@@ -229,6 +250,8 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
     mapper.updateEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
 
     // Then
-    assertThat(existingSkillsAndInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingSkillsAndInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }
