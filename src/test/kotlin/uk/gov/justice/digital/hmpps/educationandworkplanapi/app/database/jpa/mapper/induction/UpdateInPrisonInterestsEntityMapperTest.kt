@@ -64,7 +64,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
       inPrisonWorkInterests = mutableListOf(existingWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(existingTrainingInterestEntity),
     )
-    val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
+    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val updatedWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -130,7 +130,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
       inPrisonWorkInterests = mutableListOf(existingWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(existingTrainingInterestEntity),
     )
-    val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
+    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val existingWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -220,7 +220,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
       inPrisonWorkInterests = mutableListOf(firstWorkInterestEntity, secondWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(firstTrainingInterestEntity, secondTrainingInterestEntity),
     )
-    val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
+    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val existingWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,

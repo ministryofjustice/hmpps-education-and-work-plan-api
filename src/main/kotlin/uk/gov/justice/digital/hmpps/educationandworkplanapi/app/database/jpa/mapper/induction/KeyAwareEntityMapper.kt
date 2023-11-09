@@ -9,5 +9,5 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Dom
 interface KeyAwareEntityMapper<ENTITY : EntityKeyAware, DOMAIN : DomainKeyAware> {
   fun updateEntityFromDomain(entity: ENTITY, domain: DOMAIN)
 
-  fun fromDomainToEntity(dto: DOMAIN): ENTITY
+  fun fromDomainToEntity(domain: DOMAIN): ENTITY
 }

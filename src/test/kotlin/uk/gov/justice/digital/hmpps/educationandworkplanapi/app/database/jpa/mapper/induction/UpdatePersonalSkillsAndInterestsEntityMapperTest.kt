@@ -64,7 +64,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(existingSkillEntity),
       interests = mutableListOf(existingInterestEntity),
     )
-    val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
+    // val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val updatedSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.OTHER,
@@ -130,7 +130,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(existingSkillEntity),
       interests = mutableListOf(existingInterestEntity),
     )
-    val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
+    // val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val existingSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.OTHER,
@@ -220,7 +220,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(firstSkillEntity, secondSkillEntity),
       interests = mutableListOf(firstInterestEntity, secondInterestEntity),
     )
-    val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
+    // val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val existingSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.RESILIENCE,
