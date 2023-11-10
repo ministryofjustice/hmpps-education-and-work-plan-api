@@ -6,14 +6,12 @@ import org.mapstruct.MappingTarget
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperience
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousWorkExperiencesDto
 
@@ -26,6 +24,9 @@ abstract class PreviousWorkExperiencesEntityMapper {
 
   @Autowired
   private lateinit var workExperienceEntityMapper: WorkExperienceEntityMapper
+
+  @Autowired
+  private lateinit var entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
@@ -56,63 +57,23 @@ abstract class PreviousWorkExperiencesEntityMapper {
     val existingExperiences = entity.experiences!!
     val updatedExperiences = dto.experiences
 
-    updateExistingExperiences(existingExperiences, updatedExperiences)
-    addNewExperiences(existingExperiences, updatedExperiences)
-    removeExperiences(existingExperiences, updatedExperiences)
+    entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
+    entityListManager.addNew(existingExperiences, updatedExperiences, workExperienceEntityMapper)
+    entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
 
     return existingExperiences
-  }
-
-  private fun updateExistingExperiences(
-    existingExperiences: MutableList<WorkExperienceEntity>,
-    updatedExperiences: List<WorkExperience>,
-  ) {
-    val updatedExperienceTypes = updatedExperiences.map { it.experienceType.name }
-    existingExperiences
-      .filter { experienceEntity -> updatedExperienceTypes.contains(experienceEntity.experienceType!!.name) }
-      .onEach { experienceEntity ->
-        workExperienceEntityMapper.updateEntityFromDomain(
-          experienceEntity,
-          updatedExperiences.first { updatedExperienceDto -> updatedExperienceDto.experienceType.name == experienceEntity.experienceType!!.name },
-        )
-      }
-  }
-
-  private fun addNewExperiences(
-    existingExperiences: MutableList<WorkExperienceEntity>,
-    updatedExperiences: List<WorkExperience>,
-  ) {
-    val currentExperienceTypes = existingExperiences.map { it.experienceType!!.name }
-    existingExperiences.addAll(
-      updatedExperiences
-        .filter { updatedExperienceDto -> !currentExperienceTypes.contains(updatedExperienceDto.experienceType.name) }
-        .map { newExperienceDto -> workExperienceEntityMapper.fromDomainToEntity(newExperienceDto) },
-    )
-  }
-
-  /**
-   * Remove any [WorkInterestEntity]s whose work type is not in the list of updated [WorkInterest]s.
-   */
-  private fun removeExperiences(
-    existingExperiences: MutableList<WorkExperienceEntity>,
-    updatedExperiences: List<WorkExperience>,
-  ) {
-    val updatedExperienceTypes = updatedExperiences.map { it.experienceType.name }
-    existingExperiences.removeIf { experienceEntity ->
-      !updatedExperienceTypes.contains(experienceEntity.experienceType!!.name)
-    }
   }
 }
 
 @Mapper
-interface WorkExperienceEntityMapper {
+interface WorkExperienceEntityMapper : KeyAwareEntityMapper<WorkExperienceEntity, WorkExperience> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity
+  override fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity
 
   fun fromEntityToDomain(persistedEntity: WorkExperienceEntity): WorkExperience
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
-  fun updateEntityFromDomain(@MappingTarget entity: WorkExperienceEntity, domain: WorkExperience)
+  override fun updateEntityFromDomain(@MappingTarget entity: WorkExperienceEntity, domain: WorkExperience)
 }

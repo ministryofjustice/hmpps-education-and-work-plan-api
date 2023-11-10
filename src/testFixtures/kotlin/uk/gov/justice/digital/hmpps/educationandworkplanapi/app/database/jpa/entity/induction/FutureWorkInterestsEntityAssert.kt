@@ -91,6 +91,16 @@ class FutureWorkInterestsEntityAssert(actual: FutureWorkInterestsEntity?) :
     return this
   }
 
+  fun wasUpdatedAfter(dateTime: Instant): FutureWorkInterestsEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (!updatedAt!!.isAfter(dateTime)) {
+        failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
   fun wasUpdatedAtPrison(expected: String): FutureWorkInterestsEntityAssert {
     isNotNull
     with(actual!!) {

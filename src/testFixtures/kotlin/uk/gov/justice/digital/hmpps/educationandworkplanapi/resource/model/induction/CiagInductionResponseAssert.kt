@@ -19,16 +19,6 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     CiagInductionResponseAssert::class.java,
   ) {
 
-  fun hasAReference(): CiagInductionResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to have a value, but was null")
-      }
-    }
-    return this
-  }
-
   fun hasReference(expected: UUID): CiagInductionResponseAssert {
     isNotNull
     with(actual!!) {
@@ -129,31 +119,11 @@ class CiagInductionResponseAssert(actual: CiagInductionResponse?) :
     return this
   }
 
-  fun hasACreatedDateTime(): CiagInductionResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (createdDateTime == null) {
-        failWithMessage("Expected createdDateTime to have a value, but was null")
-      }
-    }
-    return this
-  }
-
   fun wasCreatedAt(expected: OffsetDateTime): CiagInductionResponseAssert {
     isNotNull
     with(actual!!) {
       if (createdDateTime != expected) {
         failWithMessage("Expected createdDateTime to be $expected, but was $createdDateTime")
-      }
-    }
-    return this
-  }
-
-  fun hasAModifiedDateTime(): CiagInductionResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (modifiedDateTime == null) {
-        failWithMessage("Expected modifiedDateTime to have a value, but was null")
       }
     }
     return this
