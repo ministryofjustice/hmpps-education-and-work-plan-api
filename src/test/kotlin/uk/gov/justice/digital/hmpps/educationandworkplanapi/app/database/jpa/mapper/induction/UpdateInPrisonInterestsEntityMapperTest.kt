@@ -1,11 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonTrainingInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInPrisonTrainingInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInPrisonInterestsDto
@@ -18,14 +22,24 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InP
 class UpdateInPrisonInterestsEntityMapperTest {
 
   private val mapper = InPrisonInterestsEntityMapperImpl().also {
-    InPrisonInterestsEntityMapper::class.java.getDeclaredField("inPrisonWorkInterestEntityMapper").apply {
+    InPrisonInterestsEntityMapper::class.java.getDeclaredField("workInterestEntityMapper").apply {
       isAccessible = true
       set(it, InPrisonWorkInterestEntityMapperImpl())
     }
 
-    InPrisonInterestsEntityMapper::class.java.getDeclaredField("inPrisonTrainingInterestEntityMapper").apply {
+    InPrisonInterestsEntityMapper::class.java.getDeclaredField("trainingInterestEntityMapper").apply {
       isAccessible = true
       set(it, InPrisonTrainingInterestEntityMapperImpl())
+    }
+
+    InPrisonInterestsEntityMapper::class.java.getDeclaredField("workInterestEntityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<InPrisonWorkInterestEntity, InPrisonWorkInterest>())
+    }
+
+    InPrisonInterestsEntityMapper::class.java.getDeclaredField("trainingInterestEntityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>())
     }
   }
 
@@ -45,11 +59,12 @@ class UpdateInPrisonInterestsEntityMapperTest {
       trainingTypeOther = "Any training I can get",
     )
     val inPrisonInterestsReference = UUID.randomUUID()
-    val existingInPrisonInterestsEntity = aValidInPrisonInterestsEntity(
+    val existingInPrisonInterestsEntity = aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
       reference = inPrisonInterestsReference,
       inPrisonWorkInterests = mutableListOf(existingWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(existingTrainingInterestEntity),
     )
+    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val updatedWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -89,7 +104,9 @@ class UpdateInPrisonInterestsEntityMapperTest {
     mapper.updateEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
 
     // Then
-    assertThat(existingInPrisonInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingInPrisonInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -108,11 +125,12 @@ class UpdateInPrisonInterestsEntityMapperTest {
       trainingTypeOther = "Any training I can get",
     )
     val inPrisonInterestsReference = UUID.randomUUID()
-    val existingInPrisonInterestsEntity = aValidInPrisonInterestsEntity(
+    val existingInPrisonInterestsEntity = aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
       reference = inPrisonInterestsReference,
       inPrisonWorkInterests = mutableListOf(existingWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(existingTrainingInterestEntity),
     )
+    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val existingWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -169,6 +187,8 @@ class UpdateInPrisonInterestsEntityMapperTest {
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingInPrisonInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -195,11 +215,12 @@ class UpdateInPrisonInterestsEntityMapperTest {
       trainingTypeOther = null,
     )
     val inPrisonInterestsReference = UUID.randomUUID()
-    val existingInPrisonInterestsEntity = aValidInPrisonInterestsEntity(
+    val existingInPrisonInterestsEntity = aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
       reference = inPrisonInterestsReference,
       inPrisonWorkInterests = mutableListOf(firstWorkInterestEntity, secondWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(firstTrainingInterestEntity, secondTrainingInterestEntity),
     )
+    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val existingWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -229,6 +250,8 @@ class UpdateInPrisonInterestsEntityMapperTest {
     mapper.updateEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
 
     // Then
-    assertThat(existingInPrisonInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingInPrisonInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

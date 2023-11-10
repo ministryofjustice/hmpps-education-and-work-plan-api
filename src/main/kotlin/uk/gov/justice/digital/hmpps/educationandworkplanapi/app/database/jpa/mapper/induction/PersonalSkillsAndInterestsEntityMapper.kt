@@ -31,6 +31,12 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Autowired
   private lateinit var personalInterestEntityMapper: PersonalInterestEntityMapper
 
+  @Autowired
+  private lateinit var personalSkillEntityListManager: InductionEntityListManager<PersonalSkillEntity, PersonalSkill>
+
+  @Autowired
+  private lateinit var personalInterestEntityListManager: InductionEntityListManager<PersonalInterestEntity, PersonalInterest>
+
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -61,9 +67,9 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
     val existingSkills = entity.skills!!
     val updatedSkills = dto.skills
 
-    updateExistingSkills(existingSkills, updatedSkills)
-    addNewSkills(existingSkills, updatedSkills)
-    removeSkills(existingSkills, updatedSkills)
+    personalSkillEntityListManager.updateExisting(existingSkills, updatedSkills, personalSkillEntityMapper)
+    personalSkillEntityListManager.addNew(existingSkills, updatedSkills, personalSkillEntityMapper)
+    personalSkillEntityListManager.deleteRemoved(existingSkills, updatedSkills)
 
     return existingSkills
   }
@@ -75,110 +81,39 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
     val existingInterests = entity.interests!!
     val updatedInterests = dto.interests
 
-    updateExistingInterests(existingInterests, updatedInterests)
-    addNewInterests(existingInterests, updatedInterests)
-    removeInterests(existingInterests, updatedInterests)
+    personalInterestEntityListManager.updateExisting(existingInterests, updatedInterests, personalInterestEntityMapper)
+    personalInterestEntityListManager.addNew(existingInterests, updatedInterests, personalInterestEntityMapper)
+    personalInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
-  }
-
-  private fun updateExistingSkills(
-    existingSkills: MutableList<PersonalSkillEntity>,
-    updatedSkills: List<PersonalSkill>,
-  ) {
-    val updatedSkillTypes = updatedSkills.map { it.skillType.name }
-    existingSkills
-      .filter { skillEntity -> updatedSkillTypes.contains(skillEntity.skillType!!.name) }
-      .onEach { skillEntity ->
-        personalSkillEntityMapper.updateEntityFromDomain(
-          skillEntity,
-          updatedSkills.first { updatedInterestDomain -> updatedInterestDomain.skillType.name == skillEntity.skillType!!.name },
-        )
-      }
-  }
-
-  private fun addNewSkills(
-    existingSkills: MutableList<PersonalSkillEntity>,
-    updatedSkills: List<PersonalSkill>,
-  ) {
-    val currentInterestTypes = existingSkills.map { it.skillType!!.name }
-    existingSkills.addAll(
-      updatedSkills
-        .filter { updatedInterestDto -> !currentInterestTypes.contains(updatedInterestDto.skillType.name) }
-        .map { newInterestDto -> personalSkillEntityMapper.fromDomainToEntity(newInterestDto) },
-    )
-  }
-
-  private fun removeSkills(
-    existingSkills: MutableList<PersonalSkillEntity>,
-    updatedSkills: List<PersonalSkill>,
-  ) {
-    val updatedInterestTypes = updatedSkills.map { it.skillType.name }
-    existingSkills.removeIf { skillEntity ->
-      !updatedInterestTypes.contains(skillEntity.skillType!!.name)
-    }
-  }
-
-  private fun updateExistingInterests(
-    existingInterests: MutableList<PersonalInterestEntity>,
-    updatedInterests: List<PersonalInterest>,
-  ) {
-    val updatedInterestTypes = updatedInterests.map { it.interestType.name }
-    existingInterests
-      .filter { interestEntity -> updatedInterestTypes.contains(interestEntity.interestType!!.name) }
-      .onEach { interestEntity ->
-        personalInterestEntityMapper.updateEntityFromDomain(
-          interestEntity,
-          updatedInterests.first { updatedInterestDomain -> updatedInterestDomain.interestType.name == interestEntity.interestType!!.name },
-        )
-      }
-  }
-
-  private fun addNewInterests(
-    existingInterests: MutableList<PersonalInterestEntity>,
-    updatedInterests: List<PersonalInterest>,
-  ) {
-    val currentInterestTypes = existingInterests.map { it.interestType!!.name }
-    existingInterests.addAll(
-      updatedInterests
-        .filter { updatedInterestDto -> !currentInterestTypes.contains(updatedInterestDto.interestType.name) }
-        .map { newInterestDto -> personalInterestEntityMapper.fromDomainToEntity(newInterestDto) },
-    )
-  }
-
-  private fun removeInterests(
-    existingInterests: MutableList<PersonalInterestEntity>,
-    updatedInterests: List<PersonalInterest>,
-  ) {
-    val updatedInterestTypes = updatedInterests.map { it.interestType.name }
-    existingInterests.removeIf { interestEntity ->
-      !updatedInterestTypes.contains(interestEntity.interestType!!.name)
-    }
   }
 }
 
 @Mapper
-interface PersonalSkillEntityMapper {
+interface PersonalSkillEntityMapper :
+  KeyAwareEntityMapper<PersonalSkillEntity, PersonalSkill> {
+
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  fun fromDomainToEntity(domain: PersonalSkill): PersonalSkillEntity
+  override fun fromDomainToEntity(domain: PersonalSkill): PersonalSkillEntity
 
   fun fromEntityToDomain(persistedEntity: PersonalSkillEntity): PersonalSkill
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
-  fun updateEntityFromDomain(@MappingTarget entity: PersonalSkillEntity, domain: PersonalSkill)
+  override fun updateEntityFromDomain(@MappingTarget entity: PersonalSkillEntity, domain: PersonalSkill)
 }
 
 @Mapper
-interface PersonalInterestEntityMapper {
+interface PersonalInterestEntityMapper :
+  KeyAwareEntityMapper<PersonalInterestEntity, PersonalInterest> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  fun fromDomainToEntity(domain: PersonalInterest): PersonalInterestEntity
+  override fun fromDomainToEntity(domain: PersonalInterest): PersonalInterestEntity
 
   fun fromEntityToDomain(persistedEntity: PersonalInterestEntity): PersonalInterest
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
-  fun updateEntityFromDomain(@MappingTarget entity: PersonalInterestEntity, domain: PersonalInterest)
+  override fun updateEntityFromDomain(@MappingTarget entity: PersonalInterestEntity, domain: PersonalInterest)
 }

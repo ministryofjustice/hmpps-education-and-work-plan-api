@@ -82,6 +82,7 @@ class InPrisonInterestsEntity(
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
 ) {
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -133,7 +134,10 @@ class InPrisonWorkInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) {
+) : EntityKeyAware {
+
+  override fun key(): String = workType!!.name
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -185,7 +189,10 @@ class InPrisonTrainingInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) {
+) : EntityKeyAware {
+
+  override fun key(): String = trainingType!!.name
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false

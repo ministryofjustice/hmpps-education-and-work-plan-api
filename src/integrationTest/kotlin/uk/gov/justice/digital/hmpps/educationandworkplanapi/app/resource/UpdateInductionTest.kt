@@ -320,6 +320,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasCreatedAt(createdDateTime)
       .wasLastModifiedAt(initialModifiedAt) // should be unchanged
     assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
+    // TODO RR-469 - modifiedDateTime is not updated if only the lists of qualifications is updated
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
@@ -398,7 +399,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasCreatedAt(createdDateTime)
       .wasLastModifiedAt(initialModifiedAt) // should be unchanged
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
-    // TODO - modifiedDateTime of workExperience is not being updated
+    // TODO RR-469 - modifiedDateTime of workExperience is not being updated
     // assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
@@ -455,6 +456,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasCreatedAt(createdDateTime)
       .wasLastModifiedAt(initialModifiedAt) // should be unchanged
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
+    // TODO RR-469 - modifiedDateTime of skillsAndInterests is not being updated
     // assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
@@ -511,6 +513,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasCreatedAt(createdDateTime)
       .wasLastModifiedAt(initialModifiedAt) // should be unchanged
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
+    // TODO RR-469 - modifiedDateTime of inPrisonInterests is not being updated
     // assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)

@@ -84,6 +84,7 @@ class PersonalSkillsAndInterestsEntity(
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
 ) {
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -135,7 +136,10 @@ class PersonalSkillEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) {
+) : EntityKeyAware {
+
+  override fun key(): String = skillType!!.name
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -187,7 +191,10 @@ class PersonalInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) {
+) : EntityKeyAware {
+
+  override fun key(): String = interestType!!.name
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
