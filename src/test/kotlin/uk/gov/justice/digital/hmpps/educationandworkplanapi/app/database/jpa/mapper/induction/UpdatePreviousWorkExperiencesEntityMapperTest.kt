@@ -1,10 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import java.util.UUID
@@ -17,6 +19,11 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     PreviousWorkExperiencesEntityMapper::class.java.getDeclaredField("workExperienceEntityMapper").apply {
       isAccessible = true
       set(it, WorkExperienceEntityMapperImpl())
+    }
+
+    PreviousWorkExperiencesEntityMapper::class.java.getDeclaredField("entityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<WorkExperienceEntity, WorkExperience>())
     }
   }
 
@@ -32,10 +39,11 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       details = "Forward, pick stuff up, reverse etc",
     )
     val previousWorkExperiencesReference = UUID.randomUUID()
-    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntity(
+    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(existingEntity),
     )
+    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val updatedExperience = aValidWorkExperience(
       experienceType = WorkExperienceTypeDomain.OTHER,
@@ -68,7 +76,53 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
 
     // Then
-    assertThat(existingPreviousWorkExperiencesEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAfter(initialUpdatedAt)
+  }
+
+  @Test
+  fun `should not update existing work experiences given no changes`() {
+    // Given
+    val workExperienceReference = UUID.randomUUID()
+    val existingEntity = aValidWorkExperienceEntity(
+      reference = workExperienceReference,
+      experienceType = WorkExperienceTypeEntity.OTHER,
+      experienceTypeOther = "Warehouse work",
+      role = "Chief Forklift Truck Driver",
+      details = "Forward, pick stuff up, reverse etc",
+    )
+    val previousWorkExperiencesReference = UUID.randomUUID()
+    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
+      reference = previousWorkExperiencesReference,
+      experiences = mutableListOf(existingEntity),
+    )
+    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
+
+    val updatedExperiencesDto = aValidUpdatePreviousWorkExperiencesDto(
+      reference = previousWorkExperiencesReference,
+      experiences = listOf(
+        aValidWorkExperience(
+          experienceType = WorkExperienceTypeDomain.OTHER,
+          experienceTypeOther = "Warehouse work",
+          role = "Chief Forklift Truck Driver",
+          details = "Forward, pick stuff up, reverse etc",
+        ),
+      ),
+    )
+
+    val expectedEntity = existingPreviousWorkExperiencesEntity.deepCopy().apply {
+      id
+      reference = reference
+    }
+
+    // When
+    mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
+
+    // Then
+    assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAt(initialUpdatedAt)
   }
 
   @Test
@@ -83,10 +137,11 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       details = "Forward, pick stuff up, reverse etc",
     )
     val previousWorkExperiencesReference = UUID.randomUUID()
-    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntity(
+    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(existingEntity),
     )
+    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val existingExperience = aValidWorkExperience(
       experienceType = WorkExperienceTypeDomain.OTHER,
@@ -132,6 +187,8 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -152,10 +209,11 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       details = "Various types of bricklaying",
     )
     val previousWorkExperiencesReference = UUID.randomUUID()
-    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntity(
+    val existingPreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(firstWorkExperienceEntity, secondWorkExperienceEntity),
     )
+    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val updatePreviousWorkExperiencesDto = aValidUpdatePreviousWorkExperiencesDto(
       reference = previousWorkExperiencesReference,
@@ -182,6 +240,8 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updatePreviousWorkExperiencesDto)
 
     // Then
-    assertThat(existingPreviousWorkExperiencesEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

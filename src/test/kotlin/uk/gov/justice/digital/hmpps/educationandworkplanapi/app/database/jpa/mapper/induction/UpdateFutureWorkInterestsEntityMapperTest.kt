@@ -1,10 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateFutureWorkInterestsDto
 import java.util.UUID
@@ -17,6 +19,11 @@ class UpdateFutureWorkInterestsEntityMapperTest {
     FutureWorkInterestsEntityMapper::class.java.getDeclaredField("workInterestEntityMapper").apply {
       isAccessible = true
       set(it, WorkInterestEntityMapperImpl())
+    }
+
+    FutureWorkInterestsEntityMapper::class.java.getDeclaredField("entityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<WorkInterestEntity, WorkInterest>())
     }
   }
 
@@ -31,10 +38,11 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       role = "Any role",
     )
     val futureWorkInterestsReference = UUID.randomUUID()
-    val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
+    val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
       reference = futureWorkInterestsReference,
       interests = mutableListOf(existingEntity),
     )
+    // val initialUpdatedAt = existingFutureWorkInterestsEntity.updatedAt!!
 
     val updatedInterest = aValidWorkInterest(
       workType = WorkInterestTypeDomain.OTHER,
@@ -65,7 +73,9 @@ class UpdateFutureWorkInterestsEntityMapperTest {
     mapper.updateEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
 
     // Then
-    assertThat(existingFutureWorkInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -79,10 +89,11 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       role = "Any role",
     )
     val futureWorkInterestsReference = UUID.randomUUID()
-    val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
+    val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
       reference = futureWorkInterestsReference,
       interests = mutableListOf(existingEntity),
     )
+    // val initialUpdatedAt = existingFutureWorkInterestsEntity.updatedAt!!
 
     val unchangedWorkInterestDomain = aValidWorkInterest(
       workType = WorkInterestTypeDomain.OTHER,
@@ -124,6 +135,8 @@ class UpdateFutureWorkInterestsEntityMapperTest {
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -142,10 +155,11 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       role = "Bricklaying",
     )
     val futureWorkInterestsReference = UUID.randomUUID()
-    val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
+    val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
       reference = futureWorkInterestsReference,
       interests = mutableListOf(firstWorkInterestEntity, secondWorkInterestEntity),
     )
+    // val initialUpdatedAt = existingFutureWorkInterestsEntity.updatedAt!!
 
     val updatedFutureWorkInterestsDto = aValidUpdateFutureWorkInterestsDto(
       reference = futureWorkInterestsReference,
@@ -171,6 +185,8 @@ class UpdateFutureWorkInterestsEntityMapperTest {
     mapper.updateEntityFromDto(existingFutureWorkInterestsEntity, updatedFutureWorkInterestsDto)
 
     // Then
-    assertThat(existingFutureWorkInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

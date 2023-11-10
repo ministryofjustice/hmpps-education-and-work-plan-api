@@ -1,10 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousQualificationsDto
 import java.util.UUID
@@ -19,6 +21,11 @@ class UpdatePreviousQualificationsEntityMapperTest {
     PreviousQualificationsEntityMapper::class.java.getDeclaredField("qualificationEntityMapper").apply {
       isAccessible = true
       set(it, QualificationEntityMapperImpl())
+    }
+
+    PreviousQualificationsEntityMapper::class.java.getDeclaredField("entityListManager").apply {
+      isAccessible = true
+      set(it, InductionEntityListManager<QualificationEntity, Qualification>())
     }
   }
 
@@ -38,6 +45,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(qualificationEntity),
     )
+    // val initialUpdatedAt = existingQualificationsEntity.updatedAt!!
 
     val updatedQualification = aValidQualification(
       subject = "English",
@@ -71,6 +79,8 @@ class UpdatePreviousQualificationsEntityMapperTest {
 
     // Then
     assertThat(existingQualificationsEntity).isEqualToComparingAllFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -89,6 +99,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(qualificationEntity),
     )
+    // val initialUpdatedAt = existingQualificationsEntity.updatedAt!!
 
     val existingQualification = aValidQualification(
       subject = "English",
@@ -132,6 +143,8 @@ class UpdatePreviousQualificationsEntityMapperTest {
 
     // Then
     assertThat(existingQualificationsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -155,6 +168,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(firstQualificationEntity, secondQualificationEntity),
     )
+    // val initialUpdatedAt = existingQualificationsEntity.updatedAt!!
 
     val existingQualification = aValidQualification(
       subject = "English",
@@ -182,5 +196,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
 
     // Then
     assertThat(existingQualificationsEntity).isEqualToComparingAllFields(expectedEntity)
+    // TODO RR-469 - fix updatedAt timestamp
+    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

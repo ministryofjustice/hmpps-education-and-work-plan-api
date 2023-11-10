@@ -25,6 +25,9 @@ abstract class PreviousQualificationsEntityMapper {
   @Autowired
   private lateinit var qualificationEntityMapper: QualificationEntityMapper
 
+  @Autowired
+  private lateinit var entityListManager: InductionEntityListManager<QualificationEntity, Qualification>
+
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -54,60 +57,23 @@ abstract class PreviousQualificationsEntityMapper {
     val existingQualifications = entity.qualifications!!
     val updatedQualifications = dto.qualifications
 
-    updateExistingQualifications(existingQualifications, updatedQualifications)
-    addNewQualifications(existingQualifications, updatedQualifications)
-    removeQualifications(existingQualifications, updatedQualifications)
+    entityListManager.updateExisting(existingQualifications, updatedQualifications, qualificationEntityMapper)
+    entityListManager.addNew(existingQualifications, updatedQualifications, qualificationEntityMapper)
+    entityListManager.deleteRemoved(existingQualifications, updatedQualifications)
 
     return existingQualifications
-  }
-
-  private fun updateExistingQualifications(
-    existingQualifications: MutableList<QualificationEntity>,
-    updatedQualifications: List<Qualification>,
-  ) {
-    val updatedSubjects = updatedQualifications.map { it.subject }
-    existingQualifications
-      .filter { qualificationEntity -> updatedSubjects.contains(qualificationEntity.subject) }
-      .onEach { qualificationEntity ->
-        qualificationEntityMapper.updateEntityFromDomain(
-          qualificationEntity,
-          updatedQualifications.first { updatedQualificationDto -> updatedQualificationDto.subject == qualificationEntity.subject },
-        )
-      }
-  }
-
-  private fun addNewQualifications(
-    existingQualifications: MutableList<QualificationEntity>,
-    updatedQualifications: List<Qualification>,
-  ) {
-    val existingSubjects = existingQualifications.map { it.subject }
-    existingQualifications.addAll(
-      updatedQualifications
-        .filter { updatedQualification -> !existingSubjects.contains(updatedQualification.subject) }
-        .map { newQualification -> qualificationEntityMapper.fromDomainToEntity(newQualification) },
-    )
-  }
-
-  private fun removeQualifications(
-    existingQualifications: MutableList<QualificationEntity>,
-    updatedQualifications: List<Qualification>,
-  ) {
-    val updatedSubjects = updatedQualifications.map { it.subject }
-    existingQualifications.removeIf { qualificationEntity ->
-      !updatedSubjects.contains(qualificationEntity.subject)
-    }
   }
 }
 
 @Mapper
-interface QualificationEntityMapper {
+interface QualificationEntityMapper : KeyAwareEntityMapper<QualificationEntity, Qualification> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
-  fun fromDomainToEntity(domain: Qualification): QualificationEntity
+  override fun fromDomainToEntity(domain: Qualification): QualificationEntity
 
   fun fromEntityToDomain(persistedEntity: QualificationEntity): Qualification
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
-  fun updateEntityFromDomain(@MappingTarget entity: QualificationEntity, domain: Qualification)
+  override fun updateEntityFromDomain(@MappingTarget entity: QualificationEntity, domain: Qualification)
 }

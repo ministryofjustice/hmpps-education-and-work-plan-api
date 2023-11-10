@@ -38,7 +38,9 @@ data class Qualification(
   val subject: String,
   val level: QualificationLevel,
   val grade: String,
-)
+) : DomainKeyAware {
+  override fun key(): String = subject
+}
 
 enum class QualificationLevel {
   ENTRY_LEVEL,

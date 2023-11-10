@@ -100,6 +100,16 @@ class PreviousWorkExperiencesEntityAssert(actual: PreviousWorkExperiencesEntity?
     return this
   }
 
+  fun wasUpdatedAfter(dateTime: Instant): PreviousWorkExperiencesEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (!updatedAt!!.isAfter(dateTime)) {
+        failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
   fun hasAReference(): PreviousWorkExperiencesEntityAssert {
     isNotNull
     with(actual!!) {
