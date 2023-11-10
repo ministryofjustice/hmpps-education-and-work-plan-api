@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Dom
 
 /**
  * Provides a centralised place to update, add or remove existing JPA entities (and thereby apply changes to the
- * database). Manages changes between lists of domain model objects (provided via the REST API) and the equivalent
+ * database). Manages changes between lists of domain model objects (provided via the external API) and the equivalent
  * lists of existing JPA entities.
  */
 @Component
