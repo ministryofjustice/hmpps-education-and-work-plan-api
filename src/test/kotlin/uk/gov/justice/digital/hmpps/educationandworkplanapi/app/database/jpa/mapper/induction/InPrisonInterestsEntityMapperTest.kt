@@ -23,7 +23,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 class InPrisonInterestsEntityMapperTest {
 
   @InjectMocks
-  private val mapper = InPrisonInterestsEntityMapperImpl()
+  private lateinit var mapper: InPrisonInterestsEntityMapperImpl
 
   @Mock
   private lateinit var workInterestEntityMapper: InPrisonWorkInterestEntityMapper
