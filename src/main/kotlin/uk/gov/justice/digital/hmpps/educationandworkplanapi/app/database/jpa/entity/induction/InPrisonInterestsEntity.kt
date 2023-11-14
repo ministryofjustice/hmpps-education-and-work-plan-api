@@ -10,7 +10,11 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreRemove
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -42,12 +46,10 @@ class InPrisonInterestsEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "interests_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var inPrisonWorkInterests: MutableList<InPrisonWorkInterestEntity>? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "interests_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestEntity>? = null,
 
   @Column(updatable = false)
@@ -81,7 +83,25 @@ class InPrisonInterestsEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) {
+) : ParentEntity() {
+
+  fun inPrisonWorkInterests(): MutableList<InPrisonWorkInterestEntity> {
+    if (inPrisonWorkInterests == null) {
+      inPrisonWorkInterests = mutableListOf()
+    }
+    return inPrisonWorkInterests!!
+  }
+
+  fun inPrisonTrainingInterests(): MutableList<InPrisonTrainingInterestEntity> {
+    if (inPrisonTrainingInterests == null) {
+      inPrisonTrainingInterests = mutableListOf()
+    }
+    return inPrisonTrainingInterests!!
+  }
+
+  override fun childEntityUpdated() {
+    this.updatedAt = Instant.now()
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -111,6 +131,10 @@ class InPrisonWorkInterestEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "interests_id")
+  var parent: InPrisonInterestsEntity? = null,
+
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
@@ -134,7 +158,18 @@ class InPrisonWorkInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) : EntityKeyAware {
+) : KeyAwareChildEntity {
+
+  @PrePersist
+  @PreUpdate
+  @PreRemove
+  fun onChange() {
+    parent?.childEntityUpdated()
+  }
+
+  override fun associateWithParent(parent: ParentEntity) {
+    this.parent = parent as InPrisonInterestsEntity
+  }
 
   override fun key(): String = workType!!.name
 
@@ -166,6 +201,10 @@ class InPrisonTrainingInterestEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "interests_id")
+  var parent: InPrisonInterestsEntity? = null,
+
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
@@ -189,7 +228,11 @@ class InPrisonTrainingInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) : EntityKeyAware {
+) : KeyAwareChildEntity {
+
+  override fun associateWithParent(parent: ParentEntity) {
+    this.parent = parent as InPrisonInterestsEntity
+  }
 
   override fun key(): String = trainingType!!.name
 

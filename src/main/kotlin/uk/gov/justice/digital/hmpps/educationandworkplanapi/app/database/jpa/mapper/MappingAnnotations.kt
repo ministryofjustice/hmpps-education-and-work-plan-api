@@ -17,5 +17,8 @@ annotation class ExcludeJpaManagedFieldsIncludingDisplayNameFields
 @Mapping(target = "reference", ignore = true)
 annotation class ExcludeReferenceField
 
+@Mapping(target = "parent", ignore = true)
+annotation class ExcludeParentEntity
+
 @Mapping(target = "reference", expression = "java(java.util.UUID.randomUUID())")
 annotation class GenerateNewReference

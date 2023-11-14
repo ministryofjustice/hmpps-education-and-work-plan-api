@@ -105,8 +105,6 @@ class UpdateInPrisonInterestsEntityMapperTest {
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingInPrisonInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -130,7 +128,6 @@ class UpdateInPrisonInterestsEntityMapperTest {
       inPrisonWorkInterests = mutableListOf(existingWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(existingTrainingInterestEntity),
     )
-    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val existingWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -187,8 +184,6 @@ class UpdateInPrisonInterestsEntityMapperTest {
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingInPrisonInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -220,7 +215,6 @@ class UpdateInPrisonInterestsEntityMapperTest {
       inPrisonWorkInterests = mutableListOf(firstWorkInterestEntity, secondWorkInterestEntity),
       inPrisonTrainingInterests = mutableListOf(firstTrainingInterestEntity, secondTrainingInterestEntity),
     )
-    // val initialUpdatedAt = existingInPrisonInterestsEntity.updatedAt!!
 
     val existingWorkInterest = aValidInPrisonWorkInterest(
       workType = InPrisonWorkTypeDomain.OTHER,
@@ -251,7 +245,5 @@ class UpdateInPrisonInterestsEntityMapperTest {
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingInPrisonInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

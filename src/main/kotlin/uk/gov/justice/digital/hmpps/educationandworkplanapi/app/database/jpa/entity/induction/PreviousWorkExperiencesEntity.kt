@@ -10,7 +10,11 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreRemove
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -45,8 +49,7 @@ class PreviousWorkExperiencesEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "work_experiences_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var experiences: MutableList<WorkExperienceEntity>? = null,
 
   @Column(updatable = false)
@@ -80,7 +83,18 @@ class PreviousWorkExperiencesEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) {
+) : ParentEntity() {
+
+  fun experiences(): MutableList<WorkExperienceEntity> {
+    if (experiences == null) {
+      experiences = mutableListOf()
+    }
+    return experiences!!
+  }
+
+  override fun childEntityUpdated() {
+    updatedAt = Instant.now()
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -109,6 +123,10 @@ class WorkExperienceEntity(
   @Column(updatable = false)
   @field:NotNull
   var reference: UUID? = null,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "work_experiences_id")
+  var parent: PreviousWorkExperiencesEntity? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
@@ -139,7 +157,18 @@ class WorkExperienceEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) : EntityKeyAware {
+) : KeyAwareChildEntity {
+
+  @PrePersist
+  @PreUpdate
+  @PreRemove
+  fun onChange() {
+    parent?.childEntityUpdated()
+  }
+
+  override fun associateWithParent(parent: ParentEntity) {
+    this.parent = parent as PreviousWorkExperiencesEntity
+  }
 
   override fun key(): String = experienceType!!.name
 

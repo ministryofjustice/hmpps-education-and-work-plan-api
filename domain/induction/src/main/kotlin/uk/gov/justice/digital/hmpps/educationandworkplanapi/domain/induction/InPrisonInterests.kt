@@ -28,14 +28,14 @@ data class InPrisonInterests(
 data class InPrisonWorkInterest(
   val workType: InPrisonWorkType,
   val workTypeOther: String?,
-) : DomainKeyAware {
+) : KeyAwareDomain {
   override fun key(): String = workType.name
 }
 
 data class InPrisonTrainingInterest(
   val trainingType: InPrisonTrainingType,
   val trainingTypeOther: String?,
-) : DomainKeyAware {
+) : KeyAwareDomain {
   override fun key(): String = trainingType.name
 }
 

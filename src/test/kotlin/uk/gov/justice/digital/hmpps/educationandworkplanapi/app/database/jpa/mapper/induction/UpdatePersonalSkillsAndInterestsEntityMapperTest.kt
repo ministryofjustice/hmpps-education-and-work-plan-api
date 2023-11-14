@@ -105,8 +105,6 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingSkillsAndInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -130,7 +128,6 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(existingSkillEntity),
       interests = mutableListOf(existingInterestEntity),
     )
-    // val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val existingSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.OTHER,
@@ -187,8 +184,6 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingSkillsAndInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -220,7 +215,6 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
       skills = mutableListOf(firstSkillEntity, secondSkillEntity),
       interests = mutableListOf(firstInterestEntity, secondInterestEntity),
     )
-    // val initialUpdatedAt = existingSkillsAndInterestsEntity.updatedAt!!
 
     val existingSkill = aValidPersonalSkill(
       skillType = SkillTypeDomain.RESILIENCE,
@@ -251,7 +245,5 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingSkillsAndInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

@@ -38,7 +38,7 @@ data class Qualification(
   val subject: String,
   val level: QualificationLevel,
   val grade: String,
-) : DomainKeyAware {
+) : KeyAwareDomain {
   override fun key(): String = subject
 }
 

@@ -1,8 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.EntityKeyAware
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.DomainKeyAware
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.KeyAwareChildEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.ParentEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.KeyAwareDomain
 
 /**
  * Provides a centralised place to update, add or remove existing JPA entities (and thereby apply changes to the
@@ -10,7 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Dom
  * lists of existing JPA entities.
  */
 @Component
-class InductionEntityListManager<ENTITY : EntityKeyAware, DOMAIN : DomainKeyAware> {
+class InductionEntityListManager<ENTITY : KeyAwareChildEntity, DOMAIN : KeyAwareDomain> {
 
   fun updateExisting(
     existingEntities: MutableList<ENTITY>,
@@ -29,6 +30,7 @@ class InductionEntityListManager<ENTITY : EntityKeyAware, DOMAIN : DomainKeyAwar
   }
 
   fun addNew(
+    parentEntity: ParentEntity,
     existingEntities: MutableList<ENTITY>,
     updatedDomain: List<DOMAIN>,
     mapper: KeyAwareEntityMapper<ENTITY, DOMAIN>,
@@ -40,7 +42,7 @@ class InductionEntityListManager<ENTITY : EntityKeyAware, DOMAIN : DomainKeyAwar
       .map { newDto -> mapper.fromDomainToEntity(newDto) }
 
     if (newEntities.isNotEmpty()) {
-      existingEntities.addAll(newEntities)
+      parentEntity.addChildren(newEntities, existingEntities)
     }
   }
 

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
@@ -8,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousWorkExperiences
@@ -32,7 +34,18 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "experiences", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity
+
+  @AfterMapping
+  fun addExperiences(dto: CreatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
+    dto.experiences.forEach {
+      entity.addChild(
+        workExperienceEntityMapper.fromDomainToEntity(it),
+        entity.experiences(),
+      )
+    }
+  }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
@@ -58,7 +71,7 @@ abstract class PreviousWorkExperiencesEntityMapper {
     val updatedExperiences = dto.experiences
 
     entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
-    entityListManager.addNew(existingExperiences, updatedExperiences, workExperienceEntityMapper)
+    entityListManager.addNew(entity, existingExperiences, updatedExperiences, workExperienceEntityMapper)
     entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
 
     return existingExperiences
@@ -69,11 +82,13 @@ abstract class PreviousWorkExperiencesEntityMapper {
 interface WorkExperienceEntityMapper : KeyAwareEntityMapper<WorkExperienceEntity, WorkExperience> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity
 
   fun fromEntityToDomain(persistedEntity: WorkExperienceEntity): WorkExperience
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(@MappingTarget entity: WorkExperienceEntity, domain: WorkExperience)
 }
