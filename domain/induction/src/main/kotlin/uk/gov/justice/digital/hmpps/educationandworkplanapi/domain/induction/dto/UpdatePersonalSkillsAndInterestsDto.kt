@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Per
 import java.util.UUID
 
 data class UpdatePersonalSkillsAndInterestsDto(
-  val reference: UUID,
+  val reference: UUID?,
   val skills: List<PersonalSkill>,
   val interests: List<PersonalInterest>,
   val prisonId: String,

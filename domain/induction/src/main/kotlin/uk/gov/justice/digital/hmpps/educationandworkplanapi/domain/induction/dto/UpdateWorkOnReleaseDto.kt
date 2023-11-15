@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Not
 import java.util.UUID
 
 data class UpdateWorkOnReleaseDto(
-  val reference: UUID,
+  val reference: UUID?,
   val hopingToWork: HopingToWork,
   val notHopingToWorkReasons: List<NotHopingToWorkReason>,
   val notHopingToWorkOtherReason: String?,

@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousQualifications
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousTraining
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.QualificationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousQualifications
@@ -14,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateEducationAndQualificationsRequest
+import java.time.Instant
 import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType as TrainingTypeDomain
@@ -132,26 +132,26 @@ class QualificationsAndTrainingResourceMapperTest {
   }
 
   @Test
-  fun `should map to null when prisoner has no previous training`() {
+  fun `should map to EducationAndQualificationResponse when qualifications were updated more recently than training`() {
     // Given
-    val training: PreviousTraining? = null
-    // qualifications are subordinate to training and ignored when the latter is null
+    val qualificationsModifiedBy = "qualifications_gen"
+    val qualificationsModifiedDateTime = Instant.now()
+
+    val training = aValidPreviousTraining(
+      lastUpdatedBy = "training_gen",
+      lastUpdatedAt = Instant.now().minusSeconds(1),
+    )
     val qualifications = aValidPreviousQualifications(
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = listOf(
-        aValidQualification(
-          subject = "English",
-          level = QualificationLevel.LEVEL_1,
-          grade = "C",
-        ),
-      ),
+      lastUpdatedBy = qualificationsModifiedBy,
+      lastUpdatedAt = qualificationsModifiedDateTime,
     )
 
     // When
     val actual = mapper.toEducationAndQualificationResponse(qualifications, training)
 
     // Then
-    assertThat(actual).isNull()
+    assertThat(actual.modifiedDateTime).isEqualTo(qualificationsModifiedDateTime.atOffset(ZoneOffset.UTC))
+    assertThat(actual.modifiedBy).isEqualTo(qualificationsModifiedBy)
   }
 
   @Test

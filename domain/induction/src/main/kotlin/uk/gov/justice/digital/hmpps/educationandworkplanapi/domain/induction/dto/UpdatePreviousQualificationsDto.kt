@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qua
 import java.util.UUID
 
 data class UpdatePreviousQualificationsDto(
-  val reference: UUID,
+  val reference: UUID?,
   val educationLevel: HighestEducationLevel?,
   val qualifications: List<Qualification>,
   val prisonId: String,

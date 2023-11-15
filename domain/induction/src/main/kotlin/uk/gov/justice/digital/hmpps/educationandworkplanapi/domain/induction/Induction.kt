@@ -28,10 +28,10 @@ data class Induction(
    */
   val previousQualifications: PreviousQualifications?,
   /**
-   * Any additional training that the Prisoner may have done previously. Null if the Prisoner has not been asked about
-   * their additional training.
+   * Any additional training that the Prisoner may have done previously. Mandatory as the Prisoner is always asked about
+   * it.
    */
-  val previousTraining: PreviousTraining?,
+  val previousTraining: PreviousTraining,
   /**
    * Details of any previous work experience that the Prisoner may have had. Null if the Prisoner has not been asked
    * about their work history.

@@ -110,6 +110,41 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
 
     return existingInterests
   }
+
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "skills", ignore = true)
+  @Mapping(target = "interests", ignore = true)
+  abstract fun fromUpdateDtoToEntity(personalSkillsAndInterests: UpdatePersonalSkillsAndInterestsDto?): PersonalSkillsAndInterestsEntity?
+
+  @AfterMapping
+  fun addSkillsAndInterests(
+    dto: UpdatePersonalSkillsAndInterestsDto,
+    @MappingTarget entity: PersonalSkillsAndInterestsEntity,
+  ) {
+    val existingSkillTypes = entity.skills?.map { it.key() }
+    dto.skills.forEach {
+      // ensure we only add new ones
+      if (existingSkillTypes == null || !existingSkillTypes.contains(it.key())) {
+        entity.addChild(
+          personalSkillEntityMapper.fromDomainToEntity(it),
+          entity.skills(),
+        )
+      }
+    }
+
+    val existingInterestTypes = entity.interests?.map { it.key() }
+    dto.interests.forEach {
+      if (existingInterestTypes == null || !existingInterestTypes.contains(it.key())) {
+        entity.addChild(
+          personalInterestEntityMapper.fromDomainToEntity(it),
+          entity.interests(),
+        )
+      }
+    }
+  }
 }
 
 @Mapper

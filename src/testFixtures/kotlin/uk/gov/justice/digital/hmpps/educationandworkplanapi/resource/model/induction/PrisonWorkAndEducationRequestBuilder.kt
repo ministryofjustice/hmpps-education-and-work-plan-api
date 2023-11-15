@@ -18,7 +18,7 @@ fun aValidCreatePrisonWorkAndEducationRequest(
   )
 
 fun aValidUpdatePrisonWorkAndEducationRequest(
-  id: UUID = UUID.randomUUID(),
+  id: UUID? = UUID.randomUUID(),
   inPrisonWork: Set<InPrisonWorkType>? = setOf(InPrisonWorkType.OTHER),
   inPrisonWorkOther: String? = "Any in-prison work",
   inPrisonEducation: Set<InPrisonTrainingType>? = setOf(InPrisonTrainingType.OTHER),

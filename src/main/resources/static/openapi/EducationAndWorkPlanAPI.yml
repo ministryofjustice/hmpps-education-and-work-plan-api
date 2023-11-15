@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.7'
+  version: '1.4.8'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -1163,7 +1163,6 @@ components:
         workInterests:
           $ref: '#/components/schemas/WorkInterests'
       required:
-        - id
         - hasWorkedBefore
 
     UpdateSkillsAndInterestsRequest:
@@ -1176,8 +1175,6 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's personal skills and interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-      required:
-        - id
 
     UpdateEducationAndQualificationsRequest:
       description: A request to update a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
@@ -1190,8 +1187,6 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's education and qualifications.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-      required:
-        - id
 
     UpdatePrisonWorkAndEducationRequest:
       description: A request to update a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
@@ -1203,8 +1198,6 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's in-prison work and education interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-      required:
-        - id
 
     WorkExperience:
       description: A Prisoner's list of work experience details. Migrated from hmpps-ciag-careers-induction-api.

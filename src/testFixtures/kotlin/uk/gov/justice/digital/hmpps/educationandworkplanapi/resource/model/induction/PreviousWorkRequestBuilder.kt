@@ -24,7 +24,7 @@ fun aValidCreatePreviousWorkRequest(
   )
 
 fun aValidUpdatePreviousWorkRequest(
-  id: UUID = UUID.randomUUID(),
+  id: UUID? = UUID.randomUUID(),
   hasWorkedBefore: Boolean = true,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",

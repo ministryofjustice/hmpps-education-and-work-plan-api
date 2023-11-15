@@ -193,6 +193,6 @@ class InductionEntityMapperTest {
     verify(previousQualificationsEntityMapper).updateEntityFromDto(existingInductionEntity.previousQualifications, updateInductionDto.previousQualifications)
     verify(previousTrainingEntityMapper).updateEntityFromDto(existingInductionEntity.previousTraining, updateInductionDto.previousTraining)
     verify(previousWorkExperiencesEntityMapper).updateEntityFromDto(existingInductionEntity.previousWorkExperiences, updateInductionDto.previousWorkExperiences)
-    verify(workOnReleaseEntityMapper).updateEntityFromDto(existingInductionEntity.workOnRelease, updateInductionDto.workOnRelease)
+    verify(workOnReleaseEntityMapper).updateEntityFromDto(existingInductionEntity.workOnRelease!!, updateInductionDto.workOnRelease)
   }
 }

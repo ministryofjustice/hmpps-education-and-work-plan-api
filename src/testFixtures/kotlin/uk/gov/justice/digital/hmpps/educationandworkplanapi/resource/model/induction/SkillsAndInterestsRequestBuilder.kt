@@ -20,7 +20,7 @@ fun aValidCreateSkillsAndInterestsRequest(
   )
 
 fun aValidUpdateSkillsAndInterestsRequest(
-  id: UUID = UUID.randomUUID(),
+  id: UUID? = UUID.randomUUID(),
   skills: Set<PersonalSkill>? = setOf(PersonalSkill.OTHER),
   skillsOther: String? = "Hidden skills",
   personalInterests: Set<PersonalInterest>? = setOf(PersonalInterest.OTHER),
