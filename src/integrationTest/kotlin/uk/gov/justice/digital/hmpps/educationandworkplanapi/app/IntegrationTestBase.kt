@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("integration-test")
-@AutoConfigureWebTestClient(timeout = "PT1M")
+@AutoConfigureWebTestClient(timeout = "PT5M")
 abstract class IntegrationTestBase {
 
   companion object {

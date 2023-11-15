@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
@@ -8,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousQualifications
@@ -32,7 +34,18 @@ abstract class PreviousQualificationsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "qualifications", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreatePreviousQualificationsDto): PreviousQualificationsEntity
+
+  @AfterMapping
+  fun addQualifications(dto: CreatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
+    dto.qualifications.forEach {
+      entity.addChild(
+        qualificationEntityMapper.fromDomainToEntity(it),
+        entity.qualifications(),
+      )
+    }
+  }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
@@ -58,7 +71,7 @@ abstract class PreviousQualificationsEntityMapper {
     val updatedQualifications = dto.qualifications
 
     entityListManager.updateExisting(existingQualifications, updatedQualifications, qualificationEntityMapper)
-    entityListManager.addNew(existingQualifications, updatedQualifications, qualificationEntityMapper)
+    entityListManager.addNew(entity, existingQualifications, updatedQualifications, qualificationEntityMapper)
     entityListManager.deleteRemoved(existingQualifications, updatedQualifications)
 
     return existingQualifications
@@ -69,11 +82,13 @@ abstract class PreviousQualificationsEntityMapper {
 interface QualificationEntityMapper : KeyAwareEntityMapper<QualificationEntity, Qualification> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: Qualification): QualificationEntity
 
   fun fromEntityToDomain(persistedEntity: QualificationEntity): Qualification
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(@MappingTarget entity: QualificationEntity, domain: Qualification)
 }

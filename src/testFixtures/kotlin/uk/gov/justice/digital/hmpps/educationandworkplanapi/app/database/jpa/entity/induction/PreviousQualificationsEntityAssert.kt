@@ -15,21 +15,6 @@ class PreviousQualificationsEntityAssert(actual: PreviousQualificationsEntity?) 
     PreviousQualificationsEntityAssert::class.java,
   ) {
 
-  companion object {
-    // JPA managed fields, plus the reference field, which are all managed/generated within the API
-    private val INTERNALLY_MANAGED_FIELDS =
-      arrayOf(
-        ".*id",
-        ".*reference",
-        ".*createdAt",
-        ".*createdBy",
-        ".*createdByDisplayName",
-        ".*updatedAt",
-        ".*updatedBy",
-        ".*updatedByDisplayName",
-      )
-  }
-
   fun hasJpaManagedFieldsPopulated(): PreviousQualificationsEntityAssert {
     isNotNull
     with(actual!!) {

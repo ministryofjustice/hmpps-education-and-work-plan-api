@@ -10,7 +10,11 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreRemove
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -42,8 +46,7 @@ class FutureWorkInterestsEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "work_interests_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var interests: MutableList<WorkInterestEntity>? = null,
 
   @Column(updatable = false)
@@ -77,7 +80,19 @@ class FutureWorkInterestsEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) {
+) : ParentEntity() {
+
+  fun interests(): MutableList<WorkInterestEntity> {
+    if (interests == null) {
+      interests = mutableListOf()
+    }
+    return interests!!
+  }
+
+  override fun childEntityUpdated() {
+    this.updatedAt = Instant.now()
+  }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -106,6 +121,10 @@ class WorkInterestEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "work_interests_id")
+  var parent: FutureWorkInterestsEntity? = null,
+
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
@@ -132,7 +151,18 @@ class WorkInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) : EntityKeyAware {
+) : KeyAwareChildEntity {
+
+  @PrePersist
+  @PreUpdate
+  @PreRemove
+  fun onChange() {
+    parent?.childEntityUpdated()
+  }
+
+  override fun associateWithParent(parent: ParentEntity) {
+    this.parent = parent as FutureWorkInterestsEntity
+  }
 
   override fun key(): String = workType!!.name
 

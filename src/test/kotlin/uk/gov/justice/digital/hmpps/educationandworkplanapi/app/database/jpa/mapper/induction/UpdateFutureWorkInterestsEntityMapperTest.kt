@@ -42,7 +42,6 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       reference = futureWorkInterestsReference,
       interests = mutableListOf(existingEntity),
     )
-    // val initialUpdatedAt = existingFutureWorkInterestsEntity.updatedAt!!
 
     val updatedInterest = aValidWorkInterest(
       workType = WorkInterestTypeDomain.OTHER,
@@ -74,8 +73,6 @@ class UpdateFutureWorkInterestsEntityMapperTest {
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -93,7 +90,6 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       reference = futureWorkInterestsReference,
       interests = mutableListOf(existingEntity),
     )
-    // val initialUpdatedAt = existingFutureWorkInterestsEntity.updatedAt!!
 
     val unchangedWorkInterestDomain = aValidWorkInterest(
       workType = WorkInterestTypeDomain.OTHER,
@@ -135,8 +131,6 @@ class UpdateFutureWorkInterestsEntityMapperTest {
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -159,7 +153,6 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       reference = futureWorkInterestsReference,
       interests = mutableListOf(firstWorkInterestEntity, secondWorkInterestEntity),
     )
-    // val initialUpdatedAt = existingFutureWorkInterestsEntity.updatedAt!!
 
     val updatedFutureWorkInterestsDto = aValidUpdateFutureWorkInterestsDto(
       reference = futureWorkInterestsReference,
@@ -186,7 +179,5 @@ class UpdateFutureWorkInterestsEntityMapperTest {
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingFutureWorkInterestsEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

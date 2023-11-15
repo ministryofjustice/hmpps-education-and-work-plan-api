@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
@@ -9,6 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonInterests
@@ -41,7 +43,25 @@ abstract class InPrisonInterestsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "inPrisonWorkInterests", ignore = true)
+  @Mapping(target = "inPrisonTrainingInterests", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity
+
+  @AfterMapping
+  fun addInterests(dto: CreateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
+    dto.inPrisonWorkInterests.forEach {
+      entity.addChild(
+        workInterestEntityMapper.fromDomainToEntity(it),
+        entity.inPrisonWorkInterests(),
+      )
+    }
+    dto.inPrisonTrainingInterests.forEach {
+      entity.addChild(
+        trainingInterestEntityMapper.fromDomainToEntity(it),
+        entity.inPrisonTrainingInterests(),
+      )
+    }
+  }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
@@ -65,7 +85,7 @@ abstract class InPrisonInterestsEntityMapper {
     val updatedInterests = dto.inPrisonWorkInterests
 
     workInterestEntityListManager.updateExisting(existingInterests, updatedInterests, workInterestEntityMapper)
-    workInterestEntityListManager.addNew(existingInterests, updatedInterests, workInterestEntityMapper)
+    workInterestEntityListManager.addNew(entity, existingInterests, updatedInterests, workInterestEntityMapper)
     workInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
@@ -79,7 +99,7 @@ abstract class InPrisonInterestsEntityMapper {
     val updatedInterests = dto.inPrisonTrainingInterests
 
     trainingInterestEntityListManager.updateExisting(existingInterests, updatedInterests, trainingInterestEntityMapper)
-    trainingInterestEntityListManager.addNew(existingInterests, updatedInterests, trainingInterestEntityMapper)
+    trainingInterestEntityListManager.addNew(entity, existingInterests, updatedInterests, trainingInterestEntityMapper)
     trainingInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
@@ -90,12 +110,14 @@ abstract class InPrisonInterestsEntityMapper {
 interface InPrisonWorkInterestEntityMapper : KeyAwareEntityMapper<InPrisonWorkInterestEntity, InPrisonWorkInterest> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: InPrisonWorkInterest): InPrisonWorkInterestEntity
 
   fun fromEntityToDomain(persistedEntity: InPrisonWorkInterestEntity): InPrisonWorkInterest
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(@MappingTarget entity: InPrisonWorkInterestEntity, domain: InPrisonWorkInterest)
 }
 
@@ -104,12 +126,14 @@ interface InPrisonTrainingInterestEntityMapper :
   KeyAwareEntityMapper<InPrisonTrainingInterestEntity, InPrisonTrainingInterest> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: InPrisonTrainingInterest): InPrisonTrainingInterestEntity
 
   fun fromEntityToDomain(persistedEntity: InPrisonTrainingInterestEntity): InPrisonTrainingInterest
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(
     @MappingTarget entity: InPrisonTrainingInterestEntity,
     domain: InPrisonTrainingInterest,

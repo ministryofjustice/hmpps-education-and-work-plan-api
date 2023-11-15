@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
@@ -9,6 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillsAndInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest
@@ -41,7 +43,28 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "skills", ignore = true)
+  @Mapping(target = "interests", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreatePersonalSkillsAndInterestsDto): PersonalSkillsAndInterestsEntity
+
+  @AfterMapping
+  fun addSkillsAndInterests(
+    dto: CreatePersonalSkillsAndInterestsDto,
+    @MappingTarget entity: PersonalSkillsAndInterestsEntity,
+  ) {
+    dto.skills.forEach {
+      entity.addChild(
+        personalSkillEntityMapper.fromDomainToEntity(it),
+        entity.skills(),
+      )
+    }
+    dto.interests.forEach {
+      entity.addChild(
+        personalInterestEntityMapper.fromDomainToEntity(it),
+        entity.interests(),
+      )
+    }
+  }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
@@ -68,7 +91,7 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
     val updatedSkills = dto.skills
 
     personalSkillEntityListManager.updateExisting(existingSkills, updatedSkills, personalSkillEntityMapper)
-    personalSkillEntityListManager.addNew(existingSkills, updatedSkills, personalSkillEntityMapper)
+    personalSkillEntityListManager.addNew(entity, existingSkills, updatedSkills, personalSkillEntityMapper)
     personalSkillEntityListManager.deleteRemoved(existingSkills, updatedSkills)
 
     return existingSkills
@@ -82,7 +105,7 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
     val updatedInterests = dto.interests
 
     personalInterestEntityListManager.updateExisting(existingInterests, updatedInterests, personalInterestEntityMapper)
-    personalInterestEntityListManager.addNew(existingInterests, updatedInterests, personalInterestEntityMapper)
+    personalInterestEntityListManager.addNew(entity, existingInterests, updatedInterests, personalInterestEntityMapper)
     personalInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
@@ -95,12 +118,14 @@ interface PersonalSkillEntityMapper :
 
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: PersonalSkill): PersonalSkillEntity
 
   fun fromEntityToDomain(persistedEntity: PersonalSkillEntity): PersonalSkill
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(@MappingTarget entity: PersonalSkillEntity, domain: PersonalSkill)
 }
 
@@ -109,11 +134,13 @@ interface PersonalInterestEntityMapper :
   KeyAwareEntityMapper<PersonalInterestEntity, PersonalInterest> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: PersonalInterest): PersonalInterestEntity
 
   fun fromEntityToDomain(persistedEntity: PersonalInterestEntity): PersonalInterest
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(@MappingTarget entity: PersonalInterestEntity, domain: PersonalInterest)
 }

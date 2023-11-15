@@ -43,7 +43,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(existingEntity),
     )
-    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val updatedExperience = aValidWorkExperience(
       experienceType = WorkExperienceTypeDomain.OTHER,
@@ -77,8 +76,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -97,7 +94,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(existingEntity),
     )
-    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val updatedExperiencesDto = aValidUpdatePreviousWorkExperiencesDto(
       reference = previousWorkExperiencesReference,
@@ -121,8 +117,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAt(initialUpdatedAt)
   }
 
   @Test
@@ -141,7 +135,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(existingEntity),
     )
-    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val existingExperience = aValidWorkExperience(
       experienceType = WorkExperienceTypeDomain.OTHER,
@@ -187,8 +180,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 
   @Test
@@ -213,7 +204,6 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       reference = previousWorkExperiencesReference,
       experiences = mutableListOf(firstWorkExperienceEntity, secondWorkExperienceEntity),
     )
-    // val initialUpdatedAt = existingPreviousWorkExperiencesEntity.updatedAt!!
 
     val updatePreviousWorkExperiencesDto = aValidUpdatePreviousWorkExperiencesDto(
       reference = previousWorkExperiencesReference,
@@ -241,7 +231,5 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
-    // TODO RR-469 - fix updatedAt timestamp
-    // assertThat(existingPreviousWorkExperiencesEntity).wasUpdatedAfter(initialUpdatedAt)
   }
 }

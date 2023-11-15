@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
@@ -8,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.FutureWorkInterests
@@ -31,7 +33,18 @@ abstract class FutureWorkInterestsEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "interests", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreateFutureWorkInterestsDto): FutureWorkInterestsEntity
+
+  @AfterMapping
+  fun addInterests(dto: CreateFutureWorkInterestsDto, @MappingTarget entity: FutureWorkInterestsEntity) {
+    dto.interests.forEach {
+      entity.addChild(
+        workInterestEntityMapper.fromDomainToEntity(it),
+        entity.interests(),
+      )
+    }
+  }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
@@ -54,7 +67,7 @@ abstract class FutureWorkInterestsEntityMapper {
     val updatedInterests = dto.interests
 
     entityListManager.updateExisting(existingInterests, updatedInterests, workInterestEntityMapper)
-    entityListManager.addNew(existingInterests, updatedInterests, workInterestEntityMapper)
+    entityListManager.addNew(entity, existingInterests, updatedInterests, workInterestEntityMapper)
     entityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
@@ -65,11 +78,13 @@ abstract class FutureWorkInterestsEntityMapper {
 interface WorkInterestEntityMapper : KeyAwareEntityMapper<WorkInterestEntity, WorkInterest> {
   @ExcludeJpaManagedFields
   @GenerateNewReference
+  @ExcludeParentEntity
   override fun fromDomainToEntity(domain: WorkInterest): WorkInterestEntity
 
   fun fromEntityToDomain(entity: WorkInterestEntity): WorkInterest
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
+  @ExcludeParentEntity
   override fun updateEntityFromDomain(@MappingTarget entity: WorkInterestEntity, domain: WorkInterest)
 }

@@ -10,7 +10,11 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreRemove
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -44,12 +48,10 @@ class PersonalSkillsAndInterestsEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "skills_interests_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var skills: MutableList<PersonalSkillEntity>? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "skills_interests_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var interests: MutableList<PersonalInterestEntity>? = null,
 
   @Column(updatable = false)
@@ -83,7 +85,25 @@ class PersonalSkillsAndInterestsEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) {
+) : ParentEntity() {
+
+  fun skills(): MutableList<PersonalSkillEntity> {
+    if (skills == null) {
+      skills = mutableListOf()
+    }
+    return skills!!
+  }
+
+  fun interests(): MutableList<PersonalInterestEntity> {
+    if (interests == null) {
+      interests = mutableListOf()
+    }
+    return interests!!
+  }
+
+  override fun childEntityUpdated() {
+    this.updatedAt = Instant.now()
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -113,6 +133,10 @@ class PersonalSkillEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "skills_interests_id")
+  var parent: PersonalSkillsAndInterestsEntity? = null,
+
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
@@ -136,7 +160,18 @@ class PersonalSkillEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) : EntityKeyAware {
+) : KeyAwareChildEntity {
+
+  @PrePersist
+  @PreUpdate
+  @PreRemove
+  fun onChange() {
+    parent?.childEntityUpdated()
+  }
+
+  override fun associateWithParent(parent: ParentEntity) {
+    this.parent = parent as PersonalSkillsAndInterestsEntity
+  }
 
   override fun key(): String = skillType!!.name
 
@@ -168,6 +203,10 @@ class PersonalInterestEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "skills_interests_id")
+  var parent: PersonalSkillsAndInterestsEntity? = null,
+
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
@@ -191,7 +230,18 @@ class PersonalInterestEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null,
-) : EntityKeyAware {
+) : KeyAwareChildEntity {
+
+  @PrePersist
+  @PreUpdate
+  @PreRemove
+  fun onChange() {
+    parent?.childEntityUpdated()
+  }
+
+  override fun associateWithParent(parent: ParentEntity) {
+    this.parent = parent as PersonalSkillsAndInterestsEntity
+  }
 
   override fun key(): String = interestType!!.name
 
