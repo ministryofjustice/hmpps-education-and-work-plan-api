@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.mapstruct.AfterMapping
+import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
@@ -39,6 +41,7 @@ abstract class InPrisonInterestsEntityMapper {
   @Autowired
   private lateinit var trainingInterestEntityListManager: InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>
 
+  @BeanMapping(qualifiedByName = ["addNewInterestsDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -47,20 +50,11 @@ abstract class InPrisonInterestsEntityMapper {
   @Mapping(target = "inPrisonTrainingInterests", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity
 
+  @Named("addNewInterestsDuringCreate")
   @AfterMapping
-  fun addInterests(dto: CreateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
-    dto.inPrisonWorkInterests.forEach {
-      entity.addChild(
-        workInterestEntityMapper.fromDomainToEntity(it),
-        entity.inPrisonWorkInterests(),
-      )
-    }
-    dto.inPrisonTrainingInterests.forEach {
-      entity.addChild(
-        trainingInterestEntityMapper.fromDomainToEntity(it),
-        entity.inPrisonTrainingInterests(),
-      )
-    }
+  fun addNewInterestsDuringCreate(dto: CreateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
+    addNewWorkInterests(dto.inPrisonWorkInterests, entity)
+    addNewTrainingInterests(dto.inPrisonTrainingInterests, entity)
   }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
@@ -76,38 +70,6 @@ abstract class InPrisonInterestsEntityMapper {
   @Mapping(target = "inPrisonWorkInterests", expression = "java( updateWorkInterests(entity, dto) )")
   @Mapping(target = "inPrisonTrainingInterests", expression = "java( updateTrainingInterests(entity, dto) )")
   abstract fun updateEntityFromDto(@MappingTarget entity: InPrisonInterestsEntity?, dto: UpdateInPrisonInterestsDto?)
-
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "inPrisonWorkInterests", ignore = true)
-  @Mapping(target = "inPrisonTrainingInterests", ignore = true)
-  abstract fun fromUpdateDtoToEntity(inPrisonInterests: UpdateInPrisonInterestsDto?): InPrisonInterestsEntity?
-
-  @AfterMapping
-  fun addInterests(dto: UpdateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
-    val existingWorkTypes = entity.inPrisonWorkInterests?.map { it.key() }
-    dto.inPrisonWorkInterests.forEach {
-      // ensure we only add new ones
-      if (existingWorkTypes == null || !existingWorkTypes.contains(it.key())) {
-        entity.addChild(
-          workInterestEntityMapper.fromDomainToEntity(it),
-          entity.inPrisonWorkInterests(),
-        )
-      }
-    }
-
-    val existingTrainingTypes = entity.inPrisonTrainingInterests?.map { it.key() }
-    dto.inPrisonTrainingInterests.forEach {
-      if (existingTrainingTypes == null || !existingTrainingTypes.contains(it.key())) {
-        entity.addChild(
-          trainingInterestEntityMapper.fromDomainToEntity(it),
-          entity.inPrisonTrainingInterests(),
-        )
-      }
-    }
-  }
 
   fun updateWorkInterests(
     entity: InPrisonInterestsEntity,
@@ -135,6 +97,40 @@ abstract class InPrisonInterestsEntityMapper {
     trainingInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
+  }
+
+  @BeanMapping(qualifiedByName = ["addNewInterestsDuringUpdate"])
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "inPrisonWorkInterests", ignore = true)
+  @Mapping(target = "inPrisonTrainingInterests", ignore = true)
+  abstract fun fromUpdateDtoToEntity(inPrisonInterests: UpdateInPrisonInterestsDto?): InPrisonInterestsEntity?
+
+  @Named("addNewInterestsDuringUpdate")
+  @AfterMapping
+  fun addNewInterestsDuringUpdate(dto: UpdateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
+    addNewWorkInterests(dto.inPrisonWorkInterests, entity)
+    addNewTrainingInterests(dto.inPrisonTrainingInterests, entity)
+  }
+
+  private fun addNewWorkInterests(workInterests: List<InPrisonWorkInterest>, entity: InPrisonInterestsEntity) {
+    workInterests.forEach {
+      entity.addChild(
+        workInterestEntityMapper.fromDomainToEntity(it),
+        entity.inPrisonWorkInterests(),
+      )
+    }
+  }
+
+  private fun addNewTrainingInterests(workInterests: List<InPrisonTrainingInterest>, entity: InPrisonInterestsEntity) {
+    workInterests.forEach {
+      entity.addChild(
+        trainingInterestEntityMapper.fromDomainToEntity(it),
+        entity.inPrisonTrainingInterests(),
+      )
+    }
   }
 }
 

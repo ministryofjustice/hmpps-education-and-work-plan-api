@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.mapstruct.AfterMapping
+import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
@@ -30,6 +32,7 @@ abstract class PreviousQualificationsEntityMapper {
   @Autowired
   private lateinit var entityListManager: InductionEntityListManager<QualificationEntity, Qualification>
 
+  @BeanMapping(qualifiedByName = ["addNewQualificationsDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -37,14 +40,10 @@ abstract class PreviousQualificationsEntityMapper {
   @Mapping(target = "qualifications", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreatePreviousQualificationsDto): PreviousQualificationsEntity
 
+  @Named("addNewQualificationsDuringCreate")
   @AfterMapping
-  fun addQualifications(dto: CreatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
-    dto.qualifications.forEach {
-      entity.addChild(
-        qualificationEntityMapper.fromDomainToEntity(it),
-        entity.qualifications(),
-      )
-    }
+  fun addNewQualificationsDuringCreate(dto: CreatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
+    addNewQualifications(dto.qualifications, entity)
   }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
@@ -77,6 +76,7 @@ abstract class PreviousQualificationsEntityMapper {
     return existingQualifications
   }
 
+  @BeanMapping(qualifiedByName = ["addNewQualificationsDuringUpdate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -84,17 +84,18 @@ abstract class PreviousQualificationsEntityMapper {
   @Mapping(target = "qualifications", ignore = true)
   abstract fun fromUpdateDtoToEntity(previousQualifications: UpdatePreviousQualificationsDto?): PreviousQualificationsEntity?
 
+  @Named("addNewQualificationsDuringUpdate")
   @AfterMapping
-  fun addQualifications(dto: UpdatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
-    val existingSubjects = entity.qualifications().map { it.key() }
-    dto.qualifications.forEach {
-      // ensure we only add new ones
-      if (!existingSubjects.contains(it.key())) {
-        entity.addChild(
-          qualificationEntityMapper.fromDomainToEntity(it),
-          entity.qualifications(),
-        )
-      }
+  fun addNewQualificationsDuringUpdate(dto: UpdatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
+    addNewQualifications(dto.qualifications, entity)
+  }
+
+  private fun addNewQualifications(qualifications: List<Qualification>, entity: PreviousQualificationsEntity) {
+    qualifications.forEach {
+      entity.addChild(
+        qualificationEntityMapper.fromDomainToEntity(it),
+        entity.qualifications(),
+      )
     }
   }
 }

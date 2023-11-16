@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.mapstruct.AfterMapping
+import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
@@ -32,6 +34,7 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Autowired
   private lateinit var entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>
 
+  @BeanMapping(qualifiedByName = ["addNewExperiencesDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -39,14 +42,10 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Mapping(target = "experiences", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity
 
+  @Named("addNewExperiencesDuringCreate")
   @AfterMapping
-  fun addExperiences(dto: CreatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
-    dto.experiences.forEach {
-      entity.addChild(
-        workExperienceEntityMapper.fromDomainToEntity(it),
-        entity.experiences(),
-      )
-    }
+  fun addNewExperiencesDuringCreate(dto: CreatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
+    addNewExperiences(dto.experiences, entity)
   }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
@@ -80,6 +79,7 @@ abstract class PreviousWorkExperiencesEntityMapper {
     return existingExperiences
   }
 
+  @BeanMapping(qualifiedByName = ["addNewExperiencesDuringUpdate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -87,17 +87,18 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Mapping(target = "experiences", ignore = true)
   abstract fun fromUpdateDtoToEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity?
 
+  @Named("addNewExperiencesDuringUpdate")
   @AfterMapping
-  fun addExperiences(dto: UpdatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
-    val existingExperienceTypes = entity.experiences?.map { it.key() }
-    dto.experiences.forEach {
-      // ensure we only add new ones
-      if (existingExperienceTypes == null || !existingExperienceTypes.contains(it.key())) {
-        entity.addChild(
-          workExperienceEntityMapper.fromDomainToEntity(it),
-          entity.experiences(),
-        )
-      }
+  fun addNewExperiencesDuringUpdate(dto: UpdatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
+    addNewExperiences(dto.experiences, entity)
+  }
+
+  private fun addNewExperiences(experiences: List<WorkExperience>, entity: PreviousWorkExperiencesEntity) {
+    experiences.forEach {
+      entity.addChild(
+        workExperienceEntityMapper.fromDomainToEntity(it),
+        entity.experiences(),
+      )
     }
   }
 }
