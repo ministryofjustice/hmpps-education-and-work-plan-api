@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -13,7 +13,7 @@ fun aValidPreviousWorkResponse(
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
-  workInterests: WorkInterests? = aValidWorkInterests(),
+  workInterests: WorkInterestsResponse? = aValidWorkInterestsResponse(),
   modifiedBy: String = "auser_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): PreviousWorkResponse =

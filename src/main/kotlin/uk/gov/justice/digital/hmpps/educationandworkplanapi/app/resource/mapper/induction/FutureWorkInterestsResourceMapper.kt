@@ -6,8 +6,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Wor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateWorkInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 
 @Component
@@ -20,7 +20,7 @@ class FutureWorkInterestsResourceMapper {
       )
     }
 
-  fun toUpdateFutureWorkInterestsDto(request: WorkInterests?, prisonId: String): UpdateFutureWorkInterestsDto? =
+  fun toUpdateFutureWorkInterestsDto(request: UpdateWorkInterestsRequest?, prisonId: String): UpdateFutureWorkInterestsDto? =
     request?.let {
       UpdateFutureWorkInterestsDto(
         reference = it.id,

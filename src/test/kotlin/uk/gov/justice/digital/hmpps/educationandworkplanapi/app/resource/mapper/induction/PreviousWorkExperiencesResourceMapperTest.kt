@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkExperienceResource
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterests
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterestsResponse
 import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperienceType as WorkExperienceTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType as WorkInterestTypeDomain
@@ -80,7 +80,7 @@ class PreviousWorkExperiencesResourceMapperTest {
           details = "A labourer in varied industries",
         ),
       ),
-      workInterests = aValidWorkInterests(
+      workInterests = aValidWorkInterestsResponse(
         id = workInterests.reference,
         workInterests = setOf(WorkType.OTHER),
         workInterestsOther = "Varied interests",
@@ -90,6 +90,8 @@ class PreviousWorkExperiencesResourceMapperTest {
             role = "Labourer",
           ),
         ),
+        modifiedBy = workInterests.lastUpdatedBy!!,
+        modifiedDateTime = workInterests.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
       ),
       modifiedDateTime = workExperiences.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
       modifiedBy = "bjones_gen",
@@ -170,11 +172,13 @@ class PreviousWorkExperiencesResourceMapperTest {
       typeOfWorkExperience = null,
       typeOfWorkExperienceOther = null,
       workExperience = null,
-      workInterests = aValidWorkInterests(
+      workInterests = aValidWorkInterestsResponse(
         id = workInterests.reference,
         workInterests = emptySet(),
         workInterestsOther = null,
         particularJobInterests = emptySet(),
+        modifiedBy = workInterests.lastUpdatedBy!!,
+        modifiedDateTime = workInterests.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
       ),
       modifiedDateTime = workExperiences.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
       modifiedBy = "bjones_gen",

@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 import java.util.UUID
 
 fun aValidUpdateCiagInductionRequest(
-  reference: UUID = UUID.randomUUID(),
+  reference: UUID? = UUID.randomUUID(),
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
   prisonId: String = "BXI",
   abilityToWork: Set<AbilityToWorkFactor>? = setOf(AbilityToWorkFactor.OTHER),

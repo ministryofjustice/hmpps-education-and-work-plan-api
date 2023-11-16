@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import java.util.UUID
 
@@ -29,7 +29,7 @@ fun aValidUpdatePreviousWorkRequest(
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
-  workInterests: WorkInterests? = aValidWorkInterests(),
+  workInterests: UpdateWorkInterestsRequest? = aValidUpdateWorkInterestsRequest(),
 ): UpdatePreviousWorkRequest =
   UpdatePreviousWorkRequest(
     id = id,
