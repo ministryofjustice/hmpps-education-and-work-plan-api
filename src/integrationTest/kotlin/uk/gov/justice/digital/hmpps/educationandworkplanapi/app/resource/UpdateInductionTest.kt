@@ -276,6 +276,62 @@ class UpdateInductionTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should update prisoner's work aspirations`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(
+      prisonNumber,
+      aValidCreateCiagInductionRequest(
+        hopingToGetWork = HopingToWork.NOT_SURE,
+        abilityToWork = setOf(AbilityToWorkFactor.OTHER),
+        abilityToWorkOther = "Lack of interest",
+        reasonToNotGetWork = setOf(ReasonNotToWork.OTHER),
+        reasonToNotGetWorkOther = "Crime pays",
+      ),
+    )
+    val persistedInduction = getInduction(prisonNumber)
+    val createdDateTime = persistedInduction.createdDateTime
+    val initialModifiedAt = persistedInduction.modifiedDateTime
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
+      originalInduction = persistedInduction,
+      hopingToGetWork = HopingToWork.YES,
+      abilityToWork = null,
+      abilityToWorkOther = null,
+      reasonToNotGetWork = null,
+      reasonToNotGetWorkOther = null,
+    )
+    shortDelayForTimestampChecking()
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val updatedInduction = getInduction(prisonNumber)
+    assertThat(updatedInduction)
+      .hasReference(persistedInduction.reference)
+      .hasHopingToGetWork(HopingToWork.YES)
+      .hasPrisonId("BXI")
+      .hasNoReasonToNotGetWorkOther()
+      .hasNoAbilityToWorkOther()
+      .hasAbilityToWork(emptySet())
+      .hasReasonToNotGetWork(emptySet())
+      .wasModifiedBy("auser_gen")
+      .wasCreatedAt(createdDateTime)
+      .wasLastModifiedAfter(initialModifiedAt)
+    // check last modified dates of child objects
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+  }
+
+  @Test
   fun `should update induction with no qualifications`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
@@ -283,7 +339,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
         id = persistedInduction.qualificationsAndTraining!!.id!!,
@@ -302,8 +358,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       additionalTrainingOther = null,
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -349,7 +404,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
         id = persistedInduction.qualificationsAndTraining!!.id,
@@ -372,8 +427,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       additionalTrainingOther = "Any training",
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -392,7 +446,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
       .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAfter(initialModifiedAt)
+      .wasLastModifiedAt(initialModifiedAt)
     assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
@@ -409,7 +463,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
         id = persistedInduction.workExperience!!.id!!,
@@ -450,8 +504,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -498,7 +551,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
         hasWorkedBefore = true,
@@ -517,8 +570,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       workInterests = aValidWorkInterests(),
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -547,14 +599,14 @@ class UpdateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should update induction with no skills and interest`() {
+  fun `should update induction with no skills or interests`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
         id = persistedInduction.workExperience!!.id!!,
@@ -573,8 +625,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       personalInterestsOther = null,
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -610,7 +661,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
         skills = setOf(PersonalSkill.OTHER),
@@ -627,8 +678,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       personalInterestsOther = "Secret interests",
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -647,7 +697,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
       .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAfter(initialModifiedAt)
+      .wasLastModifiedAt(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
@@ -664,7 +714,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       inPrisonInterests = aValidUpdatePrisonWorkAndEducationRequest(
         id = persistedInduction.workExperience!!.id!!,
@@ -683,8 +733,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       inPrisonEducationOther = null,
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -720,7 +769,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val persistedInduction = getInduction(prisonNumber)
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
-    val updateInductionRequest = aValidUpdateCiagInductionRequest(
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       inPrisonInterests = aValidUpdatePrisonWorkAndEducationRequest(
         id = null,
@@ -738,8 +787,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       inPrisonEducationOther = "Any in-prison training",
       modifiedBy = "auser_gen",
     )
-    // Short delay for the purpose of timestamp checking
-    Thread.sleep(500)
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -758,7 +806,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
       .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAfter(initialModifiedAt)
+      .wasLastModifiedAt(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
@@ -767,7 +815,11 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
 
-  private fun aValidUpdateCiagInductionRequest(
+  private fun shortDelayForTimestampChecking() {
+    Thread.sleep(100)
+  }
+
+  private fun aValidUpdateInductionRequestBasedOn(
     originalInduction: CiagInductionResponse,
     reference: UUID = originalInduction.reference,
     hopingToGetWork: HopingToWork = originalInduction.hopingToGetWork,
