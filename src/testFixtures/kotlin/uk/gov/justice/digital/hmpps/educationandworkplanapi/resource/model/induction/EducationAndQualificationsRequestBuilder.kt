@@ -23,7 +23,7 @@ fun aValidCreateEducationAndQualificationsRequest(
 )
 
 fun aValidUpdateEducationAndQualificationsRequest(
-  id: UUID = UUID.randomUUID(),
+  id: UUID? = UUID.randomUUID(),
   educationLevel: HighestEducationLevel? = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: Set<AchievedQualification>? = setOf(
     aValidAchievedQualification(),

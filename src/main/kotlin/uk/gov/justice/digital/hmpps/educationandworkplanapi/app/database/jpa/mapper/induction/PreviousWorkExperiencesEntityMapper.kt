@@ -4,6 +4,7 @@ import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
@@ -21,6 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
   uses = [
     WorkExperienceEntityMapper::class,
   ],
+  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
 abstract class PreviousWorkExperiencesEntityMapper {
 
@@ -51,6 +53,7 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
+  @Mapping(target = "experiences", source = "experiences")
   abstract fun fromEntityToDomain(persistedEntity: PreviousWorkExperiencesEntity): PreviousWorkExperiences
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
@@ -75,6 +78,27 @@ abstract class PreviousWorkExperiencesEntityMapper {
     entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
 
     return existingExperiences
+  }
+
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "experiences", ignore = true)
+  abstract fun fromUpdateDtoToEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity?
+
+  @AfterMapping
+  fun addExperiences(dto: UpdatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
+    val existingExperienceTypes = entity.experiences?.map { it.key() }
+    dto.experiences.forEach {
+      // ensure we only add new ones
+      if (existingExperienceTypes == null || !existingExperienceTypes.contains(it.key())) {
+        entity.addChild(
+          workExperienceEntityMapper.fromDomainToEntity(it),
+          entity.experiences(),
+        )
+      }
+    }
   }
 }
 

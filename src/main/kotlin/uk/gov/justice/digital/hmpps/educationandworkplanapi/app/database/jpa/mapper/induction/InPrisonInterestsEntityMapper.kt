@@ -77,6 +77,38 @@ abstract class InPrisonInterestsEntityMapper {
   @Mapping(target = "inPrisonTrainingInterests", expression = "java( updateTrainingInterests(entity, dto) )")
   abstract fun updateEntityFromDto(@MappingTarget entity: InPrisonInterestsEntity?, dto: UpdateInPrisonInterestsDto?)
 
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "inPrisonWorkInterests", ignore = true)
+  @Mapping(target = "inPrisonTrainingInterests", ignore = true)
+  abstract fun fromUpdateDtoToEntity(inPrisonInterests: UpdateInPrisonInterestsDto?): InPrisonInterestsEntity?
+
+  @AfterMapping
+  fun addInterests(dto: UpdateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
+    val existingWorkTypes = entity.inPrisonWorkInterests?.map { it.key() }
+    dto.inPrisonWorkInterests.forEach {
+      // ensure we only add new ones
+      if (existingWorkTypes == null || !existingWorkTypes.contains(it.key())) {
+        entity.addChild(
+          workInterestEntityMapper.fromDomainToEntity(it),
+          entity.inPrisonWorkInterests(),
+        )
+      }
+    }
+
+    val existingTrainingTypes = entity.inPrisonTrainingInterests?.map { it.key() }
+    dto.inPrisonTrainingInterests.forEach {
+      if (existingTrainingTypes == null || !existingTrainingTypes.contains(it.key())) {
+        entity.addChild(
+          trainingInterestEntityMapper.fromDomainToEntity(it),
+          entity.inPrisonTrainingInterests(),
+        )
+      }
+    }
+  }
+
   fun updateWorkInterests(
     entity: InPrisonInterestsEntity,
     dto: UpdateInPrisonInterestsDto,

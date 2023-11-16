@@ -62,6 +62,24 @@ abstract class FutureWorkInterestsEntityMapper {
     dto: UpdateFutureWorkInterestsDto?,
   )
 
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "interests", ignore = true)
+  abstract fun fromUpdateDtoToEntity(dto: UpdateFutureWorkInterestsDto?): FutureWorkInterestsEntity
+
+  @AfterMapping
+  fun addInterests(dto: UpdateFutureWorkInterestsDto, @MappingTarget entity: FutureWorkInterestsEntity) {
+    val existingTypes = entity.interests?.map { it.key() }
+    dto.interests.forEach {
+      // ensure we only add new interests
+      if (existingTypes == null || !existingTypes.contains(it.key())) {
+        entity.addChild(workInterestEntityMapper.fromDomainToEntity(it), entity.interests())
+      }
+    }
+  }
+
   fun updateInterests(entity: FutureWorkInterestsEntity, dto: UpdateFutureWorkInterestsDto): List<WorkInterestEntity> {
     val existingInterests = entity.interests!!
     val updatedInterests = dto.interests

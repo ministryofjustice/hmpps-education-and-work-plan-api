@@ -26,10 +26,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Train
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 abstract class QualificationsAndTrainingResourceMapper {
 
-  abstract fun toCreatePreviousQualificationsDto(
+  fun toCreatePreviousQualificationsDto(
     request: CreateEducationAndQualificationsRequest?,
     prisonId: String,
-  ): CreatePreviousQualificationsDto?
+  ): CreatePreviousQualificationsDto? {
+    if (request?.educationLevel == null) {
+      return null
+    }
+
+    return CreatePreviousQualificationsDto(
+      educationLevel = toHighestEducationLevelDomain(request.educationLevel)!!,
+      qualifications = request.qualifications?.map { toQualification(it) } ?: emptyList(),
+      prisonId = prisonId,
+    )
+  }
 
   abstract fun toQualification(qualificationRequest: AchievedQualification): Qualification
 
@@ -42,23 +52,29 @@ abstract class QualificationsAndTrainingResourceMapper {
 
   fun toEducationAndQualificationResponse(
     qualifications: PreviousQualifications?,
-    training: PreviousTraining?,
-  ): EducationAndQualificationResponse? {
-    return training?.let {
-      EducationAndQualificationResponse(
-        // We always expect to have a value within PreviousTraining (even if it only contains just TrainingType.NONE),
-        // so we use PreviousTraining as the parent/primary object. However, we are still guarding against it being
-        // null in case anything changes on the client side.
-        id = training.reference,
-        educationLevel = toHighestEducationLevelApi(qualifications?.educationLevel),
-        qualifications = toAchievedQualifications(qualifications?.qualifications),
-        additionalTraining = toTrainingTypesApi(training.trainingTypes),
-        additionalTrainingOther = if (training.trainingTypes.contains(OTHER)) training.trainingTypeOther else null,
-        modifiedBy = training.lastUpdatedBy!!,
-        modifiedDateTime = toOffsetDateTime(training.lastUpdatedAt)!!,
-      )
+    training: PreviousTraining,
+  ): EducationAndQualificationResponse {
+    // We always expect to have a value within training (even if it only contains TrainingType.NONE), so we use that
+    // as the "primary" object from which to populate the JPA generated fields from. However, if qualifications have
+    // been updated more recently, then we populate modifiedDateTime and modifiedBy from there instead.
+    var mostRecentModifiedDate = training.lastUpdatedAt!!
+    var mostRecentModifiedBy = training.lastUpdatedBy!!
+    if (qualifications != null && qualifications.lastUpdatedAt!!.isAfter(training.lastUpdatedAt)) {
+      mostRecentModifiedDate = qualifications.lastUpdatedAt!!
+      mostRecentModifiedBy = qualifications.lastUpdatedBy!!
     }
+    return EducationAndQualificationResponse(
+      id = training.reference,
+      educationLevel = toHighestEducationLevelApi(qualifications?.educationLevel),
+      qualifications = toAchievedQualifications(qualifications?.qualifications),
+      additionalTraining = toTrainingTypesApi(training.trainingTypes),
+      additionalTrainingOther = if (training.trainingTypes.contains(OTHER)) training.trainingTypeOther else null,
+      modifiedBy = mostRecentModifiedBy,
+      modifiedDateTime = toOffsetDateTime(mostRecentModifiedDate)!!,
+    )
   }
+
+  abstract fun toHighestEducationLevelDomain(educationLevel: HighestEducationLevelApi?): HighestEducationLevelDomain?
 
   abstract fun toHighestEducationLevelApi(educationLevel: HighestEducationLevelDomain?): HighestEducationLevelApi?
 

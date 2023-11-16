@@ -76,6 +76,27 @@ abstract class PreviousQualificationsEntityMapper {
 
     return existingQualifications
   }
+
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "qualifications", ignore = true)
+  abstract fun fromUpdateDtoToEntity(previousQualifications: UpdatePreviousQualificationsDto?): PreviousQualificationsEntity?
+
+  @AfterMapping
+  fun addQualifications(dto: UpdatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
+    val existingSubjects = entity.qualifications().map { it.key() }
+    dto.qualifications.forEach {
+      // ensure we only add new ones
+      if (!existingSubjects.contains(it.key())) {
+        entity.addChild(
+          qualificationEntityMapper.fromDomainToEntity(it),
+          entity.qualifications(),
+        )
+      }
+    }
+  }
 }
 
 @Mapper
