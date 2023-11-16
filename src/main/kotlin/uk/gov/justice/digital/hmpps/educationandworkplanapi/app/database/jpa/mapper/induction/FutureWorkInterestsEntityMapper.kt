@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.mapstruct.AfterMapping
+import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.FutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
@@ -29,6 +31,7 @@ abstract class FutureWorkInterestsEntityMapper {
   @Autowired
   private lateinit var entityListManager: InductionEntityListManager<WorkInterestEntity, WorkInterest>
 
+  @BeanMapping(qualifiedByName = ["addNewInterestsDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -36,14 +39,10 @@ abstract class FutureWorkInterestsEntityMapper {
   @Mapping(target = "interests", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreateFutureWorkInterestsDto): FutureWorkInterestsEntity
 
+  @Named("addNewInterestsDuringCreate")
   @AfterMapping
-  fun addInterests(dto: CreateFutureWorkInterestsDto, @MappingTarget entity: FutureWorkInterestsEntity) {
-    dto.interests.forEach {
-      entity.addChild(
-        workInterestEntityMapper.fromDomainToEntity(it),
-        entity.interests(),
-      )
-    }
+  fun addNewInterestsDuringCreate(dto: CreateFutureWorkInterestsDto, @MappingTarget entity: FutureWorkInterestsEntity) {
+    addNewInterests(dto.interests, entity)
   }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
@@ -62,24 +61,6 @@ abstract class FutureWorkInterestsEntityMapper {
     dto: UpdateFutureWorkInterestsDto?,
   )
 
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "interests", ignore = true)
-  abstract fun fromUpdateDtoToEntity(dto: UpdateFutureWorkInterestsDto?): FutureWorkInterestsEntity
-
-  @AfterMapping
-  fun addInterests(dto: UpdateFutureWorkInterestsDto, @MappingTarget entity: FutureWorkInterestsEntity) {
-    val existingTypes = entity.interests?.map { it.key() }
-    dto.interests.forEach {
-      // ensure we only add new interests
-      if (existingTypes == null || !existingTypes.contains(it.key())) {
-        entity.addChild(workInterestEntityMapper.fromDomainToEntity(it), entity.interests())
-      }
-    }
-  }
-
   fun updateInterests(entity: FutureWorkInterestsEntity, dto: UpdateFutureWorkInterestsDto): List<WorkInterestEntity> {
     val existingInterests = entity.interests!!
     val updatedInterests = dto.interests
@@ -89,6 +70,29 @@ abstract class FutureWorkInterestsEntityMapper {
     entityListManager.deleteRemoved(existingInterests, updatedInterests)
 
     return existingInterests
+  }
+
+  @BeanMapping(qualifiedByName = ["addNewInterestsDuringUpdate"])
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @GenerateNewReference
+  @Mapping(target = "createdAtPrison", source = "prisonId")
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "interests", ignore = true)
+  abstract fun fromUpdateDtoToEntity(dto: UpdateFutureWorkInterestsDto?): FutureWorkInterestsEntity
+
+  @Named("addNewInterestsDuringUpdate")
+  @AfterMapping
+  fun addNewInterestsDuringUpdate(dto: UpdateFutureWorkInterestsDto, @MappingTarget entity: FutureWorkInterestsEntity) {
+    addNewInterests(dto.interests, entity)
+  }
+
+  private fun addNewInterests(interests: List<WorkInterest>, entity: FutureWorkInterestsEntity) {
+    interests.forEach {
+      entity.addChild(
+        workInterestEntityMapper.fromDomainToEntity(it),
+        entity.interests(),
+      )
+    }
   }
 }
 

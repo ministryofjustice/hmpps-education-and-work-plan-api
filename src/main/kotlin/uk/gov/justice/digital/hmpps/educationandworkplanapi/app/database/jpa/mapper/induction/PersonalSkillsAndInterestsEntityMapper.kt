@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.mapstruct.AfterMapping
+import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillEntity
@@ -39,6 +41,7 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Autowired
   private lateinit var personalInterestEntityListManager: InductionEntityListManager<PersonalInterestEntity, PersonalInterest>
 
+  @BeanMapping(qualifiedByName = ["addNewSkillsAndInterestsDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -47,23 +50,14 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Mapping(target = "interests", ignore = true)
   abstract fun fromCreateDtoToEntity(dto: CreatePersonalSkillsAndInterestsDto): PersonalSkillsAndInterestsEntity
 
+  @Named("addNewSkillsAndInterestsDuringCreate")
   @AfterMapping
-  fun addSkillsAndInterests(
+  fun addNewSkillsAndInterestsDuringCreate(
     dto: CreatePersonalSkillsAndInterestsDto,
     @MappingTarget entity: PersonalSkillsAndInterestsEntity,
   ) {
-    dto.skills.forEach {
-      entity.addChild(
-        personalSkillEntityMapper.fromDomainToEntity(it),
-        entity.skills(),
-      )
-    }
-    dto.interests.forEach {
-      entity.addChild(
-        personalInterestEntityMapper.fromDomainToEntity(it),
-        entity.interests(),
-      )
-    }
+    addNewSkills(dto.skills, entity)
+    addNewInterests(dto.interests, entity)
   }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
@@ -111,6 +105,7 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
     return existingInterests
   }
 
+  @BeanMapping(qualifiedByName = ["addNewSkillsAndInterestsDuringUpdate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
@@ -119,30 +114,37 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Mapping(target = "interests", ignore = true)
   abstract fun fromUpdateDtoToEntity(personalSkillsAndInterests: UpdatePersonalSkillsAndInterestsDto?): PersonalSkillsAndInterestsEntity?
 
+  @Named("addNewSkillsAndInterestsDuringUpdate")
   @AfterMapping
-  fun addSkillsAndInterests(
+  fun addNewSkillsAndInterestsDuringUpdate(
     dto: UpdatePersonalSkillsAndInterestsDto,
     @MappingTarget entity: PersonalSkillsAndInterestsEntity,
   ) {
-    val existingSkillTypes = entity.skills?.map { it.key() }
-    dto.skills.forEach {
-      // ensure we only add new ones
-      if (existingSkillTypes == null || !existingSkillTypes.contains(it.key())) {
-        entity.addChild(
-          personalSkillEntityMapper.fromDomainToEntity(it),
-          entity.skills(),
-        )
-      }
-    }
+    addNewSkills(dto.skills, entity)
+    addNewInterests(dto.interests, entity)
+  }
 
-    val existingInterestTypes = entity.interests?.map { it.key() }
-    dto.interests.forEach {
-      if (existingInterestTypes == null || !existingInterestTypes.contains(it.key())) {
-        entity.addChild(
-          personalInterestEntityMapper.fromDomainToEntity(it),
-          entity.interests(),
-        )
-      }
+  private fun addNewSkills(
+    skills: List<PersonalSkill>,
+    entity: PersonalSkillsAndInterestsEntity,
+  ) {
+    skills.forEach {
+      entity.addChild(
+        personalSkillEntityMapper.fromDomainToEntity(it),
+        entity.skills(),
+      )
+    }
+  }
+
+  private fun addNewInterests(
+    interests: List<PersonalInterest>,
+    entity: PersonalSkillsAndInterestsEntity,
+  ) {
+    interests.forEach {
+      entity.addChild(
+        personalInterestEntityMapper.fromDomainToEntity(it),
+        entity.interests(),
+      )
     }
   }
 }
