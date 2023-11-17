@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkInterestsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterests
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateWorkInterestsRequest
 
 class FutureWorkInterestsResourceMapperTest {
   private val mapper = FutureWorkInterestsResourceMapper()
@@ -30,7 +30,7 @@ class FutureWorkInterestsResourceMapperTest {
   fun `should map to UpdateFutureWorkInterestsDto`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidWorkInterests()
+    val request = aValidUpdateWorkInterestsRequest()
 
     // When
     val actual = mapper.toUpdateFutureWorkInterestsDto(request, prisonId)

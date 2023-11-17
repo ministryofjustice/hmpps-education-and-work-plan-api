@@ -43,8 +43,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateSkillsAndInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkExperienceResource
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterests
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -102,7 +103,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessageContaining("JSON parse error")
-      .hasUserMessageContaining("value failed for JSON property reference due to missing (therefore NULL) value for creator parameter reference")
+      .hasUserMessageContaining("value failed for JSON property prisonId due to missing (therefore NULL) value for creator parameter prisonId")
   }
 
   @Test
@@ -138,7 +139,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val createdDateTime = persistedInduction.createdDateTime
     val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateCiagInductionRequest(
-      reference = persistedInduction.reference,
+      reference = null,
       hopingToGetWork = HopingToWork.YES,
       prisonId = "MDI",
       abilityToWork = null,
@@ -157,7 +158,7 @@ class UpdateInductionTest : IntegrationTestBase() {
             details = "General brick work",
           ),
         ),
-        workInterests = aValidWorkInterests(
+        workInterests = aValidUpdateWorkInterestsRequest(
           id = persistedInduction.workExperience!!.workInterests!!.id,
           workInterests = setOf(WorkType.SPORTS),
           workInterestsOther = null,
@@ -204,7 +205,7 @@ class UpdateInductionTest : IntegrationTestBase() {
           details = "General brick work",
         ),
       ),
-      workInterests = aValidWorkInterests(
+      workInterests = aValidWorkInterestsResponse(
         id = persistedInduction.workExperience!!.workInterests!!.id,
         workInterests = setOf(WorkType.SPORTS),
         workInterestsOther = null,
@@ -214,6 +215,7 @@ class UpdateInductionTest : IntegrationTestBase() {
             role = "Football coach",
           ),
         ),
+        modifiedBy = "auser_gen",
       ),
       modifiedBy = "auser_gen",
     )
@@ -241,6 +243,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       inPrisonEducationOther = null,
       modifiedBy = "auser_gen",
     )
+    shortDelayForTimestampChecking()
 
     // When
     webTestClient.put()
@@ -270,6 +273,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
     // check last modified dates of child objects
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
@@ -325,10 +329,11 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasCreatedAt(createdDateTime)
       .wasLastModifiedAfter(initialModifiedAt)
     // check last modified dates of child objects
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
 
   @Test
@@ -382,6 +387,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
@@ -451,12 +457,13 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
 
   @Test
-  fun `should update induction with no previous work experience`() {
+  fun `should update induction with no previous work experience and modified work interests`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
@@ -471,7 +478,7 @@ class UpdateInductionTest : IntegrationTestBase() {
         typeOfWorkExperience = null,
         typeOfWorkExperienceOther = null,
         workExperience = null,
-        workInterests = aValidWorkInterests(
+        workInterests = aValidUpdateWorkInterestsRequest(
           id = persistedInduction.workExperience!!.workInterests!!.id,
           workInterests = setOf(WorkType.SPORTS),
           workInterestsOther = null,
@@ -491,7 +498,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       typeOfWorkExperience = null,
       typeOfWorkExperienceOther = null,
       workExperience = null,
-      workInterests = aValidWorkInterests(
+      workInterests = aValidWorkInterestsResponse(
         id = persistedInduction.workExperience!!.workInterests!!.id,
         workInterests = setOf(WorkType.SPORTS),
         workInterestsOther = null,
@@ -526,6 +533,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasLastModifiedAt(initialModifiedAt) // should be unchanged
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
@@ -558,7 +566,7 @@ class UpdateInductionTest : IntegrationTestBase() {
         typeOfWorkExperience = setOf(WorkType.OTHER),
         typeOfWorkExperienceOther = "Scientist",
         workExperience = setOf(aValidWorkExperienceResource()),
-        workInterests = aValidWorkInterests(),
+        workInterests = aValidUpdateWorkInterestsRequest(),
       ),
     )
 
@@ -567,7 +575,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       typeOfWorkExperience = setOf(WorkType.OTHER),
       typeOfWorkExperienceOther = "Scientist",
       workExperience = setOf(aValidWorkExperienceResource()),
-      workInterests = aValidWorkInterests(),
+      workInterests = aValidWorkInterestsResponse(),
       modifiedBy = "auser_gen",
     )
     shortDelayForTimestampChecking()
@@ -593,6 +601,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
     // other last modified dates should remain unchanged
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
@@ -650,6 +659,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
 
@@ -703,6 +713,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
 
@@ -758,6 +769,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
   }
 
@@ -812,11 +824,8 @@ class UpdateInductionTest : IntegrationTestBase() {
     // other last modified dates should remain unchanged
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-  }
-
-  private fun shortDelayForTimestampChecking() {
-    Thread.sleep(100)
   }
 
   private fun aValidUpdateInductionRequestBasedOn(
@@ -854,4 +863,8 @@ class UpdateInductionTest : IntegrationTestBase() {
       qualificationsAndTraining = qualificationsAndTraining,
       inPrisonInterests = inPrisonInterests,
     )
+
+  private fun shortDelayForTimestampChecking() {
+    Thread.sleep(200)
+  }
 }

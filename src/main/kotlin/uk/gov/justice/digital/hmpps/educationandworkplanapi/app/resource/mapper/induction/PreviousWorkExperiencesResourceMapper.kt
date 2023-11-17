@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterests
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -58,13 +58,15 @@ abstract class PreviousWorkExperiencesResourceMapper {
   @Mapping(target = "otherWork", source = "experienceTypeOther")
   abstract fun toWorkExperienceApi(workExperience: WorkExperienceDomain): WorkExperienceApi
 
-  private fun toWorkInterestsResponse(workInterests: FutureWorkInterests?): WorkInterests? {
+  private fun toWorkInterestsResponse(workInterests: FutureWorkInterests?): WorkInterestsResponse? {
     return workInterests?.let {
-      WorkInterests(
+      WorkInterestsResponse(
         id = workInterests.reference,
         workInterests = workInterests.interests.map { toWorkTypeApi(it.workType) }.toSet(),
         workInterestsOther = toWorkInterestsOther(workInterests),
         particularJobInterests = workInterests.interests.map { toWorkInterestDetail(it) }.toSet(),
+        modifiedBy = workInterests.lastUpdatedBy!!,
+        modifiedDateTime = toOffsetDateTime(workInterests.lastUpdatedAt)!!,
       )
     }
   }

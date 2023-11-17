@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.4.8'
+  version: '1.4.9'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -594,7 +594,7 @@ components:
           items:
             $ref: '#/components/schemas/WorkExperience'
         workInterests:
-          $ref: '#/components/schemas/WorkInterests'
+          $ref: '#/components/schemas/WorkInterestsResponse'
         modifiedBy:
           type: string
           description: The DPS username of the person who last updated this Prisoner's previous work.
@@ -729,6 +729,29 @@ components:
           description: An ISO-8601 timestamp representing when this Prisoner's in-prison work and education interests was last updated. This will be the same as the created date if it has not yet been updated.
           example: '2023-06-19T09:39:44Z'
       required:
+        - modifiedBy
+        - modifiedDateTime
+    WorkInterestsResponse:
+      description: The Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
+      allOf:
+        - $ref: '#/components/schemas/CreateWorkInterestsRequest'
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A unique reference for this Prisoner's work interests.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated the Induction.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - id
         - modifiedBy
         - modifiedDateTime
 
@@ -1128,7 +1151,6 @@ components:
         inPrisonInterests:
           $ref: '#/components/schemas/UpdatePrisonWorkAndEducationRequest'
       required:
-        - reference
         - hopingToGetWork
         - prisonId
 
@@ -1161,7 +1183,7 @@ components:
           items:
             $ref: '#/components/schemas/WorkExperience'
         workInterests:
-          $ref: '#/components/schemas/WorkInterests'
+          $ref: '#/components/schemas/UpdateWorkInterestsRequest'
       required:
         - hasWorkedBefore
 
@@ -1217,15 +1239,15 @@ components:
       required:
         - typeOfWorkExperience
 
-    WorkInterests:
-      description: The Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
+    UpdateWorkInterestsRequest:
+      description: A request to update a Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
       allOf:
         - $ref: '#/components/schemas/CreateWorkInterestsRequest'
       properties:
         id:
           type: string
           format: uuid
-          description: A unique reference for this Prisoner's education and qualifications.
+          description: A unique reference for this Prisoner's work interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
       required:
         - id

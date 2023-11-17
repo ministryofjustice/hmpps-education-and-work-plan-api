@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dt
 import java.util.UUID
 
 data class UpdateInductionDto(
-  val reference: UUID,
+  val reference: UUID?,
   val prisonNumber: String,
   val workOnRelease: UpdateWorkOnReleaseDto,
   val previousQualifications: UpdatePreviousQualificationsDto?,
