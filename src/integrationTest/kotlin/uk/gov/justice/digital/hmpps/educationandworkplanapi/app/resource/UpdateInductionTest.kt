@@ -136,8 +136,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateCiagInductionRequest(
       reference = null,
       hopingToGetWork = HopingToWork.YES,
@@ -265,18 +263,18 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasAbilityToWork(emptySet())
       .hasReasonToNotGetWork(emptySet())
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAfter(initialModifiedAt)
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAfter(persistedInduction.modifiedDateTime)
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
     assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
     // check last modified dates of child objects
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(persistedInduction.skillsAndInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -294,8 +292,6 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
     )
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       hopingToGetWork = HopingToWork.YES,
@@ -326,14 +322,14 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasAbilityToWork(emptySet())
       .hasReasonToNotGetWork(emptySet())
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAfter(initialModifiedAt)
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAfter(persistedInduction.modifiedDateTime)
     // check last modified dates of child objects
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -342,8 +338,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
@@ -381,15 +375,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
     assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -408,8 +402,6 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
     )
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
@@ -451,15 +443,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt)
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime)
     assertThat(updatedInduction.qualificationsAndTraining).isEquivalentTo(expectedQualificationsAndTraining)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -468,8 +460,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
@@ -529,15 +519,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -557,8 +547,6 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
     )
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
@@ -596,15 +584,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -613,8 +601,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
@@ -652,15 +638,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(persistedInduction.skillsAndInterests!!.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -669,8 +655,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest(skillsAndInterests = null))
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
@@ -706,15 +690,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt)
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime)
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(persistedInduction.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -723,8 +707,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       inPrisonInterests = aValidUpdatePrisonWorkAndEducationRequest(
@@ -762,15 +744,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt) // should be unchanged
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(persistedInduction.inPrisonInterests!!.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
   }
 
   @Test
@@ -779,8 +761,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest(inPrisonInterests = null))
     val persistedInduction = getInduction(prisonNumber)
-    val createdDateTime = persistedInduction.createdDateTime
-    val initialModifiedAt = persistedInduction.modifiedDateTime
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       inPrisonInterests = aValidUpdatePrisonWorkAndEducationRequest(
@@ -817,15 +797,15 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
-      .wasCreatedAt(createdDateTime)
-      .wasLastModifiedAt(initialModifiedAt)
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAt(persistedInduction.modifiedDateTime)
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
-    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(initialModifiedAt)
+    assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(persistedInduction.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
-    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualToIgnoringNanos(initialModifiedAt)
+    assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
+    assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
   }
 
   private fun aValidUpdateInductionRequestBasedOn(
