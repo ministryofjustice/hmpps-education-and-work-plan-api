@@ -41,3 +41,14 @@ hmpps.sqs:
   topics:
     domainevents:
       arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
+
+# TODO - RR-502 - Remove `ciag-api` property inc. children
+ciag-api:
+  client:
+    id: ciag-api-client-id
+    secret: client-secret
+
+# TODO - RR-502 - Remove `apis` property inc. children
+apis:
+  ciag-induction:
+    url: http://localhost:9093

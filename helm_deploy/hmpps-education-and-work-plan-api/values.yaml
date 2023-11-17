@@ -25,6 +25,10 @@ generic-service:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
     HMPPS_SQS_USE_WEB_TOKEN: true
+    # TODO - RR-502 - Remove `CIAG_INDUCTION_API_URL` and `CIAG_INDUCTION_DATA_MIGRATION_ENABLED`
+    CIAG_INDUCTION_API_URL: "https://ciag-induction-api.hmpps.service.justice.gov.uk"
+    CIAG_INDUCTION_DATA_MIGRATION_ENABLED: "false"
+
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -34,6 +38,9 @@ generic-service:
   namespace_secrets:
     hmpps-education-and-work-plan-api:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+      # TODO - RR-502 - Remove `CIAG_API_CLIENT_ID` and `CIAG_API_CLIENT_SECRET` - ensure HAAR team remove oauth client from hmpps-auth
+      CIAG_API_CLIENT_ID: "CIAG_API_CLIENT_ID"
+      CIAG_API_CLIENT_SECRET: "CIAG_API_CLIENT_SECRET"
     rds-postgresql-instance-output:
       DB_SERVER: "rds_instance_address"
       DB_NAME: "database_name"
