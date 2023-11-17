@@ -14,7 +14,7 @@ private val log = KotlinLogging.logger {}
 class CiagInductionMigrationService(private val ciagWebClient: WebClient) {
 
   fun migrateCiagInductions() {
-    log.debug { "Starting migration of CIAG Inductions from CIAG API to PLP API" }
+    log.info { "Starting migration of CIAG Inductions from CIAG API to PLP API" }
 
     try {
       val ciagInduction = ciagWebClient
@@ -24,7 +24,7 @@ class CiagInductionMigrationService(private val ciagWebClient: WebClient) {
         .bodyToMono(Map::class.java)
         .block()
 
-      log.debug { "CIAG Induction: $ciagInduction" }
+      log.info { "CIAG Induction: $ciagInduction" }
     } catch (e: Exception) {
       log.error("Error calling CIAG API to get CIAG Induction", e)
     }
