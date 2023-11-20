@@ -15,6 +15,9 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
     HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+    # TODO - RR-502 - Remove `CIAG_INDUCTION_API_URL` and `CIAG_INDUCTION_DATA_MIGRATION_ENABLED`
+    CIAG_INDUCTION_API_URL: "https://ciag-induction-api-dev.hmpps.service.justice.gov.uk"
+    CIAG_INDUCTION_DATA_MIGRATION_ENABLED: "true"
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts

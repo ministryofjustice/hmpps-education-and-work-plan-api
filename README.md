@@ -79,6 +79,14 @@ The following environment variables are required in order for the app to start:
 | HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_QUEUE_NAME | The queue to receive events from the domain-events topic.                 |
 | HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_DLQ_NAME   | The dead letter queue for any failed messages.                            |
 
+### APIs
+
+| Name                   | Description                                                                                     |
+|------------------------|-------------------------------------------------------------------------------------------------|
+| CIAG_INDUCTION_API_URL | The URL of the CIAG Induction API, used as part of the ETL for the CIAG Induction API migration |
+| CIAG_API_CLIENT_ID     | hmpps-auth oauth2 client-id for connecting to the CIAG Induction API                            |
+| CIAG_API_CLIENT_SECRET | hmpps-auth oauth2 client-secret for connecting to the CIAG Induction API                        |
+
 ## Monitoring, tracing and event reporting
 The API is instrumented with the opentelemetry and Application Insights java agent. Useful data can be found and reported
 on via the Azure Application Insights console, all under the `cloud_RoleName` property of `hmpps-education-and-work-plan-api`
@@ -195,3 +203,10 @@ The REST API endpoints exposed by this API are consumed by the service UI. Roles
 The CIAG Induction service UI consumes the `GET` endpoint in order to retrieve action plan details for a list of prison
 numbers (prisoners). The role required is `ROLE_EDUCATION_WORK_PLAN_VIEWER`
 
+## Feature Toggles
+Features can be toggled by setting the relevant environment variable.
+
+| Name                                  | Default Value | Type    | Description                                                                                                          |
+|---------------------------------------|---------------|---------|----------------------------------------------------------------------------------------------------------------------|
+| SOME_TOGGLE_ENABLED                   | false         | Boolean | Example feature toggle, for demonstration purposes.                                                                  |
+| CIAG_INDUCTION_DATA_MIGRATION_ENABLED | false         | Boolean | Set to true to enable the components that perform an ETL migration of CIAG Inductions from the CIAG API to this API. |
