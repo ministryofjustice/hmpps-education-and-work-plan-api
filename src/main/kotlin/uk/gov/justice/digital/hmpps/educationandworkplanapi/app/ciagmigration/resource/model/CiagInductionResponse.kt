@@ -35,7 +35,7 @@ data class CiagInductionResponse(
     description = "An ISO-8601 timestamp representing when the Induction was created.",
   )
   @get:JsonProperty("createdDateTime", required = true)
-  val createdDateTime: java.time.OffsetDateTime,
+  val createdDateTime: java.time.LocalDateTime,
 
   @Schema(
     example = "asmith_gen",
@@ -51,7 +51,7 @@ data class CiagInductionResponse(
     description = "An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.",
   )
   @get:JsonProperty("modifiedDateTime", required = true)
-  val modifiedDateTime: java.time.OffsetDateTime,
+  val modifiedDateTime: java.time.LocalDateTime,
 
   @Schema(example = "null", description = "The ID of the Prison that that Prisoner is currently at.")
   @get:JsonProperty("prisonId")

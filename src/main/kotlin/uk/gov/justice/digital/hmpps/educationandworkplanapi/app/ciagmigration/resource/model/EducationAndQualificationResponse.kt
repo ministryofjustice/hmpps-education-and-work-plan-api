@@ -23,7 +23,7 @@ data class EducationAndQualificationResponse(
     description = "An ISO-8601 timestamp representing when this Prisoner's education and qualifications was last updated. This will be the same as the created date if it has not yet been updated.",
   )
   @get:JsonProperty("modifiedDateTime", required = true)
-  val modifiedDateTime: java.time.OffsetDateTime,
+  val modifiedDateTime: java.time.LocalDateTime,
 
   @field:Valid
   @Schema(example = "null", description = "")
