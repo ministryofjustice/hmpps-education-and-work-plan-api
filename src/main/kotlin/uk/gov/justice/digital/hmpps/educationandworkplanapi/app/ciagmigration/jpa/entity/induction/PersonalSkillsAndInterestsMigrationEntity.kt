@@ -14,8 +14,6 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import java.time.Instant
 import java.util.UUID
@@ -44,7 +42,6 @@ class PersonalSkillsAndInterestsMigrationEntity(
   var interests: MutableList<PersonalInterestMigrationEntity>? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column
@@ -58,7 +55,6 @@ class PersonalSkillsAndInterestsMigrationEntity(
   var createdByDisplayName: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
@@ -126,14 +122,12 @@ class PersonalSkillMigrationEntity(
   var skillTypeOther: String? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column(updatable = false)
   var createdBy: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
@@ -186,14 +180,12 @@ class PersonalInterestMigrationEntity(
   var interestTypeOther: String? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column(updatable = false)
   var createdBy: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column

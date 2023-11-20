@@ -14,8 +14,6 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import java.time.Instant
 import java.util.UUID
@@ -47,7 +45,6 @@ class PreviousQualificationsMigrationEntity(
   var qualifications: MutableList<QualificationMigrationEntity>? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column
@@ -61,7 +58,6 @@ class PreviousQualificationsMigrationEntity(
   var createdByDisplayName: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
@@ -123,14 +119,12 @@ class QualificationMigrationEntity(
   var grade: String? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column(updatable = false)
   var createdBy: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column

@@ -11,8 +11,6 @@ import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import java.time.Instant
 import java.util.UUID
@@ -67,7 +65,6 @@ class InductionMigrationEntity(
   var futureWorkInterests: FutureWorkInterestsMigrationEntity? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column
@@ -81,7 +78,6 @@ class InductionMigrationEntity(
   var createdByDisplayName: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
