@@ -11,14 +11,6 @@ import jakarta.validation.constraints.Size
 data class WorkInterestsResponse(
 
   @Schema(
-    example = "c88a6c48-97e2-4c04-93b5-98619966447b",
-    required = true,
-    description = "A unique reference for this Prisoner's work interests.",
-  )
-  @get:JsonProperty("id", required = true)
-  val id: java.util.UUID,
-
-  @Schema(
     example = "asmith_gen",
     required = true,
     description = "The DPS username of the person who last updated the Induction.",

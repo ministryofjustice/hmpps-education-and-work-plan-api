@@ -25,7 +25,7 @@ class CiagInductionMigrationService(private val ciagWebClient: WebClient) {
         .bodyToMono(CiagInductionResponse::class.java)
         .block()
 
-      log.info { "CIAG Induction: $ciagInduction" }
+      log.info { "Deserialised CIAG Induction: $ciagInduction" }
     } catch (e: Exception) {
       log.error("Error calling CIAG API to get CIAG Induction", e)
     }

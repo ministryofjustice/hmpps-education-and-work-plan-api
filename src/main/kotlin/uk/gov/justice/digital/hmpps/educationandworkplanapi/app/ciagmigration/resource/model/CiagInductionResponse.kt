@@ -11,14 +11,6 @@ import jakarta.validation.constraints.Pattern
  */
 data class CiagInductionResponse(
 
-  @Schema(
-    example = "814ade0a-a3b2-46a3-862f-79211ba13f7b",
-    required = true,
-    description = "The Induction's unique reference.",
-  )
-  @get:JsonProperty("reference", required = true)
-  val reference: java.util.UUID,
-
   @get:Pattern(regexp = "^[A-Z]\\d{4}[A-Z]{2}$")
   @Schema(example = "null", required = true, description = "The ID of the Prisoner. AKA the prison number.")
   @get:JsonProperty("offenderId", required = true)

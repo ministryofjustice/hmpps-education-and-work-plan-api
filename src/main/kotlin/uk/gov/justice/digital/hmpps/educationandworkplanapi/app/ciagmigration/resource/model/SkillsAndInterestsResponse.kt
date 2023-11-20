@@ -26,13 +26,6 @@ data class SkillsAndInterestsResponse(
   @get:JsonProperty("modifiedDateTime", required = true)
   val modifiedDateTime: java.time.OffsetDateTime,
 
-  @Schema(
-    example = "c88a6c48-97e2-4c04-93b5-98619966447b",
-    description = "A unique reference for this Prisoner's skills and interests (not the database primary key).",
-  )
-  @get:JsonProperty("id")
-  val id: Integer,
-
   @field:Valid
   @get:Size(min = 1)
   @Schema(example = "null", description = "One or more skills that the Prisoner feels they have.")

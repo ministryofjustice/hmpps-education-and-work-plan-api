@@ -25,13 +25,6 @@ data class EducationAndQualificationResponse(
   @get:JsonProperty("modifiedDateTime", required = true)
   val modifiedDateTime: java.time.OffsetDateTime,
 
-  @Schema(
-    example = "c88a6c48-97e2-4c04-93b5-98619966447b",
-    description = "A unique reference for this Prisoner's education and qualifications (not the database primary key).",
-  )
-  @get:JsonProperty("id")
-  val id: Integer,
-
   @field:Valid
   @Schema(example = "null", description = "")
   @get:JsonProperty("educationLevel")
