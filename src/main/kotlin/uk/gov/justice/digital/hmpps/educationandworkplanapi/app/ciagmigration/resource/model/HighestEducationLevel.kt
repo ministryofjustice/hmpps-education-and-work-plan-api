@@ -1,0 +1,30 @@
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model
+
+import com.fasterxml.jackson.annotation.JsonProperty
+
+/**
+ * The highest education level of a Prisoner.
+ */
+enum class HighestEducationLevel(val value: String) {
+
+  @JsonProperty("PRIMARY_SCHOOL")
+  PRIMARY_SCHOOL("PRIMARY_SCHOOL"),
+
+  @JsonProperty("SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS")
+  SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS("SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS"),
+
+  @JsonProperty("SECONDARY_SCHOOL_TOOK_EXAMS")
+  SECONDARY_SCHOOL_TOOK_EXAMS("SECONDARY_SCHOOL_TOOK_EXAMS"),
+
+  @JsonProperty("FURTHER_EDUCATION_COLLEGE")
+  FURTHER_EDUCATION_COLLEGE("FURTHER_EDUCATION_COLLEGE"),
+
+  @JsonProperty("UNDERGRADUATE_DEGREE_AT_UNIVERSITY")
+  UNDERGRADUATE_DEGREE_AT_UNIVERSITY("UNDERGRADUATE_DEGREE_AT_UNIVERSITY"),
+
+  @JsonProperty("POSTGRADUATE_DEGREE_AT_UNIVERSITY")
+  POSTGRADUATE_DEGREE_AT_UNIVERSITY("POSTGRADUATE_DEGREE_AT_UNIVERSITY"),
+
+  @JsonProperty("NOT_SURE")
+  NOT_SURE("NOT_SURE"),
+}

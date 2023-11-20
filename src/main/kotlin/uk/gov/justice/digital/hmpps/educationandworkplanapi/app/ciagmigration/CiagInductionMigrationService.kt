@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.CiagInductionResponse
 
 private val log = KotlinLogging.logger {}
 
@@ -21,7 +22,7 @@ class CiagInductionMigrationService(private val ciagWebClient: WebClient) {
         .get()
         .uri("/ciag/induction/A5077DY")
         .retrieve()
-        .bodyToMono(Map::class.java)
+        .bodyToMono(CiagInductionResponse::class.java)
         .block()
 
       log.info { "CIAG Induction: $ciagInduction" }
