@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.j
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction.InductionMigrationEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.InductionMigrationEntity
 import java.util.UUID
 
 @Repository
