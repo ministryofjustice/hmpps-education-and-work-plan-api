@@ -24,9 +24,9 @@ class CiagInductionMigrationService(
       val prisonNumbers = timelineLookupService.getPrisonNumbersToMigrate()
       log.info { "Identified ${prisonNumbers.size} Inductions to migrate" }
 
-      prisonNumbers.forEach {
-        val ciagInduction = getCiagInduction(it)
-        log.info { "Deserialized Induction for prisoner ${ciagInduction!!.offenderId}" }
+      prisonNumbers.forEach { prisonNumber ->
+        log.info { "Deserializing Induction for prisoner $prisonNumber" }
+        val ciagInduction = getCiagInduction(prisonNumber)
       }
 
       log.info { "Finished migrating Inductions" }
