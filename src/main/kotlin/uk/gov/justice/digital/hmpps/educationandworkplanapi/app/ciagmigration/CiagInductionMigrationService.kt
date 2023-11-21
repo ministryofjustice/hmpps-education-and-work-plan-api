@@ -12,22 +12,34 @@ private val log = KotlinLogging.logger {}
  * API and database.
  */
 @Service
-class CiagInductionMigrationService(private val ciagWebClient: WebClient) {
+class CiagInductionMigrationService(
+  private val timelineLookupService: PrisonerInductionTimelineLookupService,
+  private val ciagWebClient: WebClient,
+) {
 
   fun migrateCiagInductions() {
     log.info { "Starting migration of CIAG Inductions from CIAG API to PLP API" }
 
     try {
-      val ciagInduction = ciagWebClient
-        .get()
-        .uri("/ciag/induction/A5077DY")
-        .retrieve()
-        .bodyToMono(CiagInductionResponse::class.java)
-        .block()
+      val prisonNumbers = timelineLookupService.getPrisonNumbersToMigrate()
+      log.info { "Identified ${prisonNumbers.size} Inductions to migrate" }
 
-      log.info { "Deserialised CIAG Induction: $ciagInduction" }
+      prisonNumbers.forEach {
+        val ciagInduction = getCiagInduction(it)
+        log.info { "Deserialized Induction for prisoner ${ciagInduction!!.offenderId}" }
+      }
+
+      log.info { "Finished migrating Inductions" }
     } catch (e: Exception) {
-      log.error("Error calling CIAG API to get CIAG Induction", e)
+      log.error("Error migrating CIAG Inductions", e)
     }
   }
+
+  private fun getCiagInduction(prisonNumber: String): CiagInductionResponse? =
+    ciagWebClient
+      .get()
+      .uri("/ciag/induction/$prisonNumber")
+      .retrieve()
+      .bodyToMono(CiagInductionResponse::class.java)
+      .block()
 }
