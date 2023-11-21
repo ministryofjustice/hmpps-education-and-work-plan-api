@@ -9,8 +9,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.service.events.aValidCiagInductionCreatedEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.service.events.aValidCiagInductionUpdatedEvent
 
 internal class CiagInductionTimelineEventTest : IntegrationTestBase() {
 

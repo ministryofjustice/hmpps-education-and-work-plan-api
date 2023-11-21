@@ -15,8 +15,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.service.events.aValidCiagInductionCreatedEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.service.events.aValidCiagInductionUpdatedEvent
 
 @ExtendWith(MockitoExtension::class)
 internal class InboundEventsServiceTest {
