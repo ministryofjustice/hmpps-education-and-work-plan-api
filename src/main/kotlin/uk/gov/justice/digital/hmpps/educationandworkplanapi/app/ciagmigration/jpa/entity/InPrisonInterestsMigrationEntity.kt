@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
@@ -19,13 +19,11 @@ import java.time.Instant
 import java.util.UUID
 
 /**
- * Lists the personal skills (such as communication) and interests (such as music) that a Prisoner feels they have.
- *
- * Note that the lists of skills/interests cannot be empty, since NONE is an option in both cases.
+ * Represents any in-prison work or training interests a Prisoner might have during their time in prison.
  */
-@Table(name = "skills_and_interests")
+@Table(name = "in_prison_interests")
 @Entity
-class PersonalSkillsAndInterestsMigrationEntity(
+class InPrisonInterestsMigrationEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -36,10 +34,10 @@ class PersonalSkillsAndInterestsMigrationEntity(
   var reference: UUID? = null,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var skills: MutableList<PersonalSkillMigrationEntity>? = null,
+  var inPrisonWorkInterests: MutableList<InPrisonWorkInterestMigrationEntity>? = null,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var interests: MutableList<PersonalInterestMigrationEntity>? = null,
+  var inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestMigrationEntity>? = null,
 
   @Column(updatable = false)
   var createdAt: Instant? = null,
@@ -68,24 +66,24 @@ class PersonalSkillsAndInterestsMigrationEntity(
   var updatedByDisplayName: String? = null,
 ) : ParentMigrationEntity() {
 
-  fun skills(): MutableList<PersonalSkillMigrationEntity> {
-    if (skills == null) {
-      skills = mutableListOf()
+  fun inPrisonWorkInterests(): MutableList<InPrisonWorkInterestMigrationEntity> {
+    if (inPrisonWorkInterests == null) {
+      inPrisonWorkInterests = mutableListOf()
     }
-    return skills!!
+    return inPrisonWorkInterests!!
   }
 
-  fun interests(): MutableList<PersonalInterestMigrationEntity> {
-    if (interests == null) {
-      interests = mutableListOf()
+  fun inPrisonTrainingInterests(): MutableList<InPrisonTrainingInterestMigrationEntity> {
+    if (inPrisonTrainingInterests == null) {
+      inPrisonTrainingInterests = mutableListOf()
     }
-    return interests!!
+    return inPrisonTrainingInterests!!
   }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as PersonalSkillsAndInterestsMigrationEntity
+    other as InPrisonInterestsMigrationEntity
 
     return id != null && id == other.id
   }
@@ -97,9 +95,9 @@ class PersonalSkillsAndInterestsMigrationEntity(
   }
 }
 
-@Table(name = "personal_skill")
+@Table(name = "in_prison_work_interest")
 @Entity
-class PersonalSkillMigrationEntity(
+class InPrisonWorkInterestMigrationEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -110,16 +108,16 @@ class PersonalSkillMigrationEntity(
   var reference: UUID? = null,
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "skills_interests_id")
-  var parent: PersonalSkillsAndInterestsMigrationEntity? = null,
+  @JoinColumn(name = "interests_id")
+  var parent: InPrisonInterestsMigrationEntity? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
-  var skillType: SkillType? = null,
+  var workType: InPrisonWorkType? = null,
 
   @Column
-  var skillTypeOther: String? = null,
+  var workTypeOther: String? = null,
 
   @Column(updatable = false)
   var createdAt: Instant? = null,
@@ -135,15 +133,15 @@ class PersonalSkillMigrationEntity(
 ) : KeyAwareChildMigrationEntity {
 
   override fun associateWithParent(parent: ParentMigrationEntity) {
-    this.parent = parent as PersonalSkillsAndInterestsMigrationEntity
+    this.parent = parent as InPrisonInterestsMigrationEntity
   }
 
-  override fun key(): String = skillType!!.name
+  override fun key(): String = workType!!.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as PersonalSkillMigrationEntity
+    other as InPrisonWorkInterestMigrationEntity
 
     return id != null && id == other.id
   }
@@ -151,13 +149,13 @@ class PersonalSkillMigrationEntity(
   override fun hashCode(): Int = javaClass.hashCode()
 
   override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, skillType = $skillType, skillTypeOther = $skillTypeOther)"
+    return this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
   }
 }
 
-@Table(name = "personal_interest")
+@Table(name = "in_prison_training_interest")
 @Entity
-class PersonalInterestMigrationEntity(
+class InPrisonTrainingInterestMigrationEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -168,16 +166,16 @@ class PersonalInterestMigrationEntity(
   var reference: UUID? = null,
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "skills_interests_id")
-  var parent: PersonalSkillsAndInterestsMigrationEntity? = null,
+  @JoinColumn(name = "interests_id")
+  var parent: InPrisonInterestsMigrationEntity? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
   @field:NotNull
-  var interestType: InterestType? = null,
+  var trainingType: InPrisonTrainingType? = null,
 
   @Column
-  var interestTypeOther: String? = null,
+  var trainingTypeOther: String? = null,
 
   @Column(updatable = false)
   var createdAt: Instant? = null,
@@ -193,15 +191,15 @@ class PersonalInterestMigrationEntity(
 ) : KeyAwareChildMigrationEntity {
 
   override fun associateWithParent(parent: ParentMigrationEntity) {
-    this.parent = parent as PersonalSkillsAndInterestsMigrationEntity
+    this.parent = parent as InPrisonInterestsMigrationEntity
   }
 
-  override fun key(): String = interestType!!.name
+  override fun key(): String = trainingType!!.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as PersonalInterestMigrationEntity
+    other as InPrisonTrainingInterestMigrationEntity
 
     return id != null && id == other.id
   }
@@ -209,36 +207,36 @@ class PersonalInterestMigrationEntity(
   override fun hashCode(): Int = javaClass.hashCode()
 
   override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, interestType = $interestType, interestTypeOther = $interestTypeOther)"
+    return this::class.simpleName + "(id = $id, reference = $reference, trainingType = $trainingType, trainingTypeOther = $trainingTypeOther)"
   }
 }
 
-enum class SkillType {
-  COMMUNICATION,
-  POSITIVE_ATTITUDE,
-  RESILIENCE,
-  SELF_MANAGEMENT,
-  TEAMWORK,
-  THINKING_AND_PROBLEM_SOLVING,
-  WILLINGNESS_TO_LEARN,
+enum class InPrisonWorkType {
+  CLEANING_AND_HYGIENE,
+  COMPUTERS_OR_DESK_BASED,
+  GARDENING_AND_OUTDOORS,
+  KITCHENS_AND_COOKING,
+  MAINTENANCE,
+  PRISON_LAUNDRY,
+  PRISON_LIBRARY,
+  TEXTILES_AND_SEWING,
+  WELDING_AND_METALWORK,
+  WOODWORK_AND_JOINERY,
   OTHER,
-  NONE,
 }
 
-enum class InterestType {
-  COMMUNITY,
-  CRAFTS,
-  CREATIVE,
-  DIGITAL,
-  KNOWLEDGE_BASED,
-  MUSICAL,
-  OUTDOOR,
-  NATURE_AND_ANIMALS,
-  SOCIAL,
-  SOLO_ACTIVITIES,
-  SOLO_SPORTS,
-  TEAM_SPORTS,
-  WELLNESS,
+enum class InPrisonTrainingType {
+  BARBERING_AND_HAIRDRESSING,
+  CATERING,
+  COMMUNICATION_SKILLS,
+  ENGLISH_LANGUAGE_SKILLS,
+  FORKLIFT_DRIVING,
+  INTERVIEW_SKILLS,
+  MACHINERY_TICKETS,
+  NUMERACY_SKILLS,
+  RUNNING_A_BUSINESS,
+  SOCIAL_AND_LIFE_SKILLS,
+  WELDING_AND_METALWORK,
+  WOODWORK_AND_JOINERY,
   OTHER,
-  NONE,
 }

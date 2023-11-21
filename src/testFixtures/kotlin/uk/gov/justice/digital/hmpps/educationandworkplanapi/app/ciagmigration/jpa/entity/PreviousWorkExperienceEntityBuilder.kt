@@ -1,8 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.ciagmigration.entity
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction.PreviousWorkExperiencesMigrationEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction.WorkExperienceMigrationEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction.WorkExperienceType
 import java.time.Instant
 import java.util.UUID
 

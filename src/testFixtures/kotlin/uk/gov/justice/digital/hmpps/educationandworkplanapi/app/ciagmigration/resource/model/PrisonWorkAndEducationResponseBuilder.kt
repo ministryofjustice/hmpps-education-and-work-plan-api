@@ -1,8 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.ciagmigration.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.InPrisonTrainingType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.InPrisonWorkType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.PrisonWorkAndEducationResponse
 import java.time.LocalDateTime
 
 fun aValidPrisonWorkAndEducationResponse(

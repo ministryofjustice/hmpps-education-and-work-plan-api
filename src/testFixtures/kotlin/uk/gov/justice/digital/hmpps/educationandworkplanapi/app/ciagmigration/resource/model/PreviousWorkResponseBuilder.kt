@@ -1,9 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.ciagmigration.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.PreviousWorkResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.WorkExperience
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.WorkInterestsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.WorkType
 import java.time.LocalDateTime
 
 fun aValidPreviousWorkResponse(

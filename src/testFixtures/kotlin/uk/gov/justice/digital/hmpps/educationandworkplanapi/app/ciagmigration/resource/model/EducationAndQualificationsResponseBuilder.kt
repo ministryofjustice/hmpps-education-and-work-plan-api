@@ -1,9 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.ciagmigration.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.AchievedQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.EducationAndQualificationResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.HighestEducationLevel
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.TrainingType
 import java.time.LocalDateTime
 import java.util.UUID
 

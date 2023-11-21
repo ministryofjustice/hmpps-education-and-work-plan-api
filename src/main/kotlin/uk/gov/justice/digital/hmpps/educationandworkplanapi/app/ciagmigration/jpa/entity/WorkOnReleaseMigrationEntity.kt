@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity
 
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column

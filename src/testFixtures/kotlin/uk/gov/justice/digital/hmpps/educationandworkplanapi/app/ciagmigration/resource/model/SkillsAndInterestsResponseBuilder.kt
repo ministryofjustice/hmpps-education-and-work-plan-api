@@ -1,8 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.ciagmigration.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.PersonalInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.PersonalSkill
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.SkillsAndInterestsResponse
 import java.time.LocalDateTime
 
 fun aValidSkillsAndInterestsResponse(

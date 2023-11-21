@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity
 
 /**
  * Abstract class for "parent" entities, which contain one or more collections of [KeyAwareChildMigrationEntity] entities.

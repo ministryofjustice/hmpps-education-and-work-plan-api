@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.jpa.entity
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
@@ -19,15 +19,11 @@ import java.time.Instant
 import java.util.UUID
 
 /**
- * Holds details about a Prisoner's educational qualifications, including where relevant, the grades achieved in each
- * subject.
- *
- * Note that the list of `qualifications` can be empty, but `educationLevel` is mandatory (but only if the Prisoner has
- * been asked about their education).
+ * Represents a Prisoner's future work aspirations, including the type/sector of work and their desired role within it.
  */
-@Table(name = "previous_qualifications")
+@Table(name = "future_work_interests")
 @Entity
-class PreviousQualificationsMigrationEntity(
+class FutureWorkInterestsMigrationEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -37,12 +33,8 @@ class PreviousQualificationsMigrationEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  @Column
-  @Enumerated(value = EnumType.STRING)
-  var educationLevel: HighestEducationLevel? = null,
-
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var qualifications: MutableList<QualificationMigrationEntity>? = null,
+  var interests: MutableList<WorkInterestMigrationEntity>? = null,
 
   @Column(updatable = false)
   var createdAt: Instant? = null,
@@ -71,17 +63,17 @@ class PreviousQualificationsMigrationEntity(
   var updatedByDisplayName: String? = null,
 ) : ParentMigrationEntity() {
 
-  fun qualifications(): MutableList<QualificationMigrationEntity> {
-    if (qualifications == null) {
-      qualifications = mutableListOf()
+  fun interests(): MutableList<WorkInterestMigrationEntity> {
+    if (interests == null) {
+      interests = mutableListOf()
     }
-    return qualifications!!
+    return interests!!
   }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as PreviousQualificationsMigrationEntity
+    other as FutureWorkInterestsMigrationEntity
 
     return id != null && id == other.id
   }
@@ -89,34 +81,36 @@ class PreviousQualificationsMigrationEntity(
   override fun hashCode(): Int = javaClass.hashCode()
 
   override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, educationLevel = $educationLevel)"
+    return this::class.simpleName + "(id = $id, reference = $reference)"
   }
 }
 
-@Table(name = "qualification")
+@Table(name = "work_interest")
 @Entity
-class QualificationMigrationEntity(
+class WorkInterestMigrationEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
   var id: UUID? = null,
 
+  @Column(updatable = false)
   @field:NotNull
   var reference: UUID? = null,
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "prev_qualifications_id")
-  var parent: PreviousQualificationsMigrationEntity? = null,
-
-  @field:NotNull
-  var subject: String? = null,
+  @JoinColumn(name = "work_interests_id")
+  var parent: FutureWorkInterestsMigrationEntity? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  var level: QualificationLevel? = null,
+  @field:NotNull
+  var workType: WorkInterestType? = null,
 
   @Column
-  var grade: String? = null,
+  var workTypeOther: String? = null,
+
+  @Column
+  var role: String? = null,
 
   @Column(updatable = false)
   var createdAt: Instant? = null,
@@ -132,15 +126,15 @@ class QualificationMigrationEntity(
 ) : KeyAwareChildMigrationEntity {
 
   override fun associateWithParent(parent: ParentMigrationEntity) {
-    this.parent = parent as PreviousQualificationsMigrationEntity
+    this.parent = parent as FutureWorkInterestsMigrationEntity
   }
 
-  override fun key(): String = subject!!
+  override fun key(): String = workType!!.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as QualificationMigrationEntity
+    other as WorkInterestMigrationEntity
 
     return id != null && id == other.id
   }
@@ -148,28 +142,24 @@ class QualificationMigrationEntity(
   override fun hashCode(): Int = javaClass.hashCode()
 
   override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, subject = $subject, level = $level, grade = $grade)"
+    return this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
   }
 }
 
-enum class HighestEducationLevel {
-  PRIMARY_SCHOOL,
-  SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
-  SECONDARY_SCHOOL_TOOK_EXAMS,
-  FURTHER_EDUCATION_COLLEGE,
-  UNDERGRADUATE_DEGREE_AT_UNIVERSITY,
-  POSTGRADUATE_DEGREE_AT_UNIVERSITY,
-  NOT_SURE,
-}
-
-enum class QualificationLevel {
-  ENTRY_LEVEL,
-  LEVEL_1,
-  LEVEL_2,
-  LEVEL_3,
-  LEVEL_4,
-  LEVEL_5,
-  LEVEL_6,
-  LEVEL_7,
-  LEVEL_8,
+enum class WorkInterestType {
+  OUTDOOR,
+  CONSTRUCTION,
+  DRIVING,
+  BEAUTY,
+  HOSPITALITY,
+  TECHNICAL,
+  MANUFACTURING,
+  OFFICE,
+  RETAIL,
+  SPORTS,
+  WAREHOUSING,
+  WASTE_MANAGEMENT,
+  EDUCATION_TRAINING,
+  CLEANING_AND_MAINTENANCE,
+  OTHER,
 }
