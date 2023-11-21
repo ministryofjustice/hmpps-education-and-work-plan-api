@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.resource.model.CiagInductionResponse
 
 private val log = KotlinLogging.logger {}
@@ -25,8 +27,13 @@ class CiagInductionMigrationService(
       log.info { "Identified ${prisonNumbers.size} Inductions to migrate" }
 
       prisonNumbers.forEach { prisonNumber ->
-        log.info { "Deserializing Induction for prisoner $prisonNumber" }
+        log.info { "Retrieving Induction for prisoner $prisonNumber" }
         val ciagInduction = getCiagInduction(prisonNumber)
+        if (ciagInduction == null) {
+          log.warn { "Unable to retrieve Induction for Prisoner $prisonNumber" }
+        } else {
+          log.info { "Deserialized Induction for prisoner $prisonNumber" }
+        }
       }
 
       log.info { "Finished migrating Inductions" }
@@ -41,5 +48,12 @@ class CiagInductionMigrationService(
       .uri("/ciag/induction/$prisonNumber")
       .retrieve()
       .bodyToMono(CiagInductionResponse::class.java)
+      .onErrorResume(WebClientResponseException::class.java) {
+        if (it.statusCode.value() == 404) {
+          Mono.empty()
+        } else {
+          Mono.error(it)
+        }
+      }
       .block()
 }
