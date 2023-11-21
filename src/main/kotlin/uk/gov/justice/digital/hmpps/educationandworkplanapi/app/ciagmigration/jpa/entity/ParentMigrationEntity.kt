@@ -6,16 +6,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ciagmigration.j
 abstract class ParentMigrationEntity {
 
   fun <CHILD : KeyAwareChildMigrationEntity> addChild(newChild: CHILD, existingChildren: MutableList<CHILD>) {
-    addChildren(mutableListOf(newChild), existingChildren)
-  }
-
-  fun <CHILD : KeyAwareChildMigrationEntity> addChildren(
-    newChildren: List<CHILD>,
-    existingChildren: MutableList<CHILD>,
-  ) {
-    newChildren.forEach {
-      it.associateWithParent(this)
-      existingChildren.add(it)
-    }
+    newChild.associateWithParent(this)
+    existingChildren.add(newChild)
   }
 }

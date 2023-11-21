@@ -37,10 +37,18 @@ fun aValidQualificationMigrationEntity(
   subject: String = "English",
   level: QualificationLevel? = QualificationLevel.LEVEL_3,
   grade: String? = "A",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) =
   QualificationMigrationEntity(
     reference = reference,
     subject = subject,
     level = level,
     grade = grade,
+    createdAt = createdAt,
+    createdBy = createdBy,
+    updatedAt = updatedAt,
+    updatedBy = updatedBy,
   )
