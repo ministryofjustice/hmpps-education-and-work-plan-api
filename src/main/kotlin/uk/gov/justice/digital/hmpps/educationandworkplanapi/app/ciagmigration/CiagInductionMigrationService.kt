@@ -16,6 +16,7 @@ private val log = KotlinLogging.logger {}
 @Service
 class CiagInductionMigrationService(
   private val timelineLookupService: PrisonerInductionTimelineLookupService,
+  private val inductionPersistenceService: CiagInductionPersistenceService,
   private val ciagWebClient: WebClient,
 ) {
 
@@ -32,7 +33,7 @@ class CiagInductionMigrationService(
         if (ciagInduction == null) {
           log.warn { "Unable to retrieve Induction for Prisoner $prisonNumber" }
         } else {
-          log.info { "Deserialized Induction for prisoner $prisonNumber" }
+          inductionPersistenceService.saveInduction(ciagInduction)
         }
       }
 

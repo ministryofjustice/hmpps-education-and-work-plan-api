@@ -2,7 +2,8 @@
 # Per environment values which override defaults in hmpps-education-and-work-plan-api/values.yaml
 
 generic-service:
-  replicaCount: 2
+  # TODO - RR-502 - Set this back to 2
+  replicaCount: 1
 
   ingress:
     host: learningandworkprogress-api-dev.hmpps.service.justice.gov.uk
