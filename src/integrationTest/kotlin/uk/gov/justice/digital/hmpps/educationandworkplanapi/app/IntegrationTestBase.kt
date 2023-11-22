@@ -46,7 +46,7 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
-    const val INDUCTION_URI_TEMPLATE = "/ciag-inductions/{prisonNumber}"
+    const val INDUCTION_URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
 
     private val localStackContainer = LocalStackContainer.instance
 

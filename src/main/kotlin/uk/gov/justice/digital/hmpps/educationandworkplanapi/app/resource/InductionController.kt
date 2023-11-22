@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateCiagInductionRequest
 
 @RestController
-@RequestMapping(value = ["/ciag-inductions"], produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(value = ["/ciag/induction"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class InductionController(
   private val inductionService: InductionService,
   private val createInductionRequestMapper: CreateCiagInductionRequestMapper,

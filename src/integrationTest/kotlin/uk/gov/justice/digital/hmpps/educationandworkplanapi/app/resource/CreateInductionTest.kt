@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 class CreateInductionTest : IntegrationTestBase() {
 
   companion object {
-    private const val URI_TEMPLATE = "/ciag-inductions/{prisonNumber}"
+    private const val URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
   }
 
   @Test
