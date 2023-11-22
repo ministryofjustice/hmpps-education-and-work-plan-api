@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEqu
 class GetInductionTest : IntegrationTestBase() {
 
   companion object {
-    private const val URI_TEMPLATE = "/ciag-inductions/{prisonNumber}"
+    private const val URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
   }
 
   @Test

@@ -54,7 +54,7 @@ import java.util.UUID
 class UpdateInductionTest : IntegrationTestBase() {
 
   companion object {
-    private const val URI_TEMPLATE = "/ciag-inductions/{prisonNumber}"
+    private const val URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
   }
 
   @Test
