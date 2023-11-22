@@ -35,10 +35,18 @@ fun aValidWorkInterestMigrationEntity(
   workType: WorkInterestType = WorkInterestType.OTHER,
   workTypeOther: String? = "Any job I can get",
   role: String? = "Any role",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) =
   WorkInterestMigrationEntity(
     reference = reference,
     workType = workType,
     workTypeOther = workTypeOther,
     role = role,
+    createdAt = createdAt,
+    createdBy = createdBy,
+    updatedAt = updatedAt,
+    updatedBy = updatedBy,
   )

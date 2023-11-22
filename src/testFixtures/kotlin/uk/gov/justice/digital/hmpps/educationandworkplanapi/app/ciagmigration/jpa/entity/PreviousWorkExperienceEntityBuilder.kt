@@ -33,9 +33,13 @@ fun aValidPreviousWorkExperiencesMigrationEntity(
 fun aValidWorkExperienceMigrationEntity(
   reference: UUID = UUID.randomUUID(),
   experienceType: WorkExperienceType = WorkExperienceType.OTHER,
-  experienceTypeOther: String? = "Warehouse work",
-  role: String? = "Chief Forklift Truck Driver",
-  details: String? = "Forward, pick stuff up, reverse etc",
+  experienceTypeOther: String? = "Scientist",
+  role: String? = "Lab Technician",
+  details: String? = "Cleaning test tubes",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) =
   WorkExperienceMigrationEntity(
     reference = reference,
@@ -43,4 +47,8 @@ fun aValidWorkExperienceMigrationEntity(
     experienceTypeOther = experienceTypeOther,
     role = role,
     details = details,
+    createdAt = createdAt,
+    createdBy = createdBy,
+    updatedAt = updatedAt,
+    updatedBy = updatedBy,
   )
