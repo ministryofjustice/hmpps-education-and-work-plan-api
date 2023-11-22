@@ -35,7 +35,7 @@ fun aValidPersonalSkillsAndInterestsMigrationEntity(
 fun aValidPersonalSkillMigrationEntity(
   reference: UUID = UUID.randomUUID(),
   skillType: SkillType = SkillType.OTHER,
-  skillTypeOther: String? = "None come to mind",
+  skillTypeOther: String? = "Hidden skills",
   createdAt: Instant? = Instant.now(),
   createdBy: String? = "asmith_gen",
   updatedAt: Instant? = Instant.now(),
@@ -54,7 +54,7 @@ fun aValidPersonalSkillMigrationEntity(
 fun aValidPersonalInterestMigrationEntity(
   reference: UUID = UUID.randomUUID(),
   interestType: InterestType = InterestType.OTHER,
-  interestTypeOther: String? = "None come to mind",
+  interestTypeOther: String? = "Secret interests",
   createdAt: Instant? = Instant.now(),
   createdBy: String? = "asmith_gen",
   updatedAt: Instant? = Instant.now(),

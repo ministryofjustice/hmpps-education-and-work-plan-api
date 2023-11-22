@@ -39,7 +39,7 @@ fun aValidInPrisonInterestsMigrationEntity(
 fun aValidInPrisonWorkInterestMigrationEntity(
   reference: UUID = UUID.randomUUID(),
   workType: InPrisonWorkType = InPrisonWorkType.OTHER,
-  workTypeOther: String? = "Any work type",
+  workTypeOther: String? = "Any in-prison work",
   createdAt: Instant? = Instant.now(),
   createdBy: String? = "asmith_gen",
   updatedAt: Instant? = Instant.now(),
@@ -58,7 +58,7 @@ fun aValidInPrisonWorkInterestMigrationEntity(
 fun aValidInPrisonTrainingInterestMigrationEntity(
   reference: UUID = UUID.randomUUID(),
   trainingType: InPrisonTrainingType = InPrisonTrainingType.OTHER,
-  trainingTypeOther: String? = "Any training type",
+  trainingTypeOther: String? = "Any in-prison training",
   createdAt: Instant? = Instant.now(),
   createdBy: String? = "asmith_gen",
   updatedAt: Instant? = Instant.now(),

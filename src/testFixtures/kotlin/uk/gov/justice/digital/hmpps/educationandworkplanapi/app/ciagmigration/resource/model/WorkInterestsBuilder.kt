@@ -11,7 +11,7 @@ fun aValidWorkInterestsResponse(
       role = "Any role",
     ),
   ),
-  modifiedBy: String = "auser_gen",
+  modifiedBy: String = "bjones_gen",
   modifiedDateTime: LocalDateTime = LocalDateTime.now(),
 ): WorkInterestsResponse =
   WorkInterestsResponse(

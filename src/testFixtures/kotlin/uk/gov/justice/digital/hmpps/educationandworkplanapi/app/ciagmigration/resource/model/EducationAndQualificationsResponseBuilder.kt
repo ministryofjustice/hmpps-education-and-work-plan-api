@@ -6,11 +6,10 @@ fun aValidEducationAndQualificationsResponse(
   educationLevel: HighestEducationLevel? = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: Set<AchievedQualification>? = setOf(
     aValidAchievedQualification(),
-    anotherValidAchievedQualification(),
   ),
   additionalTraining: Set<TrainingType> = setOf(TrainingType.OTHER),
-  additionalTrainingOther: String? = "Any training",
-  modifiedBy: String = "auser_gen",
+  additionalTrainingOther: String? = "Kotlin course",
+  modifiedBy: String = "bjones_gen",
   modifiedDateTime: LocalDateTime = LocalDateTime.now(),
 ): EducationAndQualificationResponse =
   EducationAndQualificationResponse(
