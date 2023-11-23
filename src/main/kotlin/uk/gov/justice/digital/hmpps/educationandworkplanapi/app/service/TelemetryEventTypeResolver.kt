@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_ARCHIVED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_COMPLETED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_ADDED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_COMPLETED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_NOT_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_ADDED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_NOT_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStat
 class TelemetryEventTypeResolver {
 
   /**
-   * Compares two [Goal]s and returns a list of [TelemetryEventType] reflecting the types of updates
+   * Compares two [Goal]s and returns a list of [GoalTelemetryEventType] reflecting the types of updates
    * between the two [Goal]s.
    *
    * Depending on the type and number of updates between the two [Goal]s it is possible for the returned list to contain
@@ -30,8 +30,8 @@ class TelemetryEventTypeResolver {
    * This method is deliberately marked as `internal` as there are no envisaged use cases for it outside the domain
    * module.
    */
-  internal fun resolveUpdateEventTypes(previousGoal: Goal, updatedGoal: Goal): List<TelemetryEventType> {
-    val updateTypes = mutableListOf<TelemetryEventType>()
+  internal fun resolveUpdateEventTypes(previousGoal: Goal, updatedGoal: Goal): List<GoalTelemetryEventType> {
+    val updateTypes = mutableListOf<GoalTelemetryEventType>()
     // check if the goal itself was updated, excluding its steps and status
     if (hasGoalBeenUpdated(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
       updateTypes.add(GOAL_UPDATED)
@@ -87,7 +87,7 @@ class TelemetryEventTypeResolver {
   private fun hasGoalStatusChanged(previousGoal: Goal, updatedGoal: Goal) =
     updatedGoal.status != previousGoal.status
 
-  private fun getTelemetryUpdateEventTypeForGoalStatusChange(updatedGoal: Goal): TelemetryEventType =
+  private fun getTelemetryUpdateEventTypeForGoalStatusChange(updatedGoal: Goal): GoalTelemetryEventType =
     when (updatedGoal.status) {
       GoalStatus.COMPLETED -> GOAL_COMPLETED
       GoalStatus.ACTIVE -> GOAL_STARTED
@@ -101,7 +101,7 @@ class TelemetryEventTypeResolver {
   private fun hasStepStatusChanged(previousStep: Step, updatedStep: Step) =
     previousStep.status != updatedStep.status
 
-  private fun getTelemetryUpdateEventTypeForStepStatusChange(step: Step): TelemetryEventType =
+  private fun getTelemetryUpdateEventTypeForStepStatusChange(step: Step): GoalTelemetryEventType =
     when (step.status) {
       StepStatus.NOT_STARTED -> STEP_NOT_STARTED
       StepStatus.ACTIVE -> STEP_STARTED

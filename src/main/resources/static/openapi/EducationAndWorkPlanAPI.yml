@@ -172,7 +172,7 @@ paths:
       description: |
         Creates an Induction for a Prisoner (if it does not already exist). This endpoint has been migrated from the
         `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
-        the UI when it is ports to this endpoint.
+        the UI when it points to this endpoint.
       tags:
         - Induction
       responses:
@@ -203,7 +203,7 @@ paths:
         information provided in the update request. If a field is not included in the update request, it will be removed from the 
         database, effectively making the update request the authoritative source of information. This endpoint has been migrated
         from the `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
-        the CIAG UI when it is ports to this endpoint.
+        the CIAG UI when it points to this endpoint.
       tags:
         - Induction
       responses:
@@ -225,7 +225,7 @@ paths:
         prisoner. If the returned data does not include summary data for a given prisoner it can be inferred that the
         prisoner does not have a CIAG Induction.
         This endpoint has been migrated from the `hmpps-ciag-careers-induction-api` and the data structure has been 
-        kept the same in order to prevent breaking the UI when it is ports to this endpoint.
+        kept the same in order to prevent breaking the UI when it points to this endpoint.
       tags:
         - Induction
       responses:

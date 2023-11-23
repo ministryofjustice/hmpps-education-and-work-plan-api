@@ -21,20 +21,21 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_ARCHIVED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_COMPLETED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_ADDED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_COMPLETED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_NOT_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_STARTED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_ADDED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_NOT_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_STARTED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -245,6 +246,49 @@ class TelemetryServiceTest {
       assertThat(propertiesForGoalUpdatedEvent["correlationId"])
         .isEqualTo(propertiesForFirstStepRemovalEvent["correlationId"])
         .isEqualTo(propertiesForSecondStepRemovalEvent["correlationId"])
+    }
+  }
+
+  @Nested
+  inner class TrackInductionEvents {
+    @Test
+    fun `should track induction created event`() {
+      // Given
+      val induction = aValidInduction()
+      val correlationId = UUID.randomUUID()
+      val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
+        "prisonNumber" to induction.prisonNumber,
+        "prisonId" to induction.createdAtPrison,
+        "userId" to induction.createdBy!!,
+        "timestamp" to induction.createdAt.toString(),
+      )
+
+      // When
+      telemetryService.trackInductionCreated(induction, correlationId)
+
+      // Then
+      verify(telemetryClient).trackEvent("induction-created", expectedEventProperties)
+    }
+
+    @Test
+    fun `should track induction updated event`() {
+      // Given
+      val induction = aValidInduction()
+      val correlationId = UUID.randomUUID()
+      val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
+        "prisonNumber" to induction.prisonNumber,
+        "prisonId" to induction.lastUpdatedAtPrison,
+        "userId" to induction.lastUpdatedBy!!,
+        "timestamp" to induction.lastUpdatedAt.toString(),
+      )
+
+      // When
+      telemetryService.trackInductionUpdated(induction, correlationId)
+
+      // Then
+      verify(telemetryClient).trackEvent("induction-updated", expectedEventProperties)
     }
   }
 }

@@ -2,7 +2,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import aValidUpdatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -275,6 +282,22 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isAfter(persistedInduction.skillsAndInterests!!.modifiedDateTime)
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(persistedInduction.inPrisonInterests!!.modifiedDateTime)
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("induction-updated"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createInductionEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonNumber", prisonNumber)
+        .containsEntry("prisonId", "MDI")
+        .containsEntry("userId", "auser_gen")
+        .containsKey("correlationId")
+        .containsKey("timestamp")
+    }
   }
 
   @Test

@@ -3,10 +3,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.GOAL_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import java.util.UUID
 
 /**
@@ -42,6 +45,22 @@ class TelemetryService(
     )
   }
 
+  fun trackInductionCreated(induction: Induction, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForInduction(
+      induction = induction,
+      correlationId = correlationId,
+      telemetryEventType = INDUCTION_CREATED,
+    )
+  }
+
+  fun trackInductionUpdated(induction: Induction, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForInduction(
+      induction = induction,
+      correlationId = correlationId,
+      telemetryEventType = INDUCTION_UPDATED,
+    )
+  }
+
   /**
    * Sends all goal update telemetry tracking events based on the differences between the previousGoal and the
    * updatedGoal.
@@ -59,6 +78,9 @@ class TelemetryService(
     }
   }
 
-  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: TelemetryEventType) =
+  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: GoalTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
+
+  private fun sendTelemetryEventForInduction(induction: Induction, correlationId: UUID, telemetryEventType: InductionTelemetryEventType) =
+    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction, correlationId))
 }

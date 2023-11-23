@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
@@ -17,25 +18,22 @@ private val log = KotlinLogging.logger {}
 @Component
 class AsyncInductionEventService(
   private val timelineService: TimelineService,
+  private val telemetryService: TelemetryService,
 ) : InductionEventService {
 
   override fun inductionCreated(createdInduction: Induction) {
     runBlocking {
       log.debug { "Induction created event for prisoner [${createdInduction.prisonNumber}]" }
-      timelineService.recordTimelineEvent(
-        createdInduction.prisonNumber,
-        buildInductionCreatedEvent(createdInduction),
-      )
+      launch { timelineService.recordTimelineEvent(createdInduction.prisonNumber, buildInductionCreatedEvent(createdInduction)) }
+      launch { telemetryService.trackInductionCreated(induction = createdInduction) }
     }
   }
 
   override fun inductionUpdated(updatedInduction: Induction) {
     runBlocking {
       log.debug { "Induction updated event for prisoner [${updatedInduction.prisonNumber}]" }
-      timelineService.recordTimelineEvent(
-        updatedInduction.prisonNumber,
-        buildInductionUpdatedEvent(updatedInduction),
-      )
+      launch { timelineService.recordTimelineEvent(updatedInduction.prisonNumber, buildInductionUpdatedEvent(updatedInduction)) }
+      launch { telemetryService.trackInductionUpdated(induction = updatedInduction) }
     }
   }
 

@@ -1,6 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -139,5 +147,21 @@ class CreateInductionTest : IntegrationTestBase() {
       .wasUpdatedBy(dpsUsername)
       .wasCreatedAtPrison(prisonId)
       .wasUpdatedAtPrison(prisonId)
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("induction-created"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createInductionEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonNumber", prisonNumber)
+        .containsEntry("prisonId", prisonId)
+        .containsEntry("userId", dpsUsername)
+        .containsKey("correlationId")
+        .containsKey("timestamp")
+    }
   }
 }

@@ -8,7 +8,7 @@ import java.util.UUID
  *   * a text field `value` that is the name of the customEvent recorded in App Insights.
  *   * a function `customDimensions` that returns the customDimensions that are recorded with the App Insights event.
  */
-enum class TelemetryEventType(val value: String, val customDimensions: (goal: Goal, correlationId: UUID) -> Map<String, String>) {
+enum class GoalTelemetryEventType(val value: String, val customDimensions: (goal: Goal, correlationId: UUID) -> Map<String, String>) {
   GOAL_CREATED(
     "goal-created",
     { goal, correlationId ->
