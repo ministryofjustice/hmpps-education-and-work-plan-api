@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 
@@ -62,5 +63,10 @@ class InductionService(
       ?: throw InductionNotFoundException(prisonNumber).also {
         log.info { "Induction for prisoner [$prisonNumber] not found" }
       }
+  }
+
+  fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> {
+    log.debug { "Retrieving Induction Summaries for ${prisonNumbers.size} prisoners" }
+    return if (prisonNumbers.isNotEmpty()) persistenceAdapter.getInductionSummaries(prisonNumbers) else emptyList()
   }
 }
