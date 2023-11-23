@@ -30,6 +30,9 @@ class AsyncInductionEventServiceTest {
   @Mock
   private lateinit var timelineService: TimelineService
 
+  @Mock
+  private lateinit var telemetryService: TelemetryService
+
   @Captor
   private lateinit var timelineEventCaptor: ArgumentCaptor<TimelineEvent>
 
@@ -55,8 +58,8 @@ class AsyncInductionEventServiceTest {
 
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
-    assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS)
-      .isEqualTo(expectedTimelineEvent)
+    verify(telemetryService).trackInductionCreated(induction)
+    assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS).isEqualTo(expectedTimelineEvent)
   }
 
   @Test
@@ -81,7 +84,7 @@ class AsyncInductionEventServiceTest {
 
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
-    assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS)
-      .isEqualTo(expectedTimelineEvent)
+    verify(telemetryService).trackInductionUpdated(induction)
+    assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS).isEqualTo(expectedTimelineEvent)
   }
 }

@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_ADDED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_ADDED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
@@ -37,7 +37,7 @@ class TelemetryEventTypeResolverTest {
       steps = updatedSteps,
     )
 
-    val expectedTelemetryEventTypes = emptyList<TelemetryEventType>()
+    val expectedTelemetryEventTypes = emptyList<GoalTelemetryEventType>()
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
@@ -64,7 +64,7 @@ class TelemetryEventTypeResolverTest {
       title = "Learn Spanish",
       steps = updatedSteps,
     )
-    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(GoalTelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
@@ -93,7 +93,7 @@ class TelemetryEventTypeResolverTest {
       steps = updatedSteps,
       notes = "A suitable course is available from May",
     )
-    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(GoalTelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
@@ -122,7 +122,7 @@ class TelemetryEventTypeResolverTest {
       steps = updatedSteps,
       lastUpdatedAtPrison = "BXI",
     )
-    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(GoalTelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
@@ -151,7 +151,7 @@ class TelemetryEventTypeResolverTest {
       steps = updatedSteps,
       targetCompletionDate = LocalDate.parse("2024-06-30"),
     )
-    val expectedTelemetryEventTypes = listOf(TelemetryEventType.GOAL_UPDATED)
+    val expectedTelemetryEventTypes = listOf(GoalTelemetryEventType.GOAL_UPDATED)
 
     // When
     val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
@@ -171,7 +171,7 @@ class TelemetryEventTypeResolverTest {
   fun `should get goal update types given goals with different statuses`(
     previousGoalStatus: GoalStatus,
     updatedGoalStatus: GoalStatus,
-    expectedTelemetryEventType: TelemetryEventType,
+    expectedTelemetryEventType: GoalTelemetryEventType,
   ) {
     // Given
     val goalReference = aValidReference()
@@ -305,7 +305,7 @@ class TelemetryEventTypeResolverTest {
   fun `should get goal update types given a step with different statuses`(
     previousStepStatus: StepStatus,
     updatedStepStatus: StepStatus,
-    expectedTelemetryEventType: TelemetryEventType,
+    expectedTelemetryEventType: GoalTelemetryEventType,
   ) {
     // Given
     val goalReference = aValidReference()
