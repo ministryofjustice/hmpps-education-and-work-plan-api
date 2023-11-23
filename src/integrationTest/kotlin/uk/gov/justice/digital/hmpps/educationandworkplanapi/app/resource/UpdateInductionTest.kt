@@ -292,10 +292,10 @@ class UpdateInductionTest : IntegrationTestBase() {
       )
       val createInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(createInductionEventProperties)
-        .containsEntry("prisonNumber", prisonNumber)
         .containsEntry("prisonId", "MDI")
         .containsEntry("userId", "auser_gen")
         .containsKey("correlationId")
+        .containsKey("reference")
         .containsKey("timestamp")
     }
   }

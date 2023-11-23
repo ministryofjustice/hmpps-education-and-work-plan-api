@@ -157,10 +157,10 @@ class CreateInductionTest : IntegrationTestBase() {
       )
       val createInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(createInductionEventProperties)
-        .containsEntry("prisonNumber", prisonNumber)
         .containsEntry("prisonId", prisonId)
         .containsEntry("userId", dpsUsername)
         .containsKey("correlationId")
+        .containsKey("reference")
         .containsKey("timestamp")
     }
   }

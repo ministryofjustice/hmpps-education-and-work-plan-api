@@ -17,7 +17,7 @@ enum class InductionTelemetryEventType(
     { induction, correlationId ->
       mapOf(
         "correlationId" to correlationId.toString(),
-        "prisonNumber" to induction.prisonNumber,
+        "reference" to induction.reference.toString(),
         "prisonId" to induction.createdAtPrison,
         "userId" to induction.createdBy!!,
         "timestamp" to induction.createdAt.toString(),
@@ -30,7 +30,7 @@ enum class InductionTelemetryEventType(
     { induction, correlationId ->
       mapOf(
         "correlationId" to correlationId.toString(),
-        "prisonNumber" to induction.prisonNumber,
+        "reference" to induction.reference.toString(),
         "prisonId" to induction.lastUpdatedAtPrison,
         "userId" to induction.lastUpdatedBy!!,
         "timestamp" to induction.lastUpdatedAt.toString(),

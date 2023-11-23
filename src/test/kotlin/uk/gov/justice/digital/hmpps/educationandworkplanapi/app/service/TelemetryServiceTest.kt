@@ -258,7 +258,7 @@ class TelemetryServiceTest {
       val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
         "correlationId" to correlationId.toString(),
-        "prisonNumber" to induction.prisonNumber,
+        "reference" to induction.reference.toString(),
         "prisonId" to induction.createdAtPrison,
         "userId" to induction.createdBy!!,
         "timestamp" to induction.createdAt.toString(),
@@ -278,7 +278,7 @@ class TelemetryServiceTest {
       val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
         "correlationId" to correlationId.toString(),
-        "prisonNumber" to induction.prisonNumber,
+        "reference" to induction.reference.toString(),
         "prisonId" to induction.lastUpdatedAtPrison,
         "userId" to induction.lastUpdatedBy!!,
         "timestamp" to induction.lastUpdatedAt.toString(),
