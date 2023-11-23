@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionPersistenceAdapter
@@ -37,4 +38,10 @@ class JpaInductionPersistenceAdapter(
       null
     }
   }
+
+  @Transactional(readOnly = true)
+  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> =
+    inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
+      inductionMapper.fromEntitySummariesToDomainSummaries(it)
+    }
 }

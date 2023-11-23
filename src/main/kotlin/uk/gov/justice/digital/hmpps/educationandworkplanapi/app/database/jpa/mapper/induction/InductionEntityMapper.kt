@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.FutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillsAndInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousTrainingEntity
@@ -16,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 
@@ -64,6 +66,12 @@ abstract class InductionEntityMapper {
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
   abstract fun fromEntityToDomain(persistedEntity: InductionEntity): Induction
+
+  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
+  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
+  abstract fun fromEntitySummaryToDomainSummary(inductionSummaryProjection: InductionSummaryProjection): InductionSummary
+
+  abstract fun fromEntitySummariesToDomainSummaries(inductionSummaryProjections: List<InductionSummaryProjection>): List<InductionSummary>
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField

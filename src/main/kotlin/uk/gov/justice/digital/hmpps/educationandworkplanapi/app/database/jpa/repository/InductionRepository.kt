@@ -3,9 +3,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.re
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionSummaryProjection
 import java.util.UUID
 
 @Repository
 interface InductionRepository : JpaRepository<InductionEntity, UUID> {
+
+  fun findByPrisonNumberIn(prisonNumbers: List<String>): List<InductionSummaryProjection>
+
   fun findByPrisonNumber(prisonNumber: String): InductionEntity?
 }

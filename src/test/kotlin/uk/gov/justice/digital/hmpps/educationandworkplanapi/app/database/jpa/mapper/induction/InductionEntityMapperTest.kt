@@ -10,10 +10,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntityWithJpaFieldsPopulated
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalSkillsAndInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousTrainingEntity
@@ -24,6 +26,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidFutureWorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInPrisonInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousTraining
@@ -194,5 +197,46 @@ class InductionEntityMapperTest {
     verify(previousTrainingEntityMapper).updateEntityFromDto(existingInductionEntity.previousTraining, updateInductionDto.previousTraining)
     verify(previousWorkExperiencesEntityMapper).updateEntityFromDto(existingInductionEntity.previousWorkExperiences, updateInductionDto.previousWorkExperiences)
     verify(workOnReleaseEntityMapper).updateEntityFromDto(existingInductionEntity.workOnRelease!!, updateInductionDto.workOnRelease)
+  }
+
+  @Test
+  fun `should map from entity summaries to domain summaries`() {
+    // Given
+    val summaryProjection1 = aValidInductionSummaryProjection(prisonNumber = aValidPrisonNumber())
+    val summaryProjection2 = aValidInductionSummaryProjection(prisonNumber = anotherValidPrisonNumber())
+
+    val workOnRelease1 = aValidWorkOnRelease()
+    val workOnRelease2 = aValidWorkOnRelease()
+    given(workOnReleaseEntityMapper.fromEntityToDomain(any())).willReturn(workOnRelease1, workOnRelease2)
+
+    val expected = listOf(
+      aValidInductionSummary(
+        prisonNumber = summaryProjection1.prisonNumber,
+        reference = summaryProjection1.reference,
+        workOnRelease = workOnRelease1,
+        createdBy = summaryProjection1.createdBy,
+        createdAt = summaryProjection1.createdAt,
+        lastUpdatedBy = summaryProjection1.updatedBy,
+        lastUpdatedAt = summaryProjection1.updatedAt,
+      ),
+      aValidInductionSummary(
+        prisonNumber = summaryProjection2.prisonNumber,
+        reference = summaryProjection2.reference,
+        workOnRelease = workOnRelease2,
+        createdBy = summaryProjection2.createdBy,
+        createdAt = summaryProjection2.createdAt,
+        lastUpdatedBy = summaryProjection2.updatedBy,
+        lastUpdatedAt = summaryProjection2.updatedAt,
+      ),
+    )
+
+    // When
+    val actual = mapper.fromEntitySummariesToDomainSummaries(listOf(summaryProjection1, summaryProjection2))
+
+    // Then
+    assertThat(actual).hasSize(2)
+    assertThat(actual).isEqualTo(expected)
+    verify(workOnReleaseEntityMapper).fromEntityToDomain(summaryProjection1.workOnRelease)
+    verify(workOnReleaseEntityMapper).fromEntityToDomain(summaryProjection2.workOnRelease)
   }
 }

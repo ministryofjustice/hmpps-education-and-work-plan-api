@@ -13,9 +13,11 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInductionDto
 
@@ -118,5 +120,24 @@ class JpaInductionPersistenceAdapterTest {
     // Then
     assertThat(actual).isNull()
     verifyNoInteractions(inductionMapper)
+  }
+
+  @Test
+  fun `should retrieve Induction Summaries`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val prisonNumbers = listOf(prisonNumber)
+    val inductionSummaryProjections = listOf(aValidInductionSummaryProjection(prisonNumber = prisonNumber))
+    val expectedInductionSummaries = listOf(aValidInductionSummary(prisonNumber = prisonNumber))
+    given(inductionRepository.findByPrisonNumberIn(any())).willReturn(inductionSummaryProjections)
+    given(inductionMapper.fromEntitySummariesToDomainSummaries(any())).willReturn(expectedInductionSummaries)
+
+    // When
+    val actual = persistenceAdapter.getInductionSummaries(prisonNumbers)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedInductionSummaries)
+    verify(inductionRepository).findByPrisonNumberIn(prisonNumbers)
+    verify(inductionMapper).fromEntitySummariesToDomainSummaries(inductionSummaryProjections)
   }
 }

@@ -17,7 +17,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.UpdateCiagInductionRequestMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetCiagInductionSummariesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateCiagInductionRequest
 
 @RestController
@@ -60,4 +62,16 @@ class InductionController(
   ) {
     inductionService.updateInduction(updateInductionRequestMapper.toUpdateInductionDto(prisonNumber, request))
   }
+
+  @PostMapping("/list")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  fun getInductionSummaries(
+    @Valid
+    @RequestBody
+    request: GetCiagInductionSummariesRequest,
+  ): CiagInductionSummaryListResponse =
+    with(inductionService.getInductionSummaries(request.offenderIds)) {
+      CiagInductionSummaryListResponse(inductionResponseMapper.fromDomainToModel(this))
+    }
 }

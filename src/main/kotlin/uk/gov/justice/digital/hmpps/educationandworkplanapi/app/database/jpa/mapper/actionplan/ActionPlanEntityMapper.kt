@@ -20,5 +20,6 @@ interface ActionPlanEntityMapper {
   fun fromDtoToEntity(createActionPlanDto: CreateActionPlanDto): ActionPlanEntity
 
   fun fromEntityToDomain(actionPlanEntity: ActionPlanEntity): ActionPlan
+
   fun fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections: List<ActionPlanSummaryProjection>): List<ActionPlanSummary>
 }
