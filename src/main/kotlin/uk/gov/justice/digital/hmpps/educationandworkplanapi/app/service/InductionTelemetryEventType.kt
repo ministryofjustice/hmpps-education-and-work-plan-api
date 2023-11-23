@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
-import java.util.UUID
 
 /**
  * An enumeration of the types of Induction events that can be sent to the Telemetry Service, where each item has:
@@ -10,30 +9,26 @@ import java.util.UUID
  */
 enum class InductionTelemetryEventType(
   val value: String,
-  val customDimensions: (induction: Induction, correlationId: UUID) -> Map<String, String>,
+  val customDimensions: (induction: Induction) -> Map<String, String>,
 ) {
   INDUCTION_CREATED(
-    "induction-created",
-    { induction, correlationId ->
+    "INDUCTION_CREATED",
+    { induction ->
       mapOf(
-        "correlationId" to correlationId.toString(),
         "reference" to induction.reference.toString(),
         "prisonId" to induction.createdAtPrison,
         "userId" to induction.createdBy!!,
-        "timestamp" to induction.createdAt.toString(),
       )
     },
   ),
 
   INDUCTION_UPDATED(
-    "induction-updated",
-    { induction, correlationId ->
+    "INDUCTION_UPDATED",
+    { induction ->
       mapOf(
-        "correlationId" to correlationId.toString(),
         "reference" to induction.reference.toString(),
         "prisonId" to induction.lastUpdatedAtPrison,
         "userId" to induction.lastUpdatedBy!!,
-        "timestamp" to induction.lastUpdatedAt.toString(),
       )
     },
   ),

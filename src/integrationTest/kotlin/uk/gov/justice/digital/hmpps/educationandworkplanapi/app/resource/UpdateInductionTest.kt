@@ -286,7 +286,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     await.untilAsserted {
       val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
       verify(telemetryClient, times(1)).trackEvent(
-        eq("induction-updated"),
+        eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),
         eq(null),
       )
@@ -294,9 +294,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       assertThat(createInductionEventProperties)
         .containsEntry("prisonId", "MDI")
         .containsEntry("userId", "auser_gen")
-        .containsKey("correlationId")
         .containsKey("reference")
-        .containsKey("timestamp")
     }
   }
 

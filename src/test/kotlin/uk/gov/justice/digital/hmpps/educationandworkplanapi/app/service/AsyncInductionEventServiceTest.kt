@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
-import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class AsyncInductionEventServiceTest {
@@ -36,9 +35,6 @@ class AsyncInductionEventServiceTest {
 
   @Captor
   private lateinit var timelineEventCaptor: ArgumentCaptor<TimelineEvent>
-
-  @Captor
-  private lateinit var telemetryCorrelationIdCaptor: ArgumentCaptor<UUID>
 
   @Test
   fun `should handle induction created`() {
@@ -62,9 +58,8 @@ class AsyncInductionEventServiceTest {
 
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
-    verify(telemetryService).trackInductionCreated(eq(induction), capture(telemetryCorrelationIdCaptor))
+    verify(telemetryService).trackInductionCreated(induction)
     assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS).isEqualTo(expectedTimelineEvent)
-    assertThat(telemetryCorrelationIdCaptor.value).isNotNull()
   }
 
   @Test
@@ -89,8 +84,7 @@ class AsyncInductionEventServiceTest {
 
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
-    verify(telemetryService).trackInductionUpdated(eq(induction), capture(telemetryCorrelationIdCaptor))
+    verify(telemetryService).trackInductionUpdated(induction)
     assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS).isEqualTo(expectedTimelineEvent)
-    assertThat(telemetryCorrelationIdCaptor.value).isNotNull()
   }
 }

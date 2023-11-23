@@ -255,40 +255,34 @@ class TelemetryServiceTest {
     fun `should track induction created event`() {
       // Given
       val induction = aValidInduction()
-      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
-        "correlationId" to correlationId.toString(),
         "reference" to induction.reference.toString(),
         "prisonId" to induction.createdAtPrison,
         "userId" to induction.createdBy!!,
-        "timestamp" to induction.createdAt.toString(),
       )
 
       // When
-      telemetryService.trackInductionCreated(induction, correlationId)
+      telemetryService.trackInductionCreated(induction)
 
       // Then
-      verify(telemetryClient).trackEvent("induction-created", expectedEventProperties)
+      verify(telemetryClient).trackEvent("INDUCTION_CREATED", expectedEventProperties)
     }
 
     @Test
     fun `should track induction updated event`() {
       // Given
       val induction = aValidInduction()
-      val correlationId = UUID.randomUUID()
       val expectedEventProperties = mapOf(
-        "correlationId" to correlationId.toString(),
         "reference" to induction.reference.toString(),
         "prisonId" to induction.lastUpdatedAtPrison,
         "userId" to induction.lastUpdatedBy!!,
-        "timestamp" to induction.lastUpdatedAt.toString(),
       )
 
       // When
-      telemetryService.trackInductionUpdated(induction, correlationId)
+      telemetryService.trackInductionUpdated(induction)
 
       // Then
-      verify(telemetryClient).trackEvent("induction-updated", expectedEventProperties)
+      verify(telemetryClient).trackEvent("INDUCTION_UPDATED", expectedEventProperties)
     }
   }
 }
