@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.6.0'
+  version: '1.6.1'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -596,7 +596,6 @@ components:
         hasWorkedBefore:
           type: boolean
         typeOfWorkExperience:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of the Prisoner's type of previous work experience.
@@ -606,7 +605,6 @@ components:
           type: string
           description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
         workExperience:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of the Prisoner's previous work experience details.
@@ -638,7 +636,6 @@ components:
           description: A unique reference for this Prisoner's skills and interests (not the database primary key).
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         skills:
-          minItems: 1
           uniqueItems: true
           type: array
           description: One or more skills that the Prisoner feels they have.
@@ -648,7 +645,6 @@ components:
           type: string
           description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
         personalInterests:
-          minItems: 1
           uniqueItems: true
           type: array
           description: One or more interests that the Prisoner feels they have.
@@ -719,7 +715,6 @@ components:
           description: A unique reference for this Prisoner's in-prison work and education interests (not the database primary key).
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         inPrisonWork:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of in-prison work that the Prisoner is interested in.
@@ -729,7 +724,6 @@ components:
           type: string
           description: A specific type of in-prison work that does not fit the given 'inPrisonWork' types. Mandatory when 'inPrisonWork' includes 'OTHER'.
         inPrisonEducation:
-          minItems: 1
           uniqueItems: true
           type: array
           description: Any potential in-prison education/training that the Prisoner is interested in.
@@ -1011,7 +1005,6 @@ components:
         hasWorkedBefore:
           type: boolean
         typeOfWorkExperience:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of the Prisoner's type of previous work experience.
@@ -1021,7 +1014,6 @@ components:
           type: string
           description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
         workExperience:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of the Prisoner's previous work experience details.
@@ -1037,7 +1029,6 @@ components:
       type: object
       properties:
         workInterests:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of Prisoner's future work interests.
@@ -1052,15 +1043,12 @@ components:
           description: A detailed list of work interests that a Prisoner has.
           items:
             $ref: '#/components/schemas/WorkInterestDetail'
-      required:
-        - workInterests
 
     CreateSkillsAndInterestsRequest:
       description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
       type: object
       properties:
         skills:
-          minItems: 1
           uniqueItems: true
           type: array
           description: One or more skills that the Prisoner feels they have.
@@ -1070,7 +1058,6 @@ components:
           type: string
           description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
         personalInterests:
-          minItems: 1
           uniqueItems: true
           type: array
           description: One or more interests that the Prisoner feels they have.
@@ -1108,7 +1095,6 @@ components:
       type: object
       properties:
         inPrisonWork:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of in-prison work that the Prisoner is interested in.
@@ -1118,7 +1104,6 @@ components:
           type: string
           description: A specific type of in-prison work that does not fit the given 'inPrisonWork' types. Mandatory when 'inPrisonWork' includes 'OTHER'.
         inPrisonEducation:
-          minItems: 1
           uniqueItems: true
           type: array
           description: Any potential in-prison education/training that the Prisoner is interested in.
@@ -1185,7 +1170,6 @@ components:
         hasWorkedBefore:
           type: boolean
         typeOfWorkExperience:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of the Prisoner's type of previous work experience.
@@ -1195,7 +1179,6 @@ components:
           type: string
           description: A specific work experience type for the Prisoner. Mandatory when 'typeOfWorkExperience' includes 'OTHER'.
         workExperience:
-          minItems: 1
           uniqueItems: true
           type: array
           description: A list of the Prisoner's previous work experience details.

@@ -40,8 +40,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.asser
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPrisonWorkAndEducationResponse
@@ -476,7 +474,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should update induction with no previous work experience and modified work interests`() {
+  fun `should update induction with no previous work experience or work interests`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
@@ -491,14 +489,9 @@ class UpdateInductionTest : IntegrationTestBase() {
         workExperience = null,
         workInterests = aValidUpdateWorkInterestsRequest(
           id = persistedInduction.workExperience!!.workInterests!!.id,
-          workInterests = setOf(WorkType.SPORTS),
+          workInterests = null,
           workInterestsOther = null,
-          particularJobInterests = setOf(
-            WorkInterestDetail(
-              workInterest = WorkType.SPORTS,
-              role = "Football coach",
-            ),
-          ),
+          particularJobInterests = null,
         ),
       ),
     )
@@ -511,14 +504,9 @@ class UpdateInductionTest : IntegrationTestBase() {
       workExperience = null,
       workInterests = aValidWorkInterestsResponse(
         id = persistedInduction.workExperience!!.workInterests!!.id,
-        workInterests = setOf(WorkType.SPORTS),
+        workInterests = emptySet(),
         workInterestsOther = null,
-        particularJobInterests = setOf(
-          WorkInterestDetail(
-            workInterest = WorkType.SPORTS,
-            role = "Football coach",
-          ),
-        ),
+        particularJobInterests = emptySet(),
       ),
       modifiedBy = "auser_gen",
     )
@@ -552,19 +540,13 @@ class UpdateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should update induction with previous work experience given it previously did not have any`() {
+  fun `should update induction with previous work experience and future interests given it previously did not have any`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     createInduction(
       prisonNumber,
       aValidCreateCiagInductionRequest(
-        workExperience = aValidCreatePreviousWorkRequest(
-          hasWorkedBefore = false,
-          typeOfWorkExperience = null,
-          typeOfWorkExperienceOther = null,
-          workExperience = null,
-          workInterests = aValidCreateWorkInterestsRequest(),
-        ),
+        workExperience = null,
       ),
     )
     val persistedInduction = getInduction(prisonNumber)
@@ -608,9 +590,9 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasCreatedAt(persistedInduction.createdDateTime)
       .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
-    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.modifiedDateTime)
+    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isAfter(persistedInduction.modifiedDateTime)
     // other last modified dates should remain unchanged
-    assertThat(updatedInduction.workExperience!!.workInterests!!.modifiedDateTime).isEqualTo(persistedInduction.workExperience!!.workInterests!!.modifiedDateTime)
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isEqualTo(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
     assertThat(updatedInduction.skillsAndInterests!!.modifiedDateTime).isEqualTo(persistedInduction.skillsAndInterests!!.modifiedDateTime)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isEqualTo(persistedInduction.inPrisonInterests!!.modifiedDateTime)
@@ -839,16 +821,16 @@ class UpdateInductionTest : IntegrationTestBase() {
     reasonToNotGetWork: Set<ReasonNotToWork>? = originalInduction.reasonToNotGetWork,
     reasonToNotGetWorkOther: String? = originalInduction.reasonToNotGetWorkOther,
     workExperience: UpdatePreviousWorkRequest? = aValidUpdatePreviousWorkRequest(
-      id = originalInduction.workExperience!!.id!!,
+      id = originalInduction.workExperience?.id,
     ),
     skillsAndInterests: UpdateSkillsAndInterestsRequest? = aValidUpdateSkillsAndInterestsRequest(
-      id = originalInduction.workExperience!!.id!!,
+      id = originalInduction.skillsAndInterests?.id,
     ),
     qualificationsAndTraining: UpdateEducationAndQualificationsRequest? = aValidUpdateEducationAndQualificationsRequest(
-      id = originalInduction.workExperience!!.id!!,
+      id = originalInduction.qualificationsAndTraining?.id,
     ),
     inPrisonInterests: UpdatePrisonWorkAndEducationRequest? = aValidUpdatePrisonWorkAndEducationRequest(
-      id = originalInduction.workExperience!!.id!!,
+      id = originalInduction.inPrisonInterests?.id,
     ),
   ): UpdateCiagInductionRequest =
     aValidUpdateCiagInductionRequest(
