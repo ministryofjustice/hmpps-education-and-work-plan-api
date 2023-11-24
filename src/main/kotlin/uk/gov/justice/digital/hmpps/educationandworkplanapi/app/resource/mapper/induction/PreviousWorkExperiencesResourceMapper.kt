@@ -25,8 +25,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkE
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 abstract class PreviousWorkExperiencesResourceMapper {
+
+  fun toCreatePreviousWorkExperiencesDto(
+    request: CreatePreviousWorkRequest?,
+    prisonId: String,
+  ): CreatePreviousWorkExperiencesDto? {
+    return if (request == null) {
+      null
+    } else {
+      convertToCreatePreviousWorkExperiencesDto(request, prisonId)
+    }
+  }
+
   @Mapping(target = "experiences", source = "request.workExperience")
-  abstract fun toCreatePreviousWorkExperiencesDto(
+  protected abstract fun convertToCreatePreviousWorkExperiencesDto(
     request: CreatePreviousWorkRequest?,
     prisonId: String,
   ): CreatePreviousWorkExperiencesDto?
@@ -91,9 +103,20 @@ abstract class PreviousWorkExperiencesResourceMapper {
 
   fun toOffsetDateTime(instant: Instant?): OffsetDateTime? = instant?.atOffset(ZoneOffset.UTC)
 
+  fun toUpdatePreviousWorkExperiencesDto(
+    request: UpdatePreviousWorkRequest?,
+    prisonId: String,
+  ): UpdatePreviousWorkExperiencesDto? {
+    return if (request == null) {
+      null
+    } else {
+      convertToUpdatePreviousWorkExperiencesDto(request, prisonId)
+    }
+  }
+
   @Mapping(target = "reference", source = "request.id")
   @Mapping(target = "experiences", source = "request.workExperience")
-  abstract fun toUpdatePreviousWorkExperiencesDto(
+  protected abstract fun convertToUpdatePreviousWorkExperiencesDto(
     request: UpdatePreviousWorkRequest?,
     prisonId: String,
   ): UpdatePreviousWorkExperiencesDto?
