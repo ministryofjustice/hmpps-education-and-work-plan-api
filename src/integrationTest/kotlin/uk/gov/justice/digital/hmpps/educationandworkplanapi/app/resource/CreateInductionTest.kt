@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import aValidCreatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
@@ -22,8 +23,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateSkillsAndInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class CreateInductionTest : IntegrationTestBase() {
@@ -117,6 +124,176 @@ class CreateInductionTest : IntegrationTestBase() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createRequest = aValidCreateCiagInductionRequest()
+    val dpsUsername = "auser_gen"
+    val displayName = "Albert User"
+    val prisonId = createRequest.prisonId
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = dpsUsername,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = inductionRepository.findByPrisonNumber(prisonNumber)
+    assertThat(induction)
+      .isForPrisonNumber(prisonNumber)
+      .hasAReference()
+      .hasJpaManagedFieldsPopulated()
+      .wasCreatedBy(dpsUsername)
+      .wasUpdatedBy(dpsUsername)
+      .wasCreatedAtPrison(prisonId)
+      .wasUpdatedAtPrison(prisonId)
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("INDUCTION_CREATED"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createInductionEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonId", prisonId)
+        .containsEntry("userId", dpsUsername)
+        .containsKey("reference")
+    }
+  }
+
+  @Test
+  @Transactional
+  fun `should create a new induction with empty collections`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createRequest = aValidCreateCiagInductionRequest(
+      hopingToGetWork = HopingToWork.YES,
+      abilityToWork = emptySet(),
+      abilityToWorkOther = null,
+      reasonToNotGetWork = emptySet(),
+      reasonToNotGetWorkOther = null,
+      workExperience = aValidCreatePreviousWorkRequest(
+        hasWorkedBefore = false,
+        workExperience = emptySet(),
+        typeOfWorkExperience = emptySet(),
+        workInterests = aValidCreateWorkInterestsRequest(
+          workInterests = emptySet(),
+          workInterestsOther = null,
+          particularJobInterests = emptySet(),
+        ),
+      ),
+      skillsAndInterests = aValidCreateSkillsAndInterestsRequest(
+        skills = emptySet(),
+        skillsOther = null,
+        personalInterests = emptySet(),
+        personalInterestsOther = null,
+      ),
+      qualificationsAndTraining = aValidCreateEducationAndQualificationsRequest(
+        qualifications = emptySet(),
+        additionalTraining = emptySet(), // not possible via the UI
+        additionalTrainingOther = null,
+      ),
+      inPrisonInterests = aValidCreatePrisonWorkAndEducationRequest(
+        inPrisonWork = emptySet(),
+        inPrisonWorkOther = null,
+        inPrisonEducation = emptySet(),
+        inPrisonEducationOther = null,
+      ),
+    )
+    val dpsUsername = "auser_gen"
+    val displayName = "Albert User"
+    val prisonId = createRequest.prisonId
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = dpsUsername,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = inductionRepository.findByPrisonNumber(prisonNumber)
+    assertThat(induction)
+      .isForPrisonNumber(prisonNumber)
+      .hasAReference()
+      .hasJpaManagedFieldsPopulated()
+      .wasCreatedBy(dpsUsername)
+      .wasUpdatedBy(dpsUsername)
+      .wasCreatedAtPrison(prisonId)
+      .wasUpdatedAtPrison(prisonId)
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("INDUCTION_CREATED"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      val createInductionEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonId", prisonId)
+        .containsEntry("userId", dpsUsername)
+        .containsKey("reference")
+    }
+  }
+
+  @Test
+  @Transactional
+  fun `should create a new induction with null collections`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createRequest = aValidCreateCiagInductionRequest(
+      hopingToGetWork = HopingToWork.YES,
+      abilityToWork = null,
+      abilityToWorkOther = null,
+      reasonToNotGetWork = null,
+      reasonToNotGetWorkOther = null,
+      workExperience = aValidCreatePreviousWorkRequest(
+        hasWorkedBefore = false,
+        workExperience = null,
+        typeOfWorkExperience = null,
+        workInterests = aValidCreateWorkInterestsRequest(
+          workInterests = null,
+          workInterestsOther = null,
+          particularJobInterests = null,
+        ),
+      ),
+      skillsAndInterests = aValidCreateSkillsAndInterestsRequest(
+        skills = null,
+        skillsOther = null,
+        personalInterests = null,
+        personalInterestsOther = null,
+      ),
+      qualificationsAndTraining = aValidCreateEducationAndQualificationsRequest(
+        qualifications = null,
+        additionalTraining = setOf(TrainingType.NONE), // cannot set to null
+        additionalTrainingOther = null,
+      ),
+      inPrisonInterests = aValidCreatePrisonWorkAndEducationRequest(
+        inPrisonWork = null,
+        inPrisonWorkOther = null,
+        inPrisonEducation = null,
+        inPrisonEducationOther = null,
+      ),
+    )
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
     val prisonId = createRequest.prisonId

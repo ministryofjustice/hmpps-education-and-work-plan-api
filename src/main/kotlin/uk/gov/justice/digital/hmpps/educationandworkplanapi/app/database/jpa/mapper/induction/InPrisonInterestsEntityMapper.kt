@@ -6,6 +6,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
+import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
     InPrisonWorkInterestEntityMapper::class,
     InPrisonTrainingInterestEntityMapper::class,
   ],
+  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
 abstract class InPrisonInterestsEntityMapper {
 

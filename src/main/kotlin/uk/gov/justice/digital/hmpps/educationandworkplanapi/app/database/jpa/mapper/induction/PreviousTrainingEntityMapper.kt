@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.NullValueMappingStrategy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousTrainingEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
@@ -17,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Tra
   uses = [
     TrainingTypeMapper::class,
   ],
+  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
 interface PreviousTrainingEntityMapper {
 
