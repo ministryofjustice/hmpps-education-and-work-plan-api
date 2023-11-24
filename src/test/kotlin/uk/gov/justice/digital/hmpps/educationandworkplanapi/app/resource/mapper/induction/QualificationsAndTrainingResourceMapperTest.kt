@@ -168,7 +168,7 @@ class QualificationsAndTrainingResourceMapperTest {
     val expectedResponse = aValidEducationAndQualificationsResponse(
       id = training.reference,
       educationLevel = HighestEducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = null,
+      qualifications = emptySet(),
       additionalTraining = emptySet(),
       additionalTrainingOther = null,
       modifiedBy = "bjones_gen",

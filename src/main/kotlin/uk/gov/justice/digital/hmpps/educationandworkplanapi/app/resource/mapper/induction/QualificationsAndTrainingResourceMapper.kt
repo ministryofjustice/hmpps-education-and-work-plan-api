@@ -79,7 +79,7 @@ abstract class QualificationsAndTrainingResourceMapper {
   abstract fun toHighestEducationLevelApi(educationLevel: HighestEducationLevelDomain?): HighestEducationLevelApi?
 
   private fun toAchievedQualifications(qualifications: List<Qualification>?): Set<AchievedQualification>? =
-    qualifications?.map { toAchievedQualification(it) }?.toSet()?.ifEmpty { null }
+    qualifications?.map { toAchievedQualification(it) }?.toSet()
 
   private fun toAchievedQualification(qualification: Qualification): AchievedQualification =
     with(qualification) {
