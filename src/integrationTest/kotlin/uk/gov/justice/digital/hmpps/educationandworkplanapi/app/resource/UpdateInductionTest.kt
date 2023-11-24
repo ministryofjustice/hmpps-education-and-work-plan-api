@@ -362,7 +362,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
         id = persistedInduction.qualificationsAndTraining!!.id!!,
         educationLevel = null,
-        qualifications = null,
+        qualifications = emptySet(),
         additionalTraining = setOf(TrainingType.CSCS_CARD),
         additionalTrainingOther = null,
       ),

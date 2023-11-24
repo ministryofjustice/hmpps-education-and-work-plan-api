@@ -6,6 +6,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
+import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.FutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
@@ -23,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
   uses = [
     WorkInterestEntityMapper::class,
   ],
+  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
 abstract class FutureWorkInterestsEntityMapper {
   @Autowired

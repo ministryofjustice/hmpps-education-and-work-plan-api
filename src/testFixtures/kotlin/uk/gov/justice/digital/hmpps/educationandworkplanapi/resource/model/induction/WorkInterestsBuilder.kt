@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 fun aValidCreateWorkInterestsRequest(
-  workInterests: Set<WorkType> = setOf(WorkType.OTHER),
+  workInterests: Set<WorkType>? = setOf(WorkType.OTHER),
   workInterestsOther: String? = "Any job I can get",
   particularJobInterests: Set<WorkInterestDetail>? = setOf(
     WorkInterestDetail(
