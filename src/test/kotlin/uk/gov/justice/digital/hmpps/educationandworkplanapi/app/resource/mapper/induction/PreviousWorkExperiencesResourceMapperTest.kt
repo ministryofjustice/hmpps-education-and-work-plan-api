@@ -169,9 +169,9 @@ class PreviousWorkExperiencesResourceMapperTest {
     val expectedResponse = aValidPreviousWorkResponse(
       id = workExperiences.reference,
       hasWorkedBefore = false,
-      typeOfWorkExperience = null,
+      typeOfWorkExperience = emptySet(),
       typeOfWorkExperienceOther = null,
-      workExperience = null,
+      workExperience = emptySet(),
       workInterests = aValidWorkInterestsResponse(
         id = workInterests.reference,
         workInterests = emptySet(),

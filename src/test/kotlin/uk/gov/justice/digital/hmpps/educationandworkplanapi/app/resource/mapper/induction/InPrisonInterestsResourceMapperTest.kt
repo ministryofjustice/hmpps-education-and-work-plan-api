@@ -94,9 +94,9 @@ class InPrisonInterestsResourceMapperTest {
     given(instantMapper.toOffsetDateTime(any())).willReturn(modifiedDateTime)
     val expectedResponse = aValidPrisonWorkAndEducationResponse(
       id = inPrisonInterests.reference,
-      inPrisonWork = null,
+      inPrisonWork = emptySet(),
       inPrisonWorkOther = null,
-      inPrisonEducation = null,
+      inPrisonEducation = emptySet(),
       inPrisonEducationOther = null,
       modifiedDateTime = modifiedDateTime,
       modifiedBy = "bjones_gen",

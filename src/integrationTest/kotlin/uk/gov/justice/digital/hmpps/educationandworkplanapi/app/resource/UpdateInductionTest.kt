@@ -233,7 +233,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse(
       id = persistedInduction.qualificationsAndTraining!!.id!!,
       educationLevel = HighestEducationLevel.PRIMARY_SCHOOL,
-      qualifications = null,
+      qualifications = emptySet(),
       additionalTraining = setOf(TrainingType.CSCS_CARD),
       additionalTrainingOther = null,
       modifiedBy = "auser_gen",
@@ -371,7 +371,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse(
       id = persistedInduction.qualificationsAndTraining!!.id!!,
       educationLevel = null,
-      qualifications = null,
+      qualifications = emptySet(),
       additionalTraining = setOf(TrainingType.CSCS_CARD),
       additionalTrainingOther = null,
       modifiedBy = "auser_gen",
@@ -499,9 +499,9 @@ class UpdateInductionTest : IntegrationTestBase() {
     val expectedWorkExperience = aValidPreviousWorkResponse(
       id = persistedInduction.workExperience!!.id!!,
       hasWorkedBefore = false,
-      typeOfWorkExperience = null,
+      typeOfWorkExperience = emptySet(),
       typeOfWorkExperienceOther = null,
-      workExperience = null,
+      workExperience = emptySet(),
       workInterests = aValidWorkInterestsResponse(
         id = persistedInduction.workExperience!!.workInterests!!.id,
         workInterests = emptySet(),
@@ -617,9 +617,9 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val expectedSkillsAndInterests = aValidSkillsAndInterestsResponse(
       id = persistedInduction.workExperience!!.id!!,
-      skills = null,
+      skills = emptySet(),
       skillsOther = null,
-      personalInterests = null,
+      personalInterests = emptySet(),
       personalInterestsOther = null,
       modifiedBy = "auser_gen",
     )
@@ -723,9 +723,9 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val expectedInPrisonInterests = aValidPrisonWorkAndEducationResponse(
       id = persistedInduction.workExperience!!.id!!,
-      inPrisonWork = null,
+      inPrisonWork = emptySet(),
       inPrisonWorkOther = null,
-      inPrisonEducation = null,
+      inPrisonEducation = emptySet(),
       inPrisonEducationOther = null,
       modifiedBy = "auser_gen",
     )
