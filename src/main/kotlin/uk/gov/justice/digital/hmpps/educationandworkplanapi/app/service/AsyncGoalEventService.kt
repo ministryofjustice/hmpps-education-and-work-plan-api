@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -20,11 +21,20 @@ class AsyncGoalEventService(
   private val timelineService: TimelineService,
 ) : GoalEventService {
 
-  override fun goalCreated(prisonNumber: String, createdGoal: Goal) {
-    runBlocking {
-      log.debug { "Goal created event for prisoner [$prisonNumber]" }
-      launch { recordGoalCreatedTimelineEvent(prisonNumber = prisonNumber, createdGoal = createdGoal) }
-      launch { trackGoalCreatedTelemetryEvent(createdGoal = createdGoal) }
+  override fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>) {
+    val correlationId = UUID.randomUUID()
+    createdGoals.forEach { createdGoal ->
+      runBlocking {
+        log.debug { "Goal created event for prisoner [$prisonNumber]" }
+        launch {
+          recordGoalCreatedTimelineEvent(
+            prisonNumber = prisonNumber,
+            createdGoal = createdGoal,
+            correlationId = correlationId,
+          )
+        }
+        launch { trackGoalCreatedTelemetryEvent(createdGoal = createdGoal) }
+      }
     }
   }
 
@@ -43,10 +53,10 @@ class AsyncGoalEventService(
     }
   }
 
-  private fun recordGoalCreatedTimelineEvent(prisonNumber: String, createdGoal: Goal) {
+  private fun recordGoalCreatedTimelineEvent(prisonNumber: String, createdGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
     timelineService.recordTimelineEvent(
       prisonNumber,
-      timelineEventFactory.goalCreatedTimelineEvent(createdGoal),
+      timelineEventFactory.goalCreatedTimelineEvent(createdGoal, correlationId),
     )
   }
 

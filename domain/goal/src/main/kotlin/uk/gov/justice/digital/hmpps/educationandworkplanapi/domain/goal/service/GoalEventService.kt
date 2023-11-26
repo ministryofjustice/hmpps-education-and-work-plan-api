@@ -8,9 +8,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 interface GoalEventService {
 
   /**
-   * Implementations providing custom code for when a [Goal] is created.
+   * Implementations providing custom code for when one or more [Goal]s are created.
    */
-  fun goalCreated(prisonNumber: String, createdGoal: Goal)
+  fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>)
 
   /**
    * Implementations providing custom code for when a [Goal] is updated.
