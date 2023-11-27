@@ -43,4 +43,22 @@ class FutureWorkInterestsResourceMapperTest {
     assertThat(actual.interests[0].workTypeOther).isEqualTo("Any job I can get")
     assertThat(actual.interests[0].role).isEqualTo("Any role")
   }
+
+  @Test
+  fun `should map to UpdateFutureWorkInterestsDto when particular job interests is null`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdateWorkInterestsRequest(particularJobInterests = null)
+
+    // When
+    val actual = mapper.toUpdateFutureWorkInterestsDto(request, prisonId)
+
+    // Then
+    assertThat(actual!!.prisonId).isEqualTo(prisonId)
+    assertThat(actual.reference).isEqualTo(request.id)
+    assertThat(actual.interests).hasSize(1)
+    assertThat(actual.interests[0].workType).isEqualTo(WorkInterestType.OTHER)
+    assertThat(actual.interests[0].workTypeOther).isEqualTo("Any job I can get")
+    assertThat(actual.interests[0].role).isNull()
+  }
 }
