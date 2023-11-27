@@ -37,7 +37,7 @@ class FutureWorkInterestsResourceMapper {
     return workInterests?.map {
       val workType = toWorkInterestType(it)
       val workTypeOther = if (isOtherWorkType(it)) workInterestsOther else null
-      val role = particularWorkInterests?.first { particularInterest -> particularInterest.workInterest == it }?.role
+      val role = particularWorkInterests?.firstOrNull { particularInterest -> particularInterest.workInterest == it }?.role
       WorkInterest(
         workType = workType,
         workTypeOther = workTypeOther,
