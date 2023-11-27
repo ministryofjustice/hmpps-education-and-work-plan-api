@@ -28,7 +28,7 @@ class FutureWorkInterestsResourceMapperTest {
           workInterest = WorkType.TECHNICAL,
           role = "Kotlin Developer",
         ),
-      )
+      ),
     )
     val expectedInterests = listOf(
       WorkInterest(
@@ -67,7 +67,7 @@ class FutureWorkInterestsResourceMapperTest {
           workInterest = WorkType.TECHNICAL,
           role = "Kotlin Developer",
         ),
-      )
+      ),
     )
     val expectedInterests = listOf(
       WorkInterest(
@@ -103,7 +103,7 @@ class FutureWorkInterestsResourceMapperTest {
           workInterest = WorkType.OTHER,
           role = "Juggler",
         ),
-      )
+      ),
     )
     val expectedInterests = listOf(
       WorkInterest(
