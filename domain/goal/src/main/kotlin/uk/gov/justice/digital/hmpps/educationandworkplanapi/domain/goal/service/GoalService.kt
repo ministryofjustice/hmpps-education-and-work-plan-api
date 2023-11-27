@@ -48,7 +48,9 @@ class GoalService(
         .let { it.goals }
     } else {
       goalPersistenceAdapter.createGoals(prisonNumber, createGoalDtos)
-        .onEach { goalEventService.goalCreated(prisonNumber, it) }
+        .also {
+          goalEventService.goalsCreated(prisonNumber, it)
+        }
     }
   }
 

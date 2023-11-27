@@ -47,7 +47,9 @@ class GoalServiceTest {
       val prisonNumber = aValidPrisonNumber()
       val goal = aValidGoal()
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(aValidActionPlan())
-      given(goalPersistenceAdapter.createGoals(any(), any())).willReturn(listOf(goal))
+
+      val createdGoals = listOf(goal)
+      given(goalPersistenceAdapter.createGoals(any(), any())).willReturn(createdGoals)
       val createGoalDto = aValidCreateGoalDto()
 
       // When
@@ -57,7 +59,7 @@ class GoalServiceTest {
       assertThat(actual).isEqualTo(goal)
       verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
       verify(goalPersistenceAdapter).createGoals(prisonNumber, listOf(createGoalDto))
-      verify(goalEventService).goalCreated(prisonNumber, actual)
+      verify(goalEventService).goalsCreated(prisonNumber, createdGoals)
       verifyNoInteractions(actionPlanEventService)
     }
 
@@ -95,7 +97,9 @@ class GoalServiceTest {
       val goal1 = aValidGoal(title = "Goal 1")
       val goal2 = aValidGoal(title = "Goal 2")
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(aValidActionPlan())
-      given(goalPersistenceAdapter.createGoals(any(), any())).willReturn(listOf(goal1, goal2))
+
+      val createdGoals = listOf(goal1, goal2)
+      given(goalPersistenceAdapter.createGoals(any(), any())).willReturn(createdGoals)
 
       val createGoalDto1 = aValidCreateGoalDto(title = "Goal 1")
       val createGoalDto2 = aValidCreateGoalDto(title = "Goal 2")
@@ -108,8 +112,7 @@ class GoalServiceTest {
       assertThat(actual).containsExactlyInAnyOrder(goal1, goal2)
       verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
       verify(goalPersistenceAdapter).createGoals(prisonNumber, createGoalDtos)
-      verify(goalEventService).goalCreated(prisonNumber, goal1)
-      verify(goalEventService).goalCreated(prisonNumber, goal2)
+      verify(goalEventService).goalsCreated(prisonNumber, createdGoals)
       verifyNoInteractions(actionPlanEventService)
     }
 
