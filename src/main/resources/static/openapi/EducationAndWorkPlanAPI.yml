@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.6.1'
+  version: '1.6.2'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -1251,8 +1251,6 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's work interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-      required:
-        - id
 
     WorkInterestDetail:
       title: WorkInterestDetail
