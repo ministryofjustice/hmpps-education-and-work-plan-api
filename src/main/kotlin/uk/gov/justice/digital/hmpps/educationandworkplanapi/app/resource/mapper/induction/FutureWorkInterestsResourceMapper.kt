@@ -15,7 +15,7 @@ class FutureWorkInterestsResourceMapper {
   fun toCreateFutureWorkInterestsDto(request: CreateWorkInterestsRequest?, prisonId: String): CreateFutureWorkInterestsDto? =
     request?.let {
       CreateFutureWorkInterestsDto(
-        interests = toWorkInterests(it.particularJobInterests, it.workInterestsOther),
+        interests = toWorkInterests(it.workInterests, it.particularJobInterests, it.workInterestsOther),
         prisonId = prisonId,
       )
     }
@@ -24,22 +24,24 @@ class FutureWorkInterestsResourceMapper {
     request?.let {
       UpdateFutureWorkInterestsDto(
         reference = it.id,
-        interests = toWorkInterests(it.particularJobInterests, it.workInterestsOther),
+        interests = toWorkInterests(it.workInterests, it.particularJobInterests, it.workInterestsOther),
         prisonId = prisonId,
       )
     }
 
   private fun toWorkInterests(
-    workInterests: Set<WorkInterestDetail>?,
+    workInterests: Set<WorkType>?,
+    particularWorkInterests: Set<WorkInterestDetail>?,
     workInterestsOther: String?,
   ): List<WorkInterest> {
     return workInterests?.map {
-      val workType = toWorkInterestType(it.workInterest)
+      val workType = toWorkInterestType(it)
       val workTypeOther = if (isOtherWorkType(it)) workInterestsOther else null
+      val role = particularWorkInterests?.firstOrNull { particularInterest -> particularInterest.workInterest == it }?.role
       WorkInterest(
         workType = workType,
         workTypeOther = workTypeOther,
-        role = it.role,
+        role = role,
       )
     } ?: emptyList()
   }
@@ -47,6 +49,6 @@ class FutureWorkInterestsResourceMapper {
   private fun toWorkInterestType(workType: WorkType): WorkInterestType =
     WorkInterestType.valueOf(workType.name)
 
-  private fun isOtherWorkType(workInterestDetail: WorkInterestDetail) =
-    workInterestDetail.workInterest == WorkType.OTHER
+  private fun isOtherWorkType(workType: WorkType) =
+    workType == WorkType.OTHER
 }
