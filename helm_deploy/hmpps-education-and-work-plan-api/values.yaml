@@ -1,7 +1,7 @@
 generic-service:
   nameOverride: hmpps-education-and-work-plan-api
-
-  replicaCount: 4
+  # TODO - RR-502 - set this back to 4
+  replicaCount: 1
 
   image:
     repository: quay.io/hmpps/hmpps-education-and-work-plan-api
@@ -27,7 +27,7 @@ generic-service:
     HMPPS_SQS_USE_WEB_TOKEN: true
     # TODO - RR-502 - Remove `CIAG_INDUCTION_API_URL` and `CIAG_INDUCTION_DATA_MIGRATION_ENABLED`
     CIAG_INDUCTION_API_URL: "https://ciag-induction-api.hmpps.service.justice.gov.uk"
-    CIAG_INDUCTION_DATA_MIGRATION_ENABLED: "false"
+    CIAG_INDUCTION_DATA_MIGRATION_ENABLED: "true"
 
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
