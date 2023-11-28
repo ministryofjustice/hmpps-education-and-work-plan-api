@@ -154,6 +154,7 @@ class InductionMigrationMapperTest {
         updatedByDisplayName = "bjones_gen",
       ),
       previousWorkExperiences = aValidPreviousWorkExperiencesMigrationEntity(
+        hasWorkedBefore = true,
         experiences = mutableListOf(
           aValidWorkExperienceMigrationEntity(
             createdAt = updatedAt,

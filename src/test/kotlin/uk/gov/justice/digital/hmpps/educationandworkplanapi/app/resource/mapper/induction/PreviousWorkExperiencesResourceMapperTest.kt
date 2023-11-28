@@ -9,6 +9,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkRequest
@@ -28,12 +30,15 @@ class PreviousWorkExperiencesResourceMapperTest {
     // Given
     val prisonId = "BXI"
     val request = aValidCreatePreviousWorkRequest()
-    val expectedExperiences = listOf(
-      WorkExperience(
-        experienceType = WorkExperienceTypeDomain.OTHER,
-        experienceTypeOther = "Scientist",
-        role = "Lab Technician",
-        details = "Cleaning test tubes",
+    val expectedDto = aValidCreatePreviousWorkExperiencesDto(
+      hasWorkedBefore = true,
+      experiences = listOf(
+        WorkExperience(
+          experienceType = WorkExperienceTypeDomain.OTHER,
+          experienceTypeOther = "Scientist",
+          role = "Lab Technician",
+          details = "Cleaning test tubes",
+        ),
       ),
     )
 
@@ -41,14 +46,14 @@ class PreviousWorkExperiencesResourceMapperTest {
     val actual = mapper.toCreatePreviousWorkExperiencesDto(request, prisonId)
 
     // Then
-    assertThat(actual!!.prisonId).isEqualTo(prisonId)
-    assertThat(actual.experiences).isEqualTo(expectedExperiences)
+    assertThat(actual).isEqualTo(expectedDto)
   }
 
   @Test
   fun `should map to PreviousWorkResponse`() {
     // Given
     val workExperiences = aValidPreviousWorkExperiences(
+      hasWorkedBefore = true,
       experiences = listOf(
         aValidWorkExperience(
           experienceType = WorkExperienceTypeDomain.OTHER,
@@ -108,6 +113,7 @@ class PreviousWorkExperiencesResourceMapperTest {
   fun `should map to PreviousWorkResponse given no future work interests`() {
     // Given
     val workExperiences = aValidPreviousWorkExperiences(
+      hasWorkedBefore = true,
       experiences = listOf(
         aValidWorkExperience(
           experienceType = WorkExperienceTypeDomain.OTHER,
@@ -161,6 +167,7 @@ class PreviousWorkExperiencesResourceMapperTest {
   fun `should map to PreviousWorkResponse given empty collections`() {
     // Given
     val workExperiences = aValidPreviousWorkExperiences(
+      hasWorkedBefore = true,
       experiences = emptyList(),
     )
     val workInterests = aValidFutureWorkInterests(
@@ -168,7 +175,7 @@ class PreviousWorkExperiencesResourceMapperTest {
     )
     val expectedResponse = aValidPreviousWorkResponse(
       id = workExperiences.reference,
-      hasWorkedBefore = false,
+      hasWorkedBefore = true,
       typeOfWorkExperience = emptySet(),
       typeOfWorkExperienceOther = null,
       workExperience = emptySet(),
@@ -196,21 +203,24 @@ class PreviousWorkExperiencesResourceMapperTest {
     // Given
     val prisonId = "BXI"
     val request = aValidUpdatePreviousWorkRequest()
-    val expectedExperiences = listOf(
-      WorkExperience(
-        experienceType = WorkExperienceTypeDomain.OTHER,
-        experienceTypeOther = "Scientist",
-        role = "Lab Technician",
-        details = "Cleaning test tubes",
+    val expectedDto = aValidUpdatePreviousWorkExperiencesDto(
+      reference = request.id!!,
+      hasWorkedBefore = true,
+      experiences = listOf(
+        WorkExperience(
+          experienceType = WorkExperienceTypeDomain.OTHER,
+          experienceTypeOther = "Scientist",
+          role = "Lab Technician",
+          details = "Cleaning test tubes",
+        ),
       ),
+      prisonId = "BXI",
     )
 
     // When
     val actual = mapper.toUpdatePreviousWorkExperiencesDto(request, prisonId)
 
     // Then
-    assertThat(actual!!.prisonId).isEqualTo(prisonId)
-    assertThat(actual.reference).isEqualTo(request.id)
-    assertThat(actual.experiences).isEqualTo(expectedExperiences)
+    assertThat(actual).isEqualTo(expectedDto)
   }
 }

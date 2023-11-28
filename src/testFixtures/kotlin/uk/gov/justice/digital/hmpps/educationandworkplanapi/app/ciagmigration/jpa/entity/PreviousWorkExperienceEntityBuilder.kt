@@ -6,6 +6,7 @@ import java.util.UUID
 fun aValidPreviousWorkExperiencesMigrationEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
+  hasWorkedBefore: Boolean = true,
   experiences: MutableList<WorkExperienceMigrationEntity> = mutableListOf(aValidWorkExperienceMigrationEntity()),
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
@@ -19,6 +20,7 @@ fun aValidPreviousWorkExperiencesMigrationEntity(
   PreviousWorkExperiencesMigrationEntity(
     id = id,
     reference = reference,
+    hasWorkedBefore = hasWorkedBefore,
     experiences = experiences,
     createdAt = createdAt,
     createdAtPrison = createdAtPrison,

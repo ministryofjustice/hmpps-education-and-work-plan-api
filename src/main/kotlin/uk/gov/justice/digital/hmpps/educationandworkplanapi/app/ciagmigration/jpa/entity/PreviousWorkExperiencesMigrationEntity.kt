@@ -36,6 +36,9 @@ class PreviousWorkExperiencesMigrationEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  @field:NotNull
+  var hasWorkedBefore: Boolean? = null,
+
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var experiences: MutableList<WorkExperienceMigrationEntity>? = null,
 

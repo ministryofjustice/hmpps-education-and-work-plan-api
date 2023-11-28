@@ -151,6 +151,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       reasonToNotGetWorkOther = null,
       workExperience = aValidUpdatePreviousWorkRequest(
         id = persistedInduction.workExperience!!.id!!,
+        hasWorkedBefore = true,
         typeOfWorkExperience = setOf(WorkType.CONSTRUCTION),
         typeOfWorkExperienceOther = null,
         workExperience = setOf(
@@ -198,6 +199,7 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val expectedWorkExperience = aValidPreviousWorkResponse(
       id = persistedInduction.workExperience!!.id!!,
+      hasWorkedBefore = true,
       typeOfWorkExperience = setOf(WorkType.CONSTRUCTION),
       typeOfWorkExperienceOther = null,
       workExperience = setOf(
@@ -474,7 +476,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should update induction with no previous work experience or work interests`() {
+  fun `should update induction with no previous work experiences or work interests`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateCiagInductionRequest())
@@ -483,7 +485,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
         id = persistedInduction.workExperience!!.id!!,
-        hasWorkedBefore = false,
+        hasWorkedBefore = true,
         typeOfWorkExperience = null,
         typeOfWorkExperienceOther = null,
         workExperience = null,
@@ -498,7 +500,7 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val expectedWorkExperience = aValidPreviousWorkResponse(
       id = persistedInduction.workExperience!!.id!!,
-      hasWorkedBefore = false,
+      hasWorkedBefore = true,
       typeOfWorkExperience = emptySet(),
       typeOfWorkExperienceOther = null,
       workExperience = emptySet(),
