@@ -19,8 +19,7 @@ class InductionMigrationMapper(
   fun toInductionMigrationEntity(ciagInduction: CiagInductionResponse): InductionMigrationEntity =
     with(ciagInduction) {
       // prisonId shouldn't be null, but we've seen bugs here on the CIAG side recently.
-      // We can default it for now, so long as the service is still only rolled out to Lancaster Farms!
-      val prisonId = ciagInduction.prisonId ?: "LFI"
+      val prisonId = ciagInduction.prisonId ?: ""
       InductionMigrationEntity(
         reference = UUID.randomUUID(),
         prisonNumber = offenderId,
