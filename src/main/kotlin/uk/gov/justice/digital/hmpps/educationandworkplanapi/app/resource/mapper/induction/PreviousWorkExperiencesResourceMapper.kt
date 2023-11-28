@@ -55,7 +55,7 @@ abstract class PreviousWorkExperiencesResourceMapper {
       PreviousWorkResponse(
         // In the CIAG API, workInterests are effectively a child of workExperience, so we use the latter as the parent/primary object.
         id = workExperiences.reference,
-        hasWorkedBefore = workExperiences.experiences.isNotEmpty(),
+        hasWorkedBefore = workExperiences.hasWorkedBefore,
         typeOfWorkExperience = workExperiences.experiences.map { toWorkTypeApi(it.experienceType) }.toSet(),
         typeOfWorkExperienceOther = toTypeOfWorkExperienceOther(workExperiences),
         workExperience = workExperiences.experiences.map { toWorkExperienceApi(it) }.toSet(),

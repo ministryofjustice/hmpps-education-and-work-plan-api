@@ -11,6 +11,7 @@ import java.util.UUID
  */
 data class PreviousWorkExperiences(
   val reference: UUID,
+  val hasWorkedBefore: Boolean,
   val experiences: List<WorkExperience>,
   val createdBy: String?,
   val createdByDisplayName: String?,

@@ -49,6 +49,8 @@ class PreviousWorkExperiencesEntity(
   @field:NotNull
   var reference: UUID? = null,
 
+  var hasWorkedBefore: Boolean? = null,
+
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var experiences: MutableList<WorkExperienceEntity>? = null,
 

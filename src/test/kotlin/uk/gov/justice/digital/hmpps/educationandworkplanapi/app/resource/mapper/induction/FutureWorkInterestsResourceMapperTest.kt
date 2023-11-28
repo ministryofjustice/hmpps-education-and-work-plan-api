@@ -128,7 +128,7 @@ class FutureWorkInterestsResourceMapperTest {
   }
 
   @Test
-  fun `should map to UpdateFutureWorkInterestsDto when particular job interests is null`() {
+  fun `should map to UpdateFutureWorkInterestsDto when particular job interests is empty`() {
     // Given
     val prisonId = "BXI"
     val request = aValidUpdateWorkInterestsRequest(
