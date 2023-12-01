@@ -14,19 +14,6 @@ spring:
         jwt:
           jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
 
-      # TODO - RR-502 - Remove `client` property inc. children
-      client:
-        registration:
-          ciag-api:
-            provider: hmpps-auth
-            client-id: ${ciag-api.client.id}
-            client-secret: ${ciag-api.client.secret}
-            authorization-grant-type: client_credentials
-            scope: read
-        provider:
-          hmpps-auth:
-            token-uri: ${hmpps.auth.url}/oauth/token
-
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
     serialization:
@@ -99,12 +86,3 @@ springdoc:
   # swagger specification file served via /swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
   swagger-ui:
     url: '/openapi/EducationAndWorkPlanAPI.yml'
-
-# TODO - RR-502 - Remove `apis` property inc. children
-apis:
-  ciag-induction:
-    url: ${CIAG_INDUCTION_API_URL}
-
-# TODO - RR-502 - Remove `featureToggles` property inc. children
-featureToggles:
-  ciag-induction-data-migration-enabled: ${CIAG_INDUCTION_DATA_MIGRATION_ENABLED:false}
