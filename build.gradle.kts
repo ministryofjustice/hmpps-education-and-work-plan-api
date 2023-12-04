@@ -4,11 +4,11 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.7.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.10.0"
   id("org.openapi.generator") version "7.0.1"
-  kotlin("plugin.spring") version "1.9.10"
-  kotlin("plugin.jpa") version "1.9.10"
-  kotlin("kapt") version "1.9.10"
+  kotlin("plugin.spring") version "1.9.20"
+  kotlin("plugin.jpa") version "1.9.20"
+  kotlin("kapt") version "1.9.20"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.2"
@@ -23,6 +23,9 @@ val postgresqlVersion = "42.6.0"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.2.0"
 val awaitilityVersion = "4.2.0"
+val hmppsSqsVersion = "2.1.1"
+
+ext["logback.version"] = "1.4.12"
 
 allOpen {
   annotations(
@@ -54,7 +57,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.0.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:$hmppsSqsVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion")
 
