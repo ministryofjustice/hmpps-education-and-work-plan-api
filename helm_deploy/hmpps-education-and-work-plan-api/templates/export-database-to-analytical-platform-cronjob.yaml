@@ -6,7 +6,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: export-database-to-analytical-platform-data-pipeline-cronjob
+  name: export-database-to-analytical-platform-cronjob
 spec:
   schedule: "0 9-17 * * 1-5" # On the hour between 09:00 and 17:00 Mon-Fri. For testing only; once smoke tested and working change to every day at 1am -> "0 1 * * *"
   concurrencyPolicy: Replace
