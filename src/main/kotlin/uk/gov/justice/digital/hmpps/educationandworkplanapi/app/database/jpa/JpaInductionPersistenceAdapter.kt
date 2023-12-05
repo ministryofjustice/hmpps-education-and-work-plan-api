@@ -33,7 +33,8 @@ class JpaInductionPersistenceAdapter(
     val inductionEntity = inductionRepository.findByPrisonNumber(updateInductionDto.prisonNumber)
     return if (inductionEntity != null) {
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
-      inductionMapper.fromEntityToDomain(inductionEntity)
+      val persistedEntity = inductionRepository.saveAndFlush(inductionEntity)
+      inductionMapper.fromEntityToDomain(persistedEntity)
     } else {
       null
     }

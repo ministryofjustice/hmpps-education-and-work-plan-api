@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPri
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateEducationAndQualificationsRequest
@@ -53,9 +54,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.util.UUID
-
 class UpdateInductionTest : IntegrationTestBase() {
 
   companion object {
@@ -139,7 +140,13 @@ class UpdateInductionTest : IntegrationTestBase() {
   fun `should update induction for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    createInduction(
+      username = "auser_gen",
+      displayName = "Albert User",
+      prisonNumber = prisonNumber,
+      createCiagInductionRequest = aValidCreateCiagInductionRequest(),
+    )
+
     val persistedInduction = getInduction(prisonNumber)
     val updateInductionRequest = aValidUpdateCiagInductionRequest(
       reference = null,
@@ -220,9 +227,9 @@ class UpdateInductionTest : IntegrationTestBase() {
             role = "Football coach",
           ),
         ),
-        modifiedBy = "auser_gen",
+        modifiedBy = "buser_gen",
       ),
-      modifiedBy = "auser_gen",
+      modifiedBy = "buser_gen",
     )
     val expectedSkillsAndInterests = aValidSkillsAndInterestsResponse(
       id = persistedInduction.skillsAndInterests!!.id!!,
@@ -230,7 +237,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       skillsOther = null,
       personalInterests = setOf(PersonalInterest.CRAFTS),
       personalInterestsOther = null,
-      modifiedBy = "auser_gen",
+      modifiedBy = "buser_gen",
     )
     val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse(
       id = persistedInduction.qualificationsAndTraining!!.id!!,
@@ -238,7 +245,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       qualifications = emptySet(),
       additionalTraining = setOf(TrainingType.CSCS_CARD),
       additionalTrainingOther = null,
-      modifiedBy = "auser_gen",
+      modifiedBy = "buser_gen",
     )
     val expectedInPrisonInterests = aValidPrisonWorkAndEducationResponse(
       id = persistedInduction.inPrisonInterests!!.id!!,
@@ -246,7 +253,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       inPrisonWorkOther = null,
       inPrisonEducation = setOf(InPrisonTrainingType.WELDING_AND_METALWORK),
       inPrisonEducationOther = null,
-      modifiedBy = "auser_gen",
+      modifiedBy = "buser_gen",
     )
     shortDelayForTimestampChecking()
 
@@ -254,7 +261,13 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = "buser_gen",
+          displayName = "Bernie User",
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isNoContent
@@ -269,7 +282,8 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasNoAbilityToWorkOther()
       .hasAbilityToWork(emptySet())
       .hasReasonToNotGetWork(emptySet())
-      .wasModifiedBy("auser_gen")
+      .wasCreatedBy("auser_gen")
+      .wasModifiedBy("buser_gen")
       .wasCreatedAt(persistedInduction.createdDateTime)
       .wasLastModifiedAfter(persistedInduction.modifiedDateTime)
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
@@ -283,6 +297,14 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(persistedInduction.inPrisonInterests!!.modifiedDateTime)
 
+    val timeline = getTimeline(prisonNumber)
+    assertThat(timeline)
+      .event(2) { // the 2nd Timeline event will be the INDUCTION_UPDATED event
+        it.hasEventType(TimelineEventType.INDUCTION_UPDATED)
+          .wasActionedBy("buser_gen")
+          .hasActionedByDisplayName("Bernie User")
+      }
+
     await.untilAsserted {
       val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
       verify(telemetryClient, times(1)).trackEvent(
@@ -293,7 +315,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       val createInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(createInductionEventProperties)
         .containsEntry("prisonId", "MDI")
-        .containsEntry("userId", "auser_gen")
+        .containsEntry("userId", "buser_gen")
         .containsKey("reference")
     }
   }

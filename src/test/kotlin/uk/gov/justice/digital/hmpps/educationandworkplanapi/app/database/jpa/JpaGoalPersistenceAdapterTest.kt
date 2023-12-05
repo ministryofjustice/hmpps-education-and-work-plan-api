@@ -185,7 +185,7 @@ class JpaGoalPersistenceAdapterTest {
       val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
 
-      val persistedGoalEntity = aValidGoalEntity(reference = reference, title = "Original goal title", createdBy = "USER1", updatedBy = "USER2")
+      val persistedGoalEntity = aValidGoalEntity(reference = reference, title = "Updated goal title", createdBy = "USER1", updatedBy = "USER2")
       given(goalRepository.saveAndFlush(any<GoalEntity>())).willReturn(persistedGoalEntity)
 
       val expectedDomainGoal = aValidGoal(reference = reference, title = "Updated goal title", createdBy = "USER1", lastUpdatedBy = "USER2")

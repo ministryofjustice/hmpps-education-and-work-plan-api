@@ -11,15 +11,21 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionSummaryProjection
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateWorkOnReleaseDto
+import java.util.UUID
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HopingToWork as HopingToWorkDomain
 
 @ExtendWith(MockitoExtension::class)
 class JpaInductionPersistenceAdapterTest {
@@ -91,20 +97,51 @@ class JpaInductionPersistenceAdapterTest {
   fun `should update induction`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
-    val inductionEntity = aValidInductionEntity(prisonNumber = prisonNumber)
-    val expected = aValidInduction()
+    val reference = UUID.randomUUID()
+
+    val inductionEntity = aValidInductionEntity(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      workOnRelease = aValidWorkOnReleaseEntity(hopingToWork = HopingToWork.NO),
+      createdBy = "USER1",
+      updatedBy = "USER1",
+    )
     given(inductionRepository.findByPrisonNumber(any())).willReturn(inductionEntity)
-    given(inductionMapper.fromEntityToDomain(any())).willReturn(expected)
+
+    val persistedInductionEntity = aValidInductionEntity(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      workOnRelease = aValidWorkOnReleaseEntity(hopingToWork = HopingToWork.YES),
+      createdBy = "USER1",
+      updatedBy = "USER2",
+    )
+    given(inductionRepository.saveAndFlush(any<InductionEntity>())).willReturn(persistedInductionEntity)
+
+    val expectedDomainInduction = aValidInduction(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      workOnRelease = aValidWorkOnRelease(hopingToWork = HopingToWorkDomain.YES),
+      createdBy = "USER1",
+      lastUpdatedBy = "USER2",
+    )
+    given(inductionMapper.fromEntityToDomain(any())).willReturn(expectedDomainInduction)
+
+    val updateInductionDto = aValidUpdateInductionDto(
+      prisonNumber = prisonNumber,
+      workOnRelease = aValidUpdateWorkOnReleaseDto(
+        hopingToWork = HopingToWorkDomain.YES,
+      ),
+    )
 
     // When
     val actual = persistenceAdapter.updateInduction(updateInductionDto)
 
     // Then
-    assertThat(actual).isEqualTo(expected)
+    assertThat(actual).isEqualTo(expectedDomainInduction)
     verify(inductionRepository).findByPrisonNumber(prisonNumber)
+    verify(inductionRepository).saveAndFlush(inductionEntity)
     verify(inductionMapper).updateEntityFromDto(inductionEntity, updateInductionDto)
-    verify(inductionMapper).fromEntityToDomain(inductionEntity)
+    verify(inductionMapper).fromEntityToDomain(persistedInductionEntity)
   }
 
   @Test

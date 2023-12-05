@@ -135,11 +135,22 @@ abstract class IntegrationTestBase {
       .returnResult(TimelineResponse::class.java)
       .responseBody.blockFirst()!!
 
-  fun createInduction(prisonNumber: String, createCiagInductionRequest: CreateCiagInductionRequest) {
+  fun createInduction(
+    prisonNumber: String,
+    createCiagInductionRequest: CreateCiagInductionRequest,
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
+  ) {
     webTestClient.post()
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
       .withBody(createCiagInductionRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = username,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
