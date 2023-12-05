@@ -267,6 +267,36 @@ paths:
       operationId: create-prisoner-induction
       requestBody:
         $ref: '#/components/requestBodies/CreateInduction'
+    get:
+      summary: Return a Prisoner's Induction.
+      description: |
+        Returns a Prisoner's Induction.
+      tags:
+        - Inductions
+      responses:
+        '200':
+          $ref: '#/components/responses/Induction'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-prisoner-induction
+
+  '/inductions':
+    post:
+      summary: Returns summary Inductions for a specified list of prisoners.
+      description: |
+        Given a list of prisoner identifiers (Prison Numbers) returns summary Induction data for each specified
+        prisoner. If the returned data does not include data for a given prisoner, it can be inferred that the
+        prisoner does not have an Induction.
+      tags:
+        - Inductions
+      responses:
+        '200':
+          $ref: '#/components/responses/InductionSummaryList'
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+      operationId: get-prisoner-induction-summaries
+      requestBody:
+        $ref: '#/components/requestBodies/GetInductionSummaries'
 
 
 #
@@ -855,6 +885,563 @@ components:
         - createdDateTime
         - modifiedBy
         - modifiedDateTime
+
+    ### New Induction API Response ###
+    InductionResponse:
+      title: InductionResponse
+      type: object
+      description: A Prisoner's Induction containing information, such as their education history and future work interests.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for this Induction.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
+        workOnRelease:
+          $ref: '#/components/schemas/WorkOnReleaseResponse'
+        previousQualifications:
+          $ref: '#/components/schemas/PreviousQualificationsResponse'
+        previousTraining:
+          $ref: '#/components/schemas/PreviousTrainingResponse'
+        previousWorkExperiences:
+          $ref: '#/components/schemas/PreviousWorkExperiencesResponse'
+        inPrisonInterests:
+          $ref: '#/components/schemas/InPrisonInterestsResponse'
+        personalSkillsAndInterests:
+          $ref: '#/components/schemas/PersonalSkillsAndInterestsResponse'
+        futureWorkInterests:
+          $ref: '#/components/schemas/FutureWorkInterestsResponse'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created the Induction.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created the Induction.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Induction was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Induction was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated the Induction.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated the Induction.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Induction was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Induction was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - prisonNumber
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+
+    WorkOnReleaseResponse:
+      title: WorkOnReleaseResponse
+      type: object
+      description: A Prisoner's views on obtaining work after release.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this WorkOnReleaseResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        hopingToWork:
+          $ref: '#/components/schemas/HopingToWork'
+        notHopingToWorkReasons:
+          type: array
+          description: Reasons the Prisoner has given not to get work after leaving Prison. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/ReasonNotToWork'
+        notHopingToWorkOtherReason:
+          type: string
+          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
+        affectAbilityToWork:
+          type: array
+          description: Factors affecting the Prisoner's ability to work. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/AbilityToWorkFactor'
+        affectAbilityToWorkOther:
+          type: string
+          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'affectAbilityToWork' includes 'OTHER'.
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - hopingToWork
+        - notHopingToWorkReasons
+        - affectAbilityToWork
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+    PreviousQualificationsResponse:
+      title: PreviousQualificationsResponse
+      type: object
+      description: Represents a Prisoner's qualifications (if applicable).
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this PreviousQualificationsResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        educationLevel:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          type: array
+          description: A list of the Prisoner's previous qualifications. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/AchievedQualification'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - qualifications
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+    PreviousTrainingResponse:
+      title: PreviousTrainingResponse
+      type: object
+      description: Represents a Prisoner's previous training (if applicable).
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this PreviousTrainingResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        trainingTypes:
+          type: array
+          description: Any additional training that the Prisoner has completed in the past. Can be empty, but never null.
+          items:
+            $ref: '#/components/schemas/TrainingType'
+        trainingTypeOther:
+          type: string
+          description: A specific type of training that does not fit the given 'trainingTypes'. Mandatory when 'trainingTypes' includes 'OTHER'.
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - trainingTypes
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+    PreviousWorkExperiencesResponse:
+      title: PreviousWorkExperiencesResponse
+      type: object
+      description: Represents a Prisoner's previous work experience (if applicable).
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this PreviousWorkExperiencesResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        hasWorkedBefore:
+          type: boolean
+        experiences:
+          type: array
+          description: A list of the Prisoner's previous work experiences.
+          items:
+            $ref: '#/components/schemas/PreviousWorkExperience'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - hasWorkedBefore
+        - experiences
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+    InPrisonInterestsResponse:
+      title: InPrisonInterestsResponse
+      type: object
+      description: Represents a Prisoner's in-prison interests (if applicable).
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this InPrisonInterestsResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        inPrisonWorkInterests:
+          type: array
+          description: A list of in-prison work that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonWorkInterest'
+        inPrisonTrainingInterests:
+          type: array
+          description: A list of in-prison training that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonTrainingInterest'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - inPrisonWorkInterests
+        - inPrisonTrainingInterests
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+    PersonalSkillsAndInterestsResponse:
+      title: PersonalSkillsAndInterestsResponse
+      type: object
+      description: Represents a Prisoner's personal skills and interests (if applicable).
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this PersonalSkillsAndInterestsResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        skills:
+          type: array
+          description: One or more skills that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalSkill'
+        interests:
+          type: array
+          description: One or more interests that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalInterest'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - skills
+        - interests
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+    FutureWorkInterestsResponse:
+      title: FutureWorkInterestsResponse
+      type: object
+      description: Represents a Prisoner's future work interests (if applicable).
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this FutureWorkInterestsResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        interests:
+          type: array
+          description: One or more future work interests that the Prisoner has.
+          items:
+            $ref: '#/components/schemas/FutureWorkInterest'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - interests
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+
+    InductionSummaryListResponse:
+      title: InductionSummaryListResponse
+      type: object
+      description: Contains a list of Induction summaries.
+      properties:
+        inductionSummaries:
+          type: array
+          description: A list of prisoner Induction summaries. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/InductionSummaryResponse'
+      required:
+        - inductionSummaries
+
+    InductionSummaryResponse:
+      title: InductionSummaryResponse
+      type: object
+      description: A subset Prisoner Induction data.
+      properties:
+        prisonNumber:
+          type: string
+          pattern: '^[A-Z]\\d{4}[A-Z]{2}$'
+          description: The ID of the Prisoner. AKA the prison number.
+          example: 'A1234BC'
+      required:
+        - prisonNumber
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
@@ -1764,6 +2351,20 @@ components:
       required:
         - interests
 
+    GetInductionSummariesRequest:
+      title: GetInductionSummariesRequest
+      type: object
+      description: A request to retrieve a list of prisoner Induction summaries.
+      properties:
+        prisonNumbers:
+          type: array
+          description: A List of prison numbers whose Inductions should be retrieved.
+          items:
+            type: string
+            pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
+      required:
+        - prisonNumbers
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -1923,6 +2524,38 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CiagInductionSummaryListResponse'
+    Induction:
+      description: Response body containing a Prisoner's Induction.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InductionResponse'
+    InductionSummaryList:
+      description: Response body containing the a list of Induction summaries.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InductionSummaryListResponse'
   #
   # Request Body Definitions
   # --------------------------------------------------------------------------------
@@ -1975,3 +2608,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateInductionRequest'
+    GetInductionSummaries:
+      description: Request body to retrieve a list of CIAG Induction summaries for one or more Prisoners.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetInductionSummariesRequest'
