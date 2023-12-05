@@ -6,7 +6,7 @@ SET actioned_by = (
       INNER JOIN goal g ON g.reference::text = te.source_reference
     WHERE te.reference = timeline_event.reference
 )
-WHERE id = (
+WHERE id IN (
     SELECT te.id
     FROM timeline_event te
       INNER JOIN goal g ON g.reference::text = te.source_reference
