@@ -25,8 +25,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Highe
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonTrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType
@@ -183,9 +183,9 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
       skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
         id = persistedInduction.skillsAndInterests!!.id!!,
-        skills = setOf(PersonalSkill.COMMUNICATION),
+        skills = setOf(PersonalSkillType.COMMUNICATION),
         skillsOther = null,
-        personalInterests = setOf(PersonalInterest.CRAFTS),
+        personalInterests = setOf(PersonalInterestType.CRAFTS),
         personalInterestsOther = null,
       ),
       qualificationsAndTraining = aValidUpdateEducationAndQualificationsRequest(
@@ -233,9 +233,9 @@ class UpdateInductionTest : IntegrationTestBase() {
     )
     val expectedSkillsAndInterests = aValidSkillsAndInterestsResponse(
       id = persistedInduction.skillsAndInterests!!.id!!,
-      skills = setOf(PersonalSkill.COMMUNICATION),
+      skills = setOf(PersonalSkillType.COMMUNICATION),
       skillsOther = null,
-      personalInterests = setOf(PersonalInterest.CRAFTS),
+      personalInterests = setOf(PersonalInterestType.CRAFTS),
       personalInterestsOther = null,
       modifiedBy = "buser_gen",
     )
@@ -685,17 +685,17 @@ class UpdateInductionTest : IntegrationTestBase() {
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       skillsAndInterests = aValidUpdateSkillsAndInterestsRequest(
-        skills = setOf(PersonalSkill.OTHER),
+        skills = setOf(PersonalSkillType.OTHER),
         skillsOther = "Hidden skills",
-        personalInterests = setOf(PersonalInterest.OTHER),
+        personalInterests = setOf(PersonalInterestType.OTHER),
         personalInterestsOther = "Secret interests",
       ),
     )
 
     val expectedSkillsAndInterests = aValidSkillsAndInterestsResponse(
-      skills = setOf(PersonalSkill.OTHER),
+      skills = setOf(PersonalSkillType.OTHER),
       skillsOther = "Hidden skills",
-      personalInterests = setOf(PersonalInterest.OTHER),
+      personalInterests = setOf(PersonalInterestType.OTHER),
       personalInterestsOther = "Secret interests",
       modifiedBy = "auser_gen",
     )

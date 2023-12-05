@@ -14,8 +14,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Ski
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkillsAndInterests
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateSkillsAndInterestsRequest
@@ -70,9 +70,9 @@ class PersonalSkillsAndInterestsResourceMapperTest {
     given(instantMapper.toOffsetDateTime(any())).willReturn(modifiedDateTime)
     val expectedResponse = aValidSkillsAndInterestsResponse(
       id = skillsAndInterests.reference,
-      skills = setOf(PersonalSkill.OTHER),
+      skills = setOf(PersonalSkillType.OTHER),
       skillsOther = "Hidden skills",
-      personalInterests = setOf(PersonalInterest.OTHER),
+      personalInterests = setOf(PersonalInterestType.OTHER),
       personalInterestsOther = "Varied interests",
       modifiedBy = skillsAndInterests.lastUpdatedBy!!,
       modifiedDateTime = modifiedDateTime,

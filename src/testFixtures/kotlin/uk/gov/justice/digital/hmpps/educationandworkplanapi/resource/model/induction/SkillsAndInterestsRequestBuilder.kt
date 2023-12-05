@@ -1,15 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateSkillsAndInterestsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateSkillsAndInterestsRequest
 import java.util.UUID
 
 fun aValidCreateSkillsAndInterestsRequest(
-  skills: Set<PersonalSkill>? = setOf(PersonalSkill.OTHER),
+  skills: Set<PersonalSkillType>? = setOf(PersonalSkillType.OTHER),
   skillsOther: String? = "Hidden skills",
-  personalInterests: Set<PersonalInterest>? = setOf(PersonalInterest.OTHER),
+  personalInterests: Set<PersonalInterestType>? = setOf(PersonalInterestType.OTHER),
   personalInterestsOther: String? = "Secret interests",
 ): CreateSkillsAndInterestsRequest =
   CreateSkillsAndInterestsRequest(
@@ -21,9 +21,9 @@ fun aValidCreateSkillsAndInterestsRequest(
 
 fun aValidUpdateSkillsAndInterestsRequest(
   id: UUID? = UUID.randomUUID(),
-  skills: Set<PersonalSkill>? = setOf(PersonalSkill.OTHER),
+  skills: Set<PersonalSkillType>? = setOf(PersonalSkillType.OTHER),
   skillsOther: String? = "Hidden skills",
-  personalInterests: Set<PersonalInterest>? = setOf(PersonalInterest.OTHER),
+  personalInterests: Set<PersonalInterestType>? = setOf(PersonalInterestType.OTHER),
   personalInterestsOther: String? = "Secret interests",
 ): UpdateSkillsAndInterestsRequest =
   UpdateSkillsAndInterestsRequest(
