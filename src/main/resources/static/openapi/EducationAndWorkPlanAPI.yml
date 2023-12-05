@@ -2536,3 +2536,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateInductionRequest'
+    GetInductionSummaries:
+      description: Request body to retrieve a list of CIAG Induction summaries for one or more Prisoners.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetInductionSummariesRequest'
