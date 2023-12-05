@@ -20,14 +20,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class UpdateGoalTest : IntegrationTestBase() {
@@ -183,7 +183,12 @@ class UpdateGoalTest : IntegrationTestBase() {
         ),
       ),
     )
-    createGoal(prisonNumber, createGoalRequest)
+    createGoal(
+      username = "auser_gen",
+      displayName = "Albert User",
+      prisonNumber = prisonNumber,
+      createGoalRequest = createGoalRequest,
+    )
 
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
     val goalReference = actionPlan!!.goals!![0].reference!!
@@ -212,7 +217,13 @@ class UpdateGoalTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
       .withBody(updateGoalRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = "buser_gen",
+          displayName = "Bernie User",
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -238,6 +249,16 @@ class UpdateGoalTest : IntegrationTestBase() {
           }
           .wasCreatedAtPrison("BXI")
           .wasUpdatedAtPrison("MDI")
+          .wasCreatedBy("auser_gen")
+          .wasUpdatedBy("buser_gen")
+      }
+
+    val timeline = getTimeline(prisonNumber)
+    assertThat(timeline)
+      .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        it.hasEventType(TimelineEventType.GOAL_UPDATED)
+          .wasActionedBy("buser_gen")
+          .hasActionedByDisplayName("Bernie User")
       }
 
     await.untilAsserted {
@@ -265,20 +286,5 @@ class UpdateGoalTest : IntegrationTestBase() {
       assertThat(goalUpdatedEventProperties["correlationId"])
         .isEqualTo(stepRemovedEventProperties["correlationId"])
     }
-  }
-
-  private fun createGoal(
-    prisonNumber: String,
-    createGoalRequest: CreateGoalRequest,
-  ) {
-    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
-    webTestClient.post()
-      .uri("/action-plans/{prisonNumber}/goals", prisonNumber)
-      .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
   }
 }
