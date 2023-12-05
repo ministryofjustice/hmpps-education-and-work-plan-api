@@ -14,10 +14,12 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.GoalRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
@@ -29,6 +31,9 @@ class JpaGoalPersistenceAdapterTest {
 
   @InjectMocks
   private lateinit var persistenceAdapter: JpaGoalPersistenceAdapter
+
+  @Mock
+  private lateinit var goalRepository: GoalRepository
 
   @Mock
   private lateinit var actionPlanRepository: ActionPlanRepository
@@ -176,14 +181,17 @@ class JpaGoalPersistenceAdapterTest {
       val prisonNumber = aValidPrisonNumber()
       val reference = UUID.randomUUID()
 
-      val goalEntity = aValidGoalEntity(reference = reference, title = "Original goal title")
+      val goalEntity = aValidGoalEntity(reference = reference, title = "Original goal title", createdBy = "USER1", updatedBy = "USER1")
       val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
 
-      val goalWithProposedUpdates = aValidUpdateGoalDto(reference = reference, title = "Updated goal title")
+      val persistedGoalEntity = aValidGoalEntity(reference = reference, title = "Original goal title", createdBy = "USER1", updatedBy = "USER2")
+      given(goalRepository.saveAndFlush(any<GoalEntity>())).willReturn(persistedGoalEntity)
 
-      val expectedDomainGoal = aValidGoal(reference = reference, title = "Updated goal title")
+      val expectedDomainGoal = aValidGoal(reference = reference, title = "Updated goal title", createdBy = "USER1", lastUpdatedBy = "USER2")
       given(goalMapper.fromEntityToDomain(any())).willReturn(expectedDomainGoal)
+
+      val goalWithProposedUpdates = aValidUpdateGoalDto(reference = reference, title = "Updated goal title")
 
       // When
       val actual = persistenceAdapter.updateGoal(prisonNumber, goalWithProposedUpdates)
@@ -191,8 +199,9 @@ class JpaGoalPersistenceAdapterTest {
       // Then
       assertThat(actual).isEqualTo(expectedDomainGoal)
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verify(goalRepository).saveAndFlush(goalEntity)
       verify(goalMapper).updateEntityFromDto(goalEntity, goalWithProposedUpdates)
-      verify(goalMapper).fromEntityToDomain(goalEntity)
+      verify(goalMapper).fromEntityToDomain(persistedGoalEntity)
     }
 
     @Test

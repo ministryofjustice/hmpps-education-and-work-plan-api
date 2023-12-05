@@ -27,8 +27,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
@@ -153,4 +155,27 @@ abstract class IntegrationTestBase {
       .isOk
       .returnResult(CiagInductionResponse::class.java)
       .responseBody.blockFirst()!!
+
+  fun createGoal(
+    prisonNumber: String,
+    createGoalRequest: CreateGoalRequest,
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
+  ) {
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
+    webTestClient.post()
+      .uri("/action-plans/{prisonNumber}/goals", prisonNumber)
+      .withBody(createGoalsRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = username,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+  }
 }

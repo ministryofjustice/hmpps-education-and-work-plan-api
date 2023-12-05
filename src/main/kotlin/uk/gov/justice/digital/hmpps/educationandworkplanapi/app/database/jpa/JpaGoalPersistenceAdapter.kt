@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.GoalRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
@@ -17,6 +18,7 @@ private val log = KotlinLogging.logger {}
 
 @Component
 class JpaGoalPersistenceAdapter(
+  private val goalRepository: GoalRepository,
   private val actionPlanRepository: ActionPlanRepository,
   private val goalMapper: GoalEntityMapper,
 ) : GoalPersistenceAdapter {
@@ -53,7 +55,8 @@ class JpaGoalPersistenceAdapter(
     val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, updatedGoalDto.reference)
     return if (goalEntity != null) {
       goalMapper.updateEntityFromDto(goalEntity, updatedGoalDto)
-      goalMapper.fromEntityToDomain(goalEntity)
+      val persistedEntity = goalRepository.saveAndFlush(goalEntity)
+      goalMapper.fromEntityToDomain(persistedEntity)
     } else {
       null
     }
