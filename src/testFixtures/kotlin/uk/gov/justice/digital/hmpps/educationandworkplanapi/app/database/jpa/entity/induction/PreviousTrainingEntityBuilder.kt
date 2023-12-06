@@ -7,7 +7,7 @@ fun aValidPreviousTrainingEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
   trainingTypes: MutableList<TrainingType> = mutableListOf(TrainingType.OTHER),
-  trainingTypeOther: String = "Kotlin course",
+  trainingTypeOther: String? = "Kotlin course",
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,

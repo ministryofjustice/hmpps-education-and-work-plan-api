@@ -30,12 +30,12 @@ abstract class QualificationsAndTrainingResourceMapper {
     request: CreateEducationAndQualificationsRequest?,
     prisonId: String,
   ): CreatePreviousQualificationsDto? {
-    if (request?.educationLevel == null) {
+    if (request == null) {
       return null
     }
 
     return CreatePreviousQualificationsDto(
-      educationLevel = toHighestEducationLevelDomain(request.educationLevel)!!,
+      educationLevel = toHighestEducationLevelDomain(request.educationLevel) ?: HighestEducationLevelDomain.NOT_SURE,
       qualifications = request.qualifications?.map { toQualification(it) } ?: emptyList(),
       prisonId = prisonId,
     )
@@ -95,6 +95,7 @@ abstract class QualificationsAndTrainingResourceMapper {
   fun toOffsetDateTime(instant: Instant?): OffsetDateTime? = instant?.atOffset(ZoneOffset.UTC)
 
   @Mapping(target = "reference", source = "request.id")
+  @Mapping(target = "educationLevel", source = "request.educationLevel", defaultValue = "NOT_SURE")
   abstract fun toUpdatePreviousQualificationsDto(
     request: UpdateEducationAndQualificationsRequest,
     prisonId: String,
