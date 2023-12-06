@@ -51,6 +51,24 @@ class QualificationsAndTrainingResourceMapperTest {
   }
 
   @Test
+  fun `should map to CreatePreviousQualificationsDto when prisoner has no qualifications`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidCreateEducationAndQualificationsRequest(
+      educationLevel = null,
+      qualifications = null,
+    )
+
+    // When
+    val actual = mapper.toCreatePreviousQualificationsDto(request, prisonId)
+
+    // Then
+    assertThat(actual!!.prisonId).isEqualTo(prisonId)
+    assertThat(actual.educationLevel).isEqualTo(HighestEducationLevelDomain.NOT_SURE)
+    assertThat(actual.qualifications).isEmpty()
+  }
+
+  @Test
   fun `should map to CreatePreviousTrainingDto`() {
     // Given
     val prisonId = "BXI"
@@ -207,6 +225,36 @@ class QualificationsAndTrainingResourceMapperTest {
     assertThat(actual!!.prisonId).isEqualTo(prisonId)
     assertThat(actual.reference).isEqualTo(request.id)
     assertThat(actual.educationLevel).isEqualTo(HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS)
+    assertThat(actual.qualifications).isEqualTo(expectedQualifications)
+  }
+
+  @Test
+  fun `should map to UpdatePreviousQualificationsDto given missing education level`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdateEducationAndQualificationsRequest(
+      educationLevel = null,
+    )
+    val expectedQualifications = listOf(
+      Qualification(
+        subject = "English",
+        level = QualificationLevel.LEVEL_3,
+        grade = "A",
+      ),
+      Qualification(
+        subject = "Maths",
+        level = QualificationLevel.LEVEL_3,
+        grade = "B",
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdatePreviousQualificationsDto(request, prisonId)
+
+    // Then
+    assertThat(actual!!.prisonId).isEqualTo(prisonId)
+    assertThat(actual.reference).isEqualTo(request.id)
+    assertThat(actual.educationLevel).isEqualTo(HighestEducationLevelDomain.NOT_SURE)
     assertThat(actual.qualifications).isEqualTo(expectedQualifications)
   }
 

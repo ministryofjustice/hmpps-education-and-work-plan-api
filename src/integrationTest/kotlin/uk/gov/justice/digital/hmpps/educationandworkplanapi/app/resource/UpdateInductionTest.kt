@@ -394,7 +394,7 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse(
       id = persistedInduction.qualificationsAndTraining!!.id!!,
-      educationLevel = null,
+      educationLevel = HighestEducationLevel.NOT_SURE,
       qualifications = emptySet(),
       additionalTraining = setOf(TrainingType.CSCS_CARD),
       additionalTrainingOther = null,
