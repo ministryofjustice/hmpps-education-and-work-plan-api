@@ -40,9 +40,9 @@ fun aValidUpdateEducationAndQualificationsRequest(
 )
 
 fun aValidAchievedQualification(
-  subject: String? = "English",
-  level: AchievedQualification.Level? = AchievedQualification.Level.LEVEL_3,
-  grade: String? = "A",
+  subject: String = "English",
+  level: AchievedQualification.Level = AchievedQualification.Level.LEVEL_3,
+  grade: String = "A",
 ): AchievedQualification = AchievedQualification(
   subject = subject,
   level = level,
@@ -50,9 +50,9 @@ fun aValidAchievedQualification(
 )
 
 fun anotherValidAchievedQualification(
-  subject: String? = "Maths",
-  level: AchievedQualification.Level? = AchievedQualification.Level.LEVEL_3,
-  grade: String? = "B",
+  subject: String = "Maths",
+  level: AchievedQualification.Level = AchievedQualification.Level.LEVEL_3,
+  grade: String = "B",
 ): AchievedQualification = AchievedQualification(
   subject = subject,
   level = level,

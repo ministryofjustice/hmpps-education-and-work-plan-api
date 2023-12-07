@@ -1371,6 +1371,8 @@ components:
         workTypeOther:
           type: string
           description: A specific type of in-prison work that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+      required:
+        - workType
 
     InPrisonTrainingInterest:
       title: InPrisonTrainingInterest
@@ -1382,6 +1384,8 @@ components:
         trainingTypeOther:
           type: string
           description: A specific type of in-prison training that does not fit the given 'trainingType' values. Mandatory when 'trainingType' is 'OTHER'.
+      required:
+        - trainingType
 
     PersonalSkill:
       title: PersonalSkill
@@ -1393,6 +1397,8 @@ components:
         skillTypeOther:
           type: string
           description: A specific type of personal skill that does not fit the given 'skillType' values. Mandatory when 'skillType' is 'OTHER'.
+      required:
+        - skillType
 
     PersonalInterest:
       title: PersonalInterest
@@ -1404,6 +1410,8 @@ components:
         interestTypeOther:
           type: string
           description: A specific type of personal interest that does not fit the given 'interestType' values. Mandatory when 'interestType' is 'OTHER'.
+      required:
+        - interestType
 
     FutureWorkInterest:
       title: FutureWorkInterest
@@ -1415,6 +1423,8 @@ components:
         workTypeOther:
           type: string
           description: A specific type of work interest that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+      required:
+        - workType
 
     HopingToWork:
       title: HopingToWork
@@ -1599,6 +1609,10 @@ components:
         grade:
           type: string
           description: The grade which was achieved (if known/relevant).
+      required:
+        - subject
+        - level
+        - grade
 
     GetCiagInductionSummariesRequest:
       title: GetCiagInductionSummariesRequest
