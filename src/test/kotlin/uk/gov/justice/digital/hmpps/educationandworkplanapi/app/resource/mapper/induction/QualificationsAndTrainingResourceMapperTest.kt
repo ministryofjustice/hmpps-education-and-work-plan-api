@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousTraining
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
@@ -134,7 +135,7 @@ class QualificationsAndTrainingResourceMapperTest {
     )
     val expectedResponse = aValidEducationAndQualificationsResponse(
       id = training.reference,
-      educationLevel = null,
+      educationLevel = HighestEducationLevel.NOT_SURE,
       qualifications = null,
       additionalTraining = setOf(TrainingTypeApi.CSCS_CARD),
       additionalTrainingOther = null,

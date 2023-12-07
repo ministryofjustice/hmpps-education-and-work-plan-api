@@ -65,7 +65,7 @@ abstract class QualificationsAndTrainingResourceMapper {
     }
     return EducationAndQualificationResponse(
       id = training.reference,
-      educationLevel = toHighestEducationLevelApi(qualifications?.educationLevel),
+      educationLevel = toHighestEducationLevelApi(qualifications?.educationLevel) ?: HighestEducationLevelApi.NOT_SURE,
       qualifications = toAchievedQualifications(qualifications?.qualifications),
       additionalTraining = toTrainingTypesApi(training.trainingTypes),
       additionalTrainingOther = if (training.trainingTypes.contains(OTHER)) training.trainingTypeOther else null,
