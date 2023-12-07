@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.0'
+  version: '1.7.1'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -1090,6 +1090,7 @@ components:
           example: 'BXI'
       required:
         - reference
+        - educationLevel
         - qualifications
         - createdBy
         - createdByDisplayName
@@ -2089,7 +2090,7 @@ components:
     HighestEducationLevel:
       title: HighestEducationLevel
       type: string
-      description: The highest education level of a Prisoner.
+      description: The highest education level of a Prisoner. Defaults to 'NOT_SURE' if no value has been provided.
       enum:
         - PRIMARY_SCHOOL
         - SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
