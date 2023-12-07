@@ -280,25 +280,6 @@ paths:
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-prisoner-induction
 
-  '/inductions':
-    post:
-      summary: Returns summary Inductions for a specified list of prisoners.
-      description: |
-        Given a list of prisoner identifiers (Prison Numbers) returns summary Induction data for each specified
-        prisoner. If the returned data does not include data for a given prisoner, it can be inferred that the
-        prisoner does not have an Induction.
-      tags:
-        - Inductions
-      responses:
-        '200':
-          $ref: '#/components/responses/InductionSummaryList'
-        '400':
-          $ref: '#/components/responses/400ErrorResponse'
-      operationId: get-prisoner-induction-summaries
-      requestBody:
-        $ref: '#/components/requestBodies/GetInductionSummaries'
-
-
 #
 # --------------------------------------------------------------------------------
 #
@@ -1419,32 +1400,6 @@ components:
         - updatedAt
         - updatedAtPrison
 
-    InductionSummaryListResponse:
-      title: InductionSummaryListResponse
-      type: object
-      description: Contains a list of Induction summaries.
-      properties:
-        inductionSummaries:
-          type: array
-          description: A list of prisoner Induction summaries. Can be empty but not null.
-          items:
-            $ref: '#/components/schemas/InductionSummaryResponse'
-      required:
-        - inductionSummaries
-
-    InductionSummaryResponse:
-      title: InductionSummaryResponse
-      type: object
-      description: A subset Prisoner Induction data.
-      properties:
-        prisonNumber:
-          type: string
-          pattern: '^[A-Z]\\d{4}[A-Z]{2}$'
-          description: The ID of the Prisoner. AKA the prison number.
-          example: 'A1234BC'
-      required:
-        - prisonNumber
-
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
       type: object
@@ -2353,20 +2308,6 @@ components:
       required:
         - interests
 
-    GetInductionSummariesRequest:
-      title: GetInductionSummariesRequest
-      type: object
-      description: A request to retrieve a list of prisoner Induction summaries.
-      properties:
-        prisonNumbers:
-          type: array
-          description: A List of prison numbers whose Inductions should be retrieved.
-          items:
-            type: string
-            pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
-      required:
-        - prisonNumbers
-
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -2542,22 +2483,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InductionResponse'
-    InductionSummaryList:
-      description: Response body containing the a list of Induction summaries.
-      headers:
-        Access-Control-Allow-Origin:
-          schema:
-            type: string
-        Access-Control-Allow-Methods:
-          schema:
-            type: string
-        Access-Control-Allow-Headers:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InductionSummaryListResponse'
+
   #
   # Request Body Definitions
   # --------------------------------------------------------------------------------
@@ -2610,9 +2536,3 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateInductionRequest'
-    GetInductionSummaries:
-      description: Request body to retrieve a list of CIAG Induction summaries for one or more Prisoners.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/GetInductionSummariesRequest'
