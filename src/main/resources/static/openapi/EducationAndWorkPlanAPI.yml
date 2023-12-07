@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.6.2'
+  version: '1.7.0'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -26,7 +26,7 @@ paths:
       summary: Retrieves a list of Action Plans for a given list of Prisoners.
       description: Retrieves a list of Action Plans for a given list of Prisoners. This is a POST, rather than a GET, to allow a long list of prison numbers.
       tags:
-        - Action Plan
+        - Action Plans
       responses:
         '200':
           $ref: '#/components/responses/ActionPlanSummaryList'
@@ -49,7 +49,7 @@ paths:
       summary: Creates an Action Plan.
       description: Creates an Action Plan with at least one or more Goals.
       tags:
-        - Action Plan
+        - Action Plans
       responses:
         '201':
           description: The Action Plan was created successfully.
@@ -64,7 +64,7 @@ paths:
       summary: Return a Prisoner's Action Plan
       description: Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, then an Action Plan with no goals (empty array) is returned.
       tags:
-        - Action Plan
+        - Action Plans
       responses:
         '200':
           $ref: '#/components/responses/ActionPlan'
@@ -147,7 +147,7 @@ paths:
       summary: Return a Prisoner's Timeline.
       description: Returns a Prisoner's Timeline data, consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
       tags:
-        - Timeline
+        - Timelines
       responses:
         '200':
           $ref: '#/components/responses/Timeline'
@@ -156,7 +156,7 @@ paths:
       operationId: get-timeline-by-prison-number
 
     #
-    # CIAG Inductions (Inherited from the CIAG Team)
+    # CIAG Inductions (Inherited from the CIAG Team and tagged as "Legacy")
     #
   '/ciag/induction/{prisonNumber}':
     parameters:
@@ -168,13 +168,14 @@ paths:
         in: path
         required: true
     post:
+      deprecated: true
       summary: Creates an Induction for a Prisoner.
       description: |
         Creates an Induction for a Prisoner (if it does not already exist). This endpoint has been migrated from the
         `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
         the UI when it points to this endpoint.
       tags:
-        - Induction
+        - Legacy Inductions
       responses:
         '201':
           description: The Induction was created successfully.
@@ -184,12 +185,13 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/CreateCiagInduction'
     get:
+      deprecated: true
       summary: Return a Prisoner's Induction.
-      description: | 
+      description: |
         Returns a Prisoner's Induction. Note that the response body (`CiagInduction`) matches the equivalent endpoint in the
         `hmpps-ciag-careers-induction-api`. This is to maintain compatibility for when the CIAG UI migrates to use this API instead.
       tags:
-        - Induction
+        - Legacy Inductions
       responses:
         '200':
           $ref: '#/components/responses/CiagInduction'
@@ -197,6 +199,7 @@ paths:
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-ciag-prisoner-induction
     put:
+      deprecated: true
       summary: Updates an Induction for a Prisoner.
       description: |
         Provides the ability to update a Prisoner's Induction. Completely overwrites the existing Prisoner's Induction with the
@@ -205,7 +208,7 @@ paths:
         from the `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
         the CIAG UI when it points to this endpoint.
       tags:
-        - Induction
+        - Legacy Inductions
       responses:
         '204':
           description: CIAG Induction updated successfully.
@@ -219,6 +222,7 @@ paths:
 
   '/ciag/induction/list':
     post:
+      deprecated: true
       summary: Returns summary CIAG Inductions for a specified list of prisoners.
       description: |
         Given a list of prisoner identifiers (Prison Numbers) returns summary CIAG Induction data for each specified
@@ -227,7 +231,7 @@ paths:
         This endpoint has been migrated from the `hmpps-ciag-careers-induction-api` and the data structure has been 
         kept the same in order to prevent breaking the UI when it points to this endpoint.
       tags:
-        - Induction
+        - Legacy Inductions
       responses:
         '200':
           $ref: '#/components/responses/CiagInductionSummaryList'
@@ -236,6 +240,35 @@ paths:
       operationId: get-ciag-prisoner-induction-summaries
       requestBody:
         $ref: '#/components/requestBodies/GetCiagInductionSummaries'
+
+    #
+    # Inductions
+    #
+  '/inductions/{prisonNumber}':
+    parameters:
+      - name: prisonNumber
+        description: The number of the Prisoner who may have relevant Induction data.
+        schema:
+          type: string
+        example: 'A1234BC'
+        in: path
+        required: true
+    post:
+      summary: Creates an Induction for a Prisoner.
+      description: |
+        Creates an Induction for a Prisoner (if it does not already exist).
+      tags:
+        - Inductions
+      responses:
+        '201':
+          description: The Induction was created successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+      operationId: create-prisoner-induction
+      requestBody:
+        $ref: '#/components/requestBodies/CreateInduction'
+
+
 #
 # --------------------------------------------------------------------------------
 #
@@ -509,6 +542,8 @@ components:
         - actionedBy
         - timestamp
         - correlationId
+
+    ### Leagcy CIAG API Response ###
     CiagInductionResponse:
       title: CiagInductionResponse
       type: object
@@ -640,7 +675,7 @@ components:
           type: array
           description: One or more skills that the Prisoner feels they have.
           items:
-            $ref: '#/components/schemas/PersonalSkill'
+            $ref: '#/components/schemas/PersonalSkillType'
         skillsOther:
           type: string
           description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
@@ -649,7 +684,7 @@ components:
           type: array
           description: One or more interests that the Prisoner feels they have.
           items:
-            $ref: '#/components/schemas/PersonalInterest'
+            $ref: '#/components/schemas/PersonalInterestType'
         personalInterestsOther:
           type: string
           description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
@@ -765,6 +800,59 @@ components:
           example: '2023-06-19T09:39:44Z'
       required:
         - id
+        - modifiedBy
+        - modifiedDateTime
+    CiagInductionSummaryListResponse:
+      title: CiagInductionSummaryListResponse
+      type: object
+      description: Contains a list of CIAG Induction summaries. Migrated from hmpps-ciag-careers-induction-api.
+      properties:
+        ciagProfileList:
+          type: array
+          description: A List of prisoners' CIAG Induction summaries. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/CiagInductionSummaryResponse'
+      required:
+        - ciagProfileList
+    CiagInductionSummaryResponse:
+      title: CiagInductionSummaryResponse
+      type: object
+      description: A subset of data regarding a prisoner's CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
+      properties:
+        offenderId:
+          type: string
+          pattern: '^[A-Z]\\d{4}[A-Z]{2}$'
+          description: The ID of the Prisoner. AKA the prison number.
+          example: 'A1234BC'
+        desireToWork:
+          type: boolean
+          description: Whether the Prisoner wishes to work or not.
+        hopingToGetWork:
+          $ref: '#/components/schemas/HopingToWork'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created the Induction.
+          example: 'asmith_gen'
+        createdDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Induction was created.
+          example: '2023-06-19T09:39:44Z'
+        modifiedBy:
+          type: string
+          description: The DPS username of the person who last updated the Induction.
+          example: 'asmith_gen'
+        modifiedDateTime:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - offenderId
+        - desireToWork
+        - hopingToGetWork
+        - createdBy
+        - createdDateTime
         - modifiedBy
         - modifiedDateTime
 
@@ -958,6 +1046,7 @@ components:
         - STEP_STARTED
         - STEP_COMPLETED
 
+    ### Legacy Induction requests ###
     CreateCiagInductionRequest:
       title: CreateCiagInductionRequest
       description: A request to create a CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
@@ -997,7 +1086,6 @@ components:
       required:
         - hopingToGetWork
         - prisonId
-
     CreatePreviousWorkRequest:
       description: A request to persist the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
       type: object
@@ -1023,7 +1111,6 @@ components:
           $ref: '#/components/schemas/CreateWorkInterestsRequest'
       required:
         - hasWorkedBefore
-
     CreateWorkInterestsRequest:
       description: The Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
       type: object
@@ -1043,7 +1130,6 @@ components:
           description: A detailed list of work interests that a Prisoner has.
           items:
             $ref: '#/components/schemas/WorkInterestDetail'
-
     CreateSkillsAndInterestsRequest:
       description: A request to persist a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
       type: object
@@ -1053,7 +1139,7 @@ components:
           type: array
           description: One or more skills that the Prisoner feels they have.
           items:
-            $ref: '#/components/schemas/PersonalSkill'
+            $ref: '#/components/schemas/PersonalSkillType'
         skillsOther:
           type: string
           description: A specific type of a skill that the Prisoner feels they have. Mandatory when 'skills' includes 'OTHER'.
@@ -1062,11 +1148,10 @@ components:
           type: array
           description: One or more interests that the Prisoner feels they have.
           items:
-            $ref: '#/components/schemas/PersonalInterest'
+            $ref: '#/components/schemas/PersonalInterestType'
         personalInterestsOther:
           type: string
           description: A specific type of a interest that the Prisoner feels they have. Mandatory when 'personalInterests' includes 'OTHER'.
-
     CreateEducationAndQualificationsRequest:
       description: A request to persist a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
         the inmate.
@@ -1089,7 +1174,6 @@ components:
         additionalTrainingOther:
           type: string
           description: A specific type of training that does not fit the given 'additionalTraining' types. Mandatory when 'additionalTraining' includes 'OTHER'.
-
     CreatePrisonWorkAndEducationRequest:
       description: A request to persist a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
       type: object
@@ -1157,7 +1241,6 @@ components:
       required:
         - hopingToGetWork
         - prisonId
-
     UpdatePreviousWorkRequest:
       description: A request to update the previous work experience of the Prisoner. Migrated from hmpps-ciag-careers-induction-api.
       type: object
@@ -1188,7 +1271,6 @@ components:
           $ref: '#/components/schemas/UpdateWorkInterestsRequest'
       required:
         - hasWorkedBefore
-
     UpdateSkillsAndInterestsRequest:
       description: A request to update a Prisoner's personal skills and interests. Migrated from hmpps-ciag-careers-induction-api.
       allOf:
@@ -1199,7 +1281,6 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's personal skills and interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-
     UpdateEducationAndQualificationsRequest:
       description: A request to update a Prisoner's education and qualifications. Migrated from hmpps-ciag-careers-induction-api.
         the inmate.
@@ -1211,7 +1292,6 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's education and qualifications.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-
     UpdatePrisonWorkAndEducationRequest:
       description: A request to update a Prisoner's in-prison work and education interests. Migrated from hmpps-ciag-careers-induction-api.
       allOf:
@@ -1222,9 +1302,8 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's in-prison work and education interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-
     WorkExperience:
-      description: A Prisoner's list of work experience details. Migrated from hmpps-ciag-careers-induction-api.
+      description: The details of an individual work experience. Migrated from hmpps-ciag-careers-induction-api.
       type: object
       properties:
         typeOfWorkExperience:
@@ -1240,7 +1319,6 @@ components:
           description: Additional details of the work.
       required:
         - typeOfWorkExperience
-
     UpdateWorkInterestsRequest:
       description: A request to update a Prisoner's work interests. Migrated from hmpps-ciag-careers-induction-api.
       allOf:
@@ -1251,6 +1329,24 @@ components:
           format: uuid
           description: A unique reference for this Prisoner's work interests.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
+
+    PreviousWorkExperience:
+      description: The details of an individual work experience.
+      type: object
+      properties:
+        workType:
+          $ref: '#/components/schemas/WorkType'
+        otherWorkType:
+          type: string
+          description: A type of work experience, which is not listed in 'workType' Enum. Mandatory when 'workType' is 'OTHER'.
+        role:
+          type: string
+          description: The role the Prisoner had.
+        details:
+          type: string
+          description: Any additional details of the work experience.
+      required:
+        - workType
 
     WorkInterestDetail:
       title: WorkInterestDetail
@@ -1264,6 +1360,71 @@ components:
           description: The role within a Prisoner's area of work interest.
       required:
         - workInterest
+
+    InPrisonWorkInterest:
+      title: InPrisonWorkInterest
+      description: Detail about a prisoner's in-prison work interest.
+      type: object
+      properties:
+        workType:
+          $ref: '#/components/schemas/InPrisonWorkType'
+        workTypeOther:
+          type: string
+          description: A specific type of in-prison work that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+      required:
+        - workType
+
+    InPrisonTrainingInterest:
+      title: InPrisonTrainingInterest
+      description: Detail about a prisoner's in-prison training interest.
+      type: object
+      properties:
+        trainingType:
+          $ref: '#/components/schemas/InPrisonTrainingType'
+        trainingTypeOther:
+          type: string
+          description: A specific type of in-prison training that does not fit the given 'trainingType' values. Mandatory when 'trainingType' is 'OTHER'.
+      required:
+        - trainingType
+
+    PersonalSkill:
+      title: PersonalSkill
+      description: A Prisoner's personal skill.
+      type: object
+      properties:
+        skillType:
+          $ref: '#/components/schemas/PersonalSkillType'
+        skillTypeOther:
+          type: string
+          description: A specific type of personal skill that does not fit the given 'skillType' values. Mandatory when 'skillType' is 'OTHER'.
+      required:
+        - skillType
+
+    PersonalInterest:
+      title: PersonalInterest
+      description: A Prisoner's personal interest.
+      type: object
+      properties:
+        interestType:
+          $ref: '#/components/schemas/PersonalInterestType'
+        interestTypeOther:
+          type: string
+          description: A specific type of personal interest that does not fit the given 'interestType' values. Mandatory when 'interestType' is 'OTHER'.
+      required:
+        - interestType
+
+    FutureWorkInterest:
+      title: FutureWorkInterest
+      description: A Prisoner's future work interest.
+      type: object
+      properties:
+        workType:
+          $ref: '#/components/schemas/WorkType'
+        workTypeOther:
+          type: string
+          description: A specific type of work interest that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+      required:
+        - workType
 
     HopingToWork:
       title: HopingToWork
@@ -1301,8 +1462,8 @@ components:
         - OTHER
         - NO_REASON
 
-    PersonalSkill:
-      title: PersonalSkill
+    PersonalSkillType:
+      title: PersonalSkillType
       type: string
       description: Represents a Prisoner's personal skill.
       enum:
@@ -1316,8 +1477,8 @@ components:
         - OTHER
         - NONE
 
-    PersonalInterest:
-      title: PersonalInterest
+    PersonalInterestType:
+      title: PersonalInterestType
       type: string
       description: Represents a Prisoner's personal interest.
       enum:
@@ -1448,6 +1609,10 @@ components:
         grade:
           type: string
           description: The grade which was achieved (if known/relevant).
+      required:
+        - subject
+        - level
+        - grade
 
     GetCiagInductionSummariesRequest:
       title: GetCiagInductionSummariesRequest
@@ -1463,60 +1628,141 @@ components:
       required:
         - offenderIds
 
-    CiagInductionSummaryListResponse:
-      title: CiagInductionSummaryListResponse
+    CreateInductionRequest:
+      title: CreateInductionRequest
+      description: A request to create an Induction.
       type: object
-      description: Contains a list of CIAG Induction summaries. Migrated from hmpps-ciag-careers-induction-api.
       properties:
-        ciagProfileList:
-          type: array
-          description: A List of prisoners' CIAG Induction summaries. Can be empty but not null.
-          items:
-            $ref: '#/components/schemas/CiagInductionSummaryResponse'
+        workOnRelease:
+          $ref: '#/components/schemas/CreateWorkOnReleaseRequest'
+        previousQualifications:
+          $ref: '#/components/schemas/CreatePreviousQualificationsRequest'
+        previousTraining:
+          $ref: '#/components/schemas/CreatePreviousTrainingRequest'
+        previousWorkExperiences:
+          $ref: '#/components/schemas/CreatePreviousWorkExperiencesRequest'
+        inPrisonInterests:
+          $ref: '#/components/schemas/CreateInPrisonInterestsRequest'
+        personalSkillsAndInterests:
+          $ref: '#/components/schemas/CreatePersonalSkillsAndInterestsRequest'
+        futureWorkInterests:
+          $ref: '#/components/schemas/CreateFutureWorkInterestsRequest'
       required:
-        - ciagProfileList
-
-    CiagInductionSummaryResponse:
-      title: CiagInductionSummaryResponse
+        - workOnRelease
+    CreateWorkOnReleaseRequest:
+      title: CreateWorkOnReleaseRequest
       type: object
-      description: A subset of data regarding a prisoner's CIAG Induction. Migrated from hmpps-ciag-careers-induction-api.
+      description: A request to create a Prisoner's views on obtaining work after release.
       properties:
-        offenderId:
-          type: string
-          pattern: '^[A-Z]\\d{4}[A-Z]{2}$'
-          description: The ID of the Prisoner. AKA the prison number.
-          example: 'A1234BC'
-        desireToWork:
-          type: boolean
-          description: Whether the Prisoner wishes to work or not.
-        hopingToGetWork:
+        hopingToWork:
           $ref: '#/components/schemas/HopingToWork'
-        createdBy:
+        notHopingToWorkReasons:
+          type: array
+          description: Reasons the Prisoner has given not to get work after leaving Prison.
+          items:
+            $ref: '#/components/schemas/ReasonNotToWork'
+        notHopingToWorkOtherReason:
           type: string
-          description: The DPS username of the person who created the Induction.
-          example: 'asmith_gen'
-        createdDateTime:
+          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
+        affectAbilityToWork:
+          type: array
+          description: Factors affecting the Prisoner's ability to work.
+          items:
+            $ref: '#/components/schemas/AbilityToWorkFactor'
+        affectAbilityToWorkOther:
           type: string
-          format: date-time
-          description: An ISO-8601 timestamp representing when the Induction was created.
-          example: '2023-06-19T09:39:44Z'
-        modifiedBy:
-          type: string
-          description: The DPS username of the person who last updated the Induction.
-          example: 'asmith_gen'
-        modifiedDateTime:
-          type: string
-          format: date-time
-          description: An ISO-8601 timestamp representing when the Goal was last updated. This will be the same as the created date if it has not yet been updated.
-          example: '2023-06-19T09:39:44Z'
+          description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'affectAbilityToWork' includes 'OTHER'.
       required:
-        - offenderId
-        - desireToWork
-        - hopingToGetWork
-        - createdBy
-        - createdDateTime
-        - modifiedBy
-        - modifiedDateTime
+        - hopingToWork
+    CreatePreviousQualificationsRequest:
+      title: CreatePreviousQualificationsRequest
+      type: object
+      description: A request to create a Prisoner's qualifications.
+      properties:
+        educationLevel:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          type: array
+          description: A list of the Prisoner's previous qualifications.
+          items:
+            $ref: '#/components/schemas/AchievedQualification'
+    CreatePreviousTrainingRequest:
+      title: CreatePreviousTrainingRequest
+      type: object
+      description: A request to create a Prisoner's previous training.
+      properties:
+        trainingTypes:
+          type: array
+          description: Any additional training that the Prisoner has completed in the past. Must not be empty ('NONE' is an option).
+          items:
+            $ref: '#/components/schemas/TrainingType'
+        trainingTypeOther:
+          type: string
+          description: A specific type of training that does not fit the given 'trainingTypes'. Mandatory when 'trainingTypes' includes 'OTHER'.
+      required:
+        - trainingTypes
+    CreatePreviousWorkExperiencesRequest:
+      title: CreatePreviousWorkExperiencesRequest
+      type: object
+      description: A request to create a Prisoner's previous work experience.
+      properties:
+        hasWorkedBefore:
+          type: boolean
+        experiences:
+          type: array
+          description: A list of the Prisoner's previous work experiences.
+          items:
+            $ref: '#/components/schemas/PreviousWorkExperience'
+      required:
+        - hasWorkedBefore
+    CreateInPrisonInterestsRequest:
+      title: CreateInPrisonInterestsRequest
+      type: object
+      description: A request to create a Prisoner's in-prison interests. If this object is provided in the request, then at least one type of in-prison work/interest is required ('OTHER' can be provided with a reason).
+      properties:
+        inPrisonWorkInterests:
+          type: array
+          description: A list of in-prison work that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonWorkInterest'
+        inPrisonTrainingInterests:
+          type: array
+          description: A list of in-prison training that the Prisoner is interested in.
+          items:
+            $ref: '#/components/schemas/InPrisonTrainingInterest'
+      required:
+        - inPrisonWorkInterests
+        - inPrisonTrainingInterests
+    CreatePersonalSkillsAndInterestsRequest:
+      title: CreatePersonalSkillsAndInterestsRequest
+      type: object
+      description: A request to create a Prisoner's personal skills and interests. If this object is provided in the request, then at least one type of skill/interest is required (even if it's just 'NONE').
+      properties:
+        skills:
+          type: array
+          description: One or more skills that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalSkill'
+        interests:
+          type: array
+          description: One or more interests that the Prisoner feels they have.
+          items:
+            $ref: '#/components/schemas/PersonalInterest'
+      required:
+        - skills
+        - interests
+    CreateFutureWorkInterestsRequest:
+      title: CreateFutureWorkInterestsRequest
+      type: object
+      description: A request to create a Prisoner's future work interests.
+      properties:
+        interests:
+          type: array
+          description: One or more future work interests that the Prisoner has.
+          items:
+            $ref: '#/components/schemas/FutureWorkInterest'
+      required:
+        - interests
 
   #
   # Response Body Definitions
@@ -1723,3 +1969,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GetCiagInductionSummariesRequest'
+    CreateInduction:
+      description: Request body to create a Prisoner's Induction.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateInductionRequest'

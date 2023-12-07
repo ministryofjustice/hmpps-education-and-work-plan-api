@@ -12,8 +12,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Skill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest as PersonalInterestDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill as PersonalSkillDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest as PersonalInterestApi
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill as PersonalSkillApi
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType as PersonalInterestApi
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType as PersonalSkillApi
 
 @Component
 class PersonalSkillsAndInterestsResourceMapper(
