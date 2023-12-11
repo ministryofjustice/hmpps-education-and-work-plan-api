@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -92,7 +93,18 @@ class GoalEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) {
+) : ParentEntity {
+
+  fun steps(): MutableList<StepEntity> {
+    if (steps == null) {
+      steps = mutableListOf()
+    }
+    return steps!!
+  }
+
+  override fun childEntityUpdated() {
+    updatedAt = Instant.now()
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

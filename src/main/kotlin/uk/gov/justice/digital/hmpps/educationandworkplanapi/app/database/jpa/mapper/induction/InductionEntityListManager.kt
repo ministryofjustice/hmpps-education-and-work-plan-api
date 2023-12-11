@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.KeyAwareChildEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.ParentEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.KeyAwareDomain
 
 /**

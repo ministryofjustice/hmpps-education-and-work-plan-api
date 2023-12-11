@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.KeyAwareChildEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.KeyAwareDomain
 
 /**
