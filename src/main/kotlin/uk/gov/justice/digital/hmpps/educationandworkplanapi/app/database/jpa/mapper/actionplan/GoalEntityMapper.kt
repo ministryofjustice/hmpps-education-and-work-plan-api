@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
@@ -25,9 +26,11 @@ import java.util.UUID
   ],
 )
 abstract class GoalEntityMapper {
-
   @Autowired
   private lateinit var stepEntityMapper: StepEntityMapper
+
+  @Autowired
+  private lateinit var entityListManager: GoalEntityListManager<StepEntity, Step>
 
   /**
    * Maps the supplied [CreateGoalDto] into a new un-persisted [GoalEntity].
