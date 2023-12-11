@@ -1,8 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan
 
+import org.mapstruct.AfterMapping
+import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
@@ -11,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateStepDto
 import java.util.UUID
@@ -30,11 +34,19 @@ abstract class GoalEntityMapper {
    * A new reference number is generated and mapped. The JPA managed fields are not mapped.
    * This method is suitable for creating a new [GoalEntity] to be subsequently persisted to the database.
    */
+  @BeanMapping(qualifiedByName = ["addNewStepsDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "steps", ignore = true)
   abstract fun fromDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity
+
+  @Named("addNewStepsDuringCreate")
+  @AfterMapping
+  fun addNewStepsDuringCreate(dto: CreateGoalDto, @MappingTarget entity: GoalEntity) {
+    addNewStepsToEntity(dto.steps, entity)
+  }
 
   /**
    * Maps the supplied [GoalEntity] into the domain [Goal].
@@ -114,4 +126,13 @@ abstract class GoalEntityMapper {
         it
       }
     }
+
+  private fun addNewStepsToEntity(steps: List<CreateStepDto>, entity: GoalEntity) {
+    steps.forEach {
+      entity.addChild(
+        stepEntityMapper.fromDtoToEntity(it),
+        entity.steps(),
+      )
+    }
+  }
 }
