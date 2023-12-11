@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
@@ -170,7 +169,6 @@ class UpdateGoalTest : IntegrationTestBase() {
 
   @Test
   @Transactional
-  @Disabled("RR-476 - disabled whilst this fix is WIP")
   fun `should update goal`() {
     // Given
     val prisonNumber = aValidPrisonNumber()

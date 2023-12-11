@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.INTERNALLY_MANAGED_FIELDS
 import java.time.Instant
 import java.util.UUID
 

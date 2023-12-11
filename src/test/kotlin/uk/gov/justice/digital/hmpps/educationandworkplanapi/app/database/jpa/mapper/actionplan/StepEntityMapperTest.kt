@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidStepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
@@ -130,5 +131,98 @@ class StepEntityMapperTest {
       .hasTitle("Book the course with the instructor")
       .hasStatus(EntityStatus.ACTIVE)
       .hasSequenceNumber(2)
+  }
+
+  @Test
+  fun `should map from UpdateStepDto with reference to domain`() {
+    // Given
+    val reference = aValidReference()
+    val updateStepDto = aValidUpdateStepDto(reference = reference)
+
+    val expected = aValidStep(
+      reference = reference,
+      title = updateStepDto.title,
+      status = updateStepDto.status,
+      sequenceNumber = updateStepDto.sequenceNumber,
+    )
+
+    // When
+    val actual = mapper.fromDtoToDomain(updateStepDto)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map from UpdateStepDto without reference to domain`() {
+    // Given
+    val updateStepDto = aValidUpdateStepDto(reference = null)
+
+    val expected = aValidStep(
+      title = updateStepDto.title,
+      status = updateStepDto.status,
+      sequenceNumber = updateStepDto.sequenceNumber,
+    )
+
+    // When
+    val actual = mapper.fromDtoToDomain(updateStepDto)
+
+    // Then
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields("reference")
+      .isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map from domain to entity`() {
+    // Given
+    val reference = aValidReference()
+    val step = aValidStep(
+      reference = reference,
+      status = DomainStatus.ACTIVE,
+    )
+
+    val expected = aValidStepEntity(
+      reference = reference,
+      title = step.title,
+      status = EntityStatus.ACTIVE,
+      sequenceNumber = step.sequenceNumber,
+    )
+
+    // When
+    val actual = mapper.fromDomainToEntity(step)
+
+    // Then
+    assertThat(actual).isEqualToIgnoringJpaManagedFields(expected)
+  }
+
+  @Test
+  fun `should update entity from domain`() {
+    // Given
+    val reference = aValidReference()
+    val stepEntity = aValidStepEntity(
+      reference = reference,
+      title = "Book course",
+      status = EntityStatus.NOT_STARTED,
+      sequenceNumber = 1,
+    )
+
+    val step = aValidStep(
+      reference = reference,
+      title = "Book course before December",
+      status = DomainStatus.ACTIVE,
+      sequenceNumber = 2,
+    )
+
+    // When
+    mapper.updateEntityFromDomain(stepEntity, step)
+
+    // Then
+    assertThat(stepEntity)
+      .hasTitle("Book course before December")
+      .hasStatus(EntityStatus.ACTIVE)
+      .hasSequenceNumber(2)
+      .hasReference(reference)
   }
 }

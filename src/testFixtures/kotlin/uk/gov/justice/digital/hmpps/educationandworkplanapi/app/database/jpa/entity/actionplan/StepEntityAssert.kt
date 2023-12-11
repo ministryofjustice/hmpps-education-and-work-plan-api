@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.INTERNALLY_MANAGED_FIELDS
 import java.time.Instant
 import java.util.UUID
 
@@ -11,10 +12,6 @@ fun assertThat(actual: StepEntity?) = StepEntityAssert(actual)
  */
 class StepEntityAssert(actual: StepEntity?) :
   AbstractObjectAssert<StepEntityAssert, StepEntity?>(actual, StepEntityAssert::class.java) {
-
-  companion object {
-    private val JPA_MANAGED_FIELDS = arrayOf("id", "createdAt", "createdBy", "updatedAt", "updatedBy")
-  }
 
   fun hasJpaManagedFieldsPopulated(): StepEntityAssert {
     isNotNull
@@ -44,7 +41,7 @@ class StepEntityAssert(actual: StepEntity?) :
   fun isEqualToIgnoringJpaManagedFields(expected: StepEntity): StepEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
-      .ignoringFields(*JPA_MANAGED_FIELDS)
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
       .isEqualTo(expected)
     return this
   }
