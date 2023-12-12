@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.INTERNALLY_MANAGED_FIELDS
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -13,11 +14,6 @@ fun assertThat(actual: GoalEntity?) = GoalEntityAssert(actual)
  */
 class GoalEntityAssert(actual: GoalEntity?) :
   AbstractObjectAssert<GoalEntityAssert, GoalEntity?>(actual, GoalEntityAssert::class.java) {
-
-  companion object {
-    private val JPA_MANAGED_FIELDS =
-      arrayOf("id", "createdAt", "createdBy", "createdByDisplayName", "updatedAt", "updatedBy", "updatedByDisplayName")
-  }
 
   fun hasJpaManagedFieldsPopulated(): GoalEntityAssert {
     isNotNull
@@ -49,7 +45,7 @@ class GoalEntityAssert(actual: GoalEntity?) :
   fun isEqualToIgnoringJpaManagedFields(expected: GoalEntity): GoalEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
-      .ignoringFields(*JPA_MANAGED_FIELDS)
+      .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
       .isEqualTo(expected)
     return this
   }

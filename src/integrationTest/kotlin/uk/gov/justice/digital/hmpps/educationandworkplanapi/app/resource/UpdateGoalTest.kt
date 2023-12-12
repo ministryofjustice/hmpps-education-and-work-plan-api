@@ -11,14 +11,11 @@ import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.transaction.TestTransaction
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
@@ -26,6 +23,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -168,7 +166,6 @@ class UpdateGoalTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should update goal`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
@@ -190,9 +187,11 @@ class UpdateGoalTest : IntegrationTestBase() {
       createGoalRequest = createGoalRequest,
     )
 
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    val goalReference = actionPlan!!.goals!![0].reference!!
-    val stepReference = actionPlan.goals!![0].steps!![0].reference!!
+    val actionPlan = getActionPlan(prisonNumber)
+    val goal = actionPlan.goals[0]
+    val goalReference = goal.goalReference
+    val step1 = goal.steps[0]
+    val stepReference = step1.stepReference
 
     val updateGoalRequest = aValidUpdateGoalRequest(
       goalReference = goalReference,
@@ -229,22 +228,19 @@ class UpdateGoalTest : IntegrationTestBase() {
       .expectStatus()
       .isNoContent()
 
-    TestTransaction.end()
-    TestTransaction.start()
-
     // Then
-    val actual = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    val actual = getActionPlan(prisonNumber)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(1)
-      .goal(0) { goal ->
+      .goal(1) { goal ->
         goal
           .hasTitle("Learn French to GCSE standard")
           .hasNumberOfSteps(2)
-          .stepWithSequenceNumber(1) { step ->
+          .step(1) { step ->
             step.hasTitle("Book course before December 2023")
           }
-          .stepWithSequenceNumber(2) { step ->
+          .step(2) { step ->
             step.hasTitle("Attend course before March 2024")
           }
           .wasCreatedAtPrison("BXI")
@@ -286,5 +282,102 @@ class UpdateGoalTest : IntegrationTestBase() {
       assertThat(goalUpdatedEventProperties["correlationId"])
         .isEqualTo(stepRemovedEventProperties["correlationId"])
     }
+  }
+
+  @Test
+  fun `should update goal given the goal fields are unchanged and the only change is to add a step`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createGoalRequest = aValidCreateGoalRequest(
+      steps = listOf(
+        aValidCreateStepRequest(title = "Book course"),
+      ),
+    )
+    createGoal(
+      username = "auser_gen",
+      displayName = "Albert User",
+      prisonNumber = prisonNumber,
+      createGoalRequest = createGoalRequest,
+    )
+
+    val actionPlan = getActionPlan(prisonNumber)
+    val goal = actionPlan.goals[0]
+    val goalReference = goal.goalReference
+    val step1 = goal.steps[0]
+
+    val newStep = aValidUpdateStepRequest(
+      stepReference = null,
+      title = "Attend course before March 2024",
+      sequenceNumber = 2,
+    )
+
+    val updateGoalRequest = aValidUpdateGoalRequest(
+      goalReference = goal.goalReference,
+      title = goal.title,
+      targetCompletionDate = goal.targetCompletionDate,
+      notes = goal.notes,
+      prisonId = goal.createdAtPrison,
+      steps = listOf(
+        aValidUpdateStepRequest(
+          stepReference = step1.stepReference,
+          title = step1.title,
+          status = step1.status,
+          sequenceNumber = step1.sequenceNumber,
+        ),
+        newStep, // this is the only thing that is changed in the request - add a new Step
+      ),
+    )
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber, goalReference)
+      .withBody(updateGoalRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = "buser_gen",
+          displayName = "Bernie User",
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent()
+
+    // Then
+    val actual = getActionPlan(prisonNumber)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasNumberOfSteps(2)
+          .step(1) { step ->
+            step
+              .hasTitle(step1.title)
+              .hasStatus(step1.status)
+              .hasReference(step1.stepReference)
+          }
+          .step(2) { step ->
+            step
+              .hasTitle(newStep.title)
+              .hasStatus(newStep.status)
+          }
+          .wasCreatedAtPrison("BXI")
+          .wasUpdatedAtPrison("BXI")
+          .wasCreatedBy("auser_gen")
+          .wasUpdatedBy("buser_gen")
+      }
+
+    val timeline = getTimeline(prisonNumber)
+    assertThat(timeline)
+      .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        it.hasEventType(TimelineEventType.GOAL_UPDATED)
+          .wasActionedBy("buser_gen")
+          .hasActionedByDisplayName("Bernie User")
+      }
+
+    // Currently no telemetry events are sent for when Steps are added/edited but no changes to the parent Goal
+    // The only telemetry events sent are GOAL_UPDATED (which does not cover this scenario) or STEP_REMOVED
   }
 }

@@ -9,7 +9,6 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
@@ -23,6 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -56,8 +56,7 @@ class GoalEntity(
   @Column
   var notes: String? = null,
 
-  @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "goal_id", nullable = false)
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @field:NotNull
   var steps: MutableList<StepEntity>? = null,
 
@@ -92,7 +91,18 @@ class GoalEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) {
+) : ParentEntity {
+
+  fun steps(): MutableList<StepEntity> {
+    if (steps == null) {
+      steps = mutableListOf()
+    }
+    return steps!!
+  }
+
+  override fun childEntityUpdated() {
+    updatedAt = Instant.now()
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

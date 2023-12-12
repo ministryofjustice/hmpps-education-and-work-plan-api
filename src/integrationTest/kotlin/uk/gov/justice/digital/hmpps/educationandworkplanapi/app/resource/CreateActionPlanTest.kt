@@ -5,14 +5,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -153,16 +151,11 @@ class CreateActionPlanTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should fail to create action plan given action plan already exists`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val actionPlan = aValidActionPlanEntity(prisonNumber = prisonNumber)
-    actionPlanRepository.save(actionPlan)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-    TestTransaction.start()
-    assertThat(actionPlan).hasNumberOfGoals(1)
+    createActionPlan(prisonNumber)
+
     val createRequest = aValidCreateActionPlanRequest()
 
     // When

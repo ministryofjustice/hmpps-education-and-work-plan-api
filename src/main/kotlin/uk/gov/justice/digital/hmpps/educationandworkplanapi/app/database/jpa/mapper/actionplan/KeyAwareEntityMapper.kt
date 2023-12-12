@@ -1,7 +1,7 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.KeyAwareDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.KeyAwareDomain
 
 /**
  * Interface for mapping between entity and domain objects that adhere to the 'KeyAware' interfaces.

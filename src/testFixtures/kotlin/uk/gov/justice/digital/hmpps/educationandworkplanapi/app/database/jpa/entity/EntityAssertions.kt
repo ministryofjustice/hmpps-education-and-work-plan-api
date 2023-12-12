@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity
 
 // JPA managed fields, plus the reference field, which are all managed/generated within the API
 internal val INTERNALLY_MANAGED_FIELDS =

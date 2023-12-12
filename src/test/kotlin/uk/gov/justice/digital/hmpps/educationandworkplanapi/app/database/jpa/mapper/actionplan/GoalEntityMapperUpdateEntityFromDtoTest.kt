@@ -3,11 +3,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidStepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
 import java.time.LocalDate
@@ -15,17 +17,24 @@ import java.time.LocalDate
 /**
  * Unit test class for [GoalEntityMapper] specifically for the [GoalEntityMapper.updateEntityFromDto] method.
  *
- * The tests in this class test the [GoalEntityMapper] but with a concrete [StepEntityMapper] rather than a mock.
+ * The tests in this class test the [GoalEntityMapper] but with concrete [GoalEntityListManager] and [StepEntityMapper]
+ * instances rather than mocks.
  * This is because the method under test ([GoalEntityMapper.updateEntityFromDto]) mutates the steps collection using
- * the [StepEntityMapper].
+ * the [GoalEntityListManager] and [StepEntityMapper].
  * It is set with reflection as there is no setter or constructor injection on the mapstruct generated class.
  */
 class GoalEntityMapperUpdateEntityFromDtoTest {
 
   private val mapper: GoalEntityMapper = GoalEntityMapperImpl().also {
-    GoalEntityMapper::class.java.getDeclaredField("stepEntityMapper").apply {
-      isAccessible = true
-      set(it, StepEntityMapperImpl())
+    with(GoalEntityMapper::class.java) {
+      getDeclaredField("stepEntityMapper").apply {
+        isAccessible = true
+        set(it, StepEntityMapperImpl())
+      }
+      getDeclaredField("entityListManager").apply {
+        isAccessible = true
+        set(it, GoalEntityListManager<StepEntity, Step>())
+      }
     }
   }
 
@@ -213,7 +222,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
   }
 
   @Test
-  fun `should update entity from UpdateGoalDto given DTO given steps re-ordered and new step added in the middle`() {
+  fun `should update entity from UpdateGoalDto given DTO has steps re-ordered and new step added in the middle`() {
     // Given
     val goalReference = aValidReference()
     val step1Reference = aValidReference()

@@ -27,6 +27,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.util.UUID
 
@@ -88,7 +90,7 @@ class PreviousQualificationsEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
-) : ParentEntity() {
+) : ParentEntity {
 
   fun qualifications(): MutableList<QualificationEntity> {
     if (qualifications == null) {
