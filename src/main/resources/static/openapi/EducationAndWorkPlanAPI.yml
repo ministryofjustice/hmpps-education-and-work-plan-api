@@ -2348,7 +2348,6 @@ components:
           $ref: '#/components/schemas/UpdateFutureWorkInterestsRequest'
       required:
         - reference
-        - workOnRelease
     UpdateWorkOnReleaseRequest:
       description: A request to update a Prisoner's views on obtaining work after release.
       allOf:
