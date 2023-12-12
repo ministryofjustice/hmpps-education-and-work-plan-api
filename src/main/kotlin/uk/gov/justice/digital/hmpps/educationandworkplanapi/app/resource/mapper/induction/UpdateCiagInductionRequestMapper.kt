@@ -21,7 +21,7 @@ class UpdateCiagInductionRequestMapper(
       prisonNumber = prisonNumber,
       workOnRelease = workOnReleaseMapper.toUpdateWorkOnReleaseDto(request),
       previousQualifications = qualificationsAndTrainingMapper.toUpdatePreviousQualificationsDto(
-        request = request.qualificationsAndTraining!!,
+        request = request.qualificationsAndTraining,
         prisonId = prisonId,
       ),
       previousTraining = qualificationsAndTrainingMapper.toUpdatePreviousTrainingDto(
