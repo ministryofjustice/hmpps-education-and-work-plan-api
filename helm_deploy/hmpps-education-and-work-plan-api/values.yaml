@@ -53,3 +53,10 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-education-and-work-plan-api
+
+generic-data-analytics-extractor:
+  cronJobSchedule: "0 1 * * *" # 1am every day
+  databaseSecretName: rds-postgresql-instance-output
+  destinationS3SecretName: analytical-platform-reporting-s3-bucket
+  serviceAccountName: hmpps-education-and-work-plan-prod-to-ap-s3
+  enabled: false
