@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
@@ -11,11 +11,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Hopin
 
 @Component
 class CiagInductionResponseMapper(
-  private val workOnReleaseMapper: WorkOnReleaseResourceMapper,
+  private val workOnReleaseMapper: CiagWorkOnReleaseResourceMapper,
   private val qualificationsAndTrainingMapper: QualificationsAndTrainingResourceMapper,
-  private val workExperiencesMapper: PreviousWorkExperiencesResourceMapper,
-  private val inPrisonInterestsMapper: InPrisonInterestsResourceMapper,
-  private val skillsAndInterestsMapper: PersonalSkillsAndInterestsResourceMapper,
+  private val workExperiencesMapper: CiagWorkExperiencesResourceMapper,
+  private val inPrisonInterestsMapper: CiagInPrisonInterestsResourceMapper,
+  private val skillsAndInterestsMapper: CiagSkillsAndInterestsResourceMapper,
   private val instantMapper: InstantMapper,
 ) {
   fun fromDomainToModel(inductionDomain: Induction): CiagInductionResponse {

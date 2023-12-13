@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Perso
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType as PersonalSkillApi
 
 @Component
-class PersonalSkillsAndInterestsResourceMapper(
+class CiagSkillsAndInterestsResourceMapper(
   private val instantMapper: InstantMapper,
 ) {
   fun toCreatePersonalSkillsAndInterestsDto(

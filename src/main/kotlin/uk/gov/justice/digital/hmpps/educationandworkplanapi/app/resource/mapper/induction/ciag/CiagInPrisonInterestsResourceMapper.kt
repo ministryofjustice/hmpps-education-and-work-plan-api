@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPri
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType as InPrisonWorkTypeApi
 
 @Component
-class InPrisonInterestsResourceMapper(
+class CiagInPrisonInterestsResourceMapper(
   val instantMapper: InstantMapper,
 ) {
 

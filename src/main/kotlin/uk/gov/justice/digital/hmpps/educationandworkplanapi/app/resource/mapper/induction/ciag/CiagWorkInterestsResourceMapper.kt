@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 
 @Component
-class FutureWorkInterestsResourceMapper {
+class CiagWorkInterestsResourceMapper {
   fun toCreateFutureWorkInterestsDto(request: CreateWorkInterestsRequest?, prisonId: String): CreateFutureWorkInterestsDto? =
     request?.let {
       CreateFutureWorkInterestsDto(

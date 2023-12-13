@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.CiagInductionResponseMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.CreateCiagInductionRequestMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.UpdateCiagInductionRequestMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag.CiagInductionResponseMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag.CreateCiagInductionRequestMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag.UpdateCiagInductionRequestMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryListResponse
@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 
 @RestController
 @RequestMapping(value = ["/ciag/induction"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class InductionController(
+class CiagInductionController(
   private val inductionService: InductionService,
   private val createInductionRequestMapper: CreateCiagInductionRequestMapper,
   private val updateInductionRequestMapper: UpdateCiagInductionRequestMapper,

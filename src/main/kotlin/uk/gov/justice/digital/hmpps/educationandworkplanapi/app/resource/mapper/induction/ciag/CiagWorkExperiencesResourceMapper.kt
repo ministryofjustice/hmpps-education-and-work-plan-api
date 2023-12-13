@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Wor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience as WorkExperienceApi
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-abstract class PreviousWorkExperiencesResourceMapper {
+abstract class CiagWorkExperiencesResourceMapper {
 
   fun toCreatePreviousWorkExperiencesDto(
     request: CreatePreviousWorkRequest?,

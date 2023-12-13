@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -22,8 +22,8 @@ import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperienceType as WorkExperienceTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType as WorkInterestTypeDomain
 
-class PreviousWorkExperiencesResourceMapperTest {
-  private val mapper = PreviousWorkExperiencesResourceMapperImpl()
+class CiagWorkExperiencesResourceMapperTest {
+  private val mapper = CiagWorkExperiencesResourceMapperImpl()
 
   @Test
   fun `should map to CreatePreviousWorkExperiencesDto`() {
