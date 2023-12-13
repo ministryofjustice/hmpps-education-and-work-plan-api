@@ -275,4 +275,17 @@ class QualificationsAndTrainingResourceMapperTest {
     assertThat(actual.trainingTypes).isEqualTo(expectedTrainingTypes)
     assertThat(actual.trainingTypeOther).isEqualTo("Any training")
   }
+
+  @Test
+  fun `should not map to UpdatePreviousTrainingDto given null request`() {
+    // Given
+    val prisonId = "BXI"
+    val request = null
+
+    // When
+    val actual = mapper.toUpdatePreviousTrainingDto(request, prisonId)
+
+    // Then
+    assertThat(actual).isNull()
+  }
 }

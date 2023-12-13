@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.1'
+  version: '1.7.2'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -202,11 +202,11 @@ paths:
       deprecated: true
       summary: Updates an Induction for a Prisoner.
       description: |
-        Provides the ability to update a Prisoner's Induction. Completely overwrites the existing Prisoner's Induction with the
-        information provided in the update request. If a field is not included in the update request, it will be removed from the 
-        database, effectively making the update request the authoritative source of information. This endpoint has been migrated
-        from the `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking
-        the CIAG UI when it points to this endpoint.
+        Provides the ability to update a Prisoner's Induction. If a field (or "child" object) is provided in the request, it will
+        completely overwrite the existing value. Conversely, if a field is not included in the request, then the existing value
+        will remain untouched (including its updatedAt/updatedBy values). This endpoint has been migrated from the
+        `hmpps-ciag-careers-induction-api` and the data structure has been kept the same in order to prevent breaking the CIAG
+        UI when it points to this endpoint.
       tags:
         - Legacy Inductions
       responses:
