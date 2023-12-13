@@ -20,3 +20,5 @@ generic-service:
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
+
+exportToApServiceAccountName: hmpps-education-and-work-plan-dev-to-ap-s3
