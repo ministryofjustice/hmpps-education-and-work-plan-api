@@ -53,3 +53,5 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-education-and-work-plan-api
+
+exportToApServiceAccountName: hmpps-education-and-work-plan-prod-to-ap-s3
