@@ -45,18 +45,8 @@ spec:
                 - name: S3_DESTINATION
                   valueFrom:
                     secretKeyRef:
-                      name: analytical-platform-reporting-s3-bucket
+                      name: analytical-platform-reporting-s3-irsa
                       key: destination_bucket
-                - name: AWS_ACCESS_KEY_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: analytical-platform-reporting-s3-bucket
-                      key: access_key_id
-                - name: AWS_SECRET_ACCESS_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: analytical-platform-reporting-s3-bucket
-                      key: secret_access_key
                 - name: AWS_DEFAULT_REGION
                   value: eu-west-2
                 - name: SAVE_EVENTS_LOG
