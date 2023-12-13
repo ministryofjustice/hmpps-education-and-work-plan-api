@@ -39,7 +39,7 @@ data class Qualification(
   val level: QualificationLevel,
   val grade: String,
 ) : KeyAwareDomain {
-  override fun key(): String = subject
+  override fun key(): String = "${subject.trim()},$level".uppercase()
 }
 
 enum class QualificationLevel {
