@@ -172,7 +172,7 @@ class QualificationEntity(
     this.parent = parent as PreviousQualificationsEntity
   }
 
-  override fun key(): String = subject!!
+  override fun key(): String = "${subject?.trim()},$level".uppercase()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

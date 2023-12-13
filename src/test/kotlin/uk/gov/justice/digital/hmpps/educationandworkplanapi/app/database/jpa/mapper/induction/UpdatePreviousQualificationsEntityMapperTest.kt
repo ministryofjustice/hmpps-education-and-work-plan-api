@@ -33,28 +33,39 @@ class UpdatePreviousQualificationsEntityMapperTest {
   fun `should update existing qualifications`() {
     // Given
     val qualificationReference = UUID.randomUUID()
-    val qualificationEntity = aValidQualificationEntity(
+    val existingQualificationEntity1 = aValidQualificationEntity(
       reference = qualificationReference,
       subject = "English",
       level = QualificationLevelEntity.LEVEL_3,
       grade = "A",
     )
+    val existingQualificationEntity2 = aValidQualificationEntity(
+      reference = qualificationReference,
+      subject = "Maths",
+      level = QualificationLevelEntity.LEVEL_2,
+      grade = "B",
+    )
     val existingQualificationsReference = UUID.randomUUID()
     val existingQualificationsEntity = aValidPreviousQualificationsEntity(
       reference = existingQualificationsReference,
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = mutableListOf(qualificationEntity),
+      qualifications = mutableListOf(existingQualificationEntity1, existingQualificationEntity2),
     )
 
     val updatedQualification = aValidQualification(
-      subject = "English",
+      subject = "ENGLISH", // ensure case is ignored
+      level = QualificationLevelDomain.LEVEL_3,
+      grade = "B",
+    )
+    val unchangedQualification = aValidQualification(
+      subject = "Maths",
       level = QualificationLevelDomain.LEVEL_2,
       grade = "B",
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
       reference = qualificationReference,
       educationLevel = HighestEducationLevelDomain.FURTHER_EDUCATION_COLLEGE,
-      qualifications = listOf(updatedQualification),
+      qualifications = listOf(updatedQualification, unchangedQualification),
       prisonId = "MDI",
     )
 
@@ -63,11 +74,12 @@ class UpdatePreviousQualificationsEntityMapperTest {
       reference = reference
       educationLevel = HighestEducationLevelEntity.FURTHER_EDUCATION_COLLEGE
       qualifications = mutableListOf(
-        qualificationEntity.deepCopy().apply {
-          subject = "English"
-          level = QualificationLevelEntity.LEVEL_2
+        existingQualificationEntity1.deepCopy().apply {
+          subject = "ENGLISH"
+          level = QualificationLevelEntity.LEVEL_3
           grade = "B"
         },
+        existingQualificationEntity2.deepCopy(),
       )
       createdAtPrison = "BXI"
       updatedAtPrison = "MDI"
@@ -81,36 +93,35 @@ class UpdatePreviousQualificationsEntityMapperTest {
   }
 
   @Test
-  fun `should add new qualification`() {
+  fun `should update existing qualification and add new qualification`() {
     // Given
     val qualificationReference = UUID.randomUUID()
-    val qualificationEntity = aValidQualificationEntity(
-      reference = qualificationReference,
-      subject = "English",
-      level = QualificationLevelEntity.LEVEL_3,
-      grade = "A",
-    )
-    val existingQualificationsReference = UUID.randomUUID()
     val existingQualificationsEntity = aValidPreviousQualificationsEntity(
-      reference = existingQualificationsReference,
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = mutableListOf(qualificationEntity),
+      qualifications = mutableListOf(
+        aValidQualificationEntity(
+          reference = qualificationReference,
+          subject = "English",
+          level = QualificationLevelEntity.LEVEL_3,
+          grade = "A",
+        ),
+      ),
     )
 
-    val existingQualification = aValidQualification(
+    val updatedQualification = aValidQualification(
       subject = "English",
-      level = QualificationLevelDomain.LEVEL_3,
-      grade = "A",
+      level = QualificationLevelDomain.LEVEL_3, // same level as above, so the grade should be updated
+      grade = "B",
     )
     val newQualification = aValidQualification(
-      subject = "Maths",
-      level = QualificationLevelDomain.LEVEL_2,
-      grade = "B",
+      subject = "English",
+      level = QualificationLevelDomain.LEVEL_2, // different level, so should appear as a new qualification
+      grade = "C",
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
       reference = qualificationReference,
       educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
-      qualifications = listOf(existingQualification, newQualification),
+      qualifications = listOf(updatedQualification, newQualification),
       prisonId = "MDI",
     )
 
@@ -122,12 +133,12 @@ class UpdatePreviousQualificationsEntityMapperTest {
         aValidQualificationEntity(
           subject = "English",
           level = QualificationLevelEntity.LEVEL_3,
-          grade = "A",
+          grade = "B", // updated grade
         ),
         aValidQualificationEntity(
-          subject = "Maths",
+          subject = "English",
           level = QualificationLevelEntity.LEVEL_2,
-          grade = "B",
+          grade = "C", // new qualification
         ),
       )
       createdAtPrison = "BXI"
