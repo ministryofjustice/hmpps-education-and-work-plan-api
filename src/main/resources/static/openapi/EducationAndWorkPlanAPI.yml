@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.2'
+  version: '1.7.3'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -279,6 +279,24 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-prisoner-induction
+    put:
+      summary: Updates an Induction for a Prisoner.
+      description: |
+        Provides the ability to update a Prisoner's Induction. If a field (or "child" object) is provided in the request,
+        it will completely overwrite the existing value. Conversely, if a field is not included in the request, then
+        the existing value will remain untouched (including its updatedAt/updatedBy values).
+      tags:
+        - Inductions
+      responses:
+        '204':
+          description: Induction updated successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: update-prisoner-induction
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateInduction'
 
 #
 # --------------------------------------------------------------------------------
@@ -878,10 +896,6 @@ components:
           format: uuid
           description: A unique reference for this Induction.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
-        prisonNumber:
-          type: string
-          description: The ID of the prisoner
-          example: 'A1234BC'
         workOnRelease:
           $ref: '#/components/schemas/WorkOnReleaseResponse'
         previousQualifications:
@@ -2308,6 +2322,105 @@ components:
       required:
         - interests
 
+    UpdateInductionRequest:
+      title: UpdateInductionRequest
+      description: A request to update a Prisoner's Induction.
+      type: object
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The Induction's unique reference.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        workOnRelease:
+          $ref: '#/components/schemas/UpdateWorkOnReleaseRequest'
+        previousQualifications:
+          $ref: '#/components/schemas/UpdatePreviousQualificationsRequest'
+        previousTraining:
+          $ref: '#/components/schemas/UpdatePreviousTrainingRequest'
+        previousWorkExperiences:
+          $ref: '#/components/schemas/UpdatePreviousWorkExperiencesRequest'
+        inPrisonInterests:
+          $ref: '#/components/schemas/UpdateInPrisonInterestsRequest'
+        personalSkillsAndInterests:
+          $ref: '#/components/schemas/UpdatePersonalSkillsAndInterestsRequest'
+        futureWorkInterests:
+          $ref: '#/components/schemas/UpdateFutureWorkInterestsRequest'
+      required:
+        - reference
+    UpdateWorkOnReleaseRequest:
+      description: A request to update a Prisoner's views on obtaining work after release.
+      allOf:
+        - $ref: '#/components/schemas/CreateWorkOnReleaseRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a WorkOnRelease resource.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+      required:
+        - reference
+    UpdatePreviousQualificationsRequest:
+      description: A request to update a Prisoner's qualifications.
+      allOf:
+        - $ref: '#/components/schemas/CreatePreviousQualificationsRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a PreviousQualifications resource (if it already exists).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+    UpdatePreviousTrainingRequest:
+      description: A request to update a Prisoner's previous training.
+      allOf:
+        - $ref: '#/components/schemas/CreatePreviousTrainingRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a PreviousTraining resource (if it already exists).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+    UpdatePreviousWorkExperiencesRequest:
+      description: A request to update a Prisoner's previous work experience.
+      allOf:
+        - $ref: '#/components/schemas/CreatePreviousWorkExperiencesRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a PreviousWorkExperiences resource (if it already exists).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+    UpdateInPrisonInterestsRequest:
+      description: A request to update a Prisoner's in-prison interests. If this object is provided in the request, then at least one type of in-prison work/interest is required ('OTHER' can be provided with a reason).
+      allOf:
+        - $ref: '#/components/schemas/CreateInPrisonInterestsRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a InPrisonInterests resource (if it already exists).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+    UpdatePersonalSkillsAndInterestsRequest:
+      description: A request to update a Prisoner's personal skills and interests. If this object is provided in the request, then at least one type of skill/interest is required (even if it's just 'NONE').
+      allOf:
+        - $ref: '#/components/schemas/CreatePersonalSkillsAndInterestsRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a PersonalSkillsAndInterests resource (if it already exists).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+    UpdateFutureWorkInterestsRequest:
+      description: A request to update a Prisoner's future work interests.
+      allOf:
+        - $ref: '#/components/schemas/CreateFutureWorkInterestsRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for a FutureWorkInterests resource (if it already exists).
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -2536,3 +2649,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateInductionRequest'
+    UpdateInduction:
+      description: Request body to update a Prisoner's Induction.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateInductionRequest'
