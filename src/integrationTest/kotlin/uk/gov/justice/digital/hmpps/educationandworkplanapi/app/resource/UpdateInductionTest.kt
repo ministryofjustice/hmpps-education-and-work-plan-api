@@ -544,7 +544,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
       .wasCreatedAt(persistedInduction.createdDateTime)
-      .wasLastModifiedAt(persistedInduction.modifiedDateTime) // should be unchanged
+      .wasLastModifiedAfter(persistedInduction.modifiedDateTime)
 
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.workExperience!!.modifiedDateTime)
@@ -683,7 +683,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .hasPrisonId("BXI")
       .wasModifiedBy("auser_gen")
       .wasCreatedAt(persistedInduction.createdDateTime)
-      .wasLastModifiedAt(persistedInduction.modifiedDateTime)
+      .wasLastModifiedAfter(persistedInduction.modifiedDateTime)
     assertThat(updatedInduction.workExperience).isEquivalentTo(expectedWorkExperience)
     assertThat(updatedInduction.workExperience!!.modifiedDateTime).isAfter(persistedInduction.createdDateTime)
     assertThat(updatedInduction.skillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
@@ -692,6 +692,46 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.qualificationsAndTraining!!.modifiedDateTime).isAfter(persistedInduction.qualificationsAndTraining!!.modifiedDateTime)
     assertThat(updatedInduction.inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
     assertThat(updatedInduction.inPrisonInterests!!.modifiedDateTime).isAfter(persistedInduction.createdDateTime)
+  }
+
+  @Test
+  fun `should update JPA managed fields after calling update induction with no changes`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(
+      prisonNumber,
+      aValidCreateCiagInductionRequest(),
+    )
+    val persistedInduction = getInduction(prisonNumber)
+    val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
+      originalInduction = persistedInduction,
+    )
+    shortDelayForTimestampChecking()
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = "buser_gen",
+          displayName = "Bertie User",
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val updatedInduction = getInduction(prisonNumber)
+    assertThat(updatedInduction)
+      .hasReference(persistedInduction.reference)
+      .hasHopingToGetWork(HopingToWork.NOT_SURE)
+      .hasPrisonId("BXI")
+      .wasModifiedBy("buser_gen")
+      .wasCreatedAt(persistedInduction.createdDateTime)
+      .wasLastModifiedAfter(persistedInduction.modifiedDateTime)
   }
 
   private fun aValidUpdateInductionRequestBasedOn(
