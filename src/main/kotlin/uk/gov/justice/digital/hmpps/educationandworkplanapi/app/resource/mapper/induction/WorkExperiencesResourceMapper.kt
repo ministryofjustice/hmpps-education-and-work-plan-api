@@ -6,6 +6,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkExperiencesRequest
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-interface WorkExperiencesResourceMapper {
-  fun toCreatePreviousWorkExperiencesDto(request: CreatePreviousWorkExperiencesRequest?, prisonId: String): CreatePreviousWorkExperiencesDto?
+abstract class WorkExperiencesResourceMapper {
+  fun toCreatePreviousWorkExperiencesDto(
+    request: CreatePreviousWorkExperiencesRequest?,
+    prisonId: String,
+  ): CreatePreviousWorkExperiencesDto? {
+    return if (request == null) {
+      null
+    } else {
+      convertToCreatePreviousWorkExperiencesDto(request, prisonId)
+    }
+  }
+
+  abstract fun convertToCreatePreviousWorkExperiencesDto(
+    request: CreatePreviousWorkExperiencesRequest?,
+    prisonId: String,
+  ): CreatePreviousWorkExperiencesDto?
 }

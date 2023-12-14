@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ciag
 
 import aValidUpdatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
@@ -59,7 +59,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.util.UUID
 
-class UpdateInductionTest : IntegrationTestBase() {
+class UpdateCiagInductionTest : IntegrationTestBase() {
 
   companion object {
     private const val URI_TEMPLATE = "/ciag/induction/{prisonNumber}"

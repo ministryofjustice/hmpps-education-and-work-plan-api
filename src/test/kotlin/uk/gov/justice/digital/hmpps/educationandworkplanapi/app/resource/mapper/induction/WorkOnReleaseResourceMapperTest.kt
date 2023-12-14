@@ -7,9 +7,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.AffectAbilityToWork as AffectAbilityToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HopingToWork as HopingToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.NotHopingToWorkReason as NotHopingToWorkReasonDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AffectAbilityToWork as AffectAbilityToWorkApi
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NotHopingToWorkReason as NotHopingToWorkReasonApi
 
 class WorkOnReleaseResourceMapperTest {
 
@@ -19,13 +16,7 @@ class WorkOnReleaseResourceMapperTest {
   fun `should map to CreateWorkOnReleaseDto`() {
     // Given
     val prisonId = "BXI"
-    val createWorkOnReleaseRequest = aValidCreateWorkOnReleaseRequest(
-      hopingToWork = HopingToWorkApi.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonApi.OTHER),
-      notHopingToWorkOtherReason = "Long term prison sentence",
-      affectAbilityToWork = listOf(AffectAbilityToWorkApi.OTHER),
-      affectAbilityToWorkOther = "Employers aren't interested",
-    )
+    val createWorkOnReleaseRequest = aValidCreateWorkOnReleaseRequest()
     val expected = aValidCreateWorkOnReleaseDto(
       hopingToWork = HopingToWorkDomain.NO,
       notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
