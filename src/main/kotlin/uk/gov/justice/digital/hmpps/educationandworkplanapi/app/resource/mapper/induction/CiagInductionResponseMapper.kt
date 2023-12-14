@@ -42,12 +42,8 @@ class CiagInductionResponseMapper(
         inPrisonInterests = inPrisonInterestsMapper.toPrisonWorkAndEducationResponse(inPrisonInterests),
         createdBy = createdBy!!,
         createdDateTime = instantMapper.toOffsetDateTime(createdAt)!!,
-        // The main Induction domain object is immutable (the data that can be changed belongs in associated "child"
-        // objects). However, the CIAG API stores details regarding a prisoner's work aspirations at the root level,
-        // which means that any changes to these values needs to be reflected in the "modified" fields of the root
-        // Induction in the response.
-        modifiedBy = workOnRelease.lastUpdatedBy!!,
-        modifiedDateTime = instantMapper.toOffsetDateTime(workOnRelease.lastUpdatedAt)!!,
+        modifiedBy = lastUpdatedBy!!,
+        modifiedDateTime = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
       )
     }
   }

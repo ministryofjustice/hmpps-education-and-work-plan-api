@@ -33,6 +33,7 @@ class JpaInductionPersistenceAdapter(
     val inductionEntity = inductionRepository.findByPrisonNumber(updateInductionDto.prisonNumber)
     return if (inductionEntity != null) {
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
+      inductionEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
       val persistedEntity = inductionRepository.saveAndFlush(inductionEntity)
       inductionMapper.fromEntityToDomain(persistedEntity)
     } else {

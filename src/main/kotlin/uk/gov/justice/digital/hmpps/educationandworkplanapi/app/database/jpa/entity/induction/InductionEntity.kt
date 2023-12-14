@@ -106,6 +106,10 @@ class InductionEntity(
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
 ) {
+  fun updateLastUpdatedAt() {
+    updatedAt = Instant.now()
+  }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
