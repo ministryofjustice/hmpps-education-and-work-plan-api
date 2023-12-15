@@ -190,13 +190,13 @@ class InductionEntityMapperTest {
 
     // Then
     assertThat(existingInductionEntity).isEqualToComparingAllFields(expectedInductionEntity)
-    verify(futureWorkInterestsEntityMapper).updateEntityFromDto(existingInductionEntity.futureWorkInterests, updateInductionDto.futureWorkInterests)
-    verify(inPrisonInterestsEntityMapper).updateEntityFromDto(existingInductionEntity.inPrisonInterests, updateInductionDto.inPrisonInterests)
-    verify(personalSkillsAndInterestsEntityMapper).updateEntityFromDto(existingInductionEntity.personalSkillsAndInterests, updateInductionDto.personalSkillsAndInterests)
-    verify(previousQualificationsEntityMapper).updateEntityFromDto(existingInductionEntity.previousQualifications, updateInductionDto.previousQualifications)
-    verify(previousTrainingEntityMapper).updateEntityFromDto(existingInductionEntity.previousTraining, updateInductionDto.previousTraining)
-    verify(previousWorkExperiencesEntityMapper).updateEntityFromDto(existingInductionEntity.previousWorkExperiences, updateInductionDto.previousWorkExperiences)
-    verify(workOnReleaseEntityMapper).updateEntityFromDto(existingInductionEntity.workOnRelease!!, updateInductionDto.workOnRelease)
+    verify(futureWorkInterestsEntityMapper).updateExistingEntityFromDto(existingInductionEntity.futureWorkInterests!!, updateInductionDto.futureWorkInterests)
+    verify(inPrisonInterestsEntityMapper).updateExistingEntityFromDto(existingInductionEntity.inPrisonInterests!!, updateInductionDto.inPrisonInterests)
+    verify(personalSkillsAndInterestsEntityMapper).updateExistingEntityFromDto(existingInductionEntity.personalSkillsAndInterests!!, updateInductionDto.personalSkillsAndInterests)
+    verify(previousQualificationsEntityMapper).updateExistingEntityFromDto(existingInductionEntity.previousQualifications!!, updateInductionDto.previousQualifications)
+    verify(previousTrainingEntityMapper).updateExistingEntityFromDto(existingInductionEntity.previousTraining!!, updateInductionDto.previousTraining)
+    verify(previousWorkExperiencesEntityMapper).updateExistingEntityFromDto(existingInductionEntity.previousWorkExperiences!!, updateInductionDto.previousWorkExperiences)
+    verify(workOnReleaseEntityMapper).updateExistingEntityFromDto(existingInductionEntity.workOnRelease!!, updateInductionDto.workOnRelease)
   }
 
   @Test

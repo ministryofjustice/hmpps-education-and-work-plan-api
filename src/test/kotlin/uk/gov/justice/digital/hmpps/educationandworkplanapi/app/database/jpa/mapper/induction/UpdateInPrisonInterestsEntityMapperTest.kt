@@ -101,7 +101,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
+    mapper.updateExistingEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -180,7 +180,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
+    mapper.updateExistingEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -241,7 +241,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
+    mapper.updateExistingEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
 
     // Then
     assertThat(existingInPrisonInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)

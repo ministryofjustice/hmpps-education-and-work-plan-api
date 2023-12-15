@@ -59,8 +59,8 @@ abstract class PreviousQualificationsEntityMapper {
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "qualifications", expression = "java( updateQualifications(entity, dto) )")
-  abstract fun updateEntityFromDto(
-    @MappingTarget entity: PreviousQualificationsEntity?,
+  abstract fun updateExistingEntityFromDto(
+    @MappingTarget entity: PreviousQualificationsEntity,
     dto: UpdatePreviousQualificationsDto?,
   )
 
@@ -84,7 +84,7 @@ abstract class PreviousQualificationsEntityMapper {
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "qualifications", ignore = true)
-  abstract fun fromUpdateDtoToEntity(previousQualifications: UpdatePreviousQualificationsDto?): PreviousQualificationsEntity?
+  abstract fun fromUpdateDtoToNewEntity(previousQualifications: UpdatePreviousQualificationsDto?): PreviousQualificationsEntity?
 
   @Named("addNewQualificationsDuringUpdate")
   @AfterMapping

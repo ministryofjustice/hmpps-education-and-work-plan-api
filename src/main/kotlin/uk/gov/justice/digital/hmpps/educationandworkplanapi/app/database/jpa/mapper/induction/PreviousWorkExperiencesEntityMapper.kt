@@ -60,8 +60,8 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "experiences", expression = "java( updateWorkExperiences(entity, dto) )")
-  abstract fun updateEntityFromDto(
-    @MappingTarget entity: PreviousWorkExperiencesEntity?,
+  abstract fun updateExistingEntityFromDto(
+    @MappingTarget entity: PreviousWorkExperiencesEntity,
     dto: UpdatePreviousWorkExperiencesDto?,
   )
 
@@ -85,7 +85,7 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "experiences", ignore = true)
-  abstract fun fromUpdateDtoToEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity?
+  abstract fun fromUpdateDtoToNewEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity?
 
   @Named("addNewExperiencesDuringUpdate")
   @AfterMapping

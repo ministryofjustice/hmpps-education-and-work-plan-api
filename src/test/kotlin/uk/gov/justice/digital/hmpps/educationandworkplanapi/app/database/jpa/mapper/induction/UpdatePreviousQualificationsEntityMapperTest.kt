@@ -86,7 +86,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
+    mapper.updateExistingEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
 
     // Then
     assertThat(existingQualificationsEntity).isEqualToComparingAllFields(expectedEntity)
@@ -146,7 +146,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
+    mapper.updateExistingEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
 
     // Then
     assertThat(existingQualificationsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -196,7 +196,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
+    mapper.updateExistingEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
 
     // Then
     assertThat(existingQualificationsEntity).isEqualToComparingAllFields(expectedEntity)

@@ -72,7 +72,7 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
+    mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -113,7 +113,7 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
+    mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -176,7 +176,7 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updateExperiencesDto)
+    mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updateExperiencesDto)
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -227,7 +227,7 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousWorkExperiencesEntity, updatePreviousWorkExperiencesDto)
+    mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updatePreviousWorkExperiencesDto)
 
     // Then
     assertThat(existingPreviousWorkExperiencesEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)

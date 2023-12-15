@@ -88,59 +88,61 @@ abstract class InductionEntityMapper {
 
   fun updateFutureWorkInterests(entity: InductionEntity, dto: UpdateInductionDto): FutureWorkInterestsEntity? {
     return if (entity.futureWorkInterests == null) {
-      futureWorkInterestsEntityMapper.fromUpdateDtoToEntity(dto.futureWorkInterests)
+      // if the Induction previously didn't have FutureWorkInterests (e.g. because the prisoner didn't want to work), then create a new FutureWorkInterests
+      futureWorkInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.futureWorkInterests)
     } else {
-      futureWorkInterestsEntityMapper.updateEntityFromDto(entity.futureWorkInterests, dto.futureWorkInterests)
+      // else update the existing FutureWorkInterests
+      futureWorkInterestsEntityMapper.updateExistingEntityFromDto(entity.futureWorkInterests!!, dto.futureWorkInterests)
         .let { entity.futureWorkInterests }
     }
   }
 
   fun updateInPrisonInterests(entity: InductionEntity, dto: UpdateInductionDto): InPrisonInterestsEntity? {
     return if (entity.inPrisonInterests == null) {
-      inPrisonInterestsEntityMapper.fromUpdateDtoToEntity(dto.inPrisonInterests)
+      inPrisonInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.inPrisonInterests)
     } else {
-      inPrisonInterestsEntityMapper.updateEntityFromDto(entity.inPrisonInterests, dto.inPrisonInterests)
+      inPrisonInterestsEntityMapper.updateExistingEntityFromDto(entity.inPrisonInterests!!, dto.inPrisonInterests)
         .let { entity.inPrisonInterests }
     }
   }
 
   fun updatePersonalSkillsAndInterests(entity: InductionEntity, dto: UpdateInductionDto): PersonalSkillsAndInterestsEntity? {
     return if (entity.personalSkillsAndInterests == null) {
-      skillsAndInterestsEntityMapper.fromUpdateDtoToEntity(dto.personalSkillsAndInterests)
+      skillsAndInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.personalSkillsAndInterests)
     } else {
-      skillsAndInterestsEntityMapper.updateEntityFromDto(entity.personalSkillsAndInterests, dto.personalSkillsAndInterests)
+      skillsAndInterestsEntityMapper.updateExistingEntityFromDto(entity.personalSkillsAndInterests!!, dto.personalSkillsAndInterests)
         .let { entity.personalSkillsAndInterests }
     }
   }
 
   fun updatePreviousQualifications(entity: InductionEntity, dto: UpdateInductionDto): PreviousQualificationsEntity? {
     return if (entity.previousQualifications == null) {
-      previousQualificationsEntityMapper.fromUpdateDtoToEntity(dto.previousQualifications)
+      previousQualificationsEntityMapper.fromUpdateDtoToNewEntity(dto.previousQualifications)
     } else {
-      previousQualificationsEntityMapper.updateEntityFromDto(entity.previousQualifications, dto.previousQualifications)
+      previousQualificationsEntityMapper.updateExistingEntityFromDto(entity.previousQualifications!!, dto.previousQualifications)
         .let { entity.previousQualifications }
     }
   }
 
   fun updatePreviousTraining(entity: InductionEntity, dto: UpdateInductionDto): PreviousTrainingEntity? {
     return if (entity.previousTraining == null) {
-      previousTrainingEntityMapper.fromUpdateDtoToEntity(dto.previousTraining)
+      previousTrainingEntityMapper.fromUpdateDtoToNewEntity(dto.previousTraining)
     } else {
-      previousTrainingEntityMapper.updateEntityFromDto(entity.previousTraining, dto.previousTraining)
+      previousTrainingEntityMapper.updateExistingEntityFromDto(entity.previousTraining!!, dto.previousTraining)
         .let { entity.previousTraining }
     }
   }
 
   fun updatePreviousWorkExperiences(entity: InductionEntity, dto: UpdateInductionDto): PreviousWorkExperiencesEntity? {
     return if (entity.previousWorkExperiences == null) {
-      workExperiencesEntityMapper.fromUpdateDtoToEntity(dto.previousWorkExperiences)
+      workExperiencesEntityMapper.fromUpdateDtoToNewEntity(dto.previousWorkExperiences)
     } else {
-      workExperiencesEntityMapper.updateEntityFromDto(entity.previousWorkExperiences, dto.previousWorkExperiences)
+      workExperiencesEntityMapper.updateExistingEntityFromDto(entity.previousWorkExperiences!!, dto.previousWorkExperiences)
         .let { entity.previousWorkExperiences }
     }
   }
 
   fun updateWorkOnRelease(entity: InductionEntity, dto: UpdateInductionDto): WorkOnReleaseEntity? =
-    workOnReleaseEntityMapper.updateEntityFromDto(entity.workOnRelease!!, dto.workOnRelease)
+    workOnReleaseEntityMapper.updateExistingEntityFromDto(entity.workOnRelease!!, dto.workOnRelease)
       .let { entity.workOnRelease }
 }

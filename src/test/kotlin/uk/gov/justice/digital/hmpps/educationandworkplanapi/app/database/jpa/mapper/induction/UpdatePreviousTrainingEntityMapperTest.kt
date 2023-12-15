@@ -45,7 +45,7 @@ class UpdatePreviousTrainingEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
+    mapper.updateExistingEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
 
     // Then
     assertThat(existingPreviousTrainingEntity).isEqualToComparingAllFields(expectedEntity)
@@ -77,7 +77,7 @@ class UpdatePreviousTrainingEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
+    mapper.updateExistingEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
 
     // Then
     assertThat(existingPreviousTrainingEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -109,7 +109,7 @@ class UpdatePreviousTrainingEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
+    mapper.updateExistingEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
 
     // Then
     assertThat(existingPreviousTrainingEntity).isEqualToComparingAllFields(expectedEntity)

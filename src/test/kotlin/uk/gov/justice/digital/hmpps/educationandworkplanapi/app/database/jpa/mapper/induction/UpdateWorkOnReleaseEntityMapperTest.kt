@@ -53,7 +53,7 @@ class UpdateWorkOnReleaseEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
+    mapper.updateExistingEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
 
     // Then
     assertThat(existingWorkOnReleaseEntity).isEqualToComparingAllFields(expectedEntity)
@@ -95,7 +95,7 @@ class UpdateWorkOnReleaseEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
+    mapper.updateExistingEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
 
     // Then
     assertThat(existingWorkOnReleaseEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -137,7 +137,7 @@ class UpdateWorkOnReleaseEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
+    mapper.updateExistingEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
 
     // Then
     assertThat(existingWorkOnReleaseEntity).isEqualToComparingAllFields(expectedEntity)

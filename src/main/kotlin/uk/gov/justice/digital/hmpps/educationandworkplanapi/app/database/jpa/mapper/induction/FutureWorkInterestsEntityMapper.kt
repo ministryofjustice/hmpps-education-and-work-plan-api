@@ -58,8 +58,8 @@ abstract class FutureWorkInterestsEntityMapper {
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "interests", expression = "java( updateInterests(entity, dto) )")
-  abstract fun updateEntityFromDto(
-    @MappingTarget entity: FutureWorkInterestsEntity?,
+  abstract fun updateExistingEntityFromDto(
+    @MappingTarget entity: FutureWorkInterestsEntity,
     dto: UpdateFutureWorkInterestsDto?,
   )
 
@@ -80,7 +80,7 @@ abstract class FutureWorkInterestsEntityMapper {
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "interests", ignore = true)
-  abstract fun fromUpdateDtoToEntity(dto: UpdateFutureWorkInterestsDto?): FutureWorkInterestsEntity
+  abstract fun fromUpdateDtoToNewEntity(dto: UpdateFutureWorkInterestsDto?): FutureWorkInterestsEntity
 
   @Named("addNewInterestsDuringUpdate")
   @AfterMapping

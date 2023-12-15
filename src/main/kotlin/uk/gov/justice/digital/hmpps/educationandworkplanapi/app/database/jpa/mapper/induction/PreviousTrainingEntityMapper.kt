@@ -38,13 +38,13 @@ interface PreviousTrainingEntityMapper {
   @ExcludeReferenceField
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun updateEntityFromDto(@MappingTarget entity: PreviousTrainingEntity?, dto: UpdatePreviousTrainingDto?)
+  fun updateExistingEntityFromDto(@MappingTarget entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto?)
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromUpdateDtoToEntity(previousTraining: UpdatePreviousTrainingDto?): PreviousTrainingEntity?
+  fun fromUpdateDtoToNewEntity(previousTraining: UpdatePreviousTrainingDto?): PreviousTrainingEntity?
 }
 
 @Mapper
