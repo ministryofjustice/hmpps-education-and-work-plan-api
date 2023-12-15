@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -7,8 +7,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Hop
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.NotHopingToWorkReason
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
 
-class WorkOnReleaseResourceMapperTest {
-  private val mapper = WorkOnReleaseResourceMapperImpl()
+class CiagWorkOnReleaseResourceMapperTest {
+  private val mapper = CiagWorkOnReleaseResourceMapperImpl()
 
   @Test
   fun `should map to PreviousTrainingDto`() {

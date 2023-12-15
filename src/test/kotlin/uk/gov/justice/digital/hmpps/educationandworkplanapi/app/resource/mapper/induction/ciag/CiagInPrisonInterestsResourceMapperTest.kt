@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import aValidCreatePrisonWorkAndEducationRequest
 import aValidUpdatePrisonWorkAndEducationRequest
@@ -22,10 +22,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPri
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType as InPrisonWorkTypeApi
 
 @ExtendWith(MockitoExtension::class)
-class InPrisonInterestsResourceMapperTest {
+class CiagInPrisonInterestsResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: InPrisonInterestsResourceMapper
+  private lateinit var mapper: CiagInPrisonInterestsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -9,8 +9,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateWorkInterestsRequest
 
-class FutureWorkInterestsResourceMapperTest {
-  private val mapper = FutureWorkInterestsResourceMapper()
+class CiagWorkInterestsResourceMapperTest {
+  private val mapper = CiagWorkInterestsResourceMapper()
 
   @Test
   fun `should map to CreateFutureWorkInterestsDto`() {

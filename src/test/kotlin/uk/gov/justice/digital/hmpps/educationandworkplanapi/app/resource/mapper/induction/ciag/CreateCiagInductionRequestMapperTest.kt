@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -25,22 +25,22 @@ class CreateCiagInductionRequestMapperTest {
   private lateinit var mapper: CreateCiagInductionRequestMapper
 
   @Mock
-  private lateinit var workOnReleaseMapper: WorkOnReleaseResourceMapper
+  private lateinit var workOnReleaseMapper: CiagWorkOnReleaseResourceMapper
 
   @Mock
   private lateinit var qualificationsAndTrainingMapper: QualificationsAndTrainingResourceMapper
 
   @Mock
-  private lateinit var workExperiencesMapper: PreviousWorkExperiencesResourceMapper
+  private lateinit var workExperiencesMapper: CiagWorkExperiencesResourceMapper
 
   @Mock
-  private lateinit var inPrisonInterestsMapper: InPrisonInterestsResourceMapper
+  private lateinit var inPrisonInterestsMapper: CiagInPrisonInterestsResourceMapper
 
   @Mock
-  private lateinit var skillsAndInterestsMapper: PersonalSkillsAndInterestsResourceMapper
+  private lateinit var skillsAndInterestsMapper: CiagSkillsAndInterestsResourceMapper
 
   @Mock
-  private lateinit var workInterestsMapper: FutureWorkInterestsResourceMapper
+  private lateinit var workInterestsMapper: CiagWorkInterestsResourceMapper
 
   @Test
   fun `should map to createInductionDto`() {

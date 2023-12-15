@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
@@ -6,12 +6,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 
 @Component
 class UpdateCiagInductionRequestMapper(
-  private val workOnReleaseMapper: WorkOnReleaseResourceMapper,
+  private val workOnReleaseMapper: CiagWorkOnReleaseResourceMapper,
   private val qualificationsAndTrainingMapper: QualificationsAndTrainingResourceMapper,
-  private val workExperiencesMapper: PreviousWorkExperiencesResourceMapper,
-  private val inPrisonInterestsMapper: InPrisonInterestsResourceMapper,
-  private val skillsAndInterestsMapper: PersonalSkillsAndInterestsResourceMapper,
-  private val workInterestsMapper: FutureWorkInterestsResourceMapper,
+  private val workExperiencesMapper: CiagWorkExperiencesResourceMapper,
+  private val inPrisonInterestsMapper: CiagInPrisonInterestsResourceMapper,
+  private val skillsAndInterestsMapper: CiagSkillsAndInterestsResourceMapper,
+  private val workInterestsMapper: CiagWorkInterestsResourceMapper,
 ) {
 
   fun toUpdateInductionDto(prisonNumber: String, request: UpdateCiagInductionRequest): UpdateInductionDto {

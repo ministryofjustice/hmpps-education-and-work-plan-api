@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Reaso
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateCiagInductionRequest
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-interface WorkOnReleaseResourceMapper {
+interface CiagWorkOnReleaseResourceMapper {
 
   @Mapping(target = "hopingToWork", source = "hopingToGetWork")
   @Mapping(target = "notHopingToWorkReasons", source = "reasonToNotGetWork")

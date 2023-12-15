@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -24,10 +24,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Per
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill as PersonalSkillDomain
 
 @ExtendWith(MockitoExtension::class)
-class PersonalSkillsAndInterestsResourceMapperTest {
+class CiagSkillsAndInterestsResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: PersonalSkillsAndInterestsResourceMapper
+  private lateinit var mapper: CiagSkillsAndInterestsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
