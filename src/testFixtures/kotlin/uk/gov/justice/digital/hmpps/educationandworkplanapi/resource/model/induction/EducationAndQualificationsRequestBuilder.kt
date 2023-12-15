@@ -38,23 +38,3 @@ fun aValidUpdateEducationAndQualificationsRequest(
   additionalTraining = additionalTraining,
   additionalTrainingOther = additionalTrainingOther,
 )
-
-fun aValidAchievedQualification(
-  subject: String = "English",
-  level: AchievedQualification.Level = AchievedQualification.Level.LEVEL_3,
-  grade: String = "A",
-): AchievedQualification = AchievedQualification(
-  subject = subject,
-  level = level,
-  grade = grade,
-)
-
-fun anotherValidAchievedQualification(
-  subject: String = "Maths",
-  level: AchievedQualification.Level = AchievedQualification.Level.LEVEL_3,
-  grade: String = "B",
-): AchievedQualification = AchievedQualification(
-  subject = subject,
-  level = level,
-  grade = grade,
-)

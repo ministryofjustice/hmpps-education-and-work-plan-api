@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.3'
+  version: '1.7.4'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -973,7 +973,7 @@ components:
           type: array
           description: Reasons the Prisoner has given not to get work after leaving Prison. Can be empty but not null.
           items:
-            $ref: '#/components/schemas/ReasonNotToWork'
+            $ref: '#/components/schemas/NotHopingToWorkReason'
         notHopingToWorkOtherReason:
           type: string
           description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
@@ -981,7 +981,7 @@ components:
           type: array
           description: Factors affecting the Prisoner's ability to work. Can be empty but not null.
           items:
-            $ref: '#/components/schemas/AbilityToWorkFactor'
+            $ref: '#/components/schemas/AffectAbilityToWork'
         affectAbilityToWorkOther:
           type: string
           description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'affectAbilityToWork' includes 'OTHER'.
@@ -1892,11 +1892,11 @@ components:
       description: The details of an individual work experience.
       type: object
       properties:
-        workType:
+        experienceType:
           $ref: '#/components/schemas/WorkType'
-        otherWorkType:
+        experienceTypeOther:
           type: string
-          description: A type of work experience, which is not listed in 'workType' Enum. Mandatory when 'workType' is 'OTHER'.
+          description: A type of work experience, which is not listed in 'experienceType' Enum. Mandatory when 'experienceType' is 'OTHER'.
         role:
           type: string
           description: The role the Prisoner had.
@@ -1981,6 +1981,9 @@ components:
         workTypeOther:
           type: string
           description: A specific type of work interest that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+        role:
+          type: string
+          description: The role within a Prisoner's area of work interest.
       required:
         - workType
 
@@ -2005,8 +2008,35 @@ components:
         - OTHER
         - NONE
 
+    AffectAbilityToWork:
+      title: AffectAbilityToWork
+      description: Factors affecting a prisoner's ability to work.
+      type: string
+      enum:
+        - CARING_RESPONSIBILITIES
+        - LIMITED_BY_OFFENSE
+        - HEALTH_ISSUES
+        - NO_RIGHT_TO_WORK
+        - OTHER
+        - NONE
+
     ReasonNotToWork:
       title: ReasonNotToWork
+      type: string
+      description: Reasons the Prisoner has given not to get work after leaving Prison.
+      enum:
+        - LIMIT_THEIR_ABILITY
+        - FULL_TIME_CARER
+        - LACKS_CONFIDENCE_OR_MOTIVATION
+        - HEALTH
+        - RETIRED
+        - NO_RIGHT_TO_WORK
+        - NOT_SURE
+        - OTHER
+        - NO_REASON
+
+    NotHopingToWorkReason:
+      title: NotHopingToWorkReason
       type: string
       description: Reasons the Prisoner has given not to get work after leaving Prison.
       enum:
@@ -2191,6 +2221,10 @@ components:
       description: A request to create an Induction.
       type: object
       properties:
+        prisonId:
+          type: string
+          description: The identifier of the prison that the prisoner is currently resident at.
+          example: BXI
         workOnRelease:
           $ref: '#/components/schemas/CreateWorkOnReleaseRequest'
         previousQualifications:
@@ -2206,6 +2240,7 @@ components:
         futureWorkInterests:
           $ref: '#/components/schemas/CreateFutureWorkInterestsRequest'
       required:
+        - prisonId
         - workOnRelease
     CreateWorkOnReleaseRequest:
       title: CreateWorkOnReleaseRequest
@@ -2218,7 +2253,7 @@ components:
           type: array
           description: Reasons the Prisoner has given not to get work after leaving Prison.
           items:
-            $ref: '#/components/schemas/ReasonNotToWork'
+            $ref: '#/components/schemas/NotHopingToWorkReason'
         notHopingToWorkOtherReason:
           type: string
           description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
@@ -2226,7 +2261,7 @@ components:
           type: array
           description: Factors affecting the Prisoner's ability to work.
           items:
-            $ref: '#/components/schemas/AbilityToWorkFactor'
+            $ref: '#/components/schemas/AffectAbilityToWork'
         affectAbilityToWorkOther:
           type: string
           description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'affectAbilityToWork' includes 'OTHER'.

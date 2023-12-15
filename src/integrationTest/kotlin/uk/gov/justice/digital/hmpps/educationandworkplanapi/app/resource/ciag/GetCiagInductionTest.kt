@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ciag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
 
-class GetInductionTest : IntegrationTestBase() {
+class GetCiagInductionTest : IntegrationTestBase() {
 
   companion object {
     private const val URI_TEMPLATE = "/ciag/induction/{prisonNumber}"

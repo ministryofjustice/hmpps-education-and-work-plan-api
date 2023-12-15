@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ciag
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
-class GetInductionSummariesTest : IntegrationTestBase() {
+class GetCiagInductionSummariesTest : IntegrationTestBase() {
 
   companion object {
     private const val URI_TEMPLATE = "/ciag/induction/list"
