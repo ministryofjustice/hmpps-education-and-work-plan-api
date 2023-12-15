@@ -7,21 +7,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
-abstract class QualificationsResourceMapper {
-  fun toCreatePreviousQualificationsDto(
-    request: CreatePreviousQualificationsRequest?,
-    prisonId: String,
-  ): CreatePreviousQualificationsDto? {
-    return if (request == null) {
-      null
-    } else {
-      convertToCreatePreviousQualificationsDto(request, prisonId)
-    }
-  }
-
+interface QualificationsResourceMapper {
   @Mapping(target = "educationLevel", source = "request.educationLevel", defaultValue = "NOT_SURE")
-  abstract fun convertToCreatePreviousQualificationsDto(
-    request: CreatePreviousQualificationsRequest?,
-    prisonId: String,
-  ): CreatePreviousQualificationsDto?
+  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonId: String): CreatePreviousQualificationsDto
 }

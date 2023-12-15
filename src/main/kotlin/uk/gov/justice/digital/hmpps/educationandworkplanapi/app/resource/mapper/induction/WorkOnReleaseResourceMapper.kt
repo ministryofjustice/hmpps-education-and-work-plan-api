@@ -7,5 +7,5 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 interface WorkOnReleaseResourceMapper {
-  fun toCreateWorkOnReleaseDto(workOnRelease: CreateWorkOnReleaseRequest, prisonId: String): CreateWorkOnReleaseDto
+  fun toCreateWorkOnReleaseDto(request: CreateWorkOnReleaseRequest, prisonId: String): CreateWorkOnReleaseDto
 }

@@ -20,18 +20,24 @@ class InductionResourceMapper(
     return CreateInductionDto(
       prisonNumber = prisonNumber,
       workOnRelease = workOnReleaseMapper.toCreateWorkOnReleaseDto(request.workOnRelease, prisonId),
-      previousQualifications = qualificationsMapper
-        .toCreatePreviousQualificationsDto(request = request.previousQualifications, prisonId = prisonId),
-      previousTraining = previousTrainingMapper
-        .toCreatePreviousTrainingDto(request = request.previousTraining, prisonId = prisonId),
-      previousWorkExperiences = workExperiencesMapper
-        .toCreatePreviousWorkExperiencesDto(request = request.previousWorkExperiences, prisonId = prisonId),
-      inPrisonInterests = inPrisonInterestsMapper
-        .toCreateInPrisonInterestsDto(request = request.inPrisonInterests, prisonId = prisonId),
-      personalSkillsAndInterests = skillsAndInterestsMapper
-        .toCreatePersonalSkillsAndInterestsDto(request = request.personalSkillsAndInterests, prisonId = prisonId),
-      futureWorkInterests = workInterestsMapper
-        .toCreateFutureWorkInterestsDto(request = request.futureWorkInterests, prisonId = prisonId),
+      previousQualifications = request.previousQualifications?.let {
+        qualificationsMapper.toCreatePreviousQualificationsDto(request = it, prisonId = prisonId)
+      },
+      previousTraining = request.previousTraining?.let {
+        previousTrainingMapper.toCreatePreviousTrainingDto(request = it, prisonId = prisonId)
+      },
+      previousWorkExperiences = request.previousWorkExperiences?.let {
+        workExperiencesMapper.toCreatePreviousWorkExperiencesDto(request = it, prisonId = prisonId)
+      },
+      inPrisonInterests = request.inPrisonInterests?.let {
+        inPrisonInterestsMapper.toCreateInPrisonInterestsDto(request = it, prisonId = prisonId)
+      },
+      personalSkillsAndInterests = request.personalSkillsAndInterests?.let {
+        skillsAndInterestsMapper.toCreatePersonalSkillsAndInterestsDto(request = it, prisonId = prisonId)
+      },
+      futureWorkInterests = request.futureWorkInterests?.let {
+        workInterestsMapper.toCreateFutureWorkInterestsDto(request = it, prisonId = prisonId)
+      },
       prisonId = prisonId,
     )
   }
