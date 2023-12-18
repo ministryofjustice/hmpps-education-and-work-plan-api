@@ -4,7 +4,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.10.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.11.0"
   id("org.openapi.generator") version "7.0.1"
   kotlin("plugin.spring") version "1.9.20"
   kotlin("plugin.jpa") version "1.9.20"
@@ -24,8 +24,6 @@ val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.2.0"
 val awaitilityVersion = "4.2.0"
 val hmppsSqsVersion = "2.1.1"
-
-ext["logback.version"] = "1.4.12"
 
 allOpen {
   annotations(
