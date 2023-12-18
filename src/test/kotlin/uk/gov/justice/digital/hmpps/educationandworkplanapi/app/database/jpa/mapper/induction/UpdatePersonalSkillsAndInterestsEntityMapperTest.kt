@@ -101,7 +101,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
+    mapper.updateExistingEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -180,7 +180,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
+    mapper.updateExistingEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -241,7 +241,7 @@ class UpdatePersonalSkillsAndInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
+    mapper.updateExistingEntityFromDto(existingSkillsAndInterestsEntity, updateDto)
 
     // Then
     assertThat(existingSkillsAndInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)

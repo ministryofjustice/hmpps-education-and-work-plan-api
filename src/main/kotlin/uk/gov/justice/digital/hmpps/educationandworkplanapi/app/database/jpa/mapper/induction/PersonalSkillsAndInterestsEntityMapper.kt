@@ -74,8 +74,8 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "skills", expression = "java( updateSkills(entity, dto) )")
   @Mapping(target = "interests", expression = "java( updateInterests(entity, dto) )")
-  abstract fun updateEntityFromDto(
-    @MappingTarget entity: PersonalSkillsAndInterestsEntity?,
+  abstract fun updateExistingEntityFromDto(
+    @MappingTarget entity: PersonalSkillsAndInterestsEntity,
     dto: UpdatePersonalSkillsAndInterestsDto?,
   )
 
@@ -114,7 +114,7 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "skills", ignore = true)
   @Mapping(target = "interests", ignore = true)
-  abstract fun fromUpdateDtoToEntity(personalSkillsAndInterests: UpdatePersonalSkillsAndInterestsDto?): PersonalSkillsAndInterestsEntity?
+  abstract fun fromUpdateDtoToNewEntity(personalSkillsAndInterests: UpdatePersonalSkillsAndInterestsDto?): PersonalSkillsAndInterestsEntity?
 
   @Named("addNewSkillsAndInterestsDuringUpdate")
   @AfterMapping

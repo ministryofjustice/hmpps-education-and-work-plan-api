@@ -69,7 +69,7 @@ class UpdateFutureWorkInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
+    mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -127,7 +127,7 @@ class UpdateFutureWorkInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingFutureWorkInterestsEntity, updatedFutureWorkInterestsDto)
+    mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedFutureWorkInterestsDto)
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
@@ -175,7 +175,7 @@ class UpdateFutureWorkInterestsEntityMapperTest {
     }
 
     // When
-    mapper.updateEntityFromDto(existingFutureWorkInterestsEntity, updatedFutureWorkInterestsDto)
+    mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedFutureWorkInterestsDto)
 
     // Then
     assertThat(existingFutureWorkInterestsEntity).isEqualToIgnoringInternallyManagedFields(expectedEntity)
