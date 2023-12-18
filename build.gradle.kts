@@ -25,6 +25,8 @@ val springdocOpenapiVersion = "2.2.0"
 val awaitilityVersion = "4.2.0"
 val hmppsSqsVersion = "2.1.1"
 
+ext["logback.version"] = "1.4.14"
+
 allOpen {
   annotations(
     "javax.persistence.Entity",
