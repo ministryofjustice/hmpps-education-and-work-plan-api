@@ -14,7 +14,7 @@ parameters:
 executors:
   integration-test-environment:
     docker:
-      - image: cimg/openjdk:19.0
+      - image: cimg/openjdk:21.0
       - image: localstack/localstack:0.13.1
         environment:
           SERVICES: sns,sqs
@@ -142,7 +142,7 @@ workflows:
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context:
             - hmpps-common-vars
-          jdk_tag: "19.0"
+          jdk_tag: "21.0"
           cache_key: "v3_0"
       - hmpps/trivy_latest_scan:
           slack_channel: << pipeline.parameters.alerts-slack-channel >>

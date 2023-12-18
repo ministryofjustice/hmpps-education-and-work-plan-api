@@ -24,14 +24,18 @@ dependencies {
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
 }
 
+extensions.getByType(JacocoPluginExtension::class).apply {
+  toolVersion = "0.8.11"
+}
+
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "19"
+      jvmTarget = "21"
     }
   }
 }
