@@ -6,9 +6,9 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.11.0"
   id("org.openapi.generator") version "7.0.1"
-  kotlin("plugin.spring") version "1.9.20"
-  kotlin("plugin.jpa") version "1.9.20"
-  kotlin("kapt") version "1.9.20"
+  kotlin("plugin.spring") version "1.9.21"
+  kotlin("plugin.jpa") version "1.9.21"
+  kotlin("kapt") version "1.9.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.2"
@@ -39,6 +39,10 @@ kapt {
   arguments {
     arg("mapstruct.defaultComponentModel", "spring")
   }
+}
+
+jacoco {
+  toolVersion = "0.8.11"
 }
 
 configurations {
@@ -98,13 +102,13 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "19"
+      jvmTarget = "21"
     }
   }
 }
