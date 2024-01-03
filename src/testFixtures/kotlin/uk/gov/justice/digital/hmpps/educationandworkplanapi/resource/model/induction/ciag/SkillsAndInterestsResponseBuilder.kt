@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType

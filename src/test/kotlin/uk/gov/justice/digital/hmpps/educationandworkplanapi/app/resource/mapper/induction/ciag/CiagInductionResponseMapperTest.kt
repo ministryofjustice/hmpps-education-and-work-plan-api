@@ -19,12 +19,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCiagInductionResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCiagInductionSummaryResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPrisonWorkAndEducationResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidEducationAndQualificationsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPreviousWorkResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPrisonWorkAndEducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidSkillsAndInterestsResponse
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HopingToWork as HopingToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi

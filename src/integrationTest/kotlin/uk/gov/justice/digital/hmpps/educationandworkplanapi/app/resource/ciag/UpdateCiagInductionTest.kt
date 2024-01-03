@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ciag
 
-import aValidUpdatePrisonWorkAndEducationRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
@@ -39,21 +38,22 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateEducationAndQualificationsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPrisonWorkAndEducationResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateCiagInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateEducationAndQualificationsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousWorkRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateSkillsAndInterestsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateWorkInterestsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkExperienceResource
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidEducationAndQualificationsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPreviousWorkResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPrisonWorkAndEducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidSkillsAndInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdateEducationAndQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdatePreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdatePrisonWorkAndEducationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdateSkillsAndInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdateWorkInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidWorkExperienceResource
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidWorkInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -142,14 +142,14 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
   fun `should update all fields within a Prisoner's induction`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(
+    createCiagInduction(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
       createCiagInductionRequest = aValidCreateCiagInductionRequest(),
     )
 
-    val persistedInduction = getInduction(prisonNumber)
+    val persistedInduction = getCiagInduction(prisonNumber)
     val updateInductionRequest = aValidUpdateCiagInductionRequest(
       reference = null,
       hopingToGetWork = HopingToWork.YES,
@@ -275,7 +275,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       .isNoContent
 
     // Then
-    val updatedInduction = getInduction(prisonNumber)
+    val updatedInduction = getCiagInduction(prisonNumber)
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .hasHopingToGetWork(HopingToWork.YES)
@@ -326,14 +326,14 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
   fun `should update induction but ignore child fields when they are not provided`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(
+    createCiagInduction(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
       createCiagInductionRequest = aValidCreateCiagInductionRequest(),
     )
 
-    val persistedInduction = getInduction(prisonNumber)
+    val persistedInduction = getCiagInduction(prisonNumber)
     val updateInductionRequest = aValidUpdateCiagInductionRequest(
       reference = null,
       hopingToGetWork = HopingToWork.YES,
@@ -413,7 +413,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       .isNoContent
 
     // Then
-    val updatedInduction = getInduction(prisonNumber)
+    val updatedInduction = getCiagInduction(prisonNumber)
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .hasHopingToGetWork(HopingToWork.YES)
@@ -447,8 +447,8 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
   fun `should update induction with null or empty values within child fields`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
-    val persistedInduction = getInduction(prisonNumber)
+    createCiagInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    val persistedInduction = getCiagInduction(prisonNumber)
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
@@ -537,7 +537,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       .isNoContent
 
     // Then
-    val updatedInduction = getInduction(prisonNumber)
+    val updatedInduction = getCiagInduction(prisonNumber)
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
@@ -565,7 +565,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
   fun `should update induction with populated child values given it previously did not have any`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(
+    createCiagInduction(
       prisonNumber,
       aValidCreateCiagInductionRequest(
         workExperience = null,
@@ -579,7 +579,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
         inPrisonInterests = null,
       ),
     )
-    val persistedInduction = getInduction(prisonNumber)
+    val persistedInduction = getCiagInduction(prisonNumber)
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
@@ -676,7 +676,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       .isNoContent
 
     // Then
-    val updatedInduction = getInduction(prisonNumber)
+    val updatedInduction = getCiagInduction(prisonNumber)
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
@@ -698,11 +698,11 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
   fun `should update JPA managed fields after calling update induction with no changes`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(
+    createCiagInduction(
       prisonNumber,
       aValidCreateCiagInductionRequest(),
     )
-    val persistedInduction = getInduction(prisonNumber)
+    val persistedInduction = getCiagInduction(prisonNumber)
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
     )
@@ -724,7 +724,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       .isNoContent
 
     // Then
-    val updatedInduction = getInduction(prisonNumber)
+    val updatedInduction = getCiagInduction(prisonNumber)
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .hasHopingToGetWork(HopingToWork.NOT_SURE)
