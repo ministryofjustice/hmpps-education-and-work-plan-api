@@ -14,10 +14,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.NO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.YES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCiagInductionSummaryResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidGetCiagInductionSummariesRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidGetCiagInductionSummariesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class GetCiagInductionSummariesTest : IntegrationTestBase() {
@@ -84,8 +84,8 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
     // Given
     val prisonNumber1 = aValidPrisonNumber()
     val prisonNumber2 = anotherValidPrisonNumber()
-    createInduction(prisonNumber1, aValidCreateCiagInductionRequest(hopingToGetWork = NO))
-    createInduction(prisonNumber2, aValidCreateCiagInductionRequest(hopingToGetWork = YES))
+    createCiagInduction(prisonNumber1, aValidCreateCiagInductionRequest(hopingToGetWork = NO))
+    createCiagInduction(prisonNumber2, aValidCreateCiagInductionRequest(hopingToGetWork = YES))
 
     val expectedResponse = CiagInductionSummaryListResponse(
       ciagProfileList = listOf(

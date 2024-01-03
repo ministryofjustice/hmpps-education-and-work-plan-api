@@ -13,12 +13,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateCiagInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEducationAndQualificationsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPrisonWorkAndEducationResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidSkillsAndInterestsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidEducationAndQualificationsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPreviousWorkResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPrisonWorkAndEducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidSkillsAndInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
 
 class GetCiagInductionTest : IntegrationTestBase() {
@@ -62,7 +62,7 @@ class GetCiagInductionTest : IntegrationTestBase() {
   fun `should get induction for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    createInduction(prisonNumber, aValidCreateCiagInductionRequest())
+    createCiagInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val expectedWorkExperience = aValidPreviousWorkResponse()
     val expectedSkillsAndInterests = aValidSkillsAndInterestsResponse()
     val expectedQualificationsAndTraining = aValidEducationAndQualificationsResponse()

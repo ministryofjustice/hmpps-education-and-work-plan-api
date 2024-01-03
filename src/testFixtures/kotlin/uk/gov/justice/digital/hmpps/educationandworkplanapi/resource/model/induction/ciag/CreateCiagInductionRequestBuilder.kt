@@ -1,6 +1,5 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag
 
-import aValidCreatePrisonWorkAndEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationAndQualificationsRequest

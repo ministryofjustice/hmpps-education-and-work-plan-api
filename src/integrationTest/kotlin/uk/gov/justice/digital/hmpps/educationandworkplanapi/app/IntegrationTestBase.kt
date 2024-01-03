@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
@@ -48,7 +49,8 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
-    const val INDUCTION_URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
+    const val CIAG_INDUCTION_URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
+    const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
 
     private val localStackContainer = LocalStackContainer.instance
 
@@ -135,14 +137,14 @@ abstract class IntegrationTestBase {
       .returnResult(TimelineResponse::class.java)
       .responseBody.blockFirst()!!
 
-  fun createInduction(
+  fun createCiagInduction(
     prisonNumber: String,
     createCiagInductionRequest: CreateCiagInductionRequest,
     username: String = "auser_gen",
     displayName: String = "Albert User",
   ) {
     webTestClient.post()
-      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+      .uri(CIAG_INDUCTION_URI_TEMPLATE, prisonNumber)
       .withBody(createCiagInductionRequest)
       .bearerToken(
         aValidTokenWithEditAuthority(
@@ -157,9 +159,31 @@ abstract class IntegrationTestBase {
       .isCreated()
   }
 
-  fun getInduction(prisonNumber: String): CiagInductionResponse =
-    webTestClient.get()
+  fun createInduction(
+    prisonNumber: String,
+    createInductionRequest: CreateInductionRequest,
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
+  ) {
+    webTestClient.post()
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+      .withBody(createInductionRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = username,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+  }
+
+  fun getCiagInduction(prisonNumber: String): CiagInductionResponse =
+    webTestClient.get()
+      .uri(CIAG_INDUCTION_URI_TEMPLATE, prisonNumber)
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .exchange()
       .expectStatus()
