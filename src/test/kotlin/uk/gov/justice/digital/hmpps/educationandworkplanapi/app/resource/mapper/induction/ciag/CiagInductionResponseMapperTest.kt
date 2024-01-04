@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNu
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.AffectAbilityToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.NotHopingToWorkReason
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
@@ -57,7 +57,7 @@ class CiagInductionResponseMapperTest {
   fun `should map to CiagInductionResponse given prisoner does not wish to work`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val inductionDomain = aValidInduction(
+    val inductionDomain = aFullyPopulatedInduction(
       prisonNumber = prisonNumber,
       workOnRelease = aValidWorkOnRelease(
         hopingToWork = HopingToWorkDomain.NO,
@@ -83,6 +83,7 @@ class CiagInductionResponseMapperTest {
       skillsAndInterests = skillsAndInterests,
       qualificationsAndTraining = qualificationsAndTraining,
       inPrisonInterests = inPrisonInterests,
+      modifiedBy = "bjones_gen",
     )
 
     given(workOnReleaseMapper.toReasonsNotToWork(any())).willReturn(setOf(ReasonNotToWork.OTHER))
@@ -106,7 +107,7 @@ class CiagInductionResponseMapperTest {
   fun `should map to CiagInductionResponse given prisoner wishes to work`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val inductionDomain = aValidInduction(
+    val inductionDomain = aFullyPopulatedInduction(
       prisonNumber = prisonNumber,
       workOnRelease = aValidWorkOnRelease(
         hopingToWork = HopingToWorkDomain.YES,
@@ -132,6 +133,8 @@ class CiagInductionResponseMapperTest {
       skillsAndInterests = skillsAndInterests,
       qualificationsAndTraining = qualificationsAndTraining,
       inPrisonInterests = inPrisonInterests,
+      createdBy = "asmith_gen",
+      modifiedBy = "bjones_gen",
     )
 
     given(workOnReleaseMapper.toReasonsNotToWork(any())).willReturn(emptySet())

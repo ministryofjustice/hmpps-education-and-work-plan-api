@@ -12,7 +12,7 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
@@ -40,7 +40,7 @@ class AsyncInductionEventServiceTest {
   fun `should handle induction created`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val induction = aValidInduction(prisonNumber = prisonNumber)
+    val induction = aFullyPopulatedInduction(prisonNumber = prisonNumber)
     val expectedTimelineEvent =
       with(induction) {
         TimelineEvent.newTimelineEvent(
@@ -66,7 +66,7 @@ class AsyncInductionEventServiceTest {
   fun `should handle induction updated`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val induction = aValidInduction(prisonNumber = prisonNumber)
+    val induction = aFullyPopulatedInduction(prisonNumber = prisonNumber)
     val expectedTimelineEvent =
       with(induction) {
         TimelineEvent.newTimelineEvent(

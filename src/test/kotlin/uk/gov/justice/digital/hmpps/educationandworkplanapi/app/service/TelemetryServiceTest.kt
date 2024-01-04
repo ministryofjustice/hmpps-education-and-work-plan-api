@@ -35,7 +35,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTele
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -254,7 +254,7 @@ class TelemetryServiceTest {
     @Test
     fun `should track induction created event`() {
       // Given
-      val induction = aValidInduction()
+      val induction = aFullyPopulatedInduction()
       val expectedEventProperties = mapOf(
         "reference" to induction.reference.toString(),
         "prisonId" to induction.createdAtPrison,
@@ -271,7 +271,7 @@ class TelemetryServiceTest {
     @Test
     fun `should track induction updated event`() {
       // Given
-      val induction = aValidInduction()
+      val induction = aFullyPopulatedInduction()
       val expectedEventProperties = mapOf(
         "reference" to induction.reference.toString(),
         "prisonId" to induction.lastUpdatedAtPrison,

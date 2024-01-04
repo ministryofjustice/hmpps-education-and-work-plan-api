@@ -25,7 +25,7 @@ fun aValidPersonalSkill(
 
 fun aValidPersonalInterest(
   interestType: PersonalInterestType = PersonalInterestType.OTHER,
-  interestTypeOther: String? = "Secret interests",
+  interestTypeOther: String? = "Varied interests",
 ): PersonalInterest = PersonalInterest(
   interestType = interestType,
   interestTypeOther = interestTypeOther,

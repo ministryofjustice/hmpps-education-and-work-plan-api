@@ -23,9 +23,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidFutureWorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInPrisonInterests
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousQualifications
@@ -123,7 +123,7 @@ class InductionEntityMapperTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
-    val expectedInduction = aValidInduction(
+    val expectedInduction = aFullyPopulatedInduction(
       reference = inductionEntity.reference!!,
       prisonNumber = prisonNumber,
       workOnRelease = aValidWorkOnRelease(),
