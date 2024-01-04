@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
@@ -45,7 +45,7 @@ class JpaInductionPersistenceAdapterTest {
     val prisonNumber = aValidPrisonNumber()
     val createInductionDto = aValidCreateInductionDto(prisonNumber = prisonNumber)
     val inductionEntity = aValidInductionEntity(prisonNumber = prisonNumber)
-    val expected = aValidInduction(prisonNumber = prisonNumber)
+    val expected = aFullyPopulatedInduction(prisonNumber = prisonNumber)
     given(inductionMapper.fromCreateDtoToEntity(any())).willReturn(inductionEntity)
     given(inductionRepository.saveAndFlush(any<InductionEntity>())).willReturn(inductionEntity)
     given(inductionMapper.fromEntityToDomain(any())).willReturn(expected)
@@ -65,7 +65,7 @@ class JpaInductionPersistenceAdapterTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val inductionEntity = aValidInductionEntity(prisonNumber = prisonNumber)
-    val expected = aValidInduction(prisonNumber = prisonNumber)
+    val expected = aFullyPopulatedInduction(prisonNumber = prisonNumber)
     given(inductionRepository.findByPrisonNumber(any())).willReturn(inductionEntity)
     given(inductionMapper.fromEntityToDomain(any())).willReturn(expected)
 
@@ -117,7 +117,7 @@ class JpaInductionPersistenceAdapterTest {
     )
     given(inductionRepository.saveAndFlush(any<InductionEntity>())).willReturn(persistedInductionEntity)
 
-    val expectedDomainInduction = aValidInduction(
+    val expectedDomainInduction = aFullyPopulatedInduction(
       reference = reference,
       prisonNumber = prisonNumber,
       workOnRelease = aValidWorkOnRelease(hopingToWork = HopingToWorkDomain.YES),

@@ -28,7 +28,7 @@ fun aValidCiagInductionResponse(
   inPrisonInterests: PrisonWorkAndEducationResponse? = aValidPrisonWorkAndEducationResponse(),
   createdBy: String = "asmith_gen",
   createdDateTime: OffsetDateTime = OffsetDateTime.now(),
-  modifiedBy: String = "bjones_gen",
+  modifiedBy: String = "asmith_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): CiagInductionResponse =
   CiagInductionResponse(

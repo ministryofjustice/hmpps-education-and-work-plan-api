@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNu
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionSummary
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInduction
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInductionDto
@@ -44,7 +44,7 @@ class InductionServiceTest {
     fun `should create induction`() {
       // Given
       val createInductionDto = aValidCreateInductionDto()
-      val induction = aValidInduction()
+      val induction = aFullyPopulatedInduction()
       given(persistenceAdapter.getInduction(any())).willReturn(null)
       given(persistenceAdapter.createInduction(any())).willReturn(induction)
 
@@ -61,7 +61,7 @@ class InductionServiceTest {
     fun `should fail create induction given induction already exists`() {
       // Given
       val createInductionDto = aValidCreateInductionDto()
-      val induction = aValidInduction()
+      val induction = aFullyPopulatedInduction()
       given(persistenceAdapter.getInduction(any())).willReturn(induction)
 
       // When
@@ -82,7 +82,7 @@ class InductionServiceTest {
     @Test
     fun `should get induction for prisoner`() {
       // Given
-      val expected = aValidInduction()
+      val expected = aFullyPopulatedInduction()
       given(persistenceAdapter.getInduction(any())).willReturn(expected)
 
       // When
@@ -117,7 +117,7 @@ class InductionServiceTest {
     fun `should update induction`() {
       // Given
       val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
-      val expected = aValidInduction(prisonNumber = prisonNumber)
+      val expected = aFullyPopulatedInduction(prisonNumber = prisonNumber)
       given(persistenceAdapter.updateInduction(any())).willReturn(expected)
 
       // When

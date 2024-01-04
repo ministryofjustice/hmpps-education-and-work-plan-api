@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction
 import java.time.Instant
 import java.util.UUID
 
-fun aValidInduction(
+fun aFullyPopulatedInduction(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "A1234AB",
   workOnRelease: WorkOnRelease = aValidWorkOnRelease(),

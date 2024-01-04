@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInductionDto
@@ -18,6 +19,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedInductionResponse
+import java.time.ZoneOffset
 
 @ExtendWith(MockitoExtension::class)
 class InductionResourceMapperTest {
@@ -83,5 +86,34 @@ class InductionResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedCreateInductionDto)
+  }
+
+  @Test
+  fun `should map to InductionResponse`() {
+    // Given
+    val induction = aFullyPopulatedInduction()
+    val expectedInduction = aFullyPopulatedInductionResponse(
+      reference = induction.reference,
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
+      createdAt = induction.createdAt!!.atOffset(ZoneOffset.UTC),
+      updatedBy = "bjones_gen",
+      updatedByDisplayName = "Barry Jones",
+      updatedAt = induction.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+    )
+
+    given(workOnReleaseMapper.toWorkOnReleaseResponse(any())).willReturn(expectedInduction.workOnRelease)
+    given(qualificationsMapper.toPreviousQualificationsResponse(any())).willReturn(expectedInduction.previousQualifications)
+    given(previousTrainingMapper.toPreviousTrainingResponse(any())).willReturn(expectedInduction.previousTraining)
+    given(workExperiencesMapper.toPreviousWorkExperiencesResponse(any())).willReturn(expectedInduction.previousWorkExperiences)
+    given(inPrisonInterestsMapper.toInPrisonInterestsResponse(any())).willReturn(expectedInduction.inPrisonInterests)
+    given(skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(any())).willReturn(expectedInduction.personalSkillsAndInterests)
+    given(workInterestsMapper.toFutureWorkInterestsResponse(any())).willReturn(expectedInduction.futureWorkInterests)
+
+    // When
+    val actual = mapper.toInductionResponse(induction)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedInduction)
   }
 }

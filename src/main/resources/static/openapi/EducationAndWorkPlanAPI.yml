@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.4'
+  version: '1.7.5'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -1904,7 +1904,7 @@ components:
           type: string
           description: Any additional details of the work experience.
       required:
-        - workType
+        - experienceType
 
     WorkInterestDetail:
       title: WorkInterestDetail

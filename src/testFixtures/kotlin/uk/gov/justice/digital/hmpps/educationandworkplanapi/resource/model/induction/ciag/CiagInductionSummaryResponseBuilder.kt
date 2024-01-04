@@ -9,9 +9,9 @@ fun aValidCiagInductionSummaryResponse(
   offenderId: String = aValidPrisonNumber(),
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
   desireToWork: Boolean = false,
-  createdBy: String = "bjones_gen",
+  createdBy: String = "asmith_gen",
   createdDateTime: OffsetDateTime = OffsetDateTime.now(),
-  modifiedBy: String = "bjones_gen",
+  modifiedBy: String = "asmith_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
 ): CiagInductionSummaryResponse =
   CiagInductionSummaryResponse(

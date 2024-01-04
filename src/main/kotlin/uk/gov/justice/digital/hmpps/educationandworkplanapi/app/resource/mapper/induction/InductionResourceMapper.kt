@@ -1,8 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
+import java.time.ZoneOffset
 
 @Component
 class InductionResourceMapper(
@@ -40,5 +43,28 @@ class InductionResourceMapper(
       },
       prisonId = prisonId,
     )
+  }
+
+  fun toInductionResponse(induction: Induction): InductionResponse {
+    with(induction) {
+      return InductionResponse(
+        reference = reference,
+        workOnRelease = workOnReleaseMapper.toWorkOnReleaseResponse(workOnRelease),
+        previousQualifications = qualificationsMapper.toPreviousQualificationsResponse(previousQualifications),
+        previousTraining = previousTrainingMapper.toPreviousTrainingResponse(previousTraining),
+        previousWorkExperiences = workExperiencesMapper.toPreviousWorkExperiencesResponse(previousWorkExperiences),
+        inPrisonInterests = inPrisonInterestsMapper.toInPrisonInterestsResponse(inPrisonInterests),
+        personalSkillsAndInterests = skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(personalSkillsAndInterests),
+        futureWorkInterests = workInterestsMapper.toFutureWorkInterestsResponse(futureWorkInterests),
+        createdBy = createdBy!!,
+        createdByDisplayName = createdByDisplayName!!,
+        createdAt = createdAt!!.atOffset(ZoneOffset.UTC),
+        createdAtPrison = createdAtPrison,
+        updatedBy = lastUpdatedBy!!,
+        updatedByDisplayName = lastUpdatedByDisplayName!!,
+        updatedAt = lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+        updatedAtPrison = lastUpdatedAtPrison,
+      )
+    }
   }
 }
