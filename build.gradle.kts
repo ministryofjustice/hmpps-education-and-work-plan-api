@@ -26,6 +26,7 @@ val awaitilityVersion = "4.2.0"
 val hmppsSqsVersion = "2.1.1"
 
 ext["logback.version"] = "1.4.14"
+ext["jackson-bom.version"] = "2.16.0"
 
 allOpen {
   annotations(
