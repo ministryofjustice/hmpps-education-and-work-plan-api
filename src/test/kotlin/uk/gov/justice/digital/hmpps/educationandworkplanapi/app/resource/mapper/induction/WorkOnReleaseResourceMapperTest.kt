@@ -11,7 +11,9 @@ import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkOnReleaseRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateWorkOnReleaseRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkOnReleaseResponseForPrisonerNotLookingToWork
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -80,6 +82,27 @@ class WorkOnReleaseResourceMapperTest {
 
     // When
     val actual = mapper.toWorkOnReleaseResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdateWorkOnReleaseDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdateWorkOnReleaseRequest()
+    val expected = aValidUpdateWorkOnReleaseDto(
+      reference = request.reference,
+      hopingToWork = HopingToWorkDomain.NO,
+      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
+      notHopingToWorkOtherReason = "Long term prison sentence",
+      affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
+      affectAbilityToWorkOther = "Employers aren't interested",
+    )
+
+    // When
+    val actual = mapper.toUpdateWorkOnReleaseDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

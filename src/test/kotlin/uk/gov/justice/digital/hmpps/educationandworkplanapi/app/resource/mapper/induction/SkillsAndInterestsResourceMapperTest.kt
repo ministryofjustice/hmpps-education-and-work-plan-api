@@ -15,8 +15,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aVa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePersonalSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPersonalSkillsAndInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePersonalSkillsAndInterestsRequest
 import java.time.OffsetDateTime
 
 @ExtendWith(MockitoExtension::class)
@@ -71,6 +73,34 @@ class SkillsAndInterestsResourceMapperTest {
 
     // When
     val actual = mapper.toPersonalSkillsAndInterestsResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdatePersonalSkillsAndInterestsDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdatePersonalSkillsAndInterestsRequest()
+    val expected = aValidUpdatePersonalSkillsAndInterestsDto(
+      reference = request.reference!!,
+      skills = listOf(
+        aValidPersonalSkill(
+          skillType = SkillType.OTHER,
+          skillTypeOther = "Hidden skills",
+        ),
+      ),
+      interests = listOf(
+        aValidPersonalInterest(
+          interestType = InterestType.OTHER,
+          interestTypeOther = "Varied interests",
+        ),
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdatePersonalSkillsAndInterestsDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

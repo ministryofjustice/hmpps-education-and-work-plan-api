@@ -3,8 +3,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
 import java.time.ZoneOffset
 
 @Component
@@ -66,5 +68,35 @@ class InductionResourceMapper(
         updatedAtPrison = lastUpdatedAtPrison,
       )
     }
+  }
+
+  fun toUpdateInductionDto(prisonNumber: String, request: UpdateInductionRequest): UpdateInductionDto {
+    val prisonId = request.prisonId
+    return UpdateInductionDto(
+      reference = request.reference,
+      prisonNumber = prisonNumber,
+      workOnRelease = request.workOnRelease?.let {
+        workOnReleaseMapper.toUpdateWorkOnReleaseDto(request = it, prisonId = prisonId)
+      },
+      previousQualifications = request.previousQualifications?.let {
+        qualificationsMapper.toUpdatePreviousQualificationsDto(request = it, prisonId = prisonId)
+      },
+      previousTraining = request.previousTraining?.let {
+        previousTrainingMapper.toUpdatePreviousTrainingDto(request = it, prisonId = prisonId)
+      },
+      previousWorkExperiences = request.previousWorkExperiences?.let {
+        workExperiencesMapper.toUpdatePreviousWorkExperiencesDto(request = it, prisonId = prisonId)
+      },
+      inPrisonInterests = request.inPrisonInterests?.let {
+        inPrisonInterestsMapper.toUpdateInPrisonInterestsDto(request = it, prisonId = prisonId)
+      },
+      personalSkillsAndInterests = request.personalSkillsAndInterests?.let {
+        skillsAndInterestsMapper.toUpdatePersonalSkillsAndInterestsDto(request = it, prisonId = prisonId)
+      },
+      futureWorkInterests = request.futureWorkInterests?.let {
+        workInterestsMapper.toUpdateFutureWorkInterestsDto(request = it, prisonId = prisonId)
+      },
+      prisonId = prisonId,
+    )
   }
 }

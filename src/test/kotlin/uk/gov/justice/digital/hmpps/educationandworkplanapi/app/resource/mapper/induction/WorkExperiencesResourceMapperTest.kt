@@ -13,10 +13,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Wor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkExperiencesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousWorkExperiencesResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousWorkExperiencesRequest
 import java.time.OffsetDateTime
 
 @ExtendWith(MockitoExtension::class)
@@ -75,6 +77,30 @@ class WorkExperiencesResourceMapperTest {
 
     // When
     val actual = mapper.toPreviousWorkExperiencesResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdatePreviousWorkExperiencesDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdatePreviousWorkExperiencesRequest()
+    val expected = aValidUpdatePreviousWorkExperiencesDto(
+      reference = request.reference!!,
+      experiences = listOf(
+        aValidWorkExperience(
+          experienceType = WorkExperienceType.OTHER,
+          experienceTypeOther = "Scientist",
+          role = "Lab Technician",
+          details = "Cleaning test tubes",
+        ),
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdatePreviousWorkExperiencesDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

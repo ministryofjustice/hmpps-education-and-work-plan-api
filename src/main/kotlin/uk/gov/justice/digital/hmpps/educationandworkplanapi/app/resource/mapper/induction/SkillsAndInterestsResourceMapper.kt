@@ -6,8 +6,10 @@ import org.mapstruct.NullValueMappingStrategy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePersonalSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePersonalSkillsAndInterestsRequest
 
 @Mapper(
   uses = [
@@ -23,4 +25,6 @@ interface SkillsAndInterestsResourceMapper {
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
   @Mapping(target = "updatedAtPrison", source = "lastUpdatedAtPrison")
   fun toPersonalSkillsAndInterestsResponse(personalSkillsAndInterests: PersonalSkillsAndInterests?): PersonalSkillsAndInterestsResponse?
+
+  fun toUpdatePersonalSkillsAndInterestsDto(request: UpdatePersonalSkillsAndInterestsRequest, prisonId: String): UpdatePersonalSkillsAndInterestsDto
 }

@@ -6,8 +6,10 @@ import org.mapstruct.NullValueMappingStrategy
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousQualifications
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousQualificationsRequest
 
 @Mapper(
   uses = [
@@ -24,4 +26,6 @@ interface QualificationsResourceMapper {
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
   @Mapping(target = "updatedAtPrison", source = "lastUpdatedAtPrison")
   fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse?
+
+  fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String): UpdatePreviousQualificationsDto
 }

@@ -13,10 +13,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qua
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousQualificationsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
@@ -102,6 +104,35 @@ class QualificationsResourceMapperTest {
 
     // When
     val actual = mapper.toPreviousQualificationsResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdatePreviousQualificationsDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdatePreviousQualificationsRequest()
+    val expected = aValidUpdatePreviousQualificationsDto(
+      reference = request.reference!!,
+      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      qualifications = listOf(
+        aValidQualification(
+          subject = "English",
+          level = QualificationLevel.LEVEL_3,
+          grade = "A",
+        ),
+        aValidQualification(
+          subject = "Maths",
+          level = QualificationLevel.LEVEL_3,
+          grade = "B",
+        ),
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdatePreviousQualificationsDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)
