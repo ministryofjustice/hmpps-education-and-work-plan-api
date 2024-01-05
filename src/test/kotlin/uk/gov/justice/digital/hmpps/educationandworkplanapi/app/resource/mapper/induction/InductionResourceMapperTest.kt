@@ -18,8 +18,17 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedInductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedUpdateInductionRequest
 import java.time.ZoneOffset
 
 @ExtendWith(MockitoExtension::class)
@@ -115,5 +124,46 @@ class InductionResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedInduction)
+  }
+
+  @Test
+  fun `should map to UpdateInductionDto`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val prisonId = "BXI"
+    val updateRequest = aFullyPopulatedUpdateInductionRequest(prisonId = prisonId)
+    val workOnRelease = aValidUpdateWorkOnReleaseDto()
+    val workExperiences = aValidUpdatePreviousWorkExperiencesDto()
+    val skillsAndInterests = aValidUpdatePersonalSkillsAndInterestsDto()
+    val qualifications = aValidUpdatePreviousQualificationsDto()
+    val training = aValidUpdatePreviousTrainingDto()
+    val inPrisonInterests = aValidUpdateInPrisonInterestsDto()
+    val workInterests = aValidUpdateFutureWorkInterestsDto()
+
+    given(workOnReleaseMapper.toUpdateWorkOnReleaseDto(any(), any())).willReturn(workOnRelease)
+    given(qualificationsMapper.toUpdatePreviousQualificationsDto(any(), any())).willReturn(qualifications)
+    given(previousTrainingMapper.toUpdatePreviousTrainingDto(any(), any())).willReturn(training)
+    given(workExperiencesMapper.toUpdatePreviousWorkExperiencesDto(any(), any())).willReturn(workExperiences)
+    given(inPrisonInterestsMapper.toUpdateInPrisonInterestsDto(any(), any())).willReturn(inPrisonInterests)
+    given(skillsAndInterestsMapper.toUpdatePersonalSkillsAndInterestsDto(any(), any())).willReturn(skillsAndInterests)
+    given(workInterestsMapper.toUpdateFutureWorkInterestsDto(any(), any())).willReturn(workInterests)
+    val expectedUpdateInductionDto = aValidUpdateInductionDto(
+      updateRequest.reference,
+      prisonNumber = prisonNumber,
+      workOnRelease = workOnRelease,
+      previousQualifications = qualifications,
+      previousTraining = training,
+      previousWorkExperiences = workExperiences,
+      inPrisonInterests = inPrisonInterests,
+      personalSkillsAndInterests = skillsAndInterests,
+      futureWorkInterests = workInterests,
+      prisonId = prisonId,
+    )
+
+    // When
+    val actual = mapper.toUpdateInductionDto(prisonNumber, updateRequest)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedUpdateInductionDto)
   }
 }

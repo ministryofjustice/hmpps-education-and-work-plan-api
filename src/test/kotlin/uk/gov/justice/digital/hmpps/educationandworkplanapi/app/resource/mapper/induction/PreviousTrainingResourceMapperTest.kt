@@ -11,8 +11,10 @@ import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousTraining
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousTrainingRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousTrainingResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousTrainingRequest
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType as TrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType as TrainingTypeApi
@@ -64,6 +66,24 @@ class PreviousTrainingResourceMapperTest {
 
     // When
     val actual = mapper.toPreviousTrainingResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdatePreviousTrainingDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdatePreviousTrainingRequest()
+    val expected = aValidUpdatePreviousTrainingDto(
+      reference = request.reference!!,
+      trainingTypes = listOf(TrainingTypeDomain.OTHER),
+      trainingTypeOther = "Certified Kotlin Developer",
+    )
+
+    // When
+    val actual = mapper.toUpdatePreviousTrainingDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

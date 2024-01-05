@@ -13,10 +13,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Wor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidFutureWorkInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateFutureWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidFutureWorkInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidFutureWorkInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateFutureWorkInterestsRequest
 import java.time.OffsetDateTime
 
 @ExtendWith(MockitoExtension::class)
@@ -73,6 +75,29 @@ class WorkInterestsResourceMapperTest {
 
     // When
     val actual = mapper.toFutureWorkInterestsResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdateFutureWorkInterestsDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdateFutureWorkInterestsRequest()
+    val expected = aValidUpdateFutureWorkInterestsDto(
+      reference = request.reference!!,
+      interests = listOf(
+        aValidWorkInterest(
+          workType = WorkInterestType.OTHER,
+          workTypeOther = "Any job I can get",
+          role = "Any role",
+        ),
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdateFutureWorkInterestsDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

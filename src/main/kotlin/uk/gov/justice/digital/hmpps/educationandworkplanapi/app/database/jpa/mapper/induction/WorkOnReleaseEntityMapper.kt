@@ -31,5 +31,5 @@ interface WorkOnReleaseEntityMapper {
   @ExcludeReferenceField
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun updateExistingEntityFromDto(@MappingTarget entity: WorkOnReleaseEntity, dto: UpdateWorkOnReleaseDto)
+  fun updateExistingEntityFromDto(@MappingTarget entity: WorkOnReleaseEntity, dto: UpdateWorkOnReleaseDto?)
 }

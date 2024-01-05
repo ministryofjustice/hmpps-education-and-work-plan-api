@@ -11,8 +11,10 @@ import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidInPrisonInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidCreateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInPrisonInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInPrisonInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateInPrisonInterestsRequest
 import java.time.OffsetDateTime
 
 @ExtendWith(MockitoExtension::class)
@@ -54,6 +56,20 @@ class InPrisonInterestsResourceMapperTest {
 
     // When
     val actual = mapper.toInPrisonInterestsResponse(domain)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdateInPrisonInterestsDto`() {
+    // Given
+    val prisonId = "BXI"
+    val request = aValidUpdateInPrisonInterestsRequest()
+    val expected = aValidUpdateInPrisonInterestsDto(reference = request.reference!!)
+
+    // When
+    val actual = mapper.toUpdateInPrisonInterestsDto(request, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

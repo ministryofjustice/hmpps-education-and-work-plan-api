@@ -5,7 +5,7 @@ import java.util.UUID
 data class UpdateInductionDto(
   val reference: UUID?,
   val prisonNumber: String,
-  val workOnRelease: UpdateWorkOnReleaseDto,
+  val workOnRelease: UpdateWorkOnReleaseDto?,
   val previousQualifications: UpdatePreviousQualificationsDto?,
   val previousTraining: UpdatePreviousTrainingDto?,
   val previousWorkExperiences: UpdatePreviousWorkExperiencesDto?,

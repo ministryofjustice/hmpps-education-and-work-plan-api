@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
@@ -189,6 +190,16 @@ abstract class IntegrationTestBase {
       .expectStatus()
       .isOk
       .returnResult(CiagInductionResponse::class.java)
+      .responseBody.blockFirst()!!
+
+  fun getInduction(prisonNumber: String): InductionResponse =
+    webTestClient.get()
+      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(InductionResponse::class.java)
       .responseBody.blockFirst()!!
 
   fun createGoal(
