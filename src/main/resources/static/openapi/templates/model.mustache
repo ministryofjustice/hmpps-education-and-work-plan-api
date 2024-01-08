@@ -4,16 +4,9 @@ import java.util.Objects
 {{#imports}}import {{import}}
 {{/imports}}
 {{#useBeanValidation}}
-    import {{javaxPackage}}.validation.constraints.DecimalMax
-    import {{javaxPackage}}.validation.constraints.DecimalMin
-    import {{javaxPackage}}.validation.constraints.Email
-    import {{javaxPackage}}.validation.constraints.Max
-    import {{javaxPackage}}.validation.constraints.Min
-    import {{javaxPackage}}.validation.constraints.NotNull
-    import {{javaxPackage}}.validation.constraints.Pattern
-    import {{javaxPackage}}.validation.constraints.Size
+    import {{javaxPackage}}.validation.constraints.*
     import {{javaxPackage}}.validation.Valid
-    import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.*;
+    import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.*
 {{/useBeanValidation}}
 {{#swagger2AnnotationLibrary}}
     import io.swagger.v3.oas.annotations.media.Schema

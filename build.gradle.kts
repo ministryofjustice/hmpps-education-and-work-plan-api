@@ -197,22 +197,49 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
   )
 }
 
+tasks.register<GenerateTask>("buildPrisonApiModel") {
+  validateSpec.set(true)
+  generatorName.set("kotlin-spring")
+  templateDir.set("$projectDir/src/main/resources/static/openapi/templates")
+  inputSpec.set("$projectDir/src/main/resources/static/openapi/PrisonApi.json")
+  outputDir.set("$buildDir/generated")
+  modelPackage.set("uk.gov.justice.digital.hmpps.prisonapi.resource.model")
+  configOptions.set(
+    mapOf(
+      "dateLibrary" to "java8",
+      "serializationLibrary" to "jackson",
+      "useBeanValidation" to "true",
+      "useSpringBoot3" to "true",
+      "enumPropertyNaming" to "UPPERCASE"
+    )
+  )
+  globalProperties.set(
+    mapOf(
+      "models" to ""
+    )
+  )
+}
+
 tasks {
   withType<KtLintCheckTask> {
     // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
     mustRunAfter("buildEducationAndWorkPlanModel")
+    mustRunAfter("buildPrisonApiModel")
   }
   withType<KtLintFormatTask> {
     // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
     mustRunAfter("buildEducationAndWorkPlanModel")
+    mustRunAfter("buildPrisonApiModel")
   }
   withType<KaptGenerateStubsTask> {
     mustRunAfter("buildEducationAndWorkPlanModel")
+    mustRunAfter("buildPrisonApiModel")
   }
 }
 
 tasks.named("compileKotlin") {
   dependsOn("buildEducationAndWorkPlanModel")
+  dependsOn("buildPrisonApiModel")
 }
 
 kotlin {
