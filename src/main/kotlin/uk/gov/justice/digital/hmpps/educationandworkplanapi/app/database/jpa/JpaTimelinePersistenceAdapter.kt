@@ -23,7 +23,7 @@ class JpaTimelinePersistenceAdapter(
 
   @Transactional
   override fun recordTimelineEvent(prisonNumber: String, event: TimelineEvent): TimelineEvent {
-    log.info { "Recording TimelineEvent [$event] for prisoner [$prisonNumber]" }
+    log.info { "Recording TimelineEvent [${event.eventType}] for prisoner [$prisonNumber]" }
 
     val timelineEntity = findOrCreateTimelineEntity(prisonNumber)
     val timelineEventEntity = timelineEventMapper.fromDomainToEntity(event)

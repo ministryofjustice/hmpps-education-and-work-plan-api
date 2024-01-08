@@ -17,7 +17,7 @@ class InboundEventsListener(
 
   @SqsListener("educationandworkplan", factory = "hmppsQueueContainerFactoryProxy")
   internal fun onMessage(sqsMessage: SqsMessage) {
-    log.debug { "Inbound event message: $sqsMessage" }
+    log.debug { "Inbound event message: ${sqsMessage.Type}" }
 
     when (sqsMessage.Type) {
       NOTIFICATION -> {
