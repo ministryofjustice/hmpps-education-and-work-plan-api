@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.PrisonApiClient
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.PrisonApiException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity.Companion.newTimelineForPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.timeline.TimelineEntityMapper
@@ -62,8 +63,12 @@ class JpaTimelinePersistenceAdapter(
 
     // TODO RR-566 - remove this temporary code
     if (callPrisonApiEnabled) {
-      val numberOfPrisonPeriods = prisonApiClient.getPrisonTimeline(prisonNumber).let { it?.prisonPeriod?.size ?: 0 }
-      log.info { "Retrieved $numberOfPrisonPeriods prison periods from the prison-api for prisoner $prisonNumber" }
+      try {
+        val numberOfPrisonPeriods = prisonApiClient.getPrisonTimeline(prisonNumber).let { it?.prisonPeriod?.size ?: 0 }
+        log.info { "Retrieved $numberOfPrisonPeriods prison periods from the prison-api for prisoner $prisonNumber" }
+      } catch (e: PrisonApiException) {
+        log.error { "Unable to retrieve data from the prison-api: ${e.message}" }
+      }
     }
 
     val timelineEntity = timelineRepository.findByPrisonNumber(prisonNumber)
