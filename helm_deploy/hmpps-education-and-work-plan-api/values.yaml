@@ -35,8 +35,8 @@ generic-service:
   namespace_secrets:
     hmpps-education-and-work-plan-api:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
-    PRISON_API_CLIENT_ID: "PRISON_API_CLIENT_ID"
-    PRISON_API_CLIENT_SECRET: "PRISON_API_CLIENT_SECRET"
+      PRISON_API_CLIENT_ID: "PRISON_API_CLIENT_ID"
+      PRISON_API_CLIENT_SECRET: "PRISON_API_CLIENT_SECRET"
     rds-postgresql-instance-output:
       DB_SERVER: "rds_instance_address"
       DB_NAME: "database_name"
