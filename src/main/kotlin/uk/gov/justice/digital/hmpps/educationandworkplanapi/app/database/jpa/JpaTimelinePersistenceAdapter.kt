@@ -67,7 +67,7 @@ class JpaTimelinePersistenceAdapter(
         val numberOfPrisonPeriods = prisonApiClient.getPrisonTimeline(prisonNumber).let { it?.prisonPeriod?.size ?: 0 }
         log.info { "Retrieved $numberOfPrisonPeriods prison periods from the prison-api for prisoner $prisonNumber" }
       } catch (e: PrisonApiException) {
-        log.error { "Unable to retrieve data from the prison-api: ${e.message}" }
+        log.error { "Unable to retrieve data from the prison-api: $e" }
       }
     }
 
