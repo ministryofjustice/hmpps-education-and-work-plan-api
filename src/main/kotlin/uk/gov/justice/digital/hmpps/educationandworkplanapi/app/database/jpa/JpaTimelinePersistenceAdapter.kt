@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.PrisonApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity.Companion.newTimelineForPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.timeline.TimelineEntityMapper
@@ -19,6 +21,9 @@ class JpaTimelinePersistenceAdapter(
   private val timelineRepository: TimelineRepository,
   private val timelineMapper: TimelineEntityMapper,
   private val timelineEventMapper: TimelineEventEntityMapper,
+  // TODO RR-566 - call prisonApiClient via service class
+  private val prisonApiClient: PrisonApiClient,
+  @Value("\${featureToggles.call-prison-api-enabled}") private val callPrisonApiEnabled: Boolean,
 ) : TimelinePersistenceAdapter {
 
   @Transactional
@@ -54,6 +59,12 @@ class JpaTimelinePersistenceAdapter(
   @Transactional
   override fun getTimelineForPrisoner(prisonNumber: String): Timeline? {
     log.info { "Getting Timeline for prisoner [$prisonNumber]" }
+
+    // TODO RR-566 - remove this temporary code
+    if (callPrisonApiEnabled) {
+      val numberOfPrisonPeriods = prisonApiClient.getPrisonTimeline(prisonNumber).let { it?.prisonPeriod?.size ?: 0 }
+      log.info { "Retrieved $numberOfPrisonPeriods prison periods from the prison-api for prisoner $prisonNumber" }
+    }
 
     val timelineEntity = timelineRepository.findByPrisonNumber(prisonNumber)
     return if (timelineEntity != null) timelineMapper.fromEntityToDomain(timelineEntity) else null
