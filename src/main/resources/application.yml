@@ -14,6 +14,18 @@ spring:
         jwt:
           jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
 
+      client:
+        registration:
+          prison-api:
+            provider: hmpps-auth
+            client-id: ${prison-api.client.id}
+            client-secret: ${prison-api.client.secret}
+            authorization-grant-type: client_credentials
+            scope: read
+        provider:
+          hmpps-auth:
+            token-uri: ${hmpps.auth.url}/oauth/token
+
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
     serialization:
@@ -86,3 +98,10 @@ springdoc:
   # swagger specification file served via /swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
   swagger-ui:
     url: '/openapi/EducationAndWorkPlanAPI.yml'
+
+apis:
+  prison-api:
+    url: ${PRISON_API_URL}
+
+featureToggles:
+  call-prison-api-enabled: ${CALL_PRISON_API_ENABLED:false}
