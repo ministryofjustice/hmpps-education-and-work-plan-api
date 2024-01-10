@@ -28999,7 +28999,6 @@
         "required": [
           "admittedIntoPrisonId",
           "inwardType",
-          "outwardType",
           "reasonInToPrison"
         ],
         "type": "object",

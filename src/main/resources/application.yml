@@ -21,7 +21,7 @@ spring:
             client-id: ${prison-api.client.id}
             client-secret: ${prison-api.client.secret}
             authorization-grant-type: client_credentials
-            scope: READ
+            scope: read
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
