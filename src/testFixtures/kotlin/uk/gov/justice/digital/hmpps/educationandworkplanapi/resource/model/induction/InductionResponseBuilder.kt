@@ -16,6 +16,7 @@ fun aValidInductionResponse(): InductionResponse = aValidInductionResponseForPri
 
 fun aValidInductionResponseForPrisonerNotLookingToWork(
   reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = "A1234AB",
   workOnRelease: WorkOnReleaseResponse = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(),
   previousQualifications: PreviousQualificationsResponse? = aValidPreviousQualificationsResponse(
     educationLevel = HighestEducationLevel.NOT_SURE,
@@ -35,6 +36,7 @@ fun aValidInductionResponseForPrisonerNotLookingToWork(
   updatedAtPrison: String = "BXI",
 ): InductionResponse = InductionResponse(
   reference = reference,
+  prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
   previousQualifications = previousQualifications,
   previousTraining = previousTraining,
@@ -54,6 +56,7 @@ fun aValidInductionResponseForPrisonerNotLookingToWork(
 
 fun aValidInductionResponseForPrisonerLookingToWork(
   reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = "A1234AB",
   workOnRelease: WorkOnReleaseResponse = aValidWorkOnReleaseResponseForPrisonerLookingToWork(),
   previousQualifications: PreviousQualificationsResponse? = aValidPreviousQualificationsResponse(),
   previousTraining: PreviousTrainingResponse? = aValidPreviousTrainingResponse(),
@@ -71,6 +74,7 @@ fun aValidInductionResponseForPrisonerLookingToWork(
   updatedAtPrison: String = "BXI",
 ): InductionResponse = InductionResponse(
   reference = reference,
+  prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
   previousQualifications = previousQualifications,
   previousTraining = previousTraining,
@@ -90,6 +94,7 @@ fun aValidInductionResponseForPrisonerLookingToWork(
 
 fun aFullyPopulatedInductionResponse(
   reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = "A1234AB",
   workOnRelease: WorkOnReleaseResponse = aValidWorkOnReleaseResponseForPrisonerLookingToWork(),
   previousQualifications: PreviousQualificationsResponse? = aValidPreviousQualificationsResponse(),
   previousTraining: PreviousTrainingResponse? = aValidPreviousTrainingResponse(),
@@ -107,6 +112,7 @@ fun aFullyPopulatedInductionResponse(
   updatedAtPrison: String = "BXI",
 ): InductionResponse = InductionResponse(
   reference = reference,
+  prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
   previousQualifications = previousQualifications,
   previousTraining = previousTraining,

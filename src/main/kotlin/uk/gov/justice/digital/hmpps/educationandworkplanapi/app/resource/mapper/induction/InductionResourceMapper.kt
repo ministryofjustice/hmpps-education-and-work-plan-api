@@ -51,6 +51,7 @@ class InductionResourceMapper(
     with(induction) {
       return InductionResponse(
         reference = reference,
+        prisonNumber = prisonNumber,
         workOnRelease = workOnReleaseMapper.toWorkOnReleaseResponse(workOnRelease),
         previousQualifications = qualificationsMapper.toPreviousQualificationsResponse(previousQualifications),
         previousTraining = previousTrainingMapper.toPreviousTrainingResponse(previousTraining),
