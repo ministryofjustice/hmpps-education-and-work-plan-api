@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.6'
+  version: '1.7.7'
   description: Education and Work Plan API
   contact:
     name: Matt Wills
@@ -896,6 +896,10 @@ components:
           format: uuid
           description: A unique reference for this Induction.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
         workOnRelease:
           $ref: '#/components/schemas/WorkOnReleaseResponse'
         previousQualifications:

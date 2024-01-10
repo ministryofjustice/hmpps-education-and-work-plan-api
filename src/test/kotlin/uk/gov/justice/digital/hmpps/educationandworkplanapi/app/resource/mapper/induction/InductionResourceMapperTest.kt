@@ -103,6 +103,7 @@ class InductionResourceMapperTest {
     val induction = aFullyPopulatedInduction()
     val expectedInduction = aFullyPopulatedInductionResponse(
       reference = induction.reference,
+      prisonNumber = induction.prisonNumber,
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
       createdAt = induction.createdAt!!.atOffset(ZoneOffset.UTC),
