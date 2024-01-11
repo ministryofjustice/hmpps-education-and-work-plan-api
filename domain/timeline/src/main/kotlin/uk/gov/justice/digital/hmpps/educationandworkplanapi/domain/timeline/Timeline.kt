@@ -24,4 +24,11 @@ class Timeline(
    */
   fun addEvent(timelineEvent: TimelineEvent) =
     events.add(timelineEvent)
+
+  /**
+   * Adds one or more [TimelineEvent]s to the timeline.
+   */
+  fun addEvents(timelineEvents: List<TimelineEvent>) {
+    events.addAll(timelineEvents)
+  }
 }

@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -15,7 +15,6 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.PrisonApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.aValidTimelineEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.aValidTimelineEventEntity
@@ -28,6 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aVal
 @ExtendWith(MockitoExtension::class)
 class JpaTimelinePersistenceAdapterTest {
 
+  @InjectMocks
   private lateinit var persistenceAdapter: JpaTimelinePersistenceAdapter
 
   @Mock
@@ -39,23 +39,8 @@ class JpaTimelinePersistenceAdapterTest {
   @Mock
   private lateinit var timelineEventMapper: TimelineEventEntityMapper
 
-  @Mock
-  private lateinit var prisonApiClient: PrisonApiClient
-
   @Captor
   private lateinit var timelineEntityCaptor: ArgumentCaptor<TimelineEntity>
-
-  @BeforeEach
-  fun setup() {
-    persistenceAdapter = JpaTimelinePersistenceAdapter(
-      timelineRepository = timelineRepository,
-      timelineMapper = timelineMapper,
-      timelineEventMapper = timelineEventMapper,
-      prisonApiClient = prisonApiClient,
-      // TODO RR-566 - remove this boolean and revert back to @InjectMocks
-      callPrisonApiEnabled = false,
-    )
-  }
 
   @Nested
   inner class AddTimelineEvent {
