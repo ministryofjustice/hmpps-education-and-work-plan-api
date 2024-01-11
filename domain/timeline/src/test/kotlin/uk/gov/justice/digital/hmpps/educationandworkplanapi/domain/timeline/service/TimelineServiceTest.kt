@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.ser
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aVal
 @ExtendWith(MockitoExtension::class)
 class TimelineServiceTest {
 
-  @InjectMocks
   private lateinit var service: TimelineService
 
   @Mock
@@ -27,6 +26,13 @@ class TimelineServiceTest {
 
   @Mock
   private lateinit var prisonTimelineService: PrisonTimelineService
+
+  private val callPrisonApiEnabled = true
+
+  @BeforeEach
+  fun setup() {
+    service = TimelineService(persistenceAdapter, prisonTimelineService, callPrisonApiEnabled)
+  }
 
   companion object {
     private const val prisonNumber = "A1234AB"

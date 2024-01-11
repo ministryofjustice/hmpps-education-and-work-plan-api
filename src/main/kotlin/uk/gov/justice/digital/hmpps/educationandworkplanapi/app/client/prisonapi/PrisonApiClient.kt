@@ -1,9 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
+
+private val log = KotlinLogging.logger {}
 
 @Component
 class PrisonApiClient(private val prisonApiWebClient: WebClient) {
@@ -13,8 +16,8 @@ class PrisonApiClient(private val prisonApiWebClient: WebClient) {
    *
    *  @throws [PrisonApiException] if there is a problem retrieving the data.
    */
-  fun getPrisonMovementEvents(prisonNumber: String): PrisonMovementEvents? {
-    prisonApiWebClient
+  fun getPrisonMovementEvents(prisonNumber: String): PrisonMovementEvents {
+    val prisonerInPrisonSummary = prisonApiWebClient
       .get()
       .uri("/api/offenders/$prisonNumber/prison-timeline")
       .retrieve()
@@ -25,6 +28,8 @@ class PrisonApiClient(private val prisonApiWebClient: WebClient) {
       }
       .block()
     // TODO RR-580 - map PrisonerInPrisonSummary to PrisonMovementEvents
+    val numberOfPeriods = prisonerInPrisonSummary?.prisonPeriod?.size ?: 0
+    log.info { "Retrieved $numberOfPeriods prison periods from the prison-api for prisoner $prisonNumber" }
     return PrisonMovementEvents(prisonNumber, emptyMap())
   }
 }

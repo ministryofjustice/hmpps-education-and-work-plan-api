@@ -6,8 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.given
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiClient
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 
 @ExtendWith(MockitoExtension::class)
@@ -24,7 +29,7 @@ class PrisonerApiTimelineServiceTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     // TODO RR-580 populate and map PrisonMovementEvents
-    // given(prisonApiClient.getPrisonMovementEvents(any())).willReturn(PrisonMovementEvents(prisonNumber, emptyMap()))
+    given(prisonApiClient.getPrisonMovementEvents(any())).willReturn(PrisonMovementEvents(prisonNumber, emptyMap()))
     val expected = emptyList<TimelineEvent>()
 
     // When
@@ -32,6 +37,23 @@ class PrisonerApiTimelineServiceTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
-    // verify(prisonApiClient).getPrisonMovementEvents(prisonNumber)
+    verify(prisonApiClient).getPrisonMovementEvents(prisonNumber)
+  }
+
+  @Test
+  fun `should fail to get Prison timeline events given prison-api is unavailable`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    given(prisonApiClient.getPrisonMovementEvents(any())).willThrow(
+      PrisonApiException("Error retrieving prison history for Prisoner $prisonNumber", RuntimeException()),
+    )
+    val expected = emptyList<TimelineEvent>()
+
+    // When
+    val actual = prisonerApiTimelineService.getPrisonTimelineEvents(prisonNumber)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+    verify(prisonApiClient).getPrisonMovementEvents(prisonNumber)
   }
 }
