@@ -23,4 +23,5 @@ generic-service:
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
 
-exportToApServiceAccountName: hmpps-education-and-work-plan-dev-to-ap-s3
+generic-data-analytics-extractor:
+  serviceAccountName: hmpps-education-and-work-plan-dev-to-ap-s3
