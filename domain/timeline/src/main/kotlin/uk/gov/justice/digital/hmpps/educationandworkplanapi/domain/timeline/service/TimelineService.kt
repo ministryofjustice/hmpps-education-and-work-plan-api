@@ -16,6 +16,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Time
  */
 class TimelineService(
   private val persistenceAdapter: TimelinePersistenceAdapter,
+  private val prisonTimelineService: PrisonTimelineService,
+  private val callPrisonApiEnabled: Boolean,
 ) {
 
   /**
@@ -34,6 +36,13 @@ class TimelineService(
    * Returns the [Timeline] for the prisoner identified by their prison number. Otherwise, throws
    * [TimelineNotFoundException] if it cannot be found.
    */
-  fun getTimelineForPrisoner(prisonNumber: String): Timeline =
-    persistenceAdapter.getTimelineForPrisoner(prisonNumber) ?: throw TimelineNotFoundException(prisonNumber)
+  fun getTimelineForPrisoner(prisonNumber: String): Timeline {
+    val prisonerTimeline =
+      persistenceAdapter.getTimelineForPrisoner(prisonNumber) ?: throw TimelineNotFoundException(prisonNumber)
+
+    if (callPrisonApiEnabled) {
+      prisonerTimeline.addEvents(prisonTimelineService.getPrisonTimelineEvents(prisonNumber))
+    }
+    return prisonerTimeline
+  }
 }

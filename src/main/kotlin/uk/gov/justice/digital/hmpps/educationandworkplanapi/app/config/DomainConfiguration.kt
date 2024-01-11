@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanEventService
@@ -11,6 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.PrisonTimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
 
@@ -37,8 +39,12 @@ class DomainConfiguration {
     ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService)
 
   @Bean
-  fun timelineDomainService(timelinePersistenceAdapter: TimelinePersistenceAdapter): TimelineService =
-    TimelineService(timelinePersistenceAdapter)
+  fun timelineDomainService(
+    timelinePersistenceAdapter: TimelinePersistenceAdapter,
+    prisonTimelineService: PrisonTimelineService,
+    @Value("\${featureToggles.call-prison-api-enabled}") callPrisonApiEnabled: Boolean,
+  ): TimelineService =
+    TimelineService(timelinePersistenceAdapter, prisonTimelineService, callPrisonApiEnabled)
 
   @Bean
   fun inductionDomainService(
