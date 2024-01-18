@@ -28923,6 +28923,8 @@
       },
       "PrisonPeriod": {
         "required": [
+          "bookNumber",
+          "bookingId",
           "entryDate",
           "movementDates",
           "prisons",
@@ -28940,12 +28942,14 @@
           "entryDate": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
+            "format": "date-time",
             "description": "Date they first entered prison in this booking",
             "example": "2021-07-05T10:35:17"
           },
           "releaseDate": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
+            "format": "date-time",
             "description": "Date they were last released from prison in this booking if they have been released",
             "example": "2021-07-05T10:35:17"
           },
@@ -29011,6 +29015,7 @@
           "dateInToPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
+            "format": "date-time",
             "example": "2021-07-05T10:35:17"
           },
           "inwardType": {
@@ -29029,6 +29034,7 @@
           "dateOutOfPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
+            "format": "date-time",
             "description": "Date this sub-period ended - if it has ended",
             "example": "2021-07-05T10:35:17"
           },
@@ -29062,12 +29068,14 @@
           "dateOutOfPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
+            "format": "date-time",
             "description": "Date prisoner left the original prison",
             "example": "2021-07-05T10:35:17"
           },
           "dateInToPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
+            "format": "date-time",
             "description": "Date prisoner entered the new prison. Can be absent if they have not arrived at the prison yet",
             "example": "2021-07-05T10:35:17"
           },
