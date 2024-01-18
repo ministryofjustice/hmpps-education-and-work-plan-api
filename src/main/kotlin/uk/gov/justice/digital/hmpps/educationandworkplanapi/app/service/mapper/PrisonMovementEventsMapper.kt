@@ -22,20 +22,14 @@ import java.util.UUID
   ],
 )
 abstract class PrisonMovementEventsMapper {
+
   fun toTimelineEvents(prisonMovementEvents: PrisonMovementEvents): List<TimelineEvent> {
-    val timelineEvents = mutableListOf<TimelineEvent>()
-    prisonMovementEvents.prisonBookings.map { booking ->
-      booking.value.forEach { movement ->
+    return prisonMovementEvents.prisonBookings.flatMap { booking ->
+      booking.value.map { movement ->
         val bookingId = booking.key.toString()
-        timelineEvents.add(
-          toTimelineEvent(
-            bookingId = bookingId,
-            prisonMovement = movement,
-          ),
-        )
+        toTimelineEvent(bookingId = bookingId, prisonMovement = movement)
       }
     }
-    return timelineEvents
   }
 
   @Mapping(target = "reference", expression = "java( java.util.UUID.randomUUID() )")
