@@ -24,7 +24,7 @@ import java.util.UUID
 abstract class PrisonMovementEventsMapper {
   fun toTimelineEvents(prisonMovementEvents: PrisonMovementEvents): List<TimelineEvent> {
     val timelineEvents = mutableListOf<TimelineEvent>()
-    prisonMovementEvents.prisonMovements.map { booking ->
+    prisonMovementEvents.prisonBookings.map { booking ->
       booking.value.forEach { movement ->
         val bookingId = booking.key.toString()
         timelineEvents.add(

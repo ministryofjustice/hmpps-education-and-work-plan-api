@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 fun aValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
-  prisonMovements: Map<Long, List<PrisonMovementEvent>> = mapOf(
+  prisonBookings: Map<Long, List<PrisonMovementEvent>> = mapOf(
     1L to listOf(
       aValidAdmissionPrisonMovementEvent(),
       aValidReleasePrisonMovementEvent(),
@@ -22,12 +22,12 @@ fun aValidPrisonMovementEvents(
 ): PrisonMovementEvents =
   PrisonMovementEvents(
     prisonNumber = prisonNumber,
-    prisonMovements = prisonMovements,
+    prisonBookings = prisonBookings,
   )
 
 fun anotherValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
-  prisonMovements: Map<Long, List<PrisonMovementEvent>> = mapOf(
+  prisonBookings: Map<Long, List<PrisonMovementEvent>> = mapOf(
     2L to listOf(
       anotherValidAdmissionPrisonMovementEvent(),
       anotherValidReleasePrisonMovementEvent(),
@@ -36,7 +36,7 @@ fun anotherValidPrisonMovementEvents(
 ): PrisonMovementEvents =
   PrisonMovementEvents(
     prisonNumber = prisonNumber,
-    prisonMovements = prisonMovements,
+    prisonBookings = prisonBookings,
   )
 
 fun aValidAdmissionPrisonMovementEvent(

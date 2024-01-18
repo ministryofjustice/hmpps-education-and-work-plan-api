@@ -11,16 +11,16 @@ class PrisonApiMapper {
     prisonerNumber: String,
     prisonerInPrisonSummary: PrisonerInPrisonSummary,
   ): PrisonMovementEvents {
-    val prisonMovements = mutableMapOf<Long, List<PrisonMovementEvent>>()
+    val prisonBookings = mutableMapOf<Long, List<PrisonMovementEvent>>()
 
     prisonerInPrisonSummary.prisonPeriod?.forEach {
       val movementEvents = mutableListOf<PrisonMovementEvent>()
       movementEvents.addAll(buildAdmissionsAndReleases(it.movementDates))
       movementEvents.addAll(buildTransfers(it.transfers))
-      prisonMovements[it.bookingId] = movementEvents
+      prisonBookings[it.bookingId] = movementEvents
     }
 
-    return PrisonMovementEvents(prisonerNumber, prisonMovements)
+    return PrisonMovementEvents(prisonerNumber, prisonBookings)
   }
 
   private fun buildAdmissionsAndReleases(movements: List<SignificantMovement>): List<PrisonMovementEvent> {

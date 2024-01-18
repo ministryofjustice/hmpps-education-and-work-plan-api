@@ -95,7 +95,7 @@ class PrisonMovementEventsMapperTest {
   fun `should map to TimelineEvents given only one admission event`() {
     // Given
     val prisonMovementEvents = aValidPrisonMovementEvents(
-      prisonMovements = mapOf(1L to listOf(aValidAdmissionPrisonMovementEvent())),
+      prisonBookings = mapOf(1L to listOf(aValidAdmissionPrisonMovementEvent())),
     )
     val expected = listOf(
       aValidPrisonMovementTimelineEvent(
@@ -116,7 +116,7 @@ class PrisonMovementEventsMapperTest {
   @Test
   fun `should map to TimelineEvents given no prison movements`() {
     // Given
-    val prisonMovementEvents = aValidPrisonMovementEvents(prisonMovements = emptyMap()) // should never happen
+    val prisonMovementEvents = aValidPrisonMovementEvents(prisonBookings = emptyMap()) // should never happen
     val expected = emptyList<TimelineEvent>()
 
     // When

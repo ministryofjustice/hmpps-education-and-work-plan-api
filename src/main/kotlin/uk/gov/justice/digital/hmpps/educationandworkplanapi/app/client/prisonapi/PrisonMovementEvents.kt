@@ -11,5 +11,5 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonap
  */
 data class PrisonMovementEvents(
   val prisonNumber: String,
-  val prisonMovements: Map<Long, List<PrisonMovementEvent>>,
+  val prisonBookings: Map<Long, List<PrisonMovementEvent>>,
 )
