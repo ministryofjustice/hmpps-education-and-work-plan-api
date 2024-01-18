@@ -4,7 +4,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonap
  * A simple enum to represent the types of movements in or out of Prisons, or between Prisons.
  */
 enum class PrisonMovementType {
-  ARRIVAL,
+  ADMISSION,
   RELEASE,
   TRANSFER,
 }

@@ -15,26 +15,26 @@ class PrisonApiMapper {
 
     prisonerInPrisonSummary.prisonPeriod?.forEach {
       val movementEvents = mutableListOf<PrisonMovementEvent>()
-      movementEvents.addAll(buildArrivalsAndReleases(it.movementDates))
+      movementEvents.addAll(buildAdmissionsAndReleases(it.movementDates))
       movementEvents.addAll(buildTransfers(it.transfers))
-      prisonMovements[it.bookingId!!] = movementEvents
+      prisonMovements[it.bookingId] = movementEvents
     }
 
     return PrisonMovementEvents(prisonerNumber, prisonMovements)
   }
 
-  private fun buildArrivalsAndReleases(movements: List<SignificantMovement>): List<PrisonMovementEvent> {
-    val arrivalsAndReleases = mutableListOf<PrisonMovementEvent>()
+  private fun buildAdmissionsAndReleases(movements: List<SignificantMovement>): List<PrisonMovementEvent> {
+    val admissionsAndReleases = mutableListOf<PrisonMovementEvent>()
     movements.forEach {
       if (isAdmissionIntoPrison(it)) {
-        arrivalsAndReleases.add(toPrisonArrivalEvent(it))
+        admissionsAndReleases.add(toPrisonAdmissionEvent(it))
       }
       if (isReleaseFromPrison(it)) {
-        arrivalsAndReleases.add(toPrisonReleaseEvent(it))
+        admissionsAndReleases.add(toPrisonReleaseEvent(it))
       }
     }
 
-    return arrivalsAndReleases
+    return admissionsAndReleases
   }
 
   private fun buildTransfers(transfers: List<TransferDetail>): List<PrisonMovementEvent> =
@@ -47,10 +47,10 @@ class PrisonApiMapper {
       )
     } ?: emptyList()
 
-  private fun toPrisonArrivalEvent(movement: SignificantMovement): PrisonMovementEvent =
+  private fun toPrisonAdmissionEvent(movement: SignificantMovement): PrisonMovementEvent =
     PrisonMovementEvent(
       date = movement.dateInToPrison!!.toLocalDate(),
-      movementType = PrisonMovementType.ARRIVAL,
+      movementType = PrisonMovementType.ADMISSION,
       fromPrisonId = null,
       toPrisonId = movement.admittedIntoPrisonId,
     )

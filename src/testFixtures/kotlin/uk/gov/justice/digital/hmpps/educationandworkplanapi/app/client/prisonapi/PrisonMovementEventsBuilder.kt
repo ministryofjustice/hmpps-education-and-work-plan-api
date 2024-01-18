@@ -7,15 +7,15 @@ fun aValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
   prisonMovements: Map<Long, List<PrisonMovementEvent>> = mapOf(
     1L to listOf(
-      aValidArrivalPrisonMovementEvent(),
+      aValidAdmissionPrisonMovementEvent(),
       aValidReleasePrisonMovementEvent(),
-      anotherValidArrivalPrisonMovementEvent(),
+      anotherValidAdmissionPrisonMovementEvent(),
       anotherValidReleasePrisonMovementEvent(),
       aValidTransferPrisonMovementEvent(),
       anotherValidTransferPrisonMovementEvent(),
     ),
     2L to listOf(
-      anotherValidArrivalPrisonMovementEvent(),
+      anotherValidAdmissionPrisonMovementEvent(),
       anotherValidReleasePrisonMovementEvent(),
     ),
   ),
@@ -29,7 +29,7 @@ fun anotherValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
   prisonMovements: Map<Long, List<PrisonMovementEvent>> = mapOf(
     2L to listOf(
-      anotherValidArrivalPrisonMovementEvent(),
+      anotherValidAdmissionPrisonMovementEvent(),
       anotherValidReleasePrisonMovementEvent(),
     ),
   ),
@@ -39,9 +39,9 @@ fun anotherValidPrisonMovementEvents(
     prisonMovements = prisonMovements,
   )
 
-fun aValidArrivalPrisonMovementEvent(
+fun aValidAdmissionPrisonMovementEvent(
   date: LocalDate = LocalDate.now().minusMonths(6),
-  movementType: PrisonMovementType = PrisonMovementType.ARRIVAL,
+  movementType: PrisonMovementType = PrisonMovementType.ADMISSION,
   fromPrisonId: String? = null,
   toPrisonId: String? = "BMI",
 ): PrisonMovementEvent = PrisonMovementEvent(
@@ -51,9 +51,9 @@ fun aValidArrivalPrisonMovementEvent(
   toPrisonId = toPrisonId,
 )
 
-fun anotherValidArrivalPrisonMovementEvent(
+fun anotherValidAdmissionPrisonMovementEvent(
   date: LocalDate = LocalDate.now().minusMonths(1),
-  movementType: PrisonMovementType = PrisonMovementType.ARRIVAL,
+  movementType: PrisonMovementType = PrisonMovementType.ADMISSION,
   fromPrisonId: String? = null,
   toPrisonId: String? = "BXI",
 ): PrisonMovementEvent = PrisonMovementEvent(

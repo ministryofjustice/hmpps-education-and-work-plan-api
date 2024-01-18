@@ -22,15 +22,15 @@ class PrisonApiMapperTest {
       prisonNumber = prisonNumber,
       prisonMovements = mapOf(
         1L to listOf(
-          aValidArrivalPrisonMovementEvent(),
+          aValidAdmissionPrisonMovementEvent(),
           aValidReleasePrisonMovementEvent(),
-          anotherValidArrivalPrisonMovementEvent(),
+          anotherValidAdmissionPrisonMovementEvent(),
           anotherValidReleasePrisonMovementEvent(),
           aValidTransferPrisonMovementEvent(),
           anotherValidTransferPrisonMovementEvent(),
         ),
         2L to listOf(
-          anotherValidArrivalPrisonMovementEvent(),
+          anotherValidAdmissionPrisonMovementEvent(),
           anotherValidReleasePrisonMovementEvent(),
         ),
       ),
@@ -48,7 +48,7 @@ class PrisonApiMapperTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val prisonSummary = aValidPrisonerInPrisonSummary(
-      prisonPeriod = emptyList(), // not expected to happen in practice - there should always be an arrival event(?)
+      prisonPeriod = emptyList(), // not expected to happen in practice - there should always be an admission event
     )
     val expected = aValidPrisonMovementEvents(prisonNumber = prisonNumber, prisonMovements = emptyMap())
 
@@ -66,7 +66,7 @@ class PrisonApiMapperTest {
     val prisonSummary = aValidPrisonerInPrisonSummary(
       prisonPeriod = listOf(
         aValidPrisonPeriod(
-          movementDates = emptyList(), // not expected to happen in practice - there should always be an arrival event(?)
+          movementDates = emptyList(), // not expected to happen in practice - there should always be an admission event
           transfers = emptyList(),
         ),
       ),

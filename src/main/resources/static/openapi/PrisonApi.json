@@ -28923,6 +28923,8 @@
       },
       "PrisonPeriod": {
         "required": [
+          "bookNumber",
+          "bookingId",
           "entryDate",
           "movementDates",
           "prisons",

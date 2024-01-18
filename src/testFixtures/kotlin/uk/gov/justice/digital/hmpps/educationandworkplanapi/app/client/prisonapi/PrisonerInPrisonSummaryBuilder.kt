@@ -118,7 +118,7 @@ fun aValidPrisonPeriod(
     anotherValidTransferDetail(), // MDI to BXI
   ),
   prisons: List<String> = listOf("BMI", "MDI", "BXI"),
-  bookNumber: String? = "1234A",
+  bookNumber: String = "1234A",
   bookingId: Long = 1,
   releaseDate: OffsetDateTime? = null,
 ): PrisonPeriod =
@@ -139,7 +139,7 @@ fun anotherValidPrisonPeriod(
   ),
   transfers: List<TransferDetail> = emptyList(), // according to the swagger spec, this will never be null
   prisons: List<String> = listOf("BXI"),
-  bookNumber: String? = "5678B",
+  bookNumber: String = "5678B",
   bookingId: Long = 2,
   releaseDate: OffsetDateTime? = null,
 ): PrisonPeriod =
