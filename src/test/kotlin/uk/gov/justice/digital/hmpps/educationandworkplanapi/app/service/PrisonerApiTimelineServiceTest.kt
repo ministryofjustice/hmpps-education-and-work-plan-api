@@ -12,8 +12,10 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonMovementEvents
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.mapper.PrisonMovementEventsMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidPrisonMovementTimelineEvent
 
 @ExtendWith(MockitoExtension::class)
 class PrisonerApiTimelineServiceTest {
@@ -24,13 +26,17 @@ class PrisonerApiTimelineServiceTest {
   @Mock
   private lateinit var prisonApiClient: PrisonApiClient
 
+  @Mock
+  private lateinit var prisonMovementsMapper: PrisonMovementEventsMapper
+
   @Test
   fun `should get Prison timeline events`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    // TODO RR-580 populate and map PrisonMovementEvents
-    given(prisonApiClient.getPrisonMovementEvents(any())).willReturn(PrisonMovementEvents(prisonNumber, emptyMap()))
-    val expected = emptyList<TimelineEvent>()
+    val prisonMovementEvents = aValidPrisonMovementEvents()
+    val expected = listOf(aValidPrisonMovementTimelineEvent())
+    given(prisonApiClient.getPrisonMovementEvents(any())).willReturn(prisonMovementEvents)
+    given(prisonMovementsMapper.toTimelineEvents(any())).willReturn(expected)
 
     // When
     val actual = prisonerApiTimelineService.getPrisonTimelineEvents(prisonNumber)
@@ -38,6 +44,7 @@ class PrisonerApiTimelineServiceTest {
     // Then
     assertThat(actual).isEqualTo(expected)
     verify(prisonApiClient).getPrisonMovementEvents(prisonNumber)
+    verify(prisonMovementsMapper).toTimelineEvents(prisonMovementEvents)
   }
 
   @Test

@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.prisonapi.resource.model.TransferDetail
 import java.time.OffsetDateTime
 
 /**
- * Constructs a [PrisonerInPrisonSummary] based on the following response from the prison-api:
+ * Constructs a [PrisonerInPrisonSummary] based on the following response from the prison-api (ignoring dates):
  * ```
  *   {
  *    "prisonerNumber":"A1234BC",
@@ -179,7 +179,7 @@ fun aValidSignificantMovementRelease(
   admittedIntoPrisonId: String = "MDI",
   dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
   reasonOutOfPrison: String? = "Conditional Release (CJA91) -SH Term>1YR",
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(2),
+  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(3),
   outwardType: SignificantMovement.OutwardType? = SignificantMovement.OutwardType.REL,
   releaseFromPrisonId: String? = "BXI",
 ): SignificantMovement = SignificantMovement(
@@ -197,9 +197,9 @@ fun aValidSignificantMovementAdmissionAndRelease(
   reasonInToPrison: String = "Recall From Intermittent Custody",
   inwardType: SignificantMovement.InwardType = SignificantMovement.InwardType.ADM,
   admittedIntoPrisonId: String = "BXI",
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(1),
+  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(2),
   reasonOutOfPrison: String? = "Conditional Release (CJA91) -SH Term>1YR",
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now(),
+  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(1),
   outwardType: SignificantMovement.OutwardType? = SignificantMovement.OutwardType.REL,
   releaseFromPrisonId: String? = "BXI",
 ): SignificantMovement = SignificantMovement(
@@ -228,8 +228,8 @@ fun aValidTransferDetail(
 )
 
 fun anotherValidTransferDetail(
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(1),
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(1),
+  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
+  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
   transferReason: String? = "Appeals",
   fromPrisonId: String? = "MDI",
   toPrisonId: String = "BXI",
