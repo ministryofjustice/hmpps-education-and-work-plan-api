@@ -20,7 +20,7 @@ class PrisonApiMapperTest {
     val prisonSummary = aValidPrisonerInPrisonSummary()
     val expected = aValidPrisonMovementEvents(
       prisonNumber = prisonNumber,
-      prisonMovements = mapOf(
+      prisonBookings = mapOf(
         1L to listOf(
           aValidAdmissionPrisonMovementEvent(),
           aValidReleasePrisonMovementEvent(),
@@ -50,7 +50,7 @@ class PrisonApiMapperTest {
     val prisonSummary = aValidPrisonerInPrisonSummary(
       prisonPeriod = emptyList(), // not expected to happen in practice - there should always be an admission event
     )
-    val expected = aValidPrisonMovementEvents(prisonNumber = prisonNumber, prisonMovements = emptyMap())
+    val expected = aValidPrisonMovementEvents(prisonNumber = prisonNumber, prisonBookings = emptyMap())
 
     // When
     val actual = mapper.toPrisonMovementEvents(prisonNumber, prisonSummary)
@@ -60,7 +60,7 @@ class PrisonApiMapperTest {
   }
 
   @Test
-  fun `should convert to PrisonMovementEvents given empty movement dates and transfers`() {
+  fun `should convert to PrisonMovementEvents given empty prison bookings`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val prisonSummary = aValidPrisonerInPrisonSummary(
@@ -73,7 +73,7 @@ class PrisonApiMapperTest {
     )
     val expected = aValidPrisonMovementEvents(
       prisonNumber = prisonNumber,
-      prisonMovements = mapOf(
+      prisonBookings = mapOf(
         1L to emptyList(),
       ),
     )

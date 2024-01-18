@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 fun aValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
-  prisonMovements: Map<Long, List<PrisonMovementEvent>> = mapOf(
+  prisonBookings: Map<Long, List<PrisonMovementEvent>> = mapOf(
     1L to listOf(
       aValidAdmissionPrisonMovementEvent(),
       aValidReleasePrisonMovementEvent(),
@@ -22,12 +22,12 @@ fun aValidPrisonMovementEvents(
 ): PrisonMovementEvents =
   PrisonMovementEvents(
     prisonNumber = prisonNumber,
-    prisonMovements = prisonMovements,
+    prisonBookings = prisonBookings,
   )
 
 fun anotherValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
-  prisonMovements: Map<Long, List<PrisonMovementEvent>> = mapOf(
+  prisonBookings: Map<Long, List<PrisonMovementEvent>> = mapOf(
     2L to listOf(
       anotherValidAdmissionPrisonMovementEvent(),
       anotherValidReleasePrisonMovementEvent(),
@@ -36,7 +36,7 @@ fun anotherValidPrisonMovementEvents(
 ): PrisonMovementEvents =
   PrisonMovementEvents(
     prisonNumber = prisonNumber,
-    prisonMovements = prisonMovements,
+    prisonBookings = prisonBookings,
   )
 
 fun aValidAdmissionPrisonMovementEvent(
@@ -52,7 +52,7 @@ fun aValidAdmissionPrisonMovementEvent(
 )
 
 fun anotherValidAdmissionPrisonMovementEvent(
-  date: LocalDate = LocalDate.now().minusMonths(1),
+  date: LocalDate = LocalDate.now().minusMonths(2),
   movementType: PrisonMovementType = PrisonMovementType.ADMISSION,
   fromPrisonId: String? = null,
   toPrisonId: String? = "BXI",
@@ -64,7 +64,7 @@ fun anotherValidAdmissionPrisonMovementEvent(
 )
 
 fun aValidReleasePrisonMovementEvent(
-  date: LocalDate = LocalDate.now().minusMonths(2),
+  date: LocalDate = LocalDate.now().minusMonths(3),
   movementType: PrisonMovementType = PrisonMovementType.RELEASE,
   fromPrisonId: String? = "BXI",
   toPrisonId: String? = null,
@@ -76,7 +76,7 @@ fun aValidReleasePrisonMovementEvent(
 )
 
 fun anotherValidReleasePrisonMovementEvent(
-  date: LocalDate = LocalDate.now(),
+  date: LocalDate = LocalDate.now().minusMonths(1),
   movementType: PrisonMovementType = PrisonMovementType.RELEASE,
   fromPrisonId: String? = "BXI",
   toPrisonId: String? = null,
@@ -100,7 +100,7 @@ fun aValidTransferPrisonMovementEvent(
 )
 
 fun anotherValidTransferPrisonMovementEvent(
-  date: LocalDate = LocalDate.now().minusMonths(1),
+  date: LocalDate = LocalDate.now().minusMonths(4),
   movementType: PrisonMovementType = PrisonMovementType.TRANSFER,
   fromPrisonId: String? = "MDI",
   toPrisonId: String? = "BXI",
