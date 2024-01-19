@@ -11,6 +11,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAut
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonPeriod
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidSignificantMovementAdmission
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidTransferDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -94,6 +98,24 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    wiremockService.stubGetPrisonTimelineFromPrisonApi(
+      prisonNumber,
+      aValidPrisonerInPrisonSummary(
+        prisonerNumber = prisonNumber,
+        prisonPeriod = listOf(
+          aValidPrisonPeriod(
+            prisons = listOf("MDI", "BXI"),
+            bookingId = 1L,
+            movementDates = listOf(
+              aValidSignificantMovementAdmission(admittedIntoPrisonId = "MDI"),
+            ),
+            transfers = listOf(
+              aValidTransferDetail(fromPrisonId = "MDI", toPrisonId = "BXI"),
+            ),
+          ),
+        ),
+      ),
+    )
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       reviewDate = LocalDate.now(),
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
@@ -113,25 +135,43 @@ class GetTimelineTest : IntegrationTestBase() {
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
     val goal = actionPlan!!.goals!![0]
     val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(2)
+    assertThat(actual.events).hasSize(4)
+    val actionPlanCreatedCorrelationId = actual.events[3].correlationId
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .eventsHaveSameCorrelation()
       .event(1) {
+        it.hasSourceReference("1")
+          .hasEventType(TimelineEventType.PRISON_ADMISSION)
+          .hasPrisonId("MDI")
+          .wasActionedBy("system")
+          .hasNoActionedByDisplayName()
+          .hasNoContextualInfo()
+      }
+      .event(2) {
+        it.hasSourceReference("1")
+          .hasEventType(TimelineEventType.PRISON_TRANSFER)
+          .hasPrisonId("BXI")
+          .wasActionedBy("system")
+          .hasNoActionedByDisplayName()
+          .hasContextualInfo("MDI")
+      }
+      .event(3) {
         it.hasSourceReference(actionPlan.reference.toString())
           .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
           .hasPrisonId("BXI")
           .wasActionedBy("auser_gen")
           .hasActionedByDisplayName("Albert User")
           .hasNoContextualInfo()
+          .hasCorrelationId(actionPlanCreatedCorrelationId)
       }
-      .event(2) {
+      .event(4) {
         it.hasSourceReference(goal.reference.toString())
           .hasEventType(TimelineEventType.GOAL_CREATED)
           .hasPrisonId("BXI")
           .wasActionedBy("auser_gen")
           .hasActionedByDisplayName("Albert User")
           .hasContextualInfo(goal.title!!)
+          .hasCorrelationId(actionPlanCreatedCorrelationId)
       }
   }
 
@@ -140,6 +180,22 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline with multiple events in order`() {
     // Given
     val prisonNumber = anotherValidPrisonNumber()
+    wiremockService.stubGetPrisonTimelineFromPrisonApi(
+      prisonNumber,
+      aValidPrisonerInPrisonSummary(
+        prisonerNumber = prisonNumber,
+        prisonPeriod = listOf(
+          aValidPrisonPeriod(
+            prisons = listOf("MDI"),
+            bookingId = 1L,
+            movementDates = listOf(
+              aValidSignificantMovementAdmission(admittedIntoPrisonId = "MDI"),
+            ),
+            transfers = emptyList(),
+          ),
+        ),
+      ),
+    )
     createCiagInduction(prisonNumber, aValidCreateCiagInductionRequest())
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       reviewDate = LocalDate.now(),
@@ -180,12 +236,20 @@ class GetTimelineTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(7)
-    val actionPlanCreatedCorrelationId = actual.events[1].correlationId
-    val goalUpdatedCorrelationId = actual.events[5].correlationId
+    assertThat(actual.events).hasSize(8)
+    val actionPlanCreatedCorrelationId = actual.events[2].correlationId
+    val goalUpdatedCorrelationId = actual.events[6].correlationId
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .event(1) {
+        it.hasSourceReference("1")
+          .hasEventType(TimelineEventType.PRISON_ADMISSION)
+          .hasPrisonId("MDI")
+          .wasActionedBy("system")
+          .hasNoActionedByDisplayName()
+          .hasNoContextualInfo()
+      }
+      .event(2) {
         it.hasEventType(TimelineEventType.INDUCTION_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(induction!!.reference.toString())
@@ -193,21 +257,21 @@ class GetTimelineTest : IntegrationTestBase() {
           .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
           .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
       }
-      .event(2) {
+      .event(3) {
         it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(actionPlanReference.toString())
           .hasNoContextualInfo() // creating an action plan has no contextual info
           .hasCorrelationId(actionPlanCreatedCorrelationId)
       }
-      .event(3) {
+      .event(4) {
         it.hasEventType(TimelineEventType.GOAL_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal1Reference.toString())
           .hasContextualInfo("Learn German")
           .hasCorrelationId(actionPlanCreatedCorrelationId)
       }
-      .event(4) {
+      .event(5) {
         it.hasEventType(TimelineEventType.GOAL_CREATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal2Reference.toString())
@@ -215,21 +279,21 @@ class GetTimelineTest : IntegrationTestBase() {
           .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
           .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
       }
-      .event(5) {
+      .event(6) {
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(goal1Reference.toString())
           .hasContextualInfo("Learn Spanish") // Learn German changed to Learn Spanish
           .hasCorrelationId(goalUpdatedCorrelationId)
       }
-      .event(6) {
+      .event(7) {
         it.hasEventType(TimelineEventType.STEP_STARTED)
           .hasPrisonId("BXI")
           .hasSourceReference(stepToUpdate.reference.toString())
           .hasContextualInfo("Research course options")
           .hasCorrelationId(goalUpdatedCorrelationId)
       }
-      .event(7) {
+      .event(8) {
         it.hasEventType(TimelineEventType.STEP_UPDATED)
           .hasPrisonId("BXI")
           .hasSourceReference(stepToUpdate.reference.toString())
