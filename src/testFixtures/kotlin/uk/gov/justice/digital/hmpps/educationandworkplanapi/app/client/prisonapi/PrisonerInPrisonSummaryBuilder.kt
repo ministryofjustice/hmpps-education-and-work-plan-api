@@ -5,7 +5,8 @@ import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonPeriod
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.SignificantMovement
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.TransferDetail
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Constructs a [PrisonerInPrisonSummary] based on the following response from the prison-api (ignoring dates):
@@ -107,7 +108,7 @@ fun aValidPrisonerInPrisonSummary(
   PrisonerInPrisonSummary(prisonerNumber, prisonPeriod)
 
 fun aValidPrisonPeriod(
-  entryDate: OffsetDateTime = OffsetDateTime.now().minusMonths(6),
+  entryDate: LocalDateTime = LocalDateTime.now().minusMonths(6),
   movementDates: List<SignificantMovement> = listOf(
     aValidSignificantMovementAdmission(), // into BMI
     aValidSignificantMovementRelease(), // from MDI
@@ -120,20 +121,20 @@ fun aValidPrisonPeriod(
   prisons: List<String> = listOf("BMI", "MDI", "BXI"),
   bookNumber: String = "1234A",
   bookingId: Long = 1,
-  releaseDate: OffsetDateTime? = null,
+  releaseDate: LocalDateTime? = null,
 ): PrisonPeriod =
   PrisonPeriod(
-    entryDate = entryDate,
+    entryDate = entryDate.asIsoDateTimeString()!!,
     movementDates = movementDates,
     transfers = transfers,
     prisons = prisons,
     bookNumber = bookNumber,
     bookingId = bookingId,
-    releaseDate = releaseDate,
+    releaseDate = releaseDate.asIsoDateTimeString(),
   )
 
 fun anotherValidPrisonPeriod(
-  entryDate: OffsetDateTime = OffsetDateTime.now().minusMonths(1),
+  entryDate: LocalDateTime = LocalDateTime.now().minusMonths(1),
   movementDates: List<SignificantMovement> = listOf(
     aValidSignificantMovementAdmissionAndRelease(), // in and out of BXI
   ),
@@ -141,34 +142,34 @@ fun anotherValidPrisonPeriod(
   prisons: List<String> = listOf("BXI"),
   bookNumber: String = "5678B",
   bookingId: Long = 2,
-  releaseDate: OffsetDateTime? = null,
+  releaseDate: LocalDateTime? = null,
 ): PrisonPeriod =
   PrisonPeriod(
-    entryDate = entryDate,
+    entryDate = entryDate.asIsoDateTimeString()!!,
     movementDates = movementDates,
     transfers = transfers,
     prisons = prisons,
     bookNumber = bookNumber,
     bookingId = bookingId,
-    releaseDate = releaseDate,
+    releaseDate = releaseDate.asIsoDateTimeString(),
   )
 
 fun aValidSignificantMovementAdmission(
   reasonInToPrison: String = "Imprisonment Without Option",
   inwardType: SignificantMovement.InwardType = SignificantMovement.InwardType.ADM,
   admittedIntoPrisonId: String = "BMI",
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(6),
+  dateInToPrison: LocalDateTime? = LocalDateTime.now().minusMonths(6),
   reasonOutOfPrison: String? = "Wedding/Civil Ceremony",
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
+  dateOutOfPrison: LocalDateTime? = LocalDateTime.now().minusMonths(4),
   outwardType: SignificantMovement.OutwardType? = SignificantMovement.OutwardType.TAP,
   releaseFromPrisonId: String? = "MDI",
 ): SignificantMovement = SignificantMovement(
   reasonInToPrison = reasonInToPrison,
   inwardType = inwardType,
   admittedIntoPrisonId = admittedIntoPrisonId,
-  dateInToPrison = dateInToPrison,
+  dateInToPrison = dateInToPrison.asIsoDateTimeString(),
   reasonOutOfPrison = reasonOutOfPrison,
-  dateOutOfPrison = dateOutOfPrison,
+  dateOutOfPrison = dateOutOfPrison.asIsoDateTimeString(),
   outwardType = outwardType,
   releaseFromPrisonId = releaseFromPrisonId,
 )
@@ -177,18 +178,18 @@ fun aValidSignificantMovementRelease(
   reasonInToPrison: String = "Wedding/Civil Ceremony",
   inwardType: SignificantMovement.InwardType = SignificantMovement.InwardType.TAP,
   admittedIntoPrisonId: String = "MDI",
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
+  dateInToPrison: LocalDateTime? = LocalDateTime.now().minusMonths(4),
   reasonOutOfPrison: String? = "Conditional Release (CJA91) -SH Term>1YR",
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(3),
+  dateOutOfPrison: LocalDateTime? = LocalDateTime.now().minusMonths(3),
   outwardType: SignificantMovement.OutwardType? = SignificantMovement.OutwardType.REL,
   releaseFromPrisonId: String? = "BXI",
 ): SignificantMovement = SignificantMovement(
   reasonInToPrison = reasonInToPrison,
   inwardType = inwardType,
   admittedIntoPrisonId = admittedIntoPrisonId,
-  dateInToPrison = dateInToPrison,
+  dateInToPrison = dateInToPrison.asIsoDateTimeString(),
   reasonOutOfPrison = reasonOutOfPrison,
-  dateOutOfPrison = dateOutOfPrison,
+  dateOutOfPrison = dateOutOfPrison.asIsoDateTimeString(),
   outwardType = outwardType,
   releaseFromPrisonId = releaseFromPrisonId,
 )
@@ -197,46 +198,49 @@ fun aValidSignificantMovementAdmissionAndRelease(
   reasonInToPrison: String = "Recall From Intermittent Custody",
   inwardType: SignificantMovement.InwardType = SignificantMovement.InwardType.ADM,
   admittedIntoPrisonId: String = "BXI",
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(2),
+  dateInToPrison: LocalDateTime? = LocalDateTime.now().minusMonths(2),
   reasonOutOfPrison: String? = "Conditional Release (CJA91) -SH Term>1YR",
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(1),
+  dateOutOfPrison: LocalDateTime? = LocalDateTime.now().minusMonths(1),
   outwardType: SignificantMovement.OutwardType? = SignificantMovement.OutwardType.REL,
   releaseFromPrisonId: String? = "BXI",
 ): SignificantMovement = SignificantMovement(
   reasonInToPrison = reasonInToPrison,
   inwardType = inwardType,
   admittedIntoPrisonId = admittedIntoPrisonId,
-  dateInToPrison = dateInToPrison,
+  dateInToPrison = dateInToPrison.asIsoDateTimeString(),
   reasonOutOfPrison = reasonOutOfPrison,
-  dateOutOfPrison = dateOutOfPrison,
+  dateOutOfPrison = dateOutOfPrison.asIsoDateTimeString(),
   outwardType = outwardType,
   releaseFromPrisonId = releaseFromPrisonId,
 )
 
 fun aValidTransferDetail(
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(5),
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(5),
+  dateOutOfPrison: LocalDateTime? = LocalDateTime.now().minusMonths(5),
+  dateInToPrison: LocalDateTime? = LocalDateTime.now().minusMonths(5),
   transferReason: String? = "Compassionate Transfer",
   fromPrisonId: String? = "BMI",
   toPrisonId: String = "MDI",
 ): TransferDetail = TransferDetail(
-  dateOutOfPrison = dateOutOfPrison,
-  dateInToPrison = dateInToPrison,
+  dateOutOfPrison = dateOutOfPrison.asIsoDateTimeString(),
+  dateInToPrison = dateInToPrison.asIsoDateTimeString(),
   transferReason = transferReason,
   fromPrisonId = fromPrisonId,
   toPrisonId = toPrisonId,
 )
 
 fun anotherValidTransferDetail(
-  dateOutOfPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
-  dateInToPrison: OffsetDateTime? = OffsetDateTime.now().minusMonths(4),
+  dateOutOfPrison: LocalDateTime? = LocalDateTime.now().minusMonths(4),
+  dateInToPrison: LocalDateTime? = LocalDateTime.now().minusMonths(4),
   transferReason: String? = "Appeals",
   fromPrisonId: String? = "MDI",
   toPrisonId: String = "BXI",
 ): TransferDetail = TransferDetail(
-  dateOutOfPrison = dateOutOfPrison,
-  dateInToPrison = dateInToPrison,
+  dateOutOfPrison = dateOutOfPrison.asIsoDateTimeString(),
+  dateInToPrison = dateInToPrison.asIsoDateTimeString(),
   transferReason = transferReason,
   fromPrisonId = fromPrisonId,
   toPrisonId = toPrisonId,
 )
+
+private fun LocalDateTime?.asIsoDateTimeString() =
+  this?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)

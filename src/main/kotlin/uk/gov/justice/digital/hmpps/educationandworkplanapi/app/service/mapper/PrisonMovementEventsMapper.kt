@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.NullValueMappingStrategy
 import org.mapstruct.ValueMapping
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
@@ -20,6 +21,7 @@ import java.util.UUID
     Instant::class,
     UUID::class,
   ],
+  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
 abstract class PrisonMovementEventsMapper {
 
