@@ -11,7 +11,7 @@
       "name": "MIT",
       "url": "https://opensource.org/licenses/MIT"
     },
-    "version": "2024-01-05.22954.9c2e486"
+    "version": "2024-01-18.23217.98cbbbd"
   },
   "servers": [
     {
@@ -112,8 +112,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "New Users Enabled",
+          "200": {
+            "description": "No New Users",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,8 +122,8 @@
               }
             }
           },
-          "200": {
-            "description": "No New Users",
+          "201": {
+            "description": "New Users Enabled",
             "content": {
               "application/json": {
                 "schema": {
@@ -155,11 +155,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "403": {
+            "description": "Requires role ROLE_SMOKE_TEST",
             "content": {
               "application/json": {
                 "schema": {
@@ -168,8 +165,11 @@
               }
             }
           },
-          "403": {
-            "description": "Requires role ROLE_SMOKE_TEST",
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -201,11 +201,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "403": {
+            "description": "Requires role ROLE_SMOKE_TEST",
             "content": {
               "application/json": {
                 "schema": {
@@ -214,8 +211,11 @@
               }
             }
           },
-          "403": {
-            "description": "Requires role ROLE_SMOKE_TEST",
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -266,18 +266,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReferenceCode"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -296,12 +286,22 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceCode"
                 }
               }
             }
@@ -349,8 +349,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -369,22 +369,22 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Updated",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReferenceCode"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -442,8 +442,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -462,8 +462,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -516,8 +516,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -536,8 +536,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -590,8 +590,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -610,8 +610,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -674,8 +674,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -694,8 +694,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -748,8 +748,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -768,8 +768,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -832,8 +832,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -852,8 +852,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "Forbidden - user not authorised to release a prisoner.",
             "content": {
               "application/json": {
                 "schema": {
@@ -862,8 +862,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to release a prisoner.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -916,8 +916,18 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - user not authorised to recall a prisoner.",
             "content": {
               "application/json": {
                 "schema": {
@@ -936,18 +946,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - user not authorised to recall a prisoner.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1022,8 +1022,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1042,8 +1042,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1096,8 +1096,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1116,8 +1116,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "Forbidden - user not authorised to release a prisoner.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1126,8 +1126,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to release a prisoner.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1180,8 +1180,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1200,8 +1200,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1254,8 +1254,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1274,8 +1274,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1326,6 +1326,19 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "The checks passed flag was set"
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -1338,19 +1351,6 @@
           },
           "423": {
             "description": "Curfew or HDC status in use for this booking id (possibly in P-Nomis).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "The checks passed flag was set"
-          },
-          "400": {
-            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1382,6 +1382,16 @@
           "204": {
             "description": "The checks passed flag was cleared"
           },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -1394,16 +1404,6 @@
           },
           "423": {
             "description": "Curfew or HDC status in use for this booking id (possibly in P-Nomis).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1447,6 +1447,16 @@
           "204": {
             "description": "The new approval status was set"
           },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -1459,16 +1469,6 @@
           },
           "423": {
             "description": "Curfew or HDC status in use for this booking id (possibly in P-Nomis).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1500,6 +1500,16 @@
           "204": {
             "description": "The new approval status was cleared"
           },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -1512,16 +1522,6 @@
           },
           "423": {
             "description": "Curfew or HDC status in use for this booking id (possibly in P-Nomis).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1620,9 +1620,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "403": {
             "description": "Forbidden - user not authorised to update categorisations.",
             "content": {
@@ -1632,6 +1629,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "OK"
           },
           "400": {
             "description": "Invalid request - e.g. invalid status.",
@@ -1891,11 +1891,8 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Offences created successfully"
-          },
-          "404": {
-            "description": "A dependent resource is missing (either the statute or the home office code doesnt exist)",
+          "409": {
+            "description": "A record already exists for a passed in offence",
             "content": {
               "application/json": {
                 "schema": {
@@ -1903,6 +1900,9 @@
                 }
               }
             }
+          },
+          "201": {
+            "description": "Offences created successfully"
           },
           "500": {
             "description": "Unrecoverable error occurred whilst processing request.",
@@ -1914,8 +1914,8 @@
               }
             }
           },
-          "409": {
-            "description": "A record already exists for a passed in offence",
+          "404": {
+            "description": "A dependent resource is missing (either the statute or the home office code doesnt exist)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1971,8 +1971,8 @@
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1991,8 +1991,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2036,18 +2036,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OffenderBooking"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2066,12 +2056,22 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OffenderBooking"
                 }
               }
             }
@@ -2141,8 +2141,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2161,8 +2161,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2225,8 +2225,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2245,8 +2245,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2319,8 +2319,18 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Record in use for this booking id (possibly in P-Nomis).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2339,18 +2349,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Record in use for this booking id (possibly in P-Nomis).",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2416,8 +2416,38 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request - e.g. validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - user not authorised to attend activity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Attendance data has been updated"
+          },
+          "423": {
+            "description": "Record in use for this booking id (possibly in P-Nomis).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error.",
@@ -2431,36 +2461,6 @@
           },
           "404": {
             "description": "Resource not found - booking or event does not exist or is not accessible to user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Record in use for this booking id (possibly in P-Nomis).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request - e.g. validation error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - user not authorised to attend activity.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2512,6 +2512,26 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request - e.g. validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - user not authorised to attend activity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Attendance data has been updated"
           },
@@ -2527,26 +2547,6 @@
           },
           "404": {
             "description": "Resource not found - booking or event does not exist or is not accessible to user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request - e.g. validation error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - user not authorised to attend activity.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2577,6 +2577,26 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request - e.g. validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - user not authorised to attend activity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Attendance data has been updated"
           },
@@ -2592,26 +2612,6 @@
           },
           "404": {
             "description": "Resource not found - booking or event does not exist or is not accessible to user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request - e.g. validation error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - user not authorised to attend activity.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2734,8 +2734,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2754,8 +2754,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2805,8 +2805,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2825,8 +2825,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "Forbidden - user not authorised to update a agency location",
             "content": {
               "application/json": {
                 "schema": {
@@ -2835,8 +2835,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to update a agency location",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2900,8 +2900,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2920,8 +2920,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2986,8 +2986,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2996,8 +2996,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3071,8 +3071,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3091,8 +3091,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3167,8 +3167,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3177,8 +3177,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3244,8 +3244,18 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "201": {
+            "description": "Transaction Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "One of: <ul><li>Insufficient Funds - The prisoner has insufficient funds in the required account to cover the cost of the debit transaction</li><li>Offender not in specified prison - prisoner identified by {noms_id} is not in prison {prison_id}</li><li>Invalid transaction type - The transaction type has not been set up for the API for {prison_id}</li><li>Finance Exception - An unexpected error has occurred. Details will have been logged in the nomis_api_logs table on the Nomis database.</li></ul>",
             "content": {
               "application/json": {
                 "schema": {
@@ -3264,16 +3274,6 @@
               }
             }
           },
-          "201": {
-            "description": "Transaction Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Transaction"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
@@ -3284,8 +3284,8 @@
               }
             }
           },
-          "400": {
-            "description": "One of: <ul><li>Insufficient Funds - The prisoner has insufficient funds in the required account to cover the cost of the debit transaction</li><li>Offender not in specified prison - prisoner identified by {noms_id} is not in prison {prison_id}</li><li>Invalid transaction type - The transaction type has not been set up for the API for {prison_id}</li><li>Finance Exception - An unexpected error has occurred. Details will have been logged in the nomis_api_logs table on the Nomis database.</li></ul>",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3352,8 +3352,8 @@
               }
             }
           },
-          "409": {
-            "description": "Duplicate post - after an error with a post this response will be given for subsequent duplicate attempts",
+          "400": {
+            "description": "One of: <ul><li>Offender not in specified prison - prisoner identified by {noms_id} is not in prison {prison_id}</li><li>Invalid payment type</li><li>Client reference more than 12 characters</li><li>Missing data in request</li><li>Exception - An unexpected error has occurred. Details will have been logged in the nomis_api_logs table on the Nomis database.</li></ul>",
             "content": {
               "application/json": {
                 "schema": {
@@ -3372,8 +3372,8 @@
               }
             }
           },
-          "400": {
-            "description": "One of: <ul><li>Offender not in specified prison - prisoner identified by {noms_id} is not in prison {prison_id}</li><li>Invalid payment type</li><li>Client reference more than 12 characters</li><li>Missing data in request</li><li>Exception - An unexpected error has occurred. Details will have been logged in the nomis_api_logs table on the Nomis database.</li></ul>",
+          "409": {
+            "description": "Duplicate post - after an error with a post this response will be given for subsequent duplicate attempts",
             "content": {
               "application/json": {
                 "schema": {
@@ -3448,22 +3448,22 @@
           "required": true
         },
         "responses": {
+          "409": {
+            "description": "Duplicate Post - A transaction already exists with the client_unique_ref provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Transfer"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "One of: <ul><li>Offender Not Found - No offender matching the specified offender_id has been found on nomis.</li><li>Offender never at prison - The offender has never been at the specified prison</li></ul>",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -3478,8 +3478,8 @@
               }
             }
           },
-          "409": {
-            "description": "Duplicate Post - A transaction already exists with the client_unique_ref provided.",
+          "404": {
+            "description": "One of: <ul><li>Offender Not Found - No offender matching the specified offender_id has been found on nomis.</li><li>Offender never at prison - The offender has never been at the specified prison</li></ul>",
             "content": {
               "application/json": {
                 "schema": {
@@ -3561,11 +3561,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "403": {
+            "description": "Requires role ROLE_SMOKE_TEST",
             "content": {
               "application/json": {
                 "schema": {
@@ -3574,8 +3571,11 @@
               }
             }
           },
-          "403": {
-            "description": "Requires role ROLE_SMOKE_TEST",
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3617,11 +3617,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "403": {
+            "description": "Requires role ROLE_SMOKE_TEST",
             "content": {
               "application/json": {
                 "schema": {
@@ -3630,8 +3627,11 @@
               }
             }
           },
-          "403": {
-            "description": "Requires role ROLE_SMOKE_TEST",
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3671,6 +3671,16 @@
           }
         ],
         "responses": {
+          "409": {
+            "description": "The prison is already active for the service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "A valid auth token was not presented",
             "content": {
@@ -3691,26 +3701,6 @@
               }
             }
           },
-          "403": {
-            "description": "The auth token does not have the necessary role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "The prison is already active for the service",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created",
             "content": {
@@ -3723,6 +3713,16 @@
           },
           "500": {
             "description": "Unrecoverable error occurred whilst processing request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The auth token does not have the necessary role",
             "content": {
               "application/json": {
                 "schema": {
@@ -3780,16 +3780,6 @@
               }
             }
           },
-          "403": {
-            "description": "The auth token does not have the necessary role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Unrecoverable error occurred whilst processing request",
             "content": {
@@ -3802,6 +3792,16 @@
           },
           "204": {
             "description": "OK"
+          },
+          "403": {
+            "description": "The auth token does not have the necessary role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -4031,8 +4031,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4051,8 +4051,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4220,8 +4220,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4240,8 +4240,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4480,8 +4480,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4500,8 +4500,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4856,8 +4856,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4876,8 +4876,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4966,8 +4966,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4986,8 +4986,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5027,8 +5027,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5047,8 +5047,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5111,18 +5111,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - user not authorised to receive prisoner on new bookings",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5141,8 +5131,18 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "Forbidden - user not authorised to receive prisoner on new bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5233,8 +5233,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5253,8 +5253,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5311,8 +5311,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5331,8 +5331,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5492,18 +5492,18 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Offender key dates found",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SentenceCalcDates"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "403": {
+            "description": "Forbidden - user not authorised to update an offender's dates",
             "content": {
               "application/json": {
                 "schema": {
@@ -5522,18 +5522,18 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "200": {
+            "description": "Offender key dates found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/SentenceCalcDates"
                 }
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to update an offender's dates",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5574,36 +5574,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Offender key dates calculation created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SentenceCalcDates"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Invalid request.",
             "content": {
@@ -5620,6 +5590,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Offender key dates calculation created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SentenceCalcDates"
                 }
               }
             }
@@ -5701,8 +5701,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5721,8 +5721,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6097,8 +6097,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6117,8 +6117,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6157,8 +6157,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6177,8 +6177,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request",
             "content": {
               "application/json": {
                 "schema": {
@@ -6393,8 +6393,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6403,8 +6403,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6454,6 +6454,16 @@
           }
         },
         "responses": {
+          "404": {
+            "description": "The offender number could not be found or has no bookings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
@@ -6464,18 +6474,8 @@
               }
             }
           },
-          "403": {
-            "description": "IMAGE_UPLOAD role required to access endpoint",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The offender number could not be found or has no bookings.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6494,8 +6494,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "IMAGE_UPLOAD role required to access endpoint",
             "content": {
               "application/json": {
                 "schema": {
@@ -6561,26 +6561,6 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Transaction Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TransferTransaction"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "409": {
             "description": "Duplicate post - The unique_client_ref has been used before",
             "content": {
@@ -6601,8 +6581,28 @@
               }
             }
           },
+          "201": {
+            "description": "Transaction Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferTransaction"
+                }
+              }
+            }
+          },
           "400": {
             "description": "One of: <ul><li>Insufficient Funds - The prisoner has insufficient funds in the required account to cover the cost of the debit transaction</li><li>Offender not in specified prison - prisoner identified by {noms_id} is not in prison {prison_id}</li><li>Finance Exception - An unexpected error has occurred. Details will have been logged in the nomis_api_logs table on the Nomis database.</li></ul>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6650,8 +6650,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6660,8 +6660,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6777,8 +6777,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6797,8 +6797,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6944,8 +6944,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6964,22 +6964,22 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "201": {
             "description": "The scheduled prison move.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ScheduledPrisonToPrisonMove"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -7018,6 +7018,26 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -7034,26 +7054,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CourtHearing"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -7105,8 +7105,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7125,8 +7125,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7167,8 +7167,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7187,8 +7187,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7244,6 +7244,26 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -7260,26 +7280,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CourtHearing"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -7361,22 +7361,22 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Alert id.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AlertCreated"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -7391,8 +7391,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7453,8 +7453,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7473,8 +7473,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7587,8 +7587,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7607,8 +7607,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7688,8 +7688,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7708,8 +7708,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7798,8 +7798,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7808,8 +7808,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7859,8 +7859,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7879,8 +7879,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7929,8 +7929,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7939,8 +7939,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8069,8 +8069,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8089,8 +8089,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8119,16 +8119,6 @@
           "required": true
         },
         "responses": {
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Invalid request.",
             "content": {
@@ -8139,8 +8129,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to create an agency location",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8155,6 +8145,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Agency"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - user not authorised to create an agency location",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -8204,18 +8204,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to create a agency address",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8234,8 +8224,18 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "Forbidden - user not authorised to create a agency address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8309,18 +8309,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden - user not authorised to create a agency address",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8339,8 +8329,18 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "403": {
+            "description": "Forbidden - user not authorised to create a agency address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8407,22 +8407,22 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Prison Not Found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VisitSlots"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid start and end date range",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -8437,8 +8437,8 @@
               }
             }
           },
-          "404": {
-            "description": "Prison Not Found.",
+          "400": {
+            "description": "Invalid start and end date range",
             "content": {
               "application/json": {
                 "schema": {
@@ -8506,22 +8506,22 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccountTransaction"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Prison, offender or accountType not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -8536,8 +8536,8 @@
               }
             }
           },
-          "400": {
-            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
+          "404": {
+            "description": "Prison, offender or accountType not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -8617,6 +8617,16 @@
               }
             }
           },
+          "404": {
+            "description": "Offender Not Found - No offender matching the specified offender_id has been found on nomis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Offender not in specified prison",
             "content": {
@@ -8629,16 +8639,6 @@
           },
           "500": {
             "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Offender Not Found - No offender matching the specified offender_id has been found on nomis.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8685,6 +8685,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
@@ -8707,16 +8717,6 @@
           },
           "404": {
             "description": "Prison or offender was not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8795,22 +8795,22 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccountTransactions"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Prison, offender or accountType not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -8825,8 +8825,8 @@
               }
             }
           },
-          "400": {
-            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
+          "404": {
+            "description": "Prison, offender or accountType not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -8873,6 +8873,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
@@ -8895,16 +8905,6 @@
           },
           "404": {
             "description": "Prison or offender was not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Not a digital prison.  Prison not found. Offender has no account at this prison.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8951,8 +8951,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Not a digital prison.  Prison not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8961,8 +8961,8 @@
               }
             }
           },
-          "400": {
-            "description": "Not a digital prison.  Prison not found.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9019,8 +9019,8 @@
               }
             }
           },
-          "400": {
-            "description": "Dates requested must be in future",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9029,8 +9029,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Dates requested must be in future",
             "content": {
               "application/json": {
                 "schema": {
@@ -9084,8 +9084,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid start and end date range",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9094,8 +9094,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid start and end date range",
             "content": {
               "application/json": {
                 "schema": {
@@ -9171,8 +9171,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid start and end date range",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9181,8 +9181,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid start and end date range",
             "content": {
               "application/json": {
                 "schema": {
@@ -9236,8 +9236,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9256,8 +9256,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9312,8 +9312,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid Noms ID",
+          "404": {
+            "description": "Offender not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9322,8 +9322,8 @@
               }
             }
           },
-          "404": {
-            "description": "Offender not found.",
+          "400": {
+            "description": "Invalid Noms ID",
             "content": {
               "application/json": {
                 "schema": {
@@ -9367,8 +9367,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9387,8 +9387,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9432,8 +9432,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9452,8 +9452,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9497,8 +9497,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9517,8 +9517,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9604,8 +9604,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid Noms ID",
+          "404": {
+            "description": "Offender not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9614,8 +9614,8 @@
               }
             }
           },
-          "404": {
-            "description": "Offender not found.",
+          "400": {
+            "description": "Invalid Noms ID",
             "content": {
               "application/json": {
                 "schema": {
@@ -9712,8 +9712,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid Noms ID",
+          "404": {
+            "description": "Offender not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9722,8 +9722,8 @@
               }
             }
           },
-          "404": {
-            "description": "Offender not found.",
+          "400": {
+            "description": "Invalid Noms ID",
             "content": {
               "application/json": {
                 "schema": {
@@ -9778,8 +9778,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Parameter exception (invalid date, time, format, type)",
             "content": {
               "application/json": {
                 "schema": {
@@ -9788,8 +9788,8 @@
               }
             }
           },
-          "404": {
-            "description": "Parameter exception (invalid date, time, format, type)",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9831,6 +9831,26 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -9847,26 +9867,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserDetail"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -9883,6 +9883,26 @@
         "description": "Current user detail.",
         "operationId": "getMyUserInformation",
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Requested resource not found.",
             "content": {
@@ -9899,26 +9919,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserDetail"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -9960,8 +9960,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9980,8 +9980,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10027,8 +10027,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10047,8 +10047,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10094,8 +10094,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10114,8 +10114,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10133,7 +10133,7 @@
           "staff"
         ],
         "summary": "Staff detail.",
-        "description": "Staff detail.",
+        "description": "Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.",
         "operationId": "getStaffDetail",
         "parameters": [
           {
@@ -10148,22 +10148,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StaffDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -10178,8 +10178,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10197,9 +10197,18 @@
           "staff"
         ],
         "summary": "List of job roles for specified staff and agency Id",
-        "description": "List of job roles for specified staff and agency Id",
+        "description": "Security note: the agency must be in the current user's caseload.",
         "operationId": "getAllRolesForAgency",
         "parameters": [
+          {
+            "name": "agencyId",
+            "in": "path",
+            "description": "Agency Id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "staffId",
             "in": "path",
@@ -10208,15 +10217,6 @@
             "schema": {
               "type": "integer",
               "format": "int64"
-            }
-          },
-          {
-            "name": "agencyId",
-            "in": "path",
-            "description": "Agency Id.",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -10234,8 +10234,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10254,8 +10254,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10273,9 +10273,19 @@
           "staff"
         ],
         "summary": "Check if staff member has a role",
-        "description": "Check if staff member has a role, either KW or POM",
+        "description": "Check if staff member has a role, either KW or POM. Security note: the agency must be in the current user's caseload.",
         "operationId": "hasStaffRole",
         "parameters": [
+          {
+            "name": "agencyId",
+            "in": "path",
+            "description": "Agency Id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "MDI"
+          },
           {
             "name": "staffId",
             "in": "path",
@@ -10286,16 +10296,6 @@
               "format": "int64"
             },
             "example": 1111111
-          },
-          {
-            "name": "agencyId",
-            "in": "path",
-            "description": "Agency Id.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "MDI"
           },
           {
             "name": "roleType",
@@ -10313,8 +10313,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10333,8 +10333,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10352,7 +10352,7 @@
           "staff"
         ],
         "summary": "Returns a list of email addresses associated with this staff user",
-        "description": "List of email addresses for a specified staff user",
+        "description": "Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.",
         "operationId": "getStaffEmailAddresses",
         "parameters": [
           {
@@ -10367,16 +10367,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "The staffId supplied was not valid.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
@@ -10412,6 +10402,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "The staffId supplied was not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -10422,7 +10422,7 @@
           "staff"
         ],
         "summary": "Returns a list of caseloads associated with this staff user",
-        "description": "List of caseloads for a specified staff user",
+        "description": "Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.",
         "operationId": "getStaffCaseloads",
         "parameters": [
           {
@@ -10493,7 +10493,7 @@
           "staff"
         ],
         "summary": "Get staff members within agency who are currently assigned the specified role.",
-        "description": "Get staff members within agency who are currently assigned the specified role.<p>This endpoint uses the REPLICA database.</p>",
+        "description": "Get staff members within agency who are currently assigned the specified role. Security note: the agency must be in the current user's caseload.<p>This endpoint uses the REPLICA database.</p>",
         "operationId": "getStaffByAgencyRole",
         "parameters": [
           {
@@ -10603,8 +10603,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10623,8 +10623,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10655,6 +10655,16 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "The service code does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "OK",
             "content": {
@@ -10678,16 +10688,6 @@
               }
             }
           },
-          "403": {
-            "description": "The auth token does not have the necessary role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Unrecoverable error occurred whilst processing request",
             "content": {
@@ -10698,8 +10698,8 @@
               }
             }
           },
-          "404": {
-            "description": "The service code does not exist",
+          "403": {
+            "description": "The auth token does not have the necessary role",
             "content": {
               "application/json": {
                 "schema": {
@@ -10812,8 +10812,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10832,8 +10832,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10944,8 +10944,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10964,8 +10964,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11067,8 +11067,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11087,8 +11087,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11175,8 +11175,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11195,8 +11195,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11230,8 +11230,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11250,8 +11250,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11351,8 +11351,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11371,8 +11371,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11436,8 +11436,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11456,8 +11456,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11502,8 +11502,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11522,8 +11522,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11604,8 +11604,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11624,8 +11624,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11670,8 +11670,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11680,8 +11680,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11713,12 +11713,12 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized.",
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/PrisonerInformation"
                 }
               }
             }
@@ -11733,12 +11733,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "401": {
+            "description": "Unauthorized.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PrisonerInformation"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -11789,8 +11789,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11799,8 +11799,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11863,8 +11863,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11883,8 +11883,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11930,8 +11930,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11950,8 +11950,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -11997,8 +11997,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12017,8 +12017,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12064,8 +12064,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12084,8 +12084,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12131,8 +12131,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12151,8 +12151,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12205,8 +12205,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12225,8 +12225,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12314,8 +12314,8 @@
               }
             }
           },
-          "404": {
-            "description": "Prison, offender or accountType not found",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12324,8 +12324,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Prison, offender or accountType not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -12434,8 +12434,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12454,8 +12454,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12499,8 +12499,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12519,8 +12519,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12573,8 +12573,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12593,8 +12593,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12637,8 +12637,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12657,8 +12657,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12727,8 +12727,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12747,8 +12747,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12791,8 +12791,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12811,8 +12811,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12878,8 +12878,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12898,8 +12898,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12951,8 +12951,8 @@
               }
             }
           },
-          "404": {
-            "description": "Offender does not exists or is in a different caseload to the user",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12961,8 +12961,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Offender does not exists or is in a different caseload to the user",
             "content": {
               "application/json": {
                 "schema": {
@@ -13025,8 +13025,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13045,8 +13045,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13122,8 +13122,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13142,8 +13142,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13185,8 +13185,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13195,8 +13195,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13272,8 +13272,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13292,8 +13292,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13339,8 +13339,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13359,8 +13359,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13402,8 +13402,18 @@
         "description": "Version 1<p>This endpoint uses the REPLICA database.</p>",
         "operationId": "getOffenderSentencesHomeDetentionCurfewCandidates",
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13425,18 +13435,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13568,6 +13568,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "HDC information",
             "content": {
@@ -13580,16 +13590,6 @@
           },
           "404": {
             "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13621,22 +13621,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Offender fine payment details for a prisoner.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OffenderFinePaymentDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -13664,26 +13664,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Invalid request.",
             "content": {
@@ -13704,12 +13684,32 @@
               }
             }
           },
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Offender calculations found",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OffenderSentenceCalculation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -13750,8 +13750,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13760,8 +13760,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13814,8 +13814,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13824,8 +13824,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14214,8 +14214,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14224,8 +14224,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14288,8 +14288,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14308,8 +14308,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14406,8 +14406,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14426,8 +14426,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14482,8 +14482,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14502,8 +14502,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14558,8 +14558,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14568,8 +14568,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14699,8 +14699,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid agency identifiers, or from time after the to time, or a time period greater than 24 hours specified, or parameter format not correct.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14709,8 +14709,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid agency identifiers, or from time after the to time, or a time period greater than 24 hours specified, or parameter format not correct.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14765,8 +14765,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14785,8 +14785,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14838,8 +14838,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14858,8 +14858,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14902,8 +14902,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14922,8 +14922,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14976,8 +14976,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14986,8 +14986,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15033,8 +15033,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15053,8 +15053,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15145,8 +15145,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15165,8 +15165,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15208,8 +15208,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15228,22 +15228,22 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -15330,8 +15330,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15350,8 +15350,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15514,8 +15514,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15534,8 +15534,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15576,8 +15576,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15596,8 +15596,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15642,8 +15642,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15662,8 +15662,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15730,8 +15730,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15750,8 +15750,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15784,8 +15784,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15804,22 +15804,22 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IncidentCase"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -15848,8 +15848,18 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15868,22 +15878,12 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageDetail"
                 }
               }
             }
@@ -15988,8 +15988,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16008,8 +16008,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16073,8 +16073,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16093,8 +16093,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16248,8 +16248,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16268,8 +16268,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16311,8 +16311,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16331,8 +16331,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16389,8 +16389,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16409,8 +16409,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16473,8 +16473,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16493,8 +16493,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16537,8 +16537,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16547,8 +16547,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16591,18 +16591,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "204": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16621,8 +16611,18 @@
               }
             }
           },
-          "204": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16665,18 +16665,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "204": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16695,8 +16685,18 @@
               }
             }
           },
-          "204": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16818,8 +16818,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16838,8 +16838,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16892,8 +16892,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16912,8 +16912,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16955,8 +16955,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16975,8 +16975,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17022,8 +17022,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17042,8 +17042,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17099,8 +17099,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17119,8 +17119,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17166,8 +17166,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17186,8 +17186,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17230,8 +17230,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17250,8 +17250,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17297,8 +17297,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17317,8 +17317,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17441,8 +17441,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17461,8 +17461,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17504,8 +17504,8 @@
               }
             }
           },
-          "404": {
-            "description": "No Fixed Term Recall exists for this booking",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17524,8 +17524,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "No Fixed Term Recall exists for this booking",
             "content": {
               "application/json": {
                 "schema": {
@@ -17591,8 +17591,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17611,8 +17611,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17658,8 +17658,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17678,8 +17678,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17725,8 +17725,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17745,8 +17745,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17792,8 +17792,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17812,8 +17812,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17864,8 +17864,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17884,8 +17884,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17951,8 +17951,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17971,8 +17971,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18015,8 +18015,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18035,8 +18035,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18101,8 +18101,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18121,8 +18121,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18203,8 +18203,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18223,8 +18223,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18267,8 +18267,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18287,8 +18287,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18334,8 +18334,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18354,81 +18354,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/bookings/{bookingId}/assessment/{assessmentCode}": {
-      "get": {
-        "tags": [
-          "bookings"
-        ],
-        "summary": "Offender assessment detail.",
-        "description": "Offender assessment detail.",
-        "operationId": "getAssessmentByCode",
-        "parameters": [
-          {
-            "name": "bookingId",
-            "in": "path",
-            "description": "The booking id of offender",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "assessmentCode",
-            "in": "path",
-            "description": "Assessment Type Code",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Assessment"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Requested resource not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18519,8 +18446,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18539,8 +18466,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18593,8 +18520,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18613,8 +18540,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18737,8 +18664,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18757,8 +18684,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18869,8 +18796,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -18889,8 +18816,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19017,8 +18944,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19027,8 +18954,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19100,8 +19027,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19120,8 +19047,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19172,8 +19099,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19192,8 +19119,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19248,8 +19175,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19268,8 +19195,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19311,8 +19238,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19331,8 +19258,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19447,8 +19374,8 @@
               }
             }
           },
-          "500": {
-            "description": "Unrecoverable error occurred whilst processing request.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19457,8 +19384,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "500": {
+            "description": "Unrecoverable error occurred whilst processing request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19596,8 +19523,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19616,8 +19543,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19658,8 +19585,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19678,8 +19605,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19755,8 +19682,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19775,8 +19702,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19830,8 +19757,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19850,8 +19777,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19896,8 +19823,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19916,8 +19843,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -19984,8 +19911,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20004,8 +19931,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20068,8 +19995,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20088,8 +20015,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20130,8 +20057,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20150,8 +20077,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20204,8 +20131,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20224,8 +20151,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20327,8 +20254,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20347,8 +20274,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20382,8 +20309,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20402,8 +20329,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20437,8 +20364,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20457,8 +20384,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20500,8 +20427,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20520,8 +20447,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20565,8 +20492,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20585,8 +20512,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20628,8 +20555,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20648,8 +20575,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20695,8 +20622,8 @@
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Requested resource not found.",
+          "400": {
+            "description": "Invalid request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20715,8 +20642,8 @@
               }
             }
           },
-          "400": {
-            "description": "Invalid request.",
+          "404": {
+            "description": "Requested resource not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -25076,6 +25003,10 @@
             "type": "string",
             "description": "Comment to be associated with the sentence calculation, if not set a default comment is used"
           },
+          "reason": {
+            "type": "string",
+            "description": "The reason the sentence calculation was performed, if not set the default reason is used"
+          },
           "noDates": {
             "type": "boolean",
             "description": "Is true, when there are no dates to be recorded in NOMIS"
@@ -28667,6 +28598,7 @@
         "required": [
           "alerts",
           "dateOfBirth",
+          "lastName",
           "prisonerNumber"
         ],
         "type": "object",
@@ -28679,6 +28611,9 @@
           "dateOfBirth": {
             "type": "string",
             "format": "date"
+          },
+          "lastName": {
+            "type": "string"
           },
           "alerts": {
             "type": "array",
@@ -28933,23 +28868,23 @@
         "type": "object",
         "properties": {
           "bookNumber": {
-            "type": "string"
+            "type": "string",
+            "description": "The book number for this booking"
           },
           "bookingId": {
             "type": "integer",
+            "description": "The ID of this booking",
             "format": "int64"
           },
           "entryDate": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
-            "format": "date-time",
             "description": "Date they first entered prison in this booking",
             "example": "2021-07-05T10:35:17"
           },
           "releaseDate": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
-            "format": "date-time",
             "description": "Date they were last released from prison in this booking if they have been released",
             "example": "2021-07-05T10:35:17"
           },
@@ -29015,7 +28950,6 @@
           "dateInToPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
-            "format": "date-time",
             "example": "2021-07-05T10:35:17"
           },
           "inwardType": {
@@ -29034,7 +28968,6 @@
           "dateOutOfPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
-            "format": "date-time",
             "description": "Date this sub-period ended - if it has ended",
             "example": "2021-07-05T10:35:17"
           },
@@ -29068,14 +29001,12 @@
           "dateOutOfPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
-            "format": "date-time",
             "description": "Date prisoner left the original prison",
             "example": "2021-07-05T10:35:17"
           },
           "dateInToPrison": {
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
             "type": "string",
-            "format": "date-time",
             "description": "Date prisoner entered the new prison. Can be absent if they have not arrived at the prison yet",
             "example": "2021-07-05T10:35:17"
           },
@@ -30826,6 +30757,31 @@
             "type": "string",
             "description": "The reason for the review of the classification",
             "example": "HI"
+          },
+          "overridingClassificationCode": {
+            "type": "string",
+            "description": "The classification code entered to override the calculated value prior to approval",
+            "example": "HI"
+          },
+          "calculatedClassificationCode": {
+            "type": "string",
+            "description": "The classification code originally calculated by NOMIS based on the answers given to the questions when carrying out the initial review",
+            "example": "HI"
+          },
+          "approvedClassificationCode": {
+            "type": "string",
+            "description": "The classification code that has been approved",
+            "example": "HI"
+          },
+          "approvalComment": {
+            "type": "string",
+            "description": "Comment added at approval of classification code",
+            "example": "Comment"
+          },
+          "overrideReason": {
+            "type": "string",
+            "description": "The reason given for overriding the calculated classification code",
+            "example": "Overriding comment"
           },
           "questions": {
             "type": "array",

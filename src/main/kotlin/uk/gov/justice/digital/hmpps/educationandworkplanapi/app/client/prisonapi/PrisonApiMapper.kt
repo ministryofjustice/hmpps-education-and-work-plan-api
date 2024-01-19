@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.SignificantMovement
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.TransferDetail
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Component
 class PrisonApiMapper {
@@ -40,7 +42,7 @@ class PrisonApiMapper {
   private fun buildTransfers(transfers: List<TransferDetail>): List<PrisonMovementEvent> =
     transfers.map {
       PrisonMovementEvent(
-        date = it.dateInToPrison!!.toLocalDate(),
+        date = it.dateInToPrison.toLocalDate(),
         movementType = PrisonMovementType.TRANSFER,
         fromPrisonId = it.fromPrisonId,
         toPrisonId = it.toPrisonId,
@@ -49,7 +51,7 @@ class PrisonApiMapper {
 
   private fun toPrisonAdmissionEvent(movement: SignificantMovement): PrisonMovementEvent =
     PrisonMovementEvent(
-      date = movement.dateInToPrison!!.toLocalDate(),
+      date = movement.dateInToPrison.toLocalDate(),
       movementType = PrisonMovementType.ADMISSION,
       fromPrisonId = null,
       toPrisonId = movement.admittedIntoPrisonId,
@@ -57,7 +59,7 @@ class PrisonApiMapper {
 
   private fun toPrisonReleaseEvent(movement: SignificantMovement): PrisonMovementEvent =
     PrisonMovementEvent(
-      date = movement.dateOutOfPrison!!.toLocalDate(),
+      date = movement.dateOutOfPrison.toLocalDate(),
       movementType = PrisonMovementType.RELEASE,
       fromPrisonId = movement.releaseFromPrisonId,
       toPrisonId = null,
@@ -68,4 +70,6 @@ class PrisonApiMapper {
 
   private fun isReleaseFromPrison(it: SignificantMovement) =
     it.outwardType == SignificantMovement.OutwardType.REL
+
+  private fun String?.toLocalDate() = LocalDate.parse(this, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 }
