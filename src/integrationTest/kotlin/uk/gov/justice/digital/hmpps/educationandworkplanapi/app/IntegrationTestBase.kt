@@ -73,6 +73,9 @@ abstract class IntegrationTestBase {
   lateinit var webTestClient: WebTestClient
 
   @Autowired
+  lateinit var wiremockService: WiremockService
+
+  @Autowired
   lateinit var actionPlanRepository: ActionPlanRepository
 
   @Autowired
@@ -108,6 +111,11 @@ abstract class IntegrationTestBase {
     actionPlanRepository.deleteAll() // Will also remove all Goals and Steps due to cascade
     timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
     inductionRepository.deleteAll()
+  }
+
+  @BeforeEach
+  fun resetWiremock() {
+    wiremockService.resetAllStubsAndMappings()
   }
 
   fun getActionPlan(prisonNumber: String): ActionPlanResponse =

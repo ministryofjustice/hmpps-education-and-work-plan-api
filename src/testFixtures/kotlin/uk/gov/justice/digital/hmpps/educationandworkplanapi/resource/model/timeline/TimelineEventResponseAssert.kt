@@ -76,6 +76,16 @@ class TimelineEventResponseAssert(actual: TimelineEventResponse?) :
     return this
   }
 
+  fun hasNoActionedByDisplayName(): TimelineEventResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (actionedByDisplayName != null) {
+        failWithMessage("Expected actionedByDisplayName to be null, but was $actionedByDisplayName")
+      }
+    }
+    return this
+  }
+
   fun hasContextualInfo(expected: String): TimelineEventResponseAssert {
     isNotNull
     with(actual!!) {

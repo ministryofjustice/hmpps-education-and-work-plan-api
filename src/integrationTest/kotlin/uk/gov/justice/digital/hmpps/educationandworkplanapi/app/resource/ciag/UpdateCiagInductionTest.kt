@@ -16,6 +16,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonPeriod
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidSignificantMovementAdmission
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
@@ -147,6 +150,22 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       displayName = "Albert User",
       prisonNumber = prisonNumber,
       createCiagInductionRequest = aValidCreateCiagInductionRequest(),
+    )
+    wiremockService.stubGetPrisonTimelineFromPrisonApi(
+      prisonNumber,
+      aValidPrisonerInPrisonSummary(
+        prisonerNumber = prisonNumber,
+        prisonPeriod = listOf(
+          aValidPrisonPeriod(
+            prisons = listOf("MDI"),
+            bookingId = 1L,
+            movementDates = listOf(
+              aValidSignificantMovementAdmission(admittedIntoPrisonId = "MDI"),
+            ),
+            transfers = emptyList(),
+          ),
+        ),
+      ),
     )
 
     val persistedInduction = getCiagInduction(prisonNumber)
@@ -301,7 +320,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(2) { // the 2nd Timeline event will be the INDUCTION_UPDATED event
+      .event(3) { // the 3rd Timeline event will be the INDUCTION_UPDATED event
         it.hasEventType(TimelineEventType.INDUCTION_UPDATED)
           .wasActionedBy("buser_gen")
           .hasActionedByDisplayName("Bernie User")
