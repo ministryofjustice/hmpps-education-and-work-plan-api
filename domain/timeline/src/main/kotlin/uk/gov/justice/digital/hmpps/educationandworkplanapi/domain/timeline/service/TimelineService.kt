@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline.Companion.newTimeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
 
@@ -17,7 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Time
 class TimelineService(
   private val persistenceAdapter: TimelinePersistenceAdapter,
   private val prisonTimelineService: PrisonTimelineService,
-  private val callPrisonApiEnabled: Boolean,
 ) {
 
   /**
@@ -37,12 +37,16 @@ class TimelineService(
    * [TimelineNotFoundException] if it cannot be found.
    */
   fun getTimelineForPrisoner(prisonNumber: String): Timeline {
-    val prisonerTimeline =
-      persistenceAdapter.getTimelineForPrisoner(prisonNumber) ?: throw TimelineNotFoundException(prisonNumber)
+    // Get the prisoner's main PLP timeline (for Induction/Goal related events)
+    val prisonerTimeline = persistenceAdapter.getTimelineForPrisoner(prisonNumber)
+    // Get their prison location history
+    val prisonMovements = prisonTimelineService.getPrisonTimelineEvents(prisonNumber)
 
-    if (callPrisonApiEnabled) {
-      prisonerTimeline.addEvents(prisonTimelineService.getPrisonTimelineEvents(prisonNumber))
+    // This should never happen as there should always be at least 1 prison movement (for when they entered prison)
+    if (prisonerTimeline == null && prisonMovements.isEmpty()) {
+      throw TimelineNotFoundException(prisonNumber)
     }
-    return prisonerTimeline
+
+    return prisonerTimeline?.addEvents(prisonMovements) ?: newTimeline(prisonNumber, prisonMovements)
   }
 }

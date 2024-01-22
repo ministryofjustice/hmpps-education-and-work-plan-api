@@ -2,23 +2,25 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.ser
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidPrisonMovementTimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimelineEvent
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class TimelineServiceTest {
 
+  @InjectMocks
   private lateinit var service: TimelineService
 
   @Mock
@@ -26,13 +28,6 @@ class TimelineServiceTest {
 
   @Mock
   private lateinit var prisonTimelineService: PrisonTimelineService
-
-  private val callPrisonApiEnabled = true
-
-  @BeforeEach
-  fun setup() {
-    service = TimelineService(persistenceAdapter, prisonTimelineService, callPrisonApiEnabled)
-  }
 
   companion object {
     private const val prisonNumber = "A1234AB"
@@ -65,18 +60,35 @@ class TimelineServiceTest {
   @Test
   fun `should get timeline for prisoner`() {
     // Given
-    val expected = aValidTimeline()
-    // TODO RR-566 - populate prisonEvents
-    val prisonEvents = emptyList<TimelineEvent>()
-    given(persistenceAdapter.getTimelineForPrisoner(any())).willReturn(expected)
+    val expectedTimeline = aValidTimeline()
+    val prisonEvents = listOf(aValidPrisonMovementTimelineEvent())
+    given(persistenceAdapter.getTimelineForPrisoner(any())).willReturn(expectedTimeline)
     given(prisonTimelineService.getPrisonTimelineEvents(any())).willReturn(prisonEvents)
-    expected.addEvents(prisonEvents)
+    expectedTimeline.addEvents(prisonEvents)
 
     // When
     val actual = service.getTimelineForPrisoner(prisonNumber)
 
     // Then
-    assertThat(actual).isEqualTo(expected)
+    assertThat(actual).isEqualTo(expectedTimeline)
+    verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
+    verify(prisonTimelineService).getPrisonTimelineEvents(prisonNumber)
+  }
+
+  @Test
+  fun `should get timeline for prisoner with no induction or goals`() {
+    // Given
+    val plpTimeline = null
+    val prisonEvents = listOf(aValidPrisonMovementTimelineEvent())
+    given(persistenceAdapter.getTimelineForPrisoner(any())).willReturn(plpTimeline)
+    given(prisonTimelineService.getPrisonTimelineEvents(any())).willReturn(prisonEvents)
+    val expectedTimeline = Timeline(UUID.randomUUID(), prisonNumber, prisonEvents)
+
+    // When
+    val actual = service.getTimelineForPrisoner(prisonNumber)
+
+    // Then
+    assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedTimeline)
     verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
     verify(prisonTimelineService).getPrisonTimelineEvents(prisonNumber)
   }
@@ -84,12 +96,12 @@ class TimelineServiceTest {
   @Test
   fun `should fail to get timeline for prisoner given timeline does not exist`() {
     // Given
-    val prisonNumber = "A1234AB"
     given(persistenceAdapter.getTimelineForPrisoner(any())).willReturn(null)
+    given(prisonTimelineService.getPrisonTimelineEvents(any())).willReturn(emptyList())
 
     // When
     val exception = catchThrowableOfType(
-      { service.getTimelineForPrisoner(Companion.prisonNumber) },
+      { service.getTimelineForPrisoner(prisonNumber) },
       TimelineNotFoundException::class.java,
     )
 
@@ -97,6 +109,6 @@ class TimelineServiceTest {
     assertThat(exception).hasMessage("Timeline not found for prisoner [$prisonNumber]")
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
     verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
-    verifyNoInteractions(prisonTimelineService)
+    verify(prisonTimelineService).getPrisonTimelineEvents(prisonNumber)
   }
 }

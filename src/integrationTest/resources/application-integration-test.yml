@@ -59,6 +59,3 @@ prison-api:
 apis:
   prison-api:
     url: http://localhost:9093
-
-featureToggles:
-  call-prison-api-enabled: true

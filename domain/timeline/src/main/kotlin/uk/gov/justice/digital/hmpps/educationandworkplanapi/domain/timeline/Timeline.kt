@@ -22,13 +22,22 @@ class Timeline(
   /**
    * Adds a [TimelineEvent] to the timeline.
    */
-  fun addEvent(timelineEvent: TimelineEvent) =
+  fun addEvent(timelineEvent: TimelineEvent): Timeline {
     events.add(timelineEvent)
+    return this
+  }
 
   /**
    * Adds one or more [TimelineEvent]s to the timeline.
    */
-  fun addEvents(timelineEvents: List<TimelineEvent>) {
+  fun addEvents(timelineEvents: List<TimelineEvent>): Timeline {
     events.addAll(timelineEvents)
+    return this
+  }
+
+  companion object {
+    @JvmStatic
+    fun newTimeline(prisonNumber: String, events: List<TimelineEvent>) =
+      Timeline(UUID.randomUUID(), prisonNumber, events)
   }
 }

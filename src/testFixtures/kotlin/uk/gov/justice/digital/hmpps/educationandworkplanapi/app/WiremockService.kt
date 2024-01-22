@@ -33,4 +33,15 @@ class WiremockService(private val wireMockServer: WireMockServer) {
         ),
     )
   }
+
+  fun stubGetPrisonTimelineNotFound(prisonNumber: String) {
+    wireMockServer.stubFor(
+      get(urlPathMatching("/api/offenders/$prisonNumber/prison-timeline"))
+        .willReturn(
+          responseDefinition()
+            .withStatus(404)
+            .withHeader("Content-Type", "application/json"),
+        ),
+    )
+  }
 }
