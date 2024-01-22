@@ -76,6 +76,7 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should not get timeline given prisoner has no timeline`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    wiremockService.stubGetPrisonTimelineNotFound(prisonNumber)
 
     // When
     val response = webTestClient.get()
@@ -299,6 +300,52 @@ class GetTimelineTest : IntegrationTestBase() {
           .hasSourceReference(stepToUpdate.reference.toString())
           .hasContextualInfo("Research course options")
           .hasCorrelationId(goalUpdatedCorrelationId)
+      }
+  }
+
+  @Test
+  @Transactional
+  fun `should get timeline for prisoner with no plp events`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    wiremockService.stubGetPrisonTimelineFromPrisonApi(
+      prisonNumber,
+      aValidPrisonerInPrisonSummary(
+        prisonerNumber = prisonNumber,
+        prisonPeriod = listOf(
+          aValidPrisonPeriod(
+            prisons = listOf("BXI"),
+            bookingId = 1L,
+            movementDates = listOf(
+              aValidSignificantMovementAdmission(admittedIntoPrisonId = "BXI"),
+            ),
+            transfers = emptyList(),
+          ),
+        ),
+      ),
+    )
+
+    // When
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(TimelineResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual.events).hasSize(1)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .event(1) {
+        it.hasSourceReference("1")
+          .hasEventType(TimelineEventType.PRISON_ADMISSION)
+          .hasPrisonId("BXI")
+          .wasActionedBy("system")
+          .hasNoActionedByDisplayName()
+          .hasNoContextualInfo()
       }
   }
 

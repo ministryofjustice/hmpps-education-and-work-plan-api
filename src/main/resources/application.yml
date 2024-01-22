@@ -102,6 +102,3 @@ springdoc:
 apis:
   prison-api:
     url: ${PRISON_API_URL}
-
-featureToggles:
-  call-prison-api-enabled: ${CALL_PRISON_API_ENABLED:false}
