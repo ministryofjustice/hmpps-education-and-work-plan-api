@@ -42,6 +42,9 @@ generic-service:
       DB_NAME: "database_name"
       DB_USER: "database_username"
       DB_PASS: "database_password"
+    digital-prison-reporting:
+      DPR_USER: "DPR_USER"
+      DPR_PASSWORD: "DPR_PASSWORD"
 
     # Inbound SQS config
     hmpps-domain-events-topic:

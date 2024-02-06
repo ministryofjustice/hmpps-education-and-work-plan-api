@@ -19,6 +19,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://education-and-work-plan-api-db:5432/education-and-work-plan-api_db
       - DB_USER=admin
       - DB_PASS=admin_password
+      - DPR_USER=dpr_user
+      - DPR_PASSWORD=dpr_password
 
   db:
     image: postgres:latest

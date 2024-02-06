@@ -26,7 +26,7 @@ spring:
 
   # Include h2 specific migration scripts
   flyway:
-    locations: classpath:/db/migration,classpath:/db/h2
+    locations: classpath:/db/migration/common,classpath:/db/h2
 
   security:
     oauth2:
