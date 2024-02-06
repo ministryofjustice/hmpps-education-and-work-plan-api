@@ -1,0 +1,6 @@
+#
+# The "-dev" for use in the dev environment (profile enabled in the helm dev config).
+#
+spring:
+  flyway:
+    locations: classpath:/db/migration/common,classpath:/db/migration/dev,classpath:/db/postgres
