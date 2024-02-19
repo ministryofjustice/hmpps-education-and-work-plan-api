@@ -11,17 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InboundEventsService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
@@ -34,8 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import uk.gov.justice.hmpps.sqs.HmppsQueueService
-import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -52,14 +45,6 @@ abstract class IntegrationTestBase {
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val CIAG_INDUCTION_URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
-
-    private val localStackContainer = LocalStackContainer.instance
-
-    @JvmStatic
-    @DynamicPropertySource
-    fun testcontainers(registry: DynamicPropertyRegistry) {
-      localStackContainer?.also { setLocalStackProperties(it, registry) }
-    }
   }
 
   init {
@@ -92,19 +77,6 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var keyPair: KeyPair
-
-  @Autowired
-  protected lateinit var hmppsQueueService: HmppsQueueService
-
-  @SpyBean
-  protected lateinit var inboundEventsServiceSpy: InboundEventsService
-
-  private val domainEventsTopic by lazy {
-    hmppsQueueService.findByTopicId("domainevents") ?: throw MissingQueueException("HmppsTopic domainevents not found")
-  }
-
-  protected val snsClient by lazy { domainEventsTopic.snsClient }
-  protected val domainEventsTopicArn by lazy { domainEventsTopic.arn }
 
   @BeforeEach
   fun clearDatabase() {
