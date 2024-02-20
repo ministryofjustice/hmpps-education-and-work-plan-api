@@ -73,15 +73,6 @@ The following environment variables are required in order for the app to start:
 | APPLICATIONINSIGHTS_CONNECTION_STRING  | The connection string for App Insights   |
 | APPLICATIONINSIGHTS_CONFIGURATION_FILE | A configuration file for App Insights    |
 
-### SQS/SNS Topics and Queues
-
-| Name                                             | Description                                                               |
-|--------------------------------------------------|---------------------------------------------------------------------------|
-| HMPPS_SQS_USE_WEB_TOKEN                          | Set to `true` if the `DefaultAWSCredentialsProviderChain` should be used. |
-| HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN                | The AWS ARN for the shared domain-events topic.                           |
-| HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_QUEUE_NAME | The queue to receive events from the domain-events topic.                 |
-| HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_DLQ_NAME   | The dead letter queue for any failed messages.                            |
-
 ### APIs
 
 | Name                   | Description                                                                                     |
