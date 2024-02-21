@@ -41,6 +41,14 @@ generic-service:
       DPR_USER: "DPR_USER"
       DPR_PASSWORD: "DPR_PASSWORD"
 
+    # Inbound SQS config
+    hmpps-domain-events-topic:
+      HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN: "topic_arn"
+    education-and-work-plan-domain-events-sqs-instance-output:
+      HMPPS_SQS_QUEUES_EDUCATION_AND_WORK_PLAN_QUEUE_NAME: "sqs_queue_name"
+    education-and-work-plan-domain-events-sqs-dl-instance-output:
+      HMPPS_SQS_QUEUES_EDUCATION_AND_WORK_PLAN_DLQ_NAME: "sqs_queue_name"
+
   allowlist:
     groups:
       - internal
