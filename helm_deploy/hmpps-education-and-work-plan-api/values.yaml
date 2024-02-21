@@ -12,6 +12,9 @@ generic-service:
     host: app-hostname.local # override per environment
     tlsSecretName: hmpps-education-and-work-plan-api-cert
 
+  # Used to access resources like SQS queues and SNS topics
+  serviceAccountName: hmpps-education-and-work-plan-api
+
   # Environment variables to load into the deployment
   env:
     JAVA_OPTS: "-Xmx512m"
