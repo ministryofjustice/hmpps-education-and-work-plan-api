@@ -83,7 +83,7 @@ The following environment variables are required in order for the app to start:
 
 ## Monitoring, tracing and event reporting
 The API is instrumented with the opentelemetry and Application Insights java agent. Useful data can be found and reported
-on via the Azure Application Insights console, all under the `cloud_RoleName` property of `hmpps-education-and-work-plan-api`
+on via the Azure Application Insights console, all under the `cloud_RoleName` property of `hmpps-education-and-work-plan-api`.
 
 The Application Insights console and the Kusto Query Language will be your friend here, but some example queries are
 described below.
