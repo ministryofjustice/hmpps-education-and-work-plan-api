@@ -94,7 +94,6 @@ dependencies {
   testFixturesImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
   testFixturesImplementation("com.nimbusds:nimbus-jose-jwt:9.31")
 
-  // TODO RR-502 - remove these dependencies once the CIAG data has been migrated
   integrationTestImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
   testFixturesImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
 }
