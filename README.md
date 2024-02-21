@@ -182,6 +182,7 @@ This API consumes, and is therefore dependent on, data from the following APIs:
 
 * `hmpps-auth` - Standard HMPPS Digital configuration; used for Spring Security.
 * `application-insights` - Standard HMPPS Digital configuration; used for telemetry and event tracing.
+* `prison-api` - The Prison API; used for looking up a Prisoner's prison history.
 
 ## API consumers
 The following are the known consumers of this API. Any changes to this API - especially breaking or potentially breaking
