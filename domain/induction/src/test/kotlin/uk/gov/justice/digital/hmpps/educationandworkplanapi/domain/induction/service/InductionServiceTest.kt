@@ -35,7 +35,7 @@ class InductionServiceTest {
   private lateinit var inductionEventService: InductionEventService
 
   companion object {
-    private const val prisonNumber = "A1234AB"
+    private const val PRISON_NUMBER = "A1234AB"
   }
 
   @Nested
@@ -52,7 +52,7 @@ class InductionServiceTest {
       service.createInduction(createInductionDto)
 
       // Then
-      verify(persistenceAdapter).getInduction(prisonNumber)
+      verify(persistenceAdapter).getInduction(PRISON_NUMBER)
       verify(persistenceAdapter).createInduction(createInductionDto)
       verify(inductionEventService).inductionCreated(induction)
     }
@@ -71,8 +71,8 @@ class InductionServiceTest {
       )
 
       // Then
-      assertThat(exception.message).isEqualTo("An Induction already exists for prisoner $prisonNumber")
-      verify(persistenceAdapter).getInduction(prisonNumber)
+      assertThat(exception.message).isEqualTo("An Induction already exists for prisoner $PRISON_NUMBER")
+      verify(persistenceAdapter).getInduction(PRISON_NUMBER)
       verifyNoInteractions(inductionEventService)
     }
   }
@@ -86,11 +86,11 @@ class InductionServiceTest {
       given(persistenceAdapter.getInduction(any())).willReturn(expected)
 
       // When
-      val actual = service.getInductionForPrisoner(prisonNumber)
+      val actual = service.getInductionForPrisoner(PRISON_NUMBER)
 
       // Then
       assertThat(actual).isEqualTo(expected)
-      verify(persistenceAdapter).getInduction(prisonNumber)
+      verify(persistenceAdapter).getInduction(PRISON_NUMBER)
     }
 
     @Test
@@ -100,14 +100,14 @@ class InductionServiceTest {
 
       // When
       val exception = catchThrowableOfType(
-        { service.getInductionForPrisoner(prisonNumber) },
+        { service.getInductionForPrisoner(PRISON_NUMBER) },
         InductionNotFoundException::class.java,
       )
 
       // Then
-      assertThat(exception).hasMessage("Induction not found for prisoner [$prisonNumber]")
-      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-      verify(persistenceAdapter).getInduction(prisonNumber)
+      assertThat(exception).hasMessage("Induction not found for prisoner [$PRISON_NUMBER]")
+      assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
+      verify(persistenceAdapter).getInduction(PRISON_NUMBER)
     }
   }
 
@@ -116,8 +116,8 @@ class InductionServiceTest {
     @Test
     fun `should update induction`() {
       // Given
-      val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
-      val expected = aFullyPopulatedInduction(prisonNumber = prisonNumber)
+      val updateInductionDto = aValidUpdateInductionDto(prisonNumber = PRISON_NUMBER)
+      val expected = aFullyPopulatedInduction(prisonNumber = PRISON_NUMBER)
       given(persistenceAdapter.updateInduction(any())).willReturn(expected)
 
       // When
@@ -132,7 +132,7 @@ class InductionServiceTest {
     @Test
     fun `should fail to update induction given it does not exist`() {
       // Given
-      val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
+      val updateInductionDto = aValidUpdateInductionDto(prisonNumber = PRISON_NUMBER)
       given(persistenceAdapter.updateInduction(any())).willReturn(null)
 
       // When
@@ -142,7 +142,7 @@ class InductionServiceTest {
       )
 
       // Then
-      assertThat(exception).hasMessage("Induction not found for prisoner [$prisonNumber]")
+      assertThat(exception).hasMessage("Induction not found for prisoner [$PRISON_NUMBER]")
       verify(persistenceAdapter).updateInduction(updateInductionDto)
       verifyNoInteractions(inductionEventService)
     }

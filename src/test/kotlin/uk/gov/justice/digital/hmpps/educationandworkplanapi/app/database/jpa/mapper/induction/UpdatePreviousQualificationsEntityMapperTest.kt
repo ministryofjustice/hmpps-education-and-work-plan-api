@@ -52,8 +52,9 @@ class UpdatePreviousQualificationsEntityMapperTest {
       qualifications = mutableListOf(existingQualificationEntity1, existingQualificationEntity2),
     )
 
+    // ensure case is ignored
     val updatedQualification = aValidQualification(
-      subject = "ENGLISH", // ensure case is ignored
+      subject = "ENGLISH",
       level = QualificationLevelDomain.LEVEL_3,
       grade = "B",
     )
@@ -108,14 +109,16 @@ class UpdatePreviousQualificationsEntityMapperTest {
       ),
     )
 
+    // same level as above, so the grade should be updated
     val updatedQualification = aValidQualification(
       subject = "English",
-      level = QualificationLevelDomain.LEVEL_3, // same level as above, so the grade should be updated
+      level = QualificationLevelDomain.LEVEL_3,
       grade = "B",
     )
+    // different level, so should appear as a new qualification
     val newQualification = aValidQualification(
       subject = "English",
-      level = QualificationLevelDomain.LEVEL_2, // different level, so should appear as a new qualification
+      level = QualificationLevelDomain.LEVEL_2,
       grade = "C",
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
@@ -130,15 +133,17 @@ class UpdatePreviousQualificationsEntityMapperTest {
       reference = reference
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
       qualifications = mutableListOf(
+        // updated grade
         aValidQualificationEntity(
           subject = "English",
           level = QualificationLevelEntity.LEVEL_3,
-          grade = "B", // updated grade
+          grade = "B",
         ),
+        // new qualification
         aValidQualificationEntity(
           subject = "English",
           level = QualificationLevelEntity.LEVEL_2,
-          grade = "C", // new qualification
+          grade = "C",
         ),
       )
       createdAtPrison = "BXI"

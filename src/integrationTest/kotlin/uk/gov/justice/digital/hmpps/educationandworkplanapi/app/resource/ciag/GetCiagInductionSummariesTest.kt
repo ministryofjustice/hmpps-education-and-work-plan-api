@@ -93,7 +93,8 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
           offenderId = prisonNumber1,
           desireToWork = false,
           hopingToGetWork = NO,
-          createdBy = "auser_gen", // expected createdBy and modifiedBy will be the user that created the inductions via the `createInduction` method call above
+          // expected createdBy and modifiedBy will be the user that created the inductions via the `createInduction` method call above
+          createdBy = "auser_gen",
           modifiedBy = "auser_gen",
         ),
         aValidCiagInductionSummaryResponse(

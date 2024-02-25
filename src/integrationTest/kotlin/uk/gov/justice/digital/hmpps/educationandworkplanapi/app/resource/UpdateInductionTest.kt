@@ -147,7 +147,8 @@ class UpdateInductionTest : IntegrationTestBase() {
         reference = persistedInduction.workOnRelease.reference,
       ),
       inPrisonInterests = aValidUpdateInPrisonInterestsRequest(),
-      previousQualifications = null, // null means these values won't be changed
+      // null means these values won't be changed
+      previousQualifications = null,
       previousTraining = null,
       previousWorkExperiences = null,
       personalSkillsAndInterests = null,
@@ -207,10 +208,12 @@ class UpdateInductionTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
       updatedBy = updateUsername,
       updatedByDisplayName = updateDisplayName,
-      updatedAtPrison = "MDI", // different prison to the create request
+      // different prison to the create request
+      updatedAtPrison = "MDI",
     )
     val expectedInPrisonInterests = aValidInPrisonInterestsResponse(
-      createdBy = updateUsername, // in-prison interests didn't exist previously, so will be created by the update request
+      // in-prison interests didn't exist previously, so will be created by the update request
+      createdBy = updateUsername,
       createdByDisplayName = updateDisplayName,
       createdAtPrison = "MDI",
       updatedBy = updateUsername,
@@ -341,11 +344,13 @@ class UpdateInductionTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
       updatedBy = updateUsername,
       updatedByDisplayName = updateDisplayName,
-      updatedAtPrison = "MDI", // different prison to the create request
+      // different prison to the create request
+      updatedAtPrison = "MDI",
     )
     val expectedPreviousQualifications = aValidPreviousQualificationsResponse(
       educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
-      createdBy = createUsername, // didn't exist previously, so will be created by the update request
+      // didn't exist previously, so will be created by the update request
+      createdBy = createUsername,
       createdByDisplayName = createDisplayName,
       createdAtPrison = "BXI",
       updatedBy = updateUsername,

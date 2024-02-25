@@ -110,13 +110,18 @@ fun aValidPrisonerInPrisonSummary(
 fun aValidPrisonPeriod(
   entryDate: LocalDateTime = LocalDateTime.now().minusMonths(6),
   movementDates: List<SignificantMovement> = listOf(
-    aValidSignificantMovementAdmission(), // into BMI
-    aValidSignificantMovementRelease(), // from MDI
-    aValidSignificantMovementAdmissionAndRelease(), // in and out of BXI
+    // movement into BMI
+    aValidSignificantMovementAdmission(),
+    // movement from MDI
+    aValidSignificantMovementRelease(),
+    // admission and release in and out of BXI
+    aValidSignificantMovementAdmissionAndRelease(),
   ),
   transfers: List<TransferDetail> = listOf(
-    aValidTransferDetail(), // BMI to MDI
-    anotherValidTransferDetail(), // MDI to BXI
+    // BMI to MDI
+    aValidTransferDetail(),
+    // MDI to BXI
+    anotherValidTransferDetail(),
   ),
   prisons: List<String> = listOf("BMI", "MDI", "BXI"),
   bookNumber: String = "1234A",
@@ -136,9 +141,11 @@ fun aValidPrisonPeriod(
 fun anotherValidPrisonPeriod(
   entryDate: LocalDateTime = LocalDateTime.now().minusMonths(1),
   movementDates: List<SignificantMovement> = listOf(
-    aValidSignificantMovementAdmissionAndRelease(), // in and out of BXI
+    // An admission and release in and out of BXI
+    aValidSignificantMovementAdmissionAndRelease(),
   ),
-  transfers: List<TransferDetail> = emptyList(), // according to the swagger spec, this will never be null
+  // as per the swagger spec, transfers will never be null
+  transfers: List<TransferDetail> = emptyList(),
   prisons: List<String> = listOf("BXI"),
   bookNumber: String = "5678B",
   bookingId: Long = 2,

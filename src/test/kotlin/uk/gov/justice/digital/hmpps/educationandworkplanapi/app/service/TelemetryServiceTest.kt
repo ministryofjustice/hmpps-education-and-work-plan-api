@@ -214,7 +214,8 @@ class TelemetryServiceTest {
 
       val updateEventTypes = listOf(
         GOAL_UPDATED,
-        STEP_REMOVED, // 2 STEP_REMOVED event types to trigger 2 corresponding telemetry events.
+        // 2 STEP_REMOVED event types to trigger 2 corresponding telemetry events.
+        STEP_REMOVED,
         STEP_REMOVED,
         // The follow event types will be supported in the future.
         // They are included here to break the test as and when the implementation handles them.
