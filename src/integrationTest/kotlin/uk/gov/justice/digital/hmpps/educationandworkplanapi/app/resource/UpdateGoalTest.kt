@@ -324,7 +324,8 @@ class UpdateGoalTest : IntegrationTestBase() {
           status = step1.status,
           sequenceNumber = step1.sequenceNumber,
         ),
-        newStep, // this is the only thing that is changed in the request - add a new Step
+        // the New Step is the only thing that is changed in the request - add a new Step
+        newStep,
       ),
     )
 

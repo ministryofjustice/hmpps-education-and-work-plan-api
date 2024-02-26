@@ -199,7 +199,8 @@ class CreateCiagInductionTest : IntegrationTestBase() {
       workExperience = null,
       skillsAndInterests = null,
       qualificationsAndTraining = aValidCreateEducationAndQualificationsRequest(
-        educationLevel = null, // not set in short route
+        // education level is not set in short route
+        educationLevel = null,
         qualifications = setOf(aValidAchievedQualification()),
         additionalTraining = setOf(TrainingType.NONE),
         additionalTrainingOther = null,
@@ -311,7 +312,8 @@ class CreateCiagInductionTest : IntegrationTestBase() {
       ),
       qualificationsAndTraining = aValidCreateEducationAndQualificationsRequest(
         qualifications = emptySet(),
-        additionalTraining = emptySet(), // not possible via the UI
+        // additional training set to an empty collection is not possible via the UI but technically the API supports it so is tested here
+        additionalTraining = emptySet(),
         additionalTrainingOther = null,
       ),
       inPrisonInterests = aValidCreatePrisonWorkAndEducationRequest(
@@ -397,7 +399,8 @@ class CreateCiagInductionTest : IntegrationTestBase() {
       qualificationsAndTraining = aValidCreateEducationAndQualificationsRequest(
         educationLevel = null,
         qualifications = null,
-        additionalTraining = setOf(TrainingType.NONE), // cannot set to null
+        // additional training cannot be set to null
+        additionalTraining = setOf(TrainingType.NONE),
         additionalTrainingOther = null,
       ),
       inPrisonInterests = aValidCreatePrisonWorkAndEducationRequest(

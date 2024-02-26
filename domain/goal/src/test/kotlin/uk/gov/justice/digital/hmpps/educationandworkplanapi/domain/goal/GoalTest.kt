@@ -22,7 +22,8 @@ class GoalTest {
     val goal = aValidGoal(steps = mutableListOf(step2, step3, step1)) // Steps passed into the goal out of sequence
 
     // Then
-    assertThat(goal.steps.map { it.title }).containsExactly( // steps are returned in correct sequence based on sequenceNumber
+    assertThat(goal.steps.map { it.title }).containsExactly(
+      // steps are returned in correct sequence based on sequenceNumber
       "Book course",
       "Attend course",
       "Pass exam",
@@ -44,7 +45,8 @@ class GoalTest {
       goal.addStep(newStep) // add "Attend course" step
 
       // Then
-      assertThat(goal.steps.map { it.title }).containsExactly( // steps are returned in correct sequence
+      assertThat(goal.steps.map { it.title }).containsExactly(
+        // steps are returned in correct sequence
         "Book course",
         "Attend course",
         "Pass exam",
@@ -64,7 +66,8 @@ class GoalTest {
       goal.addStep(newStep)
 
       // Then
-      assertThat(goal.steps.map { it.title }).containsExactly( // steps are returned in correct sequence
+      assertThat(goal.steps.map { it.title }).containsExactly(
+        // steps are returned in correct sequence
         "The new step",
         "Book course",
         "Pass exam",
@@ -84,7 +87,8 @@ class GoalTest {
       goal.addStep(newStep)
 
       // Then
-      assertThat(goal.steps.map { it.title }).containsExactly( // steps are returned in correct sequence
+      assertThat(goal.steps.map { it.title }).containsExactly(
+        // steps are returned in correct sequence
         "Book course",
         "Pass exam",
         "The new step",

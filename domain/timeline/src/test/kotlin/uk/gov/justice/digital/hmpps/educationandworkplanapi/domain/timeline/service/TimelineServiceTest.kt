@@ -30,7 +30,7 @@ class TimelineServiceTest {
   private lateinit var prisonTimelineService: PrisonTimelineService
 
   companion object {
-    private const val prisonNumber = "A1234AB"
+    private const val PRISON_NUMBER = "A1234AB"
   }
 
   @Test
@@ -39,10 +39,10 @@ class TimelineServiceTest {
     val timelineEvent = aValidTimelineEvent()
 
     // When
-    service.recordTimelineEvent(prisonNumber, timelineEvent)
+    service.recordTimelineEvent(PRISON_NUMBER, timelineEvent)
 
     // Then
-    verify(persistenceAdapter).recordTimelineEvent(prisonNumber, timelineEvent)
+    verify(persistenceAdapter).recordTimelineEvent(PRISON_NUMBER, timelineEvent)
   }
 
   @Test
@@ -51,10 +51,10 @@ class TimelineServiceTest {
     val timelineEvents = listOf(aValidTimelineEvent(), aValidTimelineEvent())
 
     // When
-    service.recordTimelineEvents(prisonNumber, timelineEvents)
+    service.recordTimelineEvents(PRISON_NUMBER, timelineEvents)
 
     // Then
-    verify(persistenceAdapter).recordTimelineEvents(prisonNumber, timelineEvents)
+    verify(persistenceAdapter).recordTimelineEvents(PRISON_NUMBER, timelineEvents)
   }
 
   @Test
@@ -67,12 +67,12 @@ class TimelineServiceTest {
     expectedTimeline.addEvents(prisonEvents)
 
     // When
-    val actual = service.getTimelineForPrisoner(prisonNumber)
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER)
 
     // Then
     assertThat(actual).isEqualTo(expectedTimeline)
-    verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
-    verify(prisonTimelineService).getPrisonTimelineEvents(prisonNumber)
+    verify(persistenceAdapter).getTimelineForPrisoner(PRISON_NUMBER)
+    verify(prisonTimelineService).getPrisonTimelineEvents(PRISON_NUMBER)
   }
 
   @Test
@@ -82,15 +82,15 @@ class TimelineServiceTest {
     val prisonEvents = listOf(aValidPrisonMovementTimelineEvent())
     given(persistenceAdapter.getTimelineForPrisoner(any())).willReturn(plpTimeline)
     given(prisonTimelineService.getPrisonTimelineEvents(any())).willReturn(prisonEvents)
-    val expectedTimeline = Timeline(UUID.randomUUID(), prisonNumber, prisonEvents)
+    val expectedTimeline = Timeline(UUID.randomUUID(), PRISON_NUMBER, prisonEvents)
 
     // When
-    val actual = service.getTimelineForPrisoner(prisonNumber)
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER)
 
     // Then
     assertThat(actual).usingRecursiveComparison().ignoringFields("reference").isEqualTo(expectedTimeline)
-    verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
-    verify(prisonTimelineService).getPrisonTimelineEvents(prisonNumber)
+    verify(persistenceAdapter).getTimelineForPrisoner(PRISON_NUMBER)
+    verify(prisonTimelineService).getPrisonTimelineEvents(PRISON_NUMBER)
   }
 
   @Test
@@ -101,14 +101,14 @@ class TimelineServiceTest {
 
     // When
     val exception = catchThrowableOfType(
-      { service.getTimelineForPrisoner(prisonNumber) },
+      { service.getTimelineForPrisoner(PRISON_NUMBER) },
       TimelineNotFoundException::class.java,
     )
 
     // Then
-    assertThat(exception).hasMessage("Timeline not found for prisoner [$prisonNumber]")
-    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-    verify(persistenceAdapter).getTimelineForPrisoner(prisonNumber)
-    verify(prisonTimelineService).getPrisonTimelineEvents(prisonNumber)
+    assertThat(exception).hasMessage("Timeline not found for prisoner [$PRISON_NUMBER]")
+    assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
+    verify(persistenceAdapter).getTimelineForPrisoner(PRISON_NUMBER)
+    verify(prisonTimelineService).getPrisonTimelineEvents(PRISON_NUMBER)
   }
 }

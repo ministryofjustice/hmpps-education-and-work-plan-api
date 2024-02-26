@@ -158,7 +158,8 @@ class UpdateFutureWorkInterestsEntityMapperTest {
       reference = futureWorkInterestsReference,
       interests = listOf(
         aValidWorkInterest(
-          workType = WorkInterestTypeDomain.OTHER, // only first interest above included
+          // only first interest above included
+          workType = WorkInterestTypeDomain.OTHER,
           workTypeOther = "Any job I can get",
           role = "Any role",
         ),

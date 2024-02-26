@@ -8,7 +8,7 @@ import java.util.UUID
 class TimelineTest {
 
   companion object {
-    private const val prisonNumber = "A1234AB"
+    private const val PRISON_NUMBER = "A1234AB"
 
     private val earliestEvent = aValidTimelineEvent(
       eventType = TimelineEventType.ACTION_PLAN_CREATED,
@@ -31,7 +31,7 @@ class TimelineTest {
     val events = listOf(middleEvent, earliestEvent, latestEvent)
 
     // When
-    val actual = Timeline(reference = reference, prisonNumber = prisonNumber, events = events)
+    val actual = Timeline(reference = reference, prisonNumber = PRISON_NUMBER, events = events)
 
     // Then
     assertThat(actual.events).containsExactly(
@@ -46,7 +46,7 @@ class TimelineTest {
     // Given
     val reference = UUID.randomUUID()
     val initialEvents = listOf(earliestEvent, latestEvent)
-    val timeline = Timeline(reference = reference, prisonNumber = prisonNumber, events = initialEvents)
+    val timeline = Timeline(reference = reference, prisonNumber = PRISON_NUMBER, events = initialEvents)
 
     // When
     timeline.addEvent(middleEvent)

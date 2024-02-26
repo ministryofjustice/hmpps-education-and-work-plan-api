@@ -4,8 +4,8 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.11.0"
-  id("org.openapi.generator") version "7.0.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
+  id("org.openapi.generator") version "7.3.0"
   kotlin("plugin.spring") version "1.9.21"
   kotlin("plugin.jpa") version "1.9.21"
   kotlin("kapt") version "1.9.21"
@@ -19,19 +19,21 @@ plugins {
 apply(plugin = "org.openapi.generator")
 
 val mapstructVersion = "1.5.5.Final"
-val postgresqlVersion = "42.6.0"
+val postgresqlVersion = "42.7.2"
 val kotlinLoggingVersion = "3.0.5"
-val springdocOpenapiVersion = "2.2.0"
+val springdocOpenapiVersion = "2.3.0"
 val awaitilityVersion = "4.2.0"
+val wiremockVersion = "3.4.1"
+val jsonWebTokenVersion = "0.12.5"
+val nimbusJwtVersion = "9.37.3"
 
-ext["logback.version"] = "1.4.14"
-ext["jackson-bom.version"] = "2.16.0"
+ext["jackson-bom.version"] = "2.16.1"
 
 allOpen {
   annotations(
     "javax.persistence.Entity",
     "javax.persistence.MappedSuperclass",
-    "javax.persistence.Embeddable"
+    "javax.persistence.Embeddable",
   )
 }
 
@@ -90,12 +92,12 @@ dependencies {
   testFixturesImplementation("io.projectreactor:reactor-core")
   testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
   // Libraries to support creating JWTs in test fixtures
-  testFixturesImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-  testFixturesImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-  testFixturesImplementation("com.nimbusds:nimbus-jose-jwt:9.31")
+  testFixturesImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebTokenVersion")
+  testFixturesImplementation("io.jsonwebtoken:jjwt-jackson:$jsonWebTokenVersion")
+  testFixturesImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusJwtVersion")
 
-  integrationTestImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
-  testFixturesImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
+  integrationTestImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
+  testFixturesImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
 }
 
 java {
@@ -133,7 +135,7 @@ tasks.named("assemble") {
     delete(
       fileTree(project.buildDir.absolutePath)
         .include("libs/*-plain.jar")
-        .include("libs/*-test-fixtures.jar")
+        .include("libs/*-test-fixtures.jar"),
     )
   }
 }
@@ -183,13 +185,13 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
       "serializationLibrary" to "jackson",
       "useBeanValidation" to "true",
       "useSpringBoot3" to "true",
-      "enumPropertyNaming" to "UPPERCASE"
-    )
+      "enumPropertyNaming" to "UPPERCASE",
+    ),
   )
   globalProperties.set(
     mapOf(
-      "models" to ""
-    )
+      "models" to "",
+    ),
   )
 }
 
@@ -206,13 +208,13 @@ tasks.register<GenerateTask>("buildPrisonApiModel") {
       "serializationLibrary" to "jackson",
       "useBeanValidation" to "true",
       "useSpringBoot3" to "true",
-      "enumPropertyNaming" to "UPPERCASE"
-    )
+      "enumPropertyNaming" to "UPPERCASE",
+    ),
   )
   globalProperties.set(
     mapOf(
-      "models" to ""
-    )
+      "models" to "",
+    ),
   )
 }
 
