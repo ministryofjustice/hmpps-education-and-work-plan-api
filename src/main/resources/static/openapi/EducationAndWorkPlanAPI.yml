@@ -298,6 +298,31 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/UpdateInduction'
 
+  #
+  # Subject access request
+  # --------------------------------------------------------------------------------
+  '/subject-access-request':
+    get:
+      summary: Retrieves PLP SAR data
+      tags:
+        - Subject Access Request
+
+      parameters:
+        - $ref: "#/components/parameters/prisonReferenceNumber"
+        - $ref: "#/components/parameters/fromDate"
+        - $ref: "#/components/parameters/toDate"
+      responses:
+        '200':
+          $ref: '#/components/responses/SarContentFound'
+        '204':
+          description: Request successfully processed - no content found
+        '209':
+          description: Subject Identifier is not recognised by this service
+        '400':
+          $ref: '#/components/responses/SarIncorrectRequest'
+        '401':
+          description: The client does not have authorisation to make this request
+
 #
 # --------------------------------------------------------------------------------
 #
@@ -2468,6 +2493,32 @@ components:
           description: A unique reference for a FutureWorkInterests resource (if it already exists).
           example: c88a6c48-97e2-4c04-93b5-98619966447b
 
+    SubjectAccessRequestContent:
+      properties:
+        induction:
+          $ref: '#/components/schemas/InductionResponse'
+        goals:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/GoalResponse'
+
+    SarSuccessResponse:
+      properties:
+        content:
+          $ref: '#/components/schemas/SubjectAccessRequestContent'
+
+    SarErrorResponse:
+      properties:
+        developerMessage:
+          type: string
+        errorCode:
+          type: integer
+        status:
+          type: integer
+        userMessage:
+          type: string
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -2643,6 +2694,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InductionResponse'
+    SarContentFound:
+      description: Request successfully processed - content found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SarSuccessResponse'
+    SarIncorrectRequest:
+      description: The request was not formed correctly
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SarErrorResponse'
 
   #
   # Request Body Definitions
@@ -2702,3 +2765,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateInductionRequest'
+
+  parameters:
+    prisonReferenceNumber:
+      name: prn
+      description: NOMIS Prison Reference Number
+      in: query
+      schema:
+        type: string
+    fromDate:
+      name: fromDate
+      in: query
+      description: Optional parameter denoting minimum date of event occurrence which should be returned in the response
+      schema:
+        type: string
+        format: date
+    toDate:
+      name: toDate
+      in: query
+      description: Optional parameter denoting maximum date of event occurrence which should be returned in the response
+      schema:
+        type: string
+        format: date
