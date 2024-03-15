@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.asser
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import java.time.LocalDate
 
-class SubjectAccessRequest : IntegrationTestBase() {
+class SubjectAccessRequestTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/subject-access-request"
   }
