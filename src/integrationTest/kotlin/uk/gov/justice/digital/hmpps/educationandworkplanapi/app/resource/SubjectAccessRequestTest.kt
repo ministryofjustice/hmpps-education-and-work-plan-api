@@ -213,12 +213,12 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     val content: SubjectAccessRequestService.SubjectAccessRequestContent,
   )
 
-  private fun WebTestClient.sarRequest(prn: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec {
+  private fun WebTestClient.sarRequest(prisonerNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec {
     return webTestClient.get()
       .uri { uriBuilder: UriBuilder ->
         uriBuilder
           .path(URI_TEMPLATE)
-          .queryParam("prn", prn)
+          .queryParam("prn", prisonerNumber)
           .queryParam("fromDate", fromDate)
           .queryParam("toDate", toDate)
           .build()
