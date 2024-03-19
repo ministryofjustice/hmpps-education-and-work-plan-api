@@ -319,7 +319,7 @@ paths:
         '209':
           description: Subject Identifier is not recognised by this service
         '400':
-          $ref: '#/components/responses/SarIncorrectRequest'
+          $ref: '#/components/responses/ErrorResponse'
         '401':
           description: The client does not have authorisation to make this request
 
@@ -2508,17 +2508,6 @@ components:
         content:
           $ref: '#/components/schemas/SubjectAccessRequestContent'
 
-    SarErrorResponse:
-      properties:
-        developerMessage:
-          type: string
-        errorCode:
-          type: integer
-        status:
-          type: integer
-        userMessage:
-          type: string
-
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -2700,12 +2689,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/SarSuccessResponse'
-    SarIncorrectRequest:
-      description: The request was not formed correctly
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SarErrorResponse'
 
   #
   # Request Body Definitions

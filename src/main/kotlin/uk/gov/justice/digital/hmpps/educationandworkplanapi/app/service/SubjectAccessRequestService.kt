@@ -6,8 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
@@ -20,22 +19,20 @@ class SubjectAccessRequestService(
   private val inductionMapper: InductionResourceMapper,
   private val goalMapper: GoalResourceMapper,
 ) : HmppsPrisonSubjectAccessRequestService {
-  data class SubjectAccessRequestContent(val induction: InductionResponse?, val goals: List<GoalResponse>)
-
   override fun getPrisonContentFor(
-    prisonerNumber: String,
+    prisonNumber: String,
     fromDate: LocalDate?,
     toDate: LocalDate?,
   ): HmppsSubjectAccessRequestContent? {
     val fromDateInstance = fromDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
     val toDateInstance = toDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
 
-    val goals = actionPlanService.getActionPlan(prisonerNumber).goals
+    val goals = actionPlanService.getActionPlan(prisonNumber).goals
       .filter { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
       .filter { toDateInstance == null || it.createdAt?.isBefore(toDateInstance) ?: true }
 
     val induction = try {
-      inductionService.getInductionForPrisoner(prisonerNumber)
+      inductionService.getInductionForPrisoner(prisonNumber)
         .takeIf { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
         .takeIf { toDateInstance == null || it?.createdAt?.isBefore(toDateInstance) ?: true }
     } catch (e: InductionNotFoundException) {
@@ -46,7 +43,7 @@ class SubjectAccessRequestService(
     return HmppsSubjectAccessRequestContent(
       content = SubjectAccessRequestContent(
         induction = induction?.let { inductionMapper.toInductionResponse(induction) },
-        goals = goals.map { goalMapper.fromDomainToModel(it) },
+        goals = goals.map { goalMapper.fromDomainToModel(it) }.toSet(),
       ),
     )
   }

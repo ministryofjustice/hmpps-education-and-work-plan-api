@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -10,10 +11,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.SubjectAccessRequestService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.buildAccessToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -64,10 +65,76 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return 204 if no content found`() {
+    webTestClient.get()
+      .uri { uriBuilder: UriBuilder ->
+        uriBuilder
+          .path(URI_TEMPLATE)
+          .queryParam("prn", aValidPrisonNumber())
+          .build()
+      }.bearerToken(
+        buildAccessToken(
+          roles = listOf("ROLE_SAR_DATA_ACCESS"),
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isNoContent
+      .expectBody().isEmpty
+  }
+
+  @Test
+  fun `should return 209 error if called with crn param`() {
+    webTestClient.get()
+      .uri { uriBuilder: UriBuilder ->
+        uriBuilder
+          .path(URI_TEMPLATE)
+          .queryParam("crn", aValidPrisonNumber())
+          .build()
+      }.bearerToken(
+        buildAccessToken(
+          roles = listOf("ROLE_SAR_DATA_ACCESS"),
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isEqualTo(209)
+      .expectBody().isEmpty
+  }
+
+  @Test
+  fun `should return 400 error if called without prn or crn param`() {
+    val response = webTestClient.get()
+      .uri { uriBuilder: UriBuilder ->
+        uriBuilder
+          .path(URI_TEMPLATE)
+          .build()
+      }.bearerToken(
+        buildAccessToken(
+          roles = listOf("ROLE_SAR_DATA_ACCESS"),
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(BAD_REQUEST.value())
+      .hasUserMessage("One of prn or crn must be supplied.")
+      .hasDeveloperMessage("One of prn or crn must be supplied.")
+  }
+
+  @Test
   fun `should get induction and goals for specific prisoner without date filtering`() {
     // Given
-    val prisonerNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
-    prisonerNumbers.map {
+    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    prisonNumbers.map {
       createInduction(
         prisonNumber = it,
         createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
@@ -93,15 +160,15 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     with(content) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
-      assertThat(goals.first().title).isEqualTo("Goal 1")
+      assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
   }
 
   @Test
   fun `should get induction and goals for specific prisoner with from date filtering`() {
     // Given
-    val prisonerNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
-    prisonerNumbers.map {
+    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    prisonNumbers.map {
       createInduction(
         prisonNumber = it,
         createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
@@ -129,7 +196,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     with(fromLastWeekContent) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
-      assertThat(goals.first().title).isEqualTo("Goal 1")
+      assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
 
     responseFromTomorrow.expectStatus().isNoContent
@@ -138,8 +205,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
   @Test
   fun `should get induction and goals for specific prisoner with to date filtering`() {
     // Given
-    val prisonerNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
-    prisonerNumbers.map {
+    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    prisonNumbers.map {
       createInduction(
         prisonNumber = it,
         createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
@@ -168,15 +235,15 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     with(toTomorrowContent) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
-      assertThat(goals.first().title).isEqualTo("Goal 1")
+      assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
   }
 
   @Test
   fun `should get induction and goals for specific prisoner with from and to date filtering`() {
     // Given
-    val prisonerNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
-    prisonerNumbers.map {
+    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    prisonNumbers.map {
       createInduction(
         prisonNumber = it,
         createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
@@ -203,22 +270,22 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     with(thisWeekContent) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
-      assertThat(goals.first().title).isEqualTo("Goal 1")
+      assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
 
     responseLastWeek.expectStatus().isNoContent
   }
 
   private data class PLPSubjectAccessRequestContent(
-    val content: SubjectAccessRequestService.SubjectAccessRequestContent,
+    val content: SubjectAccessRequestContent,
   )
 
-  private fun WebTestClient.sarRequest(prisonerNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec {
+  private fun WebTestClient.sarRequest(prisonNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec {
     return webTestClient.get()
       .uri { uriBuilder: UriBuilder ->
         uriBuilder
           .path(URI_TEMPLATE)
-          .queryParam("prn", prisonerNumber)
+          .queryParam("prn", prisonNumber)
           .queryParam("fromDate", fromDate)
           .queryParam("toDate", toDate)
           .build()

@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponse
 import java.time.LocalDate
@@ -49,27 +50,36 @@ class SubjectAccessRequestServiceTest {
   @Test
   fun `should return induction and action plan data for a prisoner without date filtering`() {
     // Given
-    val prisonerNumber = aValidPrisonNumber()
+    val prisonNumber = aValidPrisonNumber()
 
-    val inductionCreateTime = LocalDateTime.parse("2024-01-01T10:00:00")
+    val givenInduction = aFullyPopulatedInduction(
+      prisonNumber = prisonNumber,
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(givenInduction)
+    given(inductionMapper.toInductionResponse(givenInduction)).willReturn(aValidInductionResponse())
 
     val goalCreateTimes = listOf(
       LocalDateTime.parse("2024-01-01T10:00:00"),
       LocalDateTime.parse("2024-02-15T10:00:00"),
     )
-
-    setupMocks(prisonerNumber, inductionCreateTime, goalCreateTimes)
-    given(inductionMapper.toInductionResponse(any())).willReturn(aValidInductionResponse())
-    given(goalMapper.fromDomainToModel(any())).willReturn(aValidGoalResponse())
+    val givenGoals = goalCreateTimes.map {
+      aValidGoal(createdAt = it.toInstant(ZoneOffset.UTC))
+    }
+    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = givenGoals)
+    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(actionPlan)
+    actionPlan.goals.forEach {
+      given(goalMapper.fromDomainToModel(it)).willReturn(aValidGoalResponse())
+    }
 
     // When
-    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonerNumber, null, null)
-    val sarContent = sarResponse!!.content as SubjectAccessRequestService.SubjectAccessRequestContent
+    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
+    val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
     val inductionCaptor = argumentCaptor<Induction>()
     verify(inductionMapper, times(1)).toInductionResponse(inductionCaptor.capture())
-    assertThat(inductionCaptor.firstValue.prisonNumber).isEqualTo(prisonerNumber)
+    assertThat(inductionCaptor.firstValue.prisonNumber).isEqualTo(prisonNumber)
 
     verify(goalMapper, times(2)).fromDomainToModel(any())
 
@@ -82,22 +92,29 @@ class SubjectAccessRequestServiceTest {
   @Test
   fun `should return induction and action plan data for a prisoner filtered by from date`() {
     // Given
-    val prisonerNumber = aValidPrisonNumber()
+    val prisonNumber = aValidPrisonNumber()
 
-    val inductionCreateTime = LocalDateTime.parse("2024-01-01T10:00:00")
+    val givenInduction = aFullyPopulatedInduction(
+      prisonNumber = prisonNumber,
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(givenInduction)
 
     val goalCreateTimes = listOf(
       LocalDateTime.parse("2024-01-01T10:00:00"),
       LocalDateTime.parse("2024-02-15T10:00:00"),
     )
-
-    setupMocks(prisonerNumber, inductionCreateTime, goalCreateTimes)
-    given(goalMapper.fromDomainToModel(any())).willReturn(aValidGoalResponse())
+    val givenGoals = goalCreateTimes.map {
+      aValidGoal(createdAt = it.toInstant(ZoneOffset.UTC))
+    }
+    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = givenGoals)
+    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(actionPlan)
+    given(goalMapper.fromDomainToModel(actionPlan.goals[0])).willReturn(aValidGoalResponse())
 
     // When
     val fromDate = LocalDate.parse("2024-01-15")
-    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonerNumber, fromDate, null)
-    val sarContent = sarResponse!!.content as SubjectAccessRequestService.SubjectAccessRequestContent
+    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, fromDate, null)
+    val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
     val inductionCaptor = argumentCaptor<Induction>()
@@ -117,28 +134,35 @@ class SubjectAccessRequestServiceTest {
   @Test
   fun `should return induction and action plan data for a prisoner filtered by to date`() {
     // Given
-    val prisonerNumber = aValidPrisonNumber()
+    val prisonNumber = aValidPrisonNumber()
 
-    val inductionCreateTime = LocalDateTime.parse("2024-01-01T10:00:00")
+    val givenInduction = aFullyPopulatedInduction(
+      prisonNumber = prisonNumber,
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(givenInduction)
+    given(inductionMapper.toInductionResponse(givenInduction)).willReturn(aValidInductionResponse())
 
     val goalCreateTimes = listOf(
       LocalDateTime.parse("2024-01-01T10:00:00"),
       LocalDateTime.parse("2024-02-15T10:00:00"),
     )
-
-    setupMocks(prisonerNumber, inductionCreateTime, goalCreateTimes)
-    given(inductionMapper.toInductionResponse(any())).willReturn(aValidInductionResponse())
-    given(goalMapper.fromDomainToModel(any())).willReturn(aValidGoalResponse())
+    val givenGoals = goalCreateTimes.map {
+      aValidGoal(createdAt = it.toInstant(ZoneOffset.UTC))
+    }
+    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = givenGoals)
+    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(actionPlan)
+    given(goalMapper.fromDomainToModel(actionPlan.goals[1])).willReturn(aValidGoalResponse())
 
     // When
     val toDate = LocalDate.parse("2024-01-10")
-    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonerNumber, null, toDate)
-    val sarContent = sarResponse!!.content as SubjectAccessRequestService.SubjectAccessRequestContent
+    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, toDate)
+    val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
     val inductionCaptor = argumentCaptor<Induction>()
     verify(inductionMapper, times(1)).toInductionResponse(inductionCaptor.capture())
-    assertThat(inductionCaptor.firstValue.prisonNumber).isEqualTo(prisonerNumber)
+    assertThat(inductionCaptor.firstValue.prisonNumber).isEqualTo(prisonNumber)
 
     val goalsCaptor = argumentCaptor<Goal>()
     verify(goalMapper, times(1)).fromDomainToModel(goalsCaptor.capture())
@@ -153,23 +177,31 @@ class SubjectAccessRequestServiceTest {
   @Test
   fun `should return induction and action plan data for a prisoner filtered by from date and to date`() {
     // Given
-    val prisoner = aValidPrisonNumber()
+    val prisonNumber = aValidPrisonNumber()
 
-    val inductionCreateTime = LocalDateTime.parse("2024-01-01T10:00:00")
+    val givenInduction = aFullyPopulatedInduction(
+      prisonNumber = prisonNumber,
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(givenInduction)
 
     val goalCreateTimes = listOf(
       LocalDateTime.parse("2024-01-01T10:00:00"),
       LocalDateTime.parse("2024-02-15T10:00:00"),
       LocalDateTime.parse("2024-03-10T10:00:00"),
     )
-
-    setupMocks(prisoner, inductionCreateTime, goalCreateTimes)
+    val givenGoals = goalCreateTimes.map {
+      aValidGoal(createdAt = it.toInstant(ZoneOffset.UTC))
+    }
+    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = givenGoals)
+    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(actionPlan)
+    given(goalMapper.fromDomainToModel(actionPlan.goals[1])).willReturn(aValidGoalResponse())
 
     // When
     val fromDate = LocalDate.parse("2024-02-01")
     val toDate = LocalDate.parse("2024-03-01")
-    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisoner, fromDate, toDate)
-    val sarContent = sarResponse!!.content as SubjectAccessRequestService.SubjectAccessRequestContent
+    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, fromDate, toDate)
+    val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
     verify(inductionMapper, never()).toInductionResponse(any())
@@ -187,13 +219,13 @@ class SubjectAccessRequestServiceTest {
   @Test
   fun `should return null when no data is found`() {
     // Given
-    val prisonerNumber = aValidPrisonNumber()
-    given(inductionService.getInductionForPrisoner(prisonerNumber)).willReturn(null)
-    val emptyActionPlan = aValidActionPlan(prisonNumber = prisonerNumber, goals = emptyList())
-    given(actionPlanService.getActionPlan(prisonerNumber)).willReturn(emptyActionPlan)
+    val prisonNumber = aValidPrisonNumber()
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(null)
+    val emptyActionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = emptyList())
+    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(emptyActionPlan)
 
     // When
-    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonerNumber, null, null)
+    val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
 
     // Then
     val inductionCaptor = argumentCaptor<Induction>()
@@ -203,21 +235,5 @@ class SubjectAccessRequestServiceTest {
     verify(goalMapper, never()).fromDomainToModel(goalsCaptor.capture())
 
     assertThat(sarResponse).isNull()
-  }
-
-  private fun setupMocks(prisonerNumber: String, inductionCreateTime: LocalDateTime, goalCreateTimes: List<LocalDateTime>) {
-    val induction = aFullyPopulatedInduction(
-      prisonNumber = prisonerNumber,
-      createdAt = inductionCreateTime.toInstant(ZoneOffset.UTC),
-    )
-    given(inductionService.getInductionForPrisoner(prisonerNumber)).willReturn(induction)
-
-    val goals = goalCreateTimes.map {
-      aValidGoal(
-        createdAt = it.toInstant(ZoneOffset.UTC),
-      )
-    }
-    val actionPlan = aValidActionPlan(prisonNumber = prisonerNumber, goals = goals)
-    given(actionPlanService.getActionPlan(prisonerNumber)).willReturn(actionPlan)
   }
 }
