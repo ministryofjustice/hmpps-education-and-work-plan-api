@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
+import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
 
 class SubjectAccessRequestTest : IntegrationTestBase() {
@@ -153,10 +154,10 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     // Then
     val responseBody = response
       .expectStatus().isOk
-      .expectBody(PLPSubjectAccessRequestContent::class.java)
+      .expectBody(HmppsSubjectAccessRequestContent::class.java)
       .returnResult().responseBody
 
-    val content = responseBody!!.content
+    val content = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(content) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
@@ -188,11 +189,10 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     // Then
     val responseBody = responseFromLastWeek
       .expectStatus().isOk
-      .expectBody(PLPSubjectAccessRequestContent::class.java)
+      .expectBody(HmppsSubjectAccessRequestContent::class.java)
       .returnResult().responseBody
 
-    val fromLastWeekContent = responseBody!!.content
-
+    val fromLastWeekContent = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(fromLastWeekContent) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
@@ -228,10 +228,10 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
 
     val responseBody = responseToTomorrow
       .expectStatus().isOk
-      .expectBody(PLPSubjectAccessRequestContent::class.java)
+      .expectBody(HmppsSubjectAccessRequestContent::class.java)
       .returnResult().responseBody
 
-    val toTomorrowContent = responseBody!!.content
+    val toTomorrowContent = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(toTomorrowContent) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
@@ -263,10 +263,10 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     // Then
     val responseBody = responseThisWeek
       .expectStatus().isOk
-      .expectBody(PLPSubjectAccessRequestContent::class.java)
+      .expectBody(HmppsSubjectAccessRequestContent::class.java)
       .returnResult().responseBody
 
-    val thisWeekContent = responseBody!!.content
+    val thisWeekContent = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(thisWeekContent) {
       assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
       assertThat(goals).hasSize(1)
@@ -275,10 +275,6 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
 
     responseLastWeek.expectStatus().isNoContent
   }
-
-  private data class PLPSubjectAccessRequestContent(
-    val content: SubjectAccessRequestContent,
-  )
 
   private fun WebTestClient.sarRequest(prisonNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec {
     return webTestClient.get()
