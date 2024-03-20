@@ -21,6 +21,7 @@ services:
       - DB_PASS=admin_password
       - DPR_USER=dpr_user
       - DPR_PASSWORD=dpr_password
+      - HMPPS_SAR_ADDITIONALACCESSROLE=ROLE_EDUCATION_WORK_PLAN_VIEWER
 
   db:
     image: postgres:latest
