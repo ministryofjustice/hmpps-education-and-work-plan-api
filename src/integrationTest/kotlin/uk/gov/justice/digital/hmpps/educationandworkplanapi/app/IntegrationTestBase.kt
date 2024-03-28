@@ -11,12 +11,15 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDO
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
@@ -45,6 +48,23 @@ abstract class IntegrationTestBase {
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val CIAG_INDUCTION_URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
+
+    private val postgresContainer = PostgresContainer.instance
+
+    @JvmStatic
+    @DynamicPropertySource
+    fun configureTestContainers(registry: DynamicPropertyRegistry) {
+      postgresContainer?.run {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl)
+        registry.add("spring.datasource.username", postgresContainer::getUsername)
+        registry.add("spring.datasource.password", postgresContainer::getPassword)
+        registry.add("spring.datasource.placeholders.database_update_password", postgresContainer::getPassword)
+        registry.add("spring.datasource.placeholders.database_read_only_password", postgresContainer::getPassword)
+        registry.add("spring.flyway.url", postgresContainer::getJdbcUrl)
+        registry.add("spring.flyway.user", postgresContainer::getUsername)
+        registry.add("spring.flyway.password", postgresContainer::getPassword)
+      }
+    }
   }
 
   init {

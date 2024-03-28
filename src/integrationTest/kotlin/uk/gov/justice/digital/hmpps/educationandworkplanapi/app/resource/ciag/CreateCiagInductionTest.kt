@@ -12,7 +12,6 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
@@ -22,7 +21,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonWorkInterestEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousTrainingEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
@@ -37,6 +35,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Reaso
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreatePreviousWorkRequest
@@ -104,15 +104,11 @@ class CreateCiagInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should fail to create induction given induction already exists`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val induction = aValidInductionEntity()
-    inductionRepository.save(induction)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-    TestTransaction.start()
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
+
     val createRequest = aValidCreateCiagInductionRequest()
 
     // When
@@ -160,11 +156,8 @@ class CreateCiagInductionTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val induction = inductionRepository.findByPrisonNumber(prisonNumber)
+    val induction = getInduction(prisonNumber)
     assertThat(induction)
-      .isForPrisonNumber(prisonNumber)
-      .hasAReference()
-      .hasJpaManagedFieldsPopulated()
       .wasCreatedBy(dpsUsername)
       .wasUpdatedBy(dpsUsername)
       .wasCreatedAtPrison(prisonId)

@@ -12,21 +12,18 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.transaction.TestTransaction
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class CreateInductionTest : IntegrationTestBase() {
@@ -85,15 +82,11 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should fail to create induction given induction already exists`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val induction = aValidInductionEntity()
-    inductionRepository.save(induction)
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-    TestTransaction.start()
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
+
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork()
 
     // When
@@ -115,7 +108,6 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should create an induction for a prisoner looking for work`() {
     // Given
     val prisonNumber = anotherValidPrisonNumber()
@@ -140,11 +132,8 @@ class CreateInductionTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val induction = inductionRepository.findByPrisonNumber(prisonNumber)
+    val induction = getInduction(prisonNumber)
     assertThat(induction)
-      .isForPrisonNumber(prisonNumber)
-      .hasAReference()
-      .hasJpaManagedFieldsPopulated()
       .wasCreatedBy(dpsUsername)
       .wasUpdatedBy(dpsUsername)
       .wasCreatedAtPrison(createRequest.prisonId)
@@ -166,7 +155,6 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should create an induction for a prisoner not looking for work`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
@@ -191,11 +179,8 @@ class CreateInductionTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val induction = inductionRepository.findByPrisonNumber(prisonNumber)
+    val induction = getInduction(prisonNumber)
     assertThat(induction)
-      .isForPrisonNumber(prisonNumber)
-      .hasAReference()
-      .hasJpaManagedFieldsPopulated()
       .wasCreatedBy(dpsUsername)
       .wasUpdatedBy(dpsUsername)
       .wasCreatedAtPrison(createRequest.prisonId)
