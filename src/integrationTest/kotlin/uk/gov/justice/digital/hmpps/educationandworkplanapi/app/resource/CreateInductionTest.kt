@@ -11,6 +11,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
@@ -105,6 +106,34 @@ class CreateInductionTest : IntegrationTestBase() {
     assertThat(actual)
       .hasStatus(FORBIDDEN.value())
       .hasUserMessage("An Induction already exists for prisoner $prisonNumber")
+  }
+
+  @Test
+  fun `should fail to create induction given database exception`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    val invalidPrisonId = "longer than 3 chars" // created_at_prison column on timeline_event table is set to 3 characters, so this value results in a database exception
+    val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = invalidPrisonId)
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .is5xxServerError
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(SERVICE_UNAVAILABLE.value())
+      .hasUserMessage("Service unavailable")
+
+    inductionDoesNotExistForPrisoner(prisonNumber)
   }
 
   @Test

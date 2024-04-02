@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -30,6 +31,7 @@ class GoalController(
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @Transactional
   fun createGoals(
     @Valid
     @RequestBody
@@ -46,6 +48,7 @@ class GoalController(
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @GoalReferenceMatchesReferenceInUpdateGoalRequest
+  @Transactional
   fun updateGoal(
     @Valid
     @RequestBody
