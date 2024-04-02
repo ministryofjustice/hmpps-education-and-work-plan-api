@@ -5,12 +5,14 @@ import jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
 import mu.KotlinLogging
+import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -151,6 +153,19 @@ class GlobalExceptionHandler(
   }
 
   /**
+   * Exception handler to return a 503 Service Unavailable ErrorResponse, specifically for a DataAccessException.
+   */
+  @ExceptionHandler(DataAccessException::class)
+  fun handleDataAccessException(
+    e: DataAccessException,
+    request: WebRequest,
+  ): ResponseEntity<Any>? {
+    log.error("Unexpected database exception", e)
+    request.setAttribute(ERROR_MESSAGE, "Service unavailable", SCOPE_REQUEST)
+    return populateErrorResponseAndHandleExceptionInternal(e, SERVICE_UNAVAILABLE, request)
+  }
+
+  /**
    * Overrides the MethodArgumentNotValidException exception handler to return a 400 Bad Request ErrorResponse
    */
   override fun handleMethodArgumentNotValid(
@@ -175,17 +190,10 @@ class GlobalExceptionHandler(
   }
 
   @ExceptionHandler(Exception::class)
-  fun handleException(e: Exception): ResponseEntity<ErrorResponse?>? {
+  fun unexpectedExceptionHandler(e: Exception, request: WebRequest): ResponseEntity<Any>? {
     log.error("Unexpected exception", e)
-    return ResponseEntity
-      .status(INTERNAL_SERVER_ERROR)
-      .body(
-        ErrorResponse(
-          status = INTERNAL_SERVER_ERROR.value(),
-          userMessage = "Unexpected error: ${e.message}",
-          developerMessage = e.message,
-        ),
-      )
+    request.setAttribute(ERROR_MESSAGE, "Service unavailable", SCOPE_REQUEST)
+    return populateErrorResponseAndHandleExceptionInternal(e, INTERNAL_SERVER_ERROR, request)
   }
 
   private fun populateErrorResponseAndHandleExceptionInternal(

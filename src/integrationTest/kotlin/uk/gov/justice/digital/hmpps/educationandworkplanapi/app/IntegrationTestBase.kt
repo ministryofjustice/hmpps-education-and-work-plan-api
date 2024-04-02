@@ -192,6 +192,14 @@ abstract class IntegrationTestBase {
       .returnResult(CiagInductionResponse::class.java)
       .responseBody.blockFirst()!!
 
+  fun inductionDoesNotExistForPrisoner(prisonNumber: String) =
+    webTestClient.get()
+      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNotFound
+
   fun getInduction(prisonNumber: String): InductionResponse =
     webTestClient.get()
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
