@@ -26,6 +26,7 @@ val awaitilityVersion = "4.2.0"
 val wiremockVersion = "3.4.1"
 val jsonWebTokenVersion = "0.12.5"
 val nimbusJwtVersion = "9.37.3"
+val postgressTestContainersVersion = "1.19.7"
 
 ext["jackson-bom.version"] = "2.16.1"
 
@@ -82,7 +83,7 @@ dependencies {
   testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
 
   // Integration test dependencies
-  integrationTestImplementation("com.h2database:h2")
+  integrationTestImplementation("org.testcontainers:postgresql:$postgressTestContainersVersion")
   integrationTestImplementation(testFixtures(project("domain:goal")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
   integrationTestImplementation(testFixtures(project("domain:induction")))
