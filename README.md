@@ -81,6 +81,21 @@ The following environment variables are required in order for the app to start:
 | CIAG_API_CLIENT_ID     | hmpps-auth oauth2 client-id for connecting to the CIAG Induction API                            |
 | CIAG_API_CLIENT_SECRET | hmpps-auth oauth2 client-secret for connecting to the CIAG Induction API                        |
 
+## Development and maintenance
+
+### Running the tests
+To run the test suite (unit and integration):
+```shell
+./gradle clean check
+```
+
+### Integration test dependencies
+The integration tests spin up the following docker containers, therefore a docker runtime is required on local
+development environments in order to run the tests.
+
+* postgres - A real postgres instance is used rather than h2 in order to properly test various constraints etc. (h2 is more forgiving that postgres in this respect)
+
+
 ## Monitoring, tracing and event reporting
 The API is instrumented with the opentelemetry and Application Insights java agent. Useful data can be found and reported
 on via the Azure Application Insights console, all under the `cloud_RoleName` property of `hmpps-education-and-work-plan-api`.
