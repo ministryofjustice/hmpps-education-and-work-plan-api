@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.8'
+  version: '1.7.9'
   description: Education and Work Plan API
   contact:
-    name: Matt Wills
-    email: matt.wills@digital.justice.gov.uk
+    name: Learning and Work Progress team
+    email: learningandworkprogress@digital.justice.gov.uk
 servers:
   - url: 'http://localhost:3000'
 #
@@ -38,13 +38,7 @@ paths:
 
   '/action-plans/{prisonNumber}':
     parameters:
-      - name: prisonNumber
-        description: The number of the Prisoner who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals. The prisonNumber is the unique identifier of the Action Plan.
-        schema:
-          type: string
-        example: 'A1234BC'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
     post:
       summary: Creates an Action Plan.
       description: Creates an Action Plan with at least one or more Goals.
@@ -75,13 +69,7 @@ paths:
   # --------------------------------------------------------------------------------
   '/action-plans/{prisonNumber}/goals':
     parameters:
-      - name: prisonNumber
-        description: The number of the Prisoner who may have created (or is in the process of creating) an "Action Plan", consisting of one or more Goals. The prisonNumber is the unique identifier of the Action Plan.
-        schema:
-          type: string
-        example: 'A1234BC'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
     post:
       summary: Creates one or more Goals.
       description: Creates one or more Goals and saves them to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
@@ -100,13 +88,7 @@ paths:
 
   '/action-plans/{prisonNumber}/goals/{goalReference}':
     parameters:
-      - name: prisonNumber
-        description: The number of the Prisoner who owns the Goal.
-        schema:
-          type: string
-        example: 'A1234BC'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
       - name: goalReference
         description: The Goal's unique reference
         schema:
@@ -136,13 +118,7 @@ paths:
   #
   '/timelines/{prisonNumber}':
     parameters:
-      - name: prisonNumber
-        description: The number of the Prisoner who may have relevant Timeline data.
-        schema:
-          type: string
-        example: 'A1234BC'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
     get:
       summary: Return a Prisoner's Timeline.
       description: Returns a Prisoner's Timeline data, consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
@@ -160,13 +136,7 @@ paths:
     #
   '/ciag/induction/{prisonNumber}':
     parameters:
-      - name: prisonNumber
-        description: The number of the Prisoner who may have relevant Induction data.
-        schema:
-          type: string
-        example: 'A1234BC'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
     post:
       deprecated: true
       summary: Creates an Induction for a Prisoner.
@@ -246,13 +216,7 @@ paths:
     #
   '/inductions/{prisonNumber}':
     parameters:
-      - name: prisonNumber
-        description: The number of the Prisoner who may have relevant Induction data.
-        schema:
-          type: string
-        example: 'A1234BC'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
     post:
       summary: Creates an Induction for a Prisoner.
       description: |
@@ -308,7 +272,7 @@ paths:
         - Subject Access Request
 
       parameters:
-        - $ref: "#/components/parameters/prisonReferenceNumber"
+        - $ref: "#/components/parameters/prnQueryStringParameter"
         - $ref: "#/components/parameters/fromDate"
         - $ref: "#/components/parameters/toDate"
       responses:
@@ -319,7 +283,7 @@ paths:
         '209':
           description: Subject Identifier is not recognised by this service
         '400':
-          $ref: '#/components/responses/ErrorResponse'
+          $ref: '#/components/responses/400ErrorResponse'
         '401':
           description: The client does not have authorisation to make this request
 
@@ -609,7 +573,8 @@ components:
           description: The Induction's unique reference.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         offenderId:
-          pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
+          pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+          example: "A1234BC"
           type: string
           description: 'The ID of the Prisoner. AKA the prison number.'
         prisonId:
@@ -875,7 +840,7 @@ components:
       properties:
         offenderId:
           type: string
-          pattern: '^[A-Z]\\d{4}[A-Z]{2}$'
+          pattern: '^[A-Za-z]\\d{4}[A-Za-z]{2}$'
           description: The ID of the Prisoner. AKA the prison number.
           example: 'A1234BC'
         desireToWork:
@@ -1453,6 +1418,8 @@ components:
           description: A List of prison numbers whose Action Plans should be retrieved.
           items:
             type: string
+            example: "A1234BC"
+            pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
       required:
         - prisonNumbers
 
@@ -2244,7 +2211,8 @@ components:
           description: A List of prison numbers whose CIAG Inductions should be retrieved.
           items:
             type: string
-            pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
+            pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+            example: "A1234BC"
       required:
         - offenderIds
 
@@ -2750,12 +2718,24 @@ components:
             $ref: '#/components/schemas/UpdateInductionRequest'
 
   parameters:
-    prisonReferenceNumber:
-      name: prn
-      description: NOMIS Prison Reference Number
-      in: query
+    prisonNumberPathParameter:
+      name: prisonNumber
+      description: The NOMIS Prison Reference Number of the Prisoner that the operation is being performed on.
       schema:
         type: string
+        pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+      example: 'A1234BC'
+      in: path
+      required: true
+    prnQueryStringParameter:
+      name: prn
+      description: The NOMIS Prison Reference Number of the Prisoner that the operation is being performed on.
+      schema:
+        type: string
+        pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+      example: 'A1234BC'
+      in: query
+      required: true
     fromDate:
       name: fromDate
       in: query
