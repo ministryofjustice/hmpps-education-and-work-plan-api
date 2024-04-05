@@ -13,7 +13,7 @@ generic-service:
     tlsSecretName: hmpps-education-and-work-plan-api-cert
 
   # Used to access resources like SQS queues and SNS topics
-  serviceAccountName: hmpps-education-and-work-plan-api
+  serviceAccountName: hmpps-education-and-work-plan
 
   # Environment variables to load into the deployment
   env:
