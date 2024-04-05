@@ -573,7 +573,7 @@ components:
           description: The Induction's unique reference.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         offenderId:
-          pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+          pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
           example: "A1234BC"
           type: string
           description: 'The ID of the Prisoner. AKA the prison number.'
@@ -840,7 +840,7 @@ components:
       properties:
         offenderId:
           type: string
-          pattern: '^[A-Za-z]\\d{4}[A-Za-z]{2}$'
+          pattern: '^[A-Z]\\d{4}[A-Z]{2}$'
           description: The ID of the Prisoner. AKA the prison number.
           example: 'A1234BC'
         desireToWork:
@@ -1419,7 +1419,7 @@ components:
           items:
             type: string
             example: "A1234BC"
-            pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+            pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
       required:
         - prisonNumbers
 
@@ -2211,7 +2211,7 @@ components:
           description: A List of prison numbers whose CIAG Inductions should be retrieved.
           items:
             type: string
-            pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+            pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
             example: "A1234BC"
       required:
         - offenderIds
@@ -2723,7 +2723,7 @@ components:
       description: The NOMIS Prison Reference Number of the Prisoner that the operation is being performed on.
       schema:
         type: string
-        pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+        pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
       example: 'A1234BC'
       in: path
       required: true
@@ -2732,7 +2732,7 @@ components:
       description: The NOMIS Prison Reference Number of the Prisoner that the operation is being performed on.
       schema:
         type: string
-        pattern: "^[A-Za-z]\\d{4}[A-Za-z]{2}$"
+        pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
       example: 'A1234BC'
       in: query
       required: true

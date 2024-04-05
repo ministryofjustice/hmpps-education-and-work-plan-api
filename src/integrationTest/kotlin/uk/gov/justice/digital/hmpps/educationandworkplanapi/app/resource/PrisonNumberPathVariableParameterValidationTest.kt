@@ -47,7 +47,7 @@ class PrisonNumberPathVariableParameterValidationTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
-      .hasUserMessageContaining("must match \"^[A-Za-z]\\d{4}[A-Za-z]{2}\$\"")
+      .hasUserMessageContaining("must match \"^[A-Z]\\d{4}[A-Z]{2}\$\"")
   }
 
   @ParameterizedTest
@@ -104,7 +104,7 @@ class PrisonNumberPathVariableParameterValidationTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(BAD_REQUEST.value())
-      .hasUserMessageContaining("must match \"^[A-Za-z]\\d{4}[A-Za-z]{2}\$\"")
+      .hasUserMessageContaining("must match \"^[A-Z]\\d{4}[A-Z]{2}\$\"")
   }
 
   @ParameterizedTest
