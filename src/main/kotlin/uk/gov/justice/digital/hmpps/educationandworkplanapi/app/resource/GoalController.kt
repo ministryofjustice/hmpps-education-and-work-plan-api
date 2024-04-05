@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Pattern
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
@@ -36,7 +38,7 @@ class GoalController(
     @Valid
     @RequestBody
     request: CreateGoalsRequest,
-    @PathVariable prisonNumber: String,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     goalService.createGoals(
       prisonNumber = prisonNumber,
@@ -53,7 +55,7 @@ class GoalController(
     @Valid
     @RequestBody
     updateGoalRequest: UpdateGoalRequest,
-    @PathVariable prisonNumber: String,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
   ) {
     goalService.updateGoal(
