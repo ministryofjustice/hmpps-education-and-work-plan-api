@@ -57,8 +57,10 @@ jobs:
             tar -cvzf build-reports.tar \
             build/reports/tests \
             build/reports/jacoco \
-            domain/goal/build/reports/tests \
-            domain/goal/build/reports/jacoco \
+            domain/learningandworkprogress/build/reports/tests \
+            domain/learningandworkprogress/build/reports/jacoco \
+            domain/personallearningplan/build/reports/tests \
+            domain/personallearningplan/build/reports/jacoco \
             domain/timeline/build/reports/tests \
             domain/timeline/build/reports/jacoco
       - store_artifacts:
