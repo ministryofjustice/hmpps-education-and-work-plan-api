@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
+import uk.gov.justice.digital.hmpps.domain.goal.ActionPlan
+import uk.gov.justice.digital.hmpps.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.domain.goal.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.goal.Step
+import uk.gov.justice.digital.hmpps.domain.goal.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import java.util.UUID

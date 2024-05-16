@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateStepDto
+import uk.gov.justice.digital.hmpps.domain.goal.Step
+import uk.gov.justice.digital.hmpps.domain.goal.dto.CreateStepDto
+import uk.gov.justice.digital.hmpps.domain.goal.dto.UpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest

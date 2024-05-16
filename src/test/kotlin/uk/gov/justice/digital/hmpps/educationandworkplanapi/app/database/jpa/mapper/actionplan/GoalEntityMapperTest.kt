@@ -9,21 +9,21 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.goal.Step
+import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.domain.goal.dto.CreateStepDto
+import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidCreateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidStepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateGoalDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.domain.goal.GoalStatus as DomainStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus as EntityStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus as DomainStatus
 
 @ExtendWith(MockitoExtension::class)
 class GoalEntityMapperTest {

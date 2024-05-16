@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidCreateStepDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.aValidUpdateStepDto
+import uk.gov.justice.digital.hmpps.domain.goal.StepStatus
+import uk.gov.justice.digital.hmpps.domain.goal.aValidStep
+import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidCreateStepDto
+import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidUpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidStepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest

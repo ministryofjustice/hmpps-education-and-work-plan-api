@@ -4,13 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
+import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.goal.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.goal.StepStatus
+import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_ADDED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import java.time.LocalDate
 import java.util.UUID
 

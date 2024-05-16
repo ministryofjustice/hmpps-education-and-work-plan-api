@@ -20,6 +20,9 @@ import org.mockito.kotlin.thirdValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
+import uk.gov.justice.digital.hmpps.domain.goal.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
@@ -32,9 +35,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTele
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_STARTED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
 import java.util.UUID
 

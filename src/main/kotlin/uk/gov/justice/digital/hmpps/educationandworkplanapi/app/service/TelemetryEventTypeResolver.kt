@@ -1,6 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.domain.goal.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.goal.Step
+import uk.gov.justice.digital.hmpps.domain.goal.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_STARTED
@@ -11,10 +15,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTele
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_STARTED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
 
 @Component
 class TelemetryEventTypeResolver {
