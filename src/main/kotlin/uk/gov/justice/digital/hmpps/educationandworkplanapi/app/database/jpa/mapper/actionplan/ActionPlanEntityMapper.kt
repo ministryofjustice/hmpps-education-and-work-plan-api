@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan
 
 import org.mapstruct.Mapper
-import uk.gov.justice.digital.hmpps.domain.goal.ActionPlan
-import uk.gov.justice.digital.hmpps.domain.goal.ActionPlanSummary
-import uk.gov.justice.digital.hmpps.domain.goal.dto.CreateActionPlanDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields

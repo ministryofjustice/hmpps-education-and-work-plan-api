@@ -3,11 +3,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.domain.goal.ActionPlanNotFoundException
-import uk.gov.justice.digital.hmpps.domain.goal.Goal
-import uk.gov.justice.digital.hmpps.domain.goal.dto.CreateGoalDto
-import uk.gov.justice.digital.hmpps.domain.goal.dto.UpdateGoalDto
-import uk.gov.justice.digital.hmpps.domain.goal.service.GoalPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository

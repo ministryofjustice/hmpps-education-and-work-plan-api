@@ -13,10 +13,10 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.goal.ActionPlanNotFoundException
-import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidCreateGoalDto
-import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidUpdateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity

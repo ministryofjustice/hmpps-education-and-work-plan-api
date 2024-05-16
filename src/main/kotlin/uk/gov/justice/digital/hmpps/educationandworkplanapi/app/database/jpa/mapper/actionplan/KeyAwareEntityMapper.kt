@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan
 
-import uk.gov.justice.digital.hmpps.domain.goal.KeyAwareDomain
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.KeyAwareDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
 
 /**

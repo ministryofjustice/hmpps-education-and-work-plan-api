@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.goal.Step
-import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidUpdateGoalDto
-import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidUpdateStepDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
@@ -67,13 +67,13 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills within first 3 months",
       prisonId = "MDI",
       targetCompletionDate = LocalDate.now().plusMonths(3),
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.COMPLETED,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.COMPLETED,
       notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life",
       steps = listOf(
         aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
       ),
@@ -123,13 +123,13 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.ACTIVE,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course within 6 months",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.COMPLETE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.COMPLETE,
           sequenceNumber = 1,
         ),
       ),
@@ -182,19 +182,19 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       prisonId = "BXI",
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.ACTIVE,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
       ),
@@ -258,25 +258,25 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.ACTIVE,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
         aValidUpdateStepDto(
           reference = newStepReference,
           title = "Do pre-course homework and preparation",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 3,
         ),
       ),
@@ -341,19 +341,19 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.ACTIVE,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
         aValidUpdateStepDto(
           reference = step1Reference,
           title = "Book communication skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
       ),
@@ -417,13 +417,13 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.ACTIVE,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step2Reference,
           title = "Attend skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 2,
         ),
       ),
@@ -475,13 +475,13 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.goal.GoalStatus.ACTIVE,
+      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = stepReference,
           title = "Book communication skills course",
-          status = uk.gov.justice.digital.hmpps.domain.goal.StepStatus.ACTIVE,
+          status = uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE,
           sequenceNumber = 1,
         ),
       ),

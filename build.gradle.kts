@@ -53,7 +53,7 @@ configurations {
 }
 
 dependencies {
-  implementation(project("domain:goal"))
+  implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
   implementation(project("domain:induction"))
 
@@ -77,14 +77,14 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:$postgresqlVersion")
 
   // Test dependencies
-  testImplementation(testFixtures(project("domain:goal")))
+  testImplementation(testFixtures(project("domain:personallearningplan")))
   testImplementation(testFixtures(project("domain:timeline")))
   testImplementation(testFixtures(project("domain:induction")))
   testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
 
   // Integration test dependencies
   integrationTestImplementation("org.testcontainers:postgresql:$postgressTestContainersVersion")
-  integrationTestImplementation(testFixtures(project("domain:goal")))
+  integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
   integrationTestImplementation(testFixtures(project("domain:induction")))
 

@@ -11,10 +11,10 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.goal.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.goal.aValidActionPlanSummary
-import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.domain.goal.dto.aValidCreateActionPlanDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity

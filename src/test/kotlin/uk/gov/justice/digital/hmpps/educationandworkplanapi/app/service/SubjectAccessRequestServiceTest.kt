@@ -13,13 +13,13 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.goal.Goal
-import uk.gov.justice.digital.hmpps.domain.goal.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.domain.goal.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent

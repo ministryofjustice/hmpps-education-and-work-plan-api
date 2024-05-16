@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.domain.goal.ActionPlan
-import uk.gov.justice.digital.hmpps.domain.goal.ActionPlanSummary
-import uk.gov.justice.digital.hmpps.domain.goal.dto.CreateActionPlanDto
-import uk.gov.justice.digital.hmpps.domain.goal.service.ActionPlanPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.ActionPlanEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 

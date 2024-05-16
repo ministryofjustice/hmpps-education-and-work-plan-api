@@ -17,7 +17,7 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import java.util.UUID
