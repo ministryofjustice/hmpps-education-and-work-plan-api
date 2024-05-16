@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 
 @Component

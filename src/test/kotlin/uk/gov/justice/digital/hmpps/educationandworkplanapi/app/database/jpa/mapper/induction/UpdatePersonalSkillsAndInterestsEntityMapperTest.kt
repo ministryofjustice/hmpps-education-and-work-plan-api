@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.induction.PersonalInterest
-import uk.gov.justice.digital.hmpps.domain.induction.PersonalSkill
-import uk.gov.justice.digital.hmpps.domain.induction.aValidPersonalInterest
-import uk.gov.justice.digital.hmpps.domain.induction.aValidPersonalSkill
-import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidUpdatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalSkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalSkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalInterestEntity
@@ -14,8 +14,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.domain.induction.InterestType as InterestTypeDomain
-import uk.gov.justice.digital.hmpps.domain.induction.SkillType as SkillTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InterestType as InterestTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.SkillType as SkillTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InterestType as InterestTypeEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.SkillType as SkillTypeEntity
 

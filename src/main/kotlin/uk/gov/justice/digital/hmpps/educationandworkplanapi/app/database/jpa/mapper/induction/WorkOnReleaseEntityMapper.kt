@@ -4,9 +4,9 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.NullValueMappingStrategy
-import uk.gov.justice.digital.hmpps.domain.induction.WorkOnRelease
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateWorkOnReleaseDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkOnRelease
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkOnReleaseEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField

@@ -4,10 +4,10 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.domain.induction.Induction
-import uk.gov.justice.digital.hmpps.domain.induction.InductionSummary
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateInductionDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.FutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity

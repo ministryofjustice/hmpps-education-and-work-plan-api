@@ -11,11 +11,11 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.induction.AffectAbilityToWork
-import uk.gov.justice.digital.hmpps.domain.induction.NotHopingToWorkReason
-import uk.gov.justice.digital.hmpps.domain.induction.aFullyPopulatedInduction
-import uk.gov.justice.digital.hmpps.domain.induction.aValidInductionSummary
-import uk.gov.justice.digital.hmpps.domain.induction.aValidWorkOnRelease
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.AffectAbilityToWork
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.NotHopingToWorkReason
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
@@ -26,7 +26,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPrisonWorkAndEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidSkillsAndInterestsResponse
 import java.time.OffsetDateTime
-import uk.gov.justice.digital.hmpps.domain.induction.HopingToWork as HopingToWorkDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi
 
 @ExtendWith(MockitoExtension::class)

@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import uk.gov.justice.digital.hmpps.domain.induction.InductionAlreadyExistsException
-import uk.gov.justice.digital.hmpps.domain.induction.InductionNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -86,7 +86,7 @@ class GlobalExceptionHandler(
   @ExceptionHandler(
     value = [
       ActionPlanAlreadyExistsException::class,
-      InductionAlreadyExistsException::class,
+      uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException::class,
     ],
   )
   protected fun handleExceptionReturnForbiddenErrorResponse(
@@ -112,7 +112,7 @@ class GlobalExceptionHandler(
       ActionPlanNotFoundException::class,
       GoalNotFoundException::class,
       TimelineNotFoundException::class,
-      InductionNotFoundException::class,
+      uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException::class,
     ],
   )
   fun handleExceptionReturnNotFoundErrorResponse(

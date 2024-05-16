@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import uk.gov.justice.digital.hmpps.domain.induction.service.InductionEventService
-import uk.gov.justice.digital.hmpps.domain.induction.service.InductionPersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService

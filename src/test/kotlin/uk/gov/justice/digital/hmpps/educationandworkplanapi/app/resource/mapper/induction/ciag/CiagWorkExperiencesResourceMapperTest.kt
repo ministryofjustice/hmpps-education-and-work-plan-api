@@ -2,15 +2,15 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.induction.FutureWorkInterests
-import uk.gov.justice.digital.hmpps.domain.induction.PreviousWorkExperiences
-import uk.gov.justice.digital.hmpps.domain.induction.WorkExperience
-import uk.gov.justice.digital.hmpps.domain.induction.aValidFutureWorkInterests
-import uk.gov.justice.digital.hmpps.domain.induction.aValidPreviousWorkExperiences
-import uk.gov.justice.digital.hmpps.domain.induction.aValidWorkExperience
-import uk.gov.justice.digital.hmpps.domain.induction.aValidWorkInterest
-import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidCreatePreviousWorkExperiencesDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.FutureWorkInterests
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousWorkExperiences
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperience
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidFutureWorkInterests
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousWorkExperiences
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkExperience
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreatePreviousWorkRequest
@@ -19,8 +19,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidWorkExperienceResource
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidWorkInterestsResponse
 import java.time.ZoneOffset
-import uk.gov.justice.digital.hmpps.domain.induction.WorkExperienceType as WorkExperienceTypeDomain
-import uk.gov.justice.digital.hmpps.domain.induction.WorkInterestType as WorkInterestTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperienceType as WorkExperienceTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkInterestType as WorkInterestTypeDomain
 
 class CiagWorkExperiencesResourceMapperTest {
   private val mapper = CiagWorkExperiencesResourceMapperImpl()

@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
-import uk.gov.justice.digital.hmpps.domain.induction.AffectAbilityToWork
-import uk.gov.justice.digital.hmpps.domain.induction.NotHopingToWorkReason
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateWorkOnReleaseDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.AffectAbilityToWork
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.NotHopingToWorkReason
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork

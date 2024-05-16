@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.domain.induction.InductionNotFoundException
-import uk.gov.justice.digital.hmpps.domain.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
@@ -35,7 +35,7 @@ class SubjectAccessRequestService(
       inductionService.getInductionForPrisoner(prisonNumber)
         .takeIf { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
         .takeIf { toDateInstance == null || it?.createdAt?.isBefore(toDateInstance) ?: true }
-    } catch (e: InductionNotFoundException) {
+    } catch (e: uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException) {
       null
     }
 

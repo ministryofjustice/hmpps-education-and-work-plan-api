@@ -8,10 +8,10 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.domain.induction.PreviousQualifications
-import uk.gov.justice.digital.hmpps.domain.induction.Qualification
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields

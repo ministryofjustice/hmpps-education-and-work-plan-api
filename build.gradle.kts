@@ -53,9 +53,9 @@ configurations {
 }
 
 dependencies {
+  implementation(project("domain:learningandworkprogress"))
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
-  implementation(project("domain:induction"))
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:0.2.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
@@ -77,16 +77,16 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:$postgresqlVersion")
 
   // Test dependencies
+  testImplementation(testFixtures(project("domain:learningandworkprogress")))
   testImplementation(testFixtures(project("domain:personallearningplan")))
   testImplementation(testFixtures(project("domain:timeline")))
-  testImplementation(testFixtures(project("domain:induction")))
   testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
 
   // Integration test dependencies
   integrationTestImplementation("org.testcontainers:postgresql:$postgressTestContainersVersion")
+  integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
-  integrationTestImplementation(testFixtures(project("domain:induction")))
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core")

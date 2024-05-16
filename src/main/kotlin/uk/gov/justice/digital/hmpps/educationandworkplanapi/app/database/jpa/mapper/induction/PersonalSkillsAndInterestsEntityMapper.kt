@@ -8,11 +8,11 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.domain.induction.PersonalInterest
-import uk.gov.justice.digital.hmpps.domain.induction.PersonalSkill
-import uk.gov.justice.digital.hmpps.domain.induction.PersonalSkillsAndInterests
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreatePersonalSkillsAndInterestsDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalSkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalSkillsAndInterests
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillsAndInterestsEntity

@@ -8,11 +8,11 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import uk.gov.justice.digital.hmpps.domain.induction.QualificationLevel
-import uk.gov.justice.digital.hmpps.domain.induction.aValidPreviousQualifications
-import uk.gov.justice.digital.hmpps.domain.induction.aValidQualification
-import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidCreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
-import uk.gov.justice.digital.hmpps.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel as HighestEducationLevelApi
 
 @ExtendWith(MockitoExtension::class)

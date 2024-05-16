@@ -4,8 +4,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.domain.induction.Induction
-import uk.gov.justice.digital.hmpps.domain.induction.service.InductionEventService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService

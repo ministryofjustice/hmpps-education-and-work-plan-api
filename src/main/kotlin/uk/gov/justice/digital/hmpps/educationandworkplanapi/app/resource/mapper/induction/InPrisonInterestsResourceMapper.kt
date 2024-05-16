@@ -3,9 +3,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
-import uk.gov.justice.digital.hmpps.domain.induction.InPrisonInterests
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateInPrisonInterestsDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonInterests
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInPrisonInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonInterestsResponse

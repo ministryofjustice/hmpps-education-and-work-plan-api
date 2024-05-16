@@ -8,11 +8,11 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.domain.induction.InPrisonInterests
-import uk.gov.justice.digital.hmpps.domain.induction.InPrisonTrainingInterest
-import uk.gov.justice.digital.hmpps.domain.induction.InPrisonWorkInterest
-import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateInPrisonInterestsDto
-import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonInterests
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonTrainingInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonWorkInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
