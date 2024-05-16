@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
+import uk.gov.justice.digital.hmpps.domain.induction.PreviousTraining
+import uk.gov.justice.digital.hmpps.domain.induction.dto.CreatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousTraining
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousTrainingDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousTrainingRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousTrainingResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousTrainingRequest

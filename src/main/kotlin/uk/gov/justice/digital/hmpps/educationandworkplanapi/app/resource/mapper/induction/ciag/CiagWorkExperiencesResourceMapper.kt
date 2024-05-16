@@ -3,14 +3,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.FutureWorkInterests
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousWorkExperiences
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperienceType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperienceType.OTHER
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousWorkExperiencesDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.domain.induction.FutureWorkInterests
+import uk.gov.justice.digital.hmpps.domain.induction.PreviousWorkExperiences
+import uk.gov.justice.digital.hmpps.domain.induction.WorkExperienceType
+import uk.gov.justice.digital.hmpps.domain.induction.WorkExperienceType.OTHER
+import uk.gov.justice.digital.hmpps.domain.induction.WorkInterest
+import uk.gov.justice.digital.hmpps.domain.induction.WorkInterestType
+import uk.gov.justice.digital.hmpps.domain.induction.dto.CreatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkT
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperience as WorkExperienceDomain
+import uk.gov.justice.digital.hmpps.domain.induction.WorkExperience as WorkExperienceDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience as WorkExperienceApi
 
 @Mapper(nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)

@@ -1,19 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.induction.InPrisonInterests
+import uk.gov.justice.digital.hmpps.domain.induction.InPrisonTrainingInterest
+import uk.gov.justice.digital.hmpps.domain.induction.InPrisonWorkInterest
+import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonInterests
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonTrainingInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonWorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInPrisonInterestsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePrisonWorkAndEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonTrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PrisonWorkAndEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePrisonWorkAndEducationRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonTrainingType as InPrisonTrainingTypeDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InPrisonWorkType as InPrisonWorkTypeDomain
+import uk.gov.justice.digital.hmpps.domain.induction.InPrisonTrainingType as InPrisonTrainingTypeDomain
+import uk.gov.justice.digital.hmpps.domain.induction.InPrisonWorkType as InPrisonWorkTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonTrainingType as InPrisonTrainingTypeApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType as InPrisonWorkTypeApi
 

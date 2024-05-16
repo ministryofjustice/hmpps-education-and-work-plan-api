@@ -1,17 +1,17 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.domain.induction.WorkInterest
+import uk.gov.justice.digital.hmpps.domain.induction.aValidWorkInterest
+import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidUpdateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdateFutureWorkInterestsDto
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.domain.induction.WorkInterestType as WorkInterestTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestType as WorkInterestTypeEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType as WorkInterestTypeDomain
 
 class UpdateFutureWorkInterestsEntityMapperTest {
 

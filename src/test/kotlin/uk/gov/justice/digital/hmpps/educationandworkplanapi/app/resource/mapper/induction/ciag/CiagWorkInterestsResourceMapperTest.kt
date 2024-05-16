@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
+import uk.gov.justice.digital.hmpps.domain.induction.WorkInterest
+import uk.gov.justice.digital.hmpps.domain.induction.WorkInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateWorkInterestsRequest

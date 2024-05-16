@@ -8,20 +8,20 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import uk.gov.justice.digital.hmpps.domain.induction.InterestType
+import uk.gov.justice.digital.hmpps.domain.induction.SkillType
+import uk.gov.justice.digital.hmpps.domain.induction.aValidPersonalInterest
+import uk.gov.justice.digital.hmpps.domain.induction.aValidPersonalSkill
+import uk.gov.justice.digital.hmpps.domain.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InterestType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.SkillType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkill
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidSkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdateSkillsAndInterestsRequest
 import java.time.OffsetDateTime
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest as PersonalInterestDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill as PersonalSkillDomain
+import uk.gov.justice.digital.hmpps.domain.induction.PersonalInterest as PersonalInterestDomain
+import uk.gov.justice.digital.hmpps.domain.induction.PersonalSkill as PersonalSkillDomain
 
 @ExtendWith(MockitoExtension::class)
 class CiagSkillsAndInterestsResourceMapperTest {

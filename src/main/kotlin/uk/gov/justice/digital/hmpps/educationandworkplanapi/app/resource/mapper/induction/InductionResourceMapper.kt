@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
+import uk.gov.justice.digital.hmpps.domain.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.domain.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest

@@ -3,13 +3,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.domain.induction.Induction
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_UPDATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
 import java.util.UUID
 
 /**

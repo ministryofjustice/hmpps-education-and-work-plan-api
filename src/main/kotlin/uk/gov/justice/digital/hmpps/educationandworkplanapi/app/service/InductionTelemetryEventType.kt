@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.induction.Induction
 
 /**
  * An enumeration of the types of Induction events that can be sent to the Telemetry Service, where each item has:

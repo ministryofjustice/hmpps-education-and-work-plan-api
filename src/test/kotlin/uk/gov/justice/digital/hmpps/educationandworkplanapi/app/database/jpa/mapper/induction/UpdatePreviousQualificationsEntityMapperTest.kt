@@ -1,19 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.domain.induction.Qualification
+import uk.gov.justice.digital.hmpps.domain.induction.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousQualificationsDto
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.induction.QualificationLevel as QualificationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel as HighestEducationLevelEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel as QualificationLevelEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.QualificationLevel as QualificationLevelDomain
 
 class UpdatePreviousQualificationsEntityMapperTest {
 

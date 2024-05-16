@@ -1,17 +1,17 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.domain.induction.WorkExperience
+import uk.gov.justice.digital.hmpps.domain.induction.aValidWorkExperience
+import uk.gov.justice.digital.hmpps.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperience
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidWorkExperience
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.domain.induction.WorkExperienceType as WorkExperienceTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceType as WorkExperienceTypeEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkExperienceType as WorkExperienceTypeDomain
 
 class UpdatePreviousWorkExperiencesEntityMapperTest {
 
