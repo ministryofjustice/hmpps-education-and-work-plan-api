@@ -26,9 +26,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import uk.gov.justice.digital.hmpps.domain.goal.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.goal.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.goal.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
 private val log = KotlinLogging.logger {}

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
+package uk.gov.justice.digital.hmpps.domain.timeline
 
 /**
  * Thrown when a Timeline does not exist for a given Prisoner.

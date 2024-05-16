@@ -10,12 +10,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.aValidPrisonMovementTimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonMovementEvents
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.mapper.PrisonMovementEventsMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidPrisonMovementTimelineEvent
 
 @ExtendWith(MockitoExtension::class)
 class PrisonerApiTimelineServiceTest {

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
+package uk.gov.justice.digital.hmpps.domain.timeline.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
@@ -10,11 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidPrisonMovementTimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.aValidTimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.domain.timeline.aValidPrisonMovementTimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimeline
+import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)

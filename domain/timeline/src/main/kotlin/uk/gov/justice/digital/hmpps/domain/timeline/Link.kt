@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline
+package uk.gov.justice.digital.hmpps.domain.timeline
 
 /**
  * A [Link] represents a link to the source event in the source system for a given [TimelineEvent].

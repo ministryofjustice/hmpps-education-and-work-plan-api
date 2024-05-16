@@ -12,10 +12,10 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
+import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aFullyPopulatedInduction
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
 
 @ExtendWith(MockitoExtension::class)
 class AsyncInductionEventServiceTest {

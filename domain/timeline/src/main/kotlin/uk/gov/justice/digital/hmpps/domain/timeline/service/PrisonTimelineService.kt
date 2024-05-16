@@ -1,6 +1,6 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
+package uk.gov.justice.digital.hmpps.domain.timeline.service
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 
 interface PrisonTimelineService {
 

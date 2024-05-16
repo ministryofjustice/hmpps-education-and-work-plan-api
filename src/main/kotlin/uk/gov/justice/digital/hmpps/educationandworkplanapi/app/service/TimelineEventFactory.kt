@@ -6,8 +6,8 @@ import uk.gov.justice.digital.hmpps.domain.goal.Goal
 import uk.gov.justice.digital.hmpps.domain.goal.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.goal.Step
 import uk.gov.justice.digital.hmpps.domain.goal.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import java.util.UUID
 
 /**

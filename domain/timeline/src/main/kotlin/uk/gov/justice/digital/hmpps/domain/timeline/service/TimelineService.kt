@@ -1,9 +1,9 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service
+package uk.gov.justice.digital.hmpps.domain.timeline.service
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline.Companion.newTimeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.domain.timeline.Timeline.Companion.newTimeline
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
 
 /**
  * Service class exposing methods that implement the business rules for the Timeline domain, and is how applications

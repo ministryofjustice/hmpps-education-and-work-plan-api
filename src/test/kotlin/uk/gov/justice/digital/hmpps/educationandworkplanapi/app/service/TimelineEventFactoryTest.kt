@@ -13,9 +13,9 @@ import uk.gov.justice.digital.hmpps.domain.goal.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.goal.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.goal.aValidStep
 import uk.gov.justice.digital.hmpps.domain.goal.anotherValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent.Companion.newTimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.assertThat
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
+import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)

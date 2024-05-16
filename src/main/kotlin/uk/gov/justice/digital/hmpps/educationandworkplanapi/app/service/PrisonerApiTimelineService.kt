@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.mapper.PrisonMovementEventsMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.PrisonTimelineService
 
 private val log = KotlinLogging.logger {}
 

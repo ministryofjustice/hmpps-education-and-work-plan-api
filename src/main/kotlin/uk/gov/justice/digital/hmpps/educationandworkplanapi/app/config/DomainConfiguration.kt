@@ -8,12 +8,12 @@ import uk.gov.justice.digital.hmpps.domain.goal.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.domain.goal.service.GoalEventService
 import uk.gov.justice.digital.hmpps.domain.goal.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.goal.service.GoalService
+import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineService
+import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.PrisonTimelineService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelinePersistenceAdapter
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
 
 /**
  * Configuration class responsible for providing domain bean implementations
