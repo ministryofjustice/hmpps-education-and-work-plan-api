@@ -35,7 +35,7 @@ class SubjectAccessRequestService(
       inductionService.getInductionForPrisoner(prisonNumber)
         .takeIf { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
         .takeIf { toDateInstance == null || it?.createdAt?.isBefore(toDateInstance) ?: true }
-    } catch (e: uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException) {
+    } catch (e: InductionNotFoundException) {
       null
     }
 
