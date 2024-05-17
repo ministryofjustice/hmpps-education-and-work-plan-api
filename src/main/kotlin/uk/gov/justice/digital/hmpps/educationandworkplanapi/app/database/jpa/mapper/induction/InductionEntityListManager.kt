@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.KeyAwareDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.KeyAwareDomain
 
 /**
  * Provides a centralised place to update, add or remove existing JPA entities (and thereby apply changes to the

@@ -4,12 +4,12 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
 import org.mapstruct.ValueMapping
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
 import java.time.Instant
 import java.util.UUID
 

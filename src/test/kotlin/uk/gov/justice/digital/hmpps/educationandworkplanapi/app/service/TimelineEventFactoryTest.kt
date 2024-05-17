@@ -7,15 +7,15 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidActionPlan
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidGoal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.aValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.anotherValidStep
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent.Companion.newTimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEventType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.assertThat
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
+import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)

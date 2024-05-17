@@ -2,13 +2,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionSummary
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateInductionDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateInductionDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionPersistenceAdapter
 
 @Component
 class JpaInductionPersistenceAdapter(

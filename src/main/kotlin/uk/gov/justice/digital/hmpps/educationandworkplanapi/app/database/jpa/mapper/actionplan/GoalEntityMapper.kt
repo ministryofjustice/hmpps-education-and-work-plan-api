@@ -7,16 +7,16 @@ import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.springframework.beans.factory.annotation.Autowired
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateStepDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Step
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateGoalDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.CreateStepDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.dto.UpdateGoalDto
 
 @Mapper(
   uses = [

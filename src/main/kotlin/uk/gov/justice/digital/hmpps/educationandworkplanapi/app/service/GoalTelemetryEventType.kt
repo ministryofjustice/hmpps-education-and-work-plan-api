@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.Goal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import java.util.UUID
 
 /**

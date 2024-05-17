@@ -4,9 +4,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.ActionPlan
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanEventService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
+import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 
 private val log = KotlinLogging.logger {}
 

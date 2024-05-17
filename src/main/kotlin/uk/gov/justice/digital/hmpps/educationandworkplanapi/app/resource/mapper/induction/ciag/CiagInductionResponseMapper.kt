@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Induction
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HopingToWork as HopingToWorkDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi
 
 @Component

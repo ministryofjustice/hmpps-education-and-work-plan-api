@@ -3,14 +3,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousQualifications
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousTraining
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType.OTHER
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePreviousTrainingDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousTraining
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.TrainingType.OTHER
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationAndQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAndQualificationResponse
@@ -18,8 +18,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType as TrainingTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.TrainingType as TrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel as HighestEducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType as TrainingTypeApi
 

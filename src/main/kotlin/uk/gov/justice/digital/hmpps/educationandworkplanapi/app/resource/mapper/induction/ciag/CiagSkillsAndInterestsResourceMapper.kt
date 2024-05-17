@@ -1,17 +1,17 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InterestType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalSkillsAndInterests
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.SkillType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InterestType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkillsAndInterests
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.SkillType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreatePersonalSkillsAndInterestsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateSkillsAndInterestsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalInterest as PersonalInterestDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PersonalSkill as PersonalSkillDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalInterest as PersonalInterestDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalSkill as PersonalSkillDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType as PersonalInterestApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillType as PersonalSkillApi
 

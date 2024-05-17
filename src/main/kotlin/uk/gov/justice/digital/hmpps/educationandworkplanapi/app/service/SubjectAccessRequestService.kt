@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.goal.service.ActionPlanService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.InductionNotFoundException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent

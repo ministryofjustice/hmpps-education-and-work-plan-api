@@ -2,12 +2,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.PreviousQualifications
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.Qualification
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.QualificationLevel
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousQualifications
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidPreviousTraining
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousTraining
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
@@ -16,8 +16,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidUpdateEducationAndQualificationsRequest
 import java.time.Instant
 import java.time.ZoneOffset
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.HighestEducationLevel as HighestEducationLevelDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.TrainingType as TrainingTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.TrainingType as TrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel as HighestEducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TrainingType as TrainingTypeApi
 

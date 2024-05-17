@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.WorkInterestType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.CreateFutureWorkInterestsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.induction.dto.UpdateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkInterestType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail

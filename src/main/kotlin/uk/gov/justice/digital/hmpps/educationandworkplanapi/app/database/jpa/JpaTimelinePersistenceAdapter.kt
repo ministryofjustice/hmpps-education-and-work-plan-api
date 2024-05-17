@@ -3,14 +3,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.domain.timeline.Timeline
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity.Companion.newTimelineForPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.timeline.TimelineEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.timeline.TimelineEventEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.Timeline
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.domain.timeline.service.TimelinePersistenceAdapter
 
 private val log = KotlinLogging.logger {}
 
