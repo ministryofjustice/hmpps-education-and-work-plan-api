@@ -1,3 +1,5 @@
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service
+
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
 import java.util.UUID

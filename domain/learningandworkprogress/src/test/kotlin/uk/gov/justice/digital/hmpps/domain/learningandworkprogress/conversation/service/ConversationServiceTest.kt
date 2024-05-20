@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service
 
-import ConversationPersistenceAdapter
 import aValidCreateConversationDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType

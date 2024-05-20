@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service
 
-import ConversationPersistenceAdapter
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
