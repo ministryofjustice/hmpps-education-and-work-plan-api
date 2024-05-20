@@ -20,7 +20,7 @@ private val log = KotlinLogging.logger {}
  */
 class ConversationService(
   private val persistenceAdapter: ConversationPersistenceAdapter,
-  private val conversationEventService: ConversationEventService,
+  private val conversationEventService: ConversationEventService?,
 ) {
 
   /**
@@ -31,7 +31,7 @@ class ConversationService(
       log.info { "Creating Conversation for prisoner [$prisonNumber]" }
 
       return persistenceAdapter.createConversation(createConversationDto)
-        .also { conversationEventService.conversationCreated(it) }
+        .also { conversationEventService?.conversationCreated(it) }
     }
   }
 
