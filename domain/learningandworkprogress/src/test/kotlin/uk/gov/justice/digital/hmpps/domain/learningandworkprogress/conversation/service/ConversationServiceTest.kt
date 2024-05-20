@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service
 
-import aValidCreateConversationDto
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Test
@@ -15,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationDto
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
