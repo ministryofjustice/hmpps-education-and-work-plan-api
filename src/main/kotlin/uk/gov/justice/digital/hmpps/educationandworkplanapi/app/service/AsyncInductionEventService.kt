@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
@@ -21,19 +21,19 @@ class AsyncInductionEventService(
   private val telemetryService: TelemetryService,
 ) : InductionEventService {
 
-  override fun inductionCreated(createdInduction: Induction) {
-    runBlocking {
+  override suspend fun inductionCreated(createdInduction: Induction) {
+    coroutineScope {
       log.debug { "Induction created event for prisoner [${createdInduction.prisonNumber}]" }
-      launch { timelineService.recordTimelineEvent(createdInduction.prisonNumber, buildInductionCreatedEvent(createdInduction)) }
-      launch { telemetryService.trackInductionCreated(induction = createdInduction) }
+      async { timelineService.recordTimelineEvent(createdInduction.prisonNumber, buildInductionCreatedEvent(createdInduction)) }
+      async { telemetryService.trackInductionCreated(induction = createdInduction) }
     }
   }
 
-  override fun inductionUpdated(updatedInduction: Induction) {
-    runBlocking {
+  override suspend fun inductionUpdated(updatedInduction: Induction) {
+    coroutineScope {
       log.debug { "Induction updated event for prisoner [${updatedInduction.prisonNumber}]" }
-      launch { timelineService.recordTimelineEvent(updatedInduction.prisonNumber, buildInductionUpdatedEvent(updatedInduction)) }
-      launch { telemetryService.trackInductionUpdated(induction = updatedInduction) }
+      async { timelineService.recordTimelineEvent(updatedInduction.prisonNumber, buildInductionUpdatedEvent(updatedInduction)) }
+      async { telemetryService.trackInductionUpdated(induction = updatedInduction) }
     }
   }
 

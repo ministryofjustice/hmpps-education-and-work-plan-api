@@ -10,5 +10,5 @@ interface ActionPlanEventService {
   /**
    * Implementations providing custom code for when an [ActionPlan] is created.
    */
-  fun actionPlanCreated(actionPlan: ActionPlan)
+  suspend fun actionPlanCreated(actionPlan: ActionPlan)
 }

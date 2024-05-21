@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -37,7 +38,7 @@ class AsyncInductionEventServiceTest {
   private lateinit var timelineEventCaptor: ArgumentCaptor<TimelineEvent>
 
   @Test
-  fun `should handle induction created`() {
+  fun `should handle induction created`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val induction = aFullyPopulatedInduction(prisonNumber = prisonNumber)
@@ -63,7 +64,7 @@ class AsyncInductionEventServiceTest {
   }
 
   @Test
-  fun `should handle induction updated`() {
+  fun `should handle induction updated`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val induction = aFullyPopulatedInduction(prisonNumber = prisonNumber)

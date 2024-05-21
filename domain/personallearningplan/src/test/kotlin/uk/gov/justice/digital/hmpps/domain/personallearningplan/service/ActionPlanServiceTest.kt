@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
@@ -34,7 +35,7 @@ class ActionPlanServiceTest {
   @Nested
   inner class CreateActionPlan {
     @Test
-    fun `should create action plan given prisoner does not already have an action plan`() {
+    fun `should create action plan given prisoner does not already have an action plan`() = runTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
       given(persistenceAdapter.getActionPlan(any())).willReturn(null)
@@ -66,7 +67,7 @@ class ActionPlanServiceTest {
 
       // When
       val exception = catchThrowableOfType(
-        { service.createActionPlan(createActionPlanDto) },
+        { runTest { service.createActionPlan(createActionPlanDto) } },
         ActionPlanAlreadyExistsException::class.java,
       )
 

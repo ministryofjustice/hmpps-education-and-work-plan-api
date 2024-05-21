@@ -27,7 +27,7 @@ class InductionService(
   /**
    * Records an [Induction] that has taken place for a prisoner.
    */
-  fun createInduction(createInductionDto: CreateInductionDto): Induction =
+  suspend fun createInduction(createInductionDto: CreateInductionDto): Induction =
     with(createInductionDto) {
       log.info { "Creating Induction for prisoner [$prisonNumber]" }
 
@@ -52,7 +52,7 @@ class InductionService(
    * Updates an [Induction], identified by its `prisonNumber`, from the specified [UpdateInductionDto].
    * Throws [InductionNotFoundException] if the [Induction] to be updated cannot be found.
    */
-  fun updateInduction(updateInductionDto: UpdateInductionDto): Induction {
+  suspend fun updateInduction(updateInductionDto: UpdateInductionDto): Induction {
     val prisonNumber = updateInductionDto.prisonNumber
     log.info { "Updating Induction for prisoner [$prisonNumber]" }
 

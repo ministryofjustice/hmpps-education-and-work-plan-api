@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GoalCon
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
 import java.util.UUID
+import kotlin.coroutines.Continuation
 
 class UpdateGoalRequestReferenceConstraintValidatorTest {
   private val validatorFactory = Validation.buildDefaultValidatorFactory()
@@ -21,7 +22,10 @@ class UpdateGoalRequestReferenceConstraintValidatorTest {
     UpdateGoalRequest::class.java,
     String::class.java,
     UUID::class.java,
+    Continuation::class.java,
   )
+
+  private val continuation: Continuation<*> = mock()
 
   @Test
   fun `should validate with 0 violations given goalReference matches goalReference in UpdateGoalRequest`() {
@@ -38,6 +42,7 @@ class UpdateGoalRequestReferenceConstraintValidatorTest {
           updateGoalRequest,
           null,
           goalReference,
+          continuation,
         ),
       )
 
@@ -61,6 +66,7 @@ class UpdateGoalRequestReferenceConstraintValidatorTest {
           updateGoalRequest,
           null,
           goalReference,
+          continuation,
         ),
       )
 
