@@ -34,7 +34,7 @@ class ActionPlanController(
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
-  fun createActionPlan(
+  suspend fun createActionPlan(
     @Valid
     @RequestBody
     request: CreateActionPlanRequest,

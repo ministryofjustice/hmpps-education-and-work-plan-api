@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
@@ -41,7 +42,7 @@ class InductionServiceTest {
   @Nested
   inner class CreateInduction {
     @Test
-    fun `should create induction`() {
+    fun `should create induction`() = runTest {
       // Given
       val createInductionDto = aValidCreateInductionDto()
       val induction = aFullyPopulatedInduction()
@@ -66,7 +67,7 @@ class InductionServiceTest {
 
       // When
       val exception = catchThrowableOfType(
-        { service.createInduction(createInductionDto) },
+        { runTest { service.createInduction(createInductionDto) } },
         InductionAlreadyExistsException::class.java,
       )
 
@@ -114,7 +115,7 @@ class InductionServiceTest {
   @Nested
   inner class UpdateInduction {
     @Test
-    fun `should update induction`() {
+    fun `should update induction`() = runTest {
       // Given
       val updateInductionDto = aValidUpdateInductionDto(prisonNumber = PRISON_NUMBER)
       val expected = aFullyPopulatedInduction(prisonNumber = PRISON_NUMBER)
@@ -137,7 +138,7 @@ class InductionServiceTest {
 
       // When
       val exception = catchThrowableOfType(
-        { service.updateInduction(updateInductionDto) },
+        { runTest { service.updateInduction(updateInductionDto) } },
         InductionNotFoundException::class.java,
       )
 

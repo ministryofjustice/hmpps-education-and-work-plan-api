@@ -18,6 +18,7 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
+val coroutinesVersion = "1.7.3"
 val mapstructVersion = "1.5.5.Final"
 val postgresqlVersion = "42.7.2"
 val kotlinLoggingVersion = "3.0.5"
@@ -58,7 +59,7 @@ dependencies {
   implementation(project("domain:timeline"))
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:0.2.2")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -81,6 +82,7 @@ dependencies {
   testImplementation(testFixtures(project("domain:personallearningplan")))
   testImplementation(testFixtures(project("domain:timeline")))
   testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
   // Integration test dependencies
   integrationTestImplementation("org.testcontainers:postgresql:$postgressTestContainersVersion")

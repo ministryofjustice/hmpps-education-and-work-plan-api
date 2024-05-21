@@ -34,7 +34,7 @@ class InductionController(
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
-  fun createInduction(
+  suspend fun createInduction(
     @Valid
     @RequestBody
     request: CreateInductionRequest,
@@ -55,7 +55,7 @@ class InductionController(
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
-  fun updateInduction(
+  suspend fun updateInduction(
     @Valid
     @RequestBody
     request: UpdateInductionRequest,

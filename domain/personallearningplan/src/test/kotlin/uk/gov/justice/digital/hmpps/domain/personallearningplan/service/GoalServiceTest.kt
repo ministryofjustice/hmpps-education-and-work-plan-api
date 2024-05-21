@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
@@ -42,7 +43,7 @@ class GoalServiceTest {
   @Nested
   inner class CreateGoal {
     @Test
-    fun `should create new goal for a prisoner`() {
+    fun `should create new goal for a prisoner`() = runTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
       val goal = aValidGoal()
@@ -64,7 +65,7 @@ class GoalServiceTest {
     }
 
     @Test
-    fun `should add goal to new action plan given prisoner does not have an action plan`() {
+    fun `should add goal to new action plan given prisoner does not have an action plan`() = runTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
       val goal = aValidGoal()
@@ -91,7 +92,7 @@ class GoalServiceTest {
   @Nested
   inner class CreateGoals {
     @Test
-    fun `should create new goals for a prisoner`() {
+    fun `should create new goals for a prisoner`() = runTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
       val goal1 = aValidGoal(title = "Goal 1")
@@ -117,7 +118,7 @@ class GoalServiceTest {
     }
 
     @Test
-    fun `should add goals to new action plan given prisoner does not have an action plan`() {
+    fun `should add goals to new action plan given prisoner does not have an action plan`() = runTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
       val goal1 = aValidGoal(title = "Goal 1")
@@ -185,7 +186,7 @@ class GoalServiceTest {
   }
 
   @Test
-  fun `should update goal given goal exists`() {
+  fun `should update goal given goal exists`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val goalReference = aValidReference()
@@ -217,7 +218,7 @@ class GoalServiceTest {
 
     // When
     val exception = catchThrowableOfType(
-      { service.updateGoal(prisonNumber, updatedGoal) },
+      { runTest { service.updateGoal(prisonNumber, updatedGoal) } },
       GoalNotFoundException::class.java,
     )
 
