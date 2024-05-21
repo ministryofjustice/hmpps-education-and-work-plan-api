@@ -11,7 +11,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
@@ -109,7 +108,7 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should fail to create induction given database exception`() {
+  fun `should create induction but fail to create timeline event given timeline database exception`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
@@ -117,23 +116,24 @@ class CreateInductionTest : IntegrationTestBase() {
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = invalidPrisonId)
 
     // When
-    val response = webTestClient.post()
+    webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
-      .is5xxServerError
-      .returnResult(ErrorResponse::class.java)
+      .isCreated
 
     // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasStatus(SERVICE_UNAVAILABLE.value())
-      .hasUserMessage("Service unavailable")
-
-    inductionDoesNotExistForPrisoner(prisonNumber)
+    assertThat(getInduction(prisonNumber)).isNotNull
+    Thread.sleep(3000) // wait 3 seconds then assert that there are no timeline events created (one would have been created in that time if it was going to be)
+    webTestClient.get()
+      .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNotFound
   }
 
   @Test

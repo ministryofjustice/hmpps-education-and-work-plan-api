@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -123,57 +124,60 @@ class GetTimelineTest : IntegrationTestBase() {
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
 
-    // When
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(TimelineResponse::class.java)
-
-    // Then
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
     val goal = actionPlan!!.goals!![0]
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(4)
-    val actionPlanCreatedCorrelationId = actual.events[3].correlationId
-    assertThat(actual)
-      .isForPrisonNumber(prisonNumber)
-      .event(1) {
-        it.hasSourceReference("1")
-          .hasEventType(TimelineEventType.PRISON_ADMISSION)
-          .hasPrisonId("MDI")
-          .wasActionedBy("system")
-          .hasNoActionedByDisplayName()
-          .hasNoContextualInfo()
-      }
-      .event(2) {
-        it.hasSourceReference("1")
-          .hasEventType(TimelineEventType.PRISON_TRANSFER)
-          .hasPrisonId("BXI")
-          .wasActionedBy("system")
-          .hasNoActionedByDisplayName()
-          .hasContextualInfo("MDI")
-      }
-      .event(3) {
-        it.hasSourceReference(actionPlan.reference.toString())
-          .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
-          .hasPrisonId("BXI")
-          .wasActionedBy("auser_gen")
-          .hasActionedByDisplayName("Albert User")
-          .hasNoContextualInfo()
-          .hasCorrelationId(actionPlanCreatedCorrelationId)
-      }
-      .event(4) {
-        it.hasSourceReference(goal.reference.toString())
-          .hasEventType(TimelineEventType.GOAL_CREATED)
-          .hasPrisonId("BXI")
-          .wasActionedBy("auser_gen")
-          .hasActionedByDisplayName("Albert User")
-          .hasContextualInfo(goal.title!!)
-          .hasCorrelationId(actionPlanCreatedCorrelationId)
-      }
+
+    // When
+    await.untilAsserted {
+      val response = webTestClient.get()
+        .uri(URI_TEMPLATE, prisonNumber)
+        .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+        .exchange()
+        .expectStatus()
+        .isOk
+        .returnResult(TimelineResponse::class.java)
+
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual.events).hasSize(4)
+      val actionPlanCreatedCorrelationId = actual.events[3].correlationId
+      assertThat(actual)
+        .isForPrisonNumber(prisonNumber)
+        .event(1) {
+          it.hasSourceReference("1")
+            .hasEventType(TimelineEventType.PRISON_ADMISSION)
+            .hasPrisonId("MDI")
+            .wasActionedBy("system")
+            .hasNoActionedByDisplayName()
+            .hasNoContextualInfo()
+        }
+        .event(2) {
+          it.hasSourceReference("1")
+            .hasEventType(TimelineEventType.PRISON_TRANSFER)
+            .hasPrisonId("BXI")
+            .wasActionedBy("system")
+            .hasNoActionedByDisplayName()
+            .hasContextualInfo("MDI")
+        }
+        .event(3) {
+          it.hasSourceReference(actionPlan.reference.toString())
+            .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+            .hasPrisonId("BXI")
+            .wasActionedBy("auser_gen")
+            .hasActionedByDisplayName("Albert User")
+            .hasNoContextualInfo()
+            .hasCorrelationId(actionPlanCreatedCorrelationId)
+        }
+        .event(4) {
+          it.hasSourceReference(goal.reference.toString())
+            .hasEventType(TimelineEventType.GOAL_CREATED)
+            .hasPrisonId("BXI")
+            .wasActionedBy("auser_gen")
+            .hasActionedByDisplayName("Albert User")
+            .hasContextualInfo(goal.title!!)
+            .hasCorrelationId(actionPlanCreatedCorrelationId)
+        }
+    }
   }
 
   @Test
@@ -227,80 +231,82 @@ class GetTimelineTest : IntegrationTestBase() {
     updateGoal(prisonNumber, updateGoalRequest)
 
     // When
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(TimelineResponse::class.java)
+    await.untilAsserted {
+      val response = webTestClient.get()
+        .uri(URI_TEMPLATE, prisonNumber)
+        .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+        .exchange()
+        .expectStatus()
+        .isOk
+        .returnResult(TimelineResponse::class.java)
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(8)
-    val actionPlanCreatedCorrelationId = actual.events[2].correlationId
-    val goalUpdatedCorrelationId = actual.events[6].correlationId
-    assertThat(actual)
-      .isForPrisonNumber(prisonNumber)
-      .event(1) {
-        it.hasSourceReference("1")
-          .hasEventType(TimelineEventType.PRISON_ADMISSION)
-          .hasPrisonId("MDI")
-          .wasActionedBy("system")
-          .hasNoActionedByDisplayName()
-          .hasNoContextualInfo()
-      }
-      .event(2) {
-        it.hasEventType(TimelineEventType.INDUCTION_CREATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(induction!!.reference.toString())
-          .hasNoContextualInfo() // creating an induction has no contextual info
-          .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
-          .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
-      }
-      .event(3) {
-        it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(actionPlanReference.toString())
-          .hasNoContextualInfo() // creating an action plan has no contextual info
-          .hasCorrelationId(actionPlanCreatedCorrelationId)
-      }
-      .event(4) {
-        it.hasEventType(TimelineEventType.GOAL_CREATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(goal1Reference.toString())
-          .hasContextualInfo("Learn German")
-          .hasCorrelationId(actionPlanCreatedCorrelationId)
-      }
-      .event(5) {
-        it.hasEventType(TimelineEventType.GOAL_CREATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(goal2Reference.toString())
-          .hasContextualInfo("Learn French")
-          .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
-          .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
-      }
-      .event(6) {
-        it.hasEventType(TimelineEventType.GOAL_UPDATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(goal1Reference.toString())
-          .hasContextualInfo("Learn Spanish") // Learn German changed to Learn Spanish
-          .hasCorrelationId(goalUpdatedCorrelationId)
-      }
-      .event(7) {
-        it.hasEventType(TimelineEventType.STEP_STARTED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(stepToUpdate.reference.toString())
-          .hasContextualInfo("Research course options")
-          .hasCorrelationId(goalUpdatedCorrelationId)
-      }
-      .event(8) {
-        it.hasEventType(TimelineEventType.STEP_UPDATED)
-          .hasPrisonId("BXI")
-          .hasSourceReference(stepToUpdate.reference.toString())
-          .hasContextualInfo("Research course options")
-          .hasCorrelationId(goalUpdatedCorrelationId)
-      }
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual.events).hasSize(8)
+      val actionPlanCreatedCorrelationId = actual.events[2].correlationId
+      val goalUpdatedCorrelationId = actual.events[6].correlationId
+      assertThat(actual)
+        .isForPrisonNumber(prisonNumber)
+        .event(1) {
+          it.hasSourceReference("1")
+            .hasEventType(TimelineEventType.PRISON_ADMISSION)
+            .hasPrisonId("MDI")
+            .wasActionedBy("system")
+            .hasNoActionedByDisplayName()
+            .hasNoContextualInfo()
+        }
+        .event(2) {
+          it.hasEventType(TimelineEventType.INDUCTION_CREATED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(induction!!.reference.toString())
+            .hasNoContextualInfo() // creating an induction has no contextual info
+            .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
+            .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
+        }
+        .event(3) {
+          it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(actionPlanReference.toString())
+            .hasNoContextualInfo() // creating an action plan has no contextual info
+            .hasCorrelationId(actionPlanCreatedCorrelationId)
+        }
+        .event(4) {
+          it.hasEventType(TimelineEventType.GOAL_CREATED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(goal1Reference.toString())
+            .hasContextualInfo("Learn German")
+            .hasCorrelationId(actionPlanCreatedCorrelationId)
+        }
+        .event(5) {
+          it.hasEventType(TimelineEventType.GOAL_CREATED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(goal2Reference.toString())
+            .hasContextualInfo("Learn French")
+            .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
+            .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
+        }
+        .event(6) {
+          it.hasEventType(TimelineEventType.GOAL_UPDATED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(goal1Reference.toString())
+            .hasContextualInfo("Learn Spanish") // Learn German changed to Learn Spanish
+            .hasCorrelationId(goalUpdatedCorrelationId)
+        }
+        .event(7) {
+          it.hasEventType(TimelineEventType.STEP_STARTED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(stepToUpdate.reference.toString())
+            .hasContextualInfo("Research course options")
+            .hasCorrelationId(goalUpdatedCorrelationId)
+        }
+        .event(8) {
+          it.hasEventType(TimelineEventType.STEP_UPDATED)
+            .hasPrisonId("BXI")
+            .hasSourceReference(stepToUpdate.reference.toString())
+            .hasContextualInfo("Research course options")
+            .hasCorrelationId(goalUpdatedCorrelationId)
+        }
+    }
   }
 
   @Test
