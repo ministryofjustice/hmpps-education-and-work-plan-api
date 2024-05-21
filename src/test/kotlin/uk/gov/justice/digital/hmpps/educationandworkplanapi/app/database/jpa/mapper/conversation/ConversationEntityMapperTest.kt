@@ -14,10 +14,12 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationNoteDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidUpdateConversationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.aValidConversationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.aValidConversationNoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.assertThat
 import java.time.Instant
+import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationType as DomainType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.ConversationType as EntityType
 
@@ -140,5 +142,36 @@ class ConversationEntityMapperTest {
     // Then
     assertThat(actual).isEqualTo(expected)
     verify(conversationNoteMapper).fromEntityToDomain(conversationNoteEntity)
+  }
+
+  @Test
+  fun `should update conversation entity from data in UpdateConversationDto`() {
+    // Given
+    val conversationReference = UUID.randomUUID()
+
+    val conversationEntity = aValidConversationEntity(
+      reference = conversationReference,
+      conversationNote = aValidConversationNoteEntity(
+        content = "The original note content",
+      ),
+    )
+
+    val updateConversationDto = aValidUpdateConversationDto(
+      reference = conversationReference,
+      noteContent = "The updated note content",
+    )
+
+    val expectedEntity = aValidConversationEntity(
+      reference = conversationReference,
+      conversationNote = aValidConversationNoteEntity(
+        content = "The updated note content",
+      ),
+    )
+
+    // When
+    mapper.updateEntityFromDto(conversationEntity, updateConversationDto)
+
+    // Then
+    assertThat(conversationEntity).isEqualToIgnoringJpaManagedFields(expectedEntity)
   }
 }

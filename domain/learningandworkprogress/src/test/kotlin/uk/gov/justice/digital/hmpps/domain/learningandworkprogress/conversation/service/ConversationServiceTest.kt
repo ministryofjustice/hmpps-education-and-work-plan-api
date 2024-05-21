@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidUpdateConversationDto
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -116,5 +117,55 @@ class ConversationServiceTest {
     assertThat(actual).isEqualTo(conversation)
     verify(persistenceAdapter).createConversation(createConversationDto)
     verify(conversationEventService).conversationCreated(conversation)
+  }
+
+  @Test
+  fun `should update conversation`() {
+    // Given
+    val conversationReference = UUID.randomUUID()
+
+    val updateConversationDto = aValidUpdateConversationDto(
+      reference = conversationReference,
+      noteContent = "Chris spoke positively about future work during our meeting and has made some good progress",
+    )
+
+    val updatedConversation = aValidConversation(
+      reference = conversationReference,
+      note = aValidConversationNote(
+        content = "Chris spoke positively about future work during our meeting and has made some good progress",
+      ),
+    )
+    given(persistenceAdapter.updateConversation(any())).willReturn(updatedConversation)
+
+    // When
+    val actual = service.updateConversation(updateConversationDto)
+
+    // Then
+    assertThat(actual).isEqualTo(updatedConversation)
+    verify(persistenceAdapter).updateConversation(updateConversationDto)
+  }
+
+  @Test
+  fun `should not update conversation given conversation does not exist`() {
+    // Given
+    val conversationReference = UUID.randomUUID()
+
+    val updateConversationDto = aValidUpdateConversationDto(
+      reference = conversationReference,
+      noteContent = "Chris spoke positively about future work during our meeting and has made some good progress",
+    )
+
+    given(persistenceAdapter.updateConversation(any())).willReturn(null)
+
+    // When
+    val exception = catchThrowableOfType(
+      { service.updateConversation(updateConversationDto) },
+      ConversationNotFoundException::class.java,
+    )
+
+    // Then
+    assertThat(exception.conversationReference).isEqualTo(conversationReference)
+    assertThat(exception).hasMessage("Conversation with reference [$conversationReference] not found")
+    verify(persistenceAdapter).updateConversation(updateConversationDto)
   }
 }

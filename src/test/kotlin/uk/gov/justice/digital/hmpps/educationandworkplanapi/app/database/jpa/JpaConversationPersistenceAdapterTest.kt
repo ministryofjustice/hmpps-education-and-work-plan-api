@@ -12,11 +12,15 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidUpdateConversationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.ConversationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.aValidConversationEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.aValidConversationNoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.conversation.ConversationEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
+import java.time.Instant
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -137,6 +141,74 @@ class JpaConversationPersistenceAdapterTest {
     // Then
     assertThat(actual).isEmpty()
     verify(conversationRepository).findAllByPrisonNumber(prisonNumber)
+    verify(conversationEntityMapper, never()).fromEntityToDomain(any())
+  }
+
+  @Test
+  fun `should update conversation`() {
+    // Given
+    val conversationReference = UUID.randomUUID()
+
+    val originalEntity = aValidConversationEntity(
+      reference = conversationReference,
+      conversationNote = aValidConversationNoteEntity(
+        content = "The original note content",
+      ),
+      updatedAt = Instant.parse("2024-01-01T09:00:00.000Z"),
+    )
+    given(conversationRepository.findByReference(any())).willReturn(originalEntity)
+
+    val updatedEntity = aValidConversationEntity(
+      reference = conversationReference,
+      conversationNote = aValidConversationNoteEntity(
+        content = "The updated note content",
+      ),
+      updatedAt = Instant.now(),
+    )
+    given(conversationRepository.saveAndFlush(any<ConversationEntity>())).willReturn(updatedEntity)
+
+    val expectedConversation = aValidConversation(
+      reference = conversationReference,
+      note = aValidConversationNote(
+        content = "The updated note content",
+      ),
+    )
+    given(conversationEntityMapper.fromEntityToDomain(any())).willReturn(expectedConversation)
+
+    val updateConversationDto = aValidUpdateConversationDto(
+      reference = conversationReference,
+      noteContent = "The updated note content",
+    )
+
+    // When
+    val actual = persistenceAdapter.updateConversation(updateConversationDto)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedConversation)
+    verify(conversationRepository).findByReference(conversationReference)
+    verify(conversationRepository).saveAndFlush(originalEntity)
+    verify(conversationEntityMapper).fromEntityToDomain(updatedEntity)
+  }
+
+  @Test
+  fun `should not update conversation given conversation does not exist`() {
+    // Given
+    val conversationReference = UUID.randomUUID()
+
+    given(conversationRepository.findByReference(any())).willReturn(null)
+
+    val updateConversationDto = aValidUpdateConversationDto(
+      reference = conversationReference,
+      noteContent = "The updated note content",
+    )
+
+    // When
+    val actual = persistenceAdapter.updateConversation(updateConversationDto)
+
+    // Then
+    assertThat(actual).isNull()
+    verify(conversationRepository).findByReference(conversationReference)
+    verify(conversationRepository, never()).saveAndFlush(any())
     verify(conversationEntityMapper, never()).fromEntityToDomain(any())
   }
 }
