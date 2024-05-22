@@ -249,15 +249,15 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasUpdatedBy("buser_gen")
       }
 
-    val timeline = getTimeline(prisonNumber)
-    assertThat(timeline)
-      .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
-        it.hasEventType(TimelineEventType.GOAL_UPDATED)
-          .wasActionedBy("buser_gen")
-          .hasActionedByDisplayName("Bernie User")
-      }
-
     await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+          it.hasEventType(TimelineEventType.GOAL_UPDATED)
+            .wasActionedBy("buser_gen")
+            .hasActionedByDisplayName("Bernie User")
+        }
+
       val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
 
       verify(telemetryClient).trackEvent(

@@ -5,7 +5,6 @@ import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
@@ -96,7 +95,6 @@ class GetTimelineTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should get timeline for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
@@ -124,8 +122,8 @@ class GetTimelineTest : IntegrationTestBase() {
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
 
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    val goal = actionPlan!!.goals!![0]
+    val actionPlan = getActionPlan(prisonNumber)
+    val goal = actionPlan.goals[0]
 
     // When
     await.untilAsserted {
@@ -169,19 +167,18 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .event(4) {
-          it.hasSourceReference(goal.reference.toString())
+          it.hasSourceReference(goal.goalReference.toString())
             .hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
             .wasActionedBy("auser_gen")
             .hasActionedByDisplayName("Albert User")
-            .hasContextualInfo(goal.title!!)
+            .hasContextualInfo(goal.title)
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
     }
   }
 
   @Test
-  @Transactional
   fun `should get timeline with multiple events in order`() {
     // Given
     val prisonNumber = anotherValidPrisonNumber()
@@ -209,19 +206,19 @@ class GetTimelineTest : IntegrationTestBase() {
     createActionPlan(prisonNumber, createActionPlanRequest)
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
 
-    val induction = inductionRepository.findByPrisonNumber(prisonNumber)
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    val actionPlanReference = actionPlan!!.reference!!
-    val goal1Reference = actionPlan.goals!![0].reference!!
-    val goal2Reference = actionPlan.goals!![1].reference!!
-    val stepToUpdate = actionPlan.goals!![0].steps!![0]
+    val induction = getInduction(prisonNumber)
+    val actionPlan = getActionPlan(prisonNumber)
+    val actionPlanReference = actionPlan.reference
+    val goal1Reference = actionPlan.goals[1].goalReference // The Action Plan returned by the API has Goals in reverse chronological order. The first Goal created is the 2nd in the list
+    val goal2Reference = actionPlan.goals[0].goalReference // and the 2nd Goal created is the first in the list.
+    val stepToUpdate = actionPlan.goals[1].steps[0]
 
     val updateGoalRequest = aValidUpdateGoalRequest(
       goalReference = goal1Reference,
       title = "Learn Spanish",
       steps = listOf(
         aValidUpdateStepRequest(
-          stepReference = stepToUpdate.reference,
+          stepReference = stepToUpdate.stepReference,
           title = "Research course options",
           status = StepStatus.ACTIVE,
           sequenceNumber = 1,
@@ -295,14 +292,14 @@ class GetTimelineTest : IntegrationTestBase() {
         .event(7) {
           it.hasEventType(TimelineEventType.STEP_STARTED)
             .hasPrisonId("BXI")
-            .hasSourceReference(stepToUpdate.reference.toString())
+            .hasSourceReference(stepToUpdate.stepReference.toString())
             .hasContextualInfo("Research course options")
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
         .event(8) {
           it.hasEventType(TimelineEventType.STEP_UPDATED)
             .hasPrisonId("BXI")
-            .hasSourceReference(stepToUpdate.reference.toString())
+            .hasSourceReference(stepToUpdate.stepReference.toString())
             .hasContextualInfo("Research course options")
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
@@ -310,7 +307,6 @@ class GetTimelineTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
   fun `should get timeline for prisoner with no plp events`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
