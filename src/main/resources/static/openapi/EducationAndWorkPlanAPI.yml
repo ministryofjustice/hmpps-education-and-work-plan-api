@@ -285,6 +285,32 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/CreateConversation'
 
+  '/conversations/{prisonNumber}/${conversationReference}':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - name: conversationReference
+        description: The conversation's unique reference
+        schema:
+          type: string
+          format: uuid
+        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
+        in: path
+        required: true
+    put:
+      summary: Updates a Learning Work and Progress Conversation for a Prisoner.
+      description: |
+        Updates a prisoner's Learning Work and Progress Conversation.
+      tags:
+        - Conversations
+      responses:
+        '204':
+          description: The Conversation was updated successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+      operationId: update-prisoner-conversation
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateConversation'
+
   #
   # Subject access request
   # --------------------------------------------------------------------------------
@@ -2514,6 +2540,26 @@ components:
         - type
         - note
 
+    UpdateConversationRequest:
+      title: UpdateConversationRequest
+      description: A request to update a Prisoner Conversation.
+      type: object
+      properties:
+        prisonId:
+          type: string
+          description: The identifier of the prison that the prisoner is currently resident at.
+          example: BXI
+        type:
+          $ref: '#/components/schemas/ConversationType'
+        note:
+          type: string
+          description: A note for this conversation
+          example: Pay close attention to Peter's behaviour.
+      required:
+        - prisonId
+        - type
+        - note
+
     ### SAR endpoint ###
     SubjectAccessRequestContent:
       properties:
@@ -2776,6 +2822,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateConversationRequest'
+    UpdateConversation:
+      description: Request body to update a Prisoner Conversation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateConversationRequest'
 
   parameters:
     prisonNumberPathParameter:
