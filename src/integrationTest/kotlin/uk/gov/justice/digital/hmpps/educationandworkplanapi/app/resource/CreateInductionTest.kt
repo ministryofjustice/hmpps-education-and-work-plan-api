@@ -109,7 +109,7 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  @Disabled("test is indeterminate due to the async nature of the coroutine - sometimes it will succeed meaning the controller has returned before the timeline database error; other times it will fail because the timeline database error happens before the controller has returned and the exception is propagated back")
+//  @Disabled("test is indeterminate due to the async nature of the coroutine - sometimes it will succeed meaning the controller has returned before the timeline database error; other times it will fail because the timeline database error happens before the controller has returned and the exception is propagated back")
   fun `should create induction but fail to create timeline event given timeline database exception`() {
     // Given
     val prisonNumber = aValidPrisonNumber()

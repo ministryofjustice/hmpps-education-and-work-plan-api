@@ -1,7 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
@@ -19,12 +20,13 @@ class AsyncGoalEventService(
   private val telemetryService: TelemetryService,
   private val timelineEventFactory: TimelineEventFactory,
   private val timelineService: TimelineService,
+  private val fireAndForgetScope: CoroutineScope,
 ) : GoalEventService {
 
   override suspend fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>) {
     val correlationId = UUID.randomUUID()
     createdGoals.forEach { createdGoal ->
-      coroutineScope {
+      fireAndForgetScope.launch {
         log.debug { "Goal created event for prisoner [$prisonNumber]" }
         async {
           recordGoalCreatedTimelineEvent(
@@ -39,7 +41,7 @@ class AsyncGoalEventService(
   }
 
   override suspend fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
-    coroutineScope {
+    fireAndForgetScope.launch {
       log.debug { "Goal updated event for prisoner [$prisonNumber]" }
 
       async {

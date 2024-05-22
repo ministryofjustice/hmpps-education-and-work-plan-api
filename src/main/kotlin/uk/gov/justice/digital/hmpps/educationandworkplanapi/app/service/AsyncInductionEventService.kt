@@ -1,7 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
@@ -19,10 +20,11 @@ private val log = KotlinLogging.logger {}
 class AsyncInductionEventService(
   private val timelineService: TimelineService,
   private val telemetryService: TelemetryService,
+  private val fireAndForgetScope: CoroutineScope,
 ) : InductionEventService {
 
   override suspend fun inductionCreated(createdInduction: Induction) {
-    coroutineScope {
+    fireAndForgetScope.launch {
       log.debug { "Induction created event for prisoner [${createdInduction.prisonNumber}]" }
       async { timelineService.recordTimelineEvent(createdInduction.prisonNumber, buildInductionCreatedEvent(createdInduction)) }
       async { telemetryService.trackInductionCreated(induction = createdInduction) }
@@ -30,7 +32,7 @@ class AsyncInductionEventService(
   }
 
   override suspend fun inductionUpdated(updatedInduction: Induction) {
-    coroutineScope {
+    fireAndForgetScope.launch {
       log.debug { "Induction updated event for prisoner [${updatedInduction.prisonNumber}]" }
       async { timelineService.recordTimelineEvent(updatedInduction.prisonNumber, buildInductionUpdatedEvent(updatedInduction)) }
       async { telemetryService.trackInductionUpdated(induction = updatedInduction) }
