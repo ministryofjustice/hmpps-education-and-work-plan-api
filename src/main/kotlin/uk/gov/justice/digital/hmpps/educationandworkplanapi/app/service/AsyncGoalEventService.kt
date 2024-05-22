@@ -1,7 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
@@ -19,37 +20,38 @@ class AsyncGoalEventService(
   private val telemetryService: TelemetryService,
   private val timelineEventFactory: TimelineEventFactory,
   private val timelineService: TimelineService,
+  private val fireAndForgetScope: CoroutineScope,
 ) : GoalEventService {
 
-  override fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>) {
+  override suspend fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>) {
     val correlationId = UUID.randomUUID()
     createdGoals.forEach { createdGoal ->
-      runBlocking {
+      fireAndForgetScope.launch {
         log.debug { "Goal created event for prisoner [$prisonNumber]" }
-        launch {
+        async {
           recordGoalCreatedTimelineEvent(
             prisonNumber = prisonNumber,
             createdGoal = createdGoal,
             correlationId = correlationId,
           )
         }
-        launch { trackGoalCreatedTelemetryEvent(createdGoal = createdGoal) }
+        async { trackGoalCreatedTelemetryEvent(createdGoal = createdGoal) }
       }
     }
   }
 
-  override fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
-    runBlocking {
+  override suspend fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
+    fireAndForgetScope.launch {
       log.debug { "Goal updated event for prisoner [$prisonNumber]" }
 
-      launch {
+      async {
         recordGoalUpdatedTimelineEvents(
           prisonNumber = prisonNumber,
           previousGoal = previousGoal,
           updatedGoal = updatedGoal,
         )
       }
-      launch { trackGoalUpdatedTelemetryEvents(previousGoal = previousGoal, updatedGoal = updatedGoal) }
+      async { trackGoalUpdatedTelemetryEvents(previousGoal = previousGoal, updatedGoal = updatedGoal) }
     }
   }
 

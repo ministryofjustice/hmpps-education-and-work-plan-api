@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
@@ -41,7 +42,7 @@ class AsyncGoalEventServiceTest {
   private lateinit var correlationIdCaptor: ArgumentCaptor<UUID>
 
   @Test
-  fun `should send event details given single goal created`() {
+  fun `should send event details given single goal created`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createdGoal = aValidGoal()
@@ -62,7 +63,7 @@ class AsyncGoalEventServiceTest {
   }
 
   @Test
-  fun `should send event details given multiple goals created`() {
+  fun `should send event details given multiple goals created`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
@@ -93,7 +94,7 @@ class AsyncGoalEventServiceTest {
   }
 
   @Test
-  fun `should send event details given goal updated`() {
+  fun `should send event details given goal updated`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val previousGoal = aValidGoal()

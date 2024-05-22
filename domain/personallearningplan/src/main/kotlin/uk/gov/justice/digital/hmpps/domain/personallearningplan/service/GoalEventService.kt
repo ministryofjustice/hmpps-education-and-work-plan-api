@@ -10,10 +10,10 @@ interface GoalEventService {
   /**
    * Implementations providing custom code for when one or more [Goal]s are created.
    */
-  fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>)
+  suspend fun goalsCreated(prisonNumber: String, createdGoals: List<Goal>)
 
   /**
    * Implementations providing custom code for when a [Goal] is updated.
    */
-  fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal)
+  suspend fun goalUpdated(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal)
 }

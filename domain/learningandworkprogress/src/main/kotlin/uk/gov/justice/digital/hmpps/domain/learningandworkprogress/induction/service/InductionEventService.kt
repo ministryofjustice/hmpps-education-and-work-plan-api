@@ -10,10 +10,10 @@ interface InductionEventService {
   /**
    * Implementations providing custom code for when a [Induction] is created.
    */
-  fun inductionCreated(createdInduction: Induction)
+  suspend fun inductionCreated(createdInduction: Induction)
 
   /**
    * Implementations providing custom code for when a [Induction] is updated.
    */
-  fun inductionUpdated(updatedInduction: Induction)
+  suspend fun inductionUpdated(updatedInduction: Induction)
 }

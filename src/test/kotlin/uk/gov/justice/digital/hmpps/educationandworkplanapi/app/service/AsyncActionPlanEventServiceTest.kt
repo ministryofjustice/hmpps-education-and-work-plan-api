@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -31,7 +32,7 @@ class AsyncActionPlanEventServiceTest {
   private lateinit var timelineService: TimelineService
 
   @Test
-  fun `should handle action plan created`() {
+  fun `should handle action plan created`() = runTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlan()

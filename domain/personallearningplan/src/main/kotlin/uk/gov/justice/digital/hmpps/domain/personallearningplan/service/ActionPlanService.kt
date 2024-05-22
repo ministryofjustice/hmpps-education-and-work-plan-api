@@ -26,7 +26,7 @@ class ActionPlanService(
   /**
    * Creates an [ActionPlan] for a prisoner, containing at least one or more Goals.
    */
-  fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
+  suspend fun createActionPlan(createActionPlanDto: CreateActionPlanDto): ActionPlan {
     with(createActionPlanDto) {
       log.info { "Creating ActionPlan for prisoner [$prisonNumber]" }
 

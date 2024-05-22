@@ -34,7 +34,7 @@ class GoalController(
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
-  fun createGoals(
+  suspend fun createGoals(
     @Valid
     @RequestBody
     request: CreateGoalsRequest,
@@ -51,7 +51,7 @@ class GoalController(
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @GoalReferenceMatchesReferenceInUpdateGoalRequest
   @Transactional
-  fun updateGoal(
+  suspend fun updateGoal(
     @Valid
     @RequestBody
     updateGoalRequest: UpdateGoalRequest,

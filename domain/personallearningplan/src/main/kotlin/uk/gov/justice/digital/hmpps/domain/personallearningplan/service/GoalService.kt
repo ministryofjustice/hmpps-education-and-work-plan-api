@@ -31,14 +31,14 @@ class GoalService(
   /**
    * Creates a new [Goal] for the prisoner identified by their prison number, with the data in the specified [CreateGoalDto]
    */
-  fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
+  suspend fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
     return createGoals(prisonNumber, listOf(createGoalDto))[0]
   }
 
   /**
    * Creates new [Goal]s for the prisoner identified by their prison number, with the goal data in the specified list of [CreateGoalDto]s
    */
-  fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal> {
+  suspend fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal> {
     log.info { "Creating new ${if (createGoalDtos.size == 1) "Goal" else "Goals"} for prisoner [$prisonNumber]" }
 
     // TODO RR-227 - We need to change throw a 404 once the create action plan endpoint is being called by the UI (with an optional review date)
@@ -70,7 +70,7 @@ class GoalService(
    * Updates a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [UpdateGoalDto].
    * Throws [GoalNotFoundException] if the [Goal] to be updated cannot be found.
    */
-  fun updateGoal(prisonNumber: String, updatedGoalDto: UpdateGoalDto): Goal {
+  suspend fun updateGoal(prisonNumber: String, updatedGoalDto: UpdateGoalDto): Goal {
     val goalReference = updatedGoalDto.reference
     log.info { "Updating Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
 

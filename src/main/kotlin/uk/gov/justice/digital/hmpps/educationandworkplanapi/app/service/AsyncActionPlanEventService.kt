@@ -1,7 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
@@ -19,16 +20,17 @@ class AsyncActionPlanEventService(
   private val telemetryService: TelemetryService,
   private val timelineEventFactory: TimelineEventFactory,
   private val timelineService: TimelineService,
+  private val fireAndForgetScope: CoroutineScope,
 ) : ActionPlanEventService {
-  override fun actionPlanCreated(actionPlan: ActionPlan) {
-    runBlocking {
+  override suspend fun actionPlanCreated(actionPlan: ActionPlan) {
+    fireAndForgetScope.launch {
       log.info { "ActionPlan created event for prisoner [${actionPlan.prisonNumber}]" }
-      launch {
+      async {
         actionPlan.goals.forEach {
           telemetryService.trackGoalCreatedEvent(it)
         }
       }
-      launch {
+      async {
         val timelineEvents = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
         timelineService.recordTimelineEvents(actionPlan.prisonNumber, timelineEvents)
       }
