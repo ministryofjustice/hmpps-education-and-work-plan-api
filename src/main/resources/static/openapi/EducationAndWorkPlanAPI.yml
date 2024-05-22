@@ -271,7 +271,9 @@ paths:
     post:
       summary: Creates a Learning Work and Progress Conversation for a Prisoner.
       description: |
-        Creates a Learning Work and Progress Conversation for a Prisoner (if it does not already exist).
+        Creates a Learning Work and Progress Conversation for a Prisoner.
+        A Prisoner can have many Conversations. Sending the same request will result in a new Conversation being
+        saved for the Prisoner.
       tags:
         - Conversations
       responses:
