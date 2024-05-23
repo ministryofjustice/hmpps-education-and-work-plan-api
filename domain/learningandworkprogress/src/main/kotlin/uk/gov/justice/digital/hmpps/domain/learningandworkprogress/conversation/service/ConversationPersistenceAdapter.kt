@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
 import java.util.UUID
 
 /**
@@ -18,6 +19,11 @@ interface ConversationPersistenceAdapter {
    * Creates a new [Conversation] and returns persisted instance.
    */
   fun createConversation(createConversationDto: CreateConversationDto): Conversation
+
+  /**
+   * Updates an [Conversation] identified by its `reference`.
+   */
+  fun updateConversation(updateConversationDto: UpdateConversationDto): Conversation?
 
   /**
    * Returns a [List] of [Conversation]s for the prisoner. An empty list is returned if there are no Conversations

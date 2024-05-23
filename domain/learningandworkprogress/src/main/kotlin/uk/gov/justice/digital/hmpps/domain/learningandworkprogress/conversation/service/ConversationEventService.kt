@@ -11,4 +11,9 @@ interface ConversationEventService {
    * Implementations providing custom code for when a [Conversation] is created.
    */
   fun conversationCreated(conversation: Conversation)
+
+  /**
+   * Implementations providing custom code for when a [Conversation] is updated.
+   */
+  fun conversationUpdated(conversation: Conversation)
 }

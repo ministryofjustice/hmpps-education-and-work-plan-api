@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
 import java.util.UUID
 
 private val log = KotlinLogging.logger {}
@@ -52,6 +53,23 @@ class ConversationService(
   fun getConversation(conversationReference: UUID): Conversation {
     log.info { "Retrieving Conversation with reference [$conversationReference]" }
     return persistenceAdapter.getConversation(conversationReference)
+      ?: throw ConversationNotFoundException(conversationReference).also {
+        log.info { "Conversation with reference [$conversationReference] not found" }
+      }
+  }
+
+  /**
+   * Updates a [Conversation], identified by its `reference`, from the specified [UpdateConversationDto].
+   * Throws [ConversationNotFoundException] if the [Conversation] to be updated cannot be found.
+   */
+  fun updateConversation(updateConversationDto: UpdateConversationDto): Conversation {
+    val conversationReference = updateConversationDto.reference
+    log.info { "Updating Conversation with reference [$conversationReference]" }
+
+    return persistenceAdapter.updateConversation(updateConversationDto)
+      ?.also {
+        conversationEventService?.conversationUpdated(it)
+      }
       ?: throw ConversationNotFoundException(conversationReference).also {
         log.info { "Conversation with reference [$conversationReference] not found" }
       }

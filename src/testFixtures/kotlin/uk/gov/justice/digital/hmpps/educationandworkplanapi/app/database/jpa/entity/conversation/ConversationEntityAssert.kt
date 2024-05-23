@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.INTERNALLY_MANAGED_FIELDS
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import java.time.Instant
 import java.util.UUID
 import java.util.function.Consumer
@@ -31,14 +30,14 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
     return this
   }
 
-  fun isEqualToComparingAllFields(expected: GoalEntity): ConversationEntityAssert {
+  fun isEqualToComparingAllFields(expected: ConversationEntity): ConversationEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
       .isEqualTo(expected)
     return this
   }
 
-  fun isEqualToIgnoringJpaManagedFields(expected: GoalEntity): ConversationEntityAssert {
+  fun isEqualToIgnoringJpaManagedFields(expected: ConversationEntity): ConversationEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(*INTERNALLY_MANAGED_FIELDS)
