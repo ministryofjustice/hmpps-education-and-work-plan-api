@@ -296,6 +296,19 @@ paths:
         example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
         in: path
         required: true
+    get:
+      summary: Returns a Learning Work and Progress Conversation for a Prisoner.
+      description: |
+        Returns a prisoner's Learning Work and Progress Conversation.
+      tags:
+        - Conversations
+      responses:
+        '200':
+          $ref: '#/components/responses/Conversation'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-prisoner-conversation
+
     put:
       summary: Updates a Learning Work and Progress Conversation for a Prisoner.
       description: |
@@ -1457,6 +1470,59 @@ components:
         - updatedAt
         - updatedAtPrison
 
+    ConversationResponse:
+      title: ConversationResponse
+      type: object
+      description: Represents a Conversation with a prisoner within the context of their Learning and Work Progress.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this ConversationResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
+        note:
+          type: string
+          description: A note for this conversation
+          example: Pay close attention to Peter's behaviour.
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
       type: object
@@ -2540,6 +2606,14 @@ components:
         - type
         - note
 
+    GetConversationRequest:
+      title: GetConversationRequest
+      description: A request to return a Prisoner Conversation.
+      type: object
+      required:
+        - prisonId
+        - reference
+
     UpdateConversationRequest:
       title: UpdateConversationRequest
       description: A request to update a Prisoner Conversation.
@@ -2575,6 +2649,7 @@ components:
       properties:
         content:
           $ref: '#/components/schemas/SubjectAccessRequestContent'
+
 
   #
   # Response Body Definitions
@@ -2751,6 +2826,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InductionResponse'
+    Conversation:
+      description: Response body containing a Prisoner's Learning and Work Progress conversation.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConversationResponse'
     SarContentFound:
       description: Request successfully processed - content found
       content:
