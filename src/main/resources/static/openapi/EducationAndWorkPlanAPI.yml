@@ -284,6 +284,18 @@ paths:
       operationId: create-prisoner-conversation
       requestBody:
         $ref: '#/components/requestBodies/CreateConversation'
+    get:
+      summary: Returns all Learning Work and Progress Conversations for a Prisoner.
+      description: |
+        Returns all Learning Work and Progress Conversations for a Prisoner.
+      tags:
+        - Conversations
+      responses:
+        '200':
+          $ref: '#/components/responses/Conversations'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-prisoner-conversations
 
   '/conversations/{prisonNumber}/${conversationReference}':
     parameters:
@@ -2606,14 +2618,6 @@ components:
         - type
         - note
 
-    GetConversationRequest:
-      title: GetConversationRequest
-      description: A request to return a Prisoner Conversation.
-      type: object
-      required:
-        - prisonId
-        - reference
-
     UpdateConversationRequest:
       title: UpdateConversationRequest
       description: A request to update a Prisoner Conversation.
@@ -2842,6 +2846,27 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ConversationResponse'
+
+    Conversations:
+      description: Response body containing all of Prisoner's Learning and Work Progress conversations.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: array
+            description: A List of prisoners' conversations.
+            items:
+              $ref: '#/components/schemas/ConversationResponse'
+
     SarContentFound:
       description: Request successfully processed - content found
       content:
