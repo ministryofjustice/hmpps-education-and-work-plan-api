@@ -290,6 +290,23 @@ paths:
         Returns all Learning Work and Progress Conversations for a Prisoner.
       tags:
         - Conversations
+      parameters:
+        - name: page
+          description: The page of the results set to return
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+          in: query
+        - name: pageSize
+          description: The page of the results set to return
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+          example: 20
+          in: query
       responses:
         '200':
           $ref: '#/components/responses/Conversations'
@@ -332,6 +349,8 @@ paths:
           description: The Conversation was updated successfully.
         '400':
           $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
       operationId: update-prisoner-conversation
       requestBody:
         $ref: '#/components/requestBodies/UpdateConversation'
@@ -369,6 +388,41 @@ components:
   # Schema and Enum Definitions
   # --------------------------------------------------------------------------------
   schemas:
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
+
     ErrorResponse:
       title: ErrorResponse
       description: |
@@ -1534,6 +1588,43 @@ components:
           type: string
           description: The identifier of the prison that the prisoner was resident at when this resource was updated.
           example: 'BXI'
+
+    ConversationsResponse:
+      title: ConversationsResponse
+      type: object
+      description: Represents a pageable list of Conversations with a prisoner within the context of their Learning and Work Progress.
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationResponse'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
@@ -2848,7 +2939,7 @@ components:
             $ref: '#/components/schemas/ConversationResponse'
 
     Conversations:
-      description: Response body containing all of Prisoner's Learning and Work Progress conversations.
+      description: Response body containing a Pageable list of Prisoner's Learning and Work Progress conversations.
       headers:
         Access-Control-Allow-Origin:
           schema:
@@ -2862,10 +2953,7 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            description: A List of prisoners' conversations.
-            items:
-              $ref: '#/components/schemas/ConversationResponse'
+            $ref: '#/components/schemas/ConversationsResponse'
 
     SarContentFound:
       description: Request successfully processed - content found
