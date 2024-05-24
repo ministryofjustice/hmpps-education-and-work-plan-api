@@ -23,7 +23,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY)"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
-    PRISON_API_URL: https://api.prison.service.justice.gov.uk
+    PRISON_API_URL: https://prison-api.prison.service.justice.gov.uk
     HMPPS_SAR_ADDITIONALACCESSROLE: ROLE_EDUCATION_WORK_PLAN_VIEWER
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
