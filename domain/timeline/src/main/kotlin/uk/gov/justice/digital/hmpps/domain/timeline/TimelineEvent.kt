@@ -74,12 +74,13 @@ data class TimelineEvent(
 
 /**
  * The events that the business are interested in (for example to display a history of these events on screen).
- *
- * These are currently limited to CIAG induction and PLP related events, but could be expanded in the future.
  */
 enum class TimelineEventType {
+  // Induction events
   INDUCTION_CREATED,
   INDUCTION_UPDATED,
+
+  // Action Plan/Goal/Step events
   ACTION_PLAN_CREATED,
   GOAL_CREATED,
   GOAL_UPDATED,
@@ -90,6 +91,12 @@ enum class TimelineEventType {
   STEP_NOT_STARTED,
   STEP_STARTED,
   STEP_COMPLETED,
+
+  // Conversation/Notes events
+  CONVERSATION_CREATED,
+  CONVERSATION_UPDATED,
+
+  // Prison movement events
   PRISON_ADMISSION,
   PRISON_RELEASE,
   PRISON_TRANSFER,
@@ -98,5 +105,6 @@ enum class TimelineEventType {
 enum class TimelineEventContext {
   GOAL_TITLE,
   STEP_TITLE,
+  CONVERSATION_TYPE,
   PRISON_TRANSFERRED_FROM,
 }
