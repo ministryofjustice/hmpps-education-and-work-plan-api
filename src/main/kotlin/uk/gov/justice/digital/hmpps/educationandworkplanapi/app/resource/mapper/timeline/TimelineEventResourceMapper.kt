@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.timeline
 
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventResponse
@@ -16,6 +17,14 @@ import java.util.UUID
     UUID::class,
   ],
 )
-interface TimelineEventResourceMapper {
-  fun fromDomainToModel(timelineEventDomain: TimelineEvent): TimelineEventResponse
+abstract class TimelineEventResourceMapper {
+  @Mapping(target = "contextualInfo", expression = "java( buildContextualInfo(timelineEventDomain) )")
+  abstract fun fromDomainToModel(timelineEventDomain: TimelineEvent): TimelineEventResponse
+
+  protected fun buildContextualInfo(timelineEventDomain: TimelineEvent): Map<String, String> =
+    if (timelineEventDomain.contextualInfo !== null) {
+      timelineEventDomain.contextualInfo!!.mapKeys { it.key.toString() }
+    } else {
+      emptyMap()
+    }
 }

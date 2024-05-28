@@ -23,9 +23,9 @@ data class TimelineEvent(
    */
   val eventType: TimelineEventType,
   /**
-   * Some useful contextual information about the event. For example a reason for the event.
+   * A map of useful contextual information about the event.
    */
-  val contextualInfo: String?,
+  val contextualInfo: Map<TimelineEventContext, String>?,
   /**
    * The ID of the Prison where the Prisoner is based at the time of the event.
    */
@@ -52,7 +52,7 @@ data class TimelineEvent(
     fun newTimelineEvent(
       sourceReference: String,
       eventType: TimelineEventType,
-      contextualInfo: String? = null,
+      contextualInfo: Map<TimelineEventContext, String>? = null,
       prisonId: String,
       actionedBy: String,
       actionedByDisplayName: String? = null,
@@ -93,4 +93,10 @@ enum class TimelineEventType {
   PRISON_ADMISSION,
   PRISON_RELEASE,
   PRISON_TRANSFER,
+}
+
+enum class TimelineEventContext {
+  GOAL_TITLE,
+  STEP_TITLE,
+  PRISON_TRANSFERRED_FROM,
 }

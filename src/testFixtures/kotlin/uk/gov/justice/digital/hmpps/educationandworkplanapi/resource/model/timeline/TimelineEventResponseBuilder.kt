@@ -13,7 +13,7 @@ fun aValidTimelineEventResponse(
   actionedBy: String = "asmith_gen",
   actionedByDisplayName: String = "Alex Smith",
   timestamp: OffsetDateTime = OffsetDateTime.now(),
-  contextualInfo: String? = "Learn French",
+  contextualInfo: Map<String, String> = mapOf("goalTitle" to "Learn French"),
   correlationId: UUID = UUID.randomUUID(),
 ): TimelineEventResponse =
   TimelineEventResponse(

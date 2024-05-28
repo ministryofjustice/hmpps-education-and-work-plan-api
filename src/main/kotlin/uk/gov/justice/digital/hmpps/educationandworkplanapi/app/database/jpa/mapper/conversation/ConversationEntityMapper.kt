@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.ConversationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import java.util.UUID
 
@@ -31,6 +32,8 @@ interface ConversationEntityMapper {
    */
   fun fromEntityToDomain(conversationEntity: ConversationEntity): Conversation
 
+  @ExcludeJpaManagedFields
+  @ExcludeReferenceField
   @Mapping(target = "note.content", source = "noteContent")
   fun updateEntityFromDto(@MappingTarget conversationEntity: ConversationEntity, updateConversationDto: UpdateConversationDto)
 }

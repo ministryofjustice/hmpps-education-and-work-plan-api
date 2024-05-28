@@ -8,6 +8,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventResponse
@@ -39,7 +40,7 @@ class TimelineEventResourceMapperTest {
       reference = reference,
       sourceReference = sourceReference,
       eventType = TimelineEventTypeDomain.GOAL_CREATED,
-      contextualInfo = goalTitle,
+      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goalTitle),
       prisonId = prisonId,
       actionedBy = actionedBy,
       actionedByDisplayName = actionedByDisplayName,
@@ -49,7 +50,7 @@ class TimelineEventResourceMapperTest {
       reference = reference,
       sourceReference = sourceReference,
       eventType = TimelineEventTypeModel.GOAL_CREATED,
-      contextualInfo = goalTitle,
+      contextualInfo = mapOf("GOAL_TITLE" to goalTitle),
       prisonId = prisonId,
       actionedBy = actionedBy,
       actionedByDisplayName = actionedByDisplayName,
