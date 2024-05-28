@@ -1,11 +1,16 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline
 
+import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.MapKeyColumn
+import jakarta.persistence.MapKeyEnumerated
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
@@ -35,8 +40,15 @@ class TimelineEventEntity(
   @field:NotNull
   var eventType: TimelineEventType? = null,
 
-  @Column(updatable = false)
-  var contextualInfo: String? = null,
+  @ElementCollection
+  @MapKeyColumn(name = "name")
+  @MapKeyEnumerated(EnumType.STRING)
+  @Column(name = "value")
+  @CollectionTable(
+    name = "timeline_event_contextual_info",
+    joinColumns = [JoinColumn(name = "timeline_event_id")],
+  )
+  var contextualInfo: Map<TimelineEventContext, String>? = null,
 
   /**
    * The ID of the prison that the prisoner was at when the event occurred.
@@ -110,4 +122,10 @@ enum class TimelineEventType {
   PRISON_ADMISSION,
   PRISON_RELEASE,
   PRISON_TRANSFER,
+}
+
+enum class TimelineEventContext {
+  GOAL_TITLE,
+  STEP_TITLE,
+  PRISON_TRANSFERRED_FROM,
 }

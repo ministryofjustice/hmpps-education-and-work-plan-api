@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationNoteDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.ConversationNoteEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
 import java.util.UUID
 
@@ -20,7 +20,7 @@ interface ConversationNoteEntityMapper {
    * A new reference number is generated and mapped. The JPA managed fields are not mapped.
    * This method is suitable for creating a new [ConversationNoteEntity] to be subsequently persisted to the database.
    */
-  @ExcludeJpaManagedFields
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")

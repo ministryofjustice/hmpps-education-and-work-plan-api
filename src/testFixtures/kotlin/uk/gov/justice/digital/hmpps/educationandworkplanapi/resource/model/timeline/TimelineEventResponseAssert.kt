@@ -86,7 +86,7 @@ class TimelineEventResponseAssert(actual: TimelineEventResponse?) :
     return this
   }
 
-  fun hasContextualInfo(expected: String): TimelineEventResponseAssert {
+  fun hasContextualInfo(expected: Map<String, String>): TimelineEventResponseAssert {
     isNotNull
     with(actual!!) {
       if (contextualInfo != expected) {
@@ -99,8 +99,8 @@ class TimelineEventResponseAssert(actual: TimelineEventResponse?) :
   fun hasNoContextualInfo(): TimelineEventResponseAssert {
     isNotNull
     with(actual!!) {
-      if (contextualInfo != null) {
-        failWithMessage("Expected contextualInfo to be null, but was $contextualInfo")
+      if (contextualInfo!!.isNotEmpty()) {
+        failWithMessage("Expected contextualInfo to be an empty map, but was $contextualInfo")
       }
     }
     return this

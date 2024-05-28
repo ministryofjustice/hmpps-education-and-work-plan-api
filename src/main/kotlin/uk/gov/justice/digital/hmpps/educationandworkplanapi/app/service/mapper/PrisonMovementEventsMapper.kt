@@ -5,6 +5,7 @@ import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
 import org.mapstruct.ValueMapping
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
@@ -50,10 +51,10 @@ abstract class PrisonMovementEventsMapper {
   @ValueMapping(target = "PRISON_TRANSFER", source = "TRANSFER")
   abstract fun toEventType(movementType: PrisonMovementType): TimelineEventType
 
-  protected fun getContextualInfo(prisonMovement: PrisonMovementEvent): String? =
+  protected fun getContextualInfo(prisonMovement: PrisonMovementEvent): Map<TimelineEventContext, String>? =
     // For transfers, this is the ID of the prison they were transferred from. Otherwise, null
     if (prisonMovement.movementType == PrisonMovementType.TRANSFER) {
-      prisonMovement.fromPrisonId
+      mapOf(TimelineEventContext.PRISON_TRANSFERRED_FROM to prisonMovement.fromPrisonId!!)
     } else {
       null
     }

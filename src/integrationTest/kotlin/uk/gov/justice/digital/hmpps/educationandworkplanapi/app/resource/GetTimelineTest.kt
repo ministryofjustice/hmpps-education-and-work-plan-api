@@ -155,7 +155,7 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasPrisonId("BXI")
             .wasActionedBy("system")
             .hasNoActionedByDisplayName()
-            .hasContextualInfo("MDI")
+            .hasContextualInfo(mapOf("PRISON_TRANSFERRED_FROM" to "MDI"))
         }
         .event(3) {
           it.hasSourceReference(actionPlan.reference.toString())
@@ -172,7 +172,7 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasPrisonId("BXI")
             .wasActionedBy("auser_gen")
             .hasActionedByDisplayName("Albert User")
-            .hasContextualInfo(goal.title)
+            .hasContextualInfo(mapOf("GOAL_TITLE" to goal.title))
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
     }
@@ -255,7 +255,7 @@ class GetTimelineTest : IntegrationTestBase() {
         .event(2) {
           it.hasEventType(TimelineEventType.INDUCTION_CREATED)
             .hasPrisonId("BXI")
-            .hasSourceReference(induction!!.reference.toString())
+            .hasSourceReference(induction.reference.toString())
             .hasNoContextualInfo() // creating an induction has no contextual info
             .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
             .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
@@ -271,14 +271,14 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal1Reference.toString())
-            .hasContextualInfo("Learn German")
+            .hasContextualInfo(mapOf("GOAL_TITLE" to "Learn German"))
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .event(5) {
           it.hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal2Reference.toString())
-            .hasContextualInfo("Learn French")
+            .hasContextualInfo(mapOf("GOAL_TITLE" to "Learn French"))
             .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
             .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
         }
@@ -286,21 +286,21 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal1Reference.toString())
-            .hasContextualInfo("Learn Spanish") // Learn German changed to Learn Spanish
+            .hasContextualInfo(mapOf("GOAL_TITLE" to "Learn Spanish")) // Learn German changed to Learn Spanish
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
         .event(7) {
           it.hasEventType(TimelineEventType.STEP_STARTED)
             .hasPrisonId("BXI")
             .hasSourceReference(stepToUpdate.stepReference.toString())
-            .hasContextualInfo("Research course options")
+            .hasContextualInfo(mapOf("STEP_TITLE" to "Research course options"))
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
         .event(8) {
           it.hasEventType(TimelineEventType.STEP_UPDATED)
             .hasPrisonId("BXI")
             .hasSourceReference(stepToUpdate.stepReference.toString())
-            .hasContextualInfo("Research course options")
+            .hasContextualInfo(mapOf("STEP_TITLE" to "Research course options"))
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
     }

@@ -50,6 +50,7 @@ class AsyncInductionEventServiceTest {
           actionedBy = induction.createdBy!!,
           actionedByDisplayName = induction.createdByDisplayName,
           timestamp = induction.createdAt!!,
+          contextualInfo = null,
         )
       }
 
@@ -76,6 +77,7 @@ class AsyncInductionEventServiceTest {
           actionedBy = induction.lastUpdatedBy!!,
           actionedByDisplayName = induction.lastUpdatedByDisplayName,
           timestamp = induction.lastUpdatedAt!!,
+          contextualInfo = null,
         )
       }
 

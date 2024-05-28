@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
 import java.util.UUID
@@ -55,7 +56,7 @@ class TimelineEventFactoryTest {
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
       .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
-      .hasContextualInfo(goal.title)
+      .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
       .hasCorrelationId(actionPlanCreatedEvent.correlationId)
   }
 
@@ -74,7 +75,7 @@ class TimelineEventFactoryTest {
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
       .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
-      .hasContextualInfo(goal.title)
+      .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
   }
 
   @Test
@@ -90,7 +91,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = updatedGoal.title,
+        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
       ),
     )
 
@@ -130,7 +131,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = updatedGoal.title,
+        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
       ),
     )
 
@@ -167,7 +168,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = previousGoal.title,
+        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -175,7 +176,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Book Spanish course",
+        contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
     )
 
@@ -212,7 +213,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = previousGoal.title,
+        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -220,7 +221,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Book course",
+        contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book course"),
       ),
     )
 
@@ -273,7 +274,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Learn Spanish",
+        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to "Learn Spanish"),
       ),
       newTimelineEvent(
         sourceReference = goalReference.toString(),
@@ -281,7 +282,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Learn Spanish",
+        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to "Learn Spanish"),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -289,7 +290,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Book Spanish course",
+        contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -297,7 +298,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Book Spanish course",
+        contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
       newTimelineEvent(
         sourceReference = step2Reference.toString(),
@@ -305,7 +306,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = "Complete course",
+        contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Complete course"),
       ),
     )
 

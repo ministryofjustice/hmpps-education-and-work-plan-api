@@ -8,7 +8,7 @@ fun aValidTimelineEventEntity(
   reference: UUID = UUID.randomUUID(),
   sourceReference: String = UUID.randomUUID().toString(),
   eventType: TimelineEventType = TimelineEventType.GOAL_CREATED,
-  contextualInfo: String? = null,
+  contextualInfo: Map<TimelineEventContext, String>? = null,
   prisonId: String = "BXI",
   actionedBy: String = "asmith_gen",
   actionedByDisplayName: String? = "Alex Smith",

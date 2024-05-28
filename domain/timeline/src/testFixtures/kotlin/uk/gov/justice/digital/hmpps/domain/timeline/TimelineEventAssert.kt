@@ -60,7 +60,7 @@ class TimelineEventAssert(actual: TimelineEvent?) :
     return this
   }
 
-  fun hasContextualInfo(expected: String): TimelineEventAssert {
+  fun hasContextualInfo(expected: Map<TimelineEventContext, String>): TimelineEventAssert {
     isNotNull
     with(actual!!) {
       if (contextualInfo != expected) {

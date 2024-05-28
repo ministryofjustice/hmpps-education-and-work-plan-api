@@ -7,6 +7,7 @@ import org.mockito.InjectMocks
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.PRISON_TRANSFERRED_FROM
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.PRISON_ADMISSION
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.PRISON_RELEASE
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.PRISON_TRANSFER
@@ -58,14 +59,14 @@ class PrisonMovementEventsMapperTest {
       aValidPrisonMovementTimelineEvent(
         sourceReference = "1",
         eventType = PRISON_TRANSFER,
-        contextualInfo = "BMI",
+        contextualInfo = mapOf(PRISON_TRANSFERRED_FROM to "BMI"),
         prisonId = "MDI",
         timestamp = LocalDate.now().minusMonths(5).toInstantAtStartOfDay(),
       ),
       aValidPrisonMovementTimelineEvent(
         sourceReference = "1",
         eventType = PRISON_TRANSFER,
-        contextualInfo = "MDI",
+        contextualInfo = mapOf(PRISON_TRANSFERRED_FROM to "MDI"),
         prisonId = "BXI",
         timestamp = LocalDate.now().minusMonths(4).toInstantAtStartOfDay(),
       ),

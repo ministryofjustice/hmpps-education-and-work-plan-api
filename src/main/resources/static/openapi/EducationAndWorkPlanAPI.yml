@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.7.9'
+  version: '1.8.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -655,9 +655,19 @@ components:
         eventType:
           $ref: '#/components/schemas/TimelineEventType'
         contextualInfo:
-          type: string
-          description: Contextual information that's relevant to the event in question. For example the title of a Goal that was completed.
-          example: 'Learn French'
+          type: object
+          description: |
+            An object containing properties of contextual information that's relevant to the event in question.
+            For example a property called `GOAL_TITLE` with value being the title of a Goal that was completed.
+            The object may contain any number of properties. The API spec does not define the property names, but there
+            is a defined set as part of the domain:
+            - GOAL_TITLE
+            - STEP_TITLE
+            - PRISON_TRANSFERRED_FROM
+          additionalProperties:
+            type: string
+          example:
+            GOAL_TITLE: 'Learn French'
         prisonId:
           type: string
           description: The identifier of the prison that the prisoner was at when the event occurred.
@@ -684,6 +694,7 @@ components:
         - reference
         - sourceReference
         - eventType
+        - contextualInfo
         - prisonId
         - actionedBy
         - timestamp

@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import java.util.UUID
 
@@ -39,7 +40,7 @@ class TimelineEventFactory {
       goal = goal,
       sourceReference = goal.reference,
       eventType = TimelineEventType.GOAL_CREATED,
-      contextualInfo = goal.title,
+      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goal.title),
       correlationId = correlationId,
     )
 
@@ -65,7 +66,7 @@ class TimelineEventFactory {
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
           eventType = getGoalStatusEventType(updatedGoal),
-          contextualInfo = updatedGoal.title,
+          contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
           correlationId = correlationId,
         ),
       )
@@ -76,7 +77,7 @@ class TimelineEventFactory {
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
           eventType = TimelineEventType.GOAL_UPDATED,
-          contextualInfo = updatedGoal.title,
+          contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
           correlationId = correlationId,
         ),
       )
@@ -92,7 +93,7 @@ class TimelineEventFactory {
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
           eventType = TimelineEventType.GOAL_UPDATED,
-          contextualInfo = updatedGoal.title,
+          contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
           correlationId = correlationId,
         ),
       )
@@ -129,7 +130,7 @@ class TimelineEventFactory {
             goal = updatedGoal,
             sourceReference = previousStep!!.reference,
             eventType = getStepStatusEventType(it),
-            contextualInfo = it.title,
+            contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to it.title),
             correlationId = correlationId,
           ),
         )
@@ -140,7 +141,7 @@ class TimelineEventFactory {
             goal = updatedGoal,
             sourceReference = previousStep!!.reference,
             eventType = TimelineEventType.STEP_UPDATED,
-            contextualInfo = it.title,
+            contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to it.title),
             correlationId = correlationId,
           ),
         )
@@ -183,7 +184,7 @@ class TimelineEventFactory {
     goal: Goal,
     sourceReference: UUID,
     eventType: TimelineEventType,
-    contextualInfo: String?,
+    contextualInfo: Map<TimelineEventContext, String>?,
     correlationId: UUID = UUID.randomUUID(),
   ) =
     TimelineEvent.newTimelineEvent(
