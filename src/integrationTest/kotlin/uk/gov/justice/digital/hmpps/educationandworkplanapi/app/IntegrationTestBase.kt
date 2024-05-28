@@ -17,6 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
@@ -89,6 +90,9 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var inductionRepository: InductionRepository
 
+  @Autowired
+  lateinit var conversationRepository: ConversationRepository
+
   @SpyBean
   lateinit var telemetryClient: TelemetryClient
 
@@ -103,6 +107,7 @@ abstract class IntegrationTestBase {
     actionPlanRepository.deleteAll() // Will also remove all Goals and Steps due to cascade
     timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
     inductionRepository.deleteAll()
+    conversationRepository.deleteAll()
   }
 
   @BeforeEach
