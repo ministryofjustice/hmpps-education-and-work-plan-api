@@ -55,6 +55,26 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
     return this
   }
 
+  fun isOfType(expected: ConversationType): ConversationEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (type != expected) {
+        failWithMessage("Expected type to be $expected, but was $actual")
+      }
+    }
+    return this
+  }
+
+  fun isForPrisonNumber(expected: String): ConversationEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (prisonNumber != expected) {
+        failWithMessage("Expected prisonNumber to be $expected, but was $prisonNumber")
+      }
+    }
+    return this
+  }
+
   fun wasCreatedBy(expected: String): ConversationEntityAssert {
     isNotNull
     with(actual!!) {
