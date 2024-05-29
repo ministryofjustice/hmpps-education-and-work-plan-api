@@ -22,9 +22,5 @@ abstract class TimelineEventResourceMapper {
   abstract fun fromDomainToModel(timelineEventDomain: TimelineEvent): TimelineEventResponse
 
   protected fun buildContextualInfo(timelineEventDomain: TimelineEvent): Map<String, String> =
-    if (timelineEventDomain.contextualInfo !== null) {
-      timelineEventDomain.contextualInfo!!.mapKeys { it.key.toString() }
-    } else {
-      emptyMap()
-    }
+    timelineEventDomain.contextualInfo?.mapKeys { it.key.toString() } ?: emptyMap()
 }
