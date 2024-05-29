@@ -11,7 +11,7 @@ fun aValidCreateReviewConversationRequest(
 fun aValidCreateConversationRequest(
   prisonId: String = "BXI",
   type: ConversationType = ConversationType.REVIEW,
-  note: String = "Pay close attention to Peter's behaviour."
+  note: String = "Pay close attention to Peter's behaviour.",
 ): CreateConversationRequest = CreateConversationRequest(
   prisonId = prisonId,
   type = type,

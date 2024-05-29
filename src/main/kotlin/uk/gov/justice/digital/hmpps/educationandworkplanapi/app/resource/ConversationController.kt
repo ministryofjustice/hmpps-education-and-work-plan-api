@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource;
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
@@ -24,17 +24,17 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 class ConversationController(
   private val conversationService: ConversationService,
   private val conversationMapper: ConversationsResourceMapper,
+) {
+  @PostMapping("/{prisonNumber}")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @Transactional
+  fun createInduction(
+    @Valid
+    @RequestBody
+    request: CreateConversationRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
-    @PostMapping("/{prisonNumber}")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize(HAS_EDIT_AUTHORITY)
-    @Transactional
-    fun createInduction(
-      @Valid
-      @RequestBody
-      request: CreateConversationRequest,
-      @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
-    ) {
-      conversationService.createConversation(conversationMapper.toCreateConversationDto(request, prisonNumber))
-    }
+    conversationService.createConversation(conversationMapper.toCreateConversationDto(request, prisonNumber))
+  }
 }

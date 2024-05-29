@@ -1,6 +1,6 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource;
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
@@ -8,9 +8,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.ConversationType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateReviewConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 class CreateConversationTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/conversations/{prisonNumber}"
-
   }
 
   @Test
