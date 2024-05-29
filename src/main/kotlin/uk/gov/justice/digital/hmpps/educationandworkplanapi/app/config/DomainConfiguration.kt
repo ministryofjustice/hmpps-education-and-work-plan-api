@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
@@ -56,6 +57,7 @@ class DomainConfiguration {
   @Bean
   fun conversationDomainService(
     conversationPersistenceAdapter: ConversationPersistenceAdapter,
+    conversationEventService: ConversationEventService,
   ): ConversationService =
-    ConversationService(conversationPersistenceAdapter, null)
+    ConversationService(conversationPersistenceAdapter, conversationEventService)
 }
