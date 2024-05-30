@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
@@ -229,6 +230,27 @@ abstract class IntegrationTestBase {
         aValidTokenWithEditAuthority(
           username = username,
           displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+  }
+
+  fun createConversation(
+    prisonNumber: String,
+    createConversationRequest: CreateConversationRequest,
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
+  ) {
+    webTestClient.post()
+      .uri("/conversations/{prisonNumber}", prisonNumber)
+      .withBody(createConversationRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = username,
           privateKey = keyPair.private,
         ),
       )

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -17,6 +18,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.conversation.ConversationsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateConversationRequest
+import java.util.UUID
 
 @RestController
 @Validated
@@ -29,12 +32,26 @@ class ConversationController(
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
-  fun createInduction(
+  fun createConversation(
     @Valid
     @RequestBody
     request: CreateConversationRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     conversationService.createConversation(conversationMapper.toCreateConversationDto(request, prisonNumber))
+  }
+
+  @PutMapping("/{prisonNumber}/{conversationReference}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @Transactional
+  fun updateConversation(
+    @Valid
+    @RequestBody
+    request: UpdateConversationRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @PathVariable conversationReference: UUID,
+  ) {
+    conversationService.updateConversation(conversationMapper.toUpdateConversationDto(request, conversationReference))
   }
 }

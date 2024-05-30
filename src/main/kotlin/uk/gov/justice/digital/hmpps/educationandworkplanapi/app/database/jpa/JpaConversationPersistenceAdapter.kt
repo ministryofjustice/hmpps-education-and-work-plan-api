@@ -27,6 +27,7 @@ class JpaConversationPersistenceAdapter(
     val conversationEntity = conversationRepository.findByReference(updateConversationDto.reference)
     return if (conversationEntity != null) {
       conversationEntityMapper.updateEntityFromDto(conversationEntity, updateConversationDto)
+      conversationEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
       val persistedEntity = conversationRepository.saveAndFlush(conversationEntity)
       conversationEntityMapper.fromEntityToDomain(persistedEntity)
     } else {
