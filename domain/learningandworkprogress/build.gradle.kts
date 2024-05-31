@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   `java-library`
   `java-test-fixtures`
@@ -35,10 +38,8 @@ java {
 }
 
 tasks {
-  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = "21"
-    }
+  withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
   }
 }
 
