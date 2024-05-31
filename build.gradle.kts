@@ -8,7 +8,7 @@ plugins {
   id("org.openapi.generator") version "7.3.0"
   kotlin("plugin.spring") version "1.9.21"
   kotlin("plugin.jpa") version "1.9.21"
-  kotlin("kapt") version "1.9.21"
+  kotlin("kapt") version "2.0.0"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.2"
