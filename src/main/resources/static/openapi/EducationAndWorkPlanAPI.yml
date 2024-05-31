@@ -2731,8 +2731,6 @@ components:
           type: string
           description: The identifier of the prison that the prisoner is currently resident at.
           example: BXI
-        type:
-          $ref: '#/components/schemas/ConversationType'
         note:
           type: string
           description: A note for this conversation

@@ -35,5 +35,6 @@ interface ConversationEntityMapper {
   @ExcludeJpaManagedFields
   @ExcludeReferenceField
   @Mapping(target = "note.content", source = "noteContent")
+  @Mapping(target = "note.updatedAtPrison", source = "prisonId")
   fun updateEntityFromDto(@MappingTarget conversationEntity: ConversationEntity, updateConversationDto: UpdateConversationDto)
 }

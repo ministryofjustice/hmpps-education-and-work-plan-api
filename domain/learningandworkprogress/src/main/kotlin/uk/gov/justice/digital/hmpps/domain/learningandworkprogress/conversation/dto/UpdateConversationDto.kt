@@ -13,4 +13,5 @@ import java.util.UUID
 data class UpdateConversationDto(
   val reference: UUID,
   val noteContent: String,
+  val prisonId: String,
 )

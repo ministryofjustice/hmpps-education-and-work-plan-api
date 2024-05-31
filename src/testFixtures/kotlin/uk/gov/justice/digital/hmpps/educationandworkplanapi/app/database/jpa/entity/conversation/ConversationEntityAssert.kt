@@ -115,6 +115,16 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
     return this
   }
 
+  fun wasUpdatedAfter(dateTime: Instant): ConversationEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (!updatedAt!!.isAfter(dateTime)) {
+        failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
   /**
    * Allows for assertion chaining into the child [ConversationNoteEntity]. Takes a lambda as the method argument
    * to call assertion methods provided by [ConversationNoteEntityAssert].
