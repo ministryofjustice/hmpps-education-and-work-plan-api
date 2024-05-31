@@ -1,14 +1,15 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.0"
   id("org.openapi.generator") version "7.3.0"
-  kotlin("plugin.spring") version "1.9.21"
-  kotlin("plugin.jpa") version "1.9.21"
-  kotlin("kapt") version "1.9.21"
+  kotlin("plugin.spring") version "2.0.0"
+  kotlin("plugin.jpa") version "2.0.0"
+  kotlin("kapt") version "2.0.0"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.0.2"
@@ -21,12 +22,14 @@ apply(plugin = "org.openapi.generator")
 val mapstructVersion = "1.5.5.Final"
 val postgresqlVersion = "42.7.2"
 val kotlinLoggingVersion = "3.0.5"
-val springdocOpenapiVersion = "2.3.0"
+val springdocOpenapiVersion = "2.5.0"
 val awaitilityVersion = "4.2.0"
 val wiremockVersion = "3.4.1"
 val jsonWebTokenVersion = "0.12.5"
 val nimbusJwtVersion = "9.37.3"
 val postgressTestContainersVersion = "1.19.7"
+
+val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
 
@@ -57,7 +60,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:0.2.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.0")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -72,7 +75,7 @@ dependencies {
 
   implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
-  runtimeOnly("org.flywaydb:flyway-core")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql")
   runtimeOnly("org.postgresql:postgresql:$postgresqlVersion")
 
   // Test dependencies
@@ -102,14 +105,14 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(21))
+  }
 }
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = "21"
-    }
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
   }
 }
 
@@ -134,7 +137,7 @@ tasks.named("assemble") {
   // Beforehand we need to remove the plain jar and test-fixtures jars if they exist
   doFirst {
     delete(
-      fileTree(project.buildDir.absolutePath)
+      fileTree(buildDirectory)
         .include("libs/*-plain.jar")
         .include("libs/*-test-fixtures.jar"),
     )
@@ -165,7 +168,7 @@ tasks.named<JacocoReport>("jacocoIntegrationTestReport") {
 }
 
 tasks.register<JacocoReport>("combineJacocoReports") {
-  executionData(fileTree(project.buildDir.absolutePath).include("jacoco/*.exec"))
+  executionData(fileTree(buildDirectory).include("jacoco/*.exec"))
   classDirectories.setFrom(files(project.sourceSets.main.get().output))
   sourceDirectories.setFrom(files(project.sourceSets.main.get().allSource))
   reports {
@@ -178,7 +181,7 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
   generatorName.set("kotlin-spring")
   templateDir.set("$projectDir/src/main/resources/static/openapi/templates")
   inputSpec.set("$projectDir/src/main/resources/static/openapi/EducationAndWorkPlanAPI.yml")
-  outputDir.set("$buildDir/generated")
+  outputDir.set("$buildDirectory/generated")
   modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model")
   configOptions.set(
     mapOf(
@@ -201,7 +204,7 @@ tasks.register<GenerateTask>("buildPrisonApiModel") {
   generatorName.set("kotlin-spring")
   templateDir.set("$projectDir/src/main/resources/static/openapi/templates")
   inputSpec.set("$projectDir/src/main/resources/static/openapi/PrisonApi.json")
-  outputDir.set("$buildDir/generated")
+  outputDir.set("$buildDirectory/generated")
   modelPackage.set("uk.gov.justice.digital.hmpps.prisonapi.resource.model")
   configOptions.set(
     mapOf(
@@ -243,7 +246,7 @@ tasks.named("compileKotlin") {
 
 kotlin {
   sourceSets["main"].apply {
-    kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+    kotlin.srcDir("$buildDirectory/generated/src/main/kotlin")
   }
 }
 
