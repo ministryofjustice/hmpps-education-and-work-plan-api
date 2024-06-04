@@ -7,6 +7,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -41,7 +42,7 @@ class ConversationController(
     conversationService.createConversation(conversationMapper.toCreateConversationDto(request, prisonNumber))
   }
 
-  @PutMapping("/{prisonNumber}/{conversationReference}")
+  @PutMapping("/{conversationReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
@@ -49,9 +50,18 @@ class ConversationController(
     @Valid
     @RequestBody
     request: UpdateConversationRequest,
-    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable conversationReference: UUID,
   ) {
     conversationService.updateConversation(conversationMapper.toUpdateConversationDto(request, conversationReference))
+  }
+
+  @GetMapping("/{conversationReference}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @Transactional
+  fun getConversation(
+    @PathVariable conversationReference: UUID,
+  ) = with(conversationService.getConversation(conversationReference)) {
+    conversationMapper.fromDomainToModel(this)
   }
 }

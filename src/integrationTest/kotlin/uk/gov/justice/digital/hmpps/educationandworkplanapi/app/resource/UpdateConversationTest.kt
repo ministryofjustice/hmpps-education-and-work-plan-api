@@ -18,13 +18,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class UpdateConversationTest : IntegrationTestBase() {
   companion object {
-    private const val URI_TEMPLATE = "/conversations/{prisonNumber}/{conversationReference}"
+    private const val URI_TEMPLATE = "/conversations/{conversationReference}"
   }
 
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
+      .uri(URI_TEMPLATE, aValidReference())
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -34,7 +34,7 @@ class UpdateConversationTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
+      .uri(URI_TEMPLATE, aValidReference())
       .withBody(aValidCreateReviewConversationRequest())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
@@ -47,7 +47,7 @@ class UpdateConversationTest : IntegrationTestBase() {
   fun `should fail to update Conversation given null fields`() {
     // When
     val response = webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
+      .uri(URI_TEMPLATE, aValidReference())
       .bodyValue(
         """
           { }
@@ -70,12 +70,11 @@ class UpdateConversationTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update Conversation given conversation does not exist`() {
-    val prisonNumber = aValidPrisonNumber()
     val conversationReference = aValidReference()
 
     // When
     val response = webTestClient.put()
-      .uri(URI_TEMPLATE, prisonNumber, conversationReference)
+      .uri(URI_TEMPLATE, conversationReference)
       .withBody(aValidUpdateConversationRequest())
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
@@ -121,7 +120,7 @@ class UpdateConversationTest : IntegrationTestBase() {
     val createdConversation = conversationRepository.findAllByPrisonNumber(prisonNumber).first()
 
     webTestClient.put()
-      .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
+      .uri(URI_TEMPLATE, createdConversation.reference)
       .withBody(updateConversationRequest)
       .bearerToken(
         aValidTokenWithEditAuthority(
