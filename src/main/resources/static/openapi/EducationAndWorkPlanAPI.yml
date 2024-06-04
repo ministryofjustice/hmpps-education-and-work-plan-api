@@ -314,7 +314,7 @@ paths:
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-prisoner-conversations
 
-  '/conversations/{prisonNumber}/${conversationReference}':
+  '/conversations/${conversationReference}':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
       - name: conversationReference
@@ -1599,6 +1599,18 @@ components:
           type: string
           description: The identifier of the prison that the prisoner was resident at when this resource was updated.
           example: 'BXI'
+      required:
+        - reference
+        - prisonNumber
+        - note
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
 
     ConversationsResponse:
       title: ConversationsResponse
