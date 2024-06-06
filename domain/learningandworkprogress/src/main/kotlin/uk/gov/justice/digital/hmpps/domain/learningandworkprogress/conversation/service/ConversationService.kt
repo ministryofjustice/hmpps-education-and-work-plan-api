@@ -1,8 +1,9 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.PagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.PrisonerConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
 import java.util.UUID
@@ -41,37 +42,40 @@ class ConversationService(
    * The order of the returned conversations is not guaranteed and it is up to the calling code to sort them
    * as necessary.
    */
-  fun getPrisonerConversations(prisonNumber: String): List<Conversation> {
+  fun getPrisonerConversations(prisonNumber: String, pageNumber: Int, pageSize: Int): PagedResult<Conversation> {
     log.info { "Retrieving Conversations for prisoner [$prisonNumber]" }
-    return persistenceAdapter.getConversations(prisonNumber)
+    return persistenceAdapter.getPagedConversations(prisonNumber, pageNumber, pageSize)
   }
 
   /**
-   * Returns a [Conversation] identified by its `conversationReference`.
-   * Throws [ConversationNotFoundException] if the [Conversation] cannot be found.
+   * Returns a [Conversation] identified by its `conversationReference` and validated against the associated
+   * `prisonNumber`.
+   * Throws [PrisonerConversationNotFoundException] if the [Conversation] cannot be found.
    */
-  fun getConversation(conversationReference: UUID): Conversation {
+  fun getConversation(conversationReference: UUID, prisonNumber: String): Conversation {
     log.info { "Retrieving Conversation with reference [$conversationReference]" }
-    return persistenceAdapter.getConversation(conversationReference)
-      ?: throw ConversationNotFoundException(conversationReference).also {
-        log.info { "Conversation with reference [$conversationReference] not found" }
-      }
+    return persistenceAdapter.getConversation(conversationReference)?.takeIf {
+      it.prisonNumber == prisonNumber
+    } ?: throw PrisonerConversationNotFoundException(conversationReference, prisonNumber).also {
+      log.info { "Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found" }
+    }
   }
 
   /**
-   * Updates a [Conversation], identified by its `reference`, from the specified [UpdateConversationDto].
-   * Throws [ConversationNotFoundException] if the [Conversation] to be updated cannot be found.
+   * Updates a [Conversation], identified by its `reference`, from the specified [UpdateConversationDto] and validated
+   * against the associated `prisonNumber`.
+   * Throws [PrisonerConversationNotFoundException] if the prisoner [Conversation] to be updated cannot be found.
    */
-  fun updateConversation(updateConversationDto: UpdateConversationDto): Conversation {
+  fun updateConversation(updateConversationDto: UpdateConversationDto, prisonNumber: String): Conversation {
     val conversationReference = updateConversationDto.reference
     log.info { "Updating Conversation with reference [$conversationReference]" }
 
-    return persistenceAdapter.updateConversation(updateConversationDto)
-      ?.also {
-        conversationEventService?.conversationUpdated(it)
-      }
-      ?: throw ConversationNotFoundException(conversationReference).also {
-        log.info { "Conversation with reference [$conversationReference] not found" }
-      }
+    return persistenceAdapter.updateConversation(updateConversationDto)?.takeIf {
+      it.prisonNumber == prisonNumber
+    }?.also {
+      conversationEventService?.conversationUpdated(it)
+    } ?: throw PrisonerConversationNotFoundException(conversationReference, prisonNumber).also {
+      log.info { "Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found" }
+    }
   }
 }

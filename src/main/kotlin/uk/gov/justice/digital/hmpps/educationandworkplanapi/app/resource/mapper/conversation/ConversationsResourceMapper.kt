@@ -2,11 +2,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.PagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ConversationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ConversationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateConversationRequest
 import java.time.Instant
@@ -38,4 +40,6 @@ interface ConversationsResourceMapper {
   @Mapping(source = "note.lastUpdatedAt", target = "updatedAt")
   @Mapping(source = "note.lastUpdatedAtPrison", target = "updatedAtPrison")
   fun fromDomainToModel(conversation: Conversation): ConversationResponse
+
+  fun fromPagedDomainToModel(pagedConversations: PagedResult<Conversation>): ConversationsResponse
 }

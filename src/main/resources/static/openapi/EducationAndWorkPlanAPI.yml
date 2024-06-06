@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.8.1'
+  version: '1.8.2'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -285,9 +285,9 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/CreateConversation'
     get:
-      summary: Returns all Learning Work and Progress Conversations for a Prisoner.
+      summary: Returns a page of Learning Work and Progress Conversations for a Prisoner.
       description: |
-        Returns all Learning Work and Progress Conversations for a Prisoner.
+        Returns a page of Learning Work and Progress Conversations for a Prisoner.
       tags:
         - Conversations
       parameters:
@@ -295,9 +295,9 @@ paths:
           description: The page of the results set to return
           schema:
             type: integer
-            minimum: 1
-            default: 1
-          example: 1
+            minimum: 0
+            default: 0
+          example: 0
           in: query
         - name: pageSize
           description: The page of the results set to return
@@ -314,7 +314,7 @@ paths:
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-prisoner-conversations
 
-  '/conversations/${conversationReference}':
+  '/conversations/{prisonNumber}/{conversationReference}':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
       - name: conversationReference
@@ -388,41 +388,6 @@ components:
   # Schema and Enum Definitions
   # --------------------------------------------------------------------------------
   schemas:
-    PageableObject:
-      type: object
-      properties:
-        offset:
-          type: integer
-          format: int64
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/SortObject'
-        pageSize:
-          type: integer
-          format: int32
-        pageNumber:
-          type: integer
-          format: int32
-        paged:
-          type: boolean
-        unpaged:
-          type: boolean
-
-    SortObject:
-      type: object
-      properties:
-        direction:
-          type: string
-        nullHandling:
-          type: string
-        ascending:
-          type: boolean
-        property:
-          type: string
-        ignoreCase:
-          type: boolean
-
     ErrorResponse:
       title: ErrorResponse
       description: |
@@ -1619,35 +1584,26 @@ components:
       properties:
         totalElements:
           type: integer
-          format: int64
+          format: int32
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
-        size:
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
           type: integer
           format: int32
         content:
           type: array
           items:
             $ref: '#/components/schemas/ConversationResponse'
-        number:
-          type: integer
-          format: int32
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/SortObject'
-        numberOfElements:
-          type: integer
-          format: int32
-        pageable:
-          $ref: '#/components/schemas/PageableObject'
-        empty:
-          type: boolean
+      required:
+        - totalElements
+        - totalPages
+        - pageNumber
+        - pageSize
+        - content
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest

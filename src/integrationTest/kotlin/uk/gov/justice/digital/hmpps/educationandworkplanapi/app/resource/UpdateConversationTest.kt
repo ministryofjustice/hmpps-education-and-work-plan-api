@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -12,19 +13,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateReviewConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidUpdateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class UpdateConversationTest : IntegrationTestBase() {
   companion object {
-    private const val URI_TEMPLATE = "/conversations/{conversationReference}"
+    private const val URI_TEMPLATE = "/conversations/{prisonNumber}/{conversationReference}"
   }
 
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidReference())
+      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -34,7 +36,7 @@ class UpdateConversationTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidReference())
+      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .withBody(aValidCreateReviewConversationRequest())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
@@ -47,7 +49,7 @@ class UpdateConversationTest : IntegrationTestBase() {
   fun `should fail to update Conversation given null fields`() {
     // When
     val response = webTestClient.put()
-      .uri(URI_TEMPLATE, aValidReference())
+      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .bodyValue(
         """
           { }
@@ -70,11 +72,13 @@ class UpdateConversationTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update Conversation given conversation does not exist`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
     val conversationReference = aValidReference()
 
     // When
     val response = webTestClient.put()
-      .uri(URI_TEMPLATE, conversationReference)
+      .uri(URI_TEMPLATE, prisonNumber, conversationReference)
       .withBody(aValidUpdateConversationRequest())
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +91,34 @@ class UpdateConversationTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Conversation with reference [$conversationReference] not found")
+      .hasUserMessage("Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found")
+  }
+
+  @Test
+  fun `should fail to update Conversation if given conversation exists but does not belong to prisoner`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val anotherPrisonNumber = anotherValidPrisonNumber()
+
+    // When
+    createConversation(anotherPrisonNumber, aValidCreateConversationRequest())
+    val createdConversation = conversationRepository.findAllByPrisonNumber(anotherPrisonNumber).first()
+
+    val response = webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
+      .withBody(aValidUpdateConversationRequest())
+      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNotFound
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(HttpStatus.NOT_FOUND.value())
+      .hasUserMessage("Conversation with reference [${createdConversation.reference}] for prisoner [$prisonNumber] not found")
   }
 
   @Test
@@ -120,7 +151,7 @@ class UpdateConversationTest : IntegrationTestBase() {
     val createdConversation = conversationRepository.findAllByPrisonNumber(prisonNumber).first()
 
     webTestClient.put()
-      .uri(URI_TEMPLATE, createdConversation.reference)
+      .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
       .withBody(updateConversationRequest)
       .bearerToken(
         aValidTokenWithEditAuthority(

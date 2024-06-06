@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.springframework.data.domain.Page
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.PagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
@@ -10,10 +12,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
-import java.util.UUID
+import java.util.*
 
 @Mapper(
-  imports = [UUID::class],
+  imports = [UUID::class, Collections::class],
   uses = [ConversationNoteEntityMapper::class],
 )
 interface ConversationEntityMapper {
@@ -31,6 +33,14 @@ interface ConversationEntityMapper {
    * Maps the supplied [ConversationEntity] into the domain [Conversation].
    */
   fun fromEntityToDomain(conversationEntity: ConversationEntity): Conversation
+
+  /**
+   * Maps the supplied [Page] into the domain [PagedResult].
+   */
+  @Mapping(target = "pageNumber", source = "number")
+  @Mapping(target = "pageSize", source = "size")
+  @Mapping(target = "content", defaultExpression = "java(Collections.emptyList())")
+  fun fromPagedEntitiesToDomain(pagedConversations: Page<ConversationEntity>?): PagedResult<Conversation>
 
   @ExcludeJpaManagedFields
   @ExcludeReferenceField

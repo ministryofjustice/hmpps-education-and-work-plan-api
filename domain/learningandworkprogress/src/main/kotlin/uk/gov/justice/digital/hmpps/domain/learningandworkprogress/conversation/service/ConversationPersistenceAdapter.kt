@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service
 
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.PagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
@@ -30,6 +31,16 @@ interface ConversationPersistenceAdapter {
    * for the prisoner.
    */
   fun getConversations(prisonNumber: String): List<Conversation>
+
+  /**
+   * Returns a [PagedResult] containing a page of [Conversation]s for the prisoner as well as information about the
+   * current page and total number of results.
+   */
+  fun getPagedConversations(
+    prisonNumber: String,
+    pageNumber: Int? = null,
+    pageSize: Int? = null,
+  ): PagedResult<Conversation>
 
   /**
    * Returns a prisoner [Conversation] identified by its reference, or null if not found.
