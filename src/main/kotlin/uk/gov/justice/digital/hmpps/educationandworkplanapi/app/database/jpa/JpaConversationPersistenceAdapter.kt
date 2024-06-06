@@ -46,10 +46,10 @@ class JpaConversationPersistenceAdapter(
   @Transactional(readOnly = true)
   override fun getPagedConversations(
     prisonNumber: String,
-    pageNumber: Int?,
-    pageSize: Int?,
+    pageNumber: Int,
+    pageSize: Int,
   ): PagedResult<Conversation> {
-    val pageRequest = PageRequest.of(pageNumber ?: 20, pageSize ?: 20)
+    val pageRequest = PageRequest.of(pageNumber, pageSize)
     return conversationRepository.findByPrisonNumber(prisonNumber, pageRequest).let {
       conversationEntityMapper.fromPagedEntitiesToDomain(it)
     }

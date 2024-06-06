@@ -38,8 +38,8 @@ interface ConversationPersistenceAdapter {
    */
   fun getPagedConversations(
     prisonNumber: String,
-    pageNumber: Int? = null,
-    pageSize: Int? = null,
+    pageNumber: Int,
+    pageSize: Int,
   ): PagedResult<Conversation>
 
   /**
