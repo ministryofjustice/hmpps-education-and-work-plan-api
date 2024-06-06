@@ -6,13 +6,13 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.0"
-  id("org.openapi.generator") version "7.3.0"
+  id("org.openapi.generator") version "7.6.0"
   kotlin("plugin.spring") version "2.0.0"
   kotlin("plugin.jpa") version "2.0.0"
   kotlin("kapt") version "2.0.0"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.0.2"
+  id("name.remal.integration-tests") version "4.1.1"
 
   `java-test-fixtures`
 }
@@ -20,14 +20,14 @@ plugins {
 apply(plugin = "org.openapi.generator")
 
 val mapstructVersion = "1.5.5.Final"
-val postgresqlVersion = "42.7.2"
+val postgresqlVersion = "42.7.3"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.5.0"
-val awaitilityVersion = "4.2.0"
-val wiremockVersion = "3.4.1"
+val awaitilityVersion = "4.2.1"
+val wiremockVersion = "3.6.0"
 val jsonWebTokenVersion = "0.12.5"
-val nimbusJwtVersion = "9.37.3"
-val postgressTestContainersVersion = "1.19.7"
+val nimbusJwtVersion = "9.40"
+val postgressTestContainersVersion = "1.19.8"
 
 val buildDirectory: Directory = layout.buildDirectory.get()
 
@@ -48,7 +48,7 @@ kapt {
 }
 
 jacoco {
-  toolVersion = "0.8.11"
+  toolVersion = "0.8.12"
 }
 
 configurations {
