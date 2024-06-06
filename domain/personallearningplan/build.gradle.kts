@@ -21,10 +21,10 @@ dependencies {
   api("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
   // Test dependencies
-  testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
-  testImplementation("org.assertj:assertj-core:3.24.2")
-  testImplementation("org.mockito:mockito-junit-jupiter:5.3.1")
-  testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+  testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+  testImplementation("org.assertj:assertj-core:3.26.0")
+  testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
 }
 
 extensions.getByType(JacocoPluginExtension::class).apply {
