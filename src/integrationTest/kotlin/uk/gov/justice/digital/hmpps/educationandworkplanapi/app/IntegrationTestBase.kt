@@ -33,6 +33,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -241,7 +242,7 @@ abstract class IntegrationTestBase {
 
   fun createConversation(
     prisonNumber: String,
-    createConversationRequest: CreateConversationRequest,
+    createConversationRequest: CreateConversationRequest = aValidCreateConversationRequest(),
     username: String = "auser_gen",
     displayName: String = "Albert User",
   ) {

@@ -11,7 +11,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.aValidPagedResult
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.PrisonerConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationDto
@@ -34,12 +36,16 @@ class ConversationServiceTest {
   fun `should get conversation`() {
     // Given
     val conversationReference = UUID.randomUUID()
-    val conversation = aValidConversation(reference = conversationReference)
+    val prisonNumber = aValidPrisonNumber()
+    val conversation = aValidConversation(
+      reference = conversationReference,
+      prisonNumber = prisonNumber,
+    )
 
     given(persistenceAdapter.getConversation(any())).willReturn(conversation)
 
     // When
-    val actual = service.getConversation(conversationReference)
+    val actual = service.getConversation(conversationReference, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(conversation)
@@ -50,23 +56,24 @@ class ConversationServiceTest {
   fun `should not get conversation given conversation does not exist`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
     given(persistenceAdapter.getConversation(any())).willReturn(null)
 
     // When
     val exception = catchThrowableOfType(
-      { service.getConversation(conversationReference) },
-      ConversationNotFoundException::class.java,
+      { service.getConversation(conversationReference, prisonNumber) },
+      PrisonerConversationNotFoundException::class.java,
     )
 
     // Then
     assertThat(exception.conversationReference).isEqualTo(conversationReference)
-    assertThat(exception).hasMessage("Conversation with reference [$conversationReference] not found")
+    assertThat(exception).hasMessage("Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found")
     verify(persistenceAdapter).getConversation(conversationReference)
   }
 
   @Test
-  fun `should get prisoner conversations`() {
+  fun `should get a page of prisoner conversations`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
@@ -75,29 +82,44 @@ class ConversationServiceTest {
       aValidConversation(prisonNumber = prisonNumber, note = aValidConversationNote(content = "Notes from chat 2")),
       aValidConversation(prisonNumber = prisonNumber, note = aValidConversationNote(content = "Notes from chat 3")),
     )
-    given(persistenceAdapter.getConversations(any())).willReturn(conversations)
+    val conversationsPage = aValidPagedResult(
+      content = conversations,
+    )
+    given(persistenceAdapter.getPagedConversations(any(), any(), any())).willReturn(conversationsPage)
 
     // When
-    val actual = service.getPrisonerConversations(prisonNumber)
+    val actual = service.getPrisonerConversations(prisonNumber, 0, 20)
 
     // Then
-    assertThat(actual).isEqualTo(conversations)
-    verify(persistenceAdapter).getConversations(prisonNumber)
+    with(actual) {
+      assertThat(totalElements).isEqualTo(3)
+      assertThat(content).isEqualTo(conversations)
+    }
+    verify(persistenceAdapter).getPagedConversations(prisonNumber, 0, 20)
   }
 
   @Test
-  fun `should get empty list of prisoner conversations given prisoner has no conversations`() {
+  fun `should get empty page of prisoner conversations given prisoner has no conversations`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
-    given(persistenceAdapter.getConversations(any())).willReturn(emptyList())
+    val emptyPagedResult = aValidPagedResult(
+      content = emptyList<Conversation>(),
+    )
+    given(persistenceAdapter.getPagedConversations(any(), any(), any())).willReturn(emptyPagedResult)
 
     // When
-    val actual = service.getPrisonerConversations(prisonNumber)
+    val actual = service.getPrisonerConversations(prisonNumber, 0, 20)
 
     // Then
-    assertThat(actual).isEmpty()
-    verify(persistenceAdapter).getConversations(prisonNumber)
+    with(actual) {
+      assertThat(pageNumber).isEqualTo(0)
+      assertThat(pageSize).isEqualTo(20)
+      assertThat(totalElements).isEqualTo(0)
+      assertThat(totalPages).isEqualTo(1)
+      assertThat(content).hasSize(0)
+    }
+    verify(persistenceAdapter).getPagedConversations(prisonNumber, 0, 20)
   }
 
   @Test
@@ -123,6 +145,7 @@ class ConversationServiceTest {
   fun `should update conversation`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
     val updateConversationDto = aValidUpdateConversationDto(
       reference = conversationReference,
@@ -131,6 +154,7 @@ class ConversationServiceTest {
 
     val updatedConversation = aValidConversation(
       reference = conversationReference,
+      prisonNumber = prisonNumber,
       note = aValidConversationNote(
         content = "Chris spoke positively about future work during our meeting and has made some good progress",
       ),
@@ -138,7 +162,7 @@ class ConversationServiceTest {
     given(persistenceAdapter.updateConversation(any())).willReturn(updatedConversation)
 
     // When
-    val actual = service.updateConversation(updateConversationDto)
+    val actual = service.updateConversation(updateConversationDto, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(updatedConversation)
@@ -149,6 +173,7 @@ class ConversationServiceTest {
   fun `should not update conversation given conversation does not exist`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
     val updateConversationDto = aValidUpdateConversationDto(
       reference = conversationReference,
@@ -159,13 +184,13 @@ class ConversationServiceTest {
 
     // When
     val exception = catchThrowableOfType(
-      { service.updateConversation(updateConversationDto) },
-      ConversationNotFoundException::class.java,
+      { service.updateConversation(updateConversationDto, prisonNumber) },
+      PrisonerConversationNotFoundException::class.java,
     )
 
     // Then
     assertThat(exception.conversationReference).isEqualTo(conversationReference)
-    assertThat(exception).hasMessage("Conversation with reference [$conversationReference] not found")
+    assertThat(exception).hasMessage("Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found")
     verify(persistenceAdapter).updateConversation(updateConversationDto)
   }
 }

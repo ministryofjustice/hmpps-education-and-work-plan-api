@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.PagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.CreateConversationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.UpdateConversationDto
@@ -40,6 +42,18 @@ class JpaConversationPersistenceAdapter(
     conversationRepository.findAllByPrisonNumber(prisonNumber).map {
       conversationEntityMapper.fromEntityToDomain(it)
     }
+
+  @Transactional(readOnly = true)
+  override fun getPagedConversations(
+    prisonNumber: String,
+    pageNumber: Int,
+    pageSize: Int,
+  ): PagedResult<Conversation> {
+    val pageRequest = PageRequest.of(pageNumber, pageSize)
+    return conversationRepository.findByPrisonNumber(prisonNumber, pageRequest).let {
+      conversationEntityMapper.fromPagedEntitiesToDomain(it)
+    }
+  }
 
   @Transactional(readOnly = true)
   override fun getConversation(conversationReference: UUID): Conversation? =

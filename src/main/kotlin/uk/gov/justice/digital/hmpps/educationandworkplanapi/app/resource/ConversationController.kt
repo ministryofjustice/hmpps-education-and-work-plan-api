@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationService
@@ -42,7 +43,7 @@ class ConversationController(
     conversationService.createConversation(conversationMapper.toCreateConversationDto(request, prisonNumber))
   }
 
-  @PutMapping("/{conversationReference}")
+  @PutMapping("/{prisonNumber}/{conversationReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize(HAS_EDIT_AUTHORITY)
   @Transactional
@@ -50,18 +51,34 @@ class ConversationController(
     @Valid
     @RequestBody
     request: UpdateConversationRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable conversationReference: UUID,
-  ) {
-    conversationService.updateConversation(conversationMapper.toUpdateConversationDto(request, conversationReference))
-  }
+  ) =
+    conversationService.updateConversation(
+      conversationMapper.toUpdateConversationDto(request, conversationReference),
+      prisonNumber,
+    )
 
-  @GetMapping("/{conversationReference}")
+  @GetMapping("/{prisonNumber}/{conversationReference}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_AUTHORITY)
   @Transactional
   fun getConversation(
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable conversationReference: UUID,
-  ) = with(conversationService.getConversation(conversationReference)) {
+  ) = with(conversationService.getConversation(conversationReference, prisonNumber)) {
     conversationMapper.fromDomainToModel(this)
+  }
+
+  @GetMapping("/{prisonNumber}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @Transactional
+  fun getConversations(
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @RequestParam page: Int = 0,
+    @RequestParam pageSize: Int = 20,
+  ) = with(conversationService.getPrisonerConversations(prisonNumber, page, pageSize)) {
+    conversationMapper.fromPagedDomainToModel(this)
   }
 }

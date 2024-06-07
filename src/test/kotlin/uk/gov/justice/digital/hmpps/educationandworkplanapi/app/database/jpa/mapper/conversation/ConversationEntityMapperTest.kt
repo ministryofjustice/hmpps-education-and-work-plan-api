@@ -9,7 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.aValidPagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.dto.aValidCreateConversationDto
@@ -173,5 +176,40 @@ class ConversationEntityMapperTest {
 
     // Then
     assertThat(conversationEntity).isEqualToIgnoringJpaManagedFields(expectedEntity)
+  }
+
+  @Test
+  fun `should map from paged entity to domain`() {
+    // Given
+    val conversationReference = UUID.randomUUID()
+
+    val conversationEntity = aValidConversationEntity(
+      reference = conversationReference,
+    )
+    val pagedConversation = PageImpl(
+      listOf(conversationEntity),
+      PageRequest.of(0, 20),
+      1,
+    )
+    val expectedConversationNote = aValidConversationNote(
+      content = "The original note content",
+    )
+
+    val expected = aValidPagedResult(
+      content = listOf(
+        aValidConversation(
+          reference = conversationReference,
+          note = expectedConversationNote,
+        ),
+      ),
+    )
+
+    given(conversationNoteMapper.fromEntityToDomain(any())).willReturn(expectedConversationNote)
+
+    // When
+    val actual = mapper.fromPagedEntitiesToDomain(pagedConversation)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
   }
 }
