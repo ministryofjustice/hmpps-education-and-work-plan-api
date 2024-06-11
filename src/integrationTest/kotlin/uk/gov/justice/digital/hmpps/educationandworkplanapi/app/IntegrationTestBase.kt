@@ -23,9 +23,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
@@ -49,7 +47,6 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
-    const val CIAG_INDUCTION_URI_TEMPLATE = "/ciag/induction/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
 
     private val postgresContainer = PostgresContainer.instance
@@ -145,28 +142,6 @@ abstract class IntegrationTestBase {
       .returnResult(TimelineResponse::class.java)
       .responseBody.blockFirst()!!
 
-  fun createCiagInduction(
-    prisonNumber: String,
-    createCiagInductionRequest: CreateCiagInductionRequest,
-    username: String = "auser_gen",
-    displayName: String = "Albert User",
-  ) {
-    webTestClient.post()
-      .uri(CIAG_INDUCTION_URI_TEMPLATE, prisonNumber)
-      .withBody(createCiagInductionRequest)
-      .bearerToken(
-        aValidTokenWithEditAuthority(
-          username = username,
-          displayName = displayName,
-          privateKey = keyPair.private,
-        ),
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
-  }
-
   fun createInduction(
     prisonNumber: String,
     createInductionRequest: CreateInductionRequest,
@@ -188,24 +163,6 @@ abstract class IntegrationTestBase {
       .expectStatus()
       .isCreated()
   }
-
-  fun getCiagInduction(prisonNumber: String): CiagInductionResponse =
-    webTestClient.get()
-      .uri(CIAG_INDUCTION_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(CiagInductionResponse::class.java)
-      .responseBody.blockFirst()!!
-
-  fun inductionDoesNotExistForPrisoner(prisonNumber: String) =
-    webTestClient.get()
-      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isNotFound
 
   fun getInduction(prisonNumber: String): InductionResponse =
     webTestClient.get()

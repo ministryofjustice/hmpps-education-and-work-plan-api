@@ -14,8 +14,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.NO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.YES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCreateCiagInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidGetCiagInductionSummariesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -84,8 +85,8 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
     // Given
     val prisonNumber1 = aValidPrisonNumber()
     val prisonNumber2 = anotherValidPrisonNumber()
-    createCiagInduction(prisonNumber1, aValidCreateCiagInductionRequest(hopingToGetWork = NO))
-    createCiagInduction(prisonNumber2, aValidCreateCiagInductionRequest(hopingToGetWork = YES))
+    createInduction(prisonNumber1, aValidCreateInductionRequestForPrisonerNotLookingToWork())
+    createInduction(prisonNumber2, aValidCreateInductionRequestForPrisonerLookingToWork())
 
     val expectedResponse = CiagInductionSummaryListResponse(
       ciagProfileList = listOf(
