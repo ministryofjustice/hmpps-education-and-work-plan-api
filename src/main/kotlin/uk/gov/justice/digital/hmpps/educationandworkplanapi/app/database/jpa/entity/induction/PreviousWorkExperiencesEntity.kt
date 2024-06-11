@@ -51,7 +51,9 @@ class PreviousWorkExperiencesEntity(
   @field:NotNull
   var reference: UUID? = null,
 
-  var hasWorkedBefore: Boolean? = null,
+  @Enumerated(value = EnumType.STRING)
+  @field:NotNull
+  var hasWorkedBefore: HasWorkedBefore? = null,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var experiences: MutableList<WorkExperienceEntity>? = null,
@@ -207,4 +209,10 @@ enum class WorkExperienceType {
   EDUCATION_TRAINING,
   CLEANING_AND_MAINTENANCE,
   OTHER,
+}
+
+enum class HasWorkedBefore {
+  YES,
+  NO,
+  NOT_RELEVANT,
 }

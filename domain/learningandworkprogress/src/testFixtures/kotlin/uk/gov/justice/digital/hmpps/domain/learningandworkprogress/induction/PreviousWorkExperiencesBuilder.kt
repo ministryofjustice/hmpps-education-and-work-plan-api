@@ -5,7 +5,7 @@ import java.util.UUID
 
 fun aValidPreviousWorkExperiences(
   reference: UUID = UUID.randomUUID(),
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   experiences: List<WorkExperience> = listOf(aValidWorkExperience()),
   createdBy: String? = "asmith_gen",
   createdByDisplayName: String? = "Alex Smith",

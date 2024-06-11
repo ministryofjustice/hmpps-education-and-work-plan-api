@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.9.0'
+  version: '1.10.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -610,7 +610,6 @@ components:
         - correlationId
 
     ### Leagcy CIAG API Response ###
-
     CiagInductionSummaryListResponse:
       title: CiagInductionSummaryListResponse
       type: object
@@ -953,7 +952,7 @@ components:
           description: A unique reference reference for this PreviousWorkExperiencesResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
@@ -1489,7 +1488,6 @@ components:
         - PRISON_TRANSFER
 
     ### Legacy Induction requests ###
-
     PreviousWorkExperience:
       description: The details of an individual work experience.
       type: object
@@ -1735,6 +1733,15 @@ components:
         - CLEANING_AND_MAINTENANCE
         - OTHER
 
+    HasWorkedBefore:
+      title: HasWorkedBefore
+      description: Whether the prisoner has worked before or it may not be relevant in some scenarios.
+      type: string
+      enum:
+       - "YES"
+       - "NO"
+       - "NOT_RELEVANT"
+
     AchievedQualification:
       title: AchievedQualification
       type: object
@@ -1863,7 +1870,7 @@ components:
       description: A request to create a Prisoner's previous work experience.
       properties:
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
