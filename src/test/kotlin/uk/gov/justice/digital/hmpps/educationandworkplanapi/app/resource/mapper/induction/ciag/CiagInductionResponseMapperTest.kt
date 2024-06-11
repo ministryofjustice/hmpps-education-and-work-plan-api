@@ -11,20 +11,10 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.AffectAbilityToWork
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.NotHopingToWorkReason
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonNotToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidEducationAndQualificationsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPreviousWorkResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidPrisonWorkAndEducationResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidSkillsAndInterestsResponse
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi
@@ -36,123 +26,7 @@ class CiagInductionResponseMapperTest {
   private lateinit var mapper: CiagInductionResponseMapper
 
   @Mock
-  private lateinit var workOnReleaseMapper: CiagWorkOnReleaseResourceMapper
-
-  @Mock
-  private lateinit var qualificationsAndTrainingMapper: QualificationsAndTrainingResourceMapper
-
-  @Mock
-  private lateinit var workExperiencesMapper: CiagWorkExperiencesResourceMapper
-
-  @Mock
-  private lateinit var inPrisonInterestsMapper: CiagInPrisonInterestsResourceMapper
-
-  @Mock
-  private lateinit var skillsAndInterestsMapper: CiagSkillsAndInterestsResourceMapper
-
-  @Mock
   private lateinit var instantMapper: InstantMapper
-
-  @Test
-  fun `should map to CiagInductionResponse given prisoner does not wish to work`() {
-    // Given
-    val prisonNumber = aValidPrisonNumber()
-    val inductionDomain = aFullyPopulatedInduction(
-      prisonNumber = prisonNumber,
-      workOnRelease = aValidWorkOnRelease(
-        hopingToWork = HopingToWorkDomain.NO,
-        notHopingToWorkReasons = listOf(NotHopingToWorkReason.OTHER),
-        notHopingToWorkOtherReason = "Crime pays",
-        affectAbilityToWork = listOf(AffectAbilityToWork.OTHER),
-        affectAbilityToWorkOther = "Mental health issues",
-      ),
-    )
-    val workExperience = aValidPreviousWorkResponse()
-    val skillsAndInterests = aValidSkillsAndInterestsResponse()
-    val qualificationsAndTraining = aValidEducationAndQualificationsResponse()
-    val inPrisonInterests = aValidPrisonWorkAndEducationResponse()
-    val expectedInductionResponse = aValidCiagInductionResponse(
-      offenderId = prisonNumber,
-      hopingToGetWork = HopingToWorkApi.NO,
-      desireToWork = false,
-      abilityToWork = setOf(AbilityToWorkFactor.OTHER),
-      abilityToWorkOther = "Mental health issues",
-      reasonToNotGetWork = setOf(ReasonNotToWork.OTHER),
-      reasonToNotGetWorkOther = "Crime pays",
-      workExperience = workExperience,
-      skillsAndInterests = skillsAndInterests,
-      qualificationsAndTraining = qualificationsAndTraining,
-      inPrisonInterests = inPrisonInterests,
-      modifiedBy = "bjones_gen",
-    )
-
-    given(workOnReleaseMapper.toReasonsNotToWork(any())).willReturn(setOf(ReasonNotToWork.OTHER))
-    given(workOnReleaseMapper.toAbilityToWorkFactors(any())).willReturn(setOf(AbilityToWorkFactor.OTHER))
-    given(qualificationsAndTrainingMapper.toEducationAndQualificationResponse(any(), any())).willReturn(qualificationsAndTraining)
-    given(workExperiencesMapper.toPreviousWorkResponse(any(), any())).willReturn(workExperience)
-    given(inPrisonInterestsMapper.toPrisonWorkAndEducationResponse(any())).willReturn(inPrisonInterests)
-    given(skillsAndInterestsMapper.toSkillsAndInterestsResponse(any())).willReturn(skillsAndInterests)
-    given(instantMapper.toOffsetDateTime(any())).willReturn(OffsetDateTime.now())
-
-    // When
-    val actual = mapper.fromDomainToModel(inductionDomain)
-
-    // Then
-    assertThat(actual).usingRecursiveComparison()
-      .ignoringFieldsMatchingRegexes(".*id", ".*reference", ".*createdDateTime", ".*modifiedDateTime")
-      .isEqualTo(expectedInductionResponse)
-  }
-
-  @Test
-  fun `should map to CiagInductionResponse given prisoner wishes to work`() {
-    // Given
-    val prisonNumber = aValidPrisonNumber()
-    val inductionDomain = aFullyPopulatedInduction(
-      prisonNumber = prisonNumber,
-      workOnRelease = aValidWorkOnRelease(
-        hopingToWork = HopingToWorkDomain.YES,
-        notHopingToWorkReasons = emptyList(),
-        notHopingToWorkOtherReason = null,
-        affectAbilityToWork = emptyList(),
-        affectAbilityToWorkOther = null,
-      ),
-    )
-    val workExperience = aValidPreviousWorkResponse()
-    val skillsAndInterests = aValidSkillsAndInterestsResponse()
-    val qualificationsAndTraining = aValidEducationAndQualificationsResponse()
-    val inPrisonInterests = aValidPrisonWorkAndEducationResponse()
-    val expectedInductionResponse = aValidCiagInductionResponse(
-      offenderId = prisonNumber,
-      hopingToGetWork = HopingToWorkApi.YES,
-      desireToWork = true,
-      abilityToWork = emptySet(),
-      abilityToWorkOther = null,
-      reasonToNotGetWork = emptySet(),
-      reasonToNotGetWorkOther = null,
-      workExperience = workExperience,
-      skillsAndInterests = skillsAndInterests,
-      qualificationsAndTraining = qualificationsAndTraining,
-      inPrisonInterests = inPrisonInterests,
-      createdBy = "asmith_gen",
-      modifiedBy = "bjones_gen",
-    )
-
-    given(workOnReleaseMapper.toReasonsNotToWork(any())).willReturn(emptySet())
-    given(workOnReleaseMapper.toAbilityToWorkFactors(any())).willReturn(emptySet())
-    given(qualificationsAndTrainingMapper.toEducationAndQualificationResponse(any(), any())).willReturn(qualificationsAndTraining)
-    given(workExperiencesMapper.toPreviousWorkResponse(any(), any())).willReturn(workExperience)
-    given(inPrisonInterestsMapper.toPrisonWorkAndEducationResponse(any())).willReturn(inPrisonInterests)
-    given(skillsAndInterestsMapper.toSkillsAndInterestsResponse(any())).willReturn(skillsAndInterests)
-    given(instantMapper.toOffsetDateTime(any())).willReturn(OffsetDateTime.now())
-
-    // When
-    val actual = mapper.fromDomainToModel(inductionDomain)
-
-    // Then
-    assertThat(actual).usingRecursiveComparison()
-      .ignoringFieldsMatchingRegexes(".*id", ".*reference", ".*createdDateTime", ".*modifiedDateTime")
-      .isEqualTo(expectedInductionResponse)
-  }
 
   @Test
   fun `should map from domain summaries to model summaries`() {
