@@ -1,1 +1,2 @@
 ALTER TABLE previous_work_experiences ALTER COLUMN has_worked_before TYPE VARCHAR(12) USING CASE WHEN has_worked_before=TRUE THEN 'YES' ELSE 'NO' END;
+ALTER TABLE previous_work_experiences ALTER COLUMN has_worked_before SET NOT NULL;
