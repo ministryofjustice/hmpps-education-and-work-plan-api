@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonTrainingType
@@ -179,7 +180,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       reasonToNotGetWorkOther = null,
       workExperience = aValidUpdatePreviousWorkRequest(
         id = persistedInduction.workExperience!!.id!!,
-        hasWorkedBefore = true,
+        hasWorkedBefore = HasWorkedBefore.YES,
         typeOfWorkExperience = setOf(WorkType.CONSTRUCTION),
         typeOfWorkExperienceOther = null,
         workExperience = setOf(
@@ -227,7 +228,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
 
     val expectedWorkExperience = aValidPreviousWorkResponse(
       id = persistedInduction.workExperience!!.id!!,
-      hasWorkedBefore = true,
+      hasWorkedBefore = HasWorkedBefore.YES,
       typeOfWorkExperience = setOf(WorkType.CONSTRUCTION),
       typeOfWorkExperienceOther = null,
       workExperience = setOf(
@@ -369,7 +370,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
 
     val expectedUnchangedWorkExperience = aValidPreviousWorkResponse(
       id = persistedInduction.workExperience!!.id!!,
-      hasWorkedBefore = true,
+      hasWorkedBefore = HasWorkedBefore.YES,
       typeOfWorkExperience = setOf(WorkType.OTHER),
       typeOfWorkExperienceOther = "Scientist",
       workExperience = setOf(aValidWorkExperienceResource()),
@@ -472,7 +473,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
         id = persistedInduction.workExperience!!.id!!,
-        hasWorkedBefore = false,
+        hasWorkedBefore = HasWorkedBefore.NO,
         typeOfWorkExperience = null,
         typeOfWorkExperienceOther = null,
         workExperience = null,
@@ -508,7 +509,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
 
     val expectedWorkExperience = aValidPreviousWorkResponse(
       id = persistedInduction.workExperience!!.id,
-      hasWorkedBefore = false,
+      hasWorkedBefore = HasWorkedBefore.NO,
       typeOfWorkExperience = emptySet(),
       typeOfWorkExperienceOther = null,
       workExperience = emptySet(),
@@ -602,7 +603,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
     val updateInductionRequest = aValidUpdateInductionRequestBasedOn(
       originalInduction = persistedInduction,
       workExperience = aValidUpdatePreviousWorkRequest(
-        hasWorkedBefore = true,
+        hasWorkedBefore = HasWorkedBefore.YES,
         typeOfWorkExperience = setOf(WorkType.OTHER),
         typeOfWorkExperienceOther = "Scientist",
         workExperience = setOf(aValidWorkExperienceResource()),
@@ -642,7 +643,7 @@ class UpdateCiagInductionTest : IntegrationTestBase() {
     )
 
     val expectedWorkExperience = aValidPreviousWorkResponse(
-      hasWorkedBefore = true,
+      hasWorkedBefore = HasWorkedBefore.YES,
       typeOfWorkExperience = setOf(WorkType.OTHER),
       typeOfWorkExperienceOther = "Scientist",
       workExperience = setOf(aValidWorkExperienceResource()),

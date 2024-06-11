@@ -752,7 +752,7 @@ components:
           description: A unique reference for this Prisoner's previous work experience (not the database primary key).
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         typeOfWorkExperience:
           uniqueItems: true
           type: array
@@ -1267,7 +1267,7 @@ components:
           description: A unique reference reference for this PreviousWorkExperiencesResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
@@ -1847,7 +1847,7 @@ components:
       type: object
       properties:
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         typeOfWorkExperience:
           uniqueItems: true
           type: array
@@ -2007,7 +2007,7 @@ components:
           description: A unique reference for this Prisoner's previous work experience.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         typeOfWorkExperience:
           uniqueItems: true
           type: array
@@ -2371,6 +2371,15 @@ components:
         - CLEANING_AND_MAINTENANCE
         - OTHER
 
+    HasWorkedBefore:
+      title: HasWorkedBefore
+      description: Whether the prisoner has worked before or it may not be relevant in some scenarios.
+      type: string
+      enum:
+       - "YES"
+       - "NO"
+       - "NOT_RELEVANT"
+
     AchievedQualification:
       title: AchievedQualification
       type: object
@@ -2499,7 +2508,7 @@ components:
       description: A request to create a Prisoner's previous work experience.
       properties:
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.

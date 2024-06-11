@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateWorkInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience
@@ -9,7 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkT
 import java.util.UUID
 
 fun aValidCreatePreviousWorkRequest(
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),
@@ -25,7 +26,7 @@ fun aValidCreatePreviousWorkRequest(
 
 fun aValidUpdatePreviousWorkRequest(
   id: UUID? = UUID.randomUUID(),
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),

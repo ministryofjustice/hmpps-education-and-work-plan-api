@@ -6,7 +6,7 @@ import java.util.UUID
 fun aValidPreviousWorkExperiencesEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   experiences: MutableList<WorkExperienceEntity> = mutableListOf(aValidWorkExperienceEntity()),
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
@@ -35,7 +35,7 @@ fun aValidPreviousWorkExperiencesEntity(
 fun aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   experiences: MutableList<WorkExperienceEntity> = mutableListOf(aValidWorkExperienceEntity()),
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",

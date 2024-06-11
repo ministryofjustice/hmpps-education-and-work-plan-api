@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestsResponse
@@ -9,7 +10,7 @@ import java.util.UUID
 
 fun aValidPreviousWorkResponse(
   id: UUID? = UUID.randomUUID(),
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   typeOfWorkExperience: Set<WorkType>? = setOf(WorkType.OTHER),
   typeOfWorkExperienceOther: String? = "Scientist",
   workExperience: Set<WorkExperience>? = setOf(aValidWorkExperienceResource()),

@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AbilityToWorkFactor
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonTrainingType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonWorkType
@@ -288,7 +289,7 @@ class CreateCiagInductionTest : IntegrationTestBase() {
       reasonToNotGetWork = emptySet(),
       reasonToNotGetWorkOther = null,
       workExperience = aValidCreatePreviousWorkRequest(
-        hasWorkedBefore = false,
+        hasWorkedBefore = HasWorkedBefore.NO,
         workExperience = emptySet(),
         typeOfWorkExperience = emptySet(),
         workInterests = aValidCreateWorkInterestsRequest(
@@ -374,7 +375,7 @@ class CreateCiagInductionTest : IntegrationTestBase() {
       reasonToNotGetWork = null,
       reasonToNotGetWorkOther = null,
       workExperience = aValidCreatePreviousWorkRequest(
-        hasWorkedBefore = false,
+        hasWorkedBefore = HasWorkedBefore.NO,
         workExperience = null,
         typeOfWorkExperience = null,
         workInterests = aValidCreateWorkInterestsRequest(

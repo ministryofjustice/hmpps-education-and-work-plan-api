@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Wor
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousWorkRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkInterestDetail
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkT
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HasWorkedBefore as HasWorkedBeforeDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperience as WorkExperienceDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkExperience as WorkExperienceApi
 
@@ -55,7 +57,7 @@ abstract class CiagWorkExperiencesResourceMapper {
       PreviousWorkResponse(
         // In the CIAG API, workInterests are effectively a child of workExperience, so we use the latter as the parent/primary object.
         id = workExperiences.reference,
-        hasWorkedBefore = workExperiences.hasWorkedBefore,
+        hasWorkedBefore = toHasWorkedBefore(workExperiences.hasWorkedBefore),
         typeOfWorkExperience = workExperiences.experiences.map { toWorkTypeApi(it.experienceType) }.toSet(),
         typeOfWorkExperienceOther = toTypeOfWorkExperienceOther(workExperiences),
         workExperience = workExperiences.experiences.map { toWorkExperienceApi(it) }.toSet(),
@@ -69,6 +71,8 @@ abstract class CiagWorkExperiencesResourceMapper {
   @Mapping(target = "typeOfWorkExperience", source = "experienceType")
   @Mapping(target = "otherWork", source = "experienceTypeOther")
   abstract fun toWorkExperienceApi(workExperience: WorkExperienceDomain): WorkExperienceApi
+
+  abstract fun toHasWorkedBefore(hasWorkedBefore: HasWorkedBeforeDomain): HasWorkedBefore
 
   private fun toWorkInterestsResponse(workInterests: FutureWorkInterests?): WorkInterestsResponse? {
     return workInterests?.let {
