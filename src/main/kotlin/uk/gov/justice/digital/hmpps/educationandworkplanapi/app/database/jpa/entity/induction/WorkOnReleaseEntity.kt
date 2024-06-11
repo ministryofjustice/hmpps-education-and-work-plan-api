@@ -46,15 +46,6 @@ class WorkOnReleaseEntity(
   @field:NotNull
   var hopingToWork: HopingToWork? = null,
 
-  @ElementCollection(targetClass = NotHopingToWorkReason::class)
-  @Enumerated(value = EnumType.STRING)
-  @CollectionTable(name = "not_working_reasons", joinColumns = [JoinColumn(name = "work_on_release_id")])
-  @Column(name = "reason")
-  var notHopingToWorkReasons: MutableList<NotHopingToWorkReason>? = null,
-
-  @Column(name = "not_hoping_other")
-  var notHopingToWorkOtherReason: String? = null,
-
   @ElementCollection(targetClass = AffectAbilityToWork::class)
   @Enumerated(value = EnumType.STRING)
   @CollectionTable(name = "affecting_ability_to_work", joinColumns = [JoinColumn(name = "work_on_release_id")])
@@ -117,23 +108,16 @@ enum class HopingToWork {
   NOT_SURE,
 }
 
-enum class NotHopingToWorkReason {
-  LIMIT_THEIR_ABILITY,
-  FULL_TIME_CARER,
+enum class AffectAbilityToWork {
+  LIMITED_BY_OFFENCE,
+  CARING_RESPONSIBILITIES,
+  NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH,
+  UNABLE_TO_WORK_DUE_TO_HEALTH,
   LACKS_CONFIDENCE_OR_MOTIVATION,
-  HEALTH,
+  REFUSED_SUPPORT_WITH_NO_REASON,
   RETIRED,
   NO_RIGHT_TO_WORK,
   NOT_SURE,
-  OTHER,
-  NO_REASON,
-}
-
-enum class AffectAbilityToWork {
-  CARING_RESPONSIBILITIES,
-  LIMITED_BY_OFFENSE,
-  HEALTH_ISSUES,
-  NO_RIGHT_TO_WORK,
   OTHER,
   NONE,
 }

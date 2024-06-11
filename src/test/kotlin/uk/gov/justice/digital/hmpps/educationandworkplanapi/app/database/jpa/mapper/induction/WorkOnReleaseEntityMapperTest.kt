@@ -9,10 +9,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.AffectAbilityToWork as AffectAbilityToWorkDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.NotHopingToWorkReason as NotHopingToWorkReasonDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork as AffectAbilityToWorkEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork as HopingToWorkEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.NotHopingToWorkReason as NotHopingToWorkReasonEntity
 
 class WorkOnReleaseEntityMapperTest {
 
@@ -23,15 +21,11 @@ class WorkOnReleaseEntityMapperTest {
     // Given
     val createWorkOnReleaseDto = aValidCreateWorkOnReleaseDto(
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = mutableListOf(NotHopingToWorkReasonDomain.OTHER),
-      notHopingToWorkOtherReason = "Crime pays",
       affectAbilityToWork = mutableListOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Work is for fools and horses",
     )
     val expected = aValidWorkOnReleaseEntity(
       hopingToWork = HopingToWorkEntity.NO,
-      notHopingToWorkReasons = mutableListOf(NotHopingToWorkReasonEntity.OTHER),
-      notHopingToWorkOtherReason = "Crime pays",
       affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.OTHER),
       affectAbilityToWorkOther = "Work is for fools and horses",
     )
@@ -55,8 +49,6 @@ class WorkOnReleaseEntityMapperTest {
     val expectedWorkOnReleaseEntity = aValidWorkOnRelease(
       reference = workOnReleaseEntity.reference!!,
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = mutableListOf(NotHopingToWorkReasonDomain.OTHER),
-      notHopingToWorkOtherReason = "No motivation",
       affectAbilityToWork = mutableListOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Negative attitude",
       createdAt = workOnReleaseEntity.createdAt!!,

@@ -752,14 +752,6 @@ components:
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hopingToWork:
           $ref: '#/components/schemas/HopingToWork'
-        notHopingToWorkReasons:
-          type: array
-          description: Reasons the Prisoner has given not to get work after leaving Prison. Can be empty but not null.
-          items:
-            $ref: '#/components/schemas/NotHopingToWorkReason'
-        notHopingToWorkOtherReason:
-          type: string
-          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
         affectAbilityToWork:
           type: array
           description: Factors affecting the Prisoner's ability to work. Can be empty but not null.
@@ -1588,27 +1580,17 @@ components:
       description: Factors affecting a prisoner's ability to work.
       type: string
       enum:
+        - LIMITED_BY_OFFENCE
         - CARING_RESPONSIBILITIES
-        - LIMITED_BY_OFFENSE
-        - HEALTH_ISSUES
-        - NO_RIGHT_TO_WORK
-        - OTHER
-        - NONE
-
-    NotHopingToWorkReason:
-      title: NotHopingToWorkReason
-      type: string
-      description: Reasons the Prisoner has given not to get work after leaving Prison.
-      enum:
-        - LIMIT_THEIR_ABILITY
-        - FULL_TIME_CARER
+        - NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH
+        - UNABLE_TO_WORK_DUE_TO_HEALTH
         - LACKS_CONFIDENCE_OR_MOTIVATION
-        - HEALTH
+        - REFUSED_SUPPORT_WITH_NO_REASON
         - RETIRED
         - NO_RIGHT_TO_WORK
         - NOT_SURE
         - OTHER
-        - NO_REASON
+        - NONE
 
     PersonalSkillType:
       title: PersonalSkillType
@@ -1819,14 +1801,6 @@ components:
       properties:
         hopingToWork:
           $ref: '#/components/schemas/HopingToWork'
-        notHopingToWorkReasons:
-          type: array
-          description: Reasons the Prisoner has given not to get work after leaving Prison.
-          items:
-            $ref: '#/components/schemas/NotHopingToWorkReason'
-        notHopingToWorkOtherReason:
-          type: string
-          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
         affectAbilityToWork:
           type: array
           description: Factors affecting the Prisoner's ability to work.
