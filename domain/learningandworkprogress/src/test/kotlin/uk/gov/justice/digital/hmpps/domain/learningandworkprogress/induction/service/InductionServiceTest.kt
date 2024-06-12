@@ -65,10 +65,8 @@ class InductionServiceTest {
       given(persistenceAdapter.getInduction(any())).willReturn(induction)
 
       // When
-      val exception = catchThrowableOfType(
-        { service.createInduction(createInductionDto) },
-        InductionAlreadyExistsException::class.java,
-      )
+      val exception =
+        catchThrowableOfType(InductionAlreadyExistsException::class.java) { service.createInduction(createInductionDto) }
 
       // Then
       assertThat(exception.message).isEqualTo("An Induction already exists for prisoner $PRISON_NUMBER")
@@ -99,10 +97,8 @@ class InductionServiceTest {
       given(persistenceAdapter.getInduction(any())).willReturn(null)
 
       // When
-      val exception = catchThrowableOfType(
-        { service.getInductionForPrisoner(PRISON_NUMBER) },
-        InductionNotFoundException::class.java,
-      )
+      val exception =
+        catchThrowableOfType(InductionNotFoundException::class.java) { service.getInductionForPrisoner(PRISON_NUMBER) }
 
       // Then
       assertThat(exception).hasMessage("Induction not found for prisoner [$PRISON_NUMBER]")
@@ -136,10 +132,8 @@ class InductionServiceTest {
       given(persistenceAdapter.updateInduction(any())).willReturn(null)
 
       // When
-      val exception = catchThrowableOfType(
-        { service.updateInduction(updateInductionDto) },
-        InductionNotFoundException::class.java,
-      )
+      val exception =
+        catchThrowableOfType(InductionNotFoundException::class.java) { service.updateInduction(updateInductionDto) }
 
       // Then
       assertThat(exception).hasMessage("Induction not found for prisoner [$PRISON_NUMBER]")

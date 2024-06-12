@@ -65,10 +65,9 @@ class ActionPlanServiceTest {
       val createActionPlanDto = aValidCreateActionPlanDto(prisonNumber = prisonNumber)
 
       // When
-      val exception = catchThrowableOfType(
-        { service.createActionPlan(createActionPlanDto) },
-        ActionPlanAlreadyExistsException::class.java,
-      )
+      val exception = catchThrowableOfType(ActionPlanAlreadyExistsException::class.java) {
+        service.createActionPlan(createActionPlanDto)
+      }
 
       // Then
       assertThat(exception)

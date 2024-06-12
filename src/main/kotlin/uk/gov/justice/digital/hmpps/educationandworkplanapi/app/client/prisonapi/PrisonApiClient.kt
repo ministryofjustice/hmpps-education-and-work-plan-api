@@ -30,7 +30,7 @@ class PrisonApiClient(
       }
       .block()
 
-    val numberOfPeriods = prisonerInPrisonSummary?.prisonPeriod?.size ?: 0
+    val numberOfPeriods = prisonerInPrisonSummary!!.prisonPeriod?.size ?: 0
     log.info { "Retrieved $numberOfPeriods prison periods from the prison-api for prisoner $prisonNumber" }
     return prisonApiMapper.toPrisonMovementEvents(prisonNumber, prisonerInPrisonSummary)
   }

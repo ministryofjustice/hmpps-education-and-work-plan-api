@@ -100,10 +100,8 @@ class TimelineServiceTest {
     given(prisonTimelineService.getPrisonTimelineEvents(any())).willReturn(emptyList())
 
     // When
-    val exception = catchThrowableOfType(
-      { service.getTimelineForPrisoner(PRISON_NUMBER) },
-      TimelineNotFoundException::class.java,
-    )
+    val exception =
+      catchThrowableOfType(TimelineNotFoundException::class.java) { service.getTimelineForPrisoner(PRISON_NUMBER) }
 
     // Then
     assertThat(exception).hasMessage("Timeline not found for prisoner [$PRISON_NUMBER]")
