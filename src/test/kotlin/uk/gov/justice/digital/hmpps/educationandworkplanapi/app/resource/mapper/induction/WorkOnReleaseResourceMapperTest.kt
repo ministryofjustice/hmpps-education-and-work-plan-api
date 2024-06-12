@@ -19,10 +19,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.AffectAbilityToWork as AffectAbilityToWorkDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.NotHopingToWorkReason as NotHopingToWorkReasonDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AffectAbilityToWork as AffectAbilityToWorkApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NotHopingToWorkReason as NotHopingToWorkReasonApi
 
 @ExtendWith(MockitoExtension::class)
 class WorkOnReleaseResourceMapperTest {
@@ -40,8 +38,6 @@ class WorkOnReleaseResourceMapperTest {
     val createWorkOnReleaseRequest = aValidCreateWorkOnReleaseRequest()
     val expected = aValidCreateWorkOnReleaseDto(
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
-      notHopingToWorkOtherReason = "Long term prison sentence",
       affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Employers aren't interested",
     )
@@ -60,8 +56,6 @@ class WorkOnReleaseResourceMapperTest {
     val domain = aValidWorkOnRelease(
       reference = reference,
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
-      notHopingToWorkOtherReason = "Long term prison sentence",
       affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Employers aren't interested",
     )
@@ -69,8 +63,6 @@ class WorkOnReleaseResourceMapperTest {
     val expected = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
       reference = domain.reference,
       hopingToWork = HopingToWorkApi.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonApi.OTHER),
-      notHopingToWorkOtherReason = "Long term prison sentence",
       affectAbilityToWork = listOf(AffectAbilityToWorkApi.OTHER),
       affectAbilityToWorkOther = "Employers aren't interested",
       createdAt = expectedDateTime,
@@ -95,8 +87,6 @@ class WorkOnReleaseResourceMapperTest {
     val expected = aValidUpdateWorkOnReleaseDto(
       reference = request.reference,
       hopingToWork = HopingToWorkDomain.NO,
-      notHopingToWorkReasons = listOf(NotHopingToWorkReasonDomain.OTHER),
-      notHopingToWorkOtherReason = "Long term prison sentence",
       affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Employers aren't interested",
     )

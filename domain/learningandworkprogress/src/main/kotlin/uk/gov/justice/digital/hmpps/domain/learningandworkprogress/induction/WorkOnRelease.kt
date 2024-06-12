@@ -9,8 +9,6 @@ import java.util.UUID
 data class WorkOnRelease(
   val reference: UUID,
   val hopingToWork: HopingToWork,
-  val notHopingToWorkReasons: List<NotHopingToWorkReason>,
-  val notHopingToWorkOtherReason: String?,
   val affectAbilityToWork: List<AffectAbilityToWork>,
   val affectAbilityToWorkOther: String?,
   val createdBy: String?,
@@ -29,23 +27,16 @@ enum class HopingToWork {
   NOT_SURE,
 }
 
-enum class NotHopingToWorkReason {
-  LIMIT_THEIR_ABILITY,
-  FULL_TIME_CARER,
+enum class AffectAbilityToWork {
+  LIMITED_BY_OFFENCE,
+  CARING_RESPONSIBILITIES,
+  NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH,
+  UNABLE_TO_WORK_DUE_TO_HEALTH,
   LACKS_CONFIDENCE_OR_MOTIVATION,
-  HEALTH,
+  REFUSED_SUPPORT_WITH_NO_REASON,
   RETIRED,
   NO_RIGHT_TO_WORK,
   NOT_SURE,
-  OTHER,
-  NO_REASON,
-}
-
-enum class AffectAbilityToWork {
-  CARING_RESPONSIBILITIES,
-  LIMITED_BY_OFFENSE,
-  HEALTH_ISSUES,
-  NO_RIGHT_TO_WORK,
   OTHER,
   NONE,
 }
