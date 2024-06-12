@@ -61,10 +61,12 @@ class ConversationServiceTest {
     given(persistenceAdapter.getConversation(any())).willReturn(null)
 
     // When
-    val exception = catchThrowableOfType(
-      { service.getConversation(conversationReference, prisonNumber) },
-      PrisonerConversationNotFoundException::class.java,
-    )
+    val exception = catchThrowableOfType(PrisonerConversationNotFoundException::class.java) {
+      service.getConversation(
+        conversationReference,
+        prisonNumber,
+      )
+    }
 
     // Then
     assertThat(exception.conversationReference).isEqualTo(conversationReference)
@@ -183,10 +185,12 @@ class ConversationServiceTest {
     given(persistenceAdapter.updateConversation(any())).willReturn(null)
 
     // When
-    val exception = catchThrowableOfType(
-      { service.updateConversation(updateConversationDto, prisonNumber) },
-      PrisonerConversationNotFoundException::class.java,
-    )
+    val exception = catchThrowableOfType(PrisonerConversationNotFoundException::class.java) {
+      service.updateConversation(
+        updateConversationDto,
+        prisonNumber,
+      )
+    }
 
     // Then
     assertThat(exception.conversationReference).isEqualTo(conversationReference)

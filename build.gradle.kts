@@ -91,7 +91,7 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:timeline")))
 
   // Test fixtures dependencies
-  testFixturesImplementation("org.assertj:assertj-core")
+  testFixturesImplementation("org.assertj:assertj-core:3.26.0")
   testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
   testFixturesImplementation("io.projectreactor:reactor-core")
   testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")

@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.Jwts.SIG
 import java.security.PrivateKey
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -52,8 +52,8 @@ fun buildAccessToken(
   privateKey: PrivateKey,
 ): String =
   Jwts.builder()
-    .setSubject(username)
-    .addClaims(
+    .subject(username)
+    .claims(
       mapOf(
         "authorities" to roles,
         "user_name" to username,
@@ -63,7 +63,7 @@ fun buildAccessToken(
         "client_id" to clientId,
       ),
     )
-    .setIssuedAt(Date.from(Instant.now()))
-    .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-    .signWith(privateKey, SignatureAlgorithm.RS256)
+    .issuedAt(Date.from(Instant.now()))
+    .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+    .signWith(privateKey, SIG.RS256)
     .compact()

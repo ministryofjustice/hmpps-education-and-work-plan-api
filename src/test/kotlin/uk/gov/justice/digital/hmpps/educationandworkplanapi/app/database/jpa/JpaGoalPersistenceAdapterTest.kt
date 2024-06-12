@@ -51,10 +51,12 @@ class JpaGoalPersistenceAdapterTest {
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 
       // When
-      val exception = catchThrowableOfType(
-        { persistenceAdapter.createGoals(prisonNumber, createGoalDtos) },
-        ActionPlanNotFoundException::class.java,
-      )
+      val exception = catchThrowableOfType(ActionPlanNotFoundException::class.java) {
+        persistenceAdapter.createGoals(
+          prisonNumber,
+          createGoalDtos,
+        )
+      }
 
       // Then
       assertThat(exception).hasMessage("Unable to find ActionPlan for prisoner [$prisonNumber]")
@@ -181,14 +183,17 @@ class JpaGoalPersistenceAdapterTest {
       val prisonNumber = aValidPrisonNumber()
       val reference = UUID.randomUUID()
 
-      val goalEntity = aValidGoalEntity(reference = reference, title = "Original goal title", createdBy = "USER1", updatedBy = "USER1")
+      val goalEntity =
+        aValidGoalEntity(reference = reference, title = "Original goal title", createdBy = "USER1", updatedBy = "USER1")
       val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
 
-      val persistedGoalEntity = aValidGoalEntity(reference = reference, title = "Updated goal title", createdBy = "USER1", updatedBy = "USER2")
+      val persistedGoalEntity =
+        aValidGoalEntity(reference = reference, title = "Updated goal title", createdBy = "USER1", updatedBy = "USER2")
       given(goalRepository.saveAndFlush(any<GoalEntity>())).willReturn(persistedGoalEntity)
 
-      val expectedDomainGoal = aValidGoal(reference = reference, title = "Updated goal title", createdBy = "USER1", lastUpdatedBy = "USER2")
+      val expectedDomainGoal =
+        aValidGoal(reference = reference, title = "Updated goal title", createdBy = "USER1", lastUpdatedBy = "USER2")
       given(goalMapper.fromEntityToDomain(any())).willReturn(expectedDomainGoal)
 
       val goalWithProposedUpdates = aValidUpdateGoalDto(reference = reference, title = "Updated goal title")

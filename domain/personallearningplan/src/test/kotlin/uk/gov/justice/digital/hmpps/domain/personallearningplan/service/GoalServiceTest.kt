@@ -172,10 +172,8 @@ class GoalServiceTest {
     given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
     // When
-    val exception = catchThrowableOfType(
-      { service.getGoal(prisonNumber, goalReference) },
-      GoalNotFoundException::class.java,
-    )
+    val exception =
+      catchThrowableOfType(GoalNotFoundException::class.java) { service.getGoal(prisonNumber, goalReference) }
 
     // Then
     assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
@@ -216,10 +214,8 @@ class GoalServiceTest {
     val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
     // When
-    val exception = catchThrowableOfType(
-      { service.updateGoal(prisonNumber, updatedGoal) },
-      GoalNotFoundException::class.java,
-    )
+    val exception =
+      catchThrowableOfType(GoalNotFoundException::class.java) { service.updateGoal(prisonNumber, updatedGoal) }
 
     // Then
     assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")

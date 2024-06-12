@@ -103,26 +103,23 @@ class GoalTest {
     val steps = emptyList<Step>()
 
     // When
-    val exception: InvalidGoalException = catchThrowableOfType(
-      {
-        Goal(
-          reference = goalReference,
-          title = "Improve woodworking skills",
-          targetCompletionDate = LocalDate.now().plusMonths(6),
-          status = ACTIVE,
-          createdBy = "bjones_gen",
-          createdByDisplayName = "Barry Jones",
-          createdAt = Instant.now(),
-          createdAtPrison = "BXI",
-          lastUpdatedBy = "bjones_gen",
-          lastUpdatedByDisplayName = "Barry Jones",
-          lastUpdatedAt = Instant.now(),
-          lastUpdatedAtPrison = "BXI",
-          steps = steps,
-        )
-      },
-      InvalidGoalException::class.java,
-    )
+    val exception: InvalidGoalException = catchThrowableOfType(InvalidGoalException::class.java) {
+      Goal(
+        reference = goalReference,
+        title = "Improve woodworking skills",
+        targetCompletionDate = LocalDate.now().plusMonths(6),
+        status = ACTIVE,
+        createdBy = "bjones_gen",
+        createdByDisplayName = "Barry Jones",
+        createdAt = Instant.now(),
+        createdAtPrison = "BXI",
+        lastUpdatedBy = "bjones_gen",
+        lastUpdatedByDisplayName = "Barry Jones",
+        lastUpdatedAt = Instant.now(),
+        lastUpdatedAtPrison = "BXI",
+        steps = steps,
+      )
+    }
 
     // Then
     assertThat(exception.message).isEqualTo("Cannot create Goal with reference [$goalReference]. At least one Step is required.")
