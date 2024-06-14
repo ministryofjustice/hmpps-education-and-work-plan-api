@@ -73,3 +73,4 @@ sonar-project.properties
 
 #Misc
 .DS_Store
+/.run/
