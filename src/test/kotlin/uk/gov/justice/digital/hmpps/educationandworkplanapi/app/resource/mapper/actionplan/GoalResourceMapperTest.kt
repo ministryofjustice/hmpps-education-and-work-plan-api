@@ -77,7 +77,6 @@ internal class GoalResourceMapperTest {
     val updateGoalRequest = aValidUpdateGoalRequest(
       targetCompletionDate = LocalDate.now(),
       steps = mutableListOf(updateStepRequest),
-      status = GoalStatusApi.ACTIVE,
     )
 
     val expectedStep = aValidUpdateStepDto()
@@ -88,7 +87,6 @@ internal class GoalResourceMapperTest {
       title = updateGoalRequest.title,
       prisonId = updateGoalRequest.prisonId,
       targetCompletionDate = updateGoalRequest.targetCompletionDate,
-      status = GoalStatus.ACTIVE,
       notes = updateGoalRequest.notes,
       steps = mutableListOf(expectedStep),
     )

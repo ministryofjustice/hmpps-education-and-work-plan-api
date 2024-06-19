@@ -1388,8 +1388,6 @@ components:
           format: date
           description: An optional ISO-8601 date representing the target completion date of the Goal.
           example: '2023-12-19'
-        status:
-          $ref: '#/components/schemas/GoalStatus'
         steps:
           type: array
           minItems: 1

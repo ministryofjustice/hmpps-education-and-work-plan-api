@@ -67,7 +67,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills within first 3 months",
       prisonId = "MDI",
       targetCompletionDate = LocalDate.now().plusMonths(3),
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.COMPLETED,
       notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life",
       steps = listOf(
         aValidUpdateStepDto(
@@ -82,7 +81,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     val expectedGoalEntity = goalEntity.deepCopy().apply {
       title = "Improve communication skills within first 3 months"
       targetCompletionDate = LocalDate.now().plusMonths(3)
-      status = GoalStatus.COMPLETED
+      status = GoalStatus.ACTIVE
       notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life"
       createdAtPrison = "BXI"
       updatedAtPrison = "MDI"
@@ -123,7 +122,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
@@ -182,7 +180,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       prisonId = "BXI",
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
@@ -258,7 +255,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
@@ -341,7 +337,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
@@ -417,7 +412,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
@@ -475,7 +469,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      status = uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE,
       notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(

@@ -1,8 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.dto
 
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 /**
  * A DTO class that contains the data required to update an existing Goal domain object
@@ -12,7 +11,6 @@ class UpdateGoalDto(
   val title: String,
   val prisonId: String,
   val targetCompletionDate: LocalDate,
-  var status: GoalStatus = GoalStatus.ACTIVE,
   val notes: String? = null,
   steps: List<UpdateStepDto>,
 ) {
