@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AffectAbilityToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NotHopingToWorkReason
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkOnReleaseResponse
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -13,8 +12,6 @@ fun aValidWorkOnReleaseResponse(): WorkOnReleaseResponse =
 fun aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
   reference: UUID = UUID.randomUUID(),
   hopingToWork: HopingToWork = HopingToWork.NO,
-  notHopingToWorkReasons: List<NotHopingToWorkReason> = listOf(NotHopingToWorkReason.OTHER),
-  notHopingToWorkOtherReason: String? = "Long term prison sentence",
   affectAbilityToWork: List<AffectAbilityToWork> = listOf(AffectAbilityToWork.OTHER),
   affectAbilityToWorkOther: String? = "Employers aren't interested",
   createdBy: String = "asmith_gen",
@@ -29,8 +26,6 @@ fun aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
   WorkOnReleaseResponse(
     reference = reference,
     hopingToWork = hopingToWork,
-    notHopingToWorkReasons = notHopingToWorkReasons,
-    notHopingToWorkOtherReason = notHopingToWorkOtherReason,
     affectAbilityToWork = affectAbilityToWork,
     affectAbilityToWorkOther = affectAbilityToWorkOther,
     createdBy = createdBy,
@@ -46,8 +41,6 @@ fun aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
 fun aValidWorkOnReleaseResponseForPrisonerLookingToWork(
   reference: UUID = UUID.randomUUID(),
   hopingToWork: HopingToWork = HopingToWork.YES,
-  notHopingToWorkReasons: List<NotHopingToWorkReason> = emptyList(),
-  notHopingToWorkOtherReason: String? = null,
   affectAbilityToWork: List<AffectAbilityToWork> = listOf(AffectAbilityToWork.NONE),
   affectAbilityToWorkOther: String? = null,
   createdBy: String = "asmith_gen",
@@ -62,8 +55,6 @@ fun aValidWorkOnReleaseResponseForPrisonerLookingToWork(
   WorkOnReleaseResponse(
     reference = reference,
     hopingToWork = hopingToWork,
-    notHopingToWorkReasons = notHopingToWorkReasons,
-    notHopingToWorkOtherReason = notHopingToWorkOtherReason,
     affectAbilityToWork = affectAbilityToWork,
     affectAbilityToWorkOther = affectAbilityToWorkOther,
     createdBy = createdBy,

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.9.0'
+  version: '1.10.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -610,7 +610,6 @@ components:
         - correlationId
 
     ### Leagcy CIAG API Response ###
-
     CiagInductionSummaryListResponse:
       title: CiagInductionSummaryListResponse
       type: object
@@ -753,14 +752,6 @@ components:
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hopingToWork:
           $ref: '#/components/schemas/HopingToWork'
-        notHopingToWorkReasons:
-          type: array
-          description: Reasons the Prisoner has given not to get work after leaving Prison. Can be empty but not null.
-          items:
-            $ref: '#/components/schemas/NotHopingToWorkReason'
-        notHopingToWorkOtherReason:
-          type: string
-          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
         affectAbilityToWork:
           type: array
           description: Factors affecting the Prisoner's ability to work. Can be empty but not null.
@@ -953,7 +944,7 @@ components:
           description: A unique reference reference for this PreviousWorkExperiencesResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
@@ -1489,7 +1480,6 @@ components:
         - PRISON_TRANSFER
 
     ### Legacy Induction requests ###
-
     PreviousWorkExperience:
       description: The details of an individual work experience.
       type: object
@@ -1590,27 +1580,17 @@ components:
       description: Factors affecting a prisoner's ability to work.
       type: string
       enum:
+        - LIMITED_BY_OFFENCE
         - CARING_RESPONSIBILITIES
-        - LIMITED_BY_OFFENSE
-        - HEALTH_ISSUES
-        - NO_RIGHT_TO_WORK
-        - OTHER
-        - NONE
-
-    NotHopingToWorkReason:
-      title: NotHopingToWorkReason
-      type: string
-      description: Reasons the Prisoner has given not to get work after leaving Prison.
-      enum:
-        - LIMIT_THEIR_ABILITY
-        - FULL_TIME_CARER
+        - NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH
+        - UNABLE_TO_WORK_DUE_TO_HEALTH
         - LACKS_CONFIDENCE_OR_MOTIVATION
-        - HEALTH
+        - REFUSED_SUPPORT_WITH_NO_REASON
         - RETIRED
         - NO_RIGHT_TO_WORK
         - NOT_SURE
         - OTHER
-        - NO_REASON
+        - NONE
 
     PersonalSkillType:
       title: PersonalSkillType
@@ -1735,6 +1715,15 @@ components:
         - CLEANING_AND_MAINTENANCE
         - OTHER
 
+    HasWorkedBefore:
+      title: HasWorkedBefore
+      description: Whether the prisoner has worked before or it may not be relevant in some scenarios.
+      type: string
+      enum:
+       - "YES"
+       - "NO"
+       - "NOT_RELEVANT"
+
     AchievedQualification:
       title: AchievedQualification
       type: object
@@ -1812,14 +1801,6 @@ components:
       properties:
         hopingToWork:
           $ref: '#/components/schemas/HopingToWork'
-        notHopingToWorkReasons:
-          type: array
-          description: Reasons the Prisoner has given not to get work after leaving Prison.
-          items:
-            $ref: '#/components/schemas/NotHopingToWorkReason'
-        notHopingToWorkOtherReason:
-          type: string
-          description: The reason that is given when the Prisoner does not want to work. This is mandatory when 'notHopingToWorkReasons' includes 'OTHER'.
         affectAbilityToWork:
           type: array
           description: Factors affecting the Prisoner's ability to work.
@@ -1863,7 +1844,7 @@ components:
       description: A request to create a Prisoner's previous work experience.
       properties:
         hasWorkedBefore:
-          type: boolean
+          $ref: '#/components/schemas/HasWorkedBefore'
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.

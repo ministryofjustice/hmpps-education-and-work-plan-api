@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkExperiencesResponse
 import java.time.OffsetDateTime
@@ -7,7 +8,7 @@ import java.util.UUID
 
 fun aValidPreviousWorkExperiencesResponse(
   reference: UUID = UUID.randomUUID(),
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   experiences: List<PreviousWorkExperience> = listOf(aValidPreviousWorkExperience()),
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",

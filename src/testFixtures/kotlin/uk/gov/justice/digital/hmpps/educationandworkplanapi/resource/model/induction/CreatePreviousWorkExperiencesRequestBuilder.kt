@@ -1,11 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkExperiencesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkExperience
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 
 fun aValidCreatePreviousWorkExperiencesRequest(
-  hasWorkedBefore: Boolean = true,
+  hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   experiences: List<PreviousWorkExperience>? = listOf(aValidPreviousWorkExperience()),
 ): CreatePreviousWorkExperiencesRequest =
   CreatePreviousWorkExperiencesRequest(

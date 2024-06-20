@@ -11,7 +11,7 @@ import java.util.UUID
  */
 data class PreviousWorkExperiences(
   val reference: UUID,
-  val hasWorkedBefore: Boolean,
+  val hasWorkedBefore: HasWorkedBefore,
   val experiences: List<WorkExperience>,
   val createdBy: String?,
   val createdByDisplayName: String?,
@@ -48,4 +48,10 @@ enum class WorkExperienceType {
   EDUCATION_TRAINING,
   CLEANING_AND_MAINTENANCE,
   OTHER,
+}
+
+enum class HasWorkedBefore {
+  YES,
+  NO,
+  NOT_RELEVANT,
 }
