@@ -55,6 +55,9 @@ class PreviousWorkExperiencesEntity(
   @field:NotNull
   var hasWorkedBefore: HasWorkedBefore? = null,
 
+  @Column
+  val hasWorkedBeforeNotRelevantReason: String? = null,
+
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var experiences: MutableList<WorkExperienceEntity>? = null,
 
