@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.10.0'
+  version: '1.10.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -945,6 +945,10 @@ components:
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hasWorkedBefore:
           $ref: '#/components/schemas/HasWorkedBefore'
+        hasWorkedBeforeNotRelevantReason:
+          type: string
+          description: The reason why the whether the prisoner has worked before is not relevant. Only populated when 'hasWorkedBefore' is 'NOT_RELEVANT'.
+          example: Chris has declined to talk about his previous work experience as he is not looking for work on release because he is of retirement age.
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
@@ -1845,6 +1849,10 @@ components:
       properties:
         hasWorkedBefore:
           $ref: '#/components/schemas/HasWorkedBefore'
+        hasWorkedBeforeNotRelevantReason:
+          type: string
+          description: The reason why the whether the prisoner has worked before is not relevant. Mandatory when 'hasWorkedBefore' is 'NOT_RELEVANT'
+          example: Chris has declined to talk about his previous work experience as he is not looking for work on release because he is of retirement age.
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
