@@ -14,7 +14,6 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.willReturn
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
@@ -22,6 +21,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
@@ -268,10 +268,10 @@ class JpaGoalPersistenceAdapterTest {
       val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
 
-      val goalWithProposedUpdates = aValidArchiveGoalDto(reference = reference)
+      val archiveGoalDto = aValidArchiveGoalDto(reference = reference)
 
       // When
-      val actual = persistenceAdapter.archiveGoal(prisonNumber, goalWithProposedUpdates)
+      val actual = persistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
 
       // Then
       assertThat(actual).isNull()
@@ -321,6 +321,71 @@ class JpaGoalPersistenceAdapterTest {
       assertThat(captor.firstValue.status).isEqualTo(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED)
       assertThat(captor.firstValue.archiveReason).isEqualTo(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ReasonToArchiveGoal.OTHER)
       assertThat(captor.firstValue.archiveReasonOther).isEqualTo("Foo")
+    }
+  }
+
+  @Nested
+  inner class UnarchiveGoal {
+    @Test
+    fun `should return null if existing goal could not be found`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      val goalEntity = aValidGoalEntity(reference = UUID.randomUUID(), status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED)
+      val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+
+      val unarchiveGoalDto = aValidUnarchiveGoalDto(reference = reference)
+
+      // When
+      val actual = persistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verifyNoInteractions(goalMapper)
+      verifyNoMoreInteractions(goalRepository)
+    }
+
+    @Test
+    fun `should unarchive the goal`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      val goalEntity = aValidGoalEntity(reference = reference, status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED)
+      val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+      val persistedGoalEntity =
+        aValidGoalEntity(
+          reference = reference,
+          status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ACTIVE,
+        )
+      given(goalRepository.saveAndFlush(any<GoalEntity>())).willReturn(persistedGoalEntity)
+
+      val expectedDomainGoal = aValidGoal(
+        reference = reference,
+        status = GoalStatus.ACTIVE,
+        archiveReason = null,
+        archiveReasonOther = null,
+      )
+      given(goalMapper.fromEntityToDomain(any())).willReturn(expectedDomainGoal)
+
+      // When
+      val actual = persistenceAdapter.unarchiveGoal(prisonNumber, aValidUnarchiveGoalDto(reference = reference))
+
+      // Then
+      assertThat(actual).isNotNull
+      assertThat(actual!!.status).isEqualTo(GoalStatus.ACTIVE)
+      assertThat(actual.archiveReason).isNull()
+      assertThat(actual.archiveReasonOther).isNull()
+
+      val captor = argumentCaptor<GoalEntity>()
+      verify(goalRepository).saveAndFlush(captor.capture())
+      assertThat(captor.firstValue.status).isEqualTo(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ACTIVE)
+      assertThat(captor.firstValue.archiveReason).isNull()
+      assertThat(captor.firstValue.archiveReasonOther).isNull()
     }
   }
 }

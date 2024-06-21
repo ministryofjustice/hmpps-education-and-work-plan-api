@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFou
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
@@ -71,6 +72,19 @@ class JpaGoalPersistenceAdapter(
       goalEntity.status = GoalStatus.ARCHIVED
       goalEntity.archiveReason = goalMapper.archiveReasonFromDomainToEntity(archiveGoalDto.reason)
       goalEntity.archiveReasonOther = archiveGoalDto.reasonOther
+      val persistedEntity = goalRepository.saveAndFlush(goalEntity)
+      goalMapper.fromEntityToDomain(persistedEntity)
+    } else {
+      null
+    }
+  }
+
+  override fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal? {
+    val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, unarchiveGoalDto.reference)
+    return if (goalEntity != null) {
+      goalEntity.status = GoalStatus.ACTIVE
+      goalEntity.archiveReason = null
+      goalEntity.archiveReasonOther = null
       val persistedEntity = goalRepository.saveAndFlush(goalEntity)
       goalMapper.fromEntityToDomain(persistedEntity)
     } else {
