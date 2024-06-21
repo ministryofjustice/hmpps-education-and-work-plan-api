@@ -2,9 +2,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.acti
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 import java.util.function.Consumer
 
 fun assertThat(actual: GoalResponse?) = GoalResponseAssert(actual)
@@ -183,6 +185,36 @@ class GoalResponseAssert(actual: GoalResponse?) :
     with(actual!!) {
       steps.onEach {
         consumer.accept(assertThat(it))
+      }
+    }
+    return this
+  }
+
+  fun hasStatus(expected: GoalStatus): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (status != expected) {
+        failWithMessage("Expected goal to have status '$expected', but was $status")
+      }
+    }
+    return this
+  }
+
+  fun hasArchiveReason(expected: ReasonToArchiveGoal?): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (archiveReason != expected) {
+        failWithMessage("Expected goal to have archive reason '$expected', but was $archiveReason")
+      }
+    }
+    return this
+  }
+
+  fun hasArchiveReasonOther(expected: String?): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (archiveReasonOther != expected) {
+        failWithMessage("Expected goal to have archive reason other '$expected', but was $archiveReasonOther")
       }
     }
     return this

@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.acti
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepResponse
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -22,6 +23,8 @@ fun aValidGoalResponse(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
+  archiveReason: ReasonToArchiveGoal? = null,
+  archiveReasonOther: String? = null,
 ): GoalResponse =
   GoalResponse(
     goalReference = reference,
@@ -38,6 +41,8 @@ fun aValidGoalResponse(
     updatedByDisplayName = updatedByDisplayName,
     updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
+    archiveReason = archiveReason,
+    archiveReasonOther = archiveReasonOther,
   )
 
 fun anotherValidGoalResponse(

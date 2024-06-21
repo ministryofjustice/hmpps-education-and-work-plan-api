@@ -113,6 +113,33 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/UpdateGoal'
 
+  '/action-plans/{prisonNumber}/goals/{goalReference}/archive':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - name: goalReference
+        description: The Goal's unique reference
+        schema:
+          type: string
+          format: uuid
+        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
+        in: path
+        required: true
+    put:
+      summary: Archives a Goal
+      description: Changes a goals status to 'ARCHIVED' and records the archival reason.
+      tags:
+        - Goals
+      responses:
+        '204':
+          description: The Goal was archive successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: archive-goal
+      requestBody:
+        $ref: '#/components/requestBodies/ArchiveGoal'
+
   #
   # Timeline
   #
@@ -484,6 +511,11 @@ components:
           type: string
           description: The identifier of the prison that the prisoner was resident at when the Goal was updated.
           example: 'BXI'
+        archiveReason:
+          $ref: '#/components/schemas/ReasonToArchiveGoal'
+        archiveReasonOther:
+          type: string
+          description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
       required:
         - goalReference
         - title
@@ -1442,6 +1474,25 @@ components:
       required:
         - status
 
+    ArchiveGoalRequest:
+      title: ArchiveGoalRequest
+      type: object
+      description: A request to archive an individual Goal.
+      properties:
+        goalReference:
+          type: string
+          format: uuid
+          description: The Goal's unique reference. This is used as an identifier to archive the required Goal.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        reason:
+          $ref: '#/components/schemas/ReasonToArchiveGoal'
+        reasonOther:
+          type: string
+          description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
+      required:
+        - goalReference
+        - reason
+
     GoalStatus:
       title: GoalStatus
       description: Enum describing the various statuses of a Goal's lifecycle.
@@ -1480,7 +1531,15 @@ components:
         - PRISON_ADMISSION
         - PRISON_RELEASE
         - PRISON_TRANSFER
-
+    ReasonToArchiveGoal:
+      title: ReasonToArchiveGoal
+      description: Enum describing the various reasons a goal might be archived
+      type: string
+      enum:
+        - PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
+        - PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
+        - SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
+        - OTHER
     ### Legacy Induction requests ###
     PreviousWorkExperience:
       description: The details of an individual work experience.
@@ -2304,6 +2363,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateGoalRequest'
+    ArchiveGoal:
+      description: Request body to archive a single Goal.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ArchiveGoalRequest'
     GetCiagInductionSummaries:
       description: Request body to retrieve a list of CIAG Induction summaries for one or more Prisoners.
       content:

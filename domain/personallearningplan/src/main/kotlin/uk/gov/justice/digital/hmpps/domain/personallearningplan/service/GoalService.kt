@@ -1,12 +1,24 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
+import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toOption
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalProblem
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
-import java.util.UUID
+import java.util.*
 
 private val log = KotlinLogging.logger {}
 
@@ -82,6 +94,46 @@ class GoalService(
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }
+  }
+
+  /**
+   * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
+   * Throws [GoalNotFoundException] if the [Goal] to be archived cannot be found.
+   */
+  fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): Either<ArchiveGoalProblem, Goal> {
+    val goalReference = archiveGoalDto.reference
+    log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
+
+    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference).toOption()
+      .toEither { GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference) }
+      .flatMap { validateGoalIsValidForArchiving(it, prisonNumber, goalReference) }
+      .flatMap { validateArchiveDto(archiveGoalDto, prisonNumber, goalReference) }
+      .flatMap {
+        goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)?.right() ?: GoalToBeArchivedCouldNotBeFound(
+          prisonNumber,
+          goalReference,
+        ).left()
+      }
+  }
+
+  private fun validateArchiveDto(
+    archiveGoalDto: ArchiveGoalDto,
+    prisonNumber: String,
+    goalReference: UUID,
+  ) = if (archiveGoalDto.reason == ReasonToArchiveGoal.OTHER && archiveGoalDto.reasonOther.isNullOrEmpty()) {
+    ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference).left()
+  } else {
+    Unit.right()
+  }
+
+  private fun validateGoalIsValidForArchiving(
+    it: Goal,
+    prisonNumber: String,
+    goalReference: UUID,
+  ) = if (it.status != GoalStatus.ACTIVE) {
+    TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status).left()
+  } else {
+    it.right()
   }
 
   private fun actionPlanDoesNotExist(prisonNumber: String) =
