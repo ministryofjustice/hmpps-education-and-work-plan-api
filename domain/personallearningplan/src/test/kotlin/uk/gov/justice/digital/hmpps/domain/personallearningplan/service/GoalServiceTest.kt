@@ -1,10 +1,15 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
+import arrow.core.left
+import arrow.core.right
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -16,8 +21,14 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
@@ -223,5 +234,83 @@ class GoalServiceTest {
     assertThat(exception.goalReference).isEqualTo(goalReference)
     verify(goalPersistenceAdapter, never()).updateGoal(prisonNumber, updatedGoal)
     verifyNoInteractions(goalEventService)
+  }
+
+  @Nested
+  inner class ArchiveGoals {
+
+    @Test
+    fun `should return an error if goal to be archived can't be found`() {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val archiveGoal = aValidArchiveGoalDto(goalReference)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(null)
+
+      val result = service.archiveGoal(prisonNumber, archiveGoal)
+
+      assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference).left())
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      "ARCHIVED",
+      "COMPLETED",
+    )
+    fun `should return an error if goal to be archived is in an invalid state`(status: GoalStatus) {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val archiveGoal = aValidArchiveGoalDto(reference = goalReference)
+      val existingGoal = aValidGoal(reference = goalReference, status = status)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+
+      val result = service.archiveGoal(prisonNumber, archiveGoal)
+
+      assertThat(result).isEqualTo(TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, status).left())
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    fun `Should return an error if reason description is null or empty and reason was OTHER`(reasonOther: String?) {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val archiveGoal =
+        aValidArchiveGoalDto(reference = goalReference, reason = ReasonToArchiveGoal.OTHER, reasonOther = reasonOther)
+      val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+
+      val result = service.archiveGoal(prisonNumber, archiveGoal)
+
+      assertThat(result).isEqualTo(ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference).left())
+    }
+
+    @Test
+    fun `should return an error if archiving the goal returns no goal`() {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val archiveGoal = aValidArchiveGoalDto(goalReference)
+      val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+      given(goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoal)).willReturn(null)
+
+      val result = service.archiveGoal(prisonNumber, archiveGoal)
+
+      assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference).left())
+    }
+
+    @Test
+    fun `should return an updated goal if archiving the goal returns no goal`() {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val archiveGoal = aValidArchiveGoalDto(goalReference)
+      val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
+      val archivedGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+      given(goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoal)).willReturn(archivedGoal)
+
+      val result = service.archiveGoal(prisonNumber, archiveGoal)
+
+      assertThat(result).isEqualTo(archivedGoal.right())
+      verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
+    }
   }
 }

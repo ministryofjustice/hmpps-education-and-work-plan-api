@@ -9,12 +9,18 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.willReturn
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
@@ -24,7 +30,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.GoalRepository
-import java.util.UUID
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 class JpaGoalPersistenceAdapterTest {
@@ -247,6 +253,74 @@ class JpaGoalPersistenceAdapterTest {
       assertThat(actual).isNull()
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(goalMapper)
+    }
+  }
+
+  @Nested
+  inner class ArchiveGoal {
+    @Test
+    fun `should return null if existing goal could not be found`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      val goalEntity = aValidGoalEntity(reference = UUID.randomUUID())
+      val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+
+      val goalWithProposedUpdates = aValidArchiveGoalDto(reference = reference)
+
+      // When
+      val actual = persistenceAdapter.archiveGoal(prisonNumber, goalWithProposedUpdates)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verifyNoInteractions(goalMapper)
+      verifyNoMoreInteractions(goalRepository)
+    }
+
+    @Test
+    fun `should archive the goal`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val reference = UUID.randomUUID()
+
+      val goalEntity = aValidGoalEntity(reference = reference)
+      val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+      val persistedGoalEntity =
+        aValidGoalEntity(
+          reference = reference,
+          status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED,
+          archiveReason = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ReasonToArchiveGoal.OTHER,
+          archiveReasonOther = "Foo",
+        )
+      given(goalRepository.saveAndFlush(any<GoalEntity>())).willReturn(persistedGoalEntity)
+
+      val expectedDomainGoal = aValidGoal(
+        reference = reference,
+        status = GoalStatus.ARCHIVED,
+        archiveReason = ReasonToArchiveGoal.OTHER,
+        archiveReasonOther = "Foo",
+      )
+      given(goalMapper.fromEntityToDomain(any())).willReturn(expectedDomainGoal)
+      given(goalMapper.archiveReasonFromDomainToEntity(ReasonToArchiveGoal.OTHER)).willReturn(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ReasonToArchiveGoal.OTHER)
+
+      // When
+      val actual = persistenceAdapter.archiveGoal(prisonNumber, aValidArchiveGoalDto(reference = reference, reason = ReasonToArchiveGoal.OTHER, reasonOther = "Foo"))
+
+      // Then
+      assertThat(actual).isNotNull
+      assertThat(actual!!.status).isEqualTo(GoalStatus.ARCHIVED)
+      assertThat(actual.archiveReason).isEqualTo(ReasonToArchiveGoal.OTHER)
+      assertThat(actual.archiveReasonOther).isEqualTo("Foo")
+
+      val captor = argumentCaptor<GoalEntity>()
+      verify(goalRepository).saveAndFlush(captor.capture())
+      assertThat(captor.firstValue.status).isEqualTo(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED)
+      assertThat(captor.firstValue.archiveReason).isEqualTo(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ReasonToArchiveGoal.OTHER)
+      assertThat(captor.firstValue.archiveReasonOther).isEqualTo("Foo")
     }
   }
 }

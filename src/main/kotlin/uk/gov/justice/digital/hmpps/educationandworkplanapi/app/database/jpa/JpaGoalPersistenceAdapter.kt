@@ -5,14 +5,16 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.GoalRepository
-import java.util.UUID
+import java.util.*
 
 private val log = KotlinLogging.logger {}
 
@@ -35,7 +37,8 @@ class JpaGoalPersistenceAdapter(
     }
 
     // use the persisted entities with the populated JPA fields, rather than the non persisted entity reference above
-    val persisted = goalEntities.map { goalEntity -> actionPlanEntity.goals!!.first { it.reference == goalEntity.reference } }
+    val persisted =
+      goalEntities.map { goalEntity -> actionPlanEntity.goals!!.first { it.reference == goalEntity.reference } }
     return persisted.map { goalMapper.fromEntityToDomain(it) }
   }
 
@@ -55,6 +58,19 @@ class JpaGoalPersistenceAdapter(
     val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, updatedGoalDto.reference)
     return if (goalEntity != null) {
       goalMapper.updateEntityFromDto(goalEntity, updatedGoalDto)
+      val persistedEntity = goalRepository.saveAndFlush(goalEntity)
+      goalMapper.fromEntityToDomain(persistedEntity)
+    } else {
+      null
+    }
+  }
+
+  override fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): Goal? {
+    val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, archiveGoalDto.reference)
+    return if (goalEntity != null) {
+      goalEntity.status = GoalStatus.ARCHIVED
+      goalEntity.archiveReason = goalMapper.archiveReasonFromDomainToEntity(archiveGoalDto.reason)
+      goalEntity.archiveReasonOther = archiveGoalDto.reasonOther
       val persistedEntity = goalRepository.saveAndFlush(goalEntity)
       goalMapper.fromEntityToDomain(persistedEntity)
     } else {

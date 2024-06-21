@@ -11,12 +11,14 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateStepDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ReasonToArchiveGoal as ReasonToArchiveGoalEntity
 
 @Mapper(
   uses = [
@@ -68,6 +70,8 @@ abstract class GoalEntityMapper {
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "steps", expression = "java( updateSteps(goalEntity, updatedGoalDto) )")
   abstract fun updateEntityFromDto(@MappingTarget goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto)
+
+  abstract fun archiveReasonFromDomainToEntity(reason: ReasonToArchiveGoal): ReasonToArchiveGoalEntity
 
   protected fun updateSteps(entity: GoalEntity, dto: UpdateGoalDto): List<StepEntity> {
     val existingSteps = entity.steps!!

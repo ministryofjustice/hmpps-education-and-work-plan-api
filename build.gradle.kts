@@ -28,7 +28,7 @@ val wiremockVersion = "3.6.0"
 val jsonWebTokenVersion = "0.12.5"
 val nimbusJwtVersion = "9.40"
 val postgressTestContainersVersion = "1.19.8"
-
+val arrowVersion = "1.2.4"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
@@ -74,6 +74,8 @@ dependencies {
   kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
 
   implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+
+  implementation("io.arrow-kt:arrow-core:$arrowVersion")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
   runtimeOnly("org.postgresql:postgresql:$postgresqlVersion")

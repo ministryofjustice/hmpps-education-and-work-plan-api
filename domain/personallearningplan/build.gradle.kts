@@ -12,13 +12,14 @@ apply(plugin = "jacoco")
 apply(plugin = "com.adarshr.test-logger")
 
 val kotlinLoggingVersion = "3.0.5"
-
+val arrowVersion = "1.2.4"
 repositories {
   mavenCentral()
 }
 
 dependencies {
   api("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+  api("io.arrow-kt:arrow-core:$arrowVersion")
 
   // Test dependencies
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")

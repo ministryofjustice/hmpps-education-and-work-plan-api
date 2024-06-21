@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
@@ -14,13 +15,18 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
-import java.util.UUID
+import java.util.*
 
 @RestController
 @Validated
@@ -61,6 +67,35 @@ class GoalController(
     goalService.updateGoal(
       prisonNumber = prisonNumber,
       updatedGoalDto = goalResourceMapper.fromModelToDto(updateGoalRequest),
+    )
+  }
+
+  @PutMapping("{goalReference}/archive")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @Transactional
+  fun <T> archiveGoal(
+    @Valid
+    @RequestBody
+    archiveGoalRequest: ArchiveGoalRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @PathVariable goalReference: UUID,
+  ): ResponseEntity<Any> {
+    return goalService.archiveGoal(
+      prisonNumber = prisonNumber,
+      archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
+    ).fold(
+      {
+        val status = when (it) {
+          is GoalToBeArchivedCouldNotBeFound -> HttpStatus.NOT_FOUND
+          is ArchiveReasonIsOtherButNoDescriptionProvided -> HttpStatus.BAD_REQUEST
+          is TriedToArchiveAGoalInAnInvalidState -> HttpStatus.CONFLICT
+        }
+        ResponseEntity
+          .status(status)
+          .body(ErrorResponse(status = status.value(), userMessage = it.errorMessage()))
+      },
+      { ResponseEntity.noContent().build() },
     )
   }
 }

@@ -2,9 +2,10 @@ package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ARCHIVED
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 /**
  * Represents a prisoner's Goal in their Education and Work Plan (or so-called "Action Plan").
@@ -29,6 +30,8 @@ class Goal(
   val lastUpdatedByDisplayName: String?,
   val lastUpdatedAt: Instant?,
   val lastUpdatedAtPrison: String,
+  val archiveReason: ReasonToArchiveGoal?,
+  val archiveReasonOther: String?,
   steps: List<Step>,
 ) {
 

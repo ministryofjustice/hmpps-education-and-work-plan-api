@@ -25,7 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.Dis
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Table(name = "goal")
 @Entity
@@ -91,6 +91,13 @@ class GoalEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
+
+  @Column
+  @Enumerated(value = EnumType.STRING)
+  var archiveReason: ReasonToArchiveGoal? = null,
+
+  @Column
+  var archiveReasonOther: String? = null,
 ) : ParentEntity {
 
   fun steps(): MutableList<StepEntity> {
@@ -123,4 +130,11 @@ enum class GoalStatus {
   ACTIVE,
   COMPLETED,
   ARCHIVED,
+}
+
+enum class ReasonToArchiveGoal {
+  PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL,
+  PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG,
+  SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON,
+  OTHER,
 }
