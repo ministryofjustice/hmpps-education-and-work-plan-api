@@ -1,9 +1,10 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 fun aValidGoal(
   reference: UUID = UUID.randomUUID(),
@@ -20,6 +21,8 @@ fun aValidGoal(
   lastUpdatedByDisplayName: String? = "Barry Jones",
   lastUpdatedAt: Instant? = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
+  archiveReason: ReasonToArchiveGoal? = null,
+  archiveReasonOther: String? = null,
 ): Goal =
   Goal(
     reference = reference,
@@ -36,4 +39,6 @@ fun aValidGoal(
     lastUpdatedByDisplayName = lastUpdatedByDisplayName,
     lastUpdatedAt = lastUpdatedAt,
     lastUpdatedAtPrison = lastUpdatedAtPrison,
+    archiveReason = archiveReason,
+    archiveReasonOther = archiveReasonOther,
   )

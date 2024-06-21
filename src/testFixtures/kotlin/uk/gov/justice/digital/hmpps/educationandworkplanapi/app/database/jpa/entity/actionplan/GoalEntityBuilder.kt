@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ACTIVE
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 fun aValidGoalEntity(
   id: UUID? = UUID.randomUUID(),
@@ -21,6 +21,8 @@ fun aValidGoalEntity(
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
   updatedByDisplayName: String? = "Barry Jones",
+  archiveReason: ReasonToArchiveGoal? = null,
+  archiveReasonOther: String? = null,
 ): GoalEntity =
   GoalEntity(
     id = id,
@@ -38,4 +40,6 @@ fun aValidGoalEntity(
     updatedAtPrison = updatedAtPrison,
     updatedBy = updatedBy,
     updatedByDisplayName = updatedByDisplayName,
+    archiveReason = archiveReason,
+    archiveReasonOther = archiveReasonOther,
   )

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus.ACTIVE
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 class GoalTest {
 
@@ -37,7 +37,12 @@ class GoalTest {
       // Given
       val step1 = aValidStep(sequenceNumber = 1, title = "Book course")
       val step2 = aValidStep(sequenceNumber = 2, title = "Pass exam")
-      val goal = aValidGoal(steps = mutableListOf(step1, step2)) // goal contains steps "Book course" and "Pass exam", but not "Attend Course"
+      val goal = aValidGoal(
+        steps = mutableListOf(
+          step1,
+          step2,
+        ),
+      ) // goal contains steps "Book course" and "Pass exam", but not "Attend Course"
 
       val newStep = aValidStep(sequenceNumber = 2, title = "Attend course")
 
@@ -118,6 +123,8 @@ class GoalTest {
         lastUpdatedAt = Instant.now(),
         lastUpdatedAtPrison = "BXI",
         steps = steps,
+        archiveReason = null,
+        archiveReasonOther = null,
       )
     }
 
