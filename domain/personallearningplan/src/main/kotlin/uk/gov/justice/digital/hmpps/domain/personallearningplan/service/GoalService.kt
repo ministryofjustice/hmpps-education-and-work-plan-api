@@ -15,8 +15,12 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReaso
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeUnarchivedCouldNotBeFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToUnarchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalProblem
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import java.util.*
 
@@ -98,7 +102,6 @@ class GoalService(
 
   /**
    * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
-   * Throws [GoalNotFoundException] if the [Goal] to be archived cannot be found.
    */
   fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): Either<ArchiveGoalProblem, Goal> {
     val goalReference = archiveGoalDto.reference
@@ -110,6 +113,24 @@ class GoalService(
       .flatMap { validateArchiveDto(archiveGoalDto, prisonNumber, goalReference) }
       .flatMap {
         goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)?.right() ?: GoalToBeArchivedCouldNotBeFound(
+          prisonNumber,
+          goalReference,
+        ).left()
+      }
+  }
+
+  /**
+   * Unarchives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [UnarchiveGoalDto].
+   */
+  fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Either<UnarchiveGoalProblem, Goal> {
+    val goalReference = unarchiveGoalDto.reference
+    log.info { "Unarchiving Goal with reference [$goalReference] for prisoner [$prisonNumber]." }
+
+    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference).toOption()
+      .toEither { GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference) }
+      .flatMap { validateGoalIsValidForUnarchiving(it, prisonNumber, goalReference) }
+      .flatMap {
+        goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)?.right() ?: GoalToBeUnarchivedCouldNotBeFound(
           prisonNumber,
           goalReference,
         ).left()
@@ -132,6 +153,16 @@ class GoalService(
     goalReference: UUID,
   ) = if (it.status != GoalStatus.ACTIVE) {
     TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status).left()
+  } else {
+    it.right()
+  }
+
+  private fun validateGoalIsValidForUnarchiving(
+    it: Goal,
+    prisonNumber: String,
+    goalReference: UUID,
+  ) = if (it.status != GoalStatus.ARCHIVED) {
+    TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status).left()
   } else {
     it.right()
   }

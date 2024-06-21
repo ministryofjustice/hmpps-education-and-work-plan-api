@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import java.util.*
 
@@ -35,4 +36,9 @@ interface GoalPersistenceAdapter {
    * Archives a [Goal] identified by its `prisonNumber` and [ArchiveGoalDTO.reference]
    */
   fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): Goal?
+
+  /**
+   * Unarchives a [Goal] identified by its `prisonNumber` and [UnarchiveGoalDTO.reference]
+   */
+  fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal?
 }

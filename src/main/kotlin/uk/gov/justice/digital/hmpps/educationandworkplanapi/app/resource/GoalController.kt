@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeUnarchivedCouldNotBeFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToUnarchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
@@ -26,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.util.*
 
@@ -93,6 +96,36 @@ class GoalController(
           is GoalToBeArchivedCouldNotBeFound -> HttpStatus.NOT_FOUND
           is ArchiveReasonIsOtherButNoDescriptionProvided -> HttpStatus.BAD_REQUEST
           is TriedToArchiveAGoalInAnInvalidState -> HttpStatus.CONFLICT
+        }
+        val errorMessage = it.errorMessage()
+        log.info { errorMessage }
+        ResponseEntity
+          .status(status)
+          .body(ErrorResponse(status = status.value(), userMessage = errorMessage))
+      },
+      { ResponseEntity.noContent().build() },
+    )
+  }
+
+  @PutMapping("{goalReference}/unarchive")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @Transactional
+  fun <T> unarchiveGoal(
+    @Valid
+    @RequestBody
+    archiveGoalRequest: UnarchiveGoalRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @PathVariable goalReference: UUID,
+  ): ResponseEntity<Any> {
+    return goalService.unarchiveGoal(
+      prisonNumber = prisonNumber,
+      unarchiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
+    ).fold(
+      {
+        val status = when (it) {
+          is GoalToBeUnarchivedCouldNotBeFound -> HttpStatus.NOT_FOUND
+          is TriedToUnarchiveAGoalInAnInvalidState -> HttpStatus.CONFLICT
         }
         val errorMessage = it.errorMessage()
         log.info { errorMessage }

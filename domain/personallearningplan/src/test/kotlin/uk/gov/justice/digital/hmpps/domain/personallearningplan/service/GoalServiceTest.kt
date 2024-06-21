@@ -26,11 +26,14 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeUnarchivedCouldNotBeFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToUnarchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
 
 @ExtendWith(MockitoExtension::class)
@@ -298,7 +301,7 @@ class GoalServiceTest {
     }
 
     @Test
-    fun `should return an updated goal if archiving the goal returns no goal`() {
+    fun `should return an updated goal if archiving the goal is successful`() {
       val prisonNumber = aValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(goalReference)
@@ -311,6 +314,69 @@ class GoalServiceTest {
 
       assertThat(result).isEqualTo(archivedGoal.right())
       verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
+    }
+  }
+
+  @Nested
+  inner class UnarchiveGoals {
+
+    @Test
+    fun `should return an error if goal to be unarchived can't be found`() {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(null)
+
+      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+
+      assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference).left())
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      "ACTIVE",
+      "COMPLETED",
+    )
+    fun `should return an error if goal to be unarchived is in an invalid state`(status: GoalStatus) {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val unarchiveGoal = aValidUnarchiveGoalDto(reference = goalReference)
+      val existingGoal = aValidGoal(reference = goalReference, status = status)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+
+      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+
+      assertThat(result).isEqualTo(TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, status).left())
+    }
+
+    @Test
+    fun `should return an error if unarchiving the goal returns no goal`() {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
+      val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+      given(goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoal)).willReturn(null)
+
+      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+
+      assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference).left())
+    }
+
+    @Test
+    fun `should return an updated goal if unarchiving the goal is successful`() {
+      val prisonNumber = aValidPrisonNumber()
+      val goalReference = aValidReference()
+      val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
+      val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
+      val unarchivedGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
+      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+      given(goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoal)).willReturn(unarchivedGoal)
+
+      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+
+      assertThat(result).isEqualTo(unarchivedGoal.right())
+      verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
     }
   }
 }

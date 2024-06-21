@@ -131,14 +131,44 @@ paths:
         - Goals
       responses:
         '204':
-          description: The Goal was archive successfully.
+          description: The Goal was archived successfully.
         '400':
           $ref: '#/components/responses/400ErrorResponse'
         '404':
           $ref: '#/components/responses/404ErrorResponse'
+        '409':
+          $ref: '#/components/responses/409ErrorResponse'
       operationId: archive-goal
       requestBody:
         $ref: '#/components/requestBodies/ArchiveGoal'
+  '/action-plans/{prisonNumber}/goals/{goalReference}/unarchive':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - name: goalReference
+        description: The Goal's unique reference
+        schema:
+          type: string
+          format: uuid
+        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
+        in: path
+        required: true
+    put:
+      summary: Unarchives a Goal
+      description: Changes an archived goals status back to 'ACTIVE'
+      tags:
+        - Goals
+      responses:
+        '204':
+          description: The Goal was unarchived successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+        '409':
+          $ref: '#/components/responses/409ErrorResponse'
+      operationId: unarchive-goal
+      requestBody:
+        $ref: '#/components/requestBodies/UnarchiveGoal'
 
   #
   # Timeline
@@ -1493,6 +1523,19 @@ components:
         - goalReference
         - reason
 
+    UnarchiveGoalRequest:
+      title: UnarchiveGoalRequest
+      type: object
+      description: A request to unarchive an individual Goal.
+      properties:
+        goalReference:
+          type: string
+          format: uuid
+          description: The Goal's unique reference. This is used as an identifier to unarchive the required Goal.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+      required:
+        - goalReference
+
     GoalStatus:
       title: GoalStatus
       description: Enum describing the various statuses of a Goal's lifecycle.
@@ -2369,6 +2412,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ArchiveGoalRequest'
+    UnarchiveGoal:
+      description: Request body to unarchive a single Goal.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnarchiveGoalRequest'
     GetCiagInductionSummaries:
       description: Request body to retrieve a list of CIAG Induction summaries for one or more Prisoners.
       content:
