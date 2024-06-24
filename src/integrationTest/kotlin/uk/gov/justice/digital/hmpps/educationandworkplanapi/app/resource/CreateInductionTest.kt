@@ -19,10 +19,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkExperiencesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -228,5 +230,38 @@ class CreateInductionTest : IntegrationTestBase() {
         .containsEntry("userId", dpsUsername)
         .containsKey("reference")
     }
+  }
+
+  @Test
+  fun `should create an induction for a prisoner whose previous work experience is declared as not relevant`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
+      previousWorkExperiences = aValidCreatePreviousWorkExperiencesRequest(
+        hasWorkedBefore = HasWorkedBefore.NOT_RELEVANT,
+        hasWorkedBeforeNotRelevantReason = "Prisoner is not looking for work so feels previous work experience is not relevant",
+        experiences = emptyList(),
+      ),
+    )
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction)
+      .previousWorkExperiences {
+        it.hasWorkedBefore(HasWorkedBefore.NOT_RELEVANT)
+          .hasWorkedBeforeNotRelevantReason("Prisoner is not looking for work so feels previous work experience is not relevant")
+      }
   }
 }

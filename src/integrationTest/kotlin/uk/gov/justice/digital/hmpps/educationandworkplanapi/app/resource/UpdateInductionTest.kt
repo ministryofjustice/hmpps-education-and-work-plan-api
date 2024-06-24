@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -307,7 +308,6 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
       previousQualifications = aValidUpdatePreviousQualificationsRequest(
         reference = persistedInduction.previousQualifications!!.reference,
-        // educationLevel is required for the "long" route
         educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
       ),
       previousWorkExperiences = aValidUpdatePreviousWorkExperiencesRequest(),
@@ -446,6 +446,57 @@ class UpdateInductionTest : IntegrationTestBase() {
         .containsEntry("userId", updateUsername)
         .containsKey("reference")
     }
+  }
+
+  @Test
+  fun `should update induction for prisoner who wants to set their previous work experience as Not Relevant`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(
+      prisonNumber = prisonNumber,
+      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(),
+    )
+
+    val persistedInduction = getInduction(prisonNumber)
+    val updateInductionRequest = aValidUpdateInductionRequestForPrisonerNotLookingToWork(
+      reference = persistedInduction.reference,
+      previousWorkExperiences = aValidUpdatePreviousWorkExperiencesRequest(
+        hasWorkedBefore = HasWorkedBefore.NOT_RELEVANT,
+        hasWorkedBeforeNotRelevantReason = "Prisoner is not looking for work so feels previous work experience is not relevant",
+        experiences = emptyList(),
+      ),
+      workOnRelease = aValidUpdateWorkOnReleaseRequestForPrisonerNotLookingToWork(
+        reference = persistedInduction.workOnRelease.reference,
+      ),
+      previousQualifications = aValidUpdatePreviousQualificationsRequest(
+        reference = persistedInduction.previousQualifications!!.reference,
+        educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+      ),
+      personalSkillsAndInterests = aValidUpdatePersonalSkillsAndInterestsRequest(),
+      futureWorkInterests = aValidUpdateFutureWorkInterestsRequest(),
+      // these fields were provided in the create request and won't be changed
+      inPrisonInterests = null,
+      previousTraining = null,
+    )
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(privateKey = keyPair.private),
+      )
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction)
+      .previousWorkExperiences {
+        it.hasWorkedBefore(HasWorkedBefore.NOT_RELEVANT)
+          .hasWorkedBeforeNotRelevantReason("Prisoner is not looking for work so feels previous work experience is not relevant")
+      }
   }
 
   private fun shortDelayForTimestampChecking() {

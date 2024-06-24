@@ -9,6 +9,7 @@ import java.util.UUID
 fun aValidPreviousWorkExperiencesResponse(
   reference: UUID = UUID.randomUUID(),
   hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
+  hasWorkedBeforeNotRelevantReason: String? = null,
   experiences: List<PreviousWorkExperience> = listOf(aValidPreviousWorkExperience()),
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",
@@ -22,6 +23,7 @@ fun aValidPreviousWorkExperiencesResponse(
   PreviousWorkExperiencesResponse(
     reference = reference,
     hasWorkedBefore = hasWorkedBefore,
+    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
     experiences = experiences,
     createdBy = createdBy,
     createdByDisplayName = createdByDisplayName,

@@ -7,10 +7,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkT
 
 fun aValidCreatePreviousWorkExperiencesRequest(
   hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
+  hasWorkedBeforeNotRelevantReason: String? = null,
   experiences: List<PreviousWorkExperience>? = listOf(aValidPreviousWorkExperience()),
 ): CreatePreviousWorkExperiencesRequest =
   CreatePreviousWorkExperiencesRequest(
     hasWorkedBefore = hasWorkedBefore,
+    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
     experiences = experiences,
   )
 
