@@ -7,6 +7,7 @@ import java.util.UUID
 data class UpdatePreviousWorkExperiencesDto(
   val reference: UUID?,
   val hasWorkedBefore: HasWorkedBefore,
+  val hasWorkedBeforeNotRelevantReason: String?,
   val experiences: List<WorkExperience>,
   val prisonId: String,
 )

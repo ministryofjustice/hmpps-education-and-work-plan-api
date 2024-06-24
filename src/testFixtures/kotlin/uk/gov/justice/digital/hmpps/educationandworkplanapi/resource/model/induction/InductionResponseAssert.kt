@@ -4,6 +4,7 @@ import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import java.time.OffsetDateTime
 import java.util.UUID
+import java.util.function.Consumer
 
 fun assertThat(actual: InductionResponse?) = InductionResponseAssert(actual)
 
@@ -121,6 +122,19 @@ class InductionResponseAssert(actual: InductionResponse?) :
       if (updatedAtPrison != expected) {
         failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [PreviousWorkExperiencesResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [PreviousWorkExperiencesResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun previousWorkExperiences(consumer: Consumer<PreviousWorkExperiencesResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(previousWorkExperiences))
     }
     return this
   }

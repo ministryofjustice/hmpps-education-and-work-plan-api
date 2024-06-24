@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Wor
 
 data class CreatePreviousWorkExperiencesDto(
   val hasWorkedBefore: HasWorkedBefore,
+  val hasWorkedBeforeNotRelevantReason: String?,
   val experiences: List<WorkExperience>,
   val prisonId: String,
 )
