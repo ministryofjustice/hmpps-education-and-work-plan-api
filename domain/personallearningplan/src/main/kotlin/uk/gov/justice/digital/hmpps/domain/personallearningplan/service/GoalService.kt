@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
-import arrow.core.toOption
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -107,15 +106,13 @@ class GoalService(
     val goalReference = archiveGoalDto.reference
     log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
 
-    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference).toOption()
-      .toEither { GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference) }
+    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+      .orProblem(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
       .flatMap { validateGoalIsValidForArchiving(it, prisonNumber, goalReference) }
       .flatMap { validateArchiveDto(archiveGoalDto, prisonNumber, goalReference) }
       .flatMap {
-        goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)?.right() ?: GoalToBeArchivedCouldNotBeFound(
-          prisonNumber,
-          goalReference,
-        ).left()
+        goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
+          .orProblem(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
       }
   }
 
@@ -126,14 +123,12 @@ class GoalService(
     val goalReference = unarchiveGoalDto.reference
     log.info { "Unarchiving Goal with reference [$goalReference] for prisoner [$prisonNumber]." }
 
-    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference).toOption()
-      .toEither { GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference) }
+    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+      .orProblem(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
       .flatMap { validateGoalIsValidForUnarchiving(it, prisonNumber, goalReference) }
       .flatMap {
-        goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)?.right() ?: GoalToBeUnarchivedCouldNotBeFound(
-          prisonNumber,
-          goalReference,
-        ).left()
+        goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
+          .orProblem(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
       }
   }
 
@@ -142,30 +137,32 @@ class GoalService(
     prisonNumber: String,
     goalReference: UUID,
   ) = if (archiveGoalDto.reason == ReasonToArchiveGoal.OTHER && archiveGoalDto.reasonOther.isNullOrEmpty()) {
-    ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference).left()
+    Either.Left(ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference))
   } else {
-    Unit.right()
+    Either.Right(Unit)
   }
 
   private fun validateGoalIsValidForArchiving(
     it: Goal,
     prisonNumber: String,
     goalReference: UUID,
-  ) = if (it.status != GoalStatus.ACTIVE) {
-    TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status).left()
+  ): Either<TriedToArchiveAGoalInAnInvalidState, Goal> = if (it.status != GoalStatus.ACTIVE) {
+    Either.Left(TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status))
   } else {
-    it.right()
+    Either.Right(it)
   }
 
   private fun validateGoalIsValidForUnarchiving(
     it: Goal,
     prisonNumber: String,
     goalReference: UUID,
-  ) = if (it.status != GoalStatus.ARCHIVED) {
-    TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status).left()
+  ): Either<TriedToUnarchiveAGoalInAnInvalidState, Goal> = if (it.status != GoalStatus.ARCHIVED) {
+    Either.Left(TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status))
   } else {
-    it.right()
+    Either.Right(it)
   }
+
+  private fun <T> Goal?.orProblem(problem: T): Either<T, Goal> = this?.right() ?: problem.left()
 
   private fun actionPlanDoesNotExist(prisonNumber: String) =
     actionPlanPersistenceAdapter.getActionPlan(prisonNumber) == null
