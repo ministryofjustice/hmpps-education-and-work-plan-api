@@ -114,6 +114,7 @@ class GoalService(
         goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
           .orProblem(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
       }
+      .onLeft { log.info { it.errorMessage } }
   }
 
   /**
@@ -130,6 +131,7 @@ class GoalService(
         goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
           .orProblem(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
       }
+      .onLeft { log.info { it.errorMessage } }
   }
 
   private fun validateArchiveDto(
