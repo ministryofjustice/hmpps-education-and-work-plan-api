@@ -15,17 +15,20 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeUnarchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToUnarchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchiveReasonIsOtherButNoDescriptionProvided
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchivedGoalSuccessfully
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.GoalToBeUnarchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.TriedToUnarchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.UnArchivedGoalSuccessfully
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.util.*
@@ -86,11 +89,12 @@ class GoalController(
     return goalService.archiveGoal(
       prisonNumber = prisonNumber,
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
-    ).toResponseEntity({ ResponseEntity.noContent().build() }) {
+    ).let {
       when (it) {
-        is GoalToBeArchivedCouldNotBeFound -> HttpStatus.NOT_FOUND
-        is ArchiveReasonIsOtherButNoDescriptionProvided -> HttpStatus.BAD_REQUEST
-        is TriedToArchiveAGoalInAnInvalidState -> HttpStatus.CONFLICT
+        is ArchivedGoalSuccessfully -> ResponseEntity.noContent().build()
+        is GoalToBeArchivedCouldNotBeFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
+        is ArchiveReasonIsOtherButNoDescriptionProvided -> errorResponse(HttpStatus.BAD_REQUEST, it.errorMessage())
+        is TriedToArchiveAGoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
       }
     }
   }
@@ -109,12 +113,18 @@ class GoalController(
     return goalService.unarchiveGoal(
       prisonNumber = prisonNumber,
       unarchiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
-    )
-      .toResponseEntity({ ResponseEntity.noContent().build() }) {
-        when (it) {
-          is GoalToBeUnarchivedCouldNotBeFound -> HttpStatus.NOT_FOUND
-          is TriedToUnarchiveAGoalInAnInvalidState -> HttpStatus.CONFLICT
-        }
+    ).let {
+      when (it) {
+        is UnArchivedGoalSuccessfully -> ResponseEntity.noContent().build()
+        is GoalToBeUnarchivedCouldNotBeFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
+        is TriedToUnarchiveAGoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
       }
+    }
+  }
+
+  private fun errorResponse(status: HttpStatus, errorMessage: String): ResponseEntity<Any> {
+    return ResponseEntity
+      .status(status)
+      .body(ErrorResponse(status = status.value(), userMessage = errorMessage))
   }
 }

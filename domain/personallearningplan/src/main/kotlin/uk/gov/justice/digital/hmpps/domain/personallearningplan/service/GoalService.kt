@@ -1,25 +1,23 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalProblem
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchiveReasonIsOtherButNoDescriptionProvided
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchivedGoalSuccessfully
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeUnarchivedCouldNotBeFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToUnarchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalProblem
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.GoalToBeUnarchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.TriedToUnarchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.UnArchivedGoalSuccessfully
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import java.util.*
 
@@ -102,69 +100,54 @@ class GoalService(
   /**
    * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
    */
-  fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): Either<ArchiveGoalProblem, Goal> {
+  fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): ArchiveGoalResult {
     val goalReference = archiveGoalDto.reference
     log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
 
-    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
-      .orProblem(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
-      .flatMap { validateGoalIsValidForArchiving(it, prisonNumber, goalReference) }
-      .flatMap { validateArchiveDto(archiveGoalDto, prisonNumber, goalReference) }
-      .flatMap {
-        goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
-          .orProblem(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
-      }
-      .onLeft { log.info { it.errorMessage } }
+    val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+    return if (existingGoal == null) {
+      GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
+    } else if (checkReasonIsSpecifiedIfOther(archiveGoalDto)) {
+      ArchiveReasonIsOtherButNoDescriptionProvided(
+        prisonNumber,
+        goalReference,
+      )
+    } else if (existingGoal.status != GoalStatus.ACTIVE) {
+      TriedToArchiveAGoalInAnInvalidState(
+        prisonNumber,
+        goalReference,
+        existingGoal.status,
+      )
+    } else {
+      goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)?.let { ArchivedGoalSuccessfully(it) }
+        ?: GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
+    }
   }
 
   /**
    * Unarchives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [UnarchiveGoalDto].
    */
-  fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Either<UnarchiveGoalProblem, Goal> {
+  fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): UnarchiveGoalResult {
     val goalReference = unarchiveGoalDto.reference
     log.info { "Unarchiving Goal with reference [$goalReference] for prisoner [$prisonNumber]." }
 
-    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
-      .orProblem(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
-      .flatMap { validateGoalIsValidForUnarchiving(it, prisonNumber, goalReference) }
-      .flatMap {
-        goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
-          .orProblem(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
-      }
-      .onLeft { log.info { it.errorMessage } }
+    val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+    return if (existingGoal == null) {
+      GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
+    } else if (existingGoal.status != GoalStatus.ARCHIVED) {
+      TriedToUnarchiveAGoalInAnInvalidState(
+        prisonNumber,
+        goalReference,
+        existingGoal.status,
+      )
+    } else {
+      goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
+        ?.let { UnArchivedGoalSuccessfully(it) } ?: GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
+    }
   }
 
-  private fun validateArchiveDto(
-    archiveGoalDto: ArchiveGoalDto,
-    prisonNumber: String,
-    goalReference: UUID,
-  ) = if (archiveGoalDto.reason == ReasonToArchiveGoal.OTHER && archiveGoalDto.reasonOther.isNullOrEmpty()) {
-    Either.Left(ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference))
-  } else {
-    Either.Right(Unit)
-  }
-
-  private fun validateGoalIsValidForArchiving(
-    it: Goal,
-    prisonNumber: String,
-    goalReference: UUID,
-  ): Either<TriedToArchiveAGoalInAnInvalidState, Goal> = if (it.status != GoalStatus.ACTIVE) {
-    Either.Left(TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status))
-  } else {
-    Either.Right(it)
-  }
-
-  private fun validateGoalIsValidForUnarchiving(
-    it: Goal,
-    prisonNumber: String,
-    goalReference: UUID,
-  ): Either<TriedToUnarchiveAGoalInAnInvalidState, Goal> = if (it.status != GoalStatus.ARCHIVED) {
-    Either.Left(TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, it.status))
-  } else {
-    Either.Right(it)
-  }
-
-  private fun <T> Goal?.orProblem(problem: T): Either<T, Goal> = this?.right() ?: problem.left()
+  private fun checkReasonIsSpecifiedIfOther(archiveGoalDto: ArchiveGoalDto) =
+    archiveGoalDto.reason == ReasonToArchiveGoal.OTHER && archiveGoalDto.reasonOther.isNullOrEmpty()
 
   private fun actionPlanDoesNotExist(prisonNumber: String) =
     actionPlanPersistenceAdapter.getActionPlan(prisonNumber) == null
