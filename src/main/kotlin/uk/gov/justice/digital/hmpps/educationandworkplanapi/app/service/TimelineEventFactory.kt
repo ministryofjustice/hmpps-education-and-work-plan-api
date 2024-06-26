@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
@@ -60,17 +59,6 @@ class TimelineEventFactory {
     val timelineEvents = mutableListOf<TimelineEvent>()
     val correlationId = UUID.randomUUID()
 
-    if (hasGoalStatusChanged(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
-      timelineEvents.add(
-        buildTimelineEvent(
-          goal = updatedGoal,
-          sourceReference = updatedGoal.reference,
-          eventType = getGoalStatusEventType(updatedGoal),
-          contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
-          correlationId = correlationId,
-        ),
-      )
-    }
     if (hasGoalBeenUpdated(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
       timelineEvents.add(
         buildTimelineEvent(
@@ -106,15 +94,34 @@ class TimelineEventFactory {
     return timelineEvents
   }
 
+  fun goalArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
+    buildTimelineEvent(
+      goal = goal,
+      sourceReference = goal.reference,
+      eventType = TimelineEventType.GOAL_ARCHIVED,
+      contextualInfo = listOfNotNull(
+        TimelineEventContext.GOAL_TITLE to goal.title,
+        TimelineEventContext.GOAL_ARCHIVED_REASON to goal.archiveReason!!.toString(),
+        goal.archiveReasonOther?.let { TimelineEventContext.GOAL_ARCHIVED_REASON_OTHER to it },
+      ).toMap(),
+      correlationId = correlationId,
+    )
+
+  fun goalUnArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
+    buildTimelineEvent(
+      goal = goal,
+      sourceReference = goal.reference,
+      eventType = TimelineEventType.GOAL_UNARCHIVED,
+      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goal.title),
+      correlationId = correlationId,
+    )
+
   private fun hasGoalBeenUpdated(previousGoal: Goal, updatedGoal: Goal) =
     updatedGoal.title != previousGoal.title ||
       updatedGoal.steps.size != previousGoal.steps.size ||
       updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
       updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
       updatedGoal.notes != previousGoal.notes
-
-  private fun hasGoalStatusChanged(previousGoal: Goal, updatedGoal: Goal) =
-    updatedGoal.status != previousGoal.status
 
   private fun getStepUpdatedEvents(
     updatedGoal: Goal,
@@ -161,15 +168,6 @@ class TimelineEventFactory {
 
   private fun getPreviousStep(previousSteps: List<Step>, updatedStep: Step): Step? =
     previousSteps.firstOrNull { it.reference == updatedStep.reference }
-
-  private fun getGoalStatusEventType(updatedGoal: Goal): TimelineEventType {
-    val eventType = when (updatedGoal.status) {
-      GoalStatus.COMPLETED -> TimelineEventType.GOAL_COMPLETED
-      GoalStatus.ACTIVE -> TimelineEventType.GOAL_STARTED
-      GoalStatus.ARCHIVED -> TimelineEventType.GOAL_ARCHIVED
-    }
-    return eventType
-  }
 
   private fun getStepStatusEventType(step: Step): TimelineEventType {
     val eventType = when (step.status) {

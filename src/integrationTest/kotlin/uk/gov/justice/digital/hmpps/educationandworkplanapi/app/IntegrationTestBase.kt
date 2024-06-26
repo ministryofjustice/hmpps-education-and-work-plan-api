@@ -16,6 +16,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
@@ -135,12 +136,18 @@ abstract class IntegrationTestBase {
   }
 
   fun getTimeline(prisonNumber: String): TimelineResponse =
-    webTestClient.get()
-      .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .exchange()
-      .returnResult(TimelineResponse::class.java)
-      .responseBody.blockFirst()!!
+    run {
+      wiremockService.stubGetPrisonTimelineFromPrisonApi(
+        prisonNumber,
+        aValidPrisonerInPrisonSummary(prisonerNumber = prisonNumber, prisonPeriod = emptyList()),
+      )
+      webTestClient.get()
+        .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
+        .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+        .exchange()
+        .returnResult(TimelineResponse::class.java)
+        .responseBody.blockFirst()!!
+    }
 
   fun createInduction(
     prisonNumber: String,

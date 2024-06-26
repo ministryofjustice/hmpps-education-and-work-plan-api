@@ -8,7 +8,9 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_UPDATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UNARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_CREATED
@@ -45,6 +47,22 @@ class TelemetryService(
       goal = updatedGoal,
       correlationId = correlationId,
       telemetryEventType = STEP_REMOVED,
+    )
+  }
+
+  fun trackGoalArchivedEvent(archivedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForGoal(
+      goal = archivedGoal,
+      correlationId = correlationId,
+      telemetryEventType = GOAL_ARCHIVED,
+    )
+  }
+
+  fun trackGoalUnArchivedEvent(unArchivedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForGoal(
+      goal = unArchivedGoal,
+      correlationId = correlationId,
+      telemetryEventType = GOAL_UNARCHIVED,
     )
   }
 

@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEven
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_STARTED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_ADDED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_COMPLETED
@@ -205,6 +204,50 @@ class TelemetryServiceTest {
   }
 
   @Nested
+  inner class TrackGoalArchivedEvents {
+    @Test
+    fun `should track goal archived event`() {
+      // Given
+      val reference = UUID.randomUUID()
+      val archivedGoal = aValidGoal(reference = reference, status = GoalStatus.ARCHIVED)
+
+      val correlationId = UUID.randomUUID()
+      val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
+        "reference" to reference.toString(),
+      )
+
+      // When
+      telemetryService.trackGoalArchivedEvent(archivedGoal, correlationId)
+
+      // Then
+      verify(telemetryClient).trackEvent("goal-archived", expectedEventProperties)
+    }
+  }
+
+  @Nested
+  inner class TrackGoalUnArchivedEvents {
+    @Test
+    fun `should track goal unarchived event`() {
+      // Given
+      val reference = UUID.randomUUID()
+      val archivedGoal = aValidGoal(reference = reference, status = GoalStatus.ACTIVE)
+
+      val correlationId = UUID.randomUUID()
+      val expectedEventProperties = mapOf(
+        "correlationId" to correlationId.toString(),
+        "reference" to reference.toString(),
+      )
+
+      // When
+      telemetryService.trackGoalUnArchivedEvent(archivedGoal, correlationId)
+
+      // Then
+      verify(telemetryClient).trackEvent("goal-unarchived", expectedEventProperties)
+    }
+  }
+
+  @Nested
   inner class TrackGoalUpdatedEvents {
     @Test
     fun `should track goal updated events given previous and updated goals contain all possible differences`() {
@@ -221,7 +264,6 @@ class TelemetryServiceTest {
         // The follow event types will be supported in the future.
         // They are included here to break the test as and when the implementation handles them.
         GOAL_CREATED,
-        GOAL_STARTED,
         GOAL_COMPLETED,
         GOAL_ARCHIVED,
         STEP_UPDATED,

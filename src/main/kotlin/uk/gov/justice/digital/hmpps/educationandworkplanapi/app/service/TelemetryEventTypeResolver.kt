@@ -2,12 +2,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_STARTED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_ADDED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_COMPLETED
@@ -35,12 +31,6 @@ class TelemetryEventTypeResolver {
     // check if the goal itself was updated, excluding its steps and status
     if (hasGoalBeenUpdated(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
       updateTypes.add(GOAL_UPDATED)
-    }
-
-    // check if the goal's status was updated
-    if (hasGoalStatusChanged(previousGoal = previousGoal, updatedGoal = updatedGoal)) {
-      val updateTypeForGoalStatusChange = getTelemetryUpdateEventTypeForGoalStatusChange(updatedGoal)
-      updateTypes.add(updateTypeForGoalStatusChange)
     }
 
     val previousStepReferences = previousGoal.steps.map { it.reference }
@@ -83,16 +73,6 @@ class TelemetryEventTypeResolver {
       updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
       updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
       updatedGoal.notes != previousGoal.notes
-
-  private fun hasGoalStatusChanged(previousGoal: Goal, updatedGoal: Goal) =
-    updatedGoal.status != previousGoal.status
-
-  private fun getTelemetryUpdateEventTypeForGoalStatusChange(updatedGoal: Goal): GoalTelemetryEventType =
-    when (updatedGoal.status) {
-      GoalStatus.COMPLETED -> GOAL_COMPLETED
-      GoalStatus.ACTIVE -> GOAL_STARTED
-      GoalStatus.ARCHIVED -> GOAL_ARCHIVED
-    }
 
   private fun hasStepBeenUpdated(previousStep: Step, updatedStep: Step) =
     updatedStep.title != previousStep.title ||
