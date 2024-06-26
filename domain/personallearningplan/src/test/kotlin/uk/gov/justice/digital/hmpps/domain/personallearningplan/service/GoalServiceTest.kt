@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
-import arrow.core.left
-import arrow.core.right
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
@@ -24,12 +22,14 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundExce
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveReasonIsOtherButNoDescriptionProvided
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeArchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GoalToBeUnarchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchiveReasonIsOtherButNoDescriptionProvided
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchivedGoalSuccessfully
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.GoalToBeArchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToArchiveAGoalInAnInvalidState
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.TriedToUnarchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.GoalToBeUnarchivedCouldNotBeFound
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.TriedToUnarchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.UnArchivedGoalSuccessfully
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
@@ -251,7 +251,7 @@ class GoalServiceTest {
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
-      assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference).left())
+      assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
     }
 
     @ParameterizedTest
@@ -268,7 +268,7 @@ class GoalServiceTest {
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
-      assertThat(result).isEqualTo(TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, status).left())
+      assertThat(result).isEqualTo(TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, status))
     }
 
     @ParameterizedTest
@@ -283,7 +283,7 @@ class GoalServiceTest {
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
-      assertThat(result).isEqualTo(ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference).left())
+      assertThat(result).isEqualTo(ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference))
     }
 
     @Test
@@ -297,7 +297,7 @@ class GoalServiceTest {
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
-      assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference).left())
+      assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
     }
 
     @Test
@@ -312,7 +312,7 @@ class GoalServiceTest {
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
-      assertThat(result).isEqualTo(archivedGoal.right())
+      assertThat(result).isEqualTo(ArchivedGoalSuccessfully(archivedGoal))
       verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
     }
   }
@@ -329,7 +329,7 @@ class GoalServiceTest {
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
-      assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference).left())
+      assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
     }
 
     @ParameterizedTest
@@ -346,7 +346,7 @@ class GoalServiceTest {
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
-      assertThat(result).isEqualTo(TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, status).left())
+      assertThat(result).isEqualTo(TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, status))
     }
 
     @Test
@@ -360,7 +360,7 @@ class GoalServiceTest {
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
-      assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference).left())
+      assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
     }
 
     @Test
@@ -375,7 +375,7 @@ class GoalServiceTest {
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
-      assertThat(result).isEqualTo(unarchivedGoal.right())
+      assertThat(result).isEqualTo(UnArchivedGoalSuccessfully(unarchivedGoal))
       verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
     }
   }
