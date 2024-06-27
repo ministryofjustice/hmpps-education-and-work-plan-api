@@ -1,6 +1,13 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -14,11 +21,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Archi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.util.*
 
@@ -78,6 +87,28 @@ class ArchiveGoalTest : IntegrationTestBase() {
           .hasArchiveReason(ReasonToArchiveGoal.OTHER)
           .hasArchiveReasonOther(reasonOther)
       }
+
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(3) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
+          it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
+            .wasActionedBy("buser_gen")
+            .hasActionedByDisplayName("Bernie User")
+        }
+
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+
+      verify(telemetryClient).trackEvent(
+        eq("goal-archived"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+
+      val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(goalArchivedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+    }
   }
 
   @Test

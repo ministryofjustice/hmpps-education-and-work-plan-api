@@ -247,11 +247,13 @@ class GoalServiceTest {
       val prisonNumber = aValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(goalReference)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(null)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
       assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      verifyNoInteractions(goalEventService)
     }
 
     @ParameterizedTest
@@ -264,11 +266,13 @@ class GoalServiceTest {
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(reference = goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = status)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
       assertThat(result).isEqualTo(TriedToArchiveAGoalInAnInvalidState(prisonNumber, goalReference, status))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      verifyNoInteractions(goalEventService)
     }
 
     @ParameterizedTest
@@ -278,12 +282,12 @@ class GoalServiceTest {
       val goalReference = aValidReference()
       val archiveGoal =
         aValidArchiveGoalDto(reference = goalReference, reason = ReasonToArchiveGoal.OTHER, reasonOther = reasonOther)
-      val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
       assertThat(result).isEqualTo(ArchiveReasonIsOtherButNoDescriptionProvided(prisonNumber, goalReference))
+      verifyNoInteractions(goalPersistenceAdapter)
+      verifyNoInteractions(goalEventService)
     }
 
     @Test
@@ -292,12 +296,15 @@ class GoalServiceTest {
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
-      given(goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoal)).willReturn(null)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
+      given(goalPersistenceAdapter.archiveGoal(any(), any())).willReturn(null)
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
       assertThat(result).isEqualTo(GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
+      verifyNoInteractions(goalEventService)
     }
 
     @Test
@@ -307,13 +314,15 @@ class GoalServiceTest {
       val archiveGoal = aValidArchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
       val archivedGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
-      given(goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoal)).willReturn(archivedGoal)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
+      given(goalPersistenceAdapter.archiveGoal(any(), any())).willReturn(archivedGoal)
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
       assertThat(result).isEqualTo(ArchivedGoalSuccessfully(archivedGoal))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
+      verify(goalEventService).goalArchived(prisonNumber, archivedGoal)
     }
   }
 
@@ -325,11 +334,13 @@ class GoalServiceTest {
       val prisonNumber = aValidPrisonNumber()
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(null)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
       assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      verifyNoInteractions(goalEventService)
     }
 
     @ParameterizedTest
@@ -342,11 +353,13 @@ class GoalServiceTest {
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(reference = goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = status)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
       assertThat(result).isEqualTo(TriedToUnarchiveAGoalInAnInvalidState(prisonNumber, goalReference, status))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      verifyNoInteractions(goalEventService)
     }
 
     @Test
@@ -355,12 +368,15 @@ class GoalServiceTest {
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
-      given(goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoal)).willReturn(null)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
+      given(goalPersistenceAdapter.unarchiveGoal(any(), any())).willReturn(null)
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
       assertThat(result).isEqualTo(GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
+      verifyNoInteractions(goalEventService)
     }
 
     @Test
@@ -370,13 +386,15 @@ class GoalServiceTest {
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
       val unarchivedGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
-      given(goalPersistenceAdapter.getGoal(prisonNumber, goalReference)).willReturn(existingGoal)
-      given(goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoal)).willReturn(unarchivedGoal)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
+      given(goalPersistenceAdapter.unarchiveGoal(any(), any())).willReturn(unarchivedGoal)
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
       assertThat(result).isEqualTo(UnArchivedGoalSuccessfully(unarchivedGoal))
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
+      verify(goalEventService).goalUnArchived(prisonNumber, unarchivedGoal)
     }
   }
 }

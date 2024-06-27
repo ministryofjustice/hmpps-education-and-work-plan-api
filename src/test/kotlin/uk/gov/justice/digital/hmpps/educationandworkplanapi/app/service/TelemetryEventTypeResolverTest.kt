@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
@@ -158,46 +157,6 @@ class TelemetryEventTypeResolverTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedTelemetryEventTypes)
-  }
-
-  @ParameterizedTest
-  @CsvSource(
-    value = [
-      "ACTIVE, COMPLETED, GOAL_COMPLETED",
-      "ACTIVE, ARCHIVED, GOAL_ARCHIVED",
-      "ARCHIVED, ACTIVE, GOAL_STARTED",
-    ],
-  )
-  fun `should get goal update types given goals with different statuses`(
-    previousGoalStatus: GoalStatus,
-    updatedGoalStatus: GoalStatus,
-    expectedTelemetryEventType: GoalTelemetryEventType,
-  ) {
-    // Given
-    val goalReference = aValidReference()
-    val stepReference = aValidReference()
-
-    val previousSteps = listOf(aValidStep(reference = stepReference))
-    val previousGoal = aValidGoal(
-      reference = goalReference,
-      title = "Learn French",
-      status = previousGoalStatus,
-      steps = previousSteps,
-    )
-    val updatedSteps = listOf(aValidStep(reference = stepReference))
-    val updatedGoal = aValidGoal(
-      reference = goalReference,
-      title = "Learn French",
-      status = updatedGoalStatus,
-      steps = updatedSteps,
-    )
-    val expectedTelemetryUpdateEventTypes = listOf(expectedTelemetryEventType)
-
-    // When
-    val actual = resolver.resolveUpdateEventTypes(previousGoal, updatedGoal)
-
-    // Then
-    assertThat(actual).isEqualTo(expectedTelemetryUpdateEventTypes)
   }
 
   @Test

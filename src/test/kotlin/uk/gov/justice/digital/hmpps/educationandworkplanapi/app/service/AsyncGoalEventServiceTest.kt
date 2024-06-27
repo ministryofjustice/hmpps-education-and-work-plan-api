@@ -17,6 +17,7 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
@@ -109,6 +110,44 @@ class AsyncGoalEventServiceTest {
       verify(timelineEventFactory).goalUpdatedEvents(previousGoal, updatedGoal)
       verify(timelineService).recordTimelineEvents(prisonNumber, expectedTimelineEvents)
       verify(telemetryService).trackGoalUpdatedEvents(previousGoal, updatedGoal)
+    }
+  }
+
+  @Test
+  fun `should send event details given goal archived`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val archivedGoal = aValidGoal(status = GoalStatus.ARCHIVED)
+    val expectedTimelineEvent = aValidTimelineEvent()
+    given(timelineEventFactory.goalArchivedTimelineEvent(any(), any())).willReturn(expectedTimelineEvent)
+
+    // When
+    goalEventService.goalArchived(prisonNumber = prisonNumber, archivedGoal = archivedGoal)
+
+    // Then
+    await.untilAsserted {
+      verify(timelineEventFactory).goalArchivedTimelineEvent(eq(archivedGoal), any())
+      verify(timelineService).recordTimelineEvent(prisonNumber, expectedTimelineEvent)
+      verify(telemetryService).trackGoalArchivedEvent(eq(archivedGoal), any())
+    }
+  }
+
+  @Test
+  fun `should send event details given goal unarchived`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val unArchivedGoal = aValidGoal(status = GoalStatus.ARCHIVED)
+    val expectedTimelineEvent = aValidTimelineEvent()
+    given(timelineEventFactory.goalUnArchivedTimelineEvent(any(), any())).willReturn(expectedTimelineEvent)
+
+    // When
+    goalEventService.goalUnArchived(prisonNumber = prisonNumber, unArchivedGoal = unArchivedGoal)
+
+    // Then
+    await.untilAsserted {
+      verify(timelineEventFactory).goalUnArchivedTimelineEvent(eq(unArchivedGoal), any())
+      verify(timelineService).recordTimelineEvent(prisonNumber, expectedTimelineEvent)
+      verify(telemetryService).trackGoalUnArchivedEvent(eq(unArchivedGoal), any())
     }
   }
 }

@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
@@ -13,6 +11,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
@@ -105,44 +104,6 @@ class TimelineEventFactoryTest {
       .isEqualTo(expectedEvents)
     assertThat(actual[0].reference).isNotNull
     assertThat(actual[0].timestamp).isNotNull
-  }
-
-  @ParameterizedTest
-  @CsvSource(
-    value = [
-      "ACTIVE, COMPLETED, GOAL_COMPLETED",
-      "ACTIVE, ARCHIVED, GOAL_ARCHIVED",
-      "ARCHIVED, ACTIVE, GOAL_STARTED",
-    ],
-  )
-  fun `should create goal status change event given only goal status changed`(
-    originalStatus: GoalStatus,
-    newStatus: GoalStatus,
-    expectedEventType: TimelineEventType,
-  ) {
-    // Given
-    val reference = UUID.randomUUID()
-    val previousGoal = aValidGoal(reference = reference, status = originalStatus)
-    val updatedGoal = aValidGoal(reference = reference, status = newStatus)
-    val expectedEvents = listOf(
-      newTimelineEvent(
-        sourceReference = reference.toString(),
-        eventType = expectedEventType,
-        prisonId = updatedGoal.lastUpdatedAtPrison,
-        actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
-      ),
-    )
-
-    // When
-    val actual = timelineEventFactory.goalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
-
-    // Then
-    assertThat(actual)
-      .usingRecursiveComparison()
-      .ignoringFields(*IGNORED_FIELDS)
-      .isEqualTo(expectedEvents)
   }
 
   @Test
@@ -270,14 +231,6 @@ class TimelineEventFactoryTest {
     val expectedEvents = listOf(
       newTimelineEvent(
         sourceReference = goalReference.toString(),
-        eventType = TimelineEventType.GOAL_COMPLETED,
-        prisonId = updatedGoal.lastUpdatedAtPrison,
-        actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
-        contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to "Learn Spanish"),
-      ),
-      newTimelineEvent(
-        sourceReference = goalReference.toString(),
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
@@ -320,5 +273,77 @@ class TimelineEventFactoryTest {
       .isEqualTo(expectedEvents)
     val expectedCorrelationId = actual[0].correlationId
     assertThat(actual).allMatch { it.correlationId == expectedCorrelationId }
+  }
+
+  @Test
+  fun `should create goal archived event given archived goal with an archived reason`() {
+    // Given
+    val goal = aValidGoal(
+      status = GoalStatus.ARCHIVED,
+      archiveReason = ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL,
+    )
+
+    // When
+    val actual = timelineEventFactory.goalArchivedTimelineEvent(goal)
+
+    // Then
+    assertThat(actual)
+      .hasSourceReference(goal.reference.toString())
+      .hasEventType(TimelineEventType.GOAL_ARCHIVED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
+      .hasContextualInfo(
+        mapOf(
+          TimelineEventContext.GOAL_TITLE to goal.title,
+          TimelineEventContext.GOAL_ARCHIVED_REASON to "PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL",
+        ),
+      )
+  }
+
+  @Test
+  fun `should create goal archived event given archived goal with an 'OTHER' archived reason`() {
+    // Given
+    val goal = aValidGoal(
+      status = GoalStatus.ARCHIVED,
+      archiveReason = ReasonToArchiveGoal.OTHER,
+      archiveReasonOther = "Prisoner has deceased",
+    )
+
+    // When
+    val actual = timelineEventFactory.goalArchivedTimelineEvent(goal)
+
+    // Then
+    assertThat(actual)
+      .hasSourceReference(goal.reference.toString())
+      .hasEventType(TimelineEventType.GOAL_ARCHIVED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
+      .hasContextualInfo(
+        mapOf(
+          TimelineEventContext.GOAL_TITLE to goal.title,
+          TimelineEventContext.GOAL_ARCHIVED_REASON to "OTHER",
+          TimelineEventContext.GOAL_ARCHIVED_REASON_OTHER to "Prisoner has deceased",
+        ),
+      )
+  }
+
+  @Test
+  fun `should create goal un-archived event`() {
+    // Given
+    val goal = aValidGoal(status = GoalStatus.ACTIVE)
+
+    // When
+    val actual = timelineEventFactory.goalUnArchivedTimelineEvent(goal)
+
+    // Then
+    assertThat(actual)
+      .hasSourceReference(goal.reference.toString())
+      .hasEventType(TimelineEventType.GOAL_UNARCHIVED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
+      .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
   }
 }

@@ -99,19 +99,23 @@ class GoalService(
 
   /**
    * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
+   *
+   * Returns an [ArchiveGoalResult] from which the success of the operation can be determined.
    */
   fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): ArchiveGoalResult {
     val goalReference = archiveGoalDto.reference
     log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
 
-    val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
-    return if (existingGoal == null) {
-      GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
-    } else if (checkReasonIsSpecifiedIfOther(archiveGoalDto)) {
-      ArchiveReasonIsOtherButNoDescriptionProvided(
+    if (checkReasonIsSpecifiedIfOther(archiveGoalDto)) {
+      return ArchiveReasonIsOtherButNoDescriptionProvided(
         prisonNumber,
         goalReference,
       )
+    }
+
+    val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+    return if (existingGoal == null) {
+      GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
     } else if (existingGoal.status != GoalStatus.ACTIVE) {
       TriedToArchiveAGoalInAnInvalidState(
         prisonNumber,
@@ -119,19 +123,24 @@ class GoalService(
         existingGoal.status,
       )
     } else {
-      goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)?.let { ArchivedGoalSuccessfully(it) }
+      goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
+        ?.also { goalEventService.goalArchived(prisonNumber, it) }
+        ?.let { ArchivedGoalSuccessfully(it) }
         ?: GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
     }
   }
 
   /**
    * Unarchives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [UnarchiveGoalDto].
+   *
+   * Returns an [UnarchiveGoalResult] from which the success of the operation can be determined.
    */
   fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): UnarchiveGoalResult {
     val goalReference = unarchiveGoalDto.reference
     log.info { "Unarchiving Goal with reference [$goalReference] for prisoner [$prisonNumber]." }
 
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+
     return if (existingGoal == null) {
       GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
     } else if (existingGoal.status != GoalStatus.ARCHIVED) {
@@ -142,7 +151,9 @@ class GoalService(
       )
     } else {
       goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
-        ?.let { UnArchivedGoalSuccessfully(it) } ?: GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
+        ?.also { goalEventService.goalUnArchived(prisonNumber, it) }
+        ?.let { UnArchivedGoalSuccessfully(it) }
+        ?: GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
     }
   }
 

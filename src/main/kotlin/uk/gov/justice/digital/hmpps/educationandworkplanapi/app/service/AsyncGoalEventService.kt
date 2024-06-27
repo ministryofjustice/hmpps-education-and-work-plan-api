@@ -48,6 +48,20 @@ class AsyncGoalEventService(
     trackGoalUpdatedTelemetryEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
   }
 
+  override fun goalArchived(prisonNumber: String, archivedGoal: Goal) {
+    log.debug { "Goal archived event for prisoner [$prisonNumber]" }
+
+    recordGoalArchivedTimelineEvent(prisonNumber, archivedGoal)
+    trackGoalArchivedTelemetryEvent(archivedGoal)
+  }
+
+  override fun goalUnArchived(prisonNumber: String, unArchivedGoal: Goal) {
+    log.debug { "Goal un-archived event for prisoner [$prisonNumber]" }
+
+    recordGoalUnArchivedTimelineEvent(prisonNumber, unArchivedGoal)
+    trackGoalUnArchivedTelemetryEvent(unArchivedGoal)
+  }
+
   private fun recordGoalCreatedTimelineEvent(prisonNumber: String, createdGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
     timelineService.recordTimelineEvent(
       prisonNumber,
@@ -62,11 +76,33 @@ class AsyncGoalEventService(
     )
   }
 
+  private fun recordGoalArchivedTimelineEvent(prisonNumber: String, archivedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.goalArchivedTimelineEvent(archivedGoal, correlationId),
+    )
+  }
+
+  private fun recordGoalUnArchivedTimelineEvent(prisonNumber: String, unArchivedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.goalUnArchivedTimelineEvent(unArchivedGoal, correlationId),
+    )
+  }
+
   private fun trackGoalCreatedTelemetryEvent(createdGoal: Goal) {
     telemetryService.trackGoalCreatedEvent(createdGoal)
   }
 
   private fun trackGoalUpdatedTelemetryEvents(previousGoal: Goal, updatedGoal: Goal) {
     telemetryService.trackGoalUpdatedEvents(previousGoal = previousGoal, updatedGoal = updatedGoal)
+  }
+
+  private fun trackGoalArchivedTelemetryEvent(archivedGoal: Goal) {
+    telemetryService.trackGoalArchivedEvent(archivedGoal)
+  }
+
+  private fun trackGoalUnArchivedTelemetryEvent(unArchivedGoal: Goal) {
+    telemetryService.trackGoalUnArchivedEvent(unArchivedGoal)
   }
 }
