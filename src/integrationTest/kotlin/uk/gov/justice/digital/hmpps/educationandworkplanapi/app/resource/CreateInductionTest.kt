@@ -110,32 +110,30 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should create induction but fail to create timeline event given timeline database exception`() {
+  fun `should fail to create induction given malformed prison id`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
-    val invalidPrisonId = "longer than 3 chars" // created_at_prison column on timeline_event table is set to 3 characters, so this value results in a database exception
+    val invalidPrisonId = "does not meet pattern of 3 upper case letters"
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = invalidPrisonId)
 
     // When
-    webTestClient.post()
+    val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
-      .isCreated
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
 
     // Then
-    assertThat(getInduction(prisonNumber)).isNotNull
-    Thread.sleep(3000) // wait 3 seconds then assert that there are no timeline events created (one would have been created in that time if it was going to be)
-    webTestClient.get()
-      .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isNotFound
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(BAD_REQUEST.value())
+      .hasUserMessageContaining("Validation failed for object='createInductionRequest'")
+      .hasDeveloperMessage("[Error on field 'prisonId': rejected value [does not meet pattern of 3 upper case letters], must match \"^[A-Z]{3}\$\"]")
   }
 
   @Test
