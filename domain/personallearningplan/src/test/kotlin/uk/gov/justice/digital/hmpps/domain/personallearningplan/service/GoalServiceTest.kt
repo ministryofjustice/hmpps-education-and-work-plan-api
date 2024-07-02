@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -26,6 +27,8 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalR
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchivedGoalSuccessfully
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.GoalToBeArchivedCouldNotBeFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.GoalToBeUnarchivedCouldNotBeFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.TriedToUnarchiveAGoalInAnInvalidState
@@ -395,6 +398,78 @@ class GoalServiceTest {
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
       verify(goalEventService).goalUnArchived(prisonNumber, unarchivedGoal)
+    }
+  }
+
+  @Nested
+  inner class GetGoals {
+    private val prisonNumber = aValidPrisonNumber()
+    private val activeGoal = aValidGoal(reference = aValidReference(), status = GoalStatus.ACTIVE)
+    private val archivedGoal = aValidGoal(reference = aValidReference(), status = GoalStatus.ARCHIVED)
+    private val completedGoal = aValidGoal(reference = aValidReference(), status = GoalStatus.COMPLETED)
+
+    @Test
+    fun `should return all goals if no filter`() {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, null))
+
+      // Then
+      assertThat(actual).isEqualTo(
+        GetGoalsResult.GotGoalsSuccessfully(
+          listOf(
+            activeGoal,
+            archivedGoal,
+            completedGoal,
+          ),
+        ),
+      )
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @ParameterizedTest
+    @EnumSource(GoalStatus::class)
+    fun `should return only goals matching status if a filter is set`(status: GoalStatus) {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, status))
+
+      // Then
+      assertThat(actual).isInstanceOf(GetGoalsResult.GotGoalsSuccessfully::class.java)
+      val goals = (actual as GetGoalsResult.GotGoalsSuccessfully).goals
+      assertThat(goals).hasSize(1)
+      assertThat(goals[0].status).isEqualTo(status)
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @Test
+    fun `should return an empty list if the prisoner has no matching goals`() {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(emptyList())
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, null))
+
+      // Then
+      assertThat(actual).isEqualTo(GetGoalsResult.GotGoalsSuccessfully(emptyList()))
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @Test
+    fun `should return a problem if the prisoner never had a plan created`() {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(null)
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, null))
+
+      // Then
+      assertThat(actual).isEqualTo(GetGoalsResult.PrisonerNotFound(prisonNumber))
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
     }
   }
 }

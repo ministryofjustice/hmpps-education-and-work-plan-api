@@ -11,10 +11,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.time.Instant
 import java.util.*
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus as GoalStatusDto
 
 @Mapper(
   uses = [
@@ -46,4 +48,6 @@ interface GoalResourceMapper {
 
   @Mapping(target = "reference", source = "goalReference")
   fun fromModelToDto(unarchiveGoalRequest: UnarchiveGoalRequest): UnarchiveGoalDto
+
+  fun fromModelToDto(status: GoalStatus): GoalStatusDto
 }

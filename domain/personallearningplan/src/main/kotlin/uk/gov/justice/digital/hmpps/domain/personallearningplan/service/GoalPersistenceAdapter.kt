@@ -41,4 +41,9 @@ interface GoalPersistenceAdapter {
    * Unarchives a [Goal] identified by its `prisonNumber` and [UnarchiveGoalDTO.reference]
    */
   fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal?
+
+  /**
+   * Gets all [Goal]s for a prisoner identified by `prisonNumber` or returns null if the prisoner has no action plan
+   */
+  fun getGoals(prisonNumber: String): List<Goal>?
 }

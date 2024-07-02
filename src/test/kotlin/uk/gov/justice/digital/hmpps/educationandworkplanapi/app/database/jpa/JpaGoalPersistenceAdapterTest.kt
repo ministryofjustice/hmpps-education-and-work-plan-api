@@ -308,7 +308,10 @@ class JpaGoalPersistenceAdapterTest {
       given(goalMapper.archiveReasonFromDomainToEntity(ReasonToArchiveGoal.OTHER)).willReturn(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ReasonToArchiveGoal.OTHER)
 
       // When
-      val actual = persistenceAdapter.archiveGoal(prisonNumber, aValidArchiveGoalDto(reference = reference, reason = ReasonToArchiveGoal.OTHER, reasonOther = "Foo"))
+      val actual = persistenceAdapter.archiveGoal(
+        prisonNumber,
+        aValidArchiveGoalDto(reference = reference, reason = ReasonToArchiveGoal.OTHER, reasonOther = "Foo"),
+      )
 
       // Then
       assertThat(actual).isNotNull
@@ -332,7 +335,10 @@ class JpaGoalPersistenceAdapterTest {
       val prisonNumber = aValidPrisonNumber()
       val reference = UUID.randomUUID()
 
-      val goalEntity = aValidGoalEntity(reference = UUID.randomUUID(), status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED)
+      val goalEntity = aValidGoalEntity(
+        reference = UUID.randomUUID(),
+        status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED,
+      )
       val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
 
@@ -354,7 +360,10 @@ class JpaGoalPersistenceAdapterTest {
       val prisonNumber = aValidPrisonNumber()
       val reference = UUID.randomUUID()
 
-      val goalEntity = aValidGoalEntity(reference = reference, status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED)
+      val goalEntity = aValidGoalEntity(
+        reference = reference,
+        status = uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ARCHIVED,
+      )
       val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
       val persistedGoalEntity =
@@ -386,6 +395,51 @@ class JpaGoalPersistenceAdapterTest {
       assertThat(captor.firstValue.status).isEqualTo(uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus.ACTIVE)
       assertThat(captor.firstValue.archiveReason).isNull()
       assertThat(captor.firstValue.archiveReasonOther).isNull()
+    }
+  }
+
+  @Nested
+  inner class GetGoals {
+    @Test
+    fun `should get goals gived goals exists in prisoners action plan`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+
+      val goalEntity1 = aValidGoalEntity()
+      val goalEntity2 = aValidGoalEntity()
+      val actionPlanEntity =
+        aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity1, goalEntity2))
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
+
+      val expectedDomainGoal1 = aValidGoal(reference = goalEntity1.reference!!)
+      val expectedDomainGoal2 = aValidGoal(reference = goalEntity2.reference!!)
+      given(goalMapper.fromEntityToDomain(goalEntity1)).willReturn(expectedDomainGoal1)
+      given(goalMapper.fromEntityToDomain(goalEntity2)).willReturn(expectedDomainGoal2)
+
+      // When
+      val actual = persistenceAdapter.getGoals(prisonNumber)
+
+      // Then
+      assertThat(actual).isEqualTo(listOf(expectedDomainGoal1, expectedDomainGoal2))
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verify(goalMapper).fromEntityToDomain(goalEntity1)
+      verify(goalMapper).fromEntityToDomain(goalEntity2)
+    }
+
+    @Test
+    fun `should not get goal given prisoners action plan does not exist`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+
+      given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
+
+      // When
+      val actual = persistenceAdapter.getGoals(prisonNumber)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
+      verifyNoInteractions(goalMapper)
     }
   }
 }

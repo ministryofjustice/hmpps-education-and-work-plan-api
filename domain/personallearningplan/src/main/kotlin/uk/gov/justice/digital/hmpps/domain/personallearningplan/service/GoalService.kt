@@ -12,6 +12,10 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalR
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult.GotGoalsSuccessfully
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult.PrisonerNotFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
@@ -65,6 +69,13 @@ class GoalService(
           goalEventService.goalsCreated(prisonNumber, it)
         }
     }
+  }
+
+  fun getGoals(getGoalsDto: GetGoalsDto): GetGoalsResult {
+    return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
+      ?.filter { getGoalsDto.status == null || getGoalsDto.status == it.status }
+      ?.let { GotGoalsSuccessfully(it) }
+      ?: PrisonerNotFound(getGoalsDto.prisonNumber)
   }
 
   /**
