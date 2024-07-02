@@ -6,22 +6,13 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundExce
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchiveReasonIsOtherButNoDescriptionProvided
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchivedGoalSuccessfully
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.GoalToBeArchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult.GotGoalsSuccessfully
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult.PrisonerNotFound
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.GoalToBeUnarchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.TriedToUnarchiveAGoalInAnInvalidState
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.UnArchivedGoalSuccessfully
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import java.util.*
 
@@ -74,8 +65,8 @@ class GoalService(
   fun getGoals(getGoalsDto: GetGoalsDto): GetGoalsResult {
     return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
       ?.filter { getGoalsDto.status == null || getGoalsDto.status == it.status }
-      ?.let { GotGoalsSuccessfully(it) }
-      ?: PrisonerNotFound(getGoalsDto.prisonNumber)
+      ?.let { GetGoalsResult.Success(it) }
+      ?: GetGoalsResult.PrisonerNotFound(getGoalsDto.prisonNumber)
   }
 
   /**
@@ -118,7 +109,7 @@ class GoalService(
     log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
 
     if (checkReasonIsSpecifiedIfOther(archiveGoalDto)) {
-      return ArchiveReasonIsOtherButNoDescriptionProvided(
+      return ArchiveGoalResult.NoDescriptionProvidedForOther(
         prisonNumber,
         goalReference,
       )
@@ -126,9 +117,9 @@ class GoalService(
 
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
     return if (existingGoal == null) {
-      GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
+      ArchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
     } else if (existingGoal.status != GoalStatus.ACTIVE) {
-      TriedToArchiveAGoalInAnInvalidState(
+      ArchiveGoalResult.GoalInAnInvalidState(
         prisonNumber,
         goalReference,
         existingGoal.status,
@@ -136,8 +127,8 @@ class GoalService(
     } else {
       goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
         ?.also { goalEventService.goalArchived(prisonNumber, it) }
-        ?.let { ArchivedGoalSuccessfully(it) }
-        ?: GoalToBeArchivedCouldNotBeFound(prisonNumber, goalReference)
+        ?.let { ArchiveGoalResult.Success(it) }
+        ?: ArchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
     }
   }
 
@@ -153,9 +144,9 @@ class GoalService(
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
 
     return if (existingGoal == null) {
-      GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
+      UnarchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
     } else if (existingGoal.status != GoalStatus.ARCHIVED) {
-      TriedToUnarchiveAGoalInAnInvalidState(
+      UnarchiveGoalResult.GoalInAnInvalidState(
         prisonNumber,
         goalReference,
         existingGoal.status,
@@ -163,8 +154,8 @@ class GoalService(
     } else {
       goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
         ?.also { goalEventService.goalUnArchived(prisonNumber, it) }
-        ?.let { UnArchivedGoalSuccessfully(it) }
-        ?: GoalToBeUnarchivedCouldNotBeFound(prisonNumber, goalReference)
+        ?.let { UnarchiveGoalResult.Success(it) }
+        ?: UnarchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
     }
   }
 

@@ -70,15 +70,16 @@ paths:
   '/action-plans/{prisonNumber}/goals':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
-      - name: status
-        description: Only goals with this status will be returned
-        schema:
-          $ref: '#/components/schemas/GoalStatus'
-        in: query
-        required: false
     get:
       summary: Lists the Goals for a prisoner
       description: Lists the Goals for a prisoner with an optional filter on Goal status
+      parameters:
+        - name: status
+          description: Only goals with this status will be returned
+          schema:
+            $ref: '#/components/schemas/GoalStatus'
+          in: query
+          required: false
       tags:
         - Goals
       responses:

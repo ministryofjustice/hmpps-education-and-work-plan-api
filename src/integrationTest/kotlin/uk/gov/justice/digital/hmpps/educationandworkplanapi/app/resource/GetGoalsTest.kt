@@ -129,6 +129,17 @@ class GetGoalsTest : IntegrationTestBase() {
     assertThat(getGoalsResponse[0].title).isEqualTo(archivedGoal)
   }
 
+  @Test
+  fun `Should return 400 if requested status is not recognised`() {
+    webTestClient.get()
+      .uri("$URI_TEMPLATE?status=FOO", aValidPrisonNumber(), aValidReference())
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+  }
+
   private fun anActionPlanExistsWithAnArchivedGoal(): ActionPlanResponse {
     prisonerGoals.forEach { title ->
       val createGoalRequest = aValidCreateGoalRequest(
