@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.12.0'
+  version: '1.12.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -389,6 +389,11 @@ components:
   # Schema and Enum Definitions
   # --------------------------------------------------------------------------------
   schemas:
+    PrisonId:
+      type: string
+      description: The Prison identifier.
+      example: BXI
+      pattern: "^[A-Z]{3}$"
     ErrorResponse:
       title: ErrorResponse
       description: |
@@ -640,9 +645,7 @@ components:
           example:
             GOAL_TITLE: 'Learn French'
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner was at when the event occurred.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
         actionedBy:
           type: string
           description: The username of the person who caused this event. Set to 'system' if the event was not actioned by a DPS user.
@@ -1403,9 +1406,7 @@ components:
           description: Some additional notes related to the Goal.
           example: Pay close attention to Peter's behaviour.
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner is currently resident at.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
       required:
         - title
         - targetCompletionDate
@@ -1456,9 +1457,7 @@ components:
           description: Some additional notes related to the Goal.
           example: Pay close attention to Peter's behaviour.
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner is currently resident at.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
       required:
         - goalReference
         - title
@@ -1878,9 +1877,7 @@ components:
       type: object
       properties:
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner is currently resident at.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
         workOnRelease:
           $ref: '#/components/schemas/CreateWorkOnReleaseRequest'
         previousQualifications:
@@ -2020,9 +2017,7 @@ components:
           description: The Induction's unique reference.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner is currently resident at.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
         workOnRelease:
           $ref: '#/components/schemas/UpdateWorkOnReleaseRequest'
         previousQualifications:
@@ -2129,9 +2124,7 @@ components:
       type: object
       properties:
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner is currently resident at.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
         type:
           $ref: '#/components/schemas/ConversationType'
         note:
@@ -2149,9 +2142,7 @@ components:
       type: object
       properties:
         prisonId:
-          type: string
-          description: The identifier of the prison that the prisoner is currently resident at.
-          example: BXI
+          $ref: '#/components/schemas/PrisonId'
         note:
           type: string
           description: A note for this conversation
