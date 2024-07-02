@@ -17,16 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchiveReasonIsOtherButNoDescriptionProvided
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.ArchivedGoalSuccessfully
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.GoalToBeArchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult.TriedToArchiveAGoalInAnInvalidState
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult.GotGoalsSuccessfully
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult.PrisonerNotFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.GoalToBeUnarchivedCouldNotBeFound
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.TriedToUnarchiveAGoalInAnInvalidState
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult.UnArchivedGoalSuccessfully
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
@@ -97,10 +91,10 @@ class GoalController(
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     ).let {
       when (it) {
-        is ArchivedGoalSuccessfully -> ResponseEntity.noContent().build()
-        is GoalToBeArchivedCouldNotBeFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
-        is ArchiveReasonIsOtherButNoDescriptionProvided -> errorResponse(HttpStatus.BAD_REQUEST, it.errorMessage())
-        is TriedToArchiveAGoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
+        is ArchiveGoalResult.Success -> ResponseEntity.noContent().build()
+        is ArchiveGoalResult.GoalNotFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
+        is ArchiveGoalResult.NoDescriptionProvidedForOther -> errorResponse(HttpStatus.BAD_REQUEST, it.errorMessage())
+        is ArchiveGoalResult.GoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
       }
     }
   }
@@ -121,9 +115,9 @@ class GoalController(
       unarchiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     ).let {
       when (it) {
-        is UnArchivedGoalSuccessfully -> ResponseEntity.noContent().build()
-        is GoalToBeUnarchivedCouldNotBeFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
-        is TriedToUnarchiveAGoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
+        is UnarchiveGoalResult.Success -> ResponseEntity.noContent().build()
+        is UnarchiveGoalResult.GoalNotFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
+        is UnarchiveGoalResult.GoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
       }
     }
   }
@@ -140,8 +134,8 @@ class GoalController(
       GetGoalsDto(prisonNumber, status?.let { goalResourceMapper.fromModelToDto(status) }),
     ).let { result ->
       when (result) {
-        is GotGoalsSuccessfully -> ResponseEntity.ok(result.goals.map(goalResourceMapper::fromDomainToModel))
-        is PrisonerNotFound -> errorResponse(HttpStatus.NOT_FOUND, result.errorMessage())
+        is GetGoalsResult.Success -> ResponseEntity.ok(result.goals.map(goalResourceMapper::fromDomainToModel))
+        is GetGoalsResult.PrisonerNotFound -> errorResponse(HttpStatus.NOT_FOUND, result.errorMessage())
       }
     }
   }

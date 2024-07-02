@@ -8,5 +8,5 @@ sealed class GetGoalsResult {
       "No goals have been created for prisoner [$prisonNumber] yet"
   }
 
-  data class GotGoalsSuccessfully(val goals: List<Goal>) : GetGoalsResult()
+  data class Success(val goals: List<Goal>) : GetGoalsResult()
 }
