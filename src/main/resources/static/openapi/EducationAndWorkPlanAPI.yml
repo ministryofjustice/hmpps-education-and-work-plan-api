@@ -70,6 +70,25 @@ paths:
   '/action-plans/{prisonNumber}/goals':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - name: status
+        description: Only goals with this status will be returned
+        schema:
+          $ref: '#/components/schemas/GoalStatus'
+        in: query
+        required: false
+    get:
+      summary: Lists the Goals for a prisoner
+      description: Lists the Goals for a prisoner with an optional filter on Goal status
+      tags:
+        - Goals
+      responses:
+        '200':
+          $ref: '#/components/responses/GetGoals'
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-goals
     post:
       summary: Creates one or more Goals.
       description: Creates one or more Goals and saves them to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
@@ -481,6 +500,12 @@ components:
         - reference
         - prisonNumber
         - goals
+    GetGoalsResponse:
+      title: GetGoalsResponse
+      type: array
+      description: A List containing zero or more Goals.
+      items:
+        $ref: '#/components/schemas/GoalResponse'
     GoalResponse:
       title: GoalResponse
       type: object
@@ -1823,9 +1848,9 @@ components:
       description: Whether the prisoner has worked before or it may not be relevant in some scenarios.
       type: string
       enum:
-       - "YES"
-       - "NO"
-       - "NOT_RELEVANT"
+        - "YES"
+        - "NO"
+        - "NOT_RELEVANT"
 
     AchievedQualification:
       title: AchievedQualification
@@ -2264,6 +2289,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ActionPlanResponse'
+    GetGoals:
+      description: Response body containing zero or more Goals
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetGoalsResponse'
     Goal:
       description: Response body containing a single Goal within a Prisoner's Action Plan.
       headers:
