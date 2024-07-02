@@ -6,13 +6,12 @@ import java.util.*
 
 sealed class UnarchiveGoalResult {
 
-  data class GoalToBeUnarchivedCouldNotBeFound(val prisonNumber: String, val goalReference: UUID) :
-    UnarchiveGoalResult() {
+  data class GoalNotFound(val prisonNumber: String, val goalReference: UUID) : UnarchiveGoalResult() {
     fun errorMessage() =
       "Could not unarchive goal with reference [$goalReference] for prisoner [$prisonNumber]: Not found"
   }
 
-  data class TriedToUnarchiveAGoalInAnInvalidState(
+  data class GoalInAnInvalidState(
     val prisonNumber: String,
     val goalReference: UUID,
     val status: GoalStatus,
@@ -21,5 +20,5 @@ sealed class UnarchiveGoalResult {
       "Could not unarchive goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be unarchived"
   }
 
-  data class UnArchivedGoalSuccessfully(val updatedGoal: Goal) : UnarchiveGoalResult()
+  data class Success(val updatedGoal: Goal) : UnarchiveGoalResult()
 }

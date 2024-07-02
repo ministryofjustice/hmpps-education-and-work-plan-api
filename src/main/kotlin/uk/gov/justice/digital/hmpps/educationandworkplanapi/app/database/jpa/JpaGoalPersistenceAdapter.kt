@@ -44,6 +44,13 @@ class JpaGoalPersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
+  override fun getGoals(prisonNumber: String): List<Goal>? {
+    return actionPlanRepository
+      .findByPrisonNumber(prisonNumber)?.goals
+      ?.map { goalMapper.fromEntityToDomain(it) }
+  }
+
+  @Transactional(readOnly = true)
   override fun getGoal(prisonNumber: String, goalReference: UUID): Goal? {
     val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, goalReference)
 
