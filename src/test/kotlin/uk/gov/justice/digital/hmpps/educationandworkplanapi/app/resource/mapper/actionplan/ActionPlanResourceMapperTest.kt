@@ -11,6 +11,7 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
@@ -61,7 +62,7 @@ internal class ActionPlanResourceMapperTest {
       reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoal),
     )
-    given(goalMapper.fromDomainToModel(any())).willReturn(expectedGoal)
+    given(goalMapper.fromDomainToModel(any<Goal>())).willReturn(expectedGoal)
 
     // When
     val actual = mapper.fromDomainToModel(actionPlan)

@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
@@ -51,19 +51,19 @@ class GetGoalsTest : IntegrationTestBase() {
     anActionPlanExistsWithAnArchivedGoal()
 
     // When
-    val getGoalsResponse = webTestClient.get()
+    val response = webTestClient.get()
       .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isOk
-      .returnResult(GoalResponse::class.java)
-      .responseBody.collectList().block()!!.toList()
+      .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    assertThat(getGoalsResponse).hasSize(3)
-    assertThat(getGoalsResponse.map { it.title }).isEqualTo(prisonerGoals)
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.goals).hasSize(3)
+    assertThat(actual.goals.map { it.title }).isEqualTo(prisonerGoals)
   }
 
   @Test
@@ -72,19 +72,19 @@ class GetGoalsTest : IntegrationTestBase() {
     anActionPlanExistsWithAnArchivedGoal()
 
     // When
-    val getGoalsResponse = webTestClient.get()
+    val response = webTestClient.get()
       .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isOk
-      .returnResult(GoalResponse::class.java)
-      .responseBody.collectList().block()!!.toList()
+      .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    assertThat(getGoalsResponse).hasSize(3)
-    assertThat(getGoalsResponse.map { it.title }).isEqualTo(prisonerGoals)
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.goals).hasSize(3)
+    assertThat(actual.goals.map { it.title }).isEqualTo(prisonerGoals)
   }
 
   @Test
@@ -93,19 +93,19 @@ class GetGoalsTest : IntegrationTestBase() {
     anActionPlanExistsWithAnArchivedGoal()
 
     // When
-    val getGoalsResponse = webTestClient.get()
+    val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=ACTIVE", aValidPrisonNumber(), aValidReference())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isOk
-      .returnResult(GoalResponse::class.java)
-      .responseBody.collectList().block()!!.toList()
+      .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    assertThat(getGoalsResponse).hasSize(2)
-    assertThat(getGoalsResponse.map { it.title }).isEqualTo(prisonerGoals - archivedGoal)
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual.goals).hasSize(2)
+    assertThat(actual.goals.map { it.title }).isEqualTo(prisonerGoals - archivedGoal)
   }
 
   @Test
@@ -114,19 +114,19 @@ class GetGoalsTest : IntegrationTestBase() {
     anActionPlanExistsWithAnArchivedGoal()
 
     // When
-    val getGoalsResponse = webTestClient.get()
+    val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=ARCHIVED", aValidPrisonNumber(), aValidReference())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isOk
-      .returnResult(GoalResponse::class.java)
-      .responseBody.collectList().block()!!.toList()
+      .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    assertThat(getGoalsResponse).hasSize(1)
-    assertThat(getGoalsResponse[0].title).isEqualTo(archivedGoal)
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual.goals).hasSize(1)
+    assertThat(actual.goals[0].title).isEqualTo(archivedGoal)
   }
 
   @Test

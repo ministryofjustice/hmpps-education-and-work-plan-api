@@ -503,10 +503,16 @@ components:
         - goals
     GetGoalsResponse:
       title: GetGoalsResponse
-      type: array
-      description: A List containing zero or more Goals.
-      items:
-        $ref: '#/components/schemas/GoalResponse'
+      description: A Prisoner's goals matching the specific criteria of the request.
+      type: object
+      properties:
+        goals:
+          type: array
+          description: A List containing zero or more Goals.
+          items:
+            $ref: '#/components/schemas/GoalResponse'
+      required:
+        - goals
     GoalResponse:
       title: GoalResponse
       type: object
