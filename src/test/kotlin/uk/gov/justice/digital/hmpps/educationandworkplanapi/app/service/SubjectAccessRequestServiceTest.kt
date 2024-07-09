@@ -81,7 +81,7 @@ class SubjectAccessRequestServiceTest {
     verify(inductionMapper, times(1)).toInductionResponse(inductionCaptor.capture())
     assertThat(inductionCaptor.firstValue.prisonNumber).isEqualTo(prisonNumber)
 
-    verify(goalMapper, times(2)).fromDomainToModel(any())
+    verify(goalMapper, times(2)).fromDomainToModel(any<Goal>())
 
     with(sarContent) {
       assertThat(induction).isNotNull

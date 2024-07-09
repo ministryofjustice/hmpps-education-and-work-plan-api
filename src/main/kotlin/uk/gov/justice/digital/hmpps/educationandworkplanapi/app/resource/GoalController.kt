@@ -31,7 +31,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
-import java.util.*
+import java.util.UUID
 
 @RestController
 @Validated
@@ -134,7 +134,7 @@ class GoalController(
       GetGoalsDto(prisonNumber, status?.let { goalResourceMapper.fromModelToDto(status) }),
     ).let { result ->
       when (result) {
-        is GetGoalsResult.Success -> ResponseEntity.ok(result.goals.map(goalResourceMapper::fromDomainToModel))
+        is GetGoalsResult.Success -> ResponseEntity.ok(goalResourceMapper.fromDomainToModel(result))
         is GetGoalsResult.PrisonerNotFound -> errorResponse(HttpStatus.NOT_FOUND, result.errorMessage())
       }
     }

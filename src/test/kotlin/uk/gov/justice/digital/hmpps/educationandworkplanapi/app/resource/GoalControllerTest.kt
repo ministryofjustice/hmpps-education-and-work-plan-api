@@ -9,12 +9,14 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus as GoalStatusDto
@@ -39,12 +41,14 @@ class GoalControllerTest {
     val aValidGoalDto = aValidGoal()
     val aValidGoalResponse = aValidGoalResponse()
     given(goalService.getGoals(any())).willReturn(GetGoalsResult.Success(listOf(aValidGoalDto)))
-    given(goalResourceMapper.fromDomainToModel(any())).willReturn(aValidGoalResponse)
+    given(goalResourceMapper.fromDomainToModel(any<Goal>())).willReturn(aValidGoalResponse)
+    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(GetGoalsResponse(listOf(aValidGoalResponse)))
 
     val response = controller.getGoals(prisonNumber, null)
 
     assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-    assertThat(response.body).isEqualTo(listOf(aValidGoalResponse))
+    val responseBody = response.body as GetGoalsResponse
+    assertThat(responseBody.goals).isEqualTo(listOf(aValidGoalResponse))
     verify(goalService).getGoals(GetGoalsDto(prisonNumber, null))
   }
 
@@ -53,12 +57,14 @@ class GoalControllerTest {
     val aValidGoalDto = aValidGoal()
     val aValidGoalResponse = aValidGoalResponse()
     given(goalService.getGoals(any())).willReturn(GetGoalsResult.Success(listOf(aValidGoalDto)))
-    given(goalResourceMapper.fromDomainToModel(any())).willReturn(aValidGoalResponse)
+    given(goalResourceMapper.fromDomainToModel(any<Goal>())).willReturn(aValidGoalResponse)
+    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(GetGoalsResponse(listOf(aValidGoalResponse)))
 
     val response = controller.getGoals(prisonNumber, GoalStatus.ACTIVE)
 
     assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-    assertThat(response.body).isEqualTo(listOf(aValidGoalResponse))
+    val responseBody = response.body as GetGoalsResponse
+    assertThat(responseBody.goals).isEqualTo(listOf(aValidGoalResponse))
     verify(goalService).getGoals(GetGoalsDto(prisonNumber, GoalStatusDto.ACTIVE))
   }
 
