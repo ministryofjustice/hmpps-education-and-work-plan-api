@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
@@ -22,12 +21,14 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.exception.ReturnAnErrorException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
@@ -85,16 +86,16 @@ class GoalController(
     archiveGoalRequest: ArchiveGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): ResponseEntity<Any> {
+  ) {
     return goalService.archiveGoal(
       prisonNumber = prisonNumber,
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     ).let {
       when (it) {
-        is ArchiveGoalResult.Success -> ResponseEntity.noContent().build()
-        is ArchiveGoalResult.GoalNotFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
-        is ArchiveGoalResult.NoDescriptionProvidedForOther -> errorResponse(HttpStatus.BAD_REQUEST, it.errorMessage())
-        is ArchiveGoalResult.GoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
+        is ArchiveGoalResult.Success -> Unit
+        is ArchiveGoalResult.GoalNotFound -> throw errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
+        is ArchiveGoalResult.NoDescriptionProvidedForOther -> throw errorResponse(HttpStatus.BAD_REQUEST, it.errorMessage())
+        is ArchiveGoalResult.GoalInAnInvalidState -> throw errorResponse(HttpStatus.CONFLICT, it.errorMessage())
       }
     }
   }
@@ -109,15 +110,15 @@ class GoalController(
     archiveGoalRequest: UnarchiveGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): ResponseEntity<Any> {
+  ) {
     return goalService.unarchiveGoal(
       prisonNumber = prisonNumber,
       unarchiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     ).let {
       when (it) {
-        is UnarchiveGoalResult.Success -> ResponseEntity.noContent().build()
-        is UnarchiveGoalResult.GoalNotFound -> errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
-        is UnarchiveGoalResult.GoalInAnInvalidState -> errorResponse(HttpStatus.CONFLICT, it.errorMessage())
+        is UnarchiveGoalResult.Success -> Unit
+        is UnarchiveGoalResult.GoalNotFound -> throw errorResponse(HttpStatus.NOT_FOUND, it.errorMessage())
+        is UnarchiveGoalResult.GoalInAnInvalidState -> throw errorResponse(HttpStatus.CONFLICT, it.errorMessage())
       }
     }
   }
@@ -129,20 +130,18 @@ class GoalController(
   fun getGoals(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @RequestParam(required = false) status: GoalStatus?,
-  ): ResponseEntity<Any> {
+  ): GetGoalsResponse {
     return goalService.getGoals(
       GetGoalsDto(prisonNumber, status?.let { goalResourceMapper.fromModelToDto(status) }),
     ).let { result ->
       when (result) {
-        is GetGoalsResult.Success -> ResponseEntity.ok(goalResourceMapper.fromDomainToModel(result))
-        is GetGoalsResult.PrisonerNotFound -> errorResponse(HttpStatus.NOT_FOUND, result.errorMessage())
+        is GetGoalsResult.Success -> goalResourceMapper.fromDomainToModel(result)
+        is GetGoalsResult.PrisonerNotFound -> throw errorResponse(HttpStatus.NOT_FOUND, result.errorMessage())
       }
     }
   }
 
-  private fun errorResponse(status: HttpStatus, errorMessage: String): ResponseEntity<Any> {
-    return ResponseEntity
-      .status(status)
-      .body(ErrorResponse(status = status.value(), userMessage = errorMessage))
+  private fun errorResponse(status: HttpStatus, errorMessage: String): ReturnAnErrorException {
+    return ReturnAnErrorException(ErrorResponse(status = status.value(), userMessage = errorMessage))
   }
 }

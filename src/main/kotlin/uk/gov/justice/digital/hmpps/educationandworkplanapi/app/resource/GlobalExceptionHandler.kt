@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlread
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.exception.ReturnAnErrorException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
 private val log = KotlinLogging.logger {}
@@ -131,6 +132,11 @@ class GlobalExceptionHandler(
           userMessage = e.message,
         ),
       )
+  }
+
+  @ExceptionHandler(ReturnAnErrorException::class)
+  fun handleReturnAnErrorException(e: ReturnAnErrorException): ResponseEntity<ErrorResponse> {
+    return ResponseEntity.status(e.errorResponse.status).body(e.errorResponse)
   }
 
   /**

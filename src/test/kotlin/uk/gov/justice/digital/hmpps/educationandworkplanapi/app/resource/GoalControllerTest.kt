@@ -1,19 +1,20 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.exception.ReturnAnErrorException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
@@ -42,13 +43,16 @@ class GoalControllerTest {
     val aValidGoalResponse = aValidGoalResponse()
     given(goalService.getGoals(any())).willReturn(GetGoalsResult.Success(listOf(aValidGoalDto)))
     given(goalResourceMapper.fromDomainToModel(any<Goal>())).willReturn(aValidGoalResponse)
-    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(GetGoalsResponse(listOf(aValidGoalResponse)))
+    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(
+      GetGoalsResponse(
+        listOf(
+          aValidGoalResponse,
+        ),
+      ),
+    )
 
     val response = controller.getGoals(prisonNumber, null)
-
-    assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-    val responseBody = response.body as GetGoalsResponse
-    assertThat(responseBody.goals).isEqualTo(listOf(aValidGoalResponse))
+    assertThat(response).isEqualTo(GetGoalsResponse(listOf(aValidGoalResponse)))
     verify(goalService).getGoals(GetGoalsDto(prisonNumber, null))
   }
 
@@ -58,13 +62,17 @@ class GoalControllerTest {
     val aValidGoalResponse = aValidGoalResponse()
     given(goalService.getGoals(any())).willReturn(GetGoalsResult.Success(listOf(aValidGoalDto)))
     given(goalResourceMapper.fromDomainToModel(any<Goal>())).willReturn(aValidGoalResponse)
-    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(GetGoalsResponse(listOf(aValidGoalResponse)))
+    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(
+      GetGoalsResponse(
+        listOf(
+          aValidGoalResponse,
+        ),
+      ),
+    )
 
     val response = controller.getGoals(prisonNumber, GoalStatus.ACTIVE)
 
-    assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-    val responseBody = response.body as GetGoalsResponse
-    assertThat(responseBody.goals).isEqualTo(listOf(aValidGoalResponse))
+    assertThat(response).isEqualTo(GetGoalsResponse(listOf(aValidGoalResponse)))
     verify(goalService).getGoals(GetGoalsDto(prisonNumber, GoalStatusDto.ACTIVE))
   }
 
@@ -72,10 +80,16 @@ class GoalControllerTest {
   fun `should handle failed to get goals`() {
     given(goalService.getGoals(any())).willReturn(GetGoalsResult.PrisonerNotFound(prisonNumber))
 
-    val response = controller.getGoals(prisonNumber, null)
+    val exception = assertThrows(ReturnAnErrorException::class.java) {
+      controller.getGoals(prisonNumber, null)
+    }
 
-    assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
-    assertThat(response.body).isEqualTo(ErrorResponse(status = 404, userMessage = "No goals have been created for prisoner [$prisonNumber] yet"))
+    assertThat(exception.errorResponse).isEqualTo(
+      ErrorResponse(
+        status = 404,
+        userMessage = "No goals have been created for prisoner [$prisonNumber] yet",
+      ),
+    )
     verify(goalService).getGoals(GetGoalsDto(prisonNumber, null))
   }
 }
