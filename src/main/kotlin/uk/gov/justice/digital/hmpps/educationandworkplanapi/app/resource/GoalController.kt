@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Archi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
@@ -57,6 +58,15 @@ class GoalController(
       createGoalDtos = request.goals.map { goalResourceMapper.fromModelToDto(it) },
     )
   }
+
+  @GetMapping("{goalReference}")
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  fun getPrisonerGoal(
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @PathVariable goalReference: UUID,
+  ): GoalResponse =
+    goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
 
   @PutMapping("{goalReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -126,7 +136,6 @@ class GoalController(
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_AUTHORITY)
-  @Transactional
   fun getGoals(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @RequestParam(required = false, name = "status") statuses: Set<GoalStatus>?,

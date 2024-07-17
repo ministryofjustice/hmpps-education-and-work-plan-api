@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.13.0'
+  version: '1.14.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -124,14 +124,23 @@ paths:
   '/action-plans/{prisonNumber}/goals/{goalReference}':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
-      - name: goalReference
-        description: The Goal's unique reference
-        schema:
-          type: string
-          format: uuid
-        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/goalReferencePathParameter"
+    get:
+      summary: Returns a single goal identified by the prisoner and the goal reference.
+      description: |
+        Returns a single Goal identified by the specified prison number and goal reference.  
+        
+        * If the goal identified by both the prison number and goal reference is found a 200 response is returned with the goal as the response body.  
+        * If a goal that matches both the prison number and goal reference cannot be found a 404 response is returned.  
+
+      tags:
+        - Goals
+      responses:
+        '200':
+          $ref: '#/components/responses/Goal'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-prisoner-goal
     put:
       summary: Updates a Goal
       description: Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will result in it being removed.
@@ -151,14 +160,7 @@ paths:
   '/action-plans/{prisonNumber}/goals/{goalReference}/archive':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
-      - name: goalReference
-        description: The Goal's unique reference
-        schema:
-          type: string
-          format: uuid
-        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/goalReferencePathParameter"
     put:
       summary: Archives a Goal
       description: Changes a goals status to 'ARCHIVED' and records the archival reason.
@@ -179,14 +181,7 @@ paths:
   '/action-plans/{prisonNumber}/goals/{goalReference}/unarchive':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
-      - name: goalReference
-        description: The Goal's unique reference
-        schema:
-          type: string
-          format: uuid
-        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
-        in: path
-        required: true
+      - $ref: "#/components/parameters/goalReferencePathParameter"
     put:
       summary: Unarchives a Goal
       description: Changes an archived goals status back to 'ACTIVE'
@@ -2511,6 +2506,15 @@ components:
         type: string
         pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
       example: 'A1234BC'
+      in: path
+      required: true
+    goalReferencePathParameter:
+      name: goalReference
+      description: The Goal's unique reference
+      schema:
+        type: string
+        format: uuid
+      example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
       in: path
       required: true
     prnQueryStringParameter:
