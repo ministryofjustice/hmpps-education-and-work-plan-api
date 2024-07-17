@@ -424,20 +424,58 @@ class GoalServiceTest {
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
     }
 
-    @ParameterizedTest
-    @EnumSource(GoalStatus::class)
-    fun `should return only goals matching status if a filter is set`(status: GoalStatus) {
+    @Test
+    fun `should return all goals given empty filter`() {
       // Given
       given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
 
       // When
-      val actual = service.getGoals(GetGoalsDto(prisonNumber, status))
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, emptySet()))
+
+      // Then
+      assertThat(actual).isEqualTo(
+        GetGoalsResult.Success(
+          listOf(
+            activeGoal,
+            archivedGoal,
+            completedGoal,
+          ),
+        ),
+      )
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @ParameterizedTest
+    @EnumSource(GoalStatus::class)
+    fun `should return only goals matching status if a filter is set with a single status`(status: GoalStatus) {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, setOf(status)))
 
       // Then
       assertThat(actual).isInstanceOf(GetGoalsResult.Success::class.java)
       val goals = (actual as GetGoalsResult.Success).goals
       assertThat(goals).hasSize(1)
       assertThat(goals[0].status).isEqualTo(status)
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @Test
+    fun `should return only goals matching status if a filter is set with multiple statuses`() {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, setOf(GoalStatus.ACTIVE, GoalStatus.COMPLETED)))
+
+      // Then
+      assertThat(actual).isInstanceOf(GetGoalsResult.Success::class.java)
+      val goals = (actual as GetGoalsResult.Success).goals
+      assertThat(goals).hasSize(2)
+      assertThat(goals[0].reference).isEqualTo(activeGoal.reference)
+      assertThat(goals[1].reference).isEqualTo(completedGoal.reference)
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
     }
 

@@ -57,7 +57,7 @@ class GoalControllerTest {
   }
 
   @Test
-  fun `should get goals successfully with a filter`() {
+  fun `should get goals successfully with a filter containing a single value`() {
     val aValidGoalDto = aValidGoal()
     val aValidGoalResponse = aValidGoalResponse()
     given(goalService.getGoals(any())).willReturn(GetGoalsResult.Success(listOf(aValidGoalDto)))
@@ -70,10 +70,35 @@ class GoalControllerTest {
       ),
     )
 
-    val response = controller.getGoals(prisonNumber, GoalStatus.ACTIVE)
+    val response = controller.getGoals(prisonNumber, setOf(GoalStatus.ACTIVE))
 
     assertThat(response).isEqualTo(GetGoalsResponse(listOf(aValidGoalResponse)))
-    verify(goalService).getGoals(GetGoalsDto(prisonNumber, GoalStatusDto.ACTIVE))
+    verify(goalService).getGoals(GetGoalsDto(prisonNumber, setOf(GoalStatusDto.ACTIVE)))
+  }
+
+  @Test
+  fun `should get goals successfully with a filter containing multiple values`() {
+    val anActiveGoalDto = aValidGoal(status = GoalStatusDto.ACTIVE)
+    val anArchivedGoalDto = aValidGoal(status = GoalStatusDto.ARCHIVED)
+    given(goalService.getGoals(any())).willReturn(GetGoalsResult.Success(listOf(anActiveGoalDto, anArchivedGoalDto)))
+
+    val anActiveGoalResponse = aValidGoalResponse(status = GoalStatus.ACTIVE)
+    val anArchivedGoalResponse = aValidGoalResponse(status = GoalStatus.ARCHIVED)
+    given(goalResourceMapper.fromDomainToModel(any<Goal>())).willReturn(anActiveGoalResponse, anArchivedGoalResponse)
+
+    given(goalResourceMapper.fromDomainToModel(any<GetGoalsResult.Success>())).willReturn(
+      GetGoalsResponse(
+        listOf(
+          anActiveGoalResponse,
+          anArchivedGoalResponse,
+        ),
+      ),
+    )
+
+    val response = controller.getGoals(prisonNumber, setOf(GoalStatus.ACTIVE, GoalStatus.ARCHIVED))
+
+    assertThat(response).isEqualTo(GetGoalsResponse(listOf(anActiveGoalResponse, anArchivedGoalResponse)))
+    verify(goalService).getGoals(GetGoalsDto(prisonNumber, setOf(GoalStatusDto.ACTIVE, GoalStatusDto.ARCHIVED)))
   }
 
   @Test

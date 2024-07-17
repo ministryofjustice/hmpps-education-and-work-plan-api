@@ -35,7 +35,7 @@ class GetGoalsTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return 404 if no goals exist for prisoner yet`() {
+  fun `should return 404 if no goals at all exist for prisoner yet`() {
     webTestClient.get()
       .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
@@ -103,7 +103,7 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()
+    val actual = response.responseBody.blockFirst()!!
     assertThat(actual.goals).hasSize(2)
     assertThat(actual.goals.map { it.title }).isEqualTo(prisonerGoals - archivedGoal)
   }
@@ -124,9 +124,71 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()
+    val actual = response.responseBody.blockFirst()!!
     assertThat(actual.goals).hasSize(1)
     assertThat(actual.goals[0].title).isEqualTo(archivedGoal)
+  }
+
+  @Test
+  fun `Should return archived and in-progress goals if requested with a comma delimited list`() {
+    // Given
+    anActionPlanExistsWithAnArchivedGoal()
+
+    // When
+    val response = webTestClient.get()
+      .uri("$URI_TEMPLATE?status=ARCHIVED,ACTIVE", aValidPrisonNumber(), aValidReference())
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(GetGoalsResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.goals).hasSize(3)
+    assertThat(actual.goals.map { it.title }).isEqualTo(prisonerGoals)
+  }
+
+  @Test
+  fun `Should return archived and in-progress goals if requested with multiple status query string parameters`() {
+    // Given
+    anActionPlanExistsWithAnArchivedGoal()
+
+    // When
+    val response = webTestClient.get()
+      .uri("$URI_TEMPLATE?status=ARCHIVED&status=ACTIVE", aValidPrisonNumber(), aValidReference())
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(GetGoalsResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.goals).hasSize(3)
+    assertThat(actual.goals.map { it.title }).isEqualTo(prisonerGoals)
+  }
+
+  @Test
+  fun `Should return 200 response with empty goals collection given prisoner has goals but none match the status filter`() {
+    // Given
+    anActionPlanExistsWithAnArchivedGoal()
+
+    // When
+    val response = webTestClient.get()
+      .uri("$URI_TEMPLATE?status=COMPLETED", aValidPrisonNumber(), aValidReference())
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(GetGoalsResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.goals).isEmpty()
   }
 
   @Test
