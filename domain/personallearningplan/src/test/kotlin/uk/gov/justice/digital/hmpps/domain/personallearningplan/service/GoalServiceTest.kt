@@ -463,6 +463,23 @@ class GoalServiceTest {
     }
 
     @Test
+    fun `should return only goals matching status if a filter is set with multiple statuses`() {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, setOf(GoalStatus.ACTIVE, GoalStatus.COMPLETED)))
+
+      // Then
+      assertThat(actual).isInstanceOf(GetGoalsResult.Success::class.java)
+      val goals = (actual as GetGoalsResult.Success).goals
+      assertThat(goals).hasSize(2)
+      assertThat(goals[0].reference).isEqualTo(activeGoal.reference)
+      assertThat(goals[1].reference).isEqualTo(completedGoal.reference)
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @Test
     fun `should return an empty list if the prisoner has no matching goals`() {
       // Given
       given(goalPersistenceAdapter.getGoals(any())).willReturn(emptyList())

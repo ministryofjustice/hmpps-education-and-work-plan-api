@@ -64,7 +64,7 @@ class GoalService(
 
   fun getGoals(getGoalsDto: GetGoalsDto): GetGoalsResult {
     return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
-      ?.filter { getGoalsDto.statuses.isNullOrEmpty() || getGoalsDto.statuses.contains(it.status) }
+      ?.filter { getGoalsDto.statuses.isNullOrEmpty() || it.status in getGoalsDto.statuses }
       ?.let { GetGoalsResult.Success(it) }
       ?: GetGoalsResult.PrisonerNotFound(getGoalsDto.prisonNumber)
   }
