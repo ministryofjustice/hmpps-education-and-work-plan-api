@@ -27,7 +27,7 @@ val awaitilityVersion = "4.2.1"
 val wiremockVersion = "3.8.0"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "9.40"
-val postgressTestContainersVersion = "1.19.8"
+val postgressTestContainersVersion = "1.20.0"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
@@ -59,7 +59,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.2")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -90,7 +90,7 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:timeline")))
 
   // Test fixtures dependencies
-  testFixturesImplementation("org.assertj:assertj-core:3.26.0")
+  testFixturesImplementation("org.assertj:assertj-core:3.26.3")
   testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
   testFixturesImplementation("io.projectreactor:reactor-core")
   testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
