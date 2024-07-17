@@ -424,14 +424,35 @@ class GoalServiceTest {
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
     }
 
-    @ParameterizedTest
-    @EnumSource(GoalStatus::class)
-    fun `should return only goals matching status if a filter is set`(status: GoalStatus) {
+    @Test
+    fun `should return all goals given empty filter`() {
       // Given
       given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
 
       // When
-      val actual = service.getGoals(GetGoalsDto(prisonNumber, status))
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, emptySet()))
+
+      // Then
+      assertThat(actual).isEqualTo(
+        GetGoalsResult.Success(
+          listOf(
+            activeGoal,
+            archivedGoal,
+            completedGoal,
+          ),
+        ),
+      )
+      verify(goalPersistenceAdapter).getGoals(prisonNumber)
+    }
+
+    @ParameterizedTest
+    @EnumSource(GoalStatus::class)
+    fun `should return only goals matching status if a filter is set with a single status`(status: GoalStatus) {
+      // Given
+      given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
+
+      // When
+      val actual = service.getGoals(GetGoalsDto(prisonNumber, setOf(status)))
 
       // Then
       assertThat(actual).isInstanceOf(GetGoalsResult.Success::class.java)

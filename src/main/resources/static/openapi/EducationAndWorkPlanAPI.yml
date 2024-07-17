@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.12.1'
+  version: '1.13.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -71,11 +71,26 @@ paths:
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     get:
-      summary: Lists the Goals for a prisoner
-      description: Lists the Goals for a prisoner with an optional filter on Goal status
+      summary: Lists the Goals for a prisoner with an optional filter on Goal status
+      description: | 
+        Returns Goals for the specified prisoner, optionally filtered on Goal status with the `status` query string parameter.  
+        The optional `status` query string parameter can be one or more of the supported Goal statuses (see the `GoalStatus` schema definition for valid statuses).  
+        If specifying multiple statuses these can either be a comma delimited list in a single `status` query string parameter, or multiple instances of the `status` query string parameter can be used.    
+        
+        * If the `status` query string parameter is used and the prisoner has Goals but none that match the specified status(es) a 200 response is returned with an empty `goals` collection.  
+        * If the specified prisoner has no Goals at all, irrespective of whether the `status` query string parameter was used, a 404 response is returned.  
+        * If the `status` query string parameter is used with one or more invalid values a 400 response is returned (see the `GoalStatus` schema definition for valid statuses). 
+
       parameters:
         - name: status
-          description: Only goals with this status will be returned
+          description: Returned Goals will be filtered by the specified Goal status. Multiple values can be specified by comma delimiting them.
+          examples:
+            Single value:
+              description: A single status value
+              value: ACTIVE
+            Multiple values:
+              description: Multiple status values specified as a comma delimited list
+              value: ACTIVE,COMPLETED
           schema:
             $ref: '#/components/schemas/GoalStatus'
           in: query

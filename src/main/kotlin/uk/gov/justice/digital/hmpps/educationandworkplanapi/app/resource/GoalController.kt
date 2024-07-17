@@ -129,10 +129,10 @@ class GoalController(
   @Transactional
   fun getGoals(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
-    @RequestParam(required = false) status: GoalStatus?,
+    @RequestParam(required = false, name = "status") statuses: Set<GoalStatus>?,
   ): GetGoalsResponse {
     return goalService.getGoals(
-      GetGoalsDto(prisonNumber, status?.let { goalResourceMapper.fromModelToDto(status) }),
+      GetGoalsDto(prisonNumber, statuses?.map { status -> goalResourceMapper.fromModelToDto(status) }?.toSet()),
     ).let { result ->
       when (result) {
         is GetGoalsResult.Success -> goalResourceMapper.fromDomainToModel(result)
