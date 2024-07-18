@@ -24,3 +24,4 @@ generic-prometheus-alerts:
 
 generic-data-analytics-extractor:
   serviceAccountName: hmpps-education-and-work-plan-preprod-to-ap-s3
+  cronJobSchedule: '00 7 * * 1-5' # Start at 7am UTC Monday-Friday to allow for the fact that we terminate the resources (inc. RDS) overnight and all weekend in the preprod env (see scheduledDowntime above)
