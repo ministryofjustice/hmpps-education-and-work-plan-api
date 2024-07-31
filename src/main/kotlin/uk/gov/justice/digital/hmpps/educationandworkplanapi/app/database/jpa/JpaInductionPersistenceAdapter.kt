@@ -7,35 +7,45 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 
 @Component
 class JpaInductionPersistenceAdapter(
   private val inductionRepository: InductionRepository,
   private val inductionMapper: InductionEntityMapper,
+  private val previousQualificationsRepository: PreviousQualificationsRepository,
+  private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
 ) : InductionPersistenceAdapter {
 
   @Transactional
   override fun createInduction(createInductionDto: CreateInductionDto): Induction {
-    val persistedEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
-    return inductionMapper.fromEntityToDomain(persistedEntity)
+    val prisonNumber = createInductionDto.prisonNumber
+    val inductionEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
+    val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto, prisonNumber)
+    return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity)
   }
 
   @Transactional(readOnly = true)
   override fun getInduction(prisonNumber: String): Induction? =
     inductionRepository.findByPrisonNumber(prisonNumber)?.let {
-      inductionMapper.fromEntityToDomain(it)
+      val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
+      inductionMapper.fromEntityToDomain(it, previousQualificationsEntity)
     }
 
   @Transactional
   override fun updateInduction(updateInductionDto: UpdateInductionDto): Induction? {
-    val inductionEntity = inductionRepository.findByPrisonNumber(updateInductionDto.prisonNumber)
+    val prisonNumber = updateInductionDto.prisonNumber
+    val inductionEntity = inductionRepository.findByPrisonNumber(prisonNumber)
     return if (inductionEntity != null) {
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
       inductionEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
-      val persistedEntity = inductionRepository.saveAndFlush(inductionEntity)
-      inductionMapper.fromEntityToDomain(persistedEntity)
+      val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
+      val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto, prisonNumber)
+      inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity)
     } else {
       null
     }
@@ -46,4 +56,55 @@ class JpaInductionPersistenceAdapter(
     inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
       inductionMapper.fromEntitySummariesToDomainSummaries(it)
     }
+
+  private fun createOrUpdatePreviousQualifications(updateInductionDto: UpdateInductionDto, prisonNumber: String): PreviousQualificationsEntity? {
+    val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
+
+    if (updateInductionDto.previousQualifications == null) {
+      // If previousQualifications on the DTO is null it means no change is required to the prisoner's previousQualifications. Return the entity.
+      return previousQualificationsEntity
+    }
+
+    // The DTO contains previousQualifications. Behaviour now depends on whether the prisoner already has previousQualifications or not.
+    if (previousQualificationsEntity != null) {
+      // Prisoner already has previousQualifications. We need to update them.
+      previousQualificationsMapper.updateExistingEntityFromDto(
+        previousQualificationsEntity,
+        updateInductionDto.previousQualifications,
+      )
+      return previousQualificationsRepository.saveAndFlush(previousQualificationsEntity)
+    } else {
+      // Prisoner does not already have previous qualifications, and the DTO has qualifications. We need to create them
+      return previousQualificationsRepository.saveAndFlush(
+        previousQualificationsMapper.fromUpdateDtoToNewEntity(updateInductionDto.previousQualifications)!!,
+      )
+    }
+  }
+
+  private fun createOrUpdatePreviousQualifications(createInductionDto: CreateInductionDto, prisonNumber: String): PreviousQualificationsEntity? {
+    val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
+
+    if (createInductionDto.previousQualifications == null) {
+      // If previousQualifications on the DTO is null it means the CIAG is creating an Induction with the specific intent of the prisoner having no previous qualifications.
+      // In this case we should delete the previousQualifications entity if it exists (because regardless of any previously added qualifications for the prisoner, the CIAG is
+      // saying that the Induction should be created with no qualifications)
+      previousQualificationsEntity?.also { previousQualificationsRepository.delete(it) }
+      return null
+    }
+
+    // The DTO contains previousQualifications. Behaviour now depends on whether the prisoner already has previousQualifications or not.
+    if (previousQualificationsEntity != null) {
+      // Prisoner already has previousQualifications. We need to update them.
+      previousQualificationsMapper.updateExistingEntityFromDto(
+        previousQualificationsEntity,
+        createInductionDto.previousQualifications,
+      )
+      return previousQualificationsRepository.saveAndFlush(previousQualificationsEntity)
+    } else {
+      // Prisoner does not already have previous qualifications, and the DTO has qualifications. We need to create them
+      return previousQualificationsRepository.saveAndFlush(
+        previousQualificationsMapper.fromCreateDtoToEntity(createInductionDto.previousQualifications)!!,
+      )
+    }
+  }
 }

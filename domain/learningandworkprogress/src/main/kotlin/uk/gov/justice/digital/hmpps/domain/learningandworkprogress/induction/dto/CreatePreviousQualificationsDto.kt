@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Hig
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
 
 data class CreatePreviousQualificationsDto(
+  val prisonNumber: String,
   val educationLevel: HighestEducationLevel,
   val qualifications: List<Qualification>,
   val prisonId: String,

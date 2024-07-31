@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import java.time.Instant
 import java.util.UUID
 
 fun aValidPreviousQualificationsEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = aValidPrisonNumber(),
   educationLevel: HighestEducationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: MutableList<QualificationEntity> = mutableListOf(aValidQualificationEntity()),
   createdAt: Instant? = null,
@@ -20,6 +22,7 @@ fun aValidPreviousQualificationsEntity(
   PreviousQualificationsEntity(
     id = id,
     reference = reference,
+    prisonNumber = prisonNumber,
     educationLevel = educationLevel,
     qualifications = qualifications,
     createdAt = createdAt,
@@ -35,6 +38,7 @@ fun aValidPreviousQualificationsEntity(
 fun aValidPreviousQualificationsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = aValidPrisonNumber(),
   educationLevel: HighestEducationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: MutableList<QualificationEntity> = mutableListOf(aValidQualificationEntity()),
   createdAt: Instant? = Instant.now(),
@@ -49,6 +53,7 @@ fun aValidPreviousQualificationsEntityWithJpaFieldsPopulated(
   PreviousQualificationsEntity(
     id = id,
     reference = reference,
+    prisonNumber = prisonNumber,
     educationLevel = educationLevel,
     qualifications = qualifications,
     createdAt = createdAt,

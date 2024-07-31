@@ -40,31 +40,55 @@ abstract class PreviousQualificationsEntityMapper {
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "qualifications", ignore = true)
-  abstract fun fromCreateDtoToEntity(dto: CreatePreviousQualificationsDto): PreviousQualificationsEntity
+  abstract fun fromCreateDtoToEntity(dto: CreatePreviousQualificationsDto?): PreviousQualificationsEntity?
 
   @Named("addNewQualificationsDuringCreate")
   @AfterMapping
-  fun addNewQualificationsDuringCreate(dto: CreatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
+  protected fun addNewQualificationsDuringCreate(dto: CreatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
     addNewQualifications(dto.qualifications, entity)
+  }
+
+  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
+  @ExcludeReferenceField
+  @Mapping(target = "createdAtPrison", ignore = true)
+  @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "qualifications", expression = "java( updateQualificationsFromCreateDto(entity, dto) )")
+  abstract fun updateExistingEntityFromDto(
+    @MappingTarget entity: PreviousQualificationsEntity,
+    dto: CreatePreviousQualificationsDto?,
+  )
+
+  protected fun updateQualificationsFromCreateDto(
+    entity: PreviousQualificationsEntity,
+    dto: CreatePreviousQualificationsDto,
+  ): List<QualificationEntity> {
+    val existingQualifications = entity.qualifications!!
+    val updatedQualifications = dto.qualifications
+
+    entityListManager.updateExisting(existingQualifications, updatedQualifications, qualificationEntityMapper)
+    entityListManager.addNew(entity, existingQualifications, updatedQualifications, qualificationEntityMapper)
+    entityListManager.deleteRemoved(existingQualifications, updatedQualifications)
+
+    return existingQualifications
   }
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  abstract fun fromEntityToDomain(persistedEntity: PreviousQualificationsEntity): PreviousQualifications
+  abstract fun fromEntityToDomain(persistedEntity: PreviousQualificationsEntity?): PreviousQualifications
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "qualifications", expression = "java( updateQualifications(entity, dto) )")
+  @Mapping(target = "qualifications", expression = "java( updateQualificationsFromUpdateDto(entity, dto) )")
   abstract fun updateExistingEntityFromDto(
     @MappingTarget entity: PreviousQualificationsEntity,
     dto: UpdatePreviousQualificationsDto?,
   )
 
-  fun updateQualifications(
+  protected fun updateQualificationsFromUpdateDto(
     entity: PreviousQualificationsEntity,
     dto: UpdatePreviousQualificationsDto,
   ): List<QualificationEntity> {
@@ -88,7 +112,7 @@ abstract class PreviousQualificationsEntityMapper {
 
   @Named("addNewQualificationsDuringUpdate")
   @AfterMapping
-  fun addNewQualificationsDuringUpdate(dto: UpdatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
+  protected fun addNewQualificationsDuringUpdate(dto: UpdatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
     addNewQualifications(dto.qualifications, entity)
   }
 

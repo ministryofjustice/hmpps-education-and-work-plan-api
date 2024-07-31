@@ -51,7 +51,7 @@ abstract class FutureWorkInterestsEntityMapper {
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  abstract fun fromEntityToDomain(entity: FutureWorkInterestsEntity): FutureWorkInterests
+  abstract fun fromEntityToDomain(entity: FutureWorkInterestsEntity?): FutureWorkInterests
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField

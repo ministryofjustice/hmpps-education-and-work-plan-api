@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -92,6 +93,9 @@ abstract class IntegrationTestBase {
   lateinit var inductionRepository: InductionRepository
 
   @Autowired
+  lateinit var previousQualificationsRepository: PreviousQualificationsRepository
+
+  @Autowired
   lateinit var conversationRepository: ConversationRepository
 
   @SpyBean
@@ -108,6 +112,7 @@ abstract class IntegrationTestBase {
     actionPlanRepository.deleteAll() // Will also remove all Goals and Steps due to cascade
     timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
     inductionRepository.deleteAll()
+    previousQualificationsRepository.deleteAll()
     conversationRepository.deleteAll()
   }
 

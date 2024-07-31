@@ -26,7 +26,7 @@ class InductionResourceMapper(
       prisonNumber = prisonNumber,
       workOnRelease = workOnReleaseMapper.toCreateWorkOnReleaseDto(request.workOnRelease, prisonId),
       previousQualifications = request.previousQualifications?.let {
-        qualificationsMapper.toCreatePreviousQualificationsDto(request = it, prisonId = prisonId)
+        qualificationsMapper.toCreatePreviousQualificationsDto(request = it, prisonNumber = prisonNumber, prisonId = prisonId)
       },
       previousTraining = request.previousTraining?.let {
         previousTrainingMapper.toCreatePreviousTrainingDto(request = it, prisonId = prisonId)
