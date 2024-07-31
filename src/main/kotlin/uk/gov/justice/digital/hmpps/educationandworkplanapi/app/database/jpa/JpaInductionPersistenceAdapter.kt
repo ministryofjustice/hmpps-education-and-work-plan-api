@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
@@ -12,6 +13,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
+
+private val log = KotlinLogging.logger {}
 
 @Component
 class JpaInductionPersistenceAdapter(
@@ -57,7 +60,10 @@ class JpaInductionPersistenceAdapter(
       inductionMapper.fromEntitySummariesToDomainSummaries(it)
     }
 
-  private fun createOrUpdatePreviousQualifications(updateInductionDto: UpdateInductionDto, prisonNumber: String): PreviousQualificationsEntity? {
+  private fun createOrUpdatePreviousQualifications(
+    updateInductionDto: UpdateInductionDto,
+    prisonNumber: String,
+  ): PreviousQualificationsEntity? {
     val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
 
     if (updateInductionDto.previousQualifications == null) {
@@ -68,6 +74,14 @@ class JpaInductionPersistenceAdapter(
     // The DTO contains previousQualifications. Behaviour now depends on whether the prisoner already has previousQualifications or not.
     if (previousQualificationsEntity != null) {
       // Prisoner already has previousQualifications. We need to update them.
+      if (updateInductionDto.previousQualifications!!.qualifications.isEmpty()) {
+        log.info {
+          """
+            Prisoner [$prisonNumber] has [${updateInductionDto.previousQualifications!!.qualifications.size}] qualifications recorded, but the Update Induction request contains a PreviousQualifications object containing 0 qualifications. 
+            The user has explicitly removed all previously recorded qualifications as part of updating the prisoner's Induction.
+          """.trimIndent()
+        }
+      }
       previousQualificationsMapper.updateExistingEntityFromDto(
         previousQualificationsEntity,
         updateInductionDto.previousQualifications,
@@ -81,20 +95,39 @@ class JpaInductionPersistenceAdapter(
     }
   }
 
-  private fun createOrUpdatePreviousQualifications(createInductionDto: CreateInductionDto, prisonNumber: String): PreviousQualificationsEntity? {
+  private fun createOrUpdatePreviousQualifications(
+    createInductionDto: CreateInductionDto,
+    prisonNumber: String,
+  ): PreviousQualificationsEntity? {
     val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
 
     if (createInductionDto.previousQualifications == null) {
       // If previousQualifications on the DTO is null it means the CIAG is creating an Induction with the specific intent of the prisoner having no previous qualifications.
       // In this case we should delete the previousQualifications entity if it exists (because regardless of any previously added qualifications for the prisoner, the CIAG is
       // saying that the Induction should be created with no qualifications)
-      previousQualificationsEntity?.also { previousQualificationsRepository.delete(it) }
+      previousQualificationsEntity?.also {
+        log.info {
+          """
+            Prisoner [$prisonNumber] has [${it.qualifications!!.size}] qualifications recorded pre-induction, but the Create Induction request does not contain a PreviousQualifications object. 
+            Removing the prisoner's PreviousQualificationsEntity from the database.
+          """.trimIndent()
+        }
+        previousQualificationsRepository.delete(it)
+      }
       return null
     }
 
     // The DTO contains previousQualifications. Behaviour now depends on whether the prisoner already has previousQualifications or not.
     if (previousQualificationsEntity != null) {
       // Prisoner already has previousQualifications. We need to update them.
+      if (createInductionDto.previousQualifications!!.qualifications.isEmpty()) {
+        log.info {
+          """
+            Prisoner [$prisonNumber] has [${createInductionDto.previousQualifications!!.qualifications.size}] qualifications recorded pre-induction, but the Create Induction request contains a PreviousQualifications object containing 0 qualifications. 
+            The user has explicitly removed all previously recorded qualifications as part of creating the prisoner's Induction.
+          """.trimIndent()
+        }
+      }
       previousQualificationsMapper.updateExistingEntityFromDto(
         previousQualificationsEntity,
         createInductionDto.previousQualifications,
