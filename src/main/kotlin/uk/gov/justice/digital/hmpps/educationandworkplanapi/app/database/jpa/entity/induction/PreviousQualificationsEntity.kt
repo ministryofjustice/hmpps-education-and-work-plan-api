@@ -36,8 +36,6 @@ import java.util.UUID
  * Holds details about a Prisoner's educational qualifications, including where relevant, the grades achieved in each
  * subject.
  *
- * Note that the list of `qualifications` can be empty, but `educationLevel` is mandatory (but only if the Prisoner has
- * been asked about their education).
  */
 @Table(name = "previous_qualifications")
 @Entity
@@ -51,6 +49,10 @@ class PreviousQualificationsEntity(
   @Column(updatable = false)
   @field:NotNull
   var reference: UUID? = null,
+
+  @Column(updatable = false)
+  @field:NotNull
+  var prisonNumber: String? = null,
 
   @Column
   @Enumerated(value = EnumType.STRING)

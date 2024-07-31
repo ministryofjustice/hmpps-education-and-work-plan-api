@@ -66,7 +66,7 @@ abstract class PersonalSkillsAndInterestsEntityMapper {
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  abstract fun fromEntityToDomain(persistedEntity: PersonalSkillsAndInterestsEntity): PersonalSkillsAndInterests
+  abstract fun fromEntityToDomain(persistedEntity: PersonalSkillsAndInterestsEntity?): PersonalSkillsAndInterests
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField

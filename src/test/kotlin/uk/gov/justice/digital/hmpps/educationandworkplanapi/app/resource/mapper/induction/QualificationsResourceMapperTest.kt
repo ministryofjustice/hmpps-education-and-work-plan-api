@@ -37,8 +37,10 @@ class QualificationsResourceMapperTest {
   fun `should map to CreatePreviousQualificationsDto`() {
     // Given
     val prisonId = "BXI"
+    val prisonNumber = "A1234BC"
     val request = aValidCreatePreviousQualificationsRequest()
     val expected = aValidCreatePreviousQualificationsDto(
+      prisonNumber = "A1234BC",
       educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
         aValidQualification(
@@ -55,7 +57,7 @@ class QualificationsResourceMapperTest {
     )
 
     // When
-    val actual = mapper.toCreatePreviousQualificationsDto(request, prisonId)
+    val actual = mapper.toCreatePreviousQualificationsDto(request, prisonNumber, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

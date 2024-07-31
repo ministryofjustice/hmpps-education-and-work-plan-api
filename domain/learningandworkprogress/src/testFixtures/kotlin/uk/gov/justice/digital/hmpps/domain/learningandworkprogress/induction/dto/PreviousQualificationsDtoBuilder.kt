@@ -7,11 +7,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aVa
 import java.util.UUID
 
 fun aValidCreatePreviousQualificationsDto(
+  prisonNumber: String = "A1234AB",
   educationLevel: HighestEducationLevel = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
   qualifications: List<Qualification> = listOf(aValidQualification()),
   prisonId: String = "BXI",
 ) =
   CreatePreviousQualificationsDto(
+    prisonNumber = prisonNumber,
     educationLevel = educationLevel,
     qualifications = qualifications,
     prisonId = prisonId,

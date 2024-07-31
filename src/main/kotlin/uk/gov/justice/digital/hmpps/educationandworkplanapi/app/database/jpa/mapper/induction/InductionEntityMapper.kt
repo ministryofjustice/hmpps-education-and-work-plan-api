@@ -61,11 +61,26 @@ abstract class InductionEntityMapper {
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   abstract fun fromCreateDtoToEntity(dto: CreateInductionDto): InductionEntity
 
-  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
-  @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
-  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
-  @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  abstract fun fromEntityToDomain(persistedEntity: InductionEntity): Induction
+  fun fromEntityToDomain(inductionEntity: InductionEntity, previousQualificationsEntity: PreviousQualificationsEntity?): Induction =
+    Induction(
+      reference = inductionEntity.reference!!,
+      prisonNumber = inductionEntity.prisonNumber!!,
+      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease),
+      previousQualifications = previousQualificationsEntityMapper.fromEntityToDomain(previousQualificationsEntity),
+      previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining),
+      previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
+      inPrisonInterests = inPrisonInterestsEntityMapper.fromEntityToDomain(inductionEntity.inPrisonInterests),
+      personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromEntityToDomain(inductionEntity.personalSkillsAndInterests),
+      futureWorkInterests = futureWorkInterestsEntityMapper.fromEntityToDomain(inductionEntity.futureWorkInterests),
+      createdBy = inductionEntity.createdBy,
+      createdByDisplayName = inductionEntity.createdByDisplayName,
+      createdAt = inductionEntity.createdAt,
+      createdAtPrison = inductionEntity.createdAtPrison!!,
+      lastUpdatedBy = inductionEntity.updatedBy,
+      lastUpdatedByDisplayName = inductionEntity.updatedByDisplayName,
+      lastUpdatedAt = inductionEntity.updatedAt,
+      lastUpdatedAtPrison = inductionEntity.updatedAtPrison!!,
+    )
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
@@ -80,7 +95,6 @@ abstract class InductionEntityMapper {
   @Mapping(target = "futureWorkInterests", expression = "java( updateFutureWorkInterests(entity, dto) )")
   @Mapping(target = "inPrisonInterests", expression = "java( updateInPrisonInterests(entity, dto) )")
   @Mapping(target = "personalSkillsAndInterests", expression = "java( updatePersonalSkillsAndInterests(entity, dto) )")
-  @Mapping(target = "previousQualifications", expression = "java( updatePreviousQualifications(entity, dto) )")
   @Mapping(target = "previousTraining", expression = "java( updatePreviousTraining(entity, dto) )")
   @Mapping(target = "previousWorkExperiences", expression = "java( updatePreviousWorkExperiences(entity, dto) )")
   @Mapping(target = "workOnRelease", expression = "java( updateWorkOnRelease(entity, dto) )")
@@ -112,15 +126,6 @@ abstract class InductionEntityMapper {
     } else {
       skillsAndInterestsEntityMapper.updateExistingEntityFromDto(entity.personalSkillsAndInterests!!, dto.personalSkillsAndInterests)
         .let { entity.personalSkillsAndInterests }
-    }
-  }
-
-  fun updatePreviousQualifications(entity: InductionEntity, dto: UpdateInductionDto): PreviousQualificationsEntity? {
-    return if (entity.previousQualifications == null) {
-      previousQualificationsEntityMapper.fromUpdateDtoToNewEntity(dto.previousQualifications)
-    } else {
-      previousQualificationsEntityMapper.updateExistingEntityFromDto(entity.previousQualifications!!, dto.previousQualifications)
-        .let { entity.previousQualifications }
     }
   }
 

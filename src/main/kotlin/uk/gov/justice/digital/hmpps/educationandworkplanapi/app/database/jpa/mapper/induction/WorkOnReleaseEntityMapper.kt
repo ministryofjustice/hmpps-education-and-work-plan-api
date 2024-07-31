@@ -25,7 +25,7 @@ interface WorkOnReleaseEntityMapper {
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  fun fromEntityToDomain(persistedEntity: WorkOnReleaseEntity): WorkOnRelease
+  fun fromEntityToDomain(persistedEntity: WorkOnReleaseEntity?): WorkOnRelease
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField

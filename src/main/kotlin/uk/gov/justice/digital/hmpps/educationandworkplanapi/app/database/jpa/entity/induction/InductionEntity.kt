@@ -51,10 +51,6 @@ class InductionEntity(
   var workOnRelease: WorkOnReleaseEntity? = null,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "previous_qualifications_id")
-  var previousQualifications: PreviousQualificationsEntity? = null,
-
-  @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "previous_training_id")
   var previousTraining: PreviousTrainingEntity? = null,
 

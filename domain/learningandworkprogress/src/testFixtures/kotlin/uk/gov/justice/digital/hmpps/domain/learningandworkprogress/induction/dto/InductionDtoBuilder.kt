@@ -5,7 +5,7 @@ import java.util.UUID
 fun aValidCreateInductionDto(
   prisonNumber: String = "A1234AB",
   workOnRelease: CreateWorkOnReleaseDto = aValidCreateWorkOnReleaseDto(),
-  previousQualifications: CreatePreviousQualificationsDto = aValidCreatePreviousQualificationsDto(),
+  previousQualifications: CreatePreviousQualificationsDto? = aValidCreatePreviousQualificationsDto(),
   previousTraining: CreatePreviousTrainingDto = aValidCreatePreviousTrainingDto(),
   previousWorkExperiences: CreatePreviousWorkExperiencesDto = aValidCreatePreviousWorkExperiencesDto(),
   inPrisonInterests: CreateInPrisonInterestsDto = aValidCreateInPrisonInterestsDto(),
@@ -28,7 +28,7 @@ fun aValidUpdateInductionDto(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "A1234AB",
   workOnRelease: UpdateWorkOnReleaseDto = aValidUpdateWorkOnReleaseDto(),
-  previousQualifications: UpdatePreviousQualificationsDto = aValidUpdatePreviousQualificationsDto(),
+  previousQualifications: UpdatePreviousQualificationsDto? = aValidUpdatePreviousQualificationsDto(),
   previousTraining: UpdatePreviousTrainingDto = aValidUpdatePreviousTrainingDto(),
   previousWorkExperiences: UpdatePreviousWorkExperiencesDto = aValidUpdatePreviousWorkExperiencesDto(),
   inPrisonInterests: UpdateInPrisonInterestsDto = aValidUpdateInPrisonInterestsDto(),

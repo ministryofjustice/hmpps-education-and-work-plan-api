@@ -83,7 +83,7 @@ class InductionResourceMapperTest {
     )
 
     given(workOnReleaseMapper.toCreateWorkOnReleaseDto(any(), any())).willReturn(workOnRelease)
-    given(qualificationsMapper.toCreatePreviousQualificationsDto(any(), any())).willReturn(qualifications)
+    given(qualificationsMapper.toCreatePreviousQualificationsDto(any(), any(), any())).willReturn(qualifications)
     given(previousTrainingMapper.toCreatePreviousTrainingDto(any(), any())).willReturn(training)
     given(workExperiencesMapper.toCreatePreviousWorkExperiencesDto(any(), any())).willReturn(workExperiences)
     given(inPrisonInterestsMapper.toCreateInPrisonInterestsDto(any(), any())).willReturn(inPrisonInterests)

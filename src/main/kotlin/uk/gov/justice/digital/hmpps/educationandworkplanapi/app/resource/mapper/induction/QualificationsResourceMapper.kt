@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 )
 interface QualificationsResourceMapper {
   @Mapping(target = "educationLevel", source = "request.educationLevel", defaultValue = "NOT_SURE")
-  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonId: String): CreatePreviousQualificationsDto
+  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto
 
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")
   @Mapping(target = "updatedByDisplayName", source = "lastUpdatedByDisplayName")

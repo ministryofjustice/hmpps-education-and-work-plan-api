@@ -53,7 +53,7 @@ abstract class PreviousWorkExperiencesEntityMapper {
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
   @Mapping(target = "experiences", source = "experiences")
-  abstract fun fromEntityToDomain(persistedEntity: PreviousWorkExperiencesEntity): PreviousWorkExperiences
+  abstract fun fromEntityToDomain(persistedEntity: PreviousWorkExperiencesEntity?): PreviousWorkExperiences
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField

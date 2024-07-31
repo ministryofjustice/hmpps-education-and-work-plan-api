@@ -31,13 +31,14 @@ class PreviousQualificationsEntityMapperTest {
   @Test
   fun `should map from dto to entity`() {
     // Given
-    val createQualificationsDto = aValidCreatePreviousQualificationsDto()
+    val createQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = "A1234BC")
     val expectedQualificationEntity = aValidQualificationEntity(
       subject = "English",
       level = QualificationLevelEntity.LEVEL_1,
       grade = "C",
     )
     val expected = aValidPreviousQualificationsEntity(
+      prisonNumber = "A1234BC",
       educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = mutableListOf(expectedQualificationEntity),
       createdAtPrison = "BXI",

@@ -63,7 +63,7 @@ abstract class InPrisonInterestsEntityMapper {
   @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  abstract fun fromEntityToDomain(persistedEntity: InPrisonInterestsEntity): InPrisonInterests
+  abstract fun fromEntityToDomain(persistedEntity: InPrisonInterestsEntity?): InPrisonInterests
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
