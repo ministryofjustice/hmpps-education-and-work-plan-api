@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -101,16 +100,13 @@ class GetInductionTest : IntegrationTestBase() {
       .wasUpdatedByDisplayName("Alex Smith")
       .wasCreatedAtPrison("BXI")
       .wasUpdatedAtPrison("BXI")
-
-    with(actual) {
-      assertThat(workOnRelease).isEquivalentTo(expectedWorkOnRelease)
-      assertThat(previousQualifications).isEquivalentTo(expectedPreviousQualifications)
-      assertThat(previousTraining).isEquivalentTo(expectedPreviousTraining)
-      assertThat(previousWorkExperiences).isNull()
-      assertThat(inPrisonInterests).isEquivalentTo(expectedInPrisonInterests)
-      assertThat(personalSkillsAndInterests).isNull()
-      assertThat(futureWorkInterests).isNull()
-    }
+      .workOnRelease { it.isEquivalentTo(expectedWorkOnRelease) }
+      .previousQualifications { it.isEquivalentTo(expectedPreviousQualifications) }
+      .previousTraining { it.isEquivalentTo(expectedPreviousTraining) }
+      .previousWorkExperiences { it.isNull() }
+      .inPrisonInterests { it.isEquivalentTo(expectedInPrisonInterests) }
+      .personalSkillsAndInterests { it.isNull() }
+      .futureWorkInterests { it.isNull() }
   }
 
   @Test
@@ -151,15 +147,12 @@ class GetInductionTest : IntegrationTestBase() {
       .wasUpdatedByDisplayName("Alex Smith")
       .wasCreatedAtPrison("BXI")
       .wasUpdatedAtPrison("BXI")
-
-    with(actual) {
-      assertThat(workOnRelease).isEquivalentTo(expectedWorkOnRelease)
-      assertThat(previousQualifications).isEquivalentTo(expectedPreviousQualifications)
-      assertThat(previousTraining).isEquivalentTo(expectedPreviousTraining)
-      assertThat(previousWorkExperiences).isEquivalentTo(expectedPreviousWorkExperiences)
-      assertThat(inPrisonInterests).isNull()
-      assertThat(personalSkillsAndInterests).isEquivalentTo(expectedSkillsAndInterests)
-      assertThat(futureWorkInterests).isEquivalentTo(expectedFutureWorkInterests)
-    }
+      .workOnRelease { it.isEquivalentTo(expectedWorkOnRelease) }
+      .previousQualifications { it.isEquivalentTo(expectedPreviousQualifications) }
+      .previousTraining { it.isEquivalentTo(expectedPreviousTraining) }
+      .previousWorkExperiences { it.isEquivalentTo(expectedPreviousWorkExperiences) }
+      .inPrisonInterests { it.isNull() }
+      .personalSkillsAndInterests { it.isEquivalentTo(expectedSkillsAndInterests) }
+      .futureWorkInterests { it.isEquivalentTo(expectedFutureWorkInterests) }
   }
 }
