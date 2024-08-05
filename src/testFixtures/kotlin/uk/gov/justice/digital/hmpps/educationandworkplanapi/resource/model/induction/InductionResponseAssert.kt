@@ -26,6 +26,7 @@ class InductionResponseAssert(actual: InductionResponse?) :
     }
     return this
   }
+
   fun wasCreatedAt(expected: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
@@ -135,6 +136,84 @@ class InductionResponseAssert(actual: InductionResponse?) :
     isNotNull
     with(actual!!) {
       consumer.accept(assertThat(previousWorkExperiences))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [FutureWorkInterestsResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [FutureWorkInterestsResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun futureWorkInterests(consumer: Consumer<FutureWorkInterestsResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(futureWorkInterests))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [WorkOnReleaseResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [WorkOnReleaseResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun workOnRelease(consumer: Consumer<WorkOnReleaseResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(workOnRelease))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [PreviousTrainingResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [PreviousTrainingResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun previousTraining(consumer: Consumer<PreviousTrainingResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(previousTraining))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [PersonalSkillsAndInterestsResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [PersonalSkillsAndInterestsResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun personalSkillsAndInterests(consumer: Consumer<PersonalSkillsAndInterestsResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(personalSkillsAndInterests))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [PreviousQualificationsResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [PreviousQualificationsResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun previousQualifications(consumer: Consumer<PreviousQualificationsResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(previousQualifications))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the child [InPrisonInterestsResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [InPrisonInterestsResponseAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   */
+  fun inPrisonInterests(consumer: Consumer<InPrisonInterestsResponseAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(inPrisonInterests))
     }
     return this
   }

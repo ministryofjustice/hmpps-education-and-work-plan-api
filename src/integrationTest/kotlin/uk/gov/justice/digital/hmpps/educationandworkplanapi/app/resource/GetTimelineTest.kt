@@ -136,11 +136,11 @@ class GetTimelineTest : IntegrationTestBase() {
         .returnResult(TimelineResponse::class.java)
 
       // Then
-      val actual = response.responseBody.blockFirst()
-      assertThat(actual.events).hasSize(4)
+      val actual = response.responseBody.blockFirst()!!
       val actionPlanCreatedCorrelationId = actual.events[3].correlationId
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
+        .hasNumberOfEvents(4)
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
@@ -238,12 +238,12 @@ class GetTimelineTest : IntegrationTestBase() {
         .returnResult(TimelineResponse::class.java)
 
       // Then
-      val actual = response.responseBody.blockFirst()
-      assertThat(actual.events).hasSize(8)
+      val actual = response.responseBody.blockFirst()!!
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
+        .hasNumberOfEvents(8)
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
@@ -337,10 +337,10 @@ class GetTimelineTest : IntegrationTestBase() {
       .returnResult(TimelineResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual.events).hasSize(1)
+    val actual = response.responseBody.blockFirst()!!
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
+      .hasNumberOfEvents(1)
       .event(1) {
         it.hasSourceReference("1")
           .hasEventType(TimelineEventType.PRISON_ADMISSION)
