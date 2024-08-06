@@ -8,13 +8,11 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousQualificationsResponse
@@ -22,7 +20,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel as QualificationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel as HighestEducationLevelApi
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
 @ExtendWith(MockitoExtension::class)
 class QualificationsResourceMapperTest {
@@ -45,12 +45,12 @@ class QualificationsResourceMapperTest {
       qualifications = listOf(
         aValidQualification(
           subject = "English",
-          level = QualificationLevel.LEVEL_3,
+          level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
         aValidQualification(
           subject = "Maths",
-          level = QualificationLevel.LEVEL_3,
+          level = QualificationLevelDomain.LEVEL_3,
           grade = "B",
         ),
       ),
@@ -71,12 +71,12 @@ class QualificationsResourceMapperTest {
       qualifications = listOf(
         aValidQualification(
           subject = "English",
-          level = QualificationLevel.LEVEL_3,
+          level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
         aValidQualification(
           subject = "Maths",
-          level = QualificationLevel.LEVEL_4,
+          level = QualificationLevelDomain.LEVEL_4,
           grade = "B",
         ),
       ),
@@ -88,12 +88,12 @@ class QualificationsResourceMapperTest {
       qualifications = listOf(
         aValidAchievedQualification(
           subject = "English",
-          level = AchievedQualification.Level.LEVEL_3,
+          level = QualificationLevelApi.LEVEL_3,
           grade = "A",
         ),
         anotherValidAchievedQualification(
           subject = "Maths",
-          level = AchievedQualification.Level.LEVEL_4,
+          level = QualificationLevelApi.LEVEL_4,
           grade = "B",
         ),
       ),
@@ -122,12 +122,12 @@ class QualificationsResourceMapperTest {
       qualifications = listOf(
         aValidQualification(
           subject = "English",
-          level = QualificationLevel.LEVEL_3,
+          level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
         aValidQualification(
           subject = "Maths",
-          level = QualificationLevel.LEVEL_3,
+          level = QualificationLevelDomain.LEVEL_3,
           grade = "B",
         ),
       ),

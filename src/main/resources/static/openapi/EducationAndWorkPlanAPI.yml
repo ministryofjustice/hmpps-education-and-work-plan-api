@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.14.0'
+  version: '1.15.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -17,6 +17,77 @@ paths:
   # RESTful style endpoints start here
   # --------------------------------------------------------------------------------
   #
+
+  #
+  # Education
+  # --------------------------------------------------------------------------------
+  '/person/{prisonNumber}/education':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    description: | 
+      API endpoints to create, read and update an individual's education.  
+      
+      Personal Learning Plans currently considers "education" as meaning an individual's Highest Level of Education and
+      achieved qualifications. Typically the term "qualifications" is used to refer to things like formal school,
+      college and university education. It can in theory include other education providers, but specifically excludes
+      education that has been taken and delivered whilst in-prison. In-prison education is mastered and returned by
+      the Curious API.
+      
+      An individual's education record contains their highest level of education and their achieved qualifications.
+      An individual cannot have more than one record of education.
+    get:
+      summary: Returns an individual's education record.
+      description: | 
+        Returns an individual's education which includes their highest level of education, and a collection of 
+        qualifications that have been achieved.
+      operationId: get-education
+      tags:
+        - Education
+      responses:
+        '200':
+          $ref: '#/components/responses/Education'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+    post:
+      summary: Creates a record of an individual's education.
+      description: |
+        Creates a record of an individual's education which includes their highest level of education, and a
+        collection of qualifications that have been achieved.  
+        
+        A `CONFLICT 409` response is returned if there is already an education record for the individual.
+      operationId: create-education
+      tags:
+        - Education
+      requestBody:
+        $ref: '#/components/requestBodies/CreateEducation'
+      responses:
+        '201':
+          description: The Education record was created successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '409':
+          $ref: '#/components/responses/409ErrorResponse'
+    put:
+      summary: Updates an individual's education.
+      description: |
+        Updates an individual's education.  
+        
+        The entire education record is updated as one. Updating just the highest level of education, or individual
+        qualifications (including adding, removing or updating) is not currently supported.
+
+        A `NOT_FOUND 404` response is returned if the specified individual does not currently have an education record.
+      operationId: update-education
+      tags:
+        - Education
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateEducation'
+      responses:
+        '201':
+          description: The Education record was successfully updated.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
 
   #
   # Action Plans
@@ -449,6 +520,54 @@ components:
           type: string
       required:
         - status
+    AuditedResource:
+      title: AuditedResource
+      type: object
+      properties:
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
+      required:
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
+
     ActionPlanSummaryListResponse:
       title: ActionPlanSummaryListResponse
       type: object
@@ -1304,6 +1423,8 @@ components:
       title: ConversationResponse
       type: object
       description: Represents a Conversation with a prisoner within the context of their Learning and Work Progress.
+      allOf:
+        - $ref: '#/components/schemas/AuditedResource'
       properties:
         reference:
           type: string
@@ -1318,52 +1439,10 @@ components:
           type: string
           description: A note for this conversation
           example: Pay close attention to Peter's behaviour.
-        createdBy:
-          type: string
-          description: The DPS username of the person who created this resource.
-          example: 'asmith_gen'
-        createdByDisplayName:
-          type: string
-          description: The display name of the person who created this resource.
-          example: 'Alex Smith'
-        createdAt:
-          type: string
-          format: date-time
-          description: An ISO-8601 timestamp representing when this resource was created.
-          example: '2023-06-19T09:39:44Z'
-        createdAtPrison:
-          type: string
-          description: The identifier of the prison that the prisoner was resident at when this resource was created.
-          example: 'BXI'
-        updatedBy:
-          type: string
-          description: The DPS username of the person who last updated this resource.
-          example: 'asmith_gen'
-        updatedByDisplayName:
-          type: string
-          description: The display name of the person who last updated this resource.
-          example: 'Alex Smith'
-        updatedAt:
-          type: string
-          format: date-time
-          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
-          example: '2023-06-19T09:39:44Z'
-        updatedAtPrison:
-          type: string
-          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
-          example: 'BXI'
       required:
         - reference
         - prisonNumber
         - note
-        - createdBy
-        - createdByDisplayName
-        - createdAt
-        - createdAtPrison
-        - updatedBy
-        - updatedByDisplayName
-        - updatedAt
-        - updatedAtPrison
 
     ConversationsResponse:
       title: ConversationsResponse
@@ -1392,6 +1471,30 @@ components:
         - pageNumber
         - pageSize
         - content
+
+    EducationResponse:
+      title: EducationResponse
+      type: object
+      description: Represents an education record.
+      allOf:
+        - $ref: '#/components/schemas/AuditedResource'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this EducationResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        highestLevelOfEducation:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          type: array
+          description: A list of achieved qualifications. Can be empty but not null.
+          items:
+            $ref: '#/components/schemas/AchievedQualificationResponse'
+      required:
+        - reference
+        - educationLevel
+        - qualifications
 
     GetActionPlanSummariesRequest:
       title: GetActionPlanSummariesRequest
@@ -1877,26 +1980,46 @@ components:
         subject:
           type: string
           description: The subject of the qualification.
+          example: Maths GCSE
         level:
-          type: string
-          description: The level of the qualification (if known/relevant).
-          enum:
-            - ENTRY_LEVEL
-            - LEVEL_1
-            - LEVEL_2
-            - LEVEL_3
-            - LEVEL_4
-            - LEVEL_5
-            - LEVEL_6
-            - LEVEL_7
-            - LEVEL_8
+          $ref: '#/components/schemas/QualificationLevel'
         grade:
           type: string
-          description: The grade which was achieved (if known/relevant).
+          description: |
+            The grade which was achieved (if known/relevant).  
+            Note: This is a free format value and there is no type or enum. Therefore values can be "A", "B", "C" etc,
+            but also "1", "2", "3", "Pass", "Distinction", "Merit", "First class honours" etc. It is up to the consumer
+            to interpret this data as necessary.
+          example: Distinction
       required:
         - subject
         - level
         - grade
+
+    QualificationLevel:
+      title: QualificationLevel
+      type: string
+      description: |
+        The level of an educational qualification.  
+        The levels represent the [gov.uk qualification levels](https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels).
+      enum:
+        - ENTRY_LEVEL
+        - LEVEL_1
+        - LEVEL_2
+        - LEVEL_3
+        - LEVEL_4
+        - LEVEL_5
+        - LEVEL_6
+        - LEVEL_7
+        - LEVEL_8
+
+    AchievedQualificationResponse:
+      title: AchievedQualificationResponse
+      type: object
+      description: A qualification that a Prisoner has achieved, including the audit fields of who created/updated it.
+      allOf:
+        - $ref: '#/components/schemas/AchievedQualification'
+        - $ref: '#/components/schemas/AuditedResource'
 
     GetCiagInductionSummariesRequest:
       title: GetCiagInductionSummariesRequest
@@ -2210,6 +2333,28 @@ components:
         content:
           $ref: '#/components/schemas/SubjectAccessRequestContent'
 
+    CreateEducationRequest:
+      title: CreateEducationRequest
+      description: A request to create an individual's education record.
+      type: object
+      properties:
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
+        highestLevelOfEducation:
+          $ref: '#/components/schemas/HighestEducationLevel'
+        qualifications:
+          type: array
+          description: A list of achieved qualifications.
+          items:
+            $ref: '#/components/schemas/AchievedQualification'
+      required:
+        - prisonId
+        - highestLevelOfEducation
+        - qualifications
+    UpdateEducationRequest:
+      description: A request to update an individual's education record.
+      allOf:
+        - $ref: '#/components/schemas/CreateEducationRequest'
 
   #
   # Response Body Definitions
@@ -2427,6 +2572,24 @@ components:
           schema:
             $ref: '#/components/schemas/SarSuccessResponse'
 
+    Education:
+      description: |
+        An individual's education record.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EducationResponse'
+
   #
   # Request Body Definitions
   # --------------------------------------------------------------------------------
@@ -2497,6 +2660,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateConversationRequest'
+    CreateEducation:
+      description: Request body to create an individual's education record.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateEducationRequest'
+    UpdateEducation:
+      description: Request body to update an individual's education record.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateEducationRequest'
 
   parameters:
     prisonNumberPathParameter:

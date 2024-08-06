@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel
 
 fun aValidCreatePreviousQualificationsRequest(
   educationLevel: HighestEducationLevel? = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
@@ -18,7 +19,7 @@ fun aValidCreatePreviousQualificationsRequest(
 
 fun aValidAchievedQualification(
   subject: String = "English",
-  level: AchievedQualification.Level = AchievedQualification.Level.LEVEL_3,
+  level: QualificationLevel = QualificationLevel.LEVEL_3,
   grade: String = "A",
 ): AchievedQualification = AchievedQualification(
   subject = subject,
@@ -28,7 +29,7 @@ fun aValidAchievedQualification(
 
 fun anotherValidAchievedQualification(
   subject: String = "Maths",
-  level: AchievedQualification.Level = AchievedQualification.Level.LEVEL_3,
+  level: QualificationLevel = QualificationLevel.LEVEL_3,
   grade: String = "B",
 ): AchievedQualification = AchievedQualification(
   subject = subject,
