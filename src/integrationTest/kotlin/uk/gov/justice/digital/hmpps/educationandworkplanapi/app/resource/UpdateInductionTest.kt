@@ -17,9 +17,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
@@ -308,7 +308,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
       previousQualifications = aValidUpdatePreviousQualificationsRequest(
         reference = persistedInduction.previousQualifications!!.reference,
-        educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+        educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
       ),
       previousWorkExperiences = aValidUpdatePreviousWorkExperiencesRequest(),
       personalSkillsAndInterests = aValidUpdatePersonalSkillsAndInterestsRequest(),
@@ -348,7 +348,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       updatedAtPrison = "MDI",
     )
     val expectedPreviousQualifications = aValidPreviousQualificationsResponse(
-      educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
       // didn't exist previously, so will be created by the update request
       createdBy = createUsername,
       createdByDisplayName = createDisplayName,
@@ -470,7 +470,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       ),
       previousQualifications = aValidUpdatePreviousQualificationsRequest(
         reference = persistedInduction.previousQualifications!!.reference,
-        educationLevel = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+        educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
       ),
       personalSkillsAndInterests = aValidUpdatePersonalSkillsAndInterestsRequest(),
       futureWorkInterests = aValidUpdateFutureWorkInterestsRequest(),

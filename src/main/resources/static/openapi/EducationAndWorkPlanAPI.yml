@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.15.0'
+  version: '1.15.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -27,18 +27,18 @@ paths:
     description: | 
       API endpoints to create, read and update an individual's education.  
       
-      Personal Learning Plans currently considers "education" as meaning an individual's Highest Level of Education and
+      Personal Learning Plans currently considers "education" as meaning an individual's level of education and
       achieved qualifications. Typically the term "qualifications" is used to refer to things like formal school,
       college and university education. It can in theory include other education providers, but specifically excludes
       education that has been taken and delivered whilst in-prison. In-prison education is mastered and returned by
       the Curious API.
       
-      An individual's education record contains their highest level of education and their achieved qualifications.
+      An individual's education record contains their level of education and their achieved qualifications.
       An individual cannot have more than one record of education.
     get:
       summary: Returns an individual's education record.
       description: | 
-        Returns an individual's education which includes their highest level of education, and a collection of 
+        Returns an individual's education which includes their level of education, and a collection of 
         qualifications that have been achieved.
       operationId: get-education
       tags:
@@ -51,7 +51,7 @@ paths:
     post:
       summary: Creates a record of an individual's education.
       description: |
-        Creates a record of an individual's education which includes their highest level of education, and a
+        Creates a record of an individual's education which includes their level of education, and a
         collection of qualifications that have been achieved.  
         
         A `CONFLICT 409` response is returned if there is already an education record for the individual.
@@ -72,7 +72,7 @@ paths:
       description: |
         Updates an individual's education.  
         
-        The entire education record is updated as one. Updating just the highest level of education, or individual
+        The entire education record is updated as one. Updating just the level of education, or individual
         qualifications (including adding, removing or updating) is not currently supported.
 
         A `NOT_FOUND 404` response is returned if the specified individual does not currently have an education record.
@@ -1044,7 +1044,7 @@ components:
           description: A unique reference reference for this PreviousQualificationsResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         educationLevel:
-          $ref: '#/components/schemas/HighestEducationLevel'
+          $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
           description: A list of the Prisoner's previous qualifications. Can be empty but not null.
@@ -1484,8 +1484,8 @@ components:
           format: uuid
           description: A unique reference reference for this EducationResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
-        highestLevelOfEducation:
-          $ref: '#/components/schemas/HighestEducationLevel'
+        educationLevel:
+          $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
           description: A list of achieved qualifications. Can be empty but not null.
@@ -1876,10 +1876,10 @@ components:
         - OTHER
         - NONE
 
-    HighestEducationLevel:
-      title: HighestEducationLevel
+    EducationLevel:
+      title: EducationLevel
       type: string
-      description: The highest education level of a Prisoner. Defaults to 'NOT_SURE' if no value has been provided.
+      description: An enumeration of education levels.
       enum:
         - PRIMARY_SCHOOL
         - SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
@@ -2083,7 +2083,7 @@ components:
       description: A request to create a Prisoner's qualifications.
       properties:
         educationLevel:
-          $ref: '#/components/schemas/HighestEducationLevel'
+          $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
           description: A list of the Prisoner's previous qualifications.
@@ -2340,8 +2340,8 @@ components:
       properties:
         prisonId:
           $ref: '#/components/schemas/PrisonId'
-        highestLevelOfEducation:
-          $ref: '#/components/schemas/HighestEducationLevel'
+        educationLevel:
+          $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
           description: A list of achieved qualifications.
@@ -2349,7 +2349,7 @@ components:
             $ref: '#/components/schemas/AchievedQualification'
       required:
         - prisonId
-        - highestLevelOfEducation
+        - educationLevel
         - qualifications
     UpdateEducationRequest:
       description: A request to update an individual's education record.

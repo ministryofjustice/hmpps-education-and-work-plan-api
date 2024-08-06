@@ -10,9 +10,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel as EducationLevelDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel as QualificationLevelDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel as HighestEducationLevelEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.EducationLevel as EducationLevelEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel as QualificationLevelEntity
 
 class UpdatePreviousQualificationsEntityMapperTest {
@@ -48,7 +48,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     val existingQualificationsReference = UUID.randomUUID()
     val existingQualificationsEntity = aValidPreviousQualificationsEntity(
       reference = existingQualificationsReference,
-      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(existingQualificationEntity1, existingQualificationEntity2),
     )
 
@@ -65,7 +65,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
       reference = qualificationReference,
-      educationLevel = HighestEducationLevelDomain.FURTHER_EDUCATION_COLLEGE,
+      educationLevel = EducationLevelDomain.FURTHER_EDUCATION_COLLEGE,
       qualifications = listOf(updatedQualification, unchangedQualification),
       prisonId = "MDI",
     )
@@ -73,7 +73,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     val expectedEntity = existingQualificationsEntity.deepCopy().apply {
       id
       reference = reference
-      educationLevel = HighestEducationLevelEntity.FURTHER_EDUCATION_COLLEGE
+      educationLevel = EducationLevelEntity.FURTHER_EDUCATION_COLLEGE
       qualifications = mutableListOf(
         existingQualificationEntity1.deepCopy().apply {
           subject = "ENGLISH"
@@ -98,7 +98,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     // Given
     val qualificationReference = UUID.randomUUID()
     val existingQualificationsEntity = aValidPreviousQualificationsEntity(
-      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(
         aValidQualificationEntity(
           reference = qualificationReference,
@@ -123,7 +123,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
       reference = qualificationReference,
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(updatedQualification, newQualification),
       prisonId = "MDI",
     )
@@ -131,7 +131,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     val expectedEntity = existingQualificationsEntity.deepCopy().apply {
       id
       reference = reference
-      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
       qualifications = mutableListOf(
         // updated grade
         aValidQualificationEntity(
@@ -175,7 +175,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     val existingQualificationsReference = UUID.randomUUID()
     val existingQualificationsEntity = aValidPreviousQualificationsEntity(
       reference = existingQualificationsReference,
-      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(firstQualificationEntity, secondQualificationEntity),
     )
 
@@ -186,7 +186,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
       reference = qualificationReference,
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(existingQualification),
       prisonId = "MDI",
     )
@@ -194,7 +194,7 @@ class UpdatePreviousQualificationsEntityMapperTest {
     val expectedEntity = existingQualificationsEntity.deepCopy().apply {
       id
       reference = reference
-      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
       qualifications = mutableListOf(firstQualificationEntity)
       createdAtPrison = "BXI"
       updatedAtPrison = "MDI"

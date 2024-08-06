@@ -56,7 +56,7 @@ class PreviousQualificationsEntity(
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  var educationLevel: HighestEducationLevel? = null,
+  var educationLevel: EducationLevel? = null,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   var qualifications: MutableList<QualificationEntity>? = null,
@@ -191,7 +191,7 @@ class QualificationEntity(
   }
 }
 
-enum class HighestEducationLevel {
+enum class EducationLevel {
   PRIMARY_SCHOOL,
   SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
   SECONDARY_SCHOOL_TOOK_EXAMS,

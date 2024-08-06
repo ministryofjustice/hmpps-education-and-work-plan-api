@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel
 
 fun aValidCreatePreviousQualificationsRequest(
-  educationLevel: HighestEducationLevel? = HighestEducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+  educationLevel: EducationLevel? = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
   qualifications: List<AchievedQualification>? = listOf(
     aValidAchievedQualification(),
     anotherValidAchievedQualification(),

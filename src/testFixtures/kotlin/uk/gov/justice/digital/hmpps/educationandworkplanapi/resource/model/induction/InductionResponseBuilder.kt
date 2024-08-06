@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.FutureWorkInterestsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
@@ -19,7 +19,7 @@ fun aValidInductionResponseForPrisonerNotLookingToWork(
   prisonNumber: String = "A1234AB",
   workOnRelease: WorkOnReleaseResponse = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(),
   previousQualifications: PreviousQualificationsResponse? = aValidPreviousQualificationsResponse(
-    educationLevel = HighestEducationLevel.NOT_SURE,
+    educationLevel = EducationLevel.NOT_SURE,
   ),
   previousTraining: PreviousTrainingResponse? = aValidPreviousTrainingResponse(),
   previousWorkExperiences: PreviousWorkExperiencesResponse? = null,
