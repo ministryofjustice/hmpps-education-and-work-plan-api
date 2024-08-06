@@ -8,8 +8,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditA
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
@@ -76,7 +76,7 @@ class GetInductionTest : IntegrationTestBase() {
     )
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork()
     val expectedPreviousQualifications =
-      aValidPreviousQualificationsResponse(educationLevel = HighestEducationLevel.NOT_SURE)
+      aValidPreviousQualificationsResponse(educationLevel = EducationLevel.NOT_SURE)
     val expectedPreviousTraining = aValidPreviousTrainingResponse()
     val expectedInPrisonInterests = aValidInPrisonInterestsResponse()
 

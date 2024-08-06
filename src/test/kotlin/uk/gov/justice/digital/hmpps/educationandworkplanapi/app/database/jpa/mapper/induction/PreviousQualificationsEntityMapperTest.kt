@@ -16,8 +16,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HighestEducationLevel as HighestEducationLevelEntity
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel as EducationLevelDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.EducationLevel as EducationLevelEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel as QualificationLevelEntity
 
 @ExtendWith(MockitoExtension::class)
@@ -39,7 +39,7 @@ class PreviousQualificationsEntityMapperTest {
     )
     val expected = aValidPreviousQualificationsEntity(
       prisonNumber = "A1234BC",
-      educationLevel = HighestEducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = mutableListOf(expectedQualificationEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -66,7 +66,7 @@ class PreviousQualificationsEntityMapperTest {
     val expectedQualification = aValidQualification()
     val expectedPreviousQualifications = aValidPreviousQualifications(
       reference = qualificationsEntity.reference!!,
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(expectedQualification),
       createdAt = qualificationsEntity.createdAt!!,
       createdAtPrison = qualificationsEntity.createdAtPrison!!,

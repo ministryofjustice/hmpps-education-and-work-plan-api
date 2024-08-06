@@ -19,9 +19,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HighestEducationLevel as HighestEducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel as EducationLevelDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel as QualificationLevelDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HighestEducationLevel as HighestEducationLevelApi
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
 @ExtendWith(MockitoExtension::class)
@@ -41,7 +41,7 @@ class QualificationsResourceMapperTest {
     val request = aValidCreatePreviousQualificationsRequest()
     val expected = aValidCreatePreviousQualificationsDto(
       prisonNumber = "A1234BC",
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
         aValidQualification(
           subject = "English",
@@ -67,7 +67,7 @@ class QualificationsResourceMapperTest {
   fun `should map to PreviousQualificationsResponse`() {
     // Given
     val domain = aValidPreviousQualifications(
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = listOf(
         aValidQualification(
           subject = "English",
@@ -84,7 +84,7 @@ class QualificationsResourceMapperTest {
     val expectedDateTime = OffsetDateTime.now()
     val expected = aValidPreviousQualificationsResponse(
       reference = domain.reference,
-      educationLevel = HighestEducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
+      educationLevel = EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = listOf(
         aValidAchievedQualification(
           subject = "English",
@@ -118,7 +118,7 @@ class QualificationsResourceMapperTest {
     val request = aValidUpdatePreviousQualificationsRequest()
     val expected = aValidUpdatePreviousQualificationsDto(
       reference = request.reference!!,
-      educationLevel = HighestEducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
         aValidQualification(
           subject = "English",

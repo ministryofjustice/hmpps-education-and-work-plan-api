@@ -12,7 +12,7 @@ import java.util.UUID
  */
 data class PreviousQualifications(
   val reference: UUID,
-  val educationLevel: HighestEducationLevel?,
+  val educationLevel: EducationLevel?,
   val qualifications: List<Qualification>,
   val createdBy: String?,
   val createdByDisplayName: String?,
@@ -24,7 +24,7 @@ data class PreviousQualifications(
   val lastUpdatedAtPrison: String,
 )
 
-enum class HighestEducationLevel {
+enum class EducationLevel {
   PRIMARY_SCHOOL,
   SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
   SECONDARY_SCHOOL_TOOK_EXAMS,
@@ -40,16 +40,4 @@ data class Qualification(
   val grade: String,
 ) : KeyAwareDomain {
   override fun key(): String = "${subject.trim()},$level".uppercase()
-}
-
-enum class QualificationLevel {
-  ENTRY_LEVEL,
-  LEVEL_1,
-  LEVEL_2,
-  LEVEL_3,
-  LEVEL_4,
-  LEVEL_5,
-  LEVEL_6,
-  LEVEL_7,
-  LEVEL_8,
 }
