@@ -36,13 +36,18 @@ abstract class GoalEntityMapper {
    * Maps the supplied [CreateGoalDto] into a new un-persisted [GoalEntity].
    * A new reference number is generated and mapped. The JPA managed fields are not mapped.
    * This method is suitable for creating a new [GoalEntity] to be subsequently persisted to the database.
+   *
+   * `archiveReason` and `archiveReasonOther` are not mapped as they have no corresponding fields in the source `CreateGoalDto` instance
+   * because it is not possible to create a new goal that is already in an archived state.
    */
   @BeanMapping(qualifiedByName = ["addNewStepsDuringCreate"])
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "steps", ignore = true)
+  @Mapping(target = "steps", ignore = true) // Steps are mapped in via the AfterMapping method addNewStepsDuringCreate
+  @Mapping(target = "archiveReason", ignore = true)
+  @Mapping(target = "archiveReasonOther", ignore = true)
   abstract fun fromDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity
 
   @Named("addNewStepsDuringCreate")
@@ -63,12 +68,18 @@ abstract class GoalEntityMapper {
   /**
    * Updates the supplied [GoalEntity] with fields from the supplied [UpdateGoalDtp]. The updated [GoalEntity] can then be
    * persisted to the database.
+   *
+   * `status`, `archiveReason` and `archiveReasonOther` are not mapped as they have no corresponding fields in the source `UpdateGoalDto` instance
+   * because it is not possible to either update a goal's status or update an archived goal via the Update Goal operation.
    */
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "steps", expression = "java( updateSteps(goalEntity, updatedGoalDto) )")
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "archiveReason", ignore = true)
+  @Mapping(target = "archiveReasonOther", ignore = true)
   abstract fun updateEntityFromDto(@MappingTarget goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto)
 
   abstract fun archiveReasonFromDomainToEntity(reason: ReasonToArchiveGoal): ReasonToArchiveGoalEntity

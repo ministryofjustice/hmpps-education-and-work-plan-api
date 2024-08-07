@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
@@ -89,8 +90,16 @@ class JpaInductionPersistenceAdapter(
       return previousQualificationsRepository.saveAndFlush(previousQualificationsEntity)
     } else {
       // Prisoner does not already have previous qualifications, and the DTO has qualifications. We need to create them
+      val createPreviousQualificationsDto = with(updateInductionDto.previousQualifications!!) {
+        CreatePreviousQualificationsDto(
+          prisonNumber = prisonNumber,
+          educationLevel = educationLevel!!,
+          qualifications = qualifications,
+          prisonId = prisonId,
+        )
+      }
       return previousQualificationsRepository.saveAndFlush(
-        previousQualificationsMapper.fromUpdateDtoToNewEntity(updateInductionDto.previousQualifications)!!,
+        previousQualificationsMapper.fromCreateDtoToEntity(createPreviousQualificationsDto)!!,
       )
     }
   }
