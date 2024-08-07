@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidFutureWorkInterestsResponse
@@ -446,6 +447,55 @@ class UpdateInductionTest : IntegrationTestBase() {
         .containsEntry("userId", updateUsername)
         .containsKey("reference")
     }
+  }
+
+  @Test
+  fun `should update induction for prisoner who has no qualifications to start with but wants to add qualifications`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(
+      prisonNumber = prisonNumber,
+      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(previousQualifications = null),
+    )
+
+    val persistedInduction = getInduction(prisonNumber)
+    val updateInductionRequest = aValidUpdateInductionRequestForPrisonerNotLookingToWork(
+      reference = persistedInduction.reference,
+      workOnRelease = aValidUpdateWorkOnReleaseRequestForPrisonerNotLookingToWork(
+        reference = persistedInduction.workOnRelease.reference,
+      ),
+      previousQualifications = aValidUpdatePreviousQualificationsRequest(
+        // there is no reference at this point as the previous induction had no previous qualifications. We are adding qualifications into the existing Induction where they did not exist before
+        reference = null,
+        educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+        qualifications = listOf(aValidAchievedQualification()),
+      ),
+      // these fields were provided in the create request and won't be changed
+      previousWorkExperiences = null,
+      inPrisonInterests = null,
+      previousTraining = null,
+      futureWorkInterests = null,
+      personalSkillsAndInterests = null,
+    )
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(privateKey = keyPair.private),
+      )
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction)
+      .previousQualifications {
+        it.hasEducationLevel(EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS)
+          .hasQualifications(listOf(aValidAchievedQualification()))
+      }
   }
 
   @Test

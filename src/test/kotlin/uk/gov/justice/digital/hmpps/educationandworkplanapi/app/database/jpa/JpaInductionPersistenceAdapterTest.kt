@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
@@ -335,7 +336,7 @@ class JpaInductionPersistenceAdapterTest {
       given(inductionRepository.saveAndFlush(any<InductionEntity>())).willReturn(persistedInductionEntity)
 
       val newPreviousQualificationsEntity = aValidPreviousQualificationsEntity(prisonNumber = prisonNumber)
-      given(previousQualificationsMapper.fromUpdateDtoToNewEntity(any())).willReturn(newPreviousQualificationsEntity)
+      given(previousQualificationsMapper.fromCreateDtoToEntity(any())).willReturn(newPreviousQualificationsEntity)
       val persistedPreviousQualificationsEntity = aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
       given(previousQualificationsRepository.saveAndFlush(any<PreviousQualificationsEntity>())).willReturn(persistedPreviousQualificationsEntity)
 
@@ -357,6 +358,13 @@ class JpaInductionPersistenceAdapterTest {
         previousQualifications = aValidUpdatePreviousQualificationsDto(),
       )
 
+      val expectedCreatePreviousQualificationsDto = CreatePreviousQualificationsDto(
+        prisonNumber,
+        updateInductionDto.previousQualifications!!.educationLevel!!,
+        updateInductionDto.previousQualifications!!.qualifications,
+        updateInductionDto.previousQualifications!!.prisonId,
+      )
+
       // When
       val actual = persistenceAdapter.updateInduction(updateInductionDto)
 
@@ -366,7 +374,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(inductionRepository).saveAndFlush(inductionEntity)
       verify(inductionMapper).updateEntityFromDto(inductionEntity, updateInductionDto)
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
-      verify(previousQualificationsMapper).fromUpdateDtoToNewEntity(updateInductionDto.previousQualifications)
+      verify(previousQualificationsMapper).fromCreateDtoToEntity(expectedCreatePreviousQualificationsDto)
       verify(previousQualificationsRepository).saveAndFlush(newPreviousQualificationsEntity)
       verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity)
     }

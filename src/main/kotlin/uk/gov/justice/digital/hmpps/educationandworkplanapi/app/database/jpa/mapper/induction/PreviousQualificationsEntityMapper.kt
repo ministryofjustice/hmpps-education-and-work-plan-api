@@ -80,6 +80,7 @@ abstract class PreviousQualificationsEntityMapper {
 
   @ExcludeJpaManagedFieldsIncludingDisplayNameFields
   @ExcludeReferenceField
+  @Mapping(target = "prisonNumber", ignore = true) // Updating the prison number associated with a prisoner's qualifications is not supported
   @Mapping(target = "createdAtPrison", ignore = true)
   @Mapping(target = "updatedAtPrison", source = "prisonId")
   @Mapping(target = "qualifications", expression = "java( updateQualificationsFromUpdateDto(entity, dto) )")
@@ -100,20 +101,6 @@ abstract class PreviousQualificationsEntityMapper {
     entityListManager.deleteRemoved(existingQualifications, updatedQualifications)
 
     return existingQualifications
-  }
-
-  @BeanMapping(qualifiedByName = ["addNewQualificationsDuringUpdate"])
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "qualifications", ignore = true)
-  abstract fun fromUpdateDtoToNewEntity(previousQualifications: UpdatePreviousQualificationsDto?): PreviousQualificationsEntity?
-
-  @Named("addNewQualificationsDuringUpdate")
-  @AfterMapping
-  protected fun addNewQualificationsDuringUpdate(dto: UpdatePreviousQualificationsDto, @MappingTarget entity: PreviousQualificationsEntity) {
-    addNewQualifications(dto.qualifications, entity)
   }
 
   private fun addNewQualifications(qualifications: List<Qualification>, entity: PreviousQualificationsEntity) {

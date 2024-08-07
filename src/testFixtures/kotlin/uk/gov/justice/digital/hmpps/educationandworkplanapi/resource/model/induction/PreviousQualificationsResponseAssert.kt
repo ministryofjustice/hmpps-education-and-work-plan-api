@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -21,6 +23,26 @@ class PreviousQualificationsResponseAssert(actual: PreviousQualificationsRespons
     with(actual!!) {
       if (reference != expected) {
         failWithMessage("Expected reference to be $expected, but was $reference")
+      }
+    }
+    return this
+  }
+
+  fun hasEducationLevel(expected: EducationLevel): PreviousQualificationsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (educationLevel != expected) {
+        failWithMessage("Expected educationLevel to be $expected, but was $educationLevel")
+      }
+    }
+    return this
+  }
+
+  fun hasQualifications(expected: List<AchievedQualification>): PreviousQualificationsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (qualifications != expected) {
+        failWithMessage("Expected educationLevel to be $qualifications, but was $qualifications")
       }
     }
     return this
