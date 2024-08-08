@@ -17,6 +17,24 @@ spring:
         jwt:
           public-key-location: classpath:local-public-key.pub
 
+hmpps.sqs:
+  enabled: true
+  provider: localstack
+  queues:
+    educationandworkplan:
+      queueName: education-and-work-plan-queue
+      subscribeFilter: "{\"eventType\":[\"prison-offender-events.prisoner.received\", \"prison-offender-events.prisoner.released\"]}"
+      dlqName: education-and-work-plan-dead-letter-queue
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
+    domaineventsqueue:
+      queueName: domainevents-queue
+      subscribeTopicId: domainevents
+  topics:
+    domainevents:
+      arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
+
 prison-api:
   client:
     id: prison-api-client-id

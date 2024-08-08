@@ -25,6 +25,7 @@ generic-service:
     HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
     PRISON_API_URL: https://prison-api.prison.service.justice.gov.uk
     HMPPS_SAR_ADDITIONALACCESSROLE: ROLE_EDUCATION_WORK_PLAN_VIEWER
+    HMPPS_SQS_ENABLED: false
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -44,6 +45,14 @@ generic-service:
     digital-prison-reporting:
       DPR_USER: "DPR_USER"
       DPR_PASSWORD: "DPR_PASSWORD"
+
+    # Inbound SQS config
+    hmpps-domain-events-topic:
+      HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN: "topic_arn"
+    education-and-work-plan-domain-events-sqs-instance-output:
+      HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_QUEUE_NAME: "sqs_queue_name"
+    education-and-work-plan-domain-events-sqs-dl-instance-output:
+      HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
     groups:

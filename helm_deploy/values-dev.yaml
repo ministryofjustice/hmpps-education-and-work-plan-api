@@ -17,6 +17,7 @@ generic-service:
     HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
     PRISON_API_URL: https://prison-api-dev.prison.service.justice.gov.uk
     SPRING_PROFILES_ACTIVE: dev
+    HMPPS_SQS_ENABLED: true
 
   allowlist:
     groups:

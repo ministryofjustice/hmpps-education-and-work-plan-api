@@ -22,6 +22,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
@@ -54,6 +56,8 @@ abstract class IntegrationTestBase {
 
     private val postgresContainer = PostgresContainer.instance
 
+    private val localStackContainer = LocalStackContainer.instance
+
     @JvmStatic
     @DynamicPropertySource
     fun configureTestContainers(registry: DynamicPropertyRegistry) {
@@ -67,6 +71,7 @@ abstract class IntegrationTestBase {
         registry.add("spring.flyway.user", postgresContainer::getUsername)
         registry.add("spring.flyway.password", postgresContainer::getPassword)
       }
+      localStackContainer?.also { setLocalStackProperties(it, registry) }
     }
   }
 
