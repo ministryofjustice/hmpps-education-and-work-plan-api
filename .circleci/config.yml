@@ -23,34 +23,23 @@ parameters:
     type: string
     default: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=1
 
-executors:
-  integration-test-environment:
-    docker:
-      - image: cimg/openjdk:<< pipeline.parameters.java-version >>
-      - image: cimg/postgres:<< pipeline.parameters.postgres-version >>
-        environment:
-          POSTGRES_PASSWORD: admin_password
-          POSTGRES_USER: admin
-          POSTGRES_DB: education_and_work_plan_api_db
-      - image: localstack/localstack:<< pipeline.parameters.localstack-version >>
-        environment:
-          SERVICES: sns,sqs
-          DATA_DIR: /tmp/localstack/data
-          DOCKER_HOST: unix:///var/run/docker.sock
-          AWS_EXECUTION_ENV: True
-          DEFAULT_REGION: eu-west-2
-          TMPDIR: /private
+jobs:
+  validate:
+    executor:
+      name: hmpps/java_localstack_postgres_with_db_name
+      jdk_tag: << pipeline.parameters.java-version >>
+      java_options: << pipeline.parameters.java-options >>
+      postgres_tag: << pipeline.parameters.postgres-version >>
+      postgres_db: "education_and_work_plan_api_db"
+      postgres_username: "admin"
+      postgres_password: "admin_password"
+      localstack_tag: << pipeline.parameters.localstack-version >>
+      services: "sqs,sns"
     environment:
-      _JAVA_OPTIONS: << pipeline.parameters.java-options >>
       DB_SERVER: localhost
       DB_NAME: education_and_work_plan_api_db
       DB_USER: admin
       DB_PASS: admin_password
-    working_directory: ~/app
-
-jobs:
-  validate:
-    executor: integration-test-environment
     steps:
       - checkout
       - restore_cache:
