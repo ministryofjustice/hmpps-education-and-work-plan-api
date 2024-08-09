@@ -16,16 +16,25 @@ parameters:
   postgres-version:
     type: string
     default: "15.5"
+  localstack-version:
+    type: string
+    default: "3.6.0"
+  java-options:
+    type: string
+    default: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=1
 
 jobs:
   validate:
     executor:
-      name: hmpps/java_postgres
+      name: hmpps/java_localstack_postgres_with_db_name
       jdk_tag: << pipeline.parameters.java-version >>
+      java_options: << pipeline.parameters.java-options >>
       postgres_tag: << pipeline.parameters.postgres-version >>
       postgres_db: "education_and_work_plan_api_db"
       postgres_username: "admin"
       postgres_password: "admin_password"
+      localstack_tag: << pipeline.parameters.localstack-version >>
+      services: "sqs,sns"
     environment:
       DB_SERVER: localhost
       DB_NAME: education_and_work_plan_api_db

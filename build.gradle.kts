@@ -5,7 +5,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.2"
   id("org.openapi.generator") version "7.7.0"
   kotlin("plugin.spring") version "2.0.0"
   kotlin("plugin.jpa") version "2.0.0"
@@ -23,11 +23,13 @@ val mapstructVersion = "1.5.5.Final"
 val postgresqlVersion = "42.7.3"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.6.0"
+val hmppsSqsVersion = "4.2.0"
 val awaitilityVersion = "4.2.1"
-val wiremockVersion = "3.8.0"
+val wiremockVersion = "3.9.1"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "9.40"
-val postgressTestContainersVersion = "1.20.0"
+val testContainersVersion = "1.20.1"
+val awsSdkVersion = "1.12.767"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
@@ -66,6 +68,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:$hmppsSqsVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion")
 
@@ -84,7 +87,9 @@ dependencies {
   testImplementation("org.awaitility:awaitility-kotlin:$awaitilityVersion")
 
   // Integration test dependencies
-  integrationTestImplementation("org.testcontainers:postgresql:$postgressTestContainersVersion")
+  integrationTestImplementation("org.testcontainers:postgresql:$testContainersVersion")
+  integrationTestImplementation("org.testcontainers:localstack:$testContainersVersion")
+  integrationTestApi("com.amazonaws:aws-java-sdk-core:$awsSdkVersion") // Needed so Localstack has access to the AWS SDK V1 API
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
