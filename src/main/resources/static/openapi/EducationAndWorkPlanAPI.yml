@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.15.1'
+  version: '1.15.2'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2016,10 +2016,39 @@ components:
     AchievedQualificationResponse:
       title: AchievedQualificationResponse
       type: object
-      description: A qualification that a Prisoner has achieved, including the audit fields of who created/updated it.
+      description: A qualification that a Prisoner has achieved, including the audit fields of who created/updated it and when.
       allOf:
         - $ref: '#/components/schemas/AchievedQualification'
-        - $ref: '#/components/schemas/AuditedResource'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference reference for this Achieved Qualification.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+      required:
+        - reference
+        - createdBy
+        - createdAt
+        - updatedBy
+        - updatedAt
 
     GetCiagInductionSummariesRequest:
       title: GetCiagInductionSummariesRequest
