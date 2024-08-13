@@ -15,9 +15,9 @@ sealed class AdditionalInformation {
   data class PrisonerReceivedAdditionalInformation(
     val nomsNumber: String,
     val reason: Reason,
-    val details: String,
-    val currentLocation: Location,
-    val currentPrisonStatus: PrisonStatus,
+    val details: String?,
+    val currentLocation: Location?,
+    val currentPrisonStatus: PrisonStatus?,
     val prisonId: String,
     val nomisMovementReasonCode: String,
   ) : AdditionalInformation() {
@@ -31,6 +31,7 @@ sealed class AdditionalInformation {
     enum class Location {
       IN_PRISON,
       OUTSIDE_PRISON,
+      BEING_TRANSFERRED,
     }
 
     enum class PrisonStatus {
@@ -45,9 +46,9 @@ sealed class AdditionalInformation {
   data class PrisonerReleasedAdditionalInformation(
     val nomsNumber: String,
     val reason: Reason,
-    val details: String,
-    val currentLocation: Location,
-    val currentPrisonStatus: PrisonStatus,
+    val details: String?,
+    val currentLocation: Location?,
+    val currentPrisonStatus: PrisonStatus?,
     val prisonId: String,
     val nomisMovementReasonCode: String,
   ) : AdditionalInformation() {
@@ -63,6 +64,7 @@ sealed class AdditionalInformation {
     enum class Location {
       IN_PRISON,
       OUTSIDE_PRISON,
+      BEING_TRANSFERRED,
     }
 
     enum class PrisonStatus {
