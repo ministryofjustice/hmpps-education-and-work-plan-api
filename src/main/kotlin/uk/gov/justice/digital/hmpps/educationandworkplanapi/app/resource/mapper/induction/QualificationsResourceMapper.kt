@@ -3,13 +3,19 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousQualifications
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousQualificationsRequest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.QualificationLevel as QualificationLevelDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
 @Mapper(
   uses = [
@@ -17,15 +23,60 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
   ],
   nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
-interface QualificationsResourceMapper {
-  @Mapping(target = "educationLevel", source = "request.educationLevel", defaultValue = "NOT_SURE")
-  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto
+abstract class QualificationsResourceMapper {
+  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto =
+    CreatePreviousQualificationsDto(
+      prisonNumber = prisonNumber,
+      prisonId = prisonId,
+      educationLevel = request.educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
+      qualifications = request.qualifications?.let { toQualifications(it) } ?: emptyList(),
+    )
 
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")
   @Mapping(target = "updatedByDisplayName", source = "lastUpdatedByDisplayName")
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
   @Mapping(target = "updatedAtPrison", source = "lastUpdatedAtPrison")
-  fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse?
+  abstract fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse?
 
-  fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String): UpdatePreviousQualificationsDto
+  abstract fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String): UpdatePreviousQualificationsDto
+
+  fun toQualification(achievedQualification: AchievedQualification): Qualification =
+    Qualification(
+      subject = achievedQualification.subject,
+      level = toQualificationLevel(achievedQualification.level),
+      grade = achievedQualification.grade,
+      reference = null,
+      createdBy = null,
+      createdAt = null,
+      lastUpdatedBy = null,
+      lastUpdatedAt = null,
+    )
+
+  fun toQualifications(achievedQualifications: List<AchievedQualification>): List<Qualification> =
+    achievedQualifications.map { toQualification(it) }
+
+  fun toEducationLevel(educationLevel: EducationLevelApi?): EducationLevelDomain? =
+    when (educationLevel) {
+      EducationLevelApi.NOT_SURE -> EducationLevelDomain.NOT_SURE
+      EducationLevelApi.PRIMARY_SCHOOL -> EducationLevelDomain.PRIMARY_SCHOOL
+      EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+      EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS
+      EducationLevelApi.FURTHER_EDUCATION_COLLEGE -> EducationLevelDomain.FURTHER_EDUCATION_COLLEGE
+      EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
+      EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY
+      null -> null
+    }
+
+  fun toQualificationLevel(qualificationLevel: QualificationLevelApi): QualificationLevelDomain =
+    when (qualificationLevel) {
+      QualificationLevelApi.ENTRY_LEVEL -> QualificationLevelDomain.ENTRY_LEVEL
+      QualificationLevelApi.LEVEL_1 -> QualificationLevelDomain.LEVEL_1
+      QualificationLevelApi.LEVEL_2 -> QualificationLevelDomain.LEVEL_2
+      QualificationLevelApi.LEVEL_3 -> QualificationLevelDomain.LEVEL_3
+      QualificationLevelApi.LEVEL_4 -> QualificationLevelDomain.LEVEL_4
+      QualificationLevelApi.LEVEL_5 -> QualificationLevelDomain.LEVEL_5
+      QualificationLevelApi.LEVEL_6 -> QualificationLevelDomain.LEVEL_6
+      QualificationLevelApi.LEVEL_7 -> QualificationLevelDomain.LEVEL_7
+      QualificationLevelApi.LEVEL_8 -> QualificationLevelDomain.LEVEL_8
+    }
 }

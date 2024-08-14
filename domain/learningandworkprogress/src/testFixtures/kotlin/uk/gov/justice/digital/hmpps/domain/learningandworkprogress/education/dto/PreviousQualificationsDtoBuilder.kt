@@ -1,9 +1,9 @@
-package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
 import java.util.UUID
 
 fun aValidCreatePreviousQualificationsDto(

@@ -1,5 +1,6 @@
-package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education
 
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.KeyAwareDomain
 import java.time.Instant
 import java.util.UUID
 
@@ -12,6 +13,7 @@ import java.util.UUID
  */
 data class PreviousQualifications(
   val reference: UUID,
+  val prisonNumber: String,
   val educationLevel: EducationLevel?,
   val qualifications: List<Qualification>,
   val createdBy: String?,
@@ -24,20 +26,15 @@ data class PreviousQualifications(
   val lastUpdatedAtPrison: String,
 )
 
-enum class EducationLevel {
-  PRIMARY_SCHOOL,
-  SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
-  SECONDARY_SCHOOL_TOOK_EXAMS,
-  FURTHER_EDUCATION_COLLEGE,
-  UNDERGRADUATE_DEGREE_AT_UNIVERSITY,
-  POSTGRADUATE_DEGREE_AT_UNIVERSITY,
-  NOT_SURE,
-}
-
 data class Qualification(
+  val reference: UUID?,
   val subject: String,
   val level: QualificationLevel,
   val grade: String,
+  val createdBy: String?,
+  val createdAt: Instant?,
+  val lastUpdatedBy: String?,
+  val lastUpdatedAt: Instant?,
 ) : KeyAwareDomain {
   override fun key(): String = "${subject.trim()},$level".uppercase()
 }

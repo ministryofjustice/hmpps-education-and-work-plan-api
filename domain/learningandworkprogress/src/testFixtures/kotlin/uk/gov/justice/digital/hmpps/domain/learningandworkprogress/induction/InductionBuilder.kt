@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
 
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import java.time.Instant
 import java.util.UUID
 

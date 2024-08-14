@@ -8,10 +8,12 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousQualifications
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aNewQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.anUpdatedQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousQualificationsRequest
@@ -19,8 +21,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel as EducationLevelDomain
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel as QualificationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.QualificationLevel as QualificationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
@@ -43,12 +45,12 @@ class QualificationsResourceMapperTest {
       prisonNumber = "A1234BC",
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
-        aValidQualification(
+        aNewQualification(
           subject = "English",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
-        aValidQualification(
+        aNewQualification(
           subject = "Maths",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "B",
@@ -120,12 +122,12 @@ class QualificationsResourceMapperTest {
       reference = request.reference!!,
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
-        aValidQualification(
+        anUpdatedQualification(
           subject = "English",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
-        aValidQualification(
+        anUpdatedQualification(
           subject = "Maths",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "B",
