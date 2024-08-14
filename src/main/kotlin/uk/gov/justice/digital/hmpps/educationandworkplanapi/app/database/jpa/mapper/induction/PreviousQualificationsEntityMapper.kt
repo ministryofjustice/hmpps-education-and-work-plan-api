@@ -8,10 +8,10 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.NullValueMappingStrategy
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousQualifications
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
@@ -120,6 +120,8 @@ interface QualificationEntityMapper : KeyAwareEntityMapper<QualificationEntity, 
   @ExcludeParentEntity
   override fun fromDomainToEntity(domain: Qualification): QualificationEntity
 
+  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
+  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   fun fromEntityToDomain(persistedEntity: QualificationEntity): Qualification
 
   @ExcludeJpaManagedFields

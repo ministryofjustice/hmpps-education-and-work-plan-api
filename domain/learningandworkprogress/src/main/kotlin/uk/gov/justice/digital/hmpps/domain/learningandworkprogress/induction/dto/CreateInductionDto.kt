@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+
 data class CreateInductionDto(
   val prisonNumber: String,
   val workOnRelease: CreateWorkOnReleaseDto,

@@ -1,17 +1,17 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Qualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel as EducationLevelDomain
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.QualificationLevel as QualificationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.QualificationLevel as QualificationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.EducationLevel as EducationLevelEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel as QualificationLevelEntity
 

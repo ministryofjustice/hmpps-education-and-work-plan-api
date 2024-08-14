@@ -9,14 +9,15 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousQualifications
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidQualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.EducationLevel as EducationLevelDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.EducationLevel as EducationLevelEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.QualificationLevel as QualificationLevelEntity
 
@@ -62,9 +63,11 @@ class PreviousQualificationsEntityMapperTest {
   @Test
   fun `should map from entity to domain`() {
     // Given
-    val qualificationsEntity = aValidPreviousQualificationsEntityWithJpaFieldsPopulated()
+    val prisonNumber = aValidPrisonNumber()
+    val qualificationsEntity = aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
     val expectedQualification = aValidQualification()
     val expectedPreviousQualifications = aValidPreviousQualifications(
+      prisonNumber = prisonNumber,
       reference = qualificationsEntity.reference!!,
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(expectedQualification),
