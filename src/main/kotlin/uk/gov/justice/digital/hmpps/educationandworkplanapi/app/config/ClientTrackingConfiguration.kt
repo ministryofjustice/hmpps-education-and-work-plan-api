@@ -20,7 +20,21 @@ class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientT
   override fun addInterceptors(registry: InterceptorRegistry) {
     registry.addInterceptor(clientTrackingInterceptor)
       .addPathPatterns("/**")
-      .excludePathPatterns("/swagger-ui/**", "/v3/api-docs/**", "/openapi/**")
+      .excludePathPatterns(
+        // URIs that should not use the clientTrackingInterceptor because they are requests that are intended to be made
+        // without a standard HMPPS-auth bearer token (or indeed any bearer token). These are anonymous requests.
+        //
+        // Spring Boot actuator endpoints
+        "/info",
+        "/health",
+        // swagger related endpoints
+        "/swagger-ui.html",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/openapi/**",
+        // HMPPS queue housekeeping endpoint
+        "/queue-admin/retry-all-dlqs",
+      )
   }
 }
 
