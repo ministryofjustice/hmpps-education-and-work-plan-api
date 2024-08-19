@@ -1,11 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import org.assertj.core.api.AbstractObjectAssert
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.AchievedQualificationResponseAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.assertThat
 import java.time.OffsetDateTime
 import java.util.UUID
+import java.util.function.Consumer
 
 fun assertThat(actual: PreviousQualificationsResponse?) = PreviousQualificationsResponseAssert(actual)
 
@@ -38,12 +42,42 @@ class PreviousQualificationsResponseAssert(actual: PreviousQualificationsRespons
     return this
   }
 
-  fun hasQualifications(expected: List<AchievedQualification>): PreviousQualificationsResponseAssert {
+  fun hasQualifications(expected: List<AchievedQualificationResponse>): PreviousQualificationsResponseAssert {
     isNotNull
     with(actual!!) {
       if (qualifications != expected) {
-        failWithMessage("Expected educationLevel to be $qualifications, but was $qualifications")
+        failWithMessage("Expected educationLevel to be $expected, but was $qualifications")
       }
+    }
+    return this
+  }
+
+  fun hasNumberOfQualifications(expected: Int): PreviousQualificationsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (qualifications.size != expected) {
+        failWithMessage("Expected educationLevel to have $expected qualifications, but has ${qualifications.size}")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [AchievedQualificationResponseAssert]. Takes a lambda as the method argument
+   * to call assertion methods provided by [AchievedQualificationResponseAssert].
+   * Returns this [PreviousQualificationsResponseAssert] to allow further chained assertions on the parent [GoalResponse]
+   *
+   * The `qualificationNumber` parameter is not zero indexed to make for better readability in tests. IE. the first qualification
+   * should be referenced as `.qualification(1) { .... }`
+   */
+  fun qualification(
+    qualificationNumber: Int,
+    consumer: Consumer<AchievedQualificationResponseAssert>,
+  ): PreviousQualificationsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val qualification = qualifications[qualificationNumber - 1]
+      consumer.accept(assertThat(qualification))
     }
     return this
   }

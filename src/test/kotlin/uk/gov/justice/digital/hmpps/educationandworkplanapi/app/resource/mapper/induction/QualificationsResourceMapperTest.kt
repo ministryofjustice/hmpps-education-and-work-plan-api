@@ -15,12 +15,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.anU
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.anotherValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousQualificationsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
+import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.QualificationLevel as QualificationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
@@ -69,34 +70,54 @@ class QualificationsResourceMapperTest {
   fun `should map to PreviousQualificationsResponse`() {
     // Given
     val domain = aValidPreviousQualifications(
+      reference = UUID.fromString("52ac8188-f372-4a7a-8de1-14b8160f0a2b"),
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = listOf(
         aValidQualification(
+          reference = UUID.fromString("c823568e-efe4-42fc-9a4e-227eb4e69ad0"),
           subject = "English",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
+          createdBy = "asmith_gen",
+          lastUpdatedBy = "bjones_gen",
         ),
         aValidQualification(
+          reference = UUID.fromString("371c25f7-ec55-4323-b296-11a643f12307"),
           subject = "Maths",
           level = QualificationLevelDomain.LEVEL_4,
           grade = "B",
+          createdBy = "fbloggs_gen",
+          lastUpdatedBy = "fnorth_gen",
         ),
       ),
     )
+
     val expectedDateTime = OffsetDateTime.now()
+    given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
+
     val expected = aValidPreviousQualificationsResponse(
-      reference = domain.reference,
+      reference = UUID.fromString("52ac8188-f372-4a7a-8de1-14b8160f0a2b"),
       educationLevel = EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
       qualifications = listOf(
-        aValidAchievedQualification(
+        aValidAchievedQualificationResponse(
+          reference = UUID.fromString("c823568e-efe4-42fc-9a4e-227eb4e69ad0"),
           subject = "English",
           level = QualificationLevelApi.LEVEL_3,
           grade = "A",
+          createdBy = "asmith_gen",
+          createdAt = expectedDateTime,
+          updatedBy = "bjones_gen",
+          updatedAt = expectedDateTime,
         ),
-        anotherValidAchievedQualification(
+        anotherValidAchievedQualificationResponse(
+          reference = UUID.fromString("371c25f7-ec55-4323-b296-11a643f12307"),
           subject = "Maths",
           level = QualificationLevelApi.LEVEL_4,
           grade = "B",
+          createdAt = expectedDateTime,
+          createdBy = "fbloggs_gen",
+          updatedAt = expectedDateTime,
+          updatedBy = "fnorth_gen",
         ),
       ),
       createdAt = expectedDateTime,
@@ -104,7 +125,6 @@ class QualificationsResourceMapperTest {
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
     )
-    given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
 
     // When
     val actual = mapper.toPreviousQualificationsResponse(domain)
