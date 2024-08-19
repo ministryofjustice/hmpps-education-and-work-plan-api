@@ -14,4 +14,6 @@ data class UpdateConversationDto(
   val reference: UUID,
   val noteContent: String,
   val prisonId: String,
+  val updatedBy: String,
+  val updatedByDisplayName: String,
 )

@@ -7,9 +7,13 @@ fun aValidCreateConversationDto(
   prisonNumber: String = aValidPrisonNumber(),
   type: ConversationType = ConversationType.REVIEW,
   note: CreateConversationNoteDto = aValidCreateConversationNoteDto(),
+  createdBy: String = "asmith_gen",
+  createdByDisplayName: String = "Alex Smith",
 ): CreateConversationDto =
   CreateConversationDto(
     prisonNumber = prisonNumber,
     type = type,
     note = note,
+    createdBy = createdBy,
+    createdByDisplayName = createdByDisplayName,
   )

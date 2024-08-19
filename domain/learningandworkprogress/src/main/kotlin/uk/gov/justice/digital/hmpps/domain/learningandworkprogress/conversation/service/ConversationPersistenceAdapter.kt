@@ -22,9 +22,9 @@ interface ConversationPersistenceAdapter {
   fun createConversation(createConversationDto: CreateConversationDto): Conversation
 
   /**
-   * Updates an [Conversation] identified by its `reference`.
+   * Updates an [Conversation] identified by its `reference` and `prisonNumber`.
    */
-  fun updateConversation(updateConversationDto: UpdateConversationDto): Conversation?
+  fun updateConversation(updateConversationDto: UpdateConversationDto, prisonNumber: String): Conversation?
 
   /**
    * Returns a [List] of [Conversation]s for the prisoner. An empty list is returned if there are no Conversations
@@ -43,7 +43,7 @@ interface ConversationPersistenceAdapter {
   ): PagedResult<Conversation>
 
   /**
-   * Returns a prisoner [Conversation] identified by its reference, or null if not found.
+   * Returns a prisoner [Conversation] identified by its reference and prisonNumber, or null if not found.
    */
-  fun getConversation(conversationReference: UUID): Conversation?
+  fun getConversation(conversationReference: UUID, prisonNumber: String): Conversation?
 }

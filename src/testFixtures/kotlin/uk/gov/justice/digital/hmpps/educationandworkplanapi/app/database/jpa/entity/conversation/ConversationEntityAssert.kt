@@ -10,21 +10,21 @@ fun assertThat(actual: ConversationEntity?) = ConversationEntityAssert(actual)
 
 class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAssert<ConversationEntityAssert, ConversationEntity?>(actual, ConversationEntityAssert::class.java) {
 
-  fun hasJpaManagedFieldsPopulated(): ConversationEntityAssert {
+  fun hasJpaManagedIdFieldPopulated(): ConversationEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id == null || createdAt == null || createdBy == null || updatedAt == null || updatedBy == null) {
-        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
+      if (id == null) {
+        failWithMessage("Expected entity to have the JPA managed ID field populated, but was it was null")
       }
     }
     return this
   }
 
-  fun doesNotHaveJpaManagedFieldsPopulated(): ConversationEntityAssert {
+  fun doesNotHaveJpaManagedIdFieldPopulated(): ConversationEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id != null || createdAt != null || createdBy != null || updatedAt != null || updatedBy != null) {
-        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
+      if (id != null) {
+        failWithMessage("Expected entity not to have the JPA managed ID field populated, but was [id = $id]")
       }
     }
     return this
@@ -95,6 +95,16 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
     return this
   }
 
+  fun wasCreatedAtOrAfter(dateTime: Instant): ConversationEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdAt!!.isBefore(dateTime)) {
+        failWithMessage("Expected createdAt to be at or after $dateTime, but was $createdAt")
+      }
+    }
+    return this
+  }
+
   fun wasUpdatedBy(expected: String): ConversationEntityAssert {
     isNotNull
     with(actual!!) {
@@ -120,6 +130,16 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
     with(actual!!) {
       if (!updatedAt!!.isAfter(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
+  fun wasUpdatedAtOrAfter(dateTime: Instant): ConversationEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAt!!.isBefore(dateTime)) {
+        failWithMessage("Expected updatedAt to be at or after $dateTime, but was $updatedAt")
       }
     }
     return this

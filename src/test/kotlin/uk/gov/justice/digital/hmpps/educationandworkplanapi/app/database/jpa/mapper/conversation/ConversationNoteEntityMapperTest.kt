@@ -20,30 +20,36 @@ class ConversationNoteEntityMapperTest {
       prisonId = "BXI",
       content = "Chris engaged well during our meeting and has made some good progress",
     )
+    val createdBy = "asmith_gen"
+    val createdByDisplayName = "Alex Smith"
+
+    val earliestCreatedAndUpdatedTime = Instant.now()
 
     val expected = aValidConversationNoteEntity(
       content = "Chris engaged well during our meeting and has made some good progress",
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
-      // JPA managed fields - expect these all to be null, implying a new db entity
+      createdAt = Instant.MIN,
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
+      updatedAt = Instant.MIN,
+      updatedBy = "asmith_gen",
+      updatedByDisplayName = "Alex Smith",
+      // JPA managed ID field - expect this to be null, implying a new db entity
       id = null,
-      createdAt = null,
-      createdBy = null,
-      createdByDisplayName = null,
-      updatedAt = null,
-      updatedBy = null,
-      updatedByDisplayName = null,
     )
 
     // When
-    val actual = mapper.fromCreateDtoToEntity(createConversationNoteDto)
+    val actual = mapper.fromCreateDtoToEntity(createConversationNoteDto, createdBy, createdByDisplayName)
 
     // Then
     assertThat(actual)
-      .doesNotHaveJpaManagedFieldsPopulated()
+      .doesNotHaveJpaManagedIdFieldPopulated()
       .hasAReference()
+      .wasCreatedAtOrAfter(earliestCreatedAndUpdatedTime)
+      .wasUpdatedAtOrAfter(earliestCreatedAndUpdatedTime)
       .usingRecursiveComparison()
-      .ignoringFields("reference")
+      .ignoringFields("reference", "createdAt", "updatedAt")
       .isEqualTo(expected)
   }
 

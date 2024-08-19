@@ -12,6 +12,8 @@ interface ConversationRepository : JpaRepository<ConversationEntity, UUID> {
 
   fun findByReference(reference: UUID): ConversationEntity?
 
+  fun findByReferenceAndPrisonNumber(reference: UUID, prisonNumber: String): ConversationEntity?
+
   fun findByPrisonNumber(prisonNumber: String, pageable: Pageable): Page<ConversationEntity>
 
   fun findAllByPrisonNumber(prisonNumber: String): List<ConversationEntity>

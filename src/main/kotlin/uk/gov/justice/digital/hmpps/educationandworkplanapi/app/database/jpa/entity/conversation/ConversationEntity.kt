@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
@@ -14,19 +13,12 @@ import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
-import org.springframework.data.annotation.CreatedBy
-import org.springframework.data.annotation.LastModifiedBy
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
 import java.time.Instant
 import java.util.UUID
 
 @Table(name = "conversation")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
 class ConversationEntity(
   @Id
   @GeneratedValue
@@ -52,19 +44,15 @@ class ConversationEntity(
   var prisonNumber: String? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column(updatable = false)
-  @CreatedBy
   var createdBy: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
-  @LastModifiedBy
   var updatedBy: String? = null,
 ) {
   fun updateLastUpdatedAt() {

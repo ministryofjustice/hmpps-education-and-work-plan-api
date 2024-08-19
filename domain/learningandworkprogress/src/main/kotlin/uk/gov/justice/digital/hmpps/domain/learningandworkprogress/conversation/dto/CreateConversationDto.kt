@@ -9,4 +9,6 @@ data class CreateConversationDto(
   val prisonNumber: String,
   val type: ConversationType,
   val note: CreateConversationNoteDto,
+  val createdBy: String,
+  val createdByDisplayName: String,
 )

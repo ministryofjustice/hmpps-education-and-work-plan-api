@@ -72,8 +72,10 @@ class CreateConversationTest : IntegrationTestBase() {
   fun `should create a new Conversation for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createReviewConversationRequest = aValidCreateReviewConversationRequest()
+    val prisonId = "BXI"
+    val createReviewConversationRequest = aValidCreateReviewConversationRequest(prisonId = prisonId)
     val dpsUsername = "auser_gen"
+    val userDisplayName = "Albert User"
 
     // When
     webTestClient.post()
@@ -83,6 +85,7 @@ class CreateConversationTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           CONVERSATIONS_RW,
           username = dpsUsername,
+          displayName = userDisplayName,
           privateKey = keyPair.private,
         ),
       )
@@ -97,5 +100,13 @@ class CreateConversationTest : IntegrationTestBase() {
       .isForPrisonNumber(prisonNumber)
       .isOfType(ConversationType.REVIEW)
       .wasCreatedBy(dpsUsername)
+      .content {
+        it.wasCreatedBy(dpsUsername)
+          .hasCreatedByDisplayName(userDisplayName)
+          .wasCreatedAtPrison(prisonId)
+          .wasUpdatedBy(dpsUsername)
+          .hasUpdatedByDisplayName(userDisplayName)
+          .wasUpdatedAtPrison(prisonId)
+      }
   }
 }
