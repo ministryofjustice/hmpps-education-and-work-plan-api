@@ -20,8 +20,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.anotherValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
@@ -178,6 +181,10 @@ class UpdateInductionTest : IntegrationTestBase() {
     )
     val expectedUnchangedQualifications = aValidPreviousQualificationsResponse(
       reference = persistedInduction.previousQualifications!!.reference,
+      qualifications = listOf(
+        aValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
+        anotherValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
+      ),
       createdBy = createUsername,
       createdByDisplayName = createDisplayName,
       createdAt = persistedInduction.previousQualifications!!.createdAt,
@@ -253,7 +260,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       .wasUpdatedAtPrison("MDI")
     assertThat(updatedInduction.previousWorkExperiences).isEqualTo(expectedUnchangedWorkExperience)
     assertThat(updatedInduction.personalSkillsAndInterests).isEqualTo(expectedUnchangedSkillsAndInterests)
-    assertThat(updatedInduction.previousQualifications).isEqualTo(expectedUnchangedQualifications)
+    assertThat(updatedInduction.previousQualifications).isEquivalentTo(expectedUnchangedQualifications)
     assertThat(updatedInduction.previousTraining).isEqualTo(expectedUnchangedTraining)
     assertThat(updatedInduction.futureWorkInterests).isEqualTo(expectedUnchangedWorkInterests)
     // for the updated objects, we do not have the auto generated values, so use isEquivalentTo()
@@ -351,6 +358,10 @@ class UpdateInductionTest : IntegrationTestBase() {
     val expectedPreviousQualifications = aValidPreviousQualificationsResponse(
       educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
       // didn't exist previously, so will be created by the update request
+      qualifications = listOf(
+        aValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
+        anotherValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
+      ),
       createdBy = createUsername,
       createdByDisplayName = createDisplayName,
       createdAtPrison = "BXI",
@@ -468,7 +479,13 @@ class UpdateInductionTest : IntegrationTestBase() {
         // there is no reference at this point as the previous induction had no previous qualifications. We are adding qualifications into the existing Induction where they did not exist before
         reference = null,
         educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
-        qualifications = listOf(aValidAchievedQualification()),
+        qualifications = listOf(
+          aValidAchievedQualification(
+            subject = "English",
+            level = QualificationLevel.LEVEL_3,
+            grade = "A",
+          ),
+        ),
       ),
       // these fields were provided in the create request and won't be changed
       previousWorkExperiences = null,
@@ -494,7 +511,12 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(induction)
       .previousQualifications {
         it.hasEducationLevel(EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS)
-          .hasQualifications(listOf(aValidAchievedQualification()))
+          .hasNumberOfQualifications(1)
+          .qualification(1) {
+            it.hasSubject("English")
+              .hasLevel(QualificationLevel.LEVEL_3)
+              .hasGrade("A")
+          }
       }
   }
 

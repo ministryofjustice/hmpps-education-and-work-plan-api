@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.15.2'
+  version: '1.15.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -1049,7 +1049,7 @@ components:
           type: array
           description: A list of the Prisoner's previous qualifications. Can be empty but not null.
           items:
-            $ref: '#/components/schemas/AchievedQualification'
+            $ref: '#/components/schemas/AchievedQualificationResponse'
         createdBy:
           type: string
           description: The DPS username of the person who created this resource.

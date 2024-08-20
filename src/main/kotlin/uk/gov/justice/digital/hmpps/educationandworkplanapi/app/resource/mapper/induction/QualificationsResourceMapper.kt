@@ -3,12 +3,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueMappingStrategy
+import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousQualificationsRequest
@@ -24,6 +26,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Quali
   nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 )
 abstract class QualificationsResourceMapper {
+
+  @Autowired
+  private lateinit var instantMapper: InstantMapper
+
   fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto =
     CreatePreviousQualificationsDto(
       prisonNumber = prisonNumber,
@@ -55,6 +61,21 @@ abstract class QualificationsResourceMapper {
   fun toQualifications(achievedQualifications: List<AchievedQualification>): List<Qualification> =
     achievedQualifications.map { toQualification(it) }
 
+  fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
+    AchievedQualificationResponse(
+      reference = qualification.reference!!,
+      subject = qualification.subject,
+      level = toQualificationLevel(qualification.level),
+      grade = qualification.grade,
+      createdBy = qualification.createdBy!!,
+      createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
+      updatedBy = qualification.lastUpdatedBy!!,
+      updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
+    )
+
+  fun toAchievedQualificationResponses(qualifications: List<Qualification>): List<AchievedQualificationResponse> =
+    qualifications.map { toAchievedQualificationResponse(it) }
+
   fun toEducationLevel(educationLevel: EducationLevelApi?): EducationLevelDomain? =
     when (educationLevel) {
       EducationLevelApi.NOT_SURE -> EducationLevelDomain.NOT_SURE
@@ -78,5 +99,18 @@ abstract class QualificationsResourceMapper {
       QualificationLevelApi.LEVEL_6 -> QualificationLevelDomain.LEVEL_6
       QualificationLevelApi.LEVEL_7 -> QualificationLevelDomain.LEVEL_7
       QualificationLevelApi.LEVEL_8 -> QualificationLevelDomain.LEVEL_8
+    }
+
+  fun toQualificationLevel(qualificationLevel: QualificationLevelDomain): QualificationLevelApi =
+    when (qualificationLevel) {
+      QualificationLevelDomain.ENTRY_LEVEL -> QualificationLevelApi.ENTRY_LEVEL
+      QualificationLevelDomain.LEVEL_1 -> QualificationLevelApi.LEVEL_1
+      QualificationLevelDomain.LEVEL_2 -> QualificationLevelApi.LEVEL_2
+      QualificationLevelDomain.LEVEL_3 -> QualificationLevelApi.LEVEL_3
+      QualificationLevelDomain.LEVEL_4 -> QualificationLevelApi.LEVEL_4
+      QualificationLevelDomain.LEVEL_5 -> QualificationLevelApi.LEVEL_5
+      QualificationLevelDomain.LEVEL_6 -> QualificationLevelApi.LEVEL_6
+      QualificationLevelDomain.LEVEL_7 -> QualificationLevelApi.LEVEL_7
+      QualificationLevelDomain.LEVEL_8 -> QualificationLevelApi.LEVEL_8
     }
 }
