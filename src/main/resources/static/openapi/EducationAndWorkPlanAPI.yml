@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.15.3'
+  version: '1.15.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -974,7 +974,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this WorkOnReleaseResponse.
+          description: A unique reference for this WorkOnReleaseResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hopingToWork:
           $ref: '#/components/schemas/HopingToWork'
@@ -1041,7 +1041,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this PreviousQualificationsResponse.
+          description: A unique reference for this PreviousQualificationsResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         educationLevel:
           $ref: '#/components/schemas/EducationLevel'
@@ -1104,7 +1104,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this PreviousTrainingResponse.
+          description: A unique reference for this PreviousTrainingResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         trainingTypes:
           type: array
@@ -1167,7 +1167,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this PreviousWorkExperiencesResponse.
+          description: A unique reference for this PreviousWorkExperiencesResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         hasWorkedBefore:
           $ref: '#/components/schemas/HasWorkedBefore'
@@ -1234,7 +1234,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this InPrisonInterestsResponse.
+          description: A unique reference for this InPrisonInterestsResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         inPrisonWorkInterests:
           type: array
@@ -1300,7 +1300,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this PersonalSkillsAndInterestsResponse.
+          description: A unique reference for this PersonalSkillsAndInterestsResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         skills:
           type: array
@@ -1366,7 +1366,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this FutureWorkInterestsResponse.
+          description: A unique reference for this FutureWorkInterestsResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         interests:
           type: array
@@ -1429,7 +1429,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this ConversationResponse.
+          description: A unique reference for this ConversationResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         prisonNumber:
           type: string
@@ -1482,7 +1482,7 @@ components:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this EducationResponse.
+          description: A unique reference for this EducationResponse.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
         educationLevel:
           $ref: '#/components/schemas/EducationLevel'
@@ -1972,10 +1972,10 @@ components:
         - "NO"
         - "NOT_RELEVANT"
 
-    AchievedQualification:
-      title: AchievedQualification
+    CreateAchievedQualificationRequest:
+      title: CreateAchievedQualificationRequest
       type: object
-      description: A qualification that a Prisoner has achieved.
+      description: A request object to create a qualification that a Prisoner has achieved.
       properties:
         subject:
           type: string
@@ -1995,6 +1995,23 @@ components:
         - subject
         - level
         - grade
+
+    CreateOrUpdateAchievedQualificationRequest:
+      title: CreateOrUpdateAchievedQualificationRequest
+      type: object
+      description: | 
+        A request object to create or update a qualification that a Prisoner has achieved.  
+        If the object contains a reference field the corresponding qualification will be updated, or created as a new
+        qualification if the corresponding qualification cannot be found.  
+        If the object does not contain a reference field a new qualification will be created.
+      allOf:
+        - $ref: '#/components/schemas/CreateAchievedQualificationRequest'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The unique reference for this Achieved Qualification if this request object is being used to update the qualification
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
 
     QualificationLevel:
       title: QualificationLevel
@@ -2017,14 +2034,26 @@ components:
       title: AchievedQualificationResponse
       type: object
       description: A qualification that a Prisoner has achieved, including the audit fields of who created/updated it and when.
-      allOf:
-        - $ref: '#/components/schemas/AchievedQualification'
       properties:
         reference:
           type: string
           format: uuid
-          description: A unique reference reference for this Achieved Qualification.
+          description: A unique reference for this Achieved Qualification.
           example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        subject:
+          type: string
+          description: The subject of the qualification.
+          example: Maths GCSE
+        level:
+          $ref: '#/components/schemas/QualificationLevel'
+        grade:
+          type: string
+          description: |
+            The grade which was achieved (if known/relevant).  
+            Note: This is a free format value and there is no type or enum. Therefore values can be "A", "B", "C" etc,
+            but also "1", "2", "3", "Pass", "Distinction", "Merit", "First class honours" etc. It is up to the consumer
+            to interpret this data as necessary.
+          example: Distinction
         createdBy:
           type: string
           description: The DPS username of the person who created this resource.
@@ -2045,6 +2074,9 @@ components:
           example: '2023-06-19T09:39:44Z'
       required:
         - reference
+        - subject
+        - level
+        - grade
         - createdBy
         - createdAt
         - updatedBy
@@ -2115,9 +2147,12 @@ components:
           $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
-          description: A list of the Prisoner's previous qualifications.
+          description: | 
+            A list of the Prisoner's previous qualifications.  
+            These can either be new qualfications without a reference field, or for any qualifications with a reference field they
+            will be treated as updates.
           items:
-            $ref: '#/components/schemas/AchievedQualification'
+            $ref: '#/components/schemas/CreateOrUpdateAchievedQualificationRequest'
     CreatePreviousTrainingRequest:
       title: CreatePreviousTrainingRequest
       type: object
@@ -2373,9 +2408,9 @@ components:
           $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
-          description: A list of achieved qualifications.
+          description: A list of achieved qualifications that should be created as part of the education record.
           items:
-            $ref: '#/components/schemas/AchievedQualification'
+            $ref: '#/components/schemas/CreateAchievedQualificationRequest'
       required:
         - prisonId
         - educationLevel
