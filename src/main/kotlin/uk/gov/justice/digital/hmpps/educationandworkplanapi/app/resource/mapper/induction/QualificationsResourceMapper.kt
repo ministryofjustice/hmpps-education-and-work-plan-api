@@ -9,8 +9,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qua
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateOrUpdateAchievedQualificationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdatePreviousQualificationsRequest
@@ -46,7 +46,7 @@ abstract class QualificationsResourceMapper {
 
   abstract fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String): UpdatePreviousQualificationsDto
 
-  fun toQualification(achievedQualification: AchievedQualification): Qualification =
+  fun toQualification(achievedQualification: CreateOrUpdateAchievedQualificationRequest): Qualification =
     Qualification(
       subject = achievedQualification.subject,
       level = toQualificationLevel(achievedQualification.level),
@@ -58,7 +58,7 @@ abstract class QualificationsResourceMapper {
       lastUpdatedAt = null,
     )
 
-  fun toQualifications(achievedQualifications: List<AchievedQualification>): List<Qualification> =
+  fun toQualifications(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>): List<Qualification> =
     achievedQualifications.map { toQualification(it) }
 
   fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
