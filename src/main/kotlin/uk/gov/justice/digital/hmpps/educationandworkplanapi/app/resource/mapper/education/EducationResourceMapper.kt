@@ -31,11 +31,11 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
 
   fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
     AchievedQualificationResponse(
-      reference = qualification.reference!!,
+      reference = qualification.reference,
       createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
-      createdBy = qualification.createdBy!!,
+      createdBy = qualification.createdBy,
       updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
-      updatedBy = qualification.lastUpdatedBy!!,
+      updatedBy = qualification.lastUpdatedBy,
       subject = qualification.subject,
       level = toQualificationLevel(qualification.level),
       grade = qualification.grade,

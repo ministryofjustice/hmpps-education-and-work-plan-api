@@ -2,14 +2,12 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dt
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
 import java.util.UUID
 
 fun aValidCreatePreviousQualificationsDto(
   prisonNumber: String = "A1234AB",
   educationLevel: EducationLevel = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
-  qualifications: List<Qualification> = listOf(aValidQualification()),
+  qualifications: List<UpdateOrCreateQualificationDto> = listOf(aValidCreateQualificationDto()),
   prisonId: String = "BXI",
 ) =
   CreatePreviousQualificationsDto(
@@ -22,7 +20,7 @@ fun aValidCreatePreviousQualificationsDto(
 fun aValidUpdatePreviousQualificationsDto(
   reference: UUID = UUID.randomUUID(),
   educationLevel: EducationLevel = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
-  qualifications: List<Qualification> = listOf(aValidQualification()),
+  qualifications: List<UpdateOrCreateQualificationDto> = listOf(aValidUpdateQualificationDto()),
   prisonId: String = "BXI",
 ) =
   UpdatePreviousQualificationsDto(

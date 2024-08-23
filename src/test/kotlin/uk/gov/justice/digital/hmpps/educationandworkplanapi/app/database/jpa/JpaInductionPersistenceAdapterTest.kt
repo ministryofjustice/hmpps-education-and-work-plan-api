@@ -304,7 +304,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(inductionRepository).saveAndFlush(inductionEntity)
       verify(inductionMapper).updateEntityFromDto(inductionEntity, updateInductionDto)
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
-      verify(previousQualificationsMapper).updateExistingEntityFromDto(previousQualificationsEntity, updateInductionDto.previousQualifications)
+      verify(previousQualificationsMapper).updateExistingEntityFromDto(previousQualificationsEntity, updateInductionDto.previousQualifications!!)
       verify(previousQualificationsRepository).saveAndFlush(previousQualificationsEntity)
       verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity)
     }

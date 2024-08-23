@@ -8,18 +8,20 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aNewQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.anUpdatedQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdateQualificationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.anotherValidAchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousQualificationsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.anotherValidAchievedQualification
 import java.time.OffsetDateTime
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
@@ -37,21 +39,57 @@ class QualificationsResourceMapperTest {
   private lateinit var instantMapper: InstantMapper
 
   @Test
-  fun `should map to CreatePreviousQualificationsDto`() {
+  fun `should map to CreatePreviousQualificationsDto given qualification without a reference`() {
     // Given
     val prisonId = "BXI"
     val prisonNumber = "A1234BC"
-    val request = aValidCreatePreviousQualificationsRequest()
+    val request = aValidCreatePreviousQualificationsRequest(
+      qualifications = listOf(aValidAchievedQualification(reference = null)),
+    )
+
     val expected = aValidCreatePreviousQualificationsDto(
       prisonNumber = "A1234BC",
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
-        aNewQualification(
+        aValidCreateQualificationDto(
           subject = "English",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
-        aNewQualification(
+      ),
+    )
+
+    // When
+    val actual = mapper.toCreatePreviousQualificationsDto(request, prisonNumber, prisonId)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to CreatePreviousQualificationsDto given qualifications with and without a reference`() {
+    // Given
+    val prisonId = "BXI"
+    val prisonNumber = "A1234BC"
+    val existingQualificationReference = UUID.randomUUID()
+    val request = aValidCreatePreviousQualificationsRequest(
+      qualifications = listOf(
+        aValidAchievedQualification(reference = existingQualificationReference),
+        anotherValidAchievedQualification(reference = null),
+      ),
+    )
+
+    val expected = aValidCreatePreviousQualificationsDto(
+      prisonNumber = "A1234BC",
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      qualifications = listOf(
+        aValidUpdateQualificationDto(
+          reference = existingQualificationReference,
+          subject = "English",
+          level = QualificationLevelDomain.LEVEL_3,
+          grade = "A",
+        ),
+        aValidCreateQualificationDto(
           subject = "Maths",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "B",
@@ -134,20 +172,57 @@ class QualificationsResourceMapperTest {
   }
 
   @Test
-  fun `should map to UpdatePreviousQualificationsDto`() {
+  fun `should map to UpdatePreviousQualificationsDto given qualification without a reference`() {
     // Given
     val prisonId = "BXI"
-    val request = aValidUpdatePreviousQualificationsRequest()
+    val request = aValidUpdatePreviousQualificationsRequest(
+      qualifications = listOf(
+        aValidAchievedQualification(reference = null),
+      ),
+    )
+
     val expected = aValidUpdatePreviousQualificationsDto(
       reference = request.reference!!,
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
-        anUpdatedQualification(
+        aValidCreateQualificationDto(
           subject = "English",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "A",
         ),
-        anUpdatedQualification(
+      ),
+    )
+
+    // When
+    val actual = mapper.toUpdatePreviousQualificationsDto(request, prisonId)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map to UpdatePreviousQualificationsDto given new qualification without a reference`() {
+    // Given
+    val prisonId = "BXI"
+    val existingQualificationReference = UUID.randomUUID()
+    val request = aValidUpdatePreviousQualificationsRequest(
+      qualifications = listOf(
+        aValidAchievedQualification(reference = existingQualificationReference),
+        anotherValidAchievedQualification(reference = null),
+      ),
+    )
+
+    val expected = aValidUpdatePreviousQualificationsDto(
+      reference = request.reference!!,
+      educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
+      qualifications = listOf(
+        aValidUpdateQualificationDto(
+          reference = existingQualificationReference,
+          subject = "English",
+          level = QualificationLevelDomain.LEVEL_3,
+          grade = "A",
+        ),
+        aValidCreateQualificationDto(
           subject = "Maths",
           level = QualificationLevelDomain.LEVEL_3,
           grade = "B",
