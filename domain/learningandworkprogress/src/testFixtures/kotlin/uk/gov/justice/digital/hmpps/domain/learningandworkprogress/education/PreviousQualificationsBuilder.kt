@@ -34,14 +34,14 @@ fun aValidPreviousQualifications(
   )
 
 fun aValidQualification(
-  reference: UUID? = UUID.randomUUID(),
+  reference: UUID = UUID.randomUUID(),
   subject: String = "English",
   level: QualificationLevel = QualificationLevel.LEVEL_1,
   grade: String = "C",
-  createdBy: String? = "asmith_gen",
-  createdAt: Instant? = Instant.now(),
-  lastUpdatedBy: String? = "bjones_gen",
-  lastUpdatedAt: Instant? = Instant.now(),
+  createdBy: String = "asmith_gen",
+  createdAt: Instant = Instant.now(),
+  lastUpdatedBy: String = "bjones_gen",
+  lastUpdatedAt: Instant = Instant.now(),
 ) =
   Qualification(
     reference = reference,
@@ -52,36 +52,4 @@ fun aValidQualification(
     createdAt = createdAt,
     lastUpdatedBy = lastUpdatedBy,
     lastUpdatedAt = lastUpdatedAt,
-  )
-
-fun aNewQualification(
-  subject: String = "English",
-  level: QualificationLevel = QualificationLevel.LEVEL_1,
-  grade: String = "C",
-) =
-  aValidQualification(
-    reference = null,
-    subject = subject,
-    level = level,
-    grade = grade,
-    createdBy = null,
-    createdAt = null,
-    lastUpdatedBy = null,
-    lastUpdatedAt = null,
-  )
-
-fun anUpdatedQualification(
-  subject: String = "English",
-  level: QualificationLevel = QualificationLevel.LEVEL_1,
-  grade: String = "C",
-) =
-  aValidQualification(
-    reference = null,
-    subject = subject,
-    level = level,
-    grade = grade,
-    createdBy = null,
-    createdAt = null,
-    lastUpdatedBy = null,
-    lastUpdatedAt = null,
   )

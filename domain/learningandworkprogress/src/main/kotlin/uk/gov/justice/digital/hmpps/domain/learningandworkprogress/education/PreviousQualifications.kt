@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education
 
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.KeyAwareDomain
 import java.time.Instant
 import java.util.UUID
 
@@ -27,14 +26,12 @@ data class PreviousQualifications(
 )
 
 data class Qualification(
-  val reference: UUID?,
+  val reference: UUID,
   val subject: String,
   val level: QualificationLevel,
   val grade: String,
-  val createdBy: String?,
-  val createdAt: Instant?,
-  val lastUpdatedBy: String?,
-  val lastUpdatedAt: Instant?,
-) : KeyAwareDomain {
-  override fun key(): String = "${subject.trim()},$level".uppercase()
-}
+  val createdBy: String,
+  val createdAt: Instant,
+  val lastUpdatedBy: String,
+  val lastUpdatedAt: Instant,
+)

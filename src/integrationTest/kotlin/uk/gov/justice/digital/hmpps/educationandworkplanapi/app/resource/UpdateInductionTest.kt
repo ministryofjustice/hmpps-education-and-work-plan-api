@@ -25,9 +25,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.anotherValidAchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousQualificationsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidFutureWorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInPrisonInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPersonalSkillsAndInterestsResponse
@@ -314,10 +316,6 @@ class UpdateInductionTest : IntegrationTestBase() {
       workOnRelease = aValidUpdateWorkOnReleaseRequestForPrisonerLookingToWork(
         reference = persistedInduction.workOnRelease.reference,
       ),
-      previousQualifications = aValidUpdatePreviousQualificationsRequest(
-        reference = persistedInduction.previousQualifications!!.reference,
-        educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
-      ),
       previousWorkExperiences = aValidUpdatePreviousWorkExperiencesRequest(),
       personalSkillsAndInterests = aValidUpdatePersonalSkillsAndInterestsRequest(),
       futureWorkInterests = aValidUpdateFutureWorkInterestsRequest(),
@@ -353,20 +351,6 @@ class UpdateInductionTest : IntegrationTestBase() {
       updatedBy = updateUsername,
       updatedByDisplayName = updateDisplayName,
       // different prison to the create request
-      updatedAtPrison = "MDI",
-    )
-    val expectedPreviousQualifications = aValidPreviousQualificationsResponse(
-      educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
-      // didn't exist previously, so will be created by the update request
-      qualifications = listOf(
-        aValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
-        anotherValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
-      ),
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAtPrison = "BXI",
-      updatedBy = updateUsername,
-      updatedByDisplayName = updateDisplayName,
       updatedAtPrison = "MDI",
     )
     // these fields should be created
@@ -427,7 +411,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction.inPrisonInterests).isEqualTo(expectedUnchangedInPrisonInterests)
     // for the updated objects, we do not have the auto generated values, so use isEquivalentTo()
     assertThat(updatedInduction.workOnRelease).isEquivalentTo(expectedWorkOnRelease)
-    assertThat(updatedInduction.previousQualifications).isEquivalentTo(expectedPreviousQualifications)
     assertThat(updatedInduction.previousWorkExperiences).isEquivalentTo(expectedPreviousWorkExperiences)
     assertThat(updatedInduction.personalSkillsAndInterests).isEquivalentTo(expectedPersonalSkillsAndInterests)
     assertThat(updatedInduction.futureWorkInterests).isEquivalentTo(expectedFutureWorkInterests)
@@ -569,6 +552,92 @@ class UpdateInductionTest : IntegrationTestBase() {
         it.hasWorkedBefore(HasWorkedBefore.NOT_RELEVANT)
           .hasWorkedBeforeNotRelevantReason("Prisoner is not looking for work so feels previous work experience is not relevant")
       }
+  }
+
+  @Test
+  fun `should update Induction given request that adds a qualification, removes a qualification, and updates a qualification`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(
+      username = "auser_gen",
+      prisonNumber = prisonNumber,
+      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
+        previousQualifications = aValidCreatePreviousQualificationsRequest(
+          educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+          qualifications = listOf(
+            aValidAchievedQualification(subject = "English", level = QualificationLevel.LEVEL_3, grade = "A"),
+            aValidAchievedQualification(subject = "Maths", level = QualificationLevel.LEVEL_3, grade = "B"),
+            aValidAchievedQualification(subject = "Physics", level = QualificationLevel.LEVEL_3, grade = "C"),
+          ),
+        ),
+      ),
+    )
+    val persistedInduction = getInduction(prisonNumber)
+    val referenceOfMathsQualification = persistedInduction.previousQualifications!!.qualifications.first { it.subject == "Maths" }.reference
+    val referenceOfPhysicsQualification = persistedInduction.previousQualifications!!.qualifications.first { it.subject == "Physics" }.reference
+
+    val updateInductionRequest = aValidUpdateInductionRequestForPrisonerNotLookingToWork(
+      reference = persistedInduction.reference,
+      previousQualifications = aValidUpdatePreviousQualificationsRequest(
+        reference = persistedInduction.previousQualifications!!.reference,
+        educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
+        qualifications = listOf(
+          // Update the Maths qualification with a new grade
+          aValidAchievedQualification(reference = referenceOfMathsQualification, subject = "Maths", level = QualificationLevel.LEVEL_3, grade = "D"),
+          // Include the Physics qualification in the request, but with no changes
+          aValidAchievedQualification(reference = referenceOfPhysicsQualification, subject = "Physics", level = QualificationLevel.LEVEL_3, grade = "C"),
+          // Add a new qualification for Spanish (by passing in no reference for the qualification it is treated as a new qualification)
+          aValidAchievedQualification(subject = "Spanish", level = QualificationLevel.LEVEL_4, grade = "A*"),
+          // The English qualification is not included in the request so will be treated as a delete
+        ),
+      ),
+    )
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(updateInductionRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(privateKey = keyPair.private, username = "buser_gen"),
+      )
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    with(induction.previousQualifications!!) {
+      assertThat(createdBy).isEqualTo("auser_gen")
+      assertThat(updatedBy).isEqualTo("buser_gen")
+
+      assertThat(qualifications).size().isEqualTo(3)
+
+      val mathsQualification = qualifications.first { it.subject == "Maths" }
+      assertThat(mathsQualification)
+        .hasReference(referenceOfMathsQualification)
+        .hasSubject("Maths")
+        .hasLevel(QualificationLevel.LEVEL_3)
+        .hasGrade("D")
+        .wasCreatedBy("auser_gen")
+        .wasUpdatedBy("buser_gen") // this record was updated so expect the updatedBy field to reflect that
+
+      val physicsQualification = qualifications.first { it.subject == "Physics" }
+      assertThat(physicsQualification)
+        .hasReference(referenceOfPhysicsQualification)
+        .hasSubject("Physics")
+        .hasLevel(QualificationLevel.LEVEL_3)
+        .hasGrade("C")
+        .wasCreatedBy("auser_gen")
+        .wasUpdatedBy("auser_gen") // this record was not updated so expect the updatedBy field to be the user who created it
+
+      val spanishQualification = qualifications.first { it.subject == "Spanish" }
+      assertThat(spanishQualification)
+        .hasSubject("Spanish")
+        .hasLevel(QualificationLevel.LEVEL_4)
+        .hasGrade("A*")
+        .wasCreatedBy("buser_gen") // this record was created as part of this update request so expect the createdBy and updatedBy fields to be the user who performed the Induction update
+        .wasUpdatedBy("buser_gen")
+    }
   }
 
   private fun shortDelayForTimestampChecking() {

@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.CreateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.UpdateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
@@ -35,7 +38,7 @@ abstract class QualificationsResourceMapper {
       prisonNumber = prisonNumber,
       prisonId = prisonId,
       educationLevel = request.educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
-      qualifications = request.qualifications?.let { toQualifications(it) } ?: emptyList(),
+      qualifications = request.qualifications?.let { toUpdateOrCreateQualificationDtos(it) } ?: emptyList(),
     )
 
   @Mapping(target = "updatedBy", source = "lastUpdatedBy")
@@ -46,30 +49,34 @@ abstract class QualificationsResourceMapper {
 
   abstract fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String): UpdatePreviousQualificationsDto
 
-  fun toQualification(achievedQualification: CreateOrUpdateAchievedQualificationRequest): Qualification =
-    Qualification(
-      subject = achievedQualification.subject,
-      level = toQualificationLevel(achievedQualification.level),
-      grade = achievedQualification.grade,
-      reference = null,
-      createdBy = null,
-      createdAt = null,
-      lastUpdatedBy = null,
-      lastUpdatedAt = null,
-    )
+  fun toUpdateOrCreateQualificationDto(achievedQualification: CreateOrUpdateAchievedQualificationRequest): UpdateOrCreateQualificationDto =
+    if (achievedQualification.reference == null) {
+      CreateQualificationDto(
+        subject = achievedQualification.subject,
+        level = toQualificationLevel(achievedQualification.level),
+        grade = achievedQualification.grade,
+      )
+    } else {
+      UpdateQualificationDto(
+        reference = achievedQualification.reference!!,
+        subject = achievedQualification.subject,
+        level = toQualificationLevel(achievedQualification.level),
+        grade = achievedQualification.grade,
+      )
+    }
 
-  fun toQualifications(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>): List<Qualification> =
-    achievedQualifications.map { toQualification(it) }
+  fun toUpdateOrCreateQualificationDtos(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>): List<UpdateOrCreateQualificationDto> =
+    achievedQualifications.map { toUpdateOrCreateQualificationDto(it) }
 
   fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
     AchievedQualificationResponse(
-      reference = qualification.reference!!,
+      reference = qualification.reference,
       subject = qualification.subject,
       level = toQualificationLevel(qualification.level),
       grade = qualification.grade,
-      createdBy = qualification.createdBy!!,
+      createdBy = qualification.createdBy,
       createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
-      updatedBy = qualification.lastUpdatedBy!!,
+      updatedBy = qualification.lastUpdatedBy,
       updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
     )
 
