@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: hmpps-education-and-work-plan-api-queue-housekeeping
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "{{ .Values.queueHousekeeping.cronJobSchedule }}"
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 5
   startingDeadlineSeconds: 600

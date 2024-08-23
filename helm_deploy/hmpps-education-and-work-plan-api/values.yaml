@@ -76,3 +76,6 @@ generic-data-analytics-extractor:
   databaseSecretName: rds-postgresql-instance-output
   destinationS3SecretName: analytical-platform-reporting-s3-irsa
   enabled: true
+
+queueHousekeeping:
+  cronJobSchedule: "*/10 * * * *"
