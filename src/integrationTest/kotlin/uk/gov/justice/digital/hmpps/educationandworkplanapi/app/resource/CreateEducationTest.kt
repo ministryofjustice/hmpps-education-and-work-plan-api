@@ -5,8 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -35,7 +34,12 @@ class CreateEducationTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
       .withBody(aValidCreateEducationRequest())
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          EDUCATION_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -54,7 +58,12 @@ class CreateEducationTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          EDUCATION_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -80,7 +89,12 @@ class CreateEducationTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidCreateEducationRequest())
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          EDUCATION_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -103,7 +117,12 @@ class CreateEducationTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidCreateEducationRequest())
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          EDUCATION_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()

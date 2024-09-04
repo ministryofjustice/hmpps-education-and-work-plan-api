@@ -24,6 +24,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.CONVERSATIONS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.EDUCATION_RO
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.EDUCATION_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GOALS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RW
@@ -261,7 +263,12 @@ abstract class IntegrationTestBase {
   fun getEducation(prisonNumber: String): EducationResponse =
     webTestClient.get()
       .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          EDUCATION_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isOk
@@ -278,7 +285,8 @@ abstract class IntegrationTestBase {
       .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
       .withBody(createEducationRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          EDUCATION_RW,
           username = username,
           privateKey = keyPair.private,
         ),

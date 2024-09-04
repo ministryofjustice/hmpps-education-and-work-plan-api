@@ -35,7 +35,7 @@ class EducationController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_EDUCATION)
   @Transactional
   fun createEducation(
     @Valid
