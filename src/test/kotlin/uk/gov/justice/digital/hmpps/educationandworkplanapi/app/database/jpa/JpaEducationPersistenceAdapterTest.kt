@@ -13,6 +13,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
@@ -64,6 +67,36 @@ class JpaEducationPersistenceAdapterTest {
       assertThat(actual).isNull()
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
+    }
+  }
+
+  @Nested
+  inner class CreatePreviousQualifications {
+    @Test
+    fun `should create previous qualifications`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val createPreviousQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = prisonNumber)
+
+      val newPreviousQualificationsEntity = aValidPreviousQualificationsEntity(prisonNumber = prisonNumber)
+      given(previousQualificationsMapper.fromCreateDtoToEntity(any())).willReturn(newPreviousQualificationsEntity)
+
+      val previousQualificationsEntity =
+        aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
+      given(previousQualificationsRepository.saveAndFlush(any<PreviousQualificationsEntity>())).willReturn(
+        previousQualificationsEntity,
+      )
+
+      val expected = aValidPreviousQualifications(prisonNumber = prisonNumber)
+      given(previousQualificationsMapper.fromEntityToDomain(any())).willReturn(expected)
+
+      // When
+      val actual = persistenceAdapter.createPreviousQualifications(createPreviousQualificationsDto)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+      verify(previousQualificationsMapper).fromCreateDtoToEntity(createPreviousQualificationsDto)
+      verify(previousQualificationsMapper).fromEntityToDomain(previousQualificationsEntity)
     }
   }
 }

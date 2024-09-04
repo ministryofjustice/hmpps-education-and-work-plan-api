@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
@@ -64,6 +65,9 @@ class DomainConfiguration {
     ConversationService(conversationPersistenceAdapter, conversationEventService)
 
   @Bean
-  fun educationDomainService(educationPersistenceAdapter: EducationPersistenceAdapter): EducationService =
-    EducationService(educationPersistenceAdapter)
+  fun educationDomainService(
+    educationPersistenceAdapter: EducationPersistenceAdapter,
+    educationEventService: EducationEventService,
+  ): EducationService =
+    EducationService(educationPersistenceAdapter, educationEventService)
 }

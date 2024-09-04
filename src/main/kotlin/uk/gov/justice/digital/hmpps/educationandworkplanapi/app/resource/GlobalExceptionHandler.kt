@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -25,6 +26,7 @@ import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.PrisonerConversationNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
@@ -102,6 +104,29 @@ class GlobalExceptionHandler(
       .body(
         ErrorResponse(
           status = FORBIDDEN.value(),
+          userMessage = e.message,
+        ),
+      )
+  }
+
+  /**
+   * Exception handler to return a 409 Conflict ErrorResponse.
+   */
+  @ExceptionHandler(
+    value = [
+      EducationAlreadyExistsException::class,
+    ],
+  )
+  protected fun handleExceptionReturnConflictErrorResponse(
+    e: RuntimeException,
+    request: WebRequest,
+  ): ResponseEntity<Any> {
+    log.info("Conflict exception: {}", e.message)
+    return ResponseEntity
+      .status(CONFLICT)
+      .body(
+        ErrorResponse(
+          status = CONFLICT.value(),
           userMessage = e.message,
         ),
       )

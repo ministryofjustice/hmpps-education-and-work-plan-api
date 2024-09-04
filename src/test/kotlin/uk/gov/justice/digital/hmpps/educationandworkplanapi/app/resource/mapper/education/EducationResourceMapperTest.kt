@@ -1,10 +1,16 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreateQualificationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.assertThat
 import java.time.Instant
@@ -77,6 +83,42 @@ class EducationResourceMapperTest {
 
     // When
     val actual = educationResourceMapper.toEducationResponse(previousQualifications)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map CreateEducationRequest to CreatePreviousQualificationsDto`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createEducationRequest = aValidCreateEducationRequest(
+      prisonId = "BXI",
+      educationLevel = EducationLevelApi.FURTHER_EDUCATION_COLLEGE,
+      qualifications = listOf(
+        aValidAchievedQualification(
+          subject = "Pottery",
+          level = QualificationLevelApi.LEVEL_4,
+          grade = "A*",
+        ),
+      ),
+    )
+
+    val expected = aValidCreatePreviousQualificationsDto(
+      prisonNumber = prisonNumber,
+      prisonId = "BXI",
+      educationLevel = EducationLevelDomain.FURTHER_EDUCATION_COLLEGE,
+      qualifications = listOf(
+        aValidCreateQualificationDto(
+          subject = "Pottery",
+          level = QualificationLevelDomain.LEVEL_4,
+          grade = "A*",
+        ),
+      ),
+    )
+
+    // When
+    val actual = educationResourceMapper.toCreatePreviousQualificationsDto(prisonNumber, createEducationRequest)
 
     // Then
     assertThat(actual).isEqualTo(expected)

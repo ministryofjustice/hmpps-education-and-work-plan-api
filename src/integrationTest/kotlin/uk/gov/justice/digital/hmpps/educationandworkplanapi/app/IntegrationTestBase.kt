@@ -30,13 +30,16 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -53,6 +56,7 @@ abstract class IntegrationTestBase {
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
+    const val EDUCATION_URI_TEMPLATE = "/person/{prisonNumber}/education"
 
     private val postgresContainer = PostgresContainer.instance
 
@@ -256,5 +260,35 @@ abstract class IntegrationTestBase {
       .exchange()
       .expectStatus()
       .isCreated()
+  }
+
+  fun getEducation(prisonNumber: String): EducationResponse =
+    webTestClient.get()
+      .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(EducationResponse::class.java)
+      .responseBody.blockFirst()!!
+
+  fun createEducation(
+    prisonNumber: String,
+    createEducationRequest: CreateEducationRequest = aValidCreateEducationRequest(),
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
+  ) {
+    webTestClient.post()
+      .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
+      .withBody(createEducationRequest)
+      .bearerToken(
+        aValidTokenWithEditAuthority(
+          username = username,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isCreated
   }
 }
