@@ -4,9 +4,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
@@ -65,7 +64,7 @@ class GetActionPlanTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .exchange()
       .expectStatus()
       .isOk
@@ -88,7 +87,7 @@ class GetActionPlanTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .exchange()
       .expectStatus()
       .isOk
@@ -125,7 +124,7 @@ class GetActionPlanTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .exchange()
       .expectStatus()
       .isOk
@@ -153,7 +152,7 @@ class GetActionPlanTest : IntegrationTestBase() {
     webTestClient.post()
       .uri("$URI_TEMPLATE/goals", prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()

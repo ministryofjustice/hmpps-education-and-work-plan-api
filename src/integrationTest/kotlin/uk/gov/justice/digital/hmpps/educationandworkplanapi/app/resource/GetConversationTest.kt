@@ -6,7 +6,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ConversationResponse
@@ -40,7 +40,12 @@ class GetConversationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, conversationReference)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -66,7 +71,12 @@ class GetConversationTest : IntegrationTestBase() {
 
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -103,7 +113,8 @@ class GetConversationTest : IntegrationTestBase() {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
           privateKey = keyPair.private,
           username = createUsername,
           displayName = createDisplayName,

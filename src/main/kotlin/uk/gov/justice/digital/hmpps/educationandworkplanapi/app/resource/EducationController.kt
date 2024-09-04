@@ -27,7 +27,7 @@ class EducationController(
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_EDUCATION)
   fun getEduction(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): EducationResponse =
     educationService.getPreviousQualificationsForPrisoner(prisonNumber).let {
       educationResourceMapper.toEducationResponse(it)
@@ -35,7 +35,7 @@ class EducationController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_EDUCATION)
   @Transactional
   fun createEducation(
     @Valid

@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.http.HttpStatus.BAD_REQUEST
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -37,7 +37,12 @@ class PrisonNumberPathVariableParameterValidationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, malformedPrisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isBadRequest
@@ -66,7 +71,12 @@ class PrisonNumberPathVariableParameterValidationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, malformedPrisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isBadRequest
@@ -94,7 +104,12 @@ class PrisonNumberPathVariableParameterValidationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, malformedPrisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isBadRequest
@@ -124,7 +139,12 @@ class PrisonNumberPathVariableParameterValidationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, malformedPrisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isUnauthorized

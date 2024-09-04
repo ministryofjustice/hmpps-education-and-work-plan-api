@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ConversationsResponse
@@ -47,7 +47,8 @@ class GetConversationsTest : IntegrationTestBase() {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
           privateKey = keyPair.private,
         ),
       )
@@ -85,7 +86,8 @@ class GetConversationsTest : IntegrationTestBase() {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE_WITH_QUERY_STRING, prisonNumber, pageNumber, pageSize)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
           privateKey = keyPair.private,
         ),
       )
@@ -120,7 +122,8 @@ class GetConversationsTest : IntegrationTestBase() {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE_WITH_QUERY_STRING, prisonNumber, pageNumber, pageSize)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
           privateKey = keyPair.private,
         ),
       )

@@ -13,8 +13,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
@@ -57,7 +56,12 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(UNARCHIVE_URI_TEMPLATE, prisonNumber, aValidReference())
       .withBody(aValidArchiveGoalRequest())
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -167,7 +171,12 @@ class UnarchiveGoalTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -209,7 +218,8 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     .uri(UNARCHIVE_URI_TEMPLATE, prisonNumber, goalReference)
     .withBody(unarchiveGoalRequest)
     .bearerToken(
-      aValidTokenWithEditAuthority(
+      aValidTokenWithAuthority(
+        GOALS_RW,
         username = "buser_gen",
         displayName = "Bernie User",
         privateKey = keyPair.private,
@@ -226,7 +236,8 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     .uri(ARCHIVE_URI_TEMPLATE, prisonNumber, goalReference)
     .withBody(archiveGoalRequest)
     .bearerToken(
-      aValidTokenWithEditAuthority(
+      aValidTokenWithAuthority(
+        GOALS_RW,
         username = "buser_gen",
         displayName = "Bernie User",
         privateKey = keyPair.private,

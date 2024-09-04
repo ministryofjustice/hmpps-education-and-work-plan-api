@@ -6,8 +6,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -38,7 +37,12 @@ class UpdateConversationTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
       .withBody(aValidCreateReviewConversationRequest())
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -55,7 +59,12 @@ class UpdateConversationTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -80,7 +89,12 @@ class UpdateConversationTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, conversationReference)
       .withBody(aValidUpdateConversationRequest())
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -107,7 +121,12 @@ class UpdateConversationTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
       .withBody(aValidUpdateConversationRequest())
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -154,7 +173,8 @@ class UpdateConversationTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber, createdConversation.reference)
       .withBody(updateConversationRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RW,
           username = editorUsername,
           displayName = editorName,
           privateKey = keyPair.private,

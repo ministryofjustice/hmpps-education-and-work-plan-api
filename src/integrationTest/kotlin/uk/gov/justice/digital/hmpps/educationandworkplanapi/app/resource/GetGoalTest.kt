@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -62,7 +62,12 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isNotFound
@@ -90,7 +95,12 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isNotFound
@@ -117,7 +127,12 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .exchange()
       .expectStatus()
       .isOk

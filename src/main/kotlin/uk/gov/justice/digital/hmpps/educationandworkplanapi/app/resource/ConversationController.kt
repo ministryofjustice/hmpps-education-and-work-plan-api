@@ -32,7 +32,7 @@ class ConversationController(
 ) {
   @PostMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_CONVERSATIONS)
   @Transactional
   fun createConversation(
     @Valid
@@ -45,7 +45,7 @@ class ConversationController(
 
   @PutMapping("/{prisonNumber}/{conversationReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_CONVERSATIONS)
   @Transactional
   fun updateConversation(
     @Valid
@@ -61,7 +61,7 @@ class ConversationController(
 
   @GetMapping("/{prisonNumber}/{conversationReference}")
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_CONVERSATIONS)
   @Transactional
   fun getConversation(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
@@ -72,7 +72,7 @@ class ConversationController(
 
   @GetMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_CONVERSATIONS)
   @Transactional
   fun getConversations(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,

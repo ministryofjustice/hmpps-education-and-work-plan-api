@@ -32,7 +32,7 @@ class ActionPlanController(
 
   @PostMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_ACTIONPLANS)
   @Transactional
   fun createActionPlan(
     @Valid
@@ -45,7 +45,7 @@ class ActionPlanController(
 
   @GetMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_ACTIONPLANS)
   fun getActionPlan(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): ActionPlanResponse =
     with(actionPlanService.getActionPlan(prisonNumber)) {
       actionPlanMapper.fromDomainToModel(this)
@@ -53,7 +53,7 @@ class ActionPlanController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_ACTIONPLANS)
   fun getActionPlanSummaries(
     @Valid
     @RequestBody

@@ -23,7 +23,7 @@ class CiagInductionController(
 
   @PostMapping("/list")
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_INDUCTIONS)
   fun getInductionSummaries(
     @Valid
     @RequestBody

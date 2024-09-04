@@ -32,7 +32,7 @@ class InductionController(
 
   @PostMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_INDUCTIONS)
   @Transactional
   fun createInduction(
     @Valid
@@ -45,7 +45,7 @@ class InductionController(
 
   @GetMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_INDUCTIONS)
   fun getInduction(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): InductionResponse =
     with(inductionService.getInductionForPrisoner(prisonNumber)) {
       inductionMapper.toInductionResponse(this)
@@ -53,7 +53,7 @@ class InductionController(
 
   @PutMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_INDUCTIONS)
   @Transactional
   fun updateInduction(
     @Valid

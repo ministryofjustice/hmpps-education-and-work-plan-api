@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.ConversationType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.conversation.assertThat
@@ -35,7 +34,7 @@ class CreateConversationTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
       .withBody(aValidCreateReviewConversationRequest())
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(CONVERSATIONS_RO, privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -54,7 +53,7 @@ class CreateConversationTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -81,7 +80,8 @@ class CreateConversationTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createReviewConversationRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RW,
           username = dpsUsername,
           privateKey = keyPair.private,
         ),
