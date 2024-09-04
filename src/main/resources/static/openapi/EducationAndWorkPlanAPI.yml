@@ -7,7 +7,10 @@ info:
     name: Learning and Work Progress team
     email: learningandworkprogress@digital.justice.gov.uk
 servers:
-  - url: 'http://localhost:3000'
+  - url: /
+
+security:
+  - bearerAuth: [ ]
 #
 # --------------------------------------------------------------------------------
 #
@@ -486,9 +489,17 @@ paths:
 # --------------------------------------------------------------------------------
 #
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   #
   # Schema and Enum Definitions
   # --------------------------------------------------------------------------------
+
   schemas:
     PrisonId:
       type: string
