@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.15.4'
+  version: '1.16.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -997,6 +997,7 @@ components:
         affectAbilityToWorkOther:
           type: string
           description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'affectAbilityToWork' includes 'OTHER'.
+          maxLength: 512
         createdBy:
           type: string
           description: The DPS username of the person who created this resource.
@@ -1125,6 +1126,7 @@ components:
         trainingTypeOther:
           type: string
           description: A specific type of training that does not fit the given 'trainingTypes'. Mandatory when 'trainingTypes' includes 'OTHER'.
+          maxLength: 512
         createdBy:
           type: string
           description: The DPS username of the person who created this resource.
@@ -1186,6 +1188,7 @@ components:
           type: string
           description: The reason why the whether the prisoner has worked before is not relevant. Only populated when 'hasWorkedBefore' is 'NOT_RELEVANT'.
           example: Chris has declined to talk about his previous work experience as he is not looking for work on release because he is of retirement age.
+          maxLength: 512
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
@@ -1748,12 +1751,15 @@ components:
         experienceTypeOther:
           type: string
           description: A type of work experience, which is not listed in 'experienceType' Enum. Mandatory when 'experienceType' is 'OTHER'.
+          maxLength: 256
         role:
           type: string
           description: The role the Prisoner had.
+          maxLength: 256
         details:
           type: string
           description: Any additional details of the work experience.
+          maxLength: 512
       required:
         - experienceType
 
@@ -1767,6 +1773,7 @@ components:
         workTypeOther:
           type: string
           description: A specific type of in-prison work that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+          maxLength: 255
       required:
         - workType
 
@@ -1780,6 +1787,7 @@ components:
         trainingTypeOther:
           type: string
           description: A specific type of in-prison training that does not fit the given 'trainingType' values. Mandatory when 'trainingType' is 'OTHER'.
+          maxLength: 255
       required:
         - trainingType
 
@@ -1793,6 +1801,7 @@ components:
         skillTypeOther:
           type: string
           description: A specific type of personal skill that does not fit the given 'skillType' values. Mandatory when 'skillType' is 'OTHER'.
+          maxLength: 255
       required:
         - skillType
 
@@ -1806,6 +1815,7 @@ components:
         interestTypeOther:
           type: string
           description: A specific type of personal interest that does not fit the given 'interestType' values. Mandatory when 'interestType' is 'OTHER'.
+          maxLength: 255
       required:
         - interestType
 
@@ -1819,9 +1829,11 @@ components:
         workTypeOther:
           type: string
           description: A specific type of work interest that does not fit the given 'workType' values. Mandatory when 'workType' is 'OTHER'.
+          maxLength: 255
         role:
           type: string
           description: The role within a Prisoner's area of work interest.
+          maxLength: 512
       required:
         - workType
 
@@ -1992,6 +2004,7 @@ components:
           type: string
           description: The subject of the qualification.
           example: Maths GCSE
+          maxLength: 100
         level:
           $ref: '#/components/schemas/QualificationLevel'
         grade:
@@ -2002,6 +2015,7 @@ components:
             but also "1", "2", "3", "Pass", "Distinction", "Merit", "First class honours" etc. It is up to the consumer
             to interpret this data as necessary.
           example: Distinction
+          maxLength: 50
       required:
         - subject
         - level
@@ -2055,6 +2069,7 @@ components:
           type: string
           description: The subject of the qualification.
           example: Maths GCSE
+          maxLength: 100
         level:
           $ref: '#/components/schemas/QualificationLevel'
         grade:
@@ -2065,6 +2080,7 @@ components:
             but also "1", "2", "3", "Pass", "Distinction", "Merit", "First class honours" etc. It is up to the consumer
             to interpret this data as necessary.
           example: Distinction
+          maxLength: 50
         createdBy:
           type: string
           description: The DPS username of the person who created this resource.
@@ -2147,6 +2163,7 @@ components:
         affectAbilityToWorkOther:
           type: string
           description: A specific factor affecting the Prisoner's ability to work. This is mandatory when 'affectAbilityToWork' includes 'OTHER'.
+          maxLength: 512
       required:
         - hopingToWork
     CreatePreviousQualificationsRequest:
@@ -2177,6 +2194,7 @@ components:
         trainingTypeOther:
           type: string
           description: A specific type of training that does not fit the given 'trainingTypes'. Mandatory when 'trainingTypes' includes 'OTHER'.
+          maxLength: 512
       required:
         - trainingTypes
     CreatePreviousWorkExperiencesRequest:
@@ -2190,6 +2208,7 @@ components:
           type: string
           description: The reason why the whether the prisoner has worked before is not relevant. Mandatory when 'hasWorkedBefore' is 'NOT_RELEVANT'
           example: Chris has declined to talk about his previous work experience as he is not looking for work on release because he is of retirement age.
+          maxLength: 512
         experiences:
           type: array
           description: A list of the Prisoner's previous work experiences.
