@@ -45,7 +45,7 @@ class GoalController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_GOALS)
   @Transactional
   fun createGoals(
     @Valid
@@ -61,7 +61,7 @@ class GoalController(
 
   @GetMapping("{goalReference}")
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_GOALS)
   fun getPrisonerGoal(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
@@ -70,7 +70,7 @@ class GoalController(
 
   @PutMapping("{goalReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_GOALS)
   @GoalReferenceMatchesReferenceInUpdateGoalRequest
   @Transactional
   fun updateGoal(
@@ -88,7 +88,7 @@ class GoalController(
 
   @PutMapping("{goalReference}/archive")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_GOALS)
   @Transactional
   fun archiveGoal(
     @Valid
@@ -112,7 +112,7 @@ class GoalController(
 
   @PutMapping("{goalReference}/unarchive")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize(HAS_EDIT_AUTHORITY)
+  @PreAuthorize(HAS_EDIT_GOALS)
   @Transactional
   fun unarchiveGoal(
     @Valid
@@ -135,7 +135,7 @@ class GoalController(
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_AUTHORITY)
+  @PreAuthorize(HAS_VIEW_GOALS)
   fun getGoals(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @RequestParam(required = false, name = "status") statuses: Set<GoalStatus>?,

@@ -7,8 +7,7 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
@@ -42,7 +41,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
       .withBody(aValidCreateActionPlanRequest())
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -58,7 +57,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -83,7 +82,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -108,7 +107,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -135,7 +134,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -162,7 +161,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -193,7 +192,8 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
           username = dpsUsername,
           displayName = displayName,
           privateKey = keyPair.private,
@@ -242,7 +242,8 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
           username = dpsUsername,
           displayName = displayName,
           privateKey = keyPair.private,

@@ -8,7 +8,8 @@ import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.UUID
 
-fun aValidTokenWithViewAuthority(
+fun aValidTokenWithAuthority(
+  role: String,
   username: String = "auser_gen",
   displayName: String = "Albert User",
   privateKey: PrivateKey,
@@ -16,19 +17,7 @@ fun aValidTokenWithViewAuthority(
   buildAccessToken(
     username = username,
     displayName = displayName,
-    roles = listOf("ROLE_EDUCATION_WORK_PLAN_VIEWER"),
-    privateKey = privateKey,
-  )
-
-fun aValidTokenWithEditAuthority(
-  username: String = "auser_gen",
-  displayName: String = "Albert User",
-  privateKey: PrivateKey,
-): String =
-  buildAccessToken(
-    username = username,
-    displayName = displayName,
-    roles = listOf("ROLE_EDUCATION_WORK_PLAN_EDITOR"),
+    roles = listOf(role),
     privateKey = privateKey,
   )
 

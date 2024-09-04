@@ -14,14 +14,20 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.CONVERSATIONS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GOALS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RO
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.TIMELINE_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
@@ -129,7 +135,7 @@ abstract class IntegrationTestBase {
   fun getActionPlan(prisonNumber: String): ActionPlanResponse =
     webTestClient.get()
       .uri(GET_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
       .exchange()
       .returnResult(ActionPlanResponse::class.java)
       .responseBody.blockFirst()!!
@@ -141,7 +147,7 @@ abstract class IntegrationTestBase {
     webTestClient.post()
       .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
   }
@@ -154,7 +160,7 @@ abstract class IntegrationTestBase {
       )
       webTestClient.get()
         .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
-        .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+        .bearerToken(aValidTokenWithAuthority(TIMELINE_RO, privateKey = keyPair.private))
         .exchange()
         .returnResult(TimelineResponse::class.java)
         .responseBody.blockFirst()!!
@@ -170,10 +176,11 @@ abstract class IntegrationTestBase {
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
       .withBody(createInductionRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          privateKey = keyPair.private,
           username = username,
           displayName = displayName,
-          privateKey = keyPair.private,
         ),
       )
       .contentType(MediaType.APPLICATION_JSON)
@@ -185,7 +192,7 @@ abstract class IntegrationTestBase {
   fun getInduction(prisonNumber: String): InductionResponse =
     webTestClient.get()
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
       .exchange()
       .expectStatus()
       .isOk
@@ -203,11 +210,7 @@ abstract class IntegrationTestBase {
       .uri("/action-plans/{prisonNumber}/goals", prisonNumber)
       .withBody(createGoalsRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
-          username = username,
-          displayName = displayName,
-          privateKey = keyPair.private,
-        ),
+        aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private),
       )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
@@ -225,11 +228,7 @@ abstract class IntegrationTestBase {
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/archive", prisonNumber, archiveGoalRequest.goalReference)
       .withBody(archiveGoalRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
-          username = username,
-          displayName = displayName,
-          privateKey = keyPair.private,
-        ),
+        aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private),
       )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
@@ -247,10 +246,7 @@ abstract class IntegrationTestBase {
       .uri("/conversations/{prisonNumber}", prisonNumber)
       .withBody(createConversationRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
-          username = username,
-          privateKey = keyPair.private,
-        ),
+        aValidTokenWithAuthority(CONVERSATIONS_RW, privateKey = keyPair.private),
       )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()

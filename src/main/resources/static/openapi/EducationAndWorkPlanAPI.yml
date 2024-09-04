@@ -43,6 +43,12 @@ paths:
       description: | 
         Returns an individual's education which includes their level of education, and a collection of 
         qualifications that have been achieved.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__EDUCATION__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__EDUCATION__RW` (Read-Write)
+
       operationId: get-education
       tags:
         - Education
@@ -58,6 +64,10 @@ paths:
         collection of qualifications that have been achieved.  
         
         A `CONFLICT 409` response is returned if there is already an education record for the individual.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__EDUCATION__RW` (Read-Write)
       operationId: create-education
       tags:
         - Education
@@ -79,6 +89,10 @@ paths:
         qualifications (including adding, removing or updating) is not currently supported.
 
         A `NOT_FOUND 404` response is returned if the specified individual does not currently have an education record.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__EDUCATION__RW` (Read-Write)
       operationId: update-education
       tags:
         - Education
@@ -98,7 +112,12 @@ paths:
   '/action-plans':
     post:
       summary: Retrieves a list of Action Plans for a given list of Prisoners.
-      description: Retrieves a list of Action Plans for a given list of Prisoners. This is a POST, rather than a GET, to allow a long list of prison numbers.
+      description: |
+        Retrieves a list of Action Plans for a given list of Prisoners. This is a POST, rather than a GET, to allow a long list of prison numbers.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__ACTIONPLANS__RW` (Read-Write)
       tags:
         - Action Plans
       responses:
@@ -115,7 +134,11 @@ paths:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     post:
       summary: Creates an Action Plan.
-      description: Creates an Action Plan with at least one or more Goals.
+      description: |
+        Creates an Action Plan with at least one or more Goals.
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__ACTIONPLANS__RW` (Read-Write)
       tags:
         - Action Plans
       responses:
@@ -130,7 +153,12 @@ paths:
         $ref: '#/components/requestBodies/CreateActionPlan'
     get:
       summary: Return a Prisoner's Action Plan
-      description: Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, then an Action Plan with no goals (empty array) is returned.
+      description: | 
+        Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, then an Action Plan with no goals (empty array) is returned.
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__ACTIONPLANS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__ACTIONPLANS__RW` (Read-Write)
       tags:
         - Action Plans
       responses:
@@ -153,7 +181,12 @@ paths:
         
         * If the `status` query string parameter is used and the prisoner has Goals but none that match the specified status(es) a 200 response is returned with an empty `goals` collection.  
         * If the specified prisoner has no Goals at all, irrespective of whether the `status` query string parameter was used, a 404 response is returned.  
-        * If the `status` query string parameter is used with one or more invalid values a 400 response is returned (see the `GoalStatus` schema definition for valid statuses). 
+        * If the `status` query string parameter is used with one or more invalid values a 400 response is returned (see the `GoalStatus` schema definition for valid statuses).
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
 
       parameters:
         - name: status
@@ -181,7 +214,12 @@ paths:
       operationId: get-goals
     post:
       summary: Creates one or more Goals.
-      description: Creates one or more Goals and saves them to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
+      description: |
+        Creates one or more Goals and saves them to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
       responses:
@@ -205,7 +243,12 @@ paths:
         Returns a single Goal identified by the specified prison number and goal reference.  
         
         * If the goal identified by both the prison number and goal reference is found a 200 response is returned with the goal as the response body.  
-        * If a goal that matches both the prison number and goal reference cannot be found a 404 response is returned.  
+        * If a goal that matches both the prison number and goal reference cannot be found a 404 response is returned.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
 
       tags:
         - Goals
@@ -217,7 +260,13 @@ paths:
       operationId: get-prisoner-goal
     put:
       summary: Updates a Goal
-      description: Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will result in it being removed.
+      description: |
+        Updates a single Goal and its list of Steps (including their sequential order if relevant). Note that the whole of a Goal's data should be provided, otherwise the absence of any data (such as a Step) will result in it being removed.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
       responses:
@@ -237,7 +286,13 @@ paths:
       - $ref: "#/components/parameters/goalReferencePathParameter"
     put:
       summary: Archives a Goal
-      description: Changes a goals status to 'ARCHIVED' and records the archival reason.
+      description: |
+        Changes a goals status to 'ARCHIVED' and records the archival reason.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
       responses:
@@ -258,7 +313,13 @@ paths:
       - $ref: "#/components/parameters/goalReferencePathParameter"
     put:
       summary: Unarchives a Goal
-      description: Changes an archived goals status back to 'ACTIVE'
+      description: |
+        Changes an archived goals status back to 'ACTIVE'
+        
+        **Role Requirements:**
+                Access to this endpoint requires one of the following roles:
+                  - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
+                  - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
       responses:
@@ -282,7 +343,12 @@ paths:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     get:
       summary: Return a Prisoner's Timeline.
-      description: Returns a Prisoner's Timeline data, consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
+      description: |
+        Returns a Prisoner's Timeline data, consisting of one or more 'events' of interest in chronological order. For example, it could include events such as when they completed an Induction, or updated a Goal. The prisonNumber is the unique identifier of the Timeline.
+        
+        **Role Requirements:**
+                Access to this endpoint requires one of the following roles:
+                  - `ROLE_EDUCATION_AND_WORK_PLAN__TIMELINE__RO` (Read-Only)
       tags:
         - Timelines
       responses:
@@ -305,6 +371,12 @@ paths:
         prisoner does not have a CIAG Induction.
         This endpoint has been migrated from the `hmpps-ciag-careers-induction-api` and the data structure has been 
         kept the same in order to prevent breaking the UI when it points to this endpoint.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
+
       tags:
         - Legacy Inductions
       responses:
@@ -326,6 +398,10 @@ paths:
       summary: Creates an Induction for a Prisoner.
       description: |
         Creates an Induction for a Prisoner (if it does not already exist).
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
       tags:
         - Inductions
       responses:
@@ -354,6 +430,10 @@ paths:
         Provides the ability to update a Prisoner's Induction. If a field (or "child" object) is provided in the request,
         it will completely overwrite the existing value. Conversely, if a field is not included in the request, then
         the existing value will remain untouched (including its updatedAt/updatedBy values).
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
       tags:
         - Inductions
       responses:
@@ -379,6 +459,10 @@ paths:
         Creates a Learning Work and Progress Conversation for a Prisoner.
         A Prisoner can have many Conversations. Sending the same request will result in a new Conversation being
         saved for the Prisoner.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
       tags:
         - Conversations
       responses:
@@ -393,6 +477,11 @@ paths:
       summary: Returns a page of Learning Work and Progress Conversations for a Prisoner.
       description: |
         Returns a page of Learning Work and Progress Conversations for a Prisoner.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
       tags:
         - Conversations
       parameters:
@@ -434,6 +523,11 @@ paths:
       summary: Returns a Learning Work and Progress Conversation for a Prisoner.
       description: |
         Returns a prisoner's Learning Work and Progress Conversation.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
       tags:
         - Conversations
       responses:
@@ -447,6 +541,10 @@ paths:
       summary: Updates a Learning Work and Progress Conversation for a Prisoner.
       description: |
         Updates a prisoner's Learning Work and Progress Conversation.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
       tags:
         - Conversations
       responses:

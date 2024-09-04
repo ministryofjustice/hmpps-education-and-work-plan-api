@@ -13,8 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithEditAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithViewAuthority
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
@@ -74,7 +73,12 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, aValidPrisonNumber())
       .withBody(aValidUpdateInductionRequest())
-      .bearerToken(aValidTokenWithViewAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -93,7 +97,12 @@ class UpdateInductionTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -118,7 +127,12 @@ class UpdateInductionTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(aValidTokenWithEditAuthority(privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -238,7 +252,8 @@ class UpdateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
           username = updateUsername,
           displayName = updateDisplayName,
           privateKey = keyPair.private,
@@ -385,7 +400,8 @@ class UpdateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
           username = updateUsername,
           displayName = updateDisplayName,
           privateKey = keyPair.private,
@@ -483,7 +499,10 @@ class UpdateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(privateKey = keyPair.private),
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          privateKey = keyPair.private,
+        ),
       )
       .exchange()
       .expectStatus()
@@ -539,7 +558,10 @@ class UpdateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(privateKey = keyPair.private),
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          privateKey = keyPair.private,
+        ),
       )
       .exchange()
       .expectStatus()
@@ -598,7 +620,11 @@ class UpdateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
       .bearerToken(
-        aValidTokenWithEditAuthority(privateKey = keyPair.private, username = "buser_gen"),
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          privateKey = keyPair.private,
+          username = "buser_gen",
+        ),
       )
       .exchange()
       .expectStatus()
