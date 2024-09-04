@@ -11,15 +11,22 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 
 @ExtendWith(MockitoExtension::class)
 class EducationServiceTest {
 
   @Mock
   private lateinit var persistenceAdapter: EducationPersistenceAdapter
+
+  @Mock
+  private lateinit var educationEventService: EducationEventService
 
   @InjectMocks
   private lateinit var educationService: EducationService
@@ -41,6 +48,7 @@ class EducationServiceTest {
       // Then
       assertThat(actual).isEqualTo(expected)
       verify(persistenceAdapter).getPreviousQualifications(prisonNumber)
+      verifyNoInteractions(educationEventService)
     }
 
     @Test
@@ -58,6 +66,53 @@ class EducationServiceTest {
       // Then
       assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
       verify(persistenceAdapter).getPreviousQualifications(prisonNumber)
+      verifyNoInteractions(educationEventService)
+    }
+  }
+
+  @Nested
+  inner class CreatePreviousQualifications {
+
+    @Test
+    fun `should create previous qualifications for prisoner`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val createPreviousQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = prisonNumber)
+
+      given(persistenceAdapter.getPreviousQualifications(any())).willReturn(null)
+
+      val previousQualifications = aValidPreviousQualifications(prisonNumber = prisonNumber)
+      given(persistenceAdapter.createPreviousQualifications(any())).willReturn(previousQualifications)
+
+      // When
+      val actual = educationService.createPreviousQualifications(createPreviousQualificationsDto)
+
+      // Then
+      assertThat(actual).isEqualTo(previousQualifications)
+      verify(persistenceAdapter).getPreviousQualifications(prisonNumber)
+      verify(persistenceAdapter).createPreviousQualifications(createPreviousQualificationsDto)
+      verify(educationEventService).previousQualificationsCreated(previousQualifications)
+    }
+
+    @Test
+    fun `should throw exception given previous qualifications record for prisoner already exists`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val createPreviousQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = prisonNumber)
+
+      val previousQualifications = aValidPreviousQualifications(prisonNumber = prisonNumber)
+      given(persistenceAdapter.getPreviousQualifications(any())).willReturn(previousQualifications)
+
+      // When
+      val exception = catchThrowableOfType(EducationAlreadyExistsException::class.java) {
+        educationService.createPreviousQualifications(createPreviousQualificationsDto)
+      }
+
+      // Then
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      verify(persistenceAdapter).getPreviousQualifications(prisonNumber)
+      verifyNoMoreInteractions(persistenceAdapter)
+      verifyNoInteractions(educationEventService)
     }
   }
 }

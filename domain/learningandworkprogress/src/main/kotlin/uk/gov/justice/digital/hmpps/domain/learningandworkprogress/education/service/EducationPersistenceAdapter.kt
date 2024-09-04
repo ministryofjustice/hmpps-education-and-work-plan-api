@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
 
 /**
  * Persistence Adapter for Education related classes.
@@ -16,4 +17,11 @@ interface EducationPersistenceAdapter {
    * Retrieves a [PreviousQualifications] for a given Prisoner. Returns `null` if the [PreviousQualifications] instance does not exist.
    */
   fun getPreviousQualifications(prisonNumber: String): PreviousQualifications?
+
+  /**
+   * Persists a new [PreviousQualifications] for a prisoner.
+   *
+   * @return The [PreviousQualifications] with any newly generated values (if applicable).
+   */
+  fun createPreviousQualifications(createInductionDto: CreatePreviousQualificationsDto): PreviousQualifications
 }

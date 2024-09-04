@@ -86,11 +86,11 @@ class EducationResponseAssert(actual: EducationResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): EducationResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): EducationResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
-        failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
+      if (createdAt.isBefore(dateTime)) {
+        failWithMessage("Expected createdAt to be at or after $dateTime, but was $createdAt")
       }
     }
     return this
@@ -106,11 +106,11 @@ class EducationResponseAssert(actual: EducationResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): EducationResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): EducationResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
-        failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
+      if (updatedAt.isBefore(dateTime)) {
+        failWithMessage("Expected updatedAt to be at or after $dateTime, but was $updatedAt")
       }
     }
     return this
