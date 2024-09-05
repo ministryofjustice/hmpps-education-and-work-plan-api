@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchThrowableOfType
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -57,7 +57,7 @@ class JpaGoalPersistenceAdapterTest {
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 
       // When
-      val exception = catchThrowableOfType(ActionPlanNotFoundException::class.java) {
+      val exception = assertThrows(ActionPlanNotFoundException::class.java) {
         persistenceAdapter.createGoals(
           prisonNumber,
           createGoalDtos,
