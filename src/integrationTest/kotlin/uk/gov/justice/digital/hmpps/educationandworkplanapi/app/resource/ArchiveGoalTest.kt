@@ -126,7 +126,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Not found")
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
   }
 
   @Test
@@ -146,7 +146,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Could not archive goal with reference [$goalReference] for prisoner [$aDifferentPrisonNumber]: Not found")
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$aDifferentPrisonNumber] not found")
   }
 
   @Test
@@ -178,7 +178,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return 400 if other reason without description`() {
+  fun `should return 409 if other reason without description`() {
     // given
     val goalReference = createAGoalAndGetTheReference(prisonNumber)
     val archiveGoalRequest = aValidArchiveGoalRequest(
@@ -190,13 +190,13 @@ class ArchiveGoalTest : IntegrationTestBase() {
     // when
     val response = archiveAGoal(prisonNumber, goalReference, archiveGoalRequest)
       .expectStatus()
-      .isBadRequest
+      .is4xxClientError
       .returnResult(ErrorResponse::class.java)
 
     // then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .hasStatus(HttpStatus.BAD_REQUEST.value())
+      .hasStatus(HttpStatus.CONFLICT.value())
       .hasUserMessageContaining("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Archive reason is OTHER but no description provided")
   }
 

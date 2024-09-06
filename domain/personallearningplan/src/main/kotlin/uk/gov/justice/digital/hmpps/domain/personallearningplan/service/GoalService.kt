@@ -1,18 +1,18 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.BusinessException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.NotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
 import java.util.*
 
@@ -52,8 +52,7 @@ class GoalService(
     // TODO RR-227 - We need to change throw a 404 once the create action plan endpoint is being called by the UI (with an optional review date)
     return if (actionPlanDoesNotExist(prisonNumber)) {
       actionPlanPersistenceAdapter.createActionPlan(newActionPlan(prisonNumber, createGoalDtos))
-        .also { actionPlanEventService.actionPlanCreated(it) }
-        .let { it.goals }
+        .also { actionPlanEventService.actionPlanCreated(it) }.goals
     } else {
       goalPersistenceAdapter.createGoals(prisonNumber, createGoalDtos)
         .also {
@@ -62,11 +61,12 @@ class GoalService(
     }
   }
 
-  fun getGoals(getGoalsDto: GetGoalsDto): GetGoalsResult {
+  fun getGoals(getGoalsDto: GetGoalsDto): List<Goal> {
     return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
       ?.filter { getGoalsDto.statuses.isNullOrEmpty() || it.status in getGoalsDto.statuses }
-      ?.let { GetGoalsResult.Success(it) }
-      ?: GetGoalsResult.PrisonerNotFound(getGoalsDto.prisonNumber)
+      ?: throw NotFoundException("No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet").also {
+        log.info { "No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet" }
+      }
   }
 
   /**
@@ -102,60 +102,65 @@ class GoalService(
   /**
    * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
    *
-   * Returns an [ArchiveGoalResult] from which the success of the operation can be determined.
+   * Returns the archived [Goal]
    */
-  fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): ArchiveGoalResult {
+  fun archiveGoal(prisonNumber: String, archiveGoalDto: ArchiveGoalDto): Goal {
     val goalReference = archiveGoalDto.reference
     log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
 
     if (checkReasonIsSpecifiedIfOther(archiveGoalDto)) {
-      return ArchiveGoalResult.NoDescriptionProvidedForOther(
-        prisonNumber,
-        goalReference,
-      )
+      throw BusinessException("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Archive reason is ${ReasonToArchiveGoal.OTHER} but no description provided")
     }
 
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
     return if (existingGoal == null) {
-      ArchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
+      throw GoalNotFoundException(prisonNumber, goalReference).also {
+        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+      }
     } else if (existingGoal.status != GoalStatus.ACTIVE) {
-      ArchiveGoalResult.GoalInAnInvalidState(
+      throw InvalidGoalStateException(
         prisonNumber,
         goalReference,
-        existingGoal.status,
+        existingGoal.status.toString(),
+        InvalidGoalStateException.ARCHIVE,
       )
     } else {
       goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
         ?.also { goalEventService.goalArchived(prisonNumber, it) }
-        ?.let { ArchiveGoalResult.Success(it) }
-        ?: ArchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
+        ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+          log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+        }
     }
   }
 
   /**
    * Unarchives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [UnarchiveGoalDto].
    *
-   * Returns an [UnarchiveGoalResult] from which the success of the operation can be determined.
+   * Returns the unarchived [Goal]
    */
-  fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): UnarchiveGoalResult {
+  fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal {
     val goalReference = unarchiveGoalDto.reference
     log.info { "Unarchiving Goal with reference [$goalReference] for prisoner [$prisonNumber]." }
 
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+      ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found." }
+      }
 
-    return if (existingGoal == null) {
-      UnarchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
-    } else if (existingGoal.status != GoalStatus.ARCHIVED) {
-      UnarchiveGoalResult.GoalInAnInvalidState(
+    if (existingGoal.status != GoalStatus.ARCHIVED) {
+      throw InvalidGoalStateException(
         prisonNumber,
         goalReference,
-        existingGoal.status,
+        existingGoal.status.toString(),
+        InvalidGoalStateException.UNARCHIVE,
       )
-    } else {
-      goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
-        ?.also { goalEventService.goalUnArchived(prisonNumber, it) }
-        ?.let { UnarchiveGoalResult.Success(it) }
-        ?: UnarchiveGoalResult.GoalNotFound(prisonNumber, goalReference)
+    }
+
+    return goalPersistenceAdapter.unarchiveGoal(prisonNumber, unarchiveGoalDto)
+      ?.also {
+        goalEventService.goalUnArchived(prisonNumber, it)
+      } ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+      log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found after unarchive attempt." }
     }
   }
 

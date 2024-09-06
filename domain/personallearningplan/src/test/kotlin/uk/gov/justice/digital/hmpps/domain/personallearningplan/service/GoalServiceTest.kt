@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -19,15 +20,15 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.BusinessException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.NotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalResult
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
@@ -247,10 +248,12 @@ class GoalServiceTest {
       val archiveGoal = aValidArchiveGoalDto(goalReference)
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
-      val result = service.archiveGoal(prisonNumber, archiveGoal)
+      val exception = Assertions.assertThrows(GoalNotFoundException::class.java) {
+        service.archiveGoal(prisonNumber, archiveGoal)
+      }
 
-      assertThat(result).isEqualTo(ArchiveGoalResult.GoalNotFound(prisonNumber, goalReference))
-      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      // Then
+      assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
       verifyNoInteractions(goalEventService)
     }
 
@@ -266,9 +269,12 @@ class GoalServiceTest {
       val existingGoal = aValidGoal(reference = goalReference, status = status)
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
 
-      val result = service.archiveGoal(prisonNumber, archiveGoal)
+      val exception = Assertions.assertThrows(InvalidGoalStateException::class.java) {
+        service.archiveGoal(prisonNumber, archiveGoal)
+      }
 
-      assertThat(result).isEqualTo(ArchiveGoalResult.GoalInAnInvalidState(prisonNumber, goalReference, status))
+      // Then
+      assertThat(exception).hasMessage("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be archived")
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verifyNoInteractions(goalEventService)
     }
@@ -281,9 +287,13 @@ class GoalServiceTest {
       val archiveGoal =
         aValidArchiveGoalDto(reference = goalReference, reason = ReasonToArchiveGoal.OTHER, reasonOther = reasonOther)
 
-      val result = service.archiveGoal(prisonNumber, archiveGoal)
+      val exception = Assertions.assertThrows(BusinessException::class.java) {
+        service.archiveGoal(prisonNumber, archiveGoal)
+      }
 
-      assertThat(result).isEqualTo(ArchiveGoalResult.NoDescriptionProvidedForOther(prisonNumber, goalReference))
+      // Then
+      assertThat(exception).hasMessage("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Archive reason is ${ReasonToArchiveGoal.OTHER} but no description provided")
+      verifyNoInteractions(goalEventService)
       verifyNoInteractions(goalPersistenceAdapter)
       verifyNoInteractions(goalEventService)
     }
@@ -297,9 +307,12 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
       given(goalPersistenceAdapter.archiveGoal(any(), any())).willReturn(null)
 
-      val result = service.archiveGoal(prisonNumber, archiveGoal)
+      val exception = Assertions.assertThrows(GoalNotFoundException::class.java) {
+        service.archiveGoal(prisonNumber, archiveGoal)
+      }
 
-      assertThat(result).isEqualTo(ArchiveGoalResult.GoalNotFound(prisonNumber, goalReference))
+      // Then
+      assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
       verifyNoInteractions(goalEventService)
@@ -317,7 +330,7 @@ class GoalServiceTest {
 
       val result = service.archiveGoal(prisonNumber, archiveGoal)
 
-      assertThat(result).isEqualTo(ArchiveGoalResult.Success(archivedGoal))
+      assertThat(result).isEqualTo(archivedGoal)
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).archiveGoal(prisonNumber, archiveGoal)
       verify(goalEventService).goalArchived(prisonNumber, archivedGoal)
@@ -334,9 +347,12 @@ class GoalServiceTest {
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
-      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+      val exception = Assertions.assertThrows(GoalNotFoundException::class.java) {
+        service.unarchiveGoal(prisonNumber, unarchiveGoal)
+      }
 
-      assertThat(result).isEqualTo(UnarchiveGoalResult.GoalNotFound(prisonNumber, goalReference))
+      // Then
+      assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verifyNoInteractions(goalEventService)
     }
@@ -353,9 +369,11 @@ class GoalServiceTest {
       val existingGoal = aValidGoal(reference = goalReference, status = status)
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
 
-      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+      val exception = Assertions.assertThrows(InvalidGoalStateException::class.java) {
+        service.unarchiveGoal(prisonNumber, unarchiveGoal)
+      }
 
-      assertThat(result).isEqualTo(UnarchiveGoalResult.GoalInAnInvalidState(prisonNumber, goalReference, status))
+      assertThat(exception).hasMessage("Could not unarchive goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be unarchived")
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verifyNoInteractions(goalEventService)
     }
@@ -369,9 +387,11 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(existingGoal)
       given(goalPersistenceAdapter.unarchiveGoal(any(), any())).willReturn(null)
 
-      val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
+      val exception = Assertions.assertThrows(GoalNotFoundException::class.java) {
+        service.unarchiveGoal(prisonNumber, unarchiveGoal)
+      }
 
-      assertThat(result).isEqualTo(UnarchiveGoalResult.GoalNotFound(prisonNumber, goalReference))
+      assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
       verifyNoInteractions(goalEventService)
@@ -389,7 +409,7 @@ class GoalServiceTest {
 
       val result = service.unarchiveGoal(prisonNumber, unarchiveGoal)
 
-      assertThat(result).isEqualTo(UnarchiveGoalResult.Success(unarchivedGoal))
+      assertThat(result).isEqualTo(unarchivedGoal)
       verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
       verify(goalPersistenceAdapter).unarchiveGoal(prisonNumber, unarchiveGoal)
       verify(goalEventService).goalUnArchived(prisonNumber, unarchivedGoal)
@@ -409,16 +429,14 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
 
       // When
-      val actual = service.getGoals(GetGoalsDto(prisonNumber, null))
+      val goals = service.getGoals(GetGoalsDto(prisonNumber, null))
 
       // Then
-      assertThat(actual).isEqualTo(
-        GetGoalsResult.Success(
-          listOf(
-            activeGoal,
-            archivedGoal,
-            completedGoal,
-          ),
+      assertThat(goals).isEqualTo(
+        listOf(
+          activeGoal,
+          archivedGoal,
+          completedGoal,
         ),
       )
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
@@ -434,12 +452,10 @@ class GoalServiceTest {
 
       // Then
       assertThat(actual).isEqualTo(
-        GetGoalsResult.Success(
-          listOf(
-            activeGoal,
-            archivedGoal,
-            completedGoal,
-          ),
+        listOf(
+          activeGoal,
+          archivedGoal,
+          completedGoal,
         ),
       )
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
@@ -452,11 +468,9 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
 
       // When
-      val actual = service.getGoals(GetGoalsDto(prisonNumber, setOf(status)))
+      val goals = service.getGoals(GetGoalsDto(prisonNumber, setOf(status)))
 
       // Then
-      assertThat(actual).isInstanceOf(GetGoalsResult.Success::class.java)
-      val goals = (actual as GetGoalsResult.Success).goals
       assertThat(goals).hasSize(1)
       assertThat(goals[0].status).isEqualTo(status)
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
@@ -468,11 +482,8 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoals(any())).willReturn(listOf(activeGoal, archivedGoal, completedGoal))
 
       // When
-      val actual = service.getGoals(GetGoalsDto(prisonNumber, setOf(GoalStatus.ACTIVE, GoalStatus.COMPLETED)))
+      val goals = service.getGoals(GetGoalsDto(prisonNumber, setOf(GoalStatus.ACTIVE, GoalStatus.COMPLETED)))
 
-      // Then
-      assertThat(actual).isInstanceOf(GetGoalsResult.Success::class.java)
-      val goals = (actual as GetGoalsResult.Success).goals
       assertThat(goals).hasSize(2)
       assertThat(goals[0].reference).isEqualTo(activeGoal.reference)
       assertThat(goals[1].reference).isEqualTo(completedGoal.reference)
@@ -488,7 +499,7 @@ class GoalServiceTest {
       val actual = service.getGoals(GetGoalsDto(prisonNumber, null))
 
       // Then
-      assertThat(actual).isEqualTo(GetGoalsResult.Success(emptyList()))
+      assertThat(actual).isEmpty()
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
     }
 
@@ -498,10 +509,11 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoals(any())).willReturn(null)
 
       // When
-      val actual = service.getGoals(GetGoalsDto(prisonNumber, null))
-
+      val exception = Assertions.assertThrows(NotFoundException::class.java) {
+        service.getGoals(GetGoalsDto(prisonNumber, null))
+      }
       // Then
-      assertThat(actual).isEqualTo(GetGoalsResult.PrisonerNotFound(prisonNumber))
+      assertThat(exception).hasMessage("No goals have been created for prisoner [$prisonNumber] yet")
       verify(goalPersistenceAdapter).getGoals(prisonNumber)
     }
   }

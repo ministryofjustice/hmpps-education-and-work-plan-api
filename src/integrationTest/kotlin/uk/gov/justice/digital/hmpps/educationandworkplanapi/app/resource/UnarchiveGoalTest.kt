@@ -135,7 +135,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Could not unarchive goal with reference [$goalReference] for prisoner [$prisonNumber]: Not found")
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
   }
 
   @Test
@@ -155,7 +155,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Could not unarchive goal with reference [$goalReference] for prisoner [$aDifferentPrisonNumber]: Not found")
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$aDifferentPrisonNumber] not found")
   }
 
   @Test
