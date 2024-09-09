@@ -178,7 +178,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return 409 if other reason without description`() {
+  fun `should return 400 if other reason without description`() {
     // given
     val goalReference = createAGoalAndGetTheReference(prisonNumber)
     val archiveGoalRequest = aValidArchiveGoalRequest(
@@ -196,7 +196,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     // then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .hasStatus(HttpStatus.CONFLICT.value())
+      .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessageContaining("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Archive reason is OTHER but no description provided")
   }
 

@@ -1,12 +1,13 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import mu.KotlinLogging
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.BusinessException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalAction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.NotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
@@ -64,7 +65,7 @@ class GoalService(
   fun getGoals(getGoalsDto: GetGoalsDto): List<Goal> {
     return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
       ?.filter { getGoalsDto.statuses.isNullOrEmpty() || it.status in getGoalsDto.statuses }
-      ?: throw NotFoundException("No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet").also {
+      ?: throw PrisonerHasNoGoalsException(getGoalsDto.prisonNumber).also {
         log.info { "No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet" }
       }
   }
@@ -109,7 +110,7 @@ class GoalService(
     log.info { "Archiving Goal with reference [$goalReference] for prisoner [$prisonNumber] because [${archiveGoalDto.reason}] with description [${archiveGoalDto.reasonOther ?: ""}]" }
 
     if (checkReasonIsSpecifiedIfOther(archiveGoalDto)) {
-      throw BusinessException("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Archive reason is ${ReasonToArchiveGoal.OTHER} but no description provided")
+      throw NoArchiveReasonException(goalReference, prisonNumber, ReasonToArchiveGoal.OTHER)
     }
 
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
@@ -122,7 +123,7 @@ class GoalService(
         prisonNumber,
         goalReference,
         existingGoal.status.toString(),
-        InvalidGoalStateException.ARCHIVE,
+        GoalAction.ARCHIVE,
       )
     } else {
       goalPersistenceAdapter.archiveGoal(prisonNumber, archiveGoalDto)
@@ -152,7 +153,7 @@ class GoalService(
         prisonNumber,
         goalReference,
         existingGoal.status.toString(),
-        InvalidGoalStateException.UNARCHIVE,
+        GoalAction.UNARCHIVE,
       )
     }
 

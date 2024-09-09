@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import java.util.UUID
 
 /**
@@ -26,24 +27,27 @@ class GoalNotFoundException(val prisonNumber: String, val goalReference: UUID) :
 /**
  * Thrown when a Goal cannot be arhived/unarchived due to the current state.
  */
-class InvalidGoalStateException(val prisonNumber: String, val goalReference: UUID, val status: String, val action: String) :
-  RuntimeException("Could not $action goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be ${action}d") {
-
-  companion object {
-    const val ARCHIVE = "archive"
-    const val UNARCHIVE = "unarchive"
-  }
+enum class GoalAction {
+  ARCHIVE,
+  UNARCHIVE,
 }
 
-/**
- * A general business exception that takes a string and will have a http code of 409 CONFLICT.
- */
+class InvalidGoalStateException(
+  val prisonNumber: String,
+  val goalReference: UUID,
+  val status: String,
+  val action: GoalAction,
+) :
+  RuntimeException("Could not ${action.name.lowercase()} goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be ${action.name.lowercase()}d")
 
-class BusinessException(val text: String) :
-  RuntimeException(text)
+/**
+ * Thrown when a specified Goal is archived with reason other but no reason description.
+ */
+class NoArchiveReasonException(val goalReference: UUID, val prisonNumber: String, reason: ReasonToArchiveGoal) :
+  RuntimeException(("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Archive reason is $reason but no description provided"))
 
 /**
- * A general not found exception that takes a string and will have a http code of 404 NOT_FOUND.
+ * Thrown when a specified Goals cannot be found for a prisoner.
  */
-class NotFoundException(val text: String) :
-  RuntimeException(text)
+class PrisonerHasNoGoalsException(val prisonNumber: String) :
+  RuntimeException("No goals have been created for prisoner [$prisonNumber] yet")

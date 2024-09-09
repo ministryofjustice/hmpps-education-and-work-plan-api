@@ -31,12 +31,11 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Edu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.BusinessException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.NotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.exception.ReturnAnErrorException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
 private val log = KotlinLogging.logger {}
@@ -89,6 +88,28 @@ class GlobalExceptionHandler(
   }
 
   /**
+   * Exception handler to return a 400 bad request when a goal is archived with no reason text.
+   */
+  @ExceptionHandler(
+    value = [
+      NoArchiveReasonException::class,
+    ],
+  )
+  protected fun handleNoArchiveReasonException(
+    e: RuntimeException,
+    request: WebRequest,
+  ): ResponseEntity<Any> {
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST.value(),
+          userMessage = e.message,
+        ),
+      )
+  }
+
+  /**
    * Exception handler to return a 403 Forbidden ErrorResponse for a prohibited action (e.g. a business rule violation).
    */
   @ExceptionHandler(
@@ -119,7 +140,6 @@ class GlobalExceptionHandler(
     value = [
       EducationAlreadyExistsException::class,
       InvalidGoalStateException::class,
-      BusinessException::class,
     ],
   )
   protected fun handleExceptionReturnConflictErrorResponse(
@@ -149,7 +169,7 @@ class GlobalExceptionHandler(
       ConversationNotFoundException::class,
       PrisonerConversationNotFoundException::class,
       EducationNotFoundException::class,
-      NotFoundException::class,
+      PrisonerHasNoGoalsException::class,
     ],
   )
   fun handleExceptionReturnNotFoundErrorResponse(
@@ -165,11 +185,6 @@ class GlobalExceptionHandler(
           userMessage = e.message,
         ),
       )
-  }
-
-  @ExceptionHandler(ReturnAnErrorException::class)
-  fun handleReturnAnErrorException(e: ReturnAnErrorException): ResponseEntity<ErrorResponse> {
-    return ResponseEntity.status(e.errorResponse.status).body(e.errorResponse)
   }
 
   /**

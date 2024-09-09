@@ -20,11 +20,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.BusinessException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.NotFoundException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
@@ -287,7 +287,7 @@ class GoalServiceTest {
       val archiveGoal =
         aValidArchiveGoalDto(reference = goalReference, reason = ReasonToArchiveGoal.OTHER, reasonOther = reasonOther)
 
-      val exception = Assertions.assertThrows(BusinessException::class.java) {
+      val exception = Assertions.assertThrows(NoArchiveReasonException::class.java) {
         service.archiveGoal(prisonNumber, archiveGoal)
       }
 
@@ -509,7 +509,7 @@ class GoalServiceTest {
       given(goalPersistenceAdapter.getGoals(any())).willReturn(null)
 
       // When
-      val exception = Assertions.assertThrows(NotFoundException::class.java) {
+      val exception = Assertions.assertThrows(PrisonerHasNoGoalsException::class.java) {
         service.getGoals(GetGoalsDto(prisonNumber, null))
       }
       // Then
