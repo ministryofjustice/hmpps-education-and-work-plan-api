@@ -35,7 +35,7 @@ enum class GoalAction {
 class InvalidGoalStateException(
   val prisonNumber: String,
   val goalReference: UUID,
-  val status: String,
+  val status: GoalStatus,
   val action: GoalAction,
 ) :
   RuntimeException("Could not ${action.name.lowercase()} goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be ${action.name.lowercase()}d")

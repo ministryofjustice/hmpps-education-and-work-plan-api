@@ -122,7 +122,7 @@ class GoalService(
       throw InvalidGoalStateException(
         prisonNumber,
         goalReference,
-        existingGoal.status.toString(),
+        existingGoal.status,
         GoalAction.ARCHIVE,
       )
     } else {
@@ -152,7 +152,7 @@ class GoalService(
       throw InvalidGoalStateException(
         prisonNumber,
         goalReference,
-        existingGoal.status.toString(),
+        existingGoal.status,
         GoalAction.UNARCHIVE,
       )
     }
