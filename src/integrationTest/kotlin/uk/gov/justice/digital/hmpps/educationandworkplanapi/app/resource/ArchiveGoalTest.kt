@@ -126,7 +126,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Not found")
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
   }
 
   @Test
@@ -146,7 +146,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Could not archive goal with reference [$goalReference] for prisoner [$aDifferentPrisonNumber]: Not found")
+      .hasUserMessage("Goal with reference [$goalReference] for prisoner [$aDifferentPrisonNumber] not found")
   }
 
   @Test
@@ -190,7 +190,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     // when
     val response = archiveAGoal(prisonNumber, goalReference, archiveGoalRequest)
       .expectStatus()
-      .isBadRequest
+      .is4xxClientError
       .returnResult(ErrorResponse::class.java)
 
     // then

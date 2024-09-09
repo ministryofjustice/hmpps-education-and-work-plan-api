@@ -14,7 +14,7 @@ import java.util.*
  * to a future job/career and consist of one or more [Step Steps] (at least one).
  *
  * Each goal has its own lifecycle (such as active or completed) and a prisoner can have many goals at the same time
- * (e.g. more than one active goal), thereby creating a "Action Plan".
+ * (e.g. more than one active goal), thereby creating an "Action Plan".
  */
 class Goal(
   val reference: UUID,
@@ -56,7 +56,7 @@ class Goal(
   }
 
   /**
-   * Adds a [Step] to this Goal, observing it's sequenceNumber relative to the existing list of [Step]s
+   * Adds a [Step] to this Goal, observing its sequenceNumber relative to the existing list of [Step]s
    */
   fun addStep(step: Step) =
     steps.apply {
