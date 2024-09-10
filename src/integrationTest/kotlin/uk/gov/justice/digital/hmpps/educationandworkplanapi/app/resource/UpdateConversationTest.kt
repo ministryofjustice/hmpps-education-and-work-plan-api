@@ -191,7 +191,12 @@ class UpdateConversationTest : IntegrationTestBase() {
       .isForPrisonNumber(prisonNumber)
       .content {
         it.hasContent("Peter's behaviour is improving.")
-        it.wasUpdatedAtPrison("MDI")
+          .wasCreatedAtPrison("BXI")
+          .wasCreatedBy(creatorUsername)
+          .hasCreatedByDisplayName(creatorName)
+          .wasUpdatedAtPrison("MDI")
+          .wasUpdatedBy(editorUsername)
+          .hasUpdatedByDisplayName(editorName)
       }
       .wasUpdatedAfter(conversation.createdAt!!)
       .wasCreatedBy(creatorUsername)

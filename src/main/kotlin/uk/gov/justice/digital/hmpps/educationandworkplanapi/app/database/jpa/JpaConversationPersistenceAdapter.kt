@@ -25,17 +25,14 @@ class JpaConversationPersistenceAdapter(
   }
 
   @Transactional
-  override fun updateConversation(updateConversationDto: UpdateConversationDto): Conversation? {
-    val conversationEntity = conversationRepository.findByReference(updateConversationDto.reference)
-    return if (conversationEntity != null) {
-      conversationEntityMapper.updateEntityFromDto(conversationEntity, updateConversationDto)
-      conversationEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
-      val persistedEntity = conversationRepository.saveAndFlush(conversationEntity)
-      conversationEntityMapper.fromEntityToDomain(persistedEntity)
-    } else {
-      null
-    }
-  }
+  override fun updateConversation(updateConversationDto: UpdateConversationDto, prisonNumber: String): Conversation? =
+    conversationRepository.findByReferenceAndPrisonNumber(updateConversationDto.reference, prisonNumber)
+      ?.let {
+        conversationEntityMapper.updateEntityFromDto(it, updateConversationDto)
+        it.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
+        val persistedEntity = conversationRepository.saveAndFlush(it)
+        conversationEntityMapper.fromEntityToDomain(persistedEntity)
+      }
 
   @Transactional(readOnly = true)
   override fun getConversations(prisonNumber: String): List<Conversation> =
@@ -56,8 +53,9 @@ class JpaConversationPersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
-  override fun getConversation(conversationReference: UUID): Conversation? =
-    conversationRepository.findByReference(conversationReference)?.let {
-      conversationEntityMapper.fromEntityToDomain(it)
-    }
+  override fun getConversation(conversationReference: UUID, prisonNumber: String): Conversation? =
+    conversationRepository.findByReferenceAndPrisonNumber(conversationReference, prisonNumber)
+      ?.let {
+        conversationEntityMapper.fromEntityToDomain(it)
+      }
 }

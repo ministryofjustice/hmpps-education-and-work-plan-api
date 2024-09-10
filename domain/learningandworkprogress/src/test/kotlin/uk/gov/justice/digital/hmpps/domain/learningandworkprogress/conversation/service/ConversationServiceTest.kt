@@ -42,14 +42,14 @@ class ConversationServiceTest {
       prisonNumber = prisonNumber,
     )
 
-    given(persistenceAdapter.getConversation(any())).willReturn(conversation)
+    given(persistenceAdapter.getConversation(any(), any())).willReturn(conversation)
 
     // When
     val actual = service.getConversation(conversationReference, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(conversation)
-    verify(persistenceAdapter).getConversation(conversationReference)
+    verify(persistenceAdapter).getConversation(conversationReference, prisonNumber)
   }
 
   @Test
@@ -58,20 +58,17 @@ class ConversationServiceTest {
     val conversationReference = UUID.randomUUID()
     val prisonNumber = aValidPrisonNumber()
 
-    given(persistenceAdapter.getConversation(any())).willReturn(null)
+    given(persistenceAdapter.getConversation(any(), any())).willReturn(null)
 
     // When
     val exception = catchThrowableOfType(PrisonerConversationNotFoundException::class.java) {
-      service.getConversation(
-        conversationReference,
-        prisonNumber,
-      )
+      service.getConversation(conversationReference, prisonNumber)
     }
 
     // Then
     assertThat(exception.conversationReference).isEqualTo(conversationReference)
     assertThat(exception).hasMessage("Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found")
-    verify(persistenceAdapter).getConversation(conversationReference)
+    verify(persistenceAdapter).getConversation(conversationReference, prisonNumber)
   }
 
   @Test
@@ -161,14 +158,14 @@ class ConversationServiceTest {
         content = "Chris spoke positively about future work during our meeting and has made some good progress",
       ),
     )
-    given(persistenceAdapter.updateConversation(any())).willReturn(updatedConversation)
+    given(persistenceAdapter.updateConversation(any(), any())).willReturn(updatedConversation)
 
     // When
     val actual = service.updateConversation(updateConversationDto, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(updatedConversation)
-    verify(persistenceAdapter).updateConversation(updateConversationDto)
+    verify(persistenceAdapter).updateConversation(updateConversationDto, prisonNumber)
   }
 
   @Test
@@ -182,7 +179,7 @@ class ConversationServiceTest {
       noteContent = "Chris spoke positively about future work during our meeting and has made some good progress",
     )
 
-    given(persistenceAdapter.updateConversation(any())).willReturn(null)
+    given(persistenceAdapter.updateConversation(any(), any())).willReturn(null)
 
     // When
     val exception = catchThrowableOfType(PrisonerConversationNotFoundException::class.java) {
@@ -195,6 +192,6 @@ class ConversationServiceTest {
     // Then
     assertThat(exception.conversationReference).isEqualTo(conversationReference)
     assertThat(exception).hasMessage("Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found")
-    verify(persistenceAdapter).updateConversation(updateConversationDto)
+    verify(persistenceAdapter).updateConversation(updateConversationDto, prisonNumber)
   }
 }

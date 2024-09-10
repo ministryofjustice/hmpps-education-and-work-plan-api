@@ -8,8 +8,9 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
@@ -73,19 +74,20 @@ class JpaConversationPersistenceAdapterTest {
   fun `should get conversation`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
     val conversationEntity = aValidConversationEntity(reference = conversationReference)
-    given(conversationRepository.findByReference(any())).willReturn(conversationEntity)
+    given(conversationRepository.findByReferenceAndPrisonNumber(any(), any())).willReturn(conversationEntity)
 
     val expectedConversation = aValidConversation(reference = conversationReference)
     given(conversationEntityMapper.fromEntityToDomain(any())).willReturn(expectedConversation)
 
     // When
-    val actual = persistenceAdapter.getConversation(conversationReference)
+    val actual = persistenceAdapter.getConversation(conversationReference, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(expectedConversation)
-    verify(conversationRepository).findByReference(conversationReference)
+    verify(conversationRepository).findByReferenceAndPrisonNumber(conversationReference, prisonNumber)
     verify(conversationEntityMapper).fromEntityToDomain(conversationEntity)
   }
 
@@ -93,16 +95,17 @@ class JpaConversationPersistenceAdapterTest {
   fun `should not get conversation given conversation does not exist`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
-    given(conversationRepository.findByReference(any())).willReturn(null)
+    given(conversationRepository.findByReferenceAndPrisonNumber(any(), any())).willReturn(null)
 
     // When
-    val actual = persistenceAdapter.getConversation(conversationReference)
+    val actual = persistenceAdapter.getConversation(conversationReference, prisonNumber)
 
     // Then
     assertThat(actual).isNull()
-    verify(conversationRepository).findByReference(conversationReference)
-    verify(conversationEntityMapper, never()).fromEntityToDomain(any())
+    verify(conversationRepository).findByReferenceAndPrisonNumber(conversationReference, prisonNumber)
+    verifyNoInteractions(conversationEntityMapper)
   }
 
   @Test
@@ -141,13 +144,14 @@ class JpaConversationPersistenceAdapterTest {
     // Then
     assertThat(actual).isEmpty()
     verify(conversationRepository).findAllByPrisonNumber(prisonNumber)
-    verify(conversationEntityMapper, never()).fromEntityToDomain(any())
+    verifyNoInteractions(conversationEntityMapper)
   }
 
   @Test
   fun `should update conversation`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
     val originalEntity = aValidConversationEntity(
       reference = conversationReference,
@@ -156,7 +160,7 @@ class JpaConversationPersistenceAdapterTest {
       ),
       updatedAt = Instant.parse("2024-01-01T09:00:00.000Z"),
     )
-    given(conversationRepository.findByReference(any())).willReturn(originalEntity)
+    given(conversationRepository.findByReferenceAndPrisonNumber(any(), any())).willReturn(originalEntity)
 
     val updatedEntity = aValidConversationEntity(
       reference = conversationReference,
@@ -181,11 +185,11 @@ class JpaConversationPersistenceAdapterTest {
     )
 
     // When
-    val actual = persistenceAdapter.updateConversation(updateConversationDto)
+    val actual = persistenceAdapter.updateConversation(updateConversationDto, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(expectedConversation)
-    verify(conversationRepository).findByReference(conversationReference)
+    verify(conversationRepository).findByReferenceAndPrisonNumber(conversationReference, prisonNumber)
     verify(conversationRepository).saveAndFlush(originalEntity)
     verify(conversationEntityMapper).fromEntityToDomain(updatedEntity)
   }
@@ -194,8 +198,9 @@ class JpaConversationPersistenceAdapterTest {
   fun `should not update conversation given conversation does not exist`() {
     // Given
     val conversationReference = UUID.randomUUID()
+    val prisonNumber = aValidPrisonNumber()
 
-    given(conversationRepository.findByReference(any())).willReturn(null)
+    given(conversationRepository.findByReferenceAndPrisonNumber(any(), any())).willReturn(null)
 
     val updateConversationDto = aValidUpdateConversationDto(
       reference = conversationReference,
@@ -203,12 +208,12 @@ class JpaConversationPersistenceAdapterTest {
     )
 
     // When
-    val actual = persistenceAdapter.updateConversation(updateConversationDto)
+    val actual = persistenceAdapter.updateConversation(updateConversationDto, prisonNumber)
 
     // Then
     assertThat(actual).isNull()
-    verify(conversationRepository).findByReference(conversationReference)
-    verify(conversationRepository, never()).saveAndFlush(any())
-    verify(conversationEntityMapper, never()).fromEntityToDomain(any())
+    verify(conversationRepository).findByReferenceAndPrisonNumber(conversationReference, prisonNumber)
+    verifyNoMoreInteractions(conversationRepository)
+    verifyNoInteractions(conversationEntityMapper)
   }
 }

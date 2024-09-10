@@ -54,11 +54,10 @@ class ConversationService(
    */
   fun getConversation(conversationReference: UUID, prisonNumber: String): Conversation {
     log.info { "Retrieving Conversation with reference [$conversationReference]" }
-    return persistenceAdapter.getConversation(conversationReference)?.takeIf {
-      it.prisonNumber == prisonNumber
-    } ?: throw PrisonerConversationNotFoundException(conversationReference, prisonNumber).also {
-      log.info { "Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found" }
-    }
+    return persistenceAdapter.getConversation(conversationReference, prisonNumber)
+      ?: throw PrisonerConversationNotFoundException(conversationReference, prisonNumber).also {
+        log.info { "Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found" }
+      }
   }
 
   /**
@@ -70,12 +69,12 @@ class ConversationService(
     val conversationReference = updateConversationDto.reference
     log.info { "Updating Conversation with reference [$conversationReference]" }
 
-    return persistenceAdapter.updateConversation(updateConversationDto)?.takeIf {
-      it.prisonNumber == prisonNumber
-    }?.also {
-      conversationEventService?.conversationUpdated(it)
-    } ?: throw PrisonerConversationNotFoundException(conversationReference, prisonNumber).also {
-      log.info { "Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found" }
-    }
+    return persistenceAdapter.updateConversation(updateConversationDto, prisonNumber)
+      ?.also {
+        conversationEventService?.conversationUpdated(it)
+      } ?: throw PrisonerConversationNotFoundException(conversationReference, prisonNumber)
+      .also {
+        log.info { "Conversation with reference [$conversationReference] for prisoner [$prisonNumber] not found" }
+      }
   }
 }

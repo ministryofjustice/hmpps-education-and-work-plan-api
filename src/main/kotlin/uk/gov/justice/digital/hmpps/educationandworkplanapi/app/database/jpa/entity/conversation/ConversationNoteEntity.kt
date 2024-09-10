@@ -2,27 +2,17 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
-import org.springframework.data.annotation.CreatedBy
-import org.springframework.data.annotation.LastModifiedBy
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
 import java.util.UUID
 
 @Table(name = "conversation_note")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
 class ConversationNoteEntity(
   @Id
   @GeneratedValue
@@ -38,7 +28,6 @@ class ConversationNoteEntity(
   var content: String? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
   var createdAt: Instant? = null,
 
   @Column
@@ -46,15 +35,12 @@ class ConversationNoteEntity(
   var createdAtPrison: String? = null,
 
   @Column(updatable = false)
-  @CreatedBy
   var createdBy: String? = null,
 
   @Column
-  @CreatedByDisplayName
   var createdByDisplayName: String? = null,
 
   @Column
-  @UpdateTimestamp
   var updatedAt: Instant? = null,
 
   @Column
@@ -62,11 +48,9 @@ class ConversationNoteEntity(
   var updatedAtPrison: String? = null,
 
   @Column
-  @LastModifiedBy
   var updatedBy: String? = null,
 
   @Column
-  @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
 ) {
   override fun equals(other: Any?): Boolean {
