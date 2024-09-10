@@ -13,7 +13,7 @@ import java.util.UUID
 data class PreviousQualifications(
   val reference: UUID,
   val prisonNumber: String,
-  val educationLevel: EducationLevel?,
+  val educationLevel: EducationLevel,
   val qualifications: List<Qualification>,
   val createdBy: String?,
   val createdByDisplayName: String?,

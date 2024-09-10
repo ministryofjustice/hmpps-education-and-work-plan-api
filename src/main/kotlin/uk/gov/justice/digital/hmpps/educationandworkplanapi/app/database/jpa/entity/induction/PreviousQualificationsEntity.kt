@@ -56,6 +56,7 @@ class PreviousQualificationsEntity(
 
   @Column
   @Enumerated(value = EnumType.STRING)
+  @field:NotNull
   var educationLevel: EducationLevel? = null,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)

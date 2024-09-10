@@ -7,7 +7,7 @@ import java.util.UUID
 fun aValidPreviousQualifications(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "A1234AB",
-  educationLevel: EducationLevel? = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
+  educationLevel: EducationLevel = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
   qualifications: List<Qualification> = listOf(aValidQualification()),
   createdBy: String? = "asmith_gen",
   createdByDisplayName: String? = "Alex Smith",
