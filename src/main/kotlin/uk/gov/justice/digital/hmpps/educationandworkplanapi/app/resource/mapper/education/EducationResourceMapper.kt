@@ -29,7 +29,7 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
       updatedAtPrison = previousQualifications.lastUpdatedAtPrison,
       updatedBy = previousQualifications.lastUpdatedBy!!,
       updatedByDisplayName = previousQualifications.lastUpdatedByDisplayName!!,
-      educationLevel = previousQualifications.educationLevel?.let { toEducationLevel(it) } ?: EducationLevelApi.NOT_SURE,
+      educationLevel = toEducationLevel(previousQualifications.educationLevel),
       qualifications = toAchievedQualificationResponses(previousQualifications.qualifications),
     )
 
