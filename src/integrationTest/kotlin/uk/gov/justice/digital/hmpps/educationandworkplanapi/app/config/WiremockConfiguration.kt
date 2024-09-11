@@ -16,7 +16,7 @@ class WiremockConfiguration {
 
   @Bean
   fun wireMockServer(@Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean): WireMockServer =
-    WireMockServer(options().port(9093)).apply {
+    WireMockServer(options().port(9093).usingFilesUnderClasspath("simulations")).apply {
       if (logWiremockRequests) {
         addMockServiceRequestListener { request: Request, _: Response ->
           val formattedHeaders = request.headers.all().joinToString("\n") {
@@ -31,6 +31,7 @@ class WiremockConfiguration {
           logger.info { logMessage }
         }
       }
+
       start()
     }
 }

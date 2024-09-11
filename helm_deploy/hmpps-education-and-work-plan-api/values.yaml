@@ -32,6 +32,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
     PRISON_API_URL: https://prison-api.prison.service.justice.gov.uk
+    MANAGE_USERS_API_URL: https://manage-users-api.hmpps.service.justice.gov.uk
     HMPPS_SAR_ADDITIONALACCESSROLE: ROLE_EDUCATION_WORK_PLAN_VIEWER
     HMPPS_SQS_ENABLED: true
 

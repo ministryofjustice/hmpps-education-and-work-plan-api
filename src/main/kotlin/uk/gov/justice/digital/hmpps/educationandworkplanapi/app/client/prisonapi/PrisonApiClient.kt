@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
@@ -10,6 +11,7 @@ private val log = KotlinLogging.logger {}
 
 @Component
 class PrisonApiClient(
+  @Qualifier("prisonApiWebClient")
   private val prisonApiWebClient: WebClient,
   private val prisonApiMapper: PrisonApiMapper,
 ) {

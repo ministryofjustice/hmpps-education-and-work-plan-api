@@ -128,6 +128,7 @@ class GetConversationTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
+
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNoteContent(note)
