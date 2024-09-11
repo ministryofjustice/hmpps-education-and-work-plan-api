@@ -249,6 +249,7 @@ tasks.named("compileKotlin") {
 }
 
 kotlin {
+  kotlinDaemonJvmArgs = listOf("-Xmx1g")
   sourceSets["main"].apply {
     kotlin.srcDir("$buildDirectory/generated/src/main/kotlin")
   }
