@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.ManageUsersApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.conversation.ConversationsResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.conversation.NewConversationsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ConversationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateConversationRequest
 import java.util.UUID
@@ -31,8 +30,8 @@ import java.util.UUID
 class ConversationController(
   private val conversationService: ConversationService,
   private val conversationMapper: ConversationsResourceMapper,
-  manageUsersApiClient: ManageUsersApiClient,
-) : BaseController(manageUsersApiClient) {
+  private val newConversationMapper: NewConversationsResourceMapper,
+) {
   @PostMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_CONVERSATIONS)
@@ -69,10 +68,8 @@ class ConversationController(
   fun getConversation(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable conversationReference: UUID,
-  ): ConversationResponse {
-    val conversation = conversationService.getConversation(conversationReference, prisonNumber)
-    val response = conversationMapper.fromDomainToModel(conversation)
-    return populateDisplayName(response)
+  ) = with(conversationService.getConversation(conversationReference, prisonNumber)) {
+    newConversationMapper.fromDomainToModel(this)
   }
 
   @GetMapping("/{prisonNumber}")

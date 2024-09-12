@@ -21,8 +21,6 @@ class ManageUsersApiClient(@Qualifier("manageUsersApiWebClient") private val man
         .block()
     } catch (e: WebClientResponseException.NotFound) {
       UserDetailsDto(username, false, "$username not found")
-    } catch (e: Exception) {
-      UserDetailsDto(username, false, "$username not found")
     }
   }
 }
