@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 @ExtendWith(MockitoExtension::class)
 class PreviousQualificationsEntityMapperTest {
   @InjectMocks
-  private lateinit var mapper: PreviousQualificationsEntityMapperImpl
+  private lateinit var mapper: PreviousQualificationsEntityMapper
 
   @Mock
   private lateinit var qualificationEntityMapper: QualificationEntityMapper

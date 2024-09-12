@@ -27,7 +27,7 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       prisonNumber = prisonNumber,
       prisonId = prisonId,
       educationLevel = request.educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
-      qualifications = request.qualifications?.let { toUpdateOrCreateQualificationDtos(it) } ?: emptyList(),
+      qualifications = request.qualifications?.let { toUpdateOrCreateQualificationDtos(it, prisonId) } ?: emptyList(),
     )
 
   fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse? =
@@ -53,18 +53,20 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       prisonNumber = prisonNumber,
       prisonId = prisonId,
       educationLevel = toEducationLevel(request.educationLevel),
-      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList()),
+      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList(), prisonId),
     )
 
-  fun toUpdateOrCreateQualificationDto(achievedQualification: CreateOrUpdateAchievedQualificationRequest): UpdateOrCreateQualificationDto =
+  fun toUpdateOrCreateQualificationDto(achievedQualification: CreateOrUpdateAchievedQualificationRequest, prisonId: String): UpdateOrCreateQualificationDto =
     if (achievedQualification.reference == null) {
       CreateQualificationDto(
+        prisonId = prisonId,
         subject = achievedQualification.subject,
         level = toQualificationLevel(achievedQualification.level),
         grade = achievedQualification.grade,
       )
     } else {
       UpdateQualificationDto(
+        prisonId = prisonId,
         reference = achievedQualification.reference!!,
         subject = achievedQualification.subject,
         level = toQualificationLevel(achievedQualification.level),
@@ -72,8 +74,8 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       )
     }
 
-  fun toUpdateOrCreateQualificationDtos(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>): List<UpdateOrCreateQualificationDto> =
-    achievedQualifications.map { toUpdateOrCreateQualificationDto(it) }
+  fun toUpdateOrCreateQualificationDtos(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>, prisonId: String): List<UpdateOrCreateQualificationDto> =
+    achievedQualifications.map { toUpdateOrCreateQualificationDto(it, prisonId) }
 
   fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
     AchievedQualificationResponse(
@@ -83,8 +85,10 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       grade = qualification.grade,
       createdBy = qualification.createdBy,
       createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
+      createdAtPrison = qualification.createdAtPrison,
       updatedBy = qualification.lastUpdatedBy,
       updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
+      updatedAtPrison = qualification.lastUpdatedAtPrison,
     )
 
   fun toAchievedQualificationResponses(qualifications: List<Qualification>): List<AchievedQualificationResponse> =

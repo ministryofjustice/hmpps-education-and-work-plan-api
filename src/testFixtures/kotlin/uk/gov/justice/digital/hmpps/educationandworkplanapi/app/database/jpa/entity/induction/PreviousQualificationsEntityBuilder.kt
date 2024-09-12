@@ -71,10 +71,22 @@ fun aValidQualificationEntity(
   subject: String = "English",
   level: QualificationLevel? = QualificationLevel.LEVEL_3,
   grade: String? = "A",
+  createdAt: Instant? = null,
+  createdAtPrison: String = "BXI",
+  createdBy: String? = null,
+  updatedAt: Instant? = null,
+  updatedAtPrison: String = "BXI",
+  updatedBy: String? = null,
 ) =
   QualificationEntity(
     reference = reference,
     subject = subject,
     level = level,
     grade = grade,
+    createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
+    createdBy = createdBy,
+    updatedAt = updatedAt,
+    updatedAtPrison = updatedAtPrison,
+    updatedBy = updatedBy,
   )

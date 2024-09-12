@@ -40,8 +40,10 @@ fun aValidQualification(
   grade: String = "C",
   createdBy: String = "asmith_gen",
   createdAt: Instant = Instant.now(),
+  createdAtPrison: String = "BXI",
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
+  lastUpdatedAtPrison: String = "BXI",
 ) =
   Qualification(
     reference = reference,
@@ -50,6 +52,8 @@ fun aValidQualification(
     grade = grade,
     createdBy = createdBy,
     createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
     lastUpdatedBy = lastUpdatedBy,
     lastUpdatedAt = lastUpdatedAt,
+    lastUpdatedAtPrison = lastUpdatedAtPrison,
   )

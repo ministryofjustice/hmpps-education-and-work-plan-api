@@ -151,6 +151,10 @@ class QualificationEntity(
   @CreationTimestamp
   var createdAt: Instant? = null,
 
+  @Column
+  @field:NotNull
+  var createdAtPrison: String? = null,
+
   @Column(updatable = false)
   @CreatedBy
   var createdBy: String? = null,
@@ -158,6 +162,10 @@ class QualificationEntity(
   @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null,
+
+  @Column
+  @field:NotNull
+  var updatedAtPrison: String? = null,
 
   @Column
   @LastModifiedBy

@@ -12,8 +12,10 @@ fun aValidAchievedQualificationResponse(
   grade: String = "A",
   createdBy: String = "asmith_gen",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
+  createdAtPrison: String = "BXI",
   updatedBy: String = "asmith_gen",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
+  updatedAtPrison: String = "BXI",
 ): AchievedQualificationResponse =
   AchievedQualificationResponse(
     reference = reference,
@@ -22,8 +24,10 @@ fun aValidAchievedQualificationResponse(
     grade = grade,
     createdBy = createdBy,
     createdAt = createdAt,
+    createdAtPrison = createdAtPrison,
     updatedBy = updatedBy,
     updatedAt = updatedAt,
+    updatedAtPrison = updatedAtPrison,
   )
 
 fun anotherValidAchievedQualificationResponse(
