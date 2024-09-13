@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.conversation.ConversationsResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.conversation.NewConversationsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateConversationRequest
@@ -30,7 +29,7 @@ import java.util.UUID
 class ConversationController(
   private val conversationService: ConversationService,
   private val conversationMapper: ConversationsResourceMapper,
-  private val newConversationMapper: NewConversationsResourceMapper,
+  private val newConversationMapper: ConversationsResourceMapper,
 ) {
   @PostMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.CREATED)

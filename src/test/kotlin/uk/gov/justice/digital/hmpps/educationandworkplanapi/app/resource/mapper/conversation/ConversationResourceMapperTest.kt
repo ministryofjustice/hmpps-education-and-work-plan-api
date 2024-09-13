@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -12,7 +11,9 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.aValidPagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversationNote
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidConversationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.assertThat
 import java.time.Instant
@@ -21,11 +22,12 @@ import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 internal class ConversationResourceMapperTest {
-  @InjectMocks
-  private lateinit var mapper: ConversationsResourceMapperImpl
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map from domain to model`() {
@@ -69,6 +71,11 @@ internal class ConversationResourceMapperTest {
     )
     given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
 
+    given(userService.getUserDetails("auser_gen")).willReturn(UserDetailsDto("auser_gen", true, "Albert User"))
+    given(userService.getUserDetails("buser_gen")).willReturn(UserDetailsDto("buser_gen", true, "Bernie User"))
+
+    val mapper = ConversationsResourceMapper(instantMapper, userService)
+
     // When
     val actual = mapper.fromDomainToModel(conversation)
 
@@ -105,6 +112,8 @@ internal class ConversationResourceMapperTest {
 
     val expectedDateTime = OffsetDateTime.now()
     given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
+
+    val mapper = ConversationsResourceMapper(instantMapper, userService)
 
     // When
     val actual = mapper.fromPagedDomainToModel(pagedConversations)
