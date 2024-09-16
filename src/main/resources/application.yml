@@ -24,8 +24,8 @@ spring:
             scope: read
           manage-users-api:
             provider: hmpps-auth
-            client-id: ${manage-users-api.client.id}
-            client-secret: ${manage-users-api.client.secret}
+            client-id: ${prison-api.client.id}
+            client-secret: ${prison-api.client.secret}
             authorization-grant-type: client_credentials
             scope: read
         provider:
