@@ -1,9 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.NullValueMappingStrategy
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
@@ -22,16 +19,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qua
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
-@Mapper(
-  uses = [
-    InstantMapper::class,
-  ],
-  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-)
-abstract class QualificationsResourceMapper {
-
-  @Autowired
-  private lateinit var instantMapper: InstantMapper
+@Component
+class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
 
   fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto =
     CreatePreviousQualificationsDto(
@@ -41,13 +30,31 @@ abstract class QualificationsResourceMapper {
       qualifications = request.qualifications?.let { toUpdateOrCreateQualificationDtos(it) } ?: emptyList(),
     )
 
-  @Mapping(target = "updatedBy", source = "lastUpdatedBy")
-  @Mapping(target = "updatedByDisplayName", source = "lastUpdatedByDisplayName")
-  @Mapping(target = "updatedAt", source = "lastUpdatedAt")
-  @Mapping(target = "updatedAtPrison", source = "lastUpdatedAtPrison")
-  abstract fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse?
+  fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse? =
+    previousQualifications?.let {
+      PreviousQualificationsResponse(
+        reference = it.reference,
+        qualifications = toAchievedQualificationResponses(it.qualifications),
+        educationLevel = toEducationLevel(it.educationLevel),
+        createdBy = it.createdBy!!,
+        createdByDisplayName = it.createdByDisplayName!!,
+        createdAt = instantMapper.toOffsetDateTime(it.createdAt)!!,
+        createdAtPrison = it.createdAtPrison,
+        updatedBy = it.lastUpdatedBy!!,
+        updatedByDisplayName = it.lastUpdatedByDisplayName!!,
+        updatedAt = instantMapper.toOffsetDateTime(it.lastUpdatedAt)!!,
+        updatedAtPrison = it.lastUpdatedAtPrison,
+      )
+    }
 
-  abstract fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String): UpdatePreviousQualificationsDto
+  fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String, prisonNumber: String): UpdatePreviousQualificationsDto =
+    UpdatePreviousQualificationsDto(
+      reference = request.reference,
+      prisonNumber = prisonNumber,
+      prisonId = prisonId,
+      educationLevel = toEducationLevel(request.educationLevel),
+      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList()),
+    )
 
   fun toUpdateOrCreateQualificationDto(achievedQualification: CreateOrUpdateAchievedQualificationRequest): UpdateOrCreateQualificationDto =
     if (achievedQualification.reference == null) {
@@ -93,6 +100,17 @@ abstract class QualificationsResourceMapper {
       EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
       EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY
       null -> null
+    }
+
+  fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelApi =
+    when (educationLevel) {
+      EducationLevelDomain.NOT_SURE -> EducationLevelApi.NOT_SURE
+      EducationLevelDomain.PRIMARY_SCHOOL -> EducationLevelApi.PRIMARY_SCHOOL
+      EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+      EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS
+      EducationLevelDomain.FURTHER_EDUCATION_COLLEGE -> EducationLevelApi.FURTHER_EDUCATION_COLLEGE
+      EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
+      EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY
     }
 
   fun toQualificationLevel(qualificationLevel: QualificationLevelApi): QualificationLevelDomain =

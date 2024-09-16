@@ -29,7 +29,7 @@ class JpaInductionPersistenceAdapter(
   override fun createInduction(createInductionDto: CreateInductionDto): Induction {
     val prisonNumber = createInductionDto.prisonNumber
     val inductionEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
-    val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto, prisonNumber)
+    val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto)
     return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity)
   }
 
@@ -48,7 +48,7 @@ class JpaInductionPersistenceAdapter(
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
       inductionEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
-      val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto, prisonNumber)
+      val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto)
       inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity)
     } else {
       null
@@ -61,10 +61,8 @@ class JpaInductionPersistenceAdapter(
       inductionMapper.fromEntitySummariesToDomainSummaries(it)
     }
 
-  private fun createOrUpdatePreviousQualifications(
-    updateInductionDto: UpdateInductionDto,
-    prisonNumber: String,
-  ): PreviousQualificationsEntity? {
+  private fun createOrUpdatePreviousQualifications(updateInductionDto: UpdateInductionDto): PreviousQualificationsEntity? {
+    val prisonNumber = updateInductionDto.prisonNumber
     val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
 
     if (updateInductionDto.previousQualifications == null) {
@@ -104,10 +102,8 @@ class JpaInductionPersistenceAdapter(
     }
   }
 
-  private fun createOrUpdatePreviousQualifications(
-    createInductionDto: CreateInductionDto,
-    prisonNumber: String,
-  ): PreviousQualificationsEntity? {
+  private fun createOrUpdatePreviousQualifications(createInductionDto: CreateInductionDto): PreviousQualificationsEntity? {
+    val prisonNumber = createInductionDto.prisonNumber
     val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
 
     if (createInductionDto.previousQualifications == null) {

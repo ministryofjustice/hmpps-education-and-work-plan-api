@@ -80,7 +80,11 @@ class InductionResourceMapper(
         workOnReleaseMapper.toUpdateWorkOnReleaseDto(request = it, prisonId = prisonId)
       },
       previousQualifications = request.previousQualifications?.let {
-        qualificationsMapper.toUpdatePreviousQualificationsDto(request = it, prisonId = prisonId)
+        qualificationsMapper.toUpdatePreviousQualificationsDto(
+          request = it,
+          prisonNumber = prisonNumber,
+          prisonId = prisonId,
+        )
       },
       previousTraining = request.previousTraining?.let {
         previousTrainingMapper.toUpdatePreviousTrainingDto(request = it, prisonId = prisonId)

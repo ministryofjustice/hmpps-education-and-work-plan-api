@@ -19,12 +19,14 @@ fun aValidCreatePreviousQualificationsDto(
 
 fun aValidUpdatePreviousQualificationsDto(
   reference: UUID = UUID.randomUUID(),
+  prisonNumber: String = "A1234AB",
   educationLevel: EducationLevel = SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,
   qualifications: List<UpdateOrCreateQualificationDto> = listOf(aValidUpdateQualificationDto()),
   prisonId: String = "BXI",
 ) =
   UpdatePreviousQualificationsDto(
     reference = reference,
+    prisonNumber = prisonNumber,
     educationLevel = educationLevel,
     qualifications = qualifications,
     prisonId = prisonId,
