@@ -40,6 +40,17 @@ prison-api:
     id: prison-api-client-id
     secret: client-secret
 
+manage-users-api:
+  client:
+    id: manage-users-api-client-id
+    secret: client-secret
+
 apis:
   prison-api:
     url: http://localhost:9093
+  manage-users-api:
+    url: http://localhost:9093
+
+hmpps:
+  auth:
+    url: http://localhost:9093/auth

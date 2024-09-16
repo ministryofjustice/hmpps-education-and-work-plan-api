@@ -15,15 +15,22 @@ import reactor.netty.http.client.HttpClient
 import kotlin.apply as kotlinApply
 
 @Configuration
-class WebClientConfiguration(
-  @Value("\${apis.prison-api.url}") val prisonApiUri: String,
-) {
-  @Bean
+class WebClientConfiguration {
+  @Bean(name = ["prisonApiWebClient"])
   fun prisonApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
+    @Value("\${apis.prison-api.url}") prisonApiUri: String,
   ): WebClient =
     builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonApiUri)
+
+  @Bean(name = ["manageUsersApiWebClient"])
+  fun manageUsersApiWebClient(
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    builder: WebClient.Builder,
+    @Value("\${apis.manage-users-api.url}") manageUsersApiUri: String,
+  ): WebClient =
+    builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri)
 
   @Bean
   fun authorizedClientManager(

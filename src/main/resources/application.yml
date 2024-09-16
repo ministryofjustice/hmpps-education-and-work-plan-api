@@ -22,6 +22,12 @@ spring:
             client-secret: ${prison-api.client.secret}
             authorization-grant-type: client_credentials
             scope: read
+          manage-users-api:
+            provider: hmpps-auth
+            client-id: ${manage-users-api.client.id}
+            client-secret: ${manage-users-api.client.secret}
+            authorization-grant-type: client_credentials
+            scope: read
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
@@ -105,3 +111,6 @@ springdoc:
 apis:
   prison-api:
     url: ${PRISON_API_URL}
+  manage-users-api:
+    url: ${MANAGE_USERS_API_URL}
+
