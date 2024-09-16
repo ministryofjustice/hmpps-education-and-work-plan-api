@@ -24,6 +24,8 @@ spring:
             scope: read
           manage-users-api:
             provider: hmpps-auth
+#           Don't be alarmed this is deliberate manage users only requires a valid token, so reusing the prison-api one.
+#           Possibly create our own token for this in the future
             client-id: ${prison-api.client.id}
             client-secret: ${prison-api.client.secret}
             authorization-grant-type: client_credentials
