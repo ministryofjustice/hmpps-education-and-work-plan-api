@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.core.publisher.Mono
 
 @Component
 class ManageUsersApiClient(@Qualifier("manageUsersApiWebClient") private val manageUsersApiClient: WebClient) {
@@ -15,12 +14,11 @@ class ManageUsersApiClient(@Qualifier("manageUsersApiWebClient") private val man
         .uri("/users/{username}", username)
         .retrieve()
         .bodyToMono(UserDetailsDto::class.java)
-        .onErrorResume {
-          Mono.error(ManageUsersApiException("Error retrieving user details for user $username", it))
-        }
         .block()
     } catch (e: WebClientResponseException.NotFound) {
       UserDetailsDto(username, false, "$username not found")
+    } catch (e: Exception) {
+      throw ManageUsersApiException("Error retrieving user details for user $username", e)
     }
   }
 }
