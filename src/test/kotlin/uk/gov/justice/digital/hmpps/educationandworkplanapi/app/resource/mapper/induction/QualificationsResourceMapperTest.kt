@@ -8,6 +8,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
@@ -33,7 +34,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Quali
 class QualificationsResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: QualificationsResourceMapperImpl
+  private lateinit var mapper: QualificationsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
@@ -174,6 +175,7 @@ class QualificationsResourceMapperTest {
   @Test
   fun `should map to UpdatePreviousQualificationsDto given qualification without a reference`() {
     // Given
+    val prisonNumber = aValidPrisonNumber()
     val prisonId = "BXI"
     val request = aValidUpdatePreviousQualificationsRequest(
       qualifications = listOf(
@@ -183,6 +185,8 @@ class QualificationsResourceMapperTest {
 
     val expected = aValidUpdatePreviousQualificationsDto(
       reference = request.reference!!,
+      prisonId = prisonId,
+      prisonNumber = prisonNumber,
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
         aValidCreateQualificationDto(
@@ -194,7 +198,11 @@ class QualificationsResourceMapperTest {
     )
 
     // When
-    val actual = mapper.toUpdatePreviousQualificationsDto(request, prisonId)
+    val actual = mapper.toUpdatePreviousQualificationsDto(
+      request = request,
+      prisonId = prisonId,
+      prisonNumber = prisonNumber,
+    )
 
     // Then
     assertThat(actual).isEqualTo(expected)
@@ -203,6 +211,7 @@ class QualificationsResourceMapperTest {
   @Test
   fun `should map to UpdatePreviousQualificationsDto given new qualification without a reference`() {
     // Given
+    val prisonNumber = aValidPrisonNumber()
     val prisonId = "BXI"
     val existingQualificationReference = UUID.randomUUID()
     val request = aValidUpdatePreviousQualificationsRequest(
@@ -214,6 +223,8 @@ class QualificationsResourceMapperTest {
 
     val expected = aValidUpdatePreviousQualificationsDto(
       reference = request.reference!!,
+      prisonId = prisonId,
+      prisonNumber = prisonNumber,
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = listOf(
         aValidUpdateQualificationDto(
@@ -231,7 +242,11 @@ class QualificationsResourceMapperTest {
     )
 
     // When
-    val actual = mapper.toUpdatePreviousQualificationsDto(request, prisonId)
+    val actual = mapper.toUpdatePreviousQualificationsDto(
+      request = request,
+      prisonId = prisonId,
+      prisonNumber = prisonNumber,
+    )
 
     // Then
     assertThat(actual).isEqualTo(expected)

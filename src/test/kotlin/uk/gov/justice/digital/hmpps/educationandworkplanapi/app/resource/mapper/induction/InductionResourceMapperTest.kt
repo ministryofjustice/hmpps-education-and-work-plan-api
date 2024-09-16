@@ -142,7 +142,7 @@ class InductionResourceMapperTest {
     val workInterests = aValidUpdateFutureWorkInterestsDto()
 
     given(workOnReleaseMapper.toUpdateWorkOnReleaseDto(any(), any())).willReturn(workOnRelease)
-    given(qualificationsMapper.toUpdatePreviousQualificationsDto(any(), any())).willReturn(qualifications)
+    given(qualificationsMapper.toUpdatePreviousQualificationsDto(any(), any(), any())).willReturn(qualifications)
     given(previousTrainingMapper.toUpdatePreviousTrainingDto(any(), any())).willReturn(training)
     given(workExperiencesMapper.toUpdatePreviousWorkExperiencesDto(any(), any())).willReturn(workExperiences)
     given(inPrisonInterestsMapper.toUpdateInPrisonInterestsDto(any(), any())).willReturn(inPrisonInterests)
