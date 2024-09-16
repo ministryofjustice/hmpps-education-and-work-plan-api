@@ -29,7 +29,6 @@ import java.util.UUID
 class ConversationController(
   private val conversationService: ConversationService,
   private val conversationMapper: ConversationsResourceMapper,
-  private val newConversationMapper: ConversationsResourceMapper,
 ) {
   @PostMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.CREATED)
@@ -68,7 +67,7 @@ class ConversationController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable conversationReference: UUID,
   ) = with(conversationService.getConversation(conversationReference, prisonNumber)) {
-    newConversationMapper.fromDomainToModel(this)
+    conversationMapper.fromDomainToModel(this)
   }
 
   @GetMapping("/{prisonNumber}")
