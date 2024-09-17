@@ -10,5 +10,10 @@ interface EducationEventService {
   /**
    * Implementations providing custom code for when a prisoner's record of [PreviousQualifications] is created.
    */
-  fun previousQualificationsCreated(createdInduction: PreviousQualifications)
+  fun previousQualificationsCreated(createdPreviousQualifications: PreviousQualifications)
+
+  /**
+   * Implementations providing custom code for when a prisoner's record of [PreviousQualifications] is updated.
+   */
+  fun previousQualificationsUpdated(updatedPreviousQualifications: PreviousQualifications)
 }

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -17,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateEducationRequest
 
 @RestController
 @RequestMapping("/person/{prisonNumber}/education")
@@ -45,6 +47,21 @@ class EducationController(
   ) {
     educationService.createPreviousQualifications(
       educationResourceMapper.toCreatePreviousQualificationsDto(prisonNumber, request),
+    )
+  }
+
+  @PutMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize(HAS_EDIT_EDUCATION)
+  @Transactional
+  fun updateEducation(
+    @Valid
+    @RequestBody
+    request: UpdateEducationRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+  ) {
+    educationService.updatePreviousQualifications(
+      educationResourceMapper.toUpdatePreviousQualificationsDto(prisonNumber, request),
     )
   }
 }

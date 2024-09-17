@@ -99,7 +99,7 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/UpdateEducation'
       responses:
-        '201':
+        '204':
           description: The Education record was successfully updated.
         '400':
           $ref: '#/components/responses/400ErrorResponse'
@@ -2553,10 +2553,30 @@ components:
         - prisonId
         - educationLevel
         - qualifications
+
     UpdateEducationRequest:
       description: A request to update an individual's education record.
-      allOf:
-        - $ref: '#/components/schemas/CreateEducationRequest'
+      type: object
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The unique reference of the prisoner's Education record.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
+        educationLevel:
+          $ref: '#/components/schemas/EducationLevel'
+        qualifications:
+          type: array
+          description: A list of achieved qualifications that should be updated or created as part of the education record.
+          items:
+            $ref: '#/components/schemas/CreateOrUpdateAchievedQualificationRequest'
+      required:
+        - reference
+        - prisonId
+        - educationLevel
+        - qualifications
 
   #
   # Response Body Definitions

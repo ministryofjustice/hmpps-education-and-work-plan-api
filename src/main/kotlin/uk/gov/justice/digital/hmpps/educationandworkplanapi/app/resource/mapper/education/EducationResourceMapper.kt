@@ -4,12 +4,17 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.CreateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.UpdateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateAchievedQualificationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateOrUpdateAchievedQualificationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateEducationRequest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.QualificationLevel as QualificationLevelDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
@@ -41,6 +46,15 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
       prisonId = request.prisonId,
     )
 
+  fun toUpdatePreviousQualificationsDto(prisonNumber: String, request: UpdateEducationRequest): UpdatePreviousQualificationsDto =
+    UpdatePreviousQualificationsDto(
+      reference = request.reference,
+      prisonNumber = prisonNumber,
+      prisonId = request.prisonId,
+      educationLevel = toEducationLevel(request.educationLevel),
+      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications, request.prisonId),
+    )
+
   private fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
     AchievedQualificationResponse(
       reference = qualification.reference,
@@ -70,6 +84,27 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
 
   private fun toCreateQualificationDtos(createAchievedQualificationRequests: List<CreateAchievedQualificationRequest>, prisonId: String): List<CreateQualificationDto> =
     createAchievedQualificationRequests.map { toCreateQualificationDto(it, prisonId) }
+
+  private fun toCreateOrUpdateQualificationDto(achievedQualificationRequest: CreateOrUpdateAchievedQualificationRequest, prisonId: String): UpdateOrCreateQualificationDto =
+    if (achievedQualificationRequest.reference == null) {
+      CreateQualificationDto(
+        subject = achievedQualificationRequest.subject,
+        level = toQualificationLevel(achievedQualificationRequest.level),
+        grade = achievedQualificationRequest.grade,
+        prisonId = prisonId,
+      )
+    } else {
+      UpdateQualificationDto(
+        reference = achievedQualificationRequest.reference,
+        subject = achievedQualificationRequest.subject,
+        level = toQualificationLevel(achievedQualificationRequest.level),
+        grade = achievedQualificationRequest.grade,
+        prisonId = prisonId,
+      )
+    }
+
+  private fun toUpdateOrCreateQualificationDtos(createOrUpdateAchievedQualificationRequests: List<CreateOrUpdateAchievedQualificationRequest>, prisonId: String): List<UpdateOrCreateQualificationDto> =
+    createOrUpdateAchievedQualificationRequests.map { toCreateOrUpdateQualificationDto(it, prisonId) }
 
   private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelApi =
     when (educationLevel) {
