@@ -11,7 +11,11 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.ser
 @Service
 @Async
 class AsyncEducationEventService : EducationEventService {
-  override fun previousQualificationsCreated(createdInduction: PreviousQualifications) {
+  override fun previousQualificationsCreated(createdPreviousQualifications: PreviousQualifications) {
+    // TODO - noop for now; implement behaviour once we understand what the requirements are (likely register timeline event)
+  }
+
+  override fun previousQualificationsUpdated(updatedPreviousQualifications: PreviousQualifications) {
     // TODO - noop for now; implement behaviour once we understand what the requirements are (likely register timeline event)
   }
 }

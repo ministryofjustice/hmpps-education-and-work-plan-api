@@ -7,11 +7,16 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aVa
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdateQualificationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationToCreate
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationToUpdate
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidEducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidUpdateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.assertThat
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -119,6 +124,59 @@ class EducationResourceMapperTest {
 
     // When
     val actual = educationResourceMapper.toCreatePreviousQualificationsDto(prisonNumber, createEducationRequest)
+
+    // Then
+    assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should map UpdateEducationRequest to UpdatePreviousQualificationsDto`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val qualificationsRecordReference = UUID.randomUUID()
+    val potteryQualificationReference = UUID.randomUUID()
+
+    val updateEducationRequest = aValidUpdateEducationRequest(
+      reference = qualificationsRecordReference,
+      prisonId = "BXI",
+      educationLevel = EducationLevelApi.FURTHER_EDUCATION_COLLEGE,
+      qualifications = listOf(
+        aValidAchievedQualificationToUpdate(
+          reference = potteryQualificationReference,
+          subject = "Pottery",
+          level = QualificationLevelApi.LEVEL_4,
+          grade = "A*",
+        ),
+        aValidAchievedQualificationToCreate(
+          subject = "Maths",
+          level = QualificationLevelApi.LEVEL_3,
+          grade = "C",
+        ),
+      ),
+    )
+
+    val expected = aValidUpdatePreviousQualificationsDto(
+      reference = qualificationsRecordReference,
+      prisonNumber = prisonNumber,
+      prisonId = "BXI",
+      educationLevel = EducationLevelDomain.FURTHER_EDUCATION_COLLEGE,
+      qualifications = listOf(
+        aValidUpdateQualificationDto(
+          reference = potteryQualificationReference,
+          subject = "Pottery",
+          level = QualificationLevelDomain.LEVEL_4,
+          grade = "A*",
+        ),
+        aValidCreateQualificationDto(
+          subject = "Maths",
+          level = QualificationLevelDomain.LEVEL_3,
+          grade = "C",
+        ),
+      ),
+    )
+
+    // When
+    val actual = educationResourceMapper.toUpdatePreviousQualificationsDto(prisonNumber, updateEducationRequest)
 
     // Then
     assertThat(actual).isEqualTo(expected)

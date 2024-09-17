@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Edu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 
 private val log = KotlinLogging.logger {}
 
@@ -46,4 +47,21 @@ class EducationService(
           educationEventService.previousQualificationsCreated(it)
         }
     }
+
+  /**
+   * Updates a [PreviousQualifications] with the highest level of education and qualifications from the specified [UpdatePreviousQualificationsDto].
+   * Throws [EducationNotFoundException] if the [PreviousQualifications] to be updated cannot be found.
+   */
+  fun updatePreviousQualifications(updateCreatePreviousQualificationsDto: UpdatePreviousQualificationsDto): PreviousQualifications {
+    val prisonNumber = updateCreatePreviousQualificationsDto.prisonNumber
+    log.info { "Updating Previous Qualifications for prisoner [$prisonNumber]" }
+
+    return persistenceAdapter.updatePreviousQualifications(updateCreatePreviousQualificationsDto)
+      ?.also {
+        educationEventService.previousQualificationsUpdated(it)
+      }
+      ?: throw EducationNotFoundException(prisonNumber).also {
+        log.info { "Previous Qualifications for prisoner [$prisonNumber] not found" }
+      }
+  }
 }

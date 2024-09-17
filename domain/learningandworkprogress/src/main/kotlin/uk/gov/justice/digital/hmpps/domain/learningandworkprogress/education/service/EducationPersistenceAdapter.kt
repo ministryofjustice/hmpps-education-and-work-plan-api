@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.se
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 
 /**
  * Persistence Adapter for Education related classes.
@@ -23,5 +24,10 @@ interface EducationPersistenceAdapter {
    *
    * @return The [PreviousQualifications] with any newly generated values (if applicable).
    */
-  fun createPreviousQualifications(createInductionDto: CreatePreviousQualificationsDto): PreviousQualifications
+  fun createPreviousQualifications(createPreviousQualificationsDto: CreatePreviousQualificationsDto): PreviousQualifications
+
+  /**
+   * Updates a [PreviousQualifications] identified by its `reference`.
+   */
+  fun updatePreviousQualifications(updatePreviousQualificationsDto: UpdatePreviousQualificationsDto): PreviousQualifications?
 }

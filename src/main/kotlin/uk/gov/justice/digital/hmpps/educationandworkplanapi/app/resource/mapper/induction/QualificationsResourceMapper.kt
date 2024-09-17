@@ -67,7 +67,7 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
     } else {
       UpdateQualificationDto(
         prisonId = prisonId,
-        reference = achievedQualification.reference!!,
+        reference = achievedQualification.reference,
         subject = achievedQualification.subject,
         level = toQualificationLevel(achievedQualification.level),
         grade = achievedQualification.grade,

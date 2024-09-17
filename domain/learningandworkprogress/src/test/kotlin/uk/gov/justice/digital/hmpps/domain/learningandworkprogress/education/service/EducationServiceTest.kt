@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Edu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 
 @ExtendWith(MockitoExtension::class)
 class EducationServiceTest {
@@ -112,6 +113,46 @@ class EducationServiceTest {
       assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
       verify(persistenceAdapter).getPreviousQualifications(prisonNumber)
       verifyNoMoreInteractions(persistenceAdapter)
+      verifyNoInteractions(educationEventService)
+    }
+  }
+
+  @Nested
+  inner class UpdatePreviousQualifications {
+    @Test
+    fun `should update previous qualifications for prisoner`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val updatePreviousQualificationsDto = aValidUpdatePreviousQualificationsDto(prisonNumber = prisonNumber)
+
+      val previousQualifications = aValidPreviousQualifications(prisonNumber = prisonNumber)
+      given(persistenceAdapter.updatePreviousQualifications(any())).willReturn(previousQualifications)
+
+      // When
+      val actual = educationService.updatePreviousQualifications(updatePreviousQualificationsDto)
+
+      // Then
+      assertThat(actual).isEqualTo(previousQualifications)
+      verify(persistenceAdapter).updatePreviousQualifications(updatePreviousQualificationsDto)
+      verify(educationEventService).previousQualificationsUpdated(previousQualifications)
+    }
+
+    @Test
+    fun `should throw exception given previous qualifications record for prisoner does not exist`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+      val updatePreviousQualificationsDto = aValidUpdatePreviousQualificationsDto(prisonNumber = prisonNumber)
+
+      given(persistenceAdapter.updatePreviousQualifications(any())).willReturn(null)
+
+      // When
+      val exception = catchThrowableOfType(EducationNotFoundException::class.java) {
+        educationService.updatePreviousQualifications(updatePreviousQualificationsDto)
+      }
+
+      // Then
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      verify(persistenceAdapter).updatePreviousQualifications(updatePreviousQualificationsDto)
       verifyNoInteractions(educationEventService)
     }
   }
