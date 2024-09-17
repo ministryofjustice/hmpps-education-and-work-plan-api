@@ -67,6 +67,16 @@ class AchievedQualificationResponseAssert(actual: AchievedQualificationResponse?
     return this
   }
 
+  fun wasCreatedAtPrison(expected: String): AchievedQualificationResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdAtPrison != expected) {
+        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      }
+    }
+    return this
+  }
+
   fun wasCreatedAfter(dateTime: OffsetDateTime): AchievedQualificationResponseAssert {
     isNotNull
     with(actual!!) {
@@ -82,6 +92,16 @@ class AchievedQualificationResponseAssert(actual: AchievedQualificationResponse?
     with(actual!!) {
       if (updatedAt != expected) {
         failWithMessage("Expected updatedAt to be $expected, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
+  fun wasUpdatedAtPrison(expected: String): AchievedQualificationResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAtPrison != expected) {
+        failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
     }
     return this

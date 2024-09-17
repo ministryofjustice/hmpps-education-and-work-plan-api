@@ -16,12 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class UpdatePreviousQualificationsEntityMapperTest {
 
-  private val mapper = PreviousQualificationsEntityMapperImpl().also {
-    PreviousQualificationsEntityMapper::class.java.getDeclaredField("qualificationEntityMapper").apply {
-      isAccessible = true
-      set(it, QualificationEntityMapperImpl())
-    }
-  }
+  private val mapper = PreviousQualificationsEntityMapper(QualificationEntityMapper())
 
   @Test
   fun `should update existing qualifications`() {
@@ -32,6 +27,8 @@ class UpdatePreviousQualificationsEntityMapperTest {
       subject = "English",
       level = QualificationLevelEntity.LEVEL_3,
       grade = "A",
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
     val qualification2Reference = UUID.randomUUID()
     val existingQualificationEntity2 = aValidQualificationEntity(
@@ -39,12 +36,16 @@ class UpdatePreviousQualificationsEntityMapperTest {
       subject = "Maths",
       level = QualificationLevelEntity.LEVEL_2,
       grade = "B",
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
     val existingQualificationsReference = UUID.randomUUID()
     val existingQualificationsEntity = aValidPreviousQualificationsEntity(
       reference = existingQualificationsReference,
       educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(existingQualificationEntity1, existingQualificationEntity2),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
     )
 
     val updatedQualification = aValidUpdateQualificationDto(
@@ -52,12 +53,14 @@ class UpdatePreviousQualificationsEntityMapperTest {
       subject = "English",
       level = QualificationLevelDomain.LEVEL_3,
       grade = "B",
+      prisonId = "MDI",
     )
     val unchangedQualification = aValidUpdateQualificationDto(
       reference = qualification2Reference,
       subject = "Maths",
       level = QualificationLevelDomain.LEVEL_2,
       grade = "B",
+      prisonId = "MDI",
     )
     val updatedQualificationsDto = aValidUpdatePreviousQualificationsDto(
       reference = existingQualificationsReference,
@@ -75,7 +78,10 @@ class UpdatePreviousQualificationsEntityMapperTest {
           subject = "English"
           level = QualificationLevelEntity.LEVEL_3
           grade = "B"
+          createdAtPrison = "BXI"
+          updatedAtPrison = "MDI"
         },
+        // qualification 2 should not have been updated at all because it's subject, level and grade had not changed in the request object
         existingQualificationEntity2.deepCopy(),
       )
       createdAtPrison = "BXI"

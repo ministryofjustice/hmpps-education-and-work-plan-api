@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.16.0'
+  version: '1.16.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2188,6 +2188,10 @@ components:
           format: date-time
           description: An ISO-8601 timestamp representing when this resource was created.
           example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was created.
+          example: 'BXI'
         updatedBy:
           type: string
           description: The DPS username of the person who last updated this resource.
@@ -2197,6 +2201,10 @@ components:
           format: date-time
           description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
           example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when this resource was updated.
+          example: 'BXI'
       required:
         - reference
         - subject
@@ -2204,8 +2212,10 @@ components:
         - grade
         - createdBy
         - createdAt
+        - createdAtPrison
         - updatedBy
         - updatedAt
+        - updatedAtPrison
 
     GetCiagInductionSummariesRequest:
       title: GetCiagInductionSummariesRequest

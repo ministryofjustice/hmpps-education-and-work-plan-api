@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.CreateQualificationDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateAchievedQualificationRequest
@@ -37,7 +37,7 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
     CreatePreviousQualificationsDto(
       prisonNumber = prisonNumber,
       educationLevel = toEducationLevel(request.educationLevel),
-      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications),
+      qualifications = toCreateQualificationDtos(request.qualifications, request.prisonId),
       prisonId = request.prisonId,
     )
 
@@ -46,8 +46,10 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
       reference = qualification.reference,
       createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
       createdBy = qualification.createdBy,
+      createdAtPrison = qualification.createdAtPrison,
       updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
       updatedBy = qualification.lastUpdatedBy,
+      updatedAtPrison = qualification.lastUpdatedAtPrison,
       subject = qualification.subject,
       level = toQualificationLevel(qualification.level),
       grade = qualification.grade,
@@ -56,17 +58,18 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
   private fun toAchievedQualificationResponses(qualifications: List<Qualification>): List<AchievedQualificationResponse> =
     qualifications.map { toAchievedQualificationResponse(it) }
 
-  private fun toUpdateOrCreateQualificationDto(createAchievedQualificationRequest: CreateAchievedQualificationRequest): UpdateOrCreateQualificationDto =
+  private fun toCreateQualificationDto(createAchievedQualificationRequest: CreateAchievedQualificationRequest, prisonId: String): CreateQualificationDto =
     with(createAchievedQualificationRequest) {
-      UpdateOrCreateQualificationDto.CreateQualificationDto(
+      CreateQualificationDto(
         subject = subject,
         level = toQualificationLevel(level),
         grade = grade,
+        prisonId = prisonId,
       )
     }
 
-  private fun toUpdateOrCreateQualificationDtos(createAchievedQualificationRequests: List<CreateAchievedQualificationRequest>): List<UpdateOrCreateQualificationDto> =
-    createAchievedQualificationRequests.map { toUpdateOrCreateQualificationDto(it) }
+  private fun toCreateQualificationDtos(createAchievedQualificationRequests: List<CreateAchievedQualificationRequest>, prisonId: String): List<CreateQualificationDto> =
+    createAchievedQualificationRequests.map { toCreateQualificationDto(it, prisonId) }
 
   private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelApi =
     when (educationLevel) {

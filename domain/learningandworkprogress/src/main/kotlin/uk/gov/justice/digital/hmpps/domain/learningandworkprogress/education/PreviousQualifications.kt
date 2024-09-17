@@ -31,7 +31,9 @@ data class Qualification(
   val level: QualificationLevel,
   val grade: String,
   val createdBy: String,
+  val createdAtPrison: String,
   val createdAt: Instant,
   val lastUpdatedBy: String,
   val lastUpdatedAt: Instant,
+  val lastUpdatedAtPrison: String,
 )

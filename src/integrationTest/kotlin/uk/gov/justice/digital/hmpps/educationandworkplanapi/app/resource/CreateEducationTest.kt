@@ -88,7 +88,7 @@ class CreateEducationTest : IntegrationTestBase() {
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(aValidCreateEducationRequest())
+      .withBody(aValidCreateEducationRequest(prisonId = "MDI"))
       .bearerToken(
         aValidTokenWithAuthority(
           EDUCATION_RW,
@@ -104,6 +104,15 @@ class CreateEducationTest : IntegrationTestBase() {
     val education = getEducation(prisonNumber)
     assertThat(education)
       .wasCreatedAtOrAfter(earliestCreateTime)
+      .hasNumberOfQualifications(2)
+      .qualification(1) {
+        it.wasCreatedAtPrison("MDI")
+          .wasUpdatedAtPrison("MDI")
+      }
+      .qualification(2) {
+        it.wasCreatedAtPrison("MDI")
+          .wasUpdatedAtPrison("MDI")
+      }
   }
 
   @Test

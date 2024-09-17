@@ -465,7 +465,10 @@ class UpdateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createInduction(
       prisonNumber = prisonNumber,
-      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(previousQualifications = null),
+      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
+        prisonId = "BXI",
+        previousQualifications = null,
+      ),
     )
 
     val persistedInduction = getInduction(prisonNumber)
@@ -518,6 +521,8 @@ class UpdateInductionTest : IntegrationTestBase() {
             it.hasSubject("English")
               .hasLevel(QualificationLevel.LEVEL_3)
               .hasGrade("A")
+              .wasCreatedAtPrison("BXI")
+              .wasUpdatedAtPrison("BXI")
           }
       }
   }
@@ -584,6 +589,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       username = "auser_gen",
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
+        prisonId = "LFI",
         previousQualifications = aValidCreatePreviousQualificationsRequest(
           educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
           qualifications = listOf(
@@ -599,6 +605,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val referenceOfPhysicsQualification = persistedInduction.previousQualifications!!.qualifications.first { it.subject == "Physics" }.reference
 
     val updateInductionRequest = aValidUpdateInductionRequestForPrisonerNotLookingToWork(
+      prisonId = "MDI",
       reference = persistedInduction.reference,
       previousQualifications = aValidUpdatePreviousQualificationsRequest(
         reference = persistedInduction.previousQualifications!!.reference,
@@ -645,7 +652,9 @@ class UpdateInductionTest : IntegrationTestBase() {
         .hasLevel(QualificationLevel.LEVEL_3)
         .hasGrade("D")
         .wasCreatedBy("auser_gen")
+        .wasCreatedAtPrison("LFI")
         .wasUpdatedBy("buser_gen") // this record was updated so expect the updatedBy field to reflect that
+        .wasUpdatedAtPrison("MDI")
 
       val physicsQualification = qualifications.first { it.subject == "Physics" }
       assertThat(physicsQualification)
@@ -654,7 +663,9 @@ class UpdateInductionTest : IntegrationTestBase() {
         .hasLevel(QualificationLevel.LEVEL_3)
         .hasGrade("C")
         .wasCreatedBy("auser_gen")
+        .wasCreatedAtPrison("LFI")
         .wasUpdatedBy("auser_gen") // this record was not updated so expect the updatedBy field to be the user who created it
+        .wasUpdatedAtPrison("LFI")
 
       val spanishQualification = qualifications.first { it.subject == "Spanish" }
       assertThat(spanishQualification)
@@ -662,7 +673,9 @@ class UpdateInductionTest : IntegrationTestBase() {
         .hasLevel(QualificationLevel.LEVEL_4)
         .hasGrade("A*")
         .wasCreatedBy("buser_gen") // this record was created as part of this update request so expect the createdBy and updatedBy fields to be the user who performed the Induction update
+        .wasCreatedAtPrison("MDI")
         .wasUpdatedBy("buser_gen")
+        .wasCreatedAtPrison("MDI")
     }
   }
 
