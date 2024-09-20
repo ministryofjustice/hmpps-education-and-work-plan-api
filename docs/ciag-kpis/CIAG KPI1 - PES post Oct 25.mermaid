@@ -1,0 +1,191 @@
+%%
+%% Mermaid Charts sequence diagram. View with the mermaid plugin for intellij or using the online Mermaid editor https://www.mermaidchart.com
+%%
+
+sequenceDiagram
+  title KPI 1 (PES - post October 2025)
+
+  actor Prisoner as Prisoner
+  actor CIAG as CIAG
+  participant NOMIS as NOMIS/HMPPS Domain Events
+  participant Curious as Curious
+  participant PLP as PLP
+  participant PLPDB as PLP DB
+
+  rect rgba(0, 200, 255, 0.4)
+    Prisoner ->> NOMIS: Prisoner enters prison
+    note over Prisoner, NOMIS: New or re-offending prisoner
+    activate NOMIS
+    deactivate NOMIS
+
+    activate Curious
+      note left of Curious: Curious processes<br/>prisoner.received event<br/>reason: admission
+      NOMIS -) Curious: prison-offender-events.prisoner.received event
+    deactivate Curious
+
+    activate PLP
+      note left of PLP: PLP API processes<br/>prisoner.received event<br/>reason: admission
+      NOMIS -) PLP: prison-offender-events.prisoner.received event
+      alt Prisoner does not have a PLP
+        activate PLPDB
+          PLP ->> PLPDB: Create new Induction Schedule record
+          note right of PLPDB: Record has no Induction deadline date<br/>because S&A not done yet
+        deactivate PLPDB
+        PLP -) NOMIS: waiting.for.screening.and.assessments event
+      else Prisoner already has a PLP<br/>eg. re-offending prisoner
+        note over PLP: TODO - This is essentially the "review" process from KPI2
+      end
+    deactivate PLP
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    Prisoner ->> NOMIS: Prisoner transfers into prison
+    note over Prisoner, NOMIS: Existing prisoner transferring between prisons
+    activate NOMIS
+    deactivate NOMIS
+
+    activate Curious
+      note left of Curious: Curious processes<br/>prisoner.received event<br/>reason: transferred
+      NOMIS -) Curious: prison-offender-events.prisoner.received event
+    deactivate Curious
+
+    activate PLP
+      note left of PLP: PLP API processes<br/>prisoner.received event<br/>reason: transferred
+      NOMIS -) PLP: prison-offender-events.prisoner.received event
+      alt Prisoner does not have a PLP
+        activate PLPDB
+          PLP ->> PLPDB: Create new Induction Schedule record
+          note right of PLPDB: Record has no Induction deadline date<br/>because S&A not done yet
+        deactivate PLPDB
+        PLP -) NOMIS: waiting.for.screening.and.assessments event
+      else Prisoner already has a PLP<br/>eg. PLP was done in previous prison
+        note over PLP: TODO - This is essentially the "review" process from KPI2
+      end
+    deactivate PLP
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    note over Prisoner, NOMIS: Prisoner is released
+    activate NOMIS
+    deactivate NOMIS
+
+    activate Curious
+      note left of Curious: Curious processes<br/>prisoner.released event
+      NOMIS -) Curious: prison-offender-events.prisoner.released event
+    deactivate Curious
+
+    activate PLP
+      note left of PLP: PLP API processes<br/>prisoner.released event
+      NOMIS -) PLP: prison-offender-events.prisoner.released event
+      opt Prisoner has a PLP
+        PLP ->> PLPDB: Record exemption reason
+        PLP -) NOMIS: induction.exempt event
+      end
+    deactivate PLP
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    note over Prisoner, NOMIS: Prisoner dies
+    activate NOMIS
+    deactivate NOMIS
+
+    activate Curious
+      note left of Curious: Curious processes<br/>prisoner.released event<br/>nomisMovementReasonCode: DEC
+      NOMIS -) Curious: prison-offender-events.prisoner.released event
+    deactivate Curious
+
+    activate PLP
+      note left of PLP: PLP API processes<br/>prisoner.released event<br/>nomisMovementReasonCode: DEC
+      NOMIS -) PLP: prison-offender-events.prisoner.released event
+      opt Prisoner has a PLP
+        PLP ->> PLPDB: Record exemption reason
+        PLP -) NOMIS: induction.exempt event
+      end
+    deactivate PLP
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate Curious
+      note left of Curious: Curious processes<br/>waiting.for.screening.and.assessments
+      NOMIS -) Curious: waiting.for.screening.and.assessments event
+      opt Prisoner already has relevant screenings and assessments
+        Curious -) NOMIS: all.relevant.screening.and.assessments.complete event
+      end
+    deactivate Curious
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate CIAG
+      activate Curious
+        CIAG ->> Curious: Perform & record screening & assessments
+        Curious -) NOMIS: all.relevant.screening.and.assessments.complete event
+      deactivate Curious
+    deactivate CIAG
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate PLP
+      note left of PLP: PLP API processes<br/>all.relevant.screening.and.assessments.complete event
+      NOMIS -) PLP: all.relevant.screening.and.assessments.complete event
+      activate PLPDB
+        PLP ->> PLPDB: Update Induction Schedule record
+        note right of PLPDB: Induction deadline date<br/>set to today + 10 days
+      deactivate PLPDB
+      PLP -) NOMIS: induction.deadline.set event
+    deactivate PLP
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate CIAG
+      activate PLP
+        CIAG ->> PLP: Do prisoner's Induction
+        alt Prisoners Induction could not be completed due to exemptions
+          PLP ->> PLPDB: Record exemption reason
+          PLP -) NOMIS: induction.exempt event
+        else
+          PLP -) NOMIS: induction.complete event
+        end
+      deactivate PLP
+    deactivate CIAG
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate CIAG
+      activate PLP
+        CIAG ->> PLP: Clear prisoner's Induction exemption
+        PLP ->> PLPDB: Clear exemption reason
+        PLP -) NOMIS: induction.exempt.cleared event
+        PLP ->> PLPDB: Update Induction Schedule record
+        note right of PLPDB: Induction deadline date<br/>set to today + 5 days
+        PLP -) NOMIS: induction.deadline.set event
+      deactivate PLP
+    deactivate CIAG
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate Curious
+    note left of Curious: Curious processes<br/>induction.deadline.set event
+    NOMIS -) Curious: induction.deadline.set event
+    deactivate Curious
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate Curious
+      note left of Curious: Curious processes<br/>induction.complete event
+      NOMIS -) Curious: induction.complete event
+    deactivate Curious
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate Curious
+      note left of Curious: Curious processes<br/>induction.exempt event
+      NOMIS -) Curious: induction.exempt event
+    deactivate Curious
+  end
+
+  rect rgba(0, 200, 255, 0.4)
+    activate Curious
+      note left of Curious: Curious processes<br/>induction.exempt event
+      NOMIS -) Curious: induction.exempt.cleared event
+    deactivate Curious
+  end
