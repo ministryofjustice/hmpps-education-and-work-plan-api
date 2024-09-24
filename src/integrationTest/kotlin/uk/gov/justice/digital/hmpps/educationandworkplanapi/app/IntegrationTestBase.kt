@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
@@ -123,6 +124,9 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var keyPair: KeyPair
+
+  @Autowired
+  lateinit var noteRepository: NoteRepository
 
   @BeforeEach
   fun clearDatabase() {

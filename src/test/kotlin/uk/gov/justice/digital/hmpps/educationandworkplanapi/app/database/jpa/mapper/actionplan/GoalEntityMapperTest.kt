@@ -48,7 +48,6 @@ class GoalEntityMapperTest {
       prisonId = "BXI",
       targetCompletionDate = targetCompletionDate,
       status = DomainStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(createStepDto),
     )
 
@@ -59,7 +58,6 @@ class GoalEntityMapperTest {
       title = "Improve communication skills",
       targetCompletionDate = targetCompletionDate,
       status = EntityStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(expectedEntityStep),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -81,7 +79,7 @@ class GoalEntityMapperTest {
       .doesNotHaveJpaManagedFieldsPopulated()
       .hasAReference()
       .usingRecursiveComparison()
-      .ignoringFields("reference")
+      .ignoringFields("reference", "notes")
       .isEqualTo(expected)
     verify(stepMapper).fromDtoToEntity(createStepDto)
   }
@@ -100,7 +98,6 @@ class GoalEntityMapperTest {
       title = "Improve communication skills",
       targetCompletionDate = targetCompletionDate,
       status = EntityStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = mutableListOf(entityStep),
       createdAtPrison = "BXI",
       updatedAtPrison = "MDI",
@@ -120,7 +117,6 @@ class GoalEntityMapperTest {
       title = "Improve communication skills",
       targetCompletionDate = targetCompletionDate,
       status = DomainStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(domainStep),
       createdAt = createdAt,
       createdAtPrison = "BXI",
@@ -136,7 +132,7 @@ class GoalEntityMapperTest {
     val actual = mapper.fromEntityToDomain(entityGoal)
 
     // Then
-    assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+    assertThat(actual).usingRecursiveComparison().ignoringFields("notes").isEqualTo(expected)
     verify(stepMapper).fromEntityToDomain(entityStep)
   }
 }

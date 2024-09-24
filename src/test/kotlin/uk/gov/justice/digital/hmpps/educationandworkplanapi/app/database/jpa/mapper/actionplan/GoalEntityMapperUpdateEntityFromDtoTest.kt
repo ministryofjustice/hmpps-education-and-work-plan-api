@@ -49,7 +49,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidStepEntity(
           reference = stepReference,
@@ -67,7 +66,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills within first 3 months",
       prisonId = "MDI",
       targetCompletionDate = LocalDate.now().plusMonths(3),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life",
       steps = listOf(
         aValidUpdateStepDto(
           reference = stepReference,
@@ -82,7 +80,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills within first 3 months"
       targetCompletionDate = LocalDate.now().plusMonths(3)
       status = GoalStatus.ACTIVE
-      notes = "Chris would like to improve his listening skills, not just his verbal communication; so that he can integrate with prison life"
       createdAtPrison = "BXI"
       updatedAtPrison = "MDI"
     }
@@ -91,7 +88,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
-    assertThat(goalEntity).isEqualToComparingAllFields(expectedGoalEntity)
+    assertThat(goalEntity).isEqualToComparingAllFieldsExceptNotes(expectedGoalEntity)
   }
 
   @Test
@@ -111,7 +108,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(stepEntity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -122,7 +118,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = stepReference,
@@ -148,7 +143,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
-    assertThat(goalEntity).isEqualToComparingAllFields(expectedGoalEntity)
+    assertThat(goalEntity).isEqualToComparingAllFieldsExceptNotes(expectedGoalEntity)
   }
 
   @Test
@@ -169,7 +164,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -180,7 +174,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       prisonId = "BXI",
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step1Reference,
@@ -211,7 +204,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     // Then
     assertThat(goalEntity)
       .hasNumberOfSteps(2)
-      .isEqualToIgnoringSteps(expectedGoalEntity)
+      .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
     assertThat(goalEntity.steps!![0]).isEqualToComparingAllFields(step1Entity)
     assertThat(goalEntity.steps!![1])
       .doesNotHaveJpaManagedFieldsPopulated()
@@ -242,7 +235,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity, step2Entity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -255,7 +247,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step1Reference,
@@ -286,7 +277,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     // Then
     assertThat(goalEntity)
       .hasNumberOfSteps(3)
-      .isEqualToIgnoringSteps(expectedGoalEntity)
+      .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
     assertThat(goalEntity.steps!![0]).isEqualToComparingAllFields(step1Entity)
     assertThat(goalEntity.steps!![1])
       .doesNotHaveJpaManagedFieldsPopulated()
@@ -326,7 +317,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity, step2Entity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -337,7 +327,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step2Reference,
@@ -362,7 +351,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     // Then
     assertThat(goalEntity)
       .hasNumberOfSteps(2)
-      .isEqualToIgnoringSteps(expectedGoalEntity)
+      .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
     assertThat(goalEntity.steps!![0])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
@@ -401,7 +390,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(step1Entity, step2Entity),
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
@@ -412,7 +400,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = step2Reference,
@@ -431,7 +418,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     // Then
     assertThat(goalEntity)
       .hasNumberOfSteps(1)
-      .isEqualToIgnoringSteps(expectedGoalEntity)
+      .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
     assertThat(goalEntity.steps!![0])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
@@ -451,7 +438,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       targetCompletionDate = LocalDate.now().plusMonths(6),
       status = GoalStatus.ACTIVE,
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidStepEntity(
           reference = stepReference,
@@ -469,7 +455,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       title = "Improve communication skills",
       prisonId = "BXI",
       targetCompletionDate = LocalDate.now().plusMonths(6),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
       steps = listOf(
         aValidUpdateStepDto(
           reference = stepReference,
@@ -486,6 +471,6 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     mapper.updateEntityFromDto(goalEntity, domainGoal)
 
     // Then
-    assertThat(goalEntity).usingRecursiveComparison().isEqualTo(expectedGoalEntity)
+    assertThat(goalEntity).isEqualToComparingAllFieldsExceptNotes(expectedGoalEntity)
   }
 }

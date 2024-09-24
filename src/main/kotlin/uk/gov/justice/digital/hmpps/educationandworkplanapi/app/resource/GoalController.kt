@@ -43,9 +43,7 @@ class GoalController(
   @PreAuthorize(HAS_EDIT_GOALS)
   @Transactional
   fun createGoals(
-    @Valid
-    @RequestBody
-    request: CreateGoalsRequest,
+    @Valid @RequestBody request: CreateGoalsRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     goalService.createGoals(
@@ -60,8 +58,9 @@ class GoalController(
   fun getPrisonerGoal(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): GoalResponse =
-    goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
+  ): GoalResponse {
+    return goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
+  }
 
   @PutMapping("{goalReference}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -75,6 +74,7 @@ class GoalController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
   ) {
+    // Update the goal
     goalService.updateGoal(
       prisonNumber = prisonNumber,
       updatedGoalDto = goalResourceMapper.fromModelToDto(updateGoalRequest),
