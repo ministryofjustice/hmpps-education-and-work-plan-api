@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
@@ -54,8 +55,9 @@ class DomainConfiguration {
   fun inductionDomainService(
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     inductionEventService: InductionEventService,
+    inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   ): InductionService =
-    InductionService(inductionPersistenceAdapter, inductionEventService)
+    InductionService(inductionPersistenceAdapter, inductionEventService, inductionSchedulePersistenceAdapter)
 
   @Bean
   fun conversationDomainService(
