@@ -221,7 +221,7 @@ tasks.register<GenerateTask>("buildPrisonApiModel") {
   )
   globalProperties.set(
     mapOf(
-      "models" to "",
+      "models" to "PrisonerInPrisonSummary,PrisonPeriod,SignificantMovement,TransferDetail",
     ),
   )
 }

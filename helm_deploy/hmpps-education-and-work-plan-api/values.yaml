@@ -33,6 +33,7 @@ generic-service:
     HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
     PRISON_API_URL: https://prison-api.prison.service.justice.gov.uk
     MANAGE_USERS_API_URL: https://manage-users-api.hmpps.service.justice.gov.uk
+    PRISONER_SEARCH_API_URL: https://prisoner-search.prison.service.justice.gov.uk
     HMPPS_SAR_ADDITIONALACCESSROLE: ROLE_EDUCATION_WORK_PLAN_VIEWER
     HMPPS_SQS_ENABLED: true
 
@@ -46,6 +47,10 @@ generic-service:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
       PRISON_API_CLIENT_ID: "PRISON_API_CLIENT_ID"
       PRISON_API_CLIENT_SECRET: "PRISON_API_CLIENT_SECRET"
+      PRISONER_SEARCH_API_CLIENT_ID: "PRISONER_SEARCH_API_CLIENT_ID"
+      PRISONER_SEARCH_API_CLIENT_SECRET: "PRISONER_SEARCH_API_CLIENT_SECRET"
+      MANAGE_USERS_API_CLIENT_ID: "MANAGE_USERS_API_CLIENT_ID"
+      MANAGE_USERS_API_CLIENT_SECRET: "MANAGE_USERS_API_CLIENT_SECRET"
     rds-postgresql-instance-output:
       DB_SERVER: "rds_instance_address"
       DB_NAME: "database_name"

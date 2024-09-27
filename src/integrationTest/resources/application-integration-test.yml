@@ -45,10 +45,17 @@ manage-users-api:
     id: manage-users-api-client-id
     secret: client-secret
 
+prisoner-search-api:
+  client:
+    id: prisoner-search-api-client-id
+    secret: client-secret
+
 apis:
   prison-api:
     url: http://localhost:9093
   manage-users-api:
+    url: http://localhost:9093
+  prisoner-search-api:
     url: http://localhost:9093
 
 hmpps:
