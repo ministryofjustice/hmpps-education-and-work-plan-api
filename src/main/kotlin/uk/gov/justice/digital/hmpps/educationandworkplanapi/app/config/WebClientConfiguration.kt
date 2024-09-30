@@ -32,6 +32,14 @@ class WebClientConfiguration {
   ): WebClient =
     builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri)
 
+  @Bean(name = ["prisonerSearchApiWebClient"])
+  fun prisonerSearchApiWebClient(
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    builder: WebClient.Builder,
+    @Value("\${apis.prisoner-search-api.url}") prisonerSearchApiUri: String,
+  ): WebClient =
+    builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search-api", url = prisonerSearchApiUri)
+
   @Bean
   fun authorizedClientManager(
     clientRegistrationRepository: ClientRegistrationRepository,

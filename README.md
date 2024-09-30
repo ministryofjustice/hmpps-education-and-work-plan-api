@@ -75,11 +75,17 @@ The following environment variables are required in order for the app to start:
 
 ### APIs
 
-| Name                   | Description                                                                                     |
-|------------------------|-------------------------------------------------------------------------------------------------|
-| CIAG_INDUCTION_API_URL | The URL of the CIAG Induction API, used as part of the ETL for the CIAG Induction API migration |
-| CIAG_API_CLIENT_ID     | hmpps-auth oauth2 client-id for connecting to the CIAG Induction API                            |
-| CIAG_API_CLIENT_SECRET | hmpps-auth oauth2 client-secret for connecting to the CIAG Induction API                        |
+| Name                              | Description                                                               |
+|-----------------------------------|---------------------------------------------------------------------------|
+| PRISON_API_URL                    | The URL of the Prison API                                                 |
+| PRISON_API_CLIENT_ID              | hmpps-auth oauth2 client-id for connecting to the Prison API              |
+| PRISON_API_CLIENT_SECRET          | hmpps-auth oauth2 client-secret for connecting to the Prison API          |
+| PRISONER_SEARCH_API_URL           | The URL of the Prisoner Search API                                        |
+| PRISONER_SEARCH_API_CLIENT_ID     | hmpps-auth oauth2 client-id for connecting to the Prisoner Search API     |
+| PRISONER_SEARCH_API_CLIENT_SECRET | hmpps-auth oauth2 client-secret for connecting to the Prisoner Search API |
+| MANAGE_USERS_API_URL              | The URL of the Manage Users API                                           |
+| MANAGE_USERS_API_CLIENT_ID        | hmpps-auth oauth2 client-id for connecting to the Manage Users API        |
+| MANAGE_USERS_API_CLIENT_SECRET    | hmpps-auth oauth2 client-secret for connecting to the Manage Users API    |
 
 ## Development and maintenance
 
@@ -198,6 +204,8 @@ This API consumes, and is therefore dependent on, data from the following APIs:
 * `hmpps-auth` - Standard HMPPS Digital configuration; used for Spring Security.
 * `application-insights` - Standard HMPPS Digital configuration; used for telemetry and event tracing.
 * `prison-api` - The Prison API; used for looking up a Prisoner's prison history.
+* `manage-users-api` - The Manage Users API; used for looking up the full name (display name) of DPS users.
+* `prisoner-search-api` - The Prisoner Search API; used for looking up Prisoner data in order to get their release date.
 
 ## API consumers
 The following are the known consumers of this API. Any changes to this API - especially breaking or potentially breaking
@@ -207,11 +215,11 @@ As is standard in HMPPS projects the term "service UI" specifically means the no
 UI running in the browser. UI's running in the browser do not make xhr/ajax style requests directly to the APIs.
 
 * `hmpps-eduction-and-work-plan-ui` - The Education and Work Plan service UI (aka PLP)  
-The REST API endpoints exposed by this API are consumed by the service UI. Roles required are `ROLE_EDUCATION_WORK_PLAN_EDITOR` or
-`ROLE_EDUCATION_WORK_PLAN_VIEWER` - see the individual controller methods and/or swagger spec for specific details.
-* `hmpps-ciag-careers-induction-ui` - The CIAG Induction service UI  
-The CIAG Induction service UI consumes the `GET` endpoint in order to retrieve action plan details for a list of prison
-numbers (prisoners). The role required is `ROLE_EDUCATION_WORK_PLAN_VIEWER`
+The REST API endpoints exposed by this API are consumed by the service UI. Roles required are dependent on the API 
+endpoint being consumed - see the individual controller methods and/or swagger spec for specific details.
+* `hmpps-prisoner-profile` - The DPS Prisoner Profile UI  
+The DPS Prisoner Profile UI consumes the `GET /action-plans/{prisonNumber}/goals` endpoint in order to retrieve the
+prisoner's active goals from their action plan. The role required is `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO`
 
 ## Feature Toggles
 Features can be toggled by setting the relevant environment variable.
@@ -219,4 +227,3 @@ Features can be toggled by setting the relevant environment variable.
 | Name                                  | Default Value | Type    | Description                                                                                                          |
 |---------------------------------------|---------------|---------|----------------------------------------------------------------------------------------------------------------------|
 | SOME_TOGGLE_ENABLED                   | false         | Boolean | Example feature toggle, for demonstration purposes.                                                                  |
-| CIAG_INDUCTION_DATA_MIGRATION_ENABLED | false         | Boolean | Set to true to enable the components that perform an ETL migration of CIAG Inductions from the CIAG API to this API. |
