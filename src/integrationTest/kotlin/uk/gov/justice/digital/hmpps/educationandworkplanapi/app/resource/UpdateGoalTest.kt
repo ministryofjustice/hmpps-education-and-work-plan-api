@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
@@ -300,7 +301,6 @@ class UpdateGoalTest : IntegrationTestBase() {
       val stepRemovedEventProperties = eventPropertiesCaptor.secondValue
       assertThat(goalUpdatedEventProperties)
         .containsEntry("reference", goalReference.toString())
-        .containsEntry("notesCharacterCount", "83")
       assertThat(stepRemovedEventProperties)
         .containsEntry("reference", goalReference.toString())
         .containsEntry("stepCount", "2")
@@ -340,7 +340,7 @@ class UpdateGoalTest : IntegrationTestBase() {
       goalReference = goal.goalReference,
       title = goal.title,
       targetCompletionDate = goal.targetCompletionDate,
-      notes = goal.notes,
+      notes = "Updated goal text",
       prisonId = goal.createdAtPrison,
       steps = listOf(
         aValidUpdateStepRequest(
@@ -403,6 +403,10 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasActionedBy("buser_gen")
           .hasActionedByDisplayName("Bernie User")
       }
+
+    val notes = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[0].goalReference, EntityType.GOAL)
+    assertThat(notes.size).isGreaterThan(0)
+    assertThat(notes[0].content).isEqualTo("Updated goal text")
 
     // Currently no telemetry events are sent for when Steps are added/edited but no changes to the parent Goal
     // The only telemetry events sent are GOAL_UPDATED (which does not cover this scenario) or STEP_REMOVED

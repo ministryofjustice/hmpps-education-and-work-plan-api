@@ -21,7 +21,7 @@ class Goal(
   val title: String,
   val targetCompletionDate: LocalDate,
   var status: GoalStatus = GoalStatus.ACTIVE,
-  val notes: String? = null,
+  var notes: String? = null,
   val createdBy: String?,
   val createdByDisplayName: String?,
   val createdAt: Instant?,

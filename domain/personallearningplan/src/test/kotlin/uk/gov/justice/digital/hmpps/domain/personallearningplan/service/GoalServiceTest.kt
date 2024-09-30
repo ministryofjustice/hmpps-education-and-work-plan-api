@@ -52,6 +52,9 @@ class GoalServiceTest {
   @Mock
   private lateinit var actionPlanEventService: ActionPlanEventService
 
+  @Mock
+  private lateinit var goalNotesService: GoalNotesService
+
   @Nested
   inner class CreateGoal {
     @Test

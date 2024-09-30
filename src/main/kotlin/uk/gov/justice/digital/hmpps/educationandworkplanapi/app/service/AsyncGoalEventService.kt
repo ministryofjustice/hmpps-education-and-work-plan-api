@@ -62,7 +62,11 @@ class AsyncGoalEventService(
     trackGoalUnArchivedTelemetryEvent(unArchivedGoal)
   }
 
-  private fun recordGoalCreatedTimelineEvent(prisonNumber: String, createdGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+  private fun recordGoalCreatedTimelineEvent(
+    prisonNumber: String,
+    createdGoal: Goal,
+    correlationId: UUID = UUID.randomUUID(),
+  ) {
     timelineService.recordTimelineEvent(
       prisonNumber,
       timelineEventFactory.goalCreatedTimelineEvent(createdGoal, correlationId),
@@ -76,14 +80,22 @@ class AsyncGoalEventService(
     )
   }
 
-  private fun recordGoalArchivedTimelineEvent(prisonNumber: String, archivedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+  private fun recordGoalArchivedTimelineEvent(
+    prisonNumber: String,
+    archivedGoal: Goal,
+    correlationId: UUID = UUID.randomUUID(),
+  ) {
     timelineService.recordTimelineEvent(
       prisonNumber,
       timelineEventFactory.goalArchivedTimelineEvent(archivedGoal, correlationId),
     )
   }
 
-  private fun recordGoalUnArchivedTimelineEvent(prisonNumber: String, unArchivedGoal: Goal, correlationId: UUID = UUID.randomUUID()) {
+  private fun recordGoalUnArchivedTimelineEvent(
+    prisonNumber: String,
+    unArchivedGoal: Goal,
+    correlationId: UUID = UUID.randomUUID(),
+  ) {
     timelineService.recordTimelineEvent(
       prisonNumber,
       timelineEventFactory.goalUnArchivedTimelineEvent(unArchivedGoal, correlationId),

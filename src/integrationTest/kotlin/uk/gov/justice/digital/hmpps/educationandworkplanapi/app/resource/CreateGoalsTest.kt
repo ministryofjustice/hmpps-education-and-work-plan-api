@@ -15,6 +15,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
@@ -189,7 +190,6 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsEntry("status", "ACTIVE")
         .containsEntry("stepCount", "1")
         .containsEntry("reference", goal.goalReference.toString())
-        .containsEntry("notesCharacterCount", "23")
         .containsKey("correlationId")
     }
   }
@@ -235,9 +235,12 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsEntry("status", "ACTIVE")
         .containsEntry("stepCount", "2")
         .containsEntry("reference", goal.goalReference.toString())
-        .containsEntry("notesCharacterCount", "83")
         .containsKey("correlationId")
     }
+
+    val notes = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[1].goalReference, EntityType.GOAL)
+    assertThat(notes.size).isGreaterThan(0)
+    assertThat(notes[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
   }
 
   @Test

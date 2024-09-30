@@ -53,9 +53,6 @@ class GoalEntity(
   @field:NotNull
   var status: GoalStatus? = null,
 
-  @Column
-  var notes: String? = null,
-
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @field:NotNull
   var steps: MutableList<StepEntity>? = null,
@@ -95,6 +92,9 @@ class GoalEntity(
   @Column
   @Enumerated(value = EnumType.STRING)
   var archiveReason: ReasonToArchiveGoal? = null,
+
+  @Transient
+  var notes: String? = null,
 
   @Column
   var archiveReasonOther: String? = null,

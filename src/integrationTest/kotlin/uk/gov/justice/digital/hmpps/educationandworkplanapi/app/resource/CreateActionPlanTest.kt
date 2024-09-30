@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -11,6 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
@@ -226,6 +228,10 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .hasTitle(createStepRequest.title)
       .hasStatus(StepStatus.NOT_STARTED)
       .wasCreatedBy(dpsUsername)
+
+    val notes = noteRepository.findAllByEntityReferenceAndEntityType(actionPlan.goals!![0].reference!!, EntityType.GOAL)
+    Assertions.assertThat(notes.size).isGreaterThan(0)
+    Assertions.assertThat(notes[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
   }
 
   @Test

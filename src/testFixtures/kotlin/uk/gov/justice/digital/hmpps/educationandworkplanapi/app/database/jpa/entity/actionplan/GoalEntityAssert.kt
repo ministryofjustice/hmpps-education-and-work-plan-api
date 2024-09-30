@@ -42,6 +42,14 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
+  fun isEqualToComparingAllFieldsExceptNotes(expected: GoalEntity): GoalEntityAssert {
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields("notes")
+      .isEqualTo(expected)
+    return this
+  }
+
   fun isEqualToIgnoringJpaManagedFields(expected: GoalEntity): GoalEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
@@ -50,10 +58,10 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
-  fun isEqualToIgnoringSteps(expected: GoalEntity): GoalEntityAssert {
+  fun isEqualToIgnoringStepsAndNotes(expected: GoalEntity): GoalEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
-      .ignoringFields("steps")
+      .ignoringFields("steps", "notes")
       .isEqualTo(expected)
     return this
   }

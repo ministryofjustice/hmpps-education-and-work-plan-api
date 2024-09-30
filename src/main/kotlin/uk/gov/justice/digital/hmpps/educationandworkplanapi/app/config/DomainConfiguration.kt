@@ -12,15 +12,18 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalEventService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalNotesService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -34,15 +37,23 @@ class DomainConfiguration {
     goalEventService: GoalEventService,
     actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
     actionPlanEventService: ActionPlanEventService,
+    goalNotesService: GoalNotesService,
   ): GoalService =
-    GoalService(goalPersistenceAdapter, goalEventService, actionPlanPersistenceAdapter, actionPlanEventService)
+    GoalService(goalPersistenceAdapter, goalEventService, actionPlanPersistenceAdapter, actionPlanEventService, goalNotesService)
 
   @Bean
   fun actionPlanDomainService(
     actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
     actionPlanEventService: ActionPlanEventService,
+    goalNotesService: GoalNotesService,
   ): ActionPlanService =
-    ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService)
+    ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService, goalNotesService)
+
+  @Bean
+  fun noteService(
+    notePersistenceAdapter: JpaNotePersistenceAdapter,
+  ): NoteService =
+    NoteService(notePersistenceAdapter)
 
   @Bean
   fun timelineDomainService(

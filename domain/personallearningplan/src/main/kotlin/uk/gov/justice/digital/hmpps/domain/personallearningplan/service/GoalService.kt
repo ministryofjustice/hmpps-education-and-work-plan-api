@@ -35,6 +35,7 @@ class GoalService(
   private val goalEventService: GoalEventService,
   private val actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
   private val actionPlanEventService: ActionPlanEventService,
+  private val goalNotesService: GoalNotesService,
 ) {
 
   /**
@@ -53,20 +54,25 @@ class GoalService(
     // TODO RR-227 - We need to change throw a 404 once the create action plan endpoint is being called by the UI (with an optional review date)
     return if (actionPlanDoesNotExist(prisonNumber)) {
       actionPlanPersistenceAdapter.createActionPlan(newActionPlan(prisonNumber, createGoalDtos))
-        .also { actionPlanEventService.actionPlanCreated(it) }.goals
+        .apply {
+          actionPlanEventService.actionPlanCreated(this)
+          goalNotesService.createNotes(prisonNumber, goals)
+        }.goals
     } else {
-      goalPersistenceAdapter.createGoals(prisonNumber, createGoalDtos)
-        .also {
-          goalEventService.goalsCreated(prisonNumber, it)
-        }
+      goalPersistenceAdapter.createGoals(prisonNumber, createGoalDtos).apply {
+        goalNotesService.createNotes(prisonNumber, this)
+        goalEventService.goalsCreated(prisonNumber, this)
+      }
     }
   }
 
   fun getGoals(getGoalsDto: GetGoalsDto): List<Goal> {
     return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
       ?.filter { getGoalsDto.statuses.isNullOrEmpty() || it.status in getGoalsDto.statuses }
-      ?: throw PrisonerHasNoGoalsException(getGoalsDto.prisonNumber).also {
+      ?.onEach { it.notes = goalNotesService.getNotes(it.reference) }
+      ?: run {
         log.info { "No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet" }
+        throw PrisonerHasNoGoalsException(getGoalsDto.prisonNumber)
       }
   }
 
@@ -76,10 +82,12 @@ class GoalService(
    */
   fun getGoal(prisonNumber: String, goalReference: UUID): Goal {
     log.info { "Retrieving Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
-    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
-      ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
-        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
-      }
+    return goalPersistenceAdapter.getGoal(prisonNumber, goalReference)?.apply {
+      notes = goalNotesService.getNotes(reference)
+    } ?: run {
+      log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+      throw GoalNotFoundException(prisonNumber, goalReference)
+    }
   }
 
   /**
@@ -94,10 +102,26 @@ class GoalService(
     return goalPersistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
       ?.also {
         goalEventService.goalUpdated(prisonNumber = prisonNumber, previousGoal = existingGoal, updatedGoal = it)
+        updateNote(prisonNumber, it, updatedGoalDto.notes)
       }
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }
+  }
+
+  // if the note is different to the note before then update/create the note
+  private fun updateNote(prisonNumber: String, goal: Goal, updatedNote: String?) {
+    val existingNote = goalNotesService.getNotes(goal.reference)
+
+    when {
+      existingNote == null && updatedNote != null -> {
+        goalNotesService.createNotes(prisonNumber, listOf(goal))
+      }
+      existingNote != updatedNote && updatedNote != null -> {
+        goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
+      }
+      // No action if the note hasn't changed or both are null
+    }
   }
 
   /**
