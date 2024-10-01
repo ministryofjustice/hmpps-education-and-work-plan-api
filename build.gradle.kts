@@ -27,8 +27,8 @@ val hmppsSqsVersion = "4.4.4"
 val awaitilityVersion = "4.2.2"
 val wiremockVersion = "3.9.1"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "9.41.1"
-val testContainersVersion = "1.20.1"
+val nimbusJwtVersion = "9.41.2"
+val testContainersVersion = "1.20.2"
 val awsSdkVersion = "1.12.772"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
