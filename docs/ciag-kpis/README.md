@@ -49,9 +49,11 @@ but TBC); without any regard for when screenings and assessments might or might 
 This folder contains 2 sequence diagrams that cover KPI 1, one for PEF April 2025 to October 2025, and one for
 PES October 2025 onwards.
 
-**Please note** - In the sequence diagrams the blue boxes do not mean anything. They are there simply to differentiate 
-different parts or processes of the system. Without the boxes it is hard to see where one process ends and another 
-starts.
+**Please note** - In the sequence diagrams coloured boxes are used to group together and designate higher level
+processes. Without the boxes it is hard to see where one process ends and another starts.
+* Blue boxes represent PLP based processing
+* Green boxes represent the HMPPS Integration API
+* Red boxes represent Curious based processes
 
 ## CIAG KPI 2
 TODO ....

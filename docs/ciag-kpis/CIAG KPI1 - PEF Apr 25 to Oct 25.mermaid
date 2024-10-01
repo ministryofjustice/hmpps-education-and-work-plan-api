@@ -7,21 +7,18 @@ sequenceDiagram
 
   actor Prisoner as Prisoner
   actor CIAG as CIAG
-  participant NOMIS as NOMIS/HMPPS Domain Events
-  participant Curious as Curious
   participant PLP as PLP
   participant PLPDB as PLP DB
+  participant NOMIS as NOMIS/HMPPS Domain Events
+  participant Integration as HMPPS Integration API
+  participant IntegrationDB as HMPPS Integration DB
+  participant Curious as Curious
 
   rect rgba(0, 200, 255, 0.4)
     Prisoner ->> NOMIS: Prisoner enters prison
     note over Prisoner, NOMIS: New or re-offending prisoner
     activate NOMIS
     deactivate NOMIS
-
-    activate Curious
-      note left of Curious: Curious processes<br/>prisoner.received event<br/>reason: admission
-      NOMIS -) Curious: prison-offender-events.prisoner.received event
-    deactivate Curious
 
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.received event<br/>reason: admission
@@ -31,7 +28,7 @@ sequenceDiagram
           PLP ->> PLPDB: Create new Induction Schedule record
           note right of PLPDB: Induction deadline date<br/>set to today + 30 days (TBD)
         deactivate PLPDB
-        PLP -) NOMIS: induction.deadline.set event
+        PLP -) NOMIS: prisoner.induction.updated event
       else Prisoner already has a PLP<br/>eg. re-offending prisoner
         note over PLP: TODO - This is essentially the "review" process from KPI2
       end
@@ -44,11 +41,6 @@ sequenceDiagram
     activate NOMIS
     deactivate NOMIS
 
-    activate Curious
-      note left of Curious: Curious processes<br/>prisoner.received event<br/>reason: transferred
-      NOMIS -) Curious: prison-offender-events.prisoner.received event
-    deactivate Curious
-
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.received event<br/>reason: transferred
       NOMIS -) PLP: prison-offender-events.prisoner.received event
@@ -57,7 +49,7 @@ sequenceDiagram
           PLP ->> PLPDB: Create new Induction Schedule record
           note right of PLPDB: Induction deadline date<br/>set to today + 30 days (TBD)
         deactivate PLPDB
-        PLP -) NOMIS: induction.deadline.set event
+        PLP -) NOMIS: prisoner.induction.updated event
       else Prisoner already has a PLP<br/>eg. PLP was done in previous prison
         note over PLP: TODO - This is essentially the "review" process from KPI2
       end
@@ -69,17 +61,12 @@ sequenceDiagram
     activate NOMIS
     deactivate NOMIS
 
-    activate Curious
-      note left of Curious: Curious processes<br/>prisoner.released event
-      NOMIS -) Curious: prison-offender-events.prisoner.released event
-    deactivate Curious
-
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.released event
       NOMIS -) PLP: prison-offender-events.prisoner.released event
       opt Prisoner has a PLP
         PLP ->> PLPDB: Record exemption reason
-        PLP -) NOMIS: induction.exempt event
+        PLP -) NOMIS: prisoner.induction.updated event
       end
     deactivate PLP
   end
@@ -89,17 +76,12 @@ sequenceDiagram
     activate NOMIS
     deactivate NOMIS
 
-    activate Curious
-      note left of Curious: Curious processes<br/>prisoner.released event<br/>nomisMovementReasonCode: DEC
-      NOMIS -) Curious: prison-offender-events.prisoner.released event
-    deactivate Curious
-
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.released event<br/>nomisMovementReasonCode: DEC
       NOMIS -) PLP: prison-offender-events.prisoner.released event
       opt Prisoner has a PLP
         PLP ->> PLPDB: Record exemption reason
-        PLP -) NOMIS: induction.exempt event
+        PLP -) NOMIS: prisoner.induction.updated event
       end
     deactivate PLP
   end
@@ -110,19 +92,12 @@ sequenceDiagram
         CIAG ->> PLP: Do prisoner's Induction
         alt Prisoners Induction could not be completed due to exemptions
           PLP ->> PLPDB: Record exemption reason
-          PLP -) NOMIS: induction.exempt event
         else
-          PLP -) NOMIS: induction.complete event
+          PLP ->> PLPDB: Record prisoner's induction
         end
+        PLP -) NOMIS: prisoner.induction.updated event
       deactivate PLP
     deactivate CIAG
-  end
-
-  rect rgba(0, 200, 255, 0.4)
-    activate PLP
-      note left of PLP: PLP API processes<br/>prisoner.released event
-      NOMIS -) PLP: prisoner.released event
-    deactivate PLP
   end
 
   rect rgba(0, 200, 255, 0.4)
@@ -130,38 +105,39 @@ sequenceDiagram
       activate PLP
         CIAG ->> PLP: Clear prisoner's Induction exemption
         PLP ->> PLPDB: Clear exemption reason
-        PLP -) NOMIS: induction.exempt.cleared event
         PLP ->> PLPDB: Update Induction Schedule record
         note right of PLPDB: Induction deadline date<br/>set to today + 5 days
-        PLP -) NOMIS: induction.deadline.set event
+        PLP -) NOMIS: prisoner.induction.updated event
       deactivate PLP
     deactivate CIAG
   end
 
-  rect rgba(0, 200, 255, 0.4)
+  rect rgba(0, 255, 200, 0.4)
+    activate Integration
+      note left of Integration: HMPPS Integration API processes<br/>prisoner.induction.updated event
+      NOMIS -) Integration: prisoner.induction.updated event
+      Integration ->> PLP: get prisoner's induction meta data
+      activate PLP
+        PLP ->> PLPDB: get prisoner's induction meta data
+        PLPDB ->> PLP: prisoner's induction meta data
+        PLP ->> Integration: prisoner's induction meta data
+      deactivate PLP
+      Integration ->> IntegrationDB: Store prisoner's induction meta data
+      Integration -) NOMIS: prisoner.induction.metadata.available event
+    deactivate Integration
+  end
+
+  rect rgba(255, 100, 100, 0.4)
     activate Curious
-    note left of Curious: Curious processes<br/>induction.deadline.set event
-    NOMIS -) Curious: induction.deadline.set event
+      note left of Curious: Curious processes<br/>prisoner.induction.metadata.available event
+      NOMIS -) Curious: prisoner.induction.metadata.available event
+      Curious ->> Integration: get prisoner's induction meta data
+      activate Integration
+        Integration ->> IntegrationDB: get prisoner's induction meta data
+        IntegrationDB ->> Integration: prisoner's induction meta data
+        Integration ->> Curious: prisoner's induction meta data
+      deactivate Integration
+      note left of Curious: Curious processes prisoner's induction meta data<br/>in order to produce reports
     deactivate Curious
   end
 
-  rect rgba(0, 200, 255, 0.4)
-    activate Curious
-      note left of Curious: Curious processes<br/>induction.complete event
-      NOMIS -) Curious: induction.complete event
-    deactivate Curious
-  end
-
-  rect rgba(0, 200, 255, 0.4)
-    activate Curious
-      note left of Curious: Curious processes<br/>induction.exempt event
-      NOMIS -) Curious: induction.exempt event
-    deactivate Curious
-  end
-
-  rect rgba(0, 200, 255, 0.4)
-    activate Curious
-      note left of Curious: Curious processes<br/>induction.exempt event
-      NOMIS -) Curious: induction.exempt.cleared event
-    deactivate Curious
-  end
