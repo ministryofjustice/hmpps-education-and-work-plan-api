@@ -267,4 +267,75 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .hasNoReviewDate()
       .wasCreatedBy(dpsUsername)
   }
+
+  @Test
+  @Transactional
+  fun `should create a new action plan with multiple goals given prisoner does not have an action plan`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createStepRequest1 = aValidCreateStepRequest()
+    val createGoalRequest1 = aValidCreateGoalRequest(steps = listOf(createStepRequest1))
+
+    val createStepRequest2 = aValidCreateStepRequest()
+    val createGoalRequest2 = aValidCreateGoalRequest(steps = listOf(createStepRequest2), notes = "Goal2 text")
+
+    val createStepRequest3 = aValidCreateStepRequest()
+    val createGoalRequest3 = aValidCreateGoalRequest(steps = listOf(createStepRequest3), notes = "Goal3 text")
+
+    val createStepRequest4 = aValidCreateStepRequest()
+    val createGoalRequest4 = aValidCreateGoalRequest(steps = listOf(createStepRequest4), notes = "Goal4 text")
+
+    val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest1, createGoalRequest2, createGoalRequest3, createGoalRequest4))
+    val expectedReviewDate = createActionPlanRequest.reviewDate!!
+    val dpsUsername = "auser_gen"
+    val displayName = "Albert User"
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createActionPlanRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
+          username = dpsUsername,
+          displayName = displayName,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    assertThat(actionPlan)
+      .isForPrisonNumber(prisonNumber)
+      .hasReviewDate(expectedReviewDate)
+      .hasNumberOfGoals(4)
+      .wasCreatedBy(dpsUsername)
+    val goal = actionPlan!!.goals!![0]
+    assertThat(goal)
+      .hasTitle(createGoalRequest1.title)
+      .hasNumberOfSteps(createGoalRequest1.steps.size)
+      .wasCreatedAtPrison(createGoalRequest1.prisonId)
+      .wasCreatedBy(dpsUsername)
+      .hasCreatedByDisplayName(displayName)
+      .wasUpdatedBy(dpsUsername)
+      .hasUpdatedByDisplayName(displayName)
+      .wasUpdatedAtPrison(createGoalRequest1.prisonId)
+    val step = goal.steps!![0]
+    assertThat(step)
+      .hasTitle(createStepRequest1.title)
+      .hasStatus(StepStatus.NOT_STARTED)
+      .wasCreatedBy(dpsUsername)
+
+    val notesForGoal1 = noteRepository.findAllByEntityReferenceAndEntityType(actionPlan.goals!![0].reference!!, EntityType.GOAL)
+    Assertions.assertThat(notesForGoal1.size).isGreaterThan(0)
+    Assertions.assertThat(notesForGoal1[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
+
+    val notesForGoal2 = noteRepository.findAllByEntityReferenceAndEntityType(actionPlan.goals!![1].reference!!, EntityType.GOAL)
+    Assertions.assertThat(notesForGoal2.size).isGreaterThan(0)
+    Assertions.assertThat(notesForGoal2[0].content).isEqualTo("Goal2 text")
+  }
 }
