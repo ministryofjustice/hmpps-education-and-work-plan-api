@@ -22,7 +22,7 @@ dependencies {
 
   // Test dependencies
   testImplementation("org.junit.jupiter:junit-jupiter:5.11.1")
-  testImplementation("org.mockito:mockito-junit-jupiter:5.14.0")
+  testImplementation("org.mockito:mockito-junit-jupiter:5.14.1")
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
   testImplementation("org.assertj:assertj-core:3.26.3")
 
