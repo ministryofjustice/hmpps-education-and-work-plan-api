@@ -48,13 +48,15 @@ class ActionPlanService(
   fun getActionPlan(prisonNumber: String): ActionPlan {
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }
     // TODO RR-227 - return 404 if not found
-    return persistenceAdapter.getActionPlan(prisonNumber)
+    val actionPlan = persistenceAdapter.getActionPlan(prisonNumber)
       ?: ActionPlan(
         reference = UUID.randomUUID(),
         prisonNumber = prisonNumber,
         reviewDate = null,
         goals = emptyList(),
       )
+    actionPlan.goals.onEach { it.notes = goalNotesService.getNotes(it.reference) }
+    return actionPlan
   }
 
   fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> {
