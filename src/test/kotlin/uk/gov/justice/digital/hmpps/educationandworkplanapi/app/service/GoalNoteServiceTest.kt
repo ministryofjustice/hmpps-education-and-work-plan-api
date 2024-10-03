@@ -11,6 +11,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.UpdateNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
@@ -51,14 +52,14 @@ class GoalNoteServiceTest {
       aValidNoteDto(reference = UUID.randomUUID(), content = "Second note"),
     )
 
-    given(noteService.getNotes(entityReference, EntityType.GOAL)).willReturn(notes)
+    given(noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL)).willReturn(notes)
 
     // When
     val result = goalNoteService.getNotes(entityReference)
 
     // Then
     assert(result == "First note")
-    verify(noteService, times(1)).getNotes(entityReference, EntityType.GOAL)
+    verify(noteService, times(1)).getNotes(entityReference, EntityType.GOAL, NoteType.GOAL)
   }
 
   @Test
@@ -69,7 +70,7 @@ class GoalNoteServiceTest {
     val updatedText = "Updated note content"
     val existingNote = aValidNoteDto(reference = UUID.randomUUID(), content = "Old content")
 
-    given(noteService.getNotes(entityReference, EntityType.GOAL)).willReturn(listOf(existingNote))
+    given(noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL)).willReturn(listOf(existingNote))
 
     // When
     goalNoteService.updateNotes(entityReference, lastUpdatedAtPrison, updatedText)
@@ -91,7 +92,7 @@ class GoalNoteServiceTest {
     val lastUpdatedAtPrison = "Prison A"
     val updatedText = "Updated note content"
 
-    given(noteService.getNotes(entityReference, EntityType.GOAL)).willReturn(emptyList())
+    given(noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL)).willReturn(emptyList())
 
     // When
     goalNoteService.updateNotes(entityReference, lastUpdatedAtPrison, updatedText)

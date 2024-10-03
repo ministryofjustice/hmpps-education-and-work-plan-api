@@ -25,11 +25,11 @@ class GoalNoteService(
   }
 
   override fun getNotes(entityReference: UUID): String? {
-    return noteService.getNotes(entityReference, EntityType.GOAL).firstOrNull()?.content
+    return noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL).firstOrNull()?.content
   }
 
   override fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String?) {
-    val note = noteService.getNotes(entityReference, EntityType.GOAL).firstOrNull()
+    val note = noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL).firstOrNull()
     // If no note exists, return early
     note?.let {
       noteService.updateNote(

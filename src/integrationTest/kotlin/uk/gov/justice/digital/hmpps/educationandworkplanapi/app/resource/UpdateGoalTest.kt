@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
@@ -404,7 +405,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           .hasActionedByDisplayName("Bernie User")
       }
 
-    val notes = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[0].goalReference, EntityType.GOAL)
+    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[0].goalReference, EntityType.GOAL, NoteType.GOAL)
     assertThat(notes.size).isGreaterThan(0)
     assertThat(notes[0].content).isEqualTo("Updated goal text")
 

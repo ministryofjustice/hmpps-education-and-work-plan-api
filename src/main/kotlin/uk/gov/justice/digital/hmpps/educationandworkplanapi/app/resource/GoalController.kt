@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.CreateNoteDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
@@ -36,6 +41,7 @@ import java.util.UUID
 class GoalController(
   private val goalService: GoalService,
   private val goalResourceMapper: GoalResourceMapper,
+  private val noteService: NoteService,
 ) {
 
   @PostMapping
@@ -59,7 +65,12 @@ class GoalController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
   ): GoalResponse {
-    return goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
+    val response = goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
+
+    val archiveNote =
+      noteService.getNotes(response.goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+    // TODO populate the note in the response.
+    return response
   }
 
   @PutMapping("{goalReference}")
@@ -91,11 +102,25 @@ class GoalController(
     archiveGoalRequest: ArchiveGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ) =
-    goalService.archiveGoal(
+  ): Goal {
+    val goal = goalService.archiveGoal(
       prisonNumber = prisonNumber,
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     )
+
+    noteService.createNote(
+      CreateNoteDto(
+        prisonNumber = prisonNumber,
+        entityReference = goal.reference,
+        entityType = EntityType.GOAL,
+        noteType = NoteType.GOAL_ARCHIVAL,
+        content = "noteText",
+        createdAtPrison = goal.createdAtPrison,
+        lastUpdatedAtPrison = goal.lastUpdatedAtPrison,
+      ),
+    )
+    return goal
+  }
 
   @PutMapping("{goalReference}/unarchive")
   @ResponseStatus(HttpStatus.NO_CONTENT)
