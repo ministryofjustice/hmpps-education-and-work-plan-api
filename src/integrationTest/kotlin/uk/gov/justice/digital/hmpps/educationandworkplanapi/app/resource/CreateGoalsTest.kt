@@ -201,7 +201,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
+      notes = "a second note",
     )
     val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
 
@@ -238,9 +238,13 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsKey("correlationId")
     }
 
-    val notes = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[1].goalReference, EntityType.GOAL)
-    assertThat(notes.size).isGreaterThan(0)
-    assertThat(notes[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
+    val notes1 = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[0].goalReference, EntityType.GOAL)
+    assertThat(notes1.size).isGreaterThan(0)
+    assertThat(notes1[0].content).isEqualTo("a second note")
+
+    val notes2 = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[1].goalReference, EntityType.GOAL)
+    assertThat(notes2.size).isGreaterThan(0)
+    assertThat(notes2[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
   }
 
   @Test
