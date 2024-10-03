@@ -821,6 +821,10 @@ components:
         archiveReasonOther:
           type: string
           description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
+        archiveNote:
+          type: string
+          description: Note relating to the goal archival.
+          example: Goal no longer relevant.
       required:
         - goalReference
         - title
@@ -1775,6 +1779,9 @@ components:
         reasonOther:
           type: string
           description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
+        note:
+          type: string
+          description: An optional note to accompany the archive
       required:
         - goalReference
         - reason

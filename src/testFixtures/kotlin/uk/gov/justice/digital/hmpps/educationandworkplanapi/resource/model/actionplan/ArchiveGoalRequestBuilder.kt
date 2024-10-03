@@ -9,9 +9,11 @@ fun aValidArchiveGoalRequest(
   goalReference: UUID = aValidReference(),
   reason: ReasonToArchiveGoal = ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL,
   reasonOther: String? = null,
+  note: String? = null,
 ): ArchiveGoalRequest =
   ArchiveGoalRequest(
     goalReference = goalReference,
     reason = reason,
     reasonOther = reasonOther,
+    note = note,
   )

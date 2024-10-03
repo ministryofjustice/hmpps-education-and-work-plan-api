@@ -157,6 +157,16 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
+  fun hasArchiveNote(expected: String?): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (archiveNote != expected) {
+        failWithMessage("Expected archive note to be $expected, but was $archiveNote")
+      }
+    }
+    return this
+  }
+
   /**
    * Allows for assertion chaining into the specified child [StepResponse]. Takes a lambda as the method argument
    * to call assertion methods provided by [StepResponseAssert].

@@ -8,6 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
@@ -21,8 +22,9 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus as Go
 class GoalControllerTest {
 
   private val goalService = mock<GoalService>()
+  private val noteService = mock<NoteService>()
   private val goalResourceMapper = mock<GoalResourceMapper>()
-  private val controller = GoalController(goalService, goalResourceMapper)
+  private val controller = GoalController(goalService, goalResourceMapper, noteService)
 
   private val prisonNumber = aValidPrisonNumber()
 
