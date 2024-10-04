@@ -279,7 +279,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
       .hasUserMessageContaining("Could not archive goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [ARCHIVED] that can't be archived")
   }
 
-  fun archiveAGoal(
+  private fun archiveAGoal(
     prisonNumber: String,
     goalReference: UUID,
     archiveGoalRequest: ArchiveGoalRequest,
