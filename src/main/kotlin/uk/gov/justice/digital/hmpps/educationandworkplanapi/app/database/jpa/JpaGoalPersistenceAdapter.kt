@@ -38,10 +38,18 @@ class JpaGoalPersistenceAdapter(
       actionPlanRepository.save(this)
     }
 
-    // use the persisted entities with the populated JPA fields, rather than the non persisted entity reference above
-    val persisted =
-      goalEntities.map { goalEntity -> actionPlanEntity.goals!!.first { it.reference == goalEntity.reference } }
-    return persisted.map { goalMapper.fromEntityToDomain(it) }
+    val goalEntityMap = goalEntities.associateBy { it.reference }
+    val persistedGoals = actionPlanEntity.goals!!.filter { goalEntityMap.containsKey(it.reference) }
+
+    // Set the notes from the corresponding goalEntity
+    persistedGoals.forEach { persistedGoal ->
+      val correspondingGoalEntity = goalEntityMap[persistedGoal.reference]
+      if (correspondingGoalEntity != null) {
+        persistedGoal.notes = correspondingGoalEntity.notes
+      }
+    }
+
+    return persistedGoals.map { goalMapper.fromEntityToDomain(it) }
   }
 
   @Transactional(readOnly = true)
