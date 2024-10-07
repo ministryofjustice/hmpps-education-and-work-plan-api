@@ -1,0 +1,2 @@
+ALTER TABLE note
+    ALTER COLUMN note_type TYPE VARCHAR(50);

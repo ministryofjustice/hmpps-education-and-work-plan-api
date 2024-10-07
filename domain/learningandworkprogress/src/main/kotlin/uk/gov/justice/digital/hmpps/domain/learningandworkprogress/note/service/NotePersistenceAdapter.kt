@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.CreateNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.UpdateNoteDto
 import java.util.*
 
@@ -24,10 +25,15 @@ interface NotePersistenceAdapter {
   /**
    * Gets the notes associated with this entity reference.
    */
-  fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto>
+  fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto>
 
   /**
    * update a [Note].
    */
   fun updateNote(updateNoteDto: UpdateNoteDto): NoteDto
+
+  /**
+   * delete a [Note] by the entity reference.
+   */
+  fun deleteNoteByEntityReference(entityReference: UUID, entityType: EntityType, noteType: NoteType)
 }

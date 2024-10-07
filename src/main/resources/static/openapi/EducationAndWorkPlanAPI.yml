@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.16.1'
+  version: '1.16.2'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -780,8 +780,9 @@ components:
             $ref: '#/components/schemas/StepResponse'
         notes:
           type: string
-          description: Some additional notes related to the Goal.
+          description: Some additional notes related to the Goal. This is deprecated - use the GoalNotes list instead
           example: Pay close attention to Peter's behaviour.
+          deprecated: true
         createdBy:
           type: string
           description: The DPS username of the person who created the goal.
@@ -821,6 +822,11 @@ components:
         archiveReasonOther:
           type: string
           description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
+        goalNotes:
+          type: array
+          description: A List of at Notes associated with the Goal.
+          items:
+            $ref: '#/components/schemas/Note'
       required:
         - goalReference
         - title
@@ -1775,9 +1781,37 @@ components:
         reasonOther:
           type: string
           description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
+        note:
+          type: string
+          description: An optional note to accompany the archive
       required:
         - goalReference
         - reason
+
+    Note:
+      title: Note
+      type: object
+      description: An object representing a note.
+      properties:
+        noteReference:
+          type: string
+          format: uuid
+          description: The Notes unique reference. This is used as an identifier to archive the required Note.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        content:
+          type: string
+          description: The content of the note.
+        type:
+          $ref: '#/components/schemas/NoteType'
+
+    NoteType:
+      title: NoteType
+      description: Enum describing the various note types.
+      type: string
+      enum:
+        - GOAL
+        - GOAL_ARCHIVAL
+        - GOAL_COMPLETION
 
     UnarchiveGoalRequest:
       title: UnarchiveGoalRequest

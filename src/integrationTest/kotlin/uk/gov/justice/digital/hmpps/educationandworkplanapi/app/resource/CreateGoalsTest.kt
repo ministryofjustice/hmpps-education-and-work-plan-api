@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
@@ -238,11 +239,11 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsKey("correlationId")
     }
 
-    val notes1 = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[0].goalReference, EntityType.GOAL)
+    val notes1 = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[0].goalReference, EntityType.GOAL, NoteType.GOAL)
     assertThat(notes1.size).isGreaterThan(0)
     assertThat(notes1[0].content).isEqualTo("a second note")
 
-    val notes2 = noteRepository.findAllByEntityReferenceAndEntityType(actual.goals[1].goalReference, EntityType.GOAL)
+    val notes2 = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[1].goalReference, EntityType.GOAL, NoteType.GOAL)
     assertThat(notes2.size).isGreaterThan(0)
     assertThat(notes2[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
   }

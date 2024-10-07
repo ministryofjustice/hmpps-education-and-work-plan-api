@@ -11,6 +11,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -142,5 +144,51 @@ class GetGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasReference(goalReference)
+    // archive note should be null.
+    assertThat(actual).hasArchiveNote(null)
+  }
+
+  @Test
+  fun `should return goal given prison number with archive note`() {
+    // Given a goal is created and archived.
+    createGoal(
+      prisonNumber = prisonNumber,
+      createGoalRequest = aValidCreateGoalRequest(),
+    )
+    val actionPlan = getActionPlan(prisonNumber)
+    val goal = actionPlan.goals[0]
+    val goalReference = goal.goalReference
+
+    val reasonOther = "Because it's Monday"
+    val archiveNote = "an archive note"
+    val archiveGoalRequest = aValidArchiveGoalRequest(
+      goalReference = goalReference,
+      ReasonToArchiveGoal.OTHER,
+      reasonOther,
+      note = archiveNote,
+    )
+
+    archiveGoal(prisonNumber, archiveGoalRequest)
+
+    // When
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber, goalReference)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(GoalResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasReference(goalReference)
+    // archive note should not be null.
+    assertThat(actual).hasArchiveNote(archiveNote)
   }
 }

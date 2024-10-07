@@ -15,6 +15,8 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -33,7 +35,7 @@ import java.util.*
 class ArchiveGoalTest : IntegrationTestBase() {
 
   companion object {
-    private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/archive"
+    const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/archive"
   }
 
   private val prisonNumber = aValidPrisonNumber()
@@ -107,6 +109,61 @@ class ArchiveGoalTest : IntegrationTestBase() {
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
       assertThat(goalArchivedEventProperties)
         .containsEntry("reference", goalReference.toString())
+    }
+  }
+
+  @Test
+  fun `should return 204 and archive a goal and record the reason and other text and create an archive note`() {
+    // given
+    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val reasonOther = "Because it's Monday"
+    val noteText = "no longer relevant"
+    val archiveGoalRequest = aValidArchiveGoalRequest(
+      goalReference = goalReference,
+      ReasonToArchiveGoal.OTHER,
+      reasonOther,
+      note = noteText,
+    )
+
+    // when
+    archiveAGoal(prisonNumber, goalReference, archiveGoalRequest)
+      .expectStatus()
+      .isNoContent()
+
+    // then
+    assertThat(getActionPlan(prisonNumber))
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasStatus(GoalStatus.ARCHIVED)
+          .hasArchiveReason(ReasonToArchiveGoal.OTHER)
+          .hasArchiveReasonOther(reasonOther)
+      }
+
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(3) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
+          it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
+            .wasActionedBy("buser_gen")
+            .hasActionedByDisplayName("Bernie User")
+        }
+
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+
+      verify(telemetryClient).trackEvent(
+        eq("goal-archived"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+
+      val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(goalArchivedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+
+      val note = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+      assertThat(note!!.content).isEqualTo(noteText)
     }
   }
 

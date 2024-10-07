@@ -15,6 +15,8 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -117,6 +119,69 @@ class UnarchiveGoalTest : IntegrationTestBase() {
       assertThat(goalArchivedEventProperties)
         .containsEntry("reference", goalReference.toString())
     }
+  }
+
+  @Test
+  fun `should return 204 and unarchive a goal and reset the reason and other text and archive note is deleted `() {
+    // given
+    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val reasonOther = "Because it's Monday"
+    val archiveNote = "an archive note"
+    val archiveRequestWithOtherReason = aValidArchiveGoalRequest(
+      goalReference = goalReference,
+      reason = ReasonToArchiveGoal.OTHER,
+      reasonOther = "Other reason",
+      note = archiveNote,
+    )
+    archiveAGoal(prisonNumber, goalReference, archiveRequestWithOtherReason)
+
+    // check that the note is there:
+
+    val noteBefore = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+    assertThat(noteBefore!!.content).isEqualTo(archiveNote)
+
+    val unarchiveGoalRequest = aValidUnarchiveGoalRequest(goalReference)
+    // when
+    unarchiveAGoal(prisonNumber, goalReference, unarchiveGoalRequest)
+      .expectStatus()
+      .isNoContent()
+
+    // then
+    assertThat(getActionPlan(prisonNumber))
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasStatus(GoalStatus.ACTIVE)
+          .hasArchiveReason(null)
+          .hasArchiveReasonOther(null)
+      }
+
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(4) { // the 4th Timeline event will be the GOAL_UNARCHIVED event
+          it.hasEventType(TimelineEventType.GOAL_UNARCHIVED)
+            .wasActionedBy("buser_gen")
+            .hasActionedByDisplayName("Bernie User")
+        }
+
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+
+      verify(telemetryClient).trackEvent(
+        eq("goal-unarchived"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+
+      val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(goalArchivedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+    }
+
+    // check that the note has been deleted
+    val noteAfter = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+    assertThat(noteAfter).isNull()
   }
 
   @Test

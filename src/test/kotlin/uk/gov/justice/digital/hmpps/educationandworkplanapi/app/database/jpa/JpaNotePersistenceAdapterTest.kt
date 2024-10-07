@@ -11,6 +11,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.UpdateNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidCreateNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
@@ -51,26 +52,29 @@ class JpaNotePersistenceAdapterTest {
     // given
     val entityReference = UUID.randomUUID()
     val entityType = EntityType.GOAL
+    val noteType = NoteType.GOAL
     val noteDTO = aValidNoteDto()
     val noteEntity = aValidNoteEntity(content = noteDTO.content)
 
     given(
-      noteRepository.findAllByEntityReferenceAndEntityType(
+      noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
         entityReference,
         NoteMapper.toEntity(entityType),
+        NoteMapper.toEntity(noteType),
       ),
     ).willReturn(
       listOf(noteEntity),
     )
 
     // when
-    val result = persistenceAdapter.getNotes(entityReference, entityType)
+    val result = persistenceAdapter.getNotes(entityReference, entityType, noteType)
 
     // then
     Assertions.assertThat(result[0].content).isEqualTo(noteDTO.content)
-    verify(noteRepository, times(1)).findAllByEntityReferenceAndEntityType(
+    verify(noteRepository, times(1)).findAllByEntityReferenceAndEntityTypeAndNoteType(
       entityReference,
       NoteMapper.toEntity(entityType),
+      NoteMapper.toEntity(noteType),
     )
   }
 
