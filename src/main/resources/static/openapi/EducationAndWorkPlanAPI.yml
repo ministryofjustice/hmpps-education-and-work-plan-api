@@ -780,8 +780,9 @@ components:
             $ref: '#/components/schemas/StepResponse'
         notes:
           type: string
-          description: Some additional notes related to the Goal.
+          description: Some additional notes related to the Goal. This is deprecated - use the GoalNotes list instead
           example: Pay close attention to Peter's behaviour.
+          deprecated: true
         createdBy:
           type: string
           description: The DPS username of the person who created the goal.
