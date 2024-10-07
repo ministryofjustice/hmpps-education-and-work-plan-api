@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.Enti
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType as DomainNoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType as EntityEntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType as EntityNoteType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType as ResourceNoteType
 
 object NoteMapper {
 
@@ -52,6 +53,13 @@ object NoteMapper {
       EntityNoteType.GOAL -> DomainNoteType.GOAL
       EntityNoteType.GOAL_ARCHIVAL -> DomainNoteType.GOAL_ARCHIVAL
       EntityNoteType.GOAL_COMPLETION -> DomainNoteType.GOAL_COMPLETION
+    }
+
+  fun toResourceModel(noteType: DomainNoteType) =
+    when (noteType) {
+      DomainNoteType.GOAL -> ResourceNoteType.GOAL
+      DomainNoteType.GOAL_ARCHIVAL -> ResourceNoteType.GOAL_ARCHIVAL
+      DomainNoteType.GOAL_COMPLETION -> ResourceNoteType.GOAL_COMPLETION
     }
 
   fun toEntity(entityType: DomainEntityType) =

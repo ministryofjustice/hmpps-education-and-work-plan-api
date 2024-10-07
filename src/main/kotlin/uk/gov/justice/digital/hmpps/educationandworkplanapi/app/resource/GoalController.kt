@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
@@ -31,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Note
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.util.UUID
@@ -67,11 +69,8 @@ class GoalController(
   ): GoalResponse {
     val response = goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
     // Get the archive note and update the response if present
-    noteService.getNotes(response.goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL)
-      .firstOrNull()?.let { archiveNote ->
-        return response.copy(archiveNote = archiveNote.content)
-      }
-    return response
+    val notes = noteService.getNotes(response.goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL)
+    return response.copy(goalNotes = notes.map { Note(it.reference, it.content, NoteMapper.toResourceModel(it.noteType)) })
   }
 
   @PutMapping("{goalReference}")

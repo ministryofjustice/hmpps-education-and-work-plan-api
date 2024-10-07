@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.re
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
@@ -12,12 +13,21 @@ import java.util.UUID
 interface NoteRepository : JpaRepository<NoteEntity, UUID> {
   fun findAllByPrisonNumber(prisonNumber: String): List<NoteEntity>
 
-  fun findAllByEntityReferenceAndEntityTypeAndNoteType(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteEntity>
+  fun findAllByEntityReferenceAndEntityTypeAndNoteType(
+    entityReference: UUID,
+    entityType: EntityType,
+    noteType: NoteType,
+  ): List<NoteEntity>
 
   fun findByReference(entityReference: UUID): NoteEntity
 
   fun findAllByEntityReference(entityReference: UUID): NoteEntity
 
   @Modifying
-  fun deleteNoteEntityByEntityReferenceAndEntityTypeAndNoteType(entityReference: UUID, entityType: EntityType, noteType: NoteType)
+  @Query("delete NoteEntity n where n.entityReference = :entityReference and n.entityType = :entityType and n.noteType = :noteType")
+  fun deleteNoteEntityByEntityReferenceAndEntityTypeAndNoteType(
+    entityReference: UUID,
+    entityType: EntityType,
+    noteType: NoteType,
+  )
 }

@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.acti
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -160,8 +161,12 @@ class GoalResponseAssert(actual: GoalResponse?) :
   fun hasArchiveNote(expected: String?): GoalResponseAssert {
     isNotNull
     with(actual!!) {
-      if (archiveNote != expected) {
-        failWithMessage("Expected archive note to be $expected, but was $archiveNote")
+      val archiveNote = goalNotes?.firstOrNull { it.type == NoteType.GOAL_ARCHIVAL }
+      if (archiveNote != null && archiveNote.content != expected) {
+        failWithMessage("Expected archive note to be $expected, but was ${archiveNote.content}")
+      }
+      if (expected == null && archiveNote != null) {
+        failWithMessage("Expected no archive note, but was ${archiveNote.content}")
       }
     }
     return this

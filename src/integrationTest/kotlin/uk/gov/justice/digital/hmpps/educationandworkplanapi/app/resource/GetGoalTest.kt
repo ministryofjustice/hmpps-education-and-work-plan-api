@@ -2,8 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
@@ -11,7 +9,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
@@ -19,8 +16,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.util.UUID
 
 class GetGoalTest : IntegrationTestBase() {
   companion object {
@@ -173,9 +168,7 @@ class GetGoalTest : IntegrationTestBase() {
       note = archiveNote,
     )
 
-    archiveAGoal(prisonNumber, goalReference, archiveGoalRequest)
-      .expectStatus()
-      .isNoContent()
+    archiveGoal(prisonNumber, archiveGoalRequest)
 
     // When
     val response = webTestClient.get()
@@ -198,22 +191,4 @@ class GetGoalTest : IntegrationTestBase() {
     // archive note should not be null.
     assertThat(actual).hasArchiveNote(archiveNote)
   }
-
-  fun archiveAGoal(
-    prisonNumber: String,
-    goalReference: UUID,
-    archiveGoalRequest: ArchiveGoalRequest,
-  ): WebTestClient.ResponseSpec = webTestClient.put()
-    .uri(ArchiveGoalTest.URI_TEMPLATE, prisonNumber, goalReference)
-    .withBody(archiveGoalRequest)
-    .bearerToken(
-      aValidTokenWithAuthority(
-        GOALS_RW,
-        username = "buser_gen",
-        displayName = "Bernie User",
-        privateKey = keyPair.private,
-      ),
-    )
-    .contentType(MediaType.APPLICATION_JSON)
-    .exchange()
 }
