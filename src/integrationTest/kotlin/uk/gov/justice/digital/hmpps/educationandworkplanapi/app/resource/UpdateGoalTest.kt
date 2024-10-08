@@ -395,6 +395,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasUpdatedAtPrison("BXI")
           .wasCreatedBy("auser_gen")
           .wasUpdatedBy("buser_gen")
+          .hasGoalNote("Updated goal text")
       }
 
     val timeline = getTimeline(prisonNumber)

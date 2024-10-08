@@ -23,6 +23,13 @@ class JpaNotePersistenceAdapter(
     return NoteMapper.toModel(noteEntity)
   }
 
+  override fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> {
+    return noteRepository.findAllByEntityReferenceAndEntityType(
+      entityReference,
+      NoteMapper.toEntity(entityType),
+    ).map { NoteMapper.toModel(it) }
+  }
+
   override fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> {
     return noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
       entityReference,
