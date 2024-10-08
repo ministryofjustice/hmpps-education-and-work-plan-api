@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActiveGoalStepsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalAction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -8,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CompleteGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
@@ -118,6 +120,7 @@ class GoalService(
       existingNote == null && updatedNote != null -> {
         goalNotesService.createNotes(prisonNumber, listOf(goal))
       }
+
       existingNote != updatedNote && updatedNote != null -> {
         goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
       }
@@ -198,25 +201,34 @@ class GoalService(
   fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal {
     val goalReference = completeGoalDto.reference
     log.info { "Completing Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
-
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
-    return if (existingGoal == null) {
-      throw GoalNotFoundException(prisonNumber, goalReference).also {
-        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
-      }
-    } else if (existingGoal.status != GoalStatus.ACTIVE) {
-      throw InvalidGoalStateException(
-        prisonNumber,
-        goalReference,
-        existingGoal.status,
-        GoalAction.COMPLETE,
-      )
-    } else {
-      goalPersistenceAdapter.completeGoal(prisonNumber, completeGoalDto)
-        ?.also { goalEventService.goalCompleted(prisonNumber, it) }
-        ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+    return when {
+      existingGoal == null -> {
+        throw GoalNotFoundException(prisonNumber, goalReference).also {
           log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
         }
+      }
+      existingGoal.status != GoalStatus.ACTIVE -> { // Archived too?
+        throw InvalidGoalStateException(
+          prisonNumber,
+          goalReference,
+          existingGoal.status,
+          GoalAction.COMPLETE,
+        )
+      }
+      existingGoal.steps.any { it.status != StepStatus.COMPLETE } -> {
+        throw ActiveGoalStepsException(
+          goalReference,
+          prisonNumber,
+        )
+      }
+      else -> {
+        goalPersistenceAdapter.completeGoal(prisonNumber, completeGoalDto)
+          ?.also { goalEventService.goalCompleted(prisonNumber, it) }
+          ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+            log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+          }
+      }
     }
   }
 
