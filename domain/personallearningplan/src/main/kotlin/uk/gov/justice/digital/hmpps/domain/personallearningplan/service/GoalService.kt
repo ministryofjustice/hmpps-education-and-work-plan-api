@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CompleteGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
@@ -186,6 +187,36 @@ class GoalService(
         goalEventService.goalUnArchived(prisonNumber, it)
       } ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
       log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found after unarchive attempt." }
+    }
+  }
+
+  /**
+   * Complete a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
+   *
+   * Returns the completed [Goal]
+   */
+  fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal {
+    val goalReference = completeGoalDto.reference
+    log.info { "Completing Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
+
+    val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
+    return if (existingGoal == null) {
+      throw GoalNotFoundException(prisonNumber, goalReference).also {
+        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+      }
+    } else if (existingGoal.status != GoalStatus.ACTIVE) {
+      throw InvalidGoalStateException(
+        prisonNumber,
+        goalReference,
+        existingGoal.status,
+        GoalAction.COMPLETE,
+      )
+    } else {
+      goalPersistenceAdapter.completeGoal(prisonNumber, completeGoalDto)
+        ?.also { goalEventService.goalCompleted(prisonNumber, it) }
+        ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+          log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
+        }
     }
   }
 

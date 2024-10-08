@@ -30,6 +30,7 @@ class GoalNotFoundException(val prisonNumber: String, val goalReference: UUID) :
 enum class GoalAction {
   ARCHIVE,
   UNARCHIVE,
+  COMPLETE,
 }
 
 class InvalidGoalStateException(

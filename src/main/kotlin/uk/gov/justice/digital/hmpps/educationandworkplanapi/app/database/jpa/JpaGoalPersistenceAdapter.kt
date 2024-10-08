@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CompleteGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
@@ -89,6 +90,14 @@ class JpaGoalPersistenceAdapter(
       GoalStatus.ARCHIVED,
       archiveGoalDto.reason,
       archiveGoalDto.reasonOther,
+    )
+  }
+
+  override fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal? {
+    return updateStatus(
+      prisonNumber,
+      completeGoalDto.reference,
+      GoalStatus.COMPLETED,
     )
   }
 
