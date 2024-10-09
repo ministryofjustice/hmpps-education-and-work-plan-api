@@ -158,6 +158,10 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
+  fun hasCompletedNote(expected: String?): GoalResponseAssert {
+    return hasNoteOfType(NoteType.GOAL_COMPLETION, expected, "completion")
+  }
+
   fun hasArchiveNote(expected: String?): GoalResponseAssert {
     return hasNoteOfType(NoteType.GOAL_ARCHIVAL, expected, "archive")
   }

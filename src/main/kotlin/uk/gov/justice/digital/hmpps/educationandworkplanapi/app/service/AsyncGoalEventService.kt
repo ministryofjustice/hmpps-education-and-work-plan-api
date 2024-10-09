@@ -116,7 +116,7 @@ class AsyncGoalEventService(
   ) {
     timelineService.recordTimelineEvent(
       prisonNumber,
-      timelineEventFactory.goalArchivedTimelineEvent(goal, correlationId),
+      timelineEventFactory.goalCompletedTimelineEvent(goal, correlationId),
     )
   }
 
