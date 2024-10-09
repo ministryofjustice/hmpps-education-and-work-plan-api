@@ -44,7 +44,7 @@ interface GoalPersistenceAdapter {
   fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal?
 
   /**
-   * Archives a [Goal] identified by its `prisonNumber` and [ArchiveGoalDTO.reference]
+   * Completes a [Goal] identified by its `prisonNumber` and [ArchiveGoalDTO.reference]
    */
   fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal?
 
