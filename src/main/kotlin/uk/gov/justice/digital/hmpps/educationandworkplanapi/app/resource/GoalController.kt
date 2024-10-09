@@ -120,7 +120,7 @@ class GoalController(
     @Valid @RequestBody completeGoalRequest: CompleteGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): Goal {
+  ) {
     val goal = goalService.completeGoal(
       prisonNumber = prisonNumber,
       completeGoalDto = goalResourceMapper.fromModelToDto(completeGoalRequest),
@@ -128,7 +128,6 @@ class GoalController(
     completeGoalRequest.note?.let {
       createGoalNote(prisonNumber, goal, it, NoteType.GOAL_COMPLETION)
     }
-    return goal
   }
 
   private fun createGoalNote(prisonNumber: String, goal: Goal, noteText: String, noteType: NoteType) {
