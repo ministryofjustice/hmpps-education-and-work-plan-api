@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.16.2'
+  version: '1.16.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -780,7 +780,7 @@ components:
             $ref: '#/components/schemas/StepResponse'
         notes:
           type: string
-          description: Some additional notes related to the Goal. This is deprecated - use the GoalNotes list instead
+          description: Some additional notes related to the Goal. This is deprecated - use the`goalNotes` list instead
           example: Pay close attention to Peter's behaviour.
           deprecated: true
         createdBy:
@@ -824,9 +824,9 @@ components:
           description: Describes the reason for archiving if 'OTHER' is selected, it is mandatory in this scenario.
         goalNotes:
           type: array
-          description: A List of at Notes associated with the Goal.
+          description: A List of at Notes associated with the Goal. Will be an empty array if the goal has no Notes
           items:
-            $ref: '#/components/schemas/Note'
+            $ref: '#/components/schemas/NoteResponse'
       required:
         - goalReference
         - title
@@ -841,6 +841,7 @@ components:
         - updatedByDisplayName
         - updatedAt
         - updatedAtPrison
+        - goalNotes
     StepResponse:
       title: StepResponse
       type: object
@@ -1788,8 +1789,8 @@ components:
         - goalReference
         - reason
 
-    Note:
-      title: Note
+    NoteResponse:
+      title: NoteResponse
       type: object
       description: An object representing a note.
       properties:
@@ -1803,6 +1804,52 @@ components:
           description: The content of the note.
         type:
           $ref: '#/components/schemas/NoteType'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created the Note.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created the Note.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Note was created.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Note was created.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated the Note.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated the Note.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Note was last updated. This will be the same as the created date if it has not yet been updated.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Note was updated.
+          example: 'BXI'
+      required:
+        - reference
+        - content
+        - type
+        - createdAt
+        - createdBy
+        - createdByDisplayName
+        - createdAtPrison
+        - updatedAt
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAtPrison
 
     NoteType:
       title: NoteType

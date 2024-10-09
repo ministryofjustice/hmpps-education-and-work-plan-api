@@ -169,7 +169,7 @@ class GoalResponseAssert(actual: GoalResponse?) :
   private fun hasNoteOfType(noteType: NoteType, expected: String?, noteLabel: String): GoalResponseAssert {
     isNotNull
     with(actual!!) {
-      val note = goalNotes?.firstOrNull { it.type == noteType }
+      val note = goalNotes.firstOrNull { it.type == noteType }
       when {
         note == null && expected != null ->
           failWithMessage("Expected $noteLabel note to be $expected, but was null")

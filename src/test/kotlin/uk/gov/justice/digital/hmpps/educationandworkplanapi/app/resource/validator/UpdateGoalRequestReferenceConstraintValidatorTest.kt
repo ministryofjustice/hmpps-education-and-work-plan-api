@@ -15,7 +15,7 @@ class UpdateGoalRequestReferenceConstraintValidatorTest {
   private val validatorFactory = Validation.buildDefaultValidatorFactory()
   private val validator = validatorFactory.validator.forExecutables()
 
-  private val goalController = GoalController(mock(), mock(), mock())
+  private val goalController = GoalController(mock(), mock(), mock(), mock())
   private val updateGoalMethod = GoalController::class.java.getMethod(
     "updateGoal",
     UpdateGoalRequest::class.java,
