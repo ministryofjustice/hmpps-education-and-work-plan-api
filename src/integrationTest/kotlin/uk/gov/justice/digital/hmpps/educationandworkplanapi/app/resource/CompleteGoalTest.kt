@@ -41,7 +41,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/complete"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
+  private val prisonNumber = "A4321BC"
 
   @Test
   fun `should return unauthorized given no bearer token`() {
