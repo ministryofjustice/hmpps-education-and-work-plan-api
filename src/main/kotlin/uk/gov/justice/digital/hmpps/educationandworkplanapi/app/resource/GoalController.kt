@@ -69,7 +69,7 @@ class GoalController(
   ): GoalResponse {
     val response = goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
     // Get the archive note and update the response if present
-    val notes = noteService.getNotes(response.goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL)
+    val notes = noteService.getNotes(response.goalReference, EntityType.GOAL)
     return response.copy(goalNotes = notes.map { Note(it.reference, it.content, NoteMapper.toResourceModel(it.noteType)) })
   }
 

@@ -130,7 +130,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     val archiveRequestWithOtherReason = aValidArchiveGoalRequest(
       goalReference = goalReference,
       reason = ReasonToArchiveGoal.OTHER,
-      reasonOther = "Other reason",
+      reasonOther = reasonOther,
       note = archiveNote,
     )
     archiveAGoal(prisonNumber, goalReference, archiveRequestWithOtherReason)
@@ -155,6 +155,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
           .hasStatus(GoalStatus.ACTIVE)
           .hasArchiveReason(null)
           .hasArchiveReasonOther(null)
+          .hasArchiveNote(null) // previous archive note will be removed
       }
 
     await.untilAsserted {

@@ -14,13 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetActionPlanSummariesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Note
 
 @RestController
 @Validated
@@ -28,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetAc
 class ActionPlanController(
   private val actionPlanService: ActionPlanService,
   private val actionPlanMapper: ActionPlanResourceMapper,
+  private val noteService: NoteService,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -46,10 +51,29 @@ class ActionPlanController(
   @GetMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_ACTIONPLANS)
-  fun getActionPlan(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): ActionPlanResponse =
-    with(actionPlanService.getActionPlan(prisonNumber)) {
-      actionPlanMapper.fromDomainToModel(this)
+  fun getActionPlan(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): ActionPlanResponse {
+    val response = actionPlanMapper.fromDomainToModel(actionPlanService.getActionPlan(prisonNumber))
+
+    // Map each goal response to its corresponding version with notes
+    val goalResponsesWithNotes = response.goals.map { goalResponse ->
+      val notes = noteService.getNotes(goalResponse.goalReference, EntityType.GOAL)
+
+      // Map the notes into their respective models
+      val mappedNotes = notes.map { note ->
+        Note(
+          reference = note.reference,
+          content = note.content,
+          type = NoteMapper.toResourceModel(note.noteType),
+        )
+      }
+
+      // Return a new goal response with the updated notes
+      goalResponse.copy(goalNotes = mappedNotes)
     }
+
+    // Return the response with the updated goals
+    return response.copy(goals = goalResponsesWithNotes)
+  }
 
   @PostMapping
   @ResponseStatus(HttpStatus.OK)

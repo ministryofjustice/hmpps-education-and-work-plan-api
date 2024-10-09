@@ -25,6 +25,11 @@ interface NotePersistenceAdapter {
   /**
    * Gets the notes associated with this entity reference.
    */
+  fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto>
+
+  /**
+   * Gets the notes associated with this entity reference and NoteType.
+   */
   fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto>
 
   /**

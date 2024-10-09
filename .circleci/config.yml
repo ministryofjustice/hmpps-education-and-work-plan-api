@@ -74,6 +74,8 @@ jobs:
             domain/timeline/build/reports/jacoco
       - store_artifacts:
           path: build-reports.tar
+      - store_artifacts:
+          path: build/reports/tests
 
 workflows:
   version: 2

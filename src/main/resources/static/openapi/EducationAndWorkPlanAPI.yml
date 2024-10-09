@@ -1793,7 +1793,7 @@ components:
       type: object
       description: An object representing a note.
       properties:
-        noteReference:
+        reference:
           type: string
           format: uuid
           description: The Notes unique reference. This is used as an identifier to archive the required Note.

@@ -159,14 +159,26 @@ class GoalResponseAssert(actual: GoalResponse?) :
   }
 
   fun hasArchiveNote(expected: String?): GoalResponseAssert {
+    return hasNoteOfType(NoteType.GOAL_ARCHIVAL, expected, "archive")
+  }
+
+  fun hasGoalNote(expected: String?): GoalResponseAssert {
+    return hasNoteOfType(NoteType.GOAL, expected, "goal")
+  }
+
+  private fun hasNoteOfType(noteType: NoteType, expected: String?, noteLabel: String): GoalResponseAssert {
     isNotNull
     with(actual!!) {
-      val archiveNote = goalNotes?.firstOrNull { it.type == NoteType.GOAL_ARCHIVAL }
-      if (archiveNote != null && archiveNote.content != expected) {
-        failWithMessage("Expected archive note to be $expected, but was ${archiveNote.content}")
-      }
-      if (expected == null && archiveNote != null) {
-        failWithMessage("Expected no archive note, but was ${archiveNote.content}")
+      val note = goalNotes?.firstOrNull { it.type == noteType }
+      when {
+        note == null && expected != null ->
+          failWithMessage("Expected $noteLabel note to be $expected, but was null")
+
+        note != null && note.content != expected ->
+          failWithMessage("Expected $noteLabel note to be $expected, but was ${note.content}")
+
+        expected == null && note != null ->
+          failWithMessage("Expected no $noteLabel note, but was ${note.content}")
       }
     }
     return this

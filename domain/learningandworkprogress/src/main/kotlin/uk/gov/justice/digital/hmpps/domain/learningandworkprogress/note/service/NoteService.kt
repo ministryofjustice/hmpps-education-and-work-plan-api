@@ -12,6 +12,10 @@ class NoteService(private val notePersistenceAdapter: NotePersistenceAdapter) {
     return notePersistenceAdapter.createNote(createNoteDto)
   }
 
+  fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> {
+    return notePersistenceAdapter.getNotes(entityReference, entityType)
+  }
+
   fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> {
     return notePersistenceAdapter.getNotes(entityReference, entityType, noteType)
   }

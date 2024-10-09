@@ -13,6 +13,11 @@ import java.util.UUID
 interface NoteRepository : JpaRepository<NoteEntity, UUID> {
   fun findAllByPrisonNumber(prisonNumber: String): List<NoteEntity>
 
+  fun findAllByEntityReferenceAndEntityType(
+    entityReference: UUID,
+    entityType: EntityType,
+  ): List<NoteEntity>
+
   fun findAllByEntityReferenceAndEntityTypeAndNoteType(
     entityReference: UUID,
     entityType: EntityType,
