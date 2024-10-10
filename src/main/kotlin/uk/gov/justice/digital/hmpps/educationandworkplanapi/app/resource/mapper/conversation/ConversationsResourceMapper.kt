@@ -28,13 +28,13 @@ class ConversationsResourceMapper(
       note = conversation.note.content,
       createdBy = conversation.note.createdBy!!,
       createdByDisplayName = conversation.note.createdBy?.let {
-        userService.getUserDetails(it)?.name
+        userService.getUserDetails(it).name
       } ?: "Unknown",
       createdAt = instantMapper.toOffsetDateTime(conversation.note.createdAt)!!,
       createdAtPrison = conversation.note.createdAtPrison,
       updatedBy = conversation.note.lastUpdatedBy!!,
       updatedByDisplayName = conversation.note.lastUpdatedBy?.let {
-        userService.getUserDetails(it)?.name
+        userService.getUserDetails(it).name
       } ?: "Unknown",
       updatedAt = instantMapper.toOffsetDateTime(conversation.note.lastUpdatedAt)!!,
       updatedAtPrison = conversation.note.lastUpdatedAtPrison,

@@ -23,8 +23,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
@@ -32,7 +32,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Note
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.util.UUID
@@ -44,6 +43,7 @@ class GoalController(
   private val goalService: GoalService,
   private val goalResourceMapper: GoalResourceMapper,
   private val noteService: NoteService,
+  private val noteResourceMapper: NoteResourceMapper,
 ) {
 
   @PostMapping
@@ -70,7 +70,7 @@ class GoalController(
     val response = goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
     // Get the archive note and update the response if present
     val notes = noteService.getNotes(response.goalReference, EntityType.GOAL)
-    return response.copy(goalNotes = notes.map { Note(it.reference, it.content, NoteMapper.toResourceModel(it.noteType)) })
+    return response.copy(goalNotes = notes.map { noteResourceMapper.fromDomainToModel(it) })
   }
 
   @PutMapping("{goalReference}")
@@ -100,7 +100,7 @@ class GoalController(
     @Valid @RequestBody archiveGoalRequest: ArchiveGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): Goal {
+  ) {
     val goal = goalService.archiveGoal(
       prisonNumber = prisonNumber,
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
@@ -108,7 +108,6 @@ class GoalController(
     archiveGoalRequest.note?.let {
       createGoalNote(prisonNumber, goal, it, NoteType.GOAL_ARCHIVAL)
     }
-    return goal
   }
 
   private fun createGoalNote(prisonNumber: String, goal: Goal, noteText: String, noteType: NoteType) {
@@ -133,16 +132,14 @@ class GoalController(
     @Valid @RequestBody archiveGoalRequest: UnarchiveGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): Goal {
-    val goal = goalService.unarchiveGoal(
+  ) {
+    goalService.unarchiveGoal(
       prisonNumber = prisonNumber,
       unarchiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     )
 
     // delete any goal notes
     noteService.deleteNote(archiveGoalRequest.goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL)
-
-    return goal
   }
 
   @GetMapping
