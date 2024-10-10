@@ -9,5 +9,7 @@ interface GoalNotesService {
 
   fun getNotes(entityReference: UUID): String?
 
+  fun deleteNote(entityReference: UUID)
+
   fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String?)
 }
