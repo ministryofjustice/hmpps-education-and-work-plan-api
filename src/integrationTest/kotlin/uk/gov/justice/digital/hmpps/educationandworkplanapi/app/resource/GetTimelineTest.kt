@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timelineValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
@@ -190,7 +189,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline with multiple events in order`() {
     // Given
-    val prisonNumber = anotherValidPrisonNumber()
+    val prisonNumber = timelineValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
