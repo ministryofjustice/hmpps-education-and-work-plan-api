@@ -1,12 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.conversation
 
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.aValidPagedResult
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
@@ -22,6 +24,8 @@ import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 internal class ConversationResourceMapperTest {
+  @InjectMocks
+  private lateinit var mapper: ConversationsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
@@ -71,16 +75,18 @@ internal class ConversationResourceMapperTest {
     )
     given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
 
-    given(userService.getUserDetails("auser_gen")).willReturn(UserDetailsDto("auser_gen", true, "Albert User"))
-    given(userService.getUserDetails("buser_gen")).willReturn(UserDetailsDto("buser_gen", true, "Bernie User"))
-
-    val mapper = ConversationsResourceMapper(instantMapper, userService)
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("auser_gen", true, "Albert User"),
+      UserDetailsDto("buser_gen", true, "Bernie User"),
+    )
 
     // When
     val actual = mapper.fromDomainToModel(conversation)
 
     // Then
-    Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expectedConversation)
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expectedConversation)
+    verify(userService).getUserDetails("auser_gen")
+    verify(userService).getUserDetails("buser_gen")
   }
 
   @Test
@@ -113,7 +119,10 @@ internal class ConversationResourceMapperTest {
     val expectedDateTime = OffsetDateTime.now()
     given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
 
-    val mapper = ConversationsResourceMapper(instantMapper, userService)
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
 
     // When
     val actual = mapper.fromPagedDomainToModel(pagedConversations)
@@ -129,5 +138,7 @@ internal class ConversationResourceMapperTest {
     assertThat(actual.content[0]).hasNoteContent("Pay attention to Peter's behaviour.")
     assertThat(actual.content[1]).hasNoteContent("Peter is progressing well.")
     assertThat(actual.content[2]).hasNoteContent("Peter has complete his goal.")
+    verify(userService, times(3)).getUserDetails("asmith_gen")
+    verify(userService, times(3)).getUserDetails("bjones_gen")
   }
 }

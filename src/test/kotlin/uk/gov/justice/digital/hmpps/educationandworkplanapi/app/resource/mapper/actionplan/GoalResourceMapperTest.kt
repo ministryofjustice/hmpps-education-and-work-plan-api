@@ -133,6 +133,7 @@ internal class GoalResourceMapperTest {
       updatedAtPrison = "MDI",
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
+      goalNotes = emptyList(),
     )
 
     // When

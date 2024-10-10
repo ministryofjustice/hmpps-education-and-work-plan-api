@@ -2,8 +2,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.acti
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -25,6 +27,7 @@ fun aValidGoalResponse(
   updatedAtPrison: String = "BXI",
   archiveReason: ReasonToArchiveGoal? = null,
   archiveReasonOther: String? = null,
+  goalNotes: List<NoteResponse> = listOf(aValidNoteResponse()),
 ): GoalResponse =
   GoalResponse(
     goalReference = reference,
@@ -43,6 +46,7 @@ fun aValidGoalResponse(
     updatedAtPrison = updatedAtPrison,
     archiveReason = archiveReason,
     archiveReasonOther = archiveReasonOther,
+    goalNotes = goalNotes,
   )
 
 fun anotherValidGoalResponse(
@@ -60,6 +64,7 @@ fun anotherValidGoalResponse(
   updatedByDisplayName: String = "Barry Jones",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
+  goalNotes: List<NoteResponse> = listOf(aValidNoteResponse()),
 ): GoalResponse =
   GoalResponse(
     goalReference = reference,
@@ -76,4 +81,5 @@ fun anotherValidGoalResponse(
     updatedAt = updatedAt,
     updatedByDisplayName = updatedByDisplayName,
     updatedAtPrison = updatedAtPrison,
+    goalNotes = goalNotes,
   )

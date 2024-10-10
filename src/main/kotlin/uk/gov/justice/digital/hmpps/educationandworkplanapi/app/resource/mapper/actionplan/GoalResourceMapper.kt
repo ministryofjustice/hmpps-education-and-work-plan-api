@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.time.Instant
+import java.util.Collections
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus as GoalStatusDto
 
@@ -28,6 +29,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus as Go
   imports = [
     Instant::class,
     UUID::class,
+    Collections::class,
   ],
 )
 interface GoalResourceMapper {
@@ -43,6 +45,7 @@ interface GoalResourceMapper {
   @Mapping(target = "updatedAt", source = "lastUpdatedAt")
   @Mapping(target = "createdAtPrison", source = "createdAtPrison")
   @Mapping(target = "updatedAtPrison", source = "lastUpdatedAtPrison")
+  @Mapping(target = "goalNotes", expression = "java( Collections.emptyList() )")
   fun fromDomainToModel(goalDomain: Goal): GoalResponse
 
   @Mapping(target = "reference", source = "goalReference")
