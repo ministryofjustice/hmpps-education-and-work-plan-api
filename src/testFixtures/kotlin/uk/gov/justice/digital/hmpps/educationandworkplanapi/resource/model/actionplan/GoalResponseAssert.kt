@@ -131,18 +131,30 @@ class GoalResponseAssert(actual: GoalResponse?) :
   fun hasNoNotes(): GoalResponseAssert {
     isNotNull
     with(actual!!) {
-      if (notes != null) {
-        failWithMessage("Expected goal to have no notes, but was $notes")
+      if (goalNotes.isNotEmpty()) {
+        failWithMessage("Expected goal to have no notes, but there were ${goalNotes.size}")
       }
     }
     return this
   }
 
-  fun hasNotes(expected: String): GoalResponseAssert {
+  fun hasNoGoalNote(): GoalResponseAssert {
     isNotNull
     with(actual!!) {
-      if (notes != expected) {
-        failWithMessage("Expected goal to have notes '$expected', but was $notes")
+      val goalNotesCount = goalNotes.count { it.type == NoteType.GOAL }
+      if (goalNotesCount > 0) {
+        failWithMessage("Expected goal to have no goal notes, but there were $goalNotesCount")
+      }
+    }
+    return this
+  }
+
+  fun hasNoArchiveNote(): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val archiveNotesCount = goalNotes.count { it.type == NoteType.GOAL_ARCHIVAL }
+      if (archiveNotesCount > 0) {
+        failWithMessage("Expected goal to have no archive notes, but there were $archiveNotesCount")
       }
     }
     return this
@@ -158,27 +170,24 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
-  fun hasArchiveNote(expected: String?): GoalResponseAssert {
+  fun hasArchiveNote(expected: String): GoalResponseAssert {
     return hasNoteOfType(NoteType.GOAL_ARCHIVAL, expected, "archive")
   }
 
-  fun hasGoalNote(expected: String?): GoalResponseAssert {
+  fun hasGoalNote(expected: String): GoalResponseAssert {
     return hasNoteOfType(NoteType.GOAL, expected, "goal")
   }
 
-  private fun hasNoteOfType(noteType: NoteType, expected: String?, noteLabel: String): GoalResponseAssert {
+  private fun hasNoteOfType(noteType: NoteType, expected: String, noteLabel: String): GoalResponseAssert {
     isNotNull
     with(actual!!) {
       val note = goalNotes.firstOrNull { it.type == noteType }
       when {
-        note == null && expected != null ->
+        note == null ->
           failWithMessage("Expected $noteLabel note to be $expected, but was null")
 
-        note != null && note.content != expected ->
+        note.content != expected ->
           failWithMessage("Expected $noteLabel note to be $expected, but was ${note.content}")
-
-        expected == null && note != null ->
-          failWithMessage("Expected no $noteLabel note, but was ${note.content}")
       }
     }
     return this

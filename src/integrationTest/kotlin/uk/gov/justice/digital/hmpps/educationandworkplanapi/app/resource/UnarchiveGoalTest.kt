@@ -155,7 +155,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
           .hasStatus(GoalStatus.ACTIVE)
           .hasArchiveReason(null)
           .hasArchiveReasonOther(null)
-          .hasArchiveNote(null) // previous archive note will be removed
+          .hasNoArchiveNote() // previous archive note will be removed
       }
 
     await.untilAsserted {

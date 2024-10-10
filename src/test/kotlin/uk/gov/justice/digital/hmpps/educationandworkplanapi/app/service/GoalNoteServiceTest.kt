@@ -6,17 +6,20 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.given
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.CreateNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.UpdateNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.assertThat
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
-import java.util.*
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class GoalNoteServiceTest {
@@ -28,19 +31,40 @@ class GoalNoteServiceTest {
   private lateinit var goalNoteService: GoalNoteService
 
   @Test
-  fun `createNotes should call createNote for each goal note`() {
+  fun `createNotes should call createNote for each goal with a populated goal note`() {
     // Given
     val prisonNumber = "A1234BC"
-    val goal1 = aValidGoal()
-    val goal2 = aValidGoal()
+    val goal1 = aValidGoal(
+      notes = "The notes for goal 1",
+    )
+    val goal2 = aValidGoal(
+      notes = "The notes for goal 2",
+    )
+    val goal3 = aValidGoal(
+      notes = "",
+    )
+    val goal4 = aValidGoal(
+      notes = null,
+    )
+
+    val createdGoals = listOf(goal1, goal2, goal3, goal4)
 
     // When
-    val createdGoals = listOf(goal1, goal2)
-
-    // Then
     goalNoteService.createNotes(prisonNumber, createdGoals)
 
-    verify(noteService, times(2)).createNote(any())
+    // Then
+    val captor = argumentCaptor<CreateNoteDto>()
+    verify(noteService, times(2)).createNote(captor.capture())
+    assertThat(captor.firstValue)
+      .hasPrisonNumber(prisonNumber)
+      .hasEntityReference(goal1.reference)
+      .hasEntityType(EntityType.GOAL)
+      .hasContent(goal1.notes!!)
+    assertThat(captor.secondValue)
+      .hasPrisonNumber(prisonNumber)
+      .hasEntityReference(goal2.reference)
+      .hasEntityType(EntityType.GOAL)
+      .hasContent(goal2.notes!!)
   }
 
   @Test
