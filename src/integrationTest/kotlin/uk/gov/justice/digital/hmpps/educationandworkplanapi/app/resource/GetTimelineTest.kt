@@ -128,8 +128,6 @@ class GetTimelineTest : IntegrationTestBase() {
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]
 
-    Thread.sleep(3000)
-
     // When
     await.untilAsserted {
       val response = webTestClient.get()
@@ -219,7 +217,8 @@ class GetTimelineTest : IntegrationTestBase() {
     val induction = getInduction(prisonNumber)
     val actionPlan = getActionPlan(prisonNumber)
     val actionPlanReference = actionPlan.reference
-    val goal1Reference = actionPlan.goals[1].goalReference // The Action Plan returned by the API has Goals in reverse chronological order. The first Goal created is the 2nd in the list
+    val goal1Reference =
+      actionPlan.goals[1].goalReference // The Action Plan returned by the API has Goals in reverse chronological order. The first Goal created is the 2nd in the list
     val goal2Reference = actionPlan.goals[0].goalReference // and the 2nd Goal created is the first in the list.
     val stepToUpdate = actionPlan.goals[1].steps[0]
 
@@ -236,8 +235,6 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
     updateGoal(prisonNumber, updateGoalRequest)
-
-    Thread.sleep(3000)
 
     // When
     await.untilAsserted {
