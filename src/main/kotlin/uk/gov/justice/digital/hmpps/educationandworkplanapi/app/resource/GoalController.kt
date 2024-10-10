@@ -100,7 +100,7 @@ class GoalController(
     @Valid @RequestBody archiveGoalRequest: ArchiveGoalRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
-  ): Goal {
+  ) {
     val goal = goalService.archiveGoal(
       prisonNumber = prisonNumber,
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
@@ -108,7 +108,6 @@ class GoalController(
     archiveGoalRequest.note?.let {
       createGoalNote(prisonNumber, goal, it, NoteType.GOAL_ARCHIVAL)
     }
-    return goal
   }
 
   private fun createGoalNote(prisonNumber: String, goal: Goal, noteText: String, noteType: NoteType) {
