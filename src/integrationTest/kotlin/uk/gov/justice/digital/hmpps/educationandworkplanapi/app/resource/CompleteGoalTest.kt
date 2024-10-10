@@ -13,6 +13,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -41,7 +42,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/complete"
   }
 
-  private val prisonNumber = "A4321BC"
+  private val prisonNumber = anotherValidPrisonNumber()
 
   @Test
   fun `should return unauthorized given no bearer token`() {
