@@ -302,4 +302,66 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsKey("correlationId")
     }
   }
+
+  @Test
+  fun `should add goal with no notes`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    val createGoalRequest = aValidCreateGoalRequest(
+      notes = null,
+    )
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
+
+    // When
+    webTestClient.post()
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val actual = getActionPlan(prisonNumber)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasNoGoalNote()
+          .hasNoNotes()
+      }
+  }
+
+  @Test
+  fun `should add goal with notes`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    val createGoalRequest = aValidCreateGoalRequest(
+      notes = "This feels like an appropriate and achievable goal for Chris",
+    )
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
+
+    // When
+    webTestClient.post()
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val actual = getActionPlan(prisonNumber)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal.hasGoalNote("This feels like an appropriate and achievable goal for Chris")
+      }
+  }
 }

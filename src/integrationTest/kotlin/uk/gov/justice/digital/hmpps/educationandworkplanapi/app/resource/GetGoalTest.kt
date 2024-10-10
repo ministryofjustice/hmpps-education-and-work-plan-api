@@ -144,8 +144,8 @@ class GetGoalTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasReference(goalReference)
-    // archive note should be null.
-    assertThat(actual).hasArchiveNote(null)
+      // archive note should be null.
+      .hasNoArchiveNote()
   }
 
   @Test
