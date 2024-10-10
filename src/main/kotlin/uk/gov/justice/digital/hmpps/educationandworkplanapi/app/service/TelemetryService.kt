@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEven
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UNARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
@@ -55,6 +56,14 @@ class TelemetryService(
       goal = archivedGoal,
       correlationId = correlationId,
       telemetryEventType = GOAL_ARCHIVED,
+    )
+  }
+
+  fun trackGoalCompletedEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) {
+    sendTelemetryEventForGoal(
+      goal = goal,
+      correlationId = correlationId,
+      telemetryEventType = GOAL_COMPLETED,
     )
   }
 

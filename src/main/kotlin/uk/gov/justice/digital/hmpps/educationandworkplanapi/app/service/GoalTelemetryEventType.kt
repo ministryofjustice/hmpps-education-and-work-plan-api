@@ -33,7 +33,15 @@ enum class GoalTelemetryEventType(val value: String, val customDimensions: (goal
     },
   ),
 
-  GOAL_COMPLETED("goal-completed", { goal, correlationId -> emptyMap() }),
+  GOAL_COMPLETED(
+    "goal-completed",
+    { goal, correlationId ->
+      mapOf(
+        "correlationId" to correlationId.toString(),
+        "reference" to goal.reference.toString(),
+      )
+    },
+  ),
 
   GOAL_ARCHIVED(
     "goal-archived",

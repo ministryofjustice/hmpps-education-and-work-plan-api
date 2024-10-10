@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CompleteGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDto
@@ -41,6 +42,11 @@ interface GoalPersistenceAdapter {
    * Unarchives a [Goal] identified by its `prisonNumber` and [UnarchiveGoalDTO.reference]
    */
   fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal?
+
+  /**
+   * Completes a [Goal] identified by its `prisonNumber` and [ArchiveGoalDTO.reference]
+   */
+  fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal?
 
   /**
    * Gets all [Goal]s for a prisoner identified by `prisonNumber` or returns null if the prisoner has no action plan

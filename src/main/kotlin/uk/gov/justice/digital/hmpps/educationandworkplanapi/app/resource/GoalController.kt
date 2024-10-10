@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
@@ -107,6 +108,24 @@ class GoalController(
     )
     archiveGoalRequest.note?.let {
       createGoalNote(prisonNumber, goal, it, NoteType.GOAL_ARCHIVAL)
+    }
+  }
+
+  @PutMapping("{goalReference}/complete")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize(HAS_EDIT_GOALS)
+  @Transactional
+  fun completeGoal(
+    @Valid @RequestBody completeGoalRequest: CompleteGoalRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @PathVariable goalReference: UUID,
+  ) {
+    val goal = goalService.completeGoal(
+      prisonNumber = prisonNumber,
+      completeGoalDto = goalResourceMapper.fromModelToDto(completeGoalRequest),
+    )
+    completeGoalRequest.note?.let {
+      createGoalNote(prisonNumber, goal, it, NoteType.GOAL_COMPLETION)
     }
   }
 

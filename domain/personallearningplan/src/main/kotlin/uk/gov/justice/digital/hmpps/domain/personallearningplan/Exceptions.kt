@@ -30,6 +30,7 @@ class GoalNotFoundException(val prisonNumber: String, val goalReference: UUID) :
 enum class GoalAction {
   ARCHIVE,
   UNARCHIVE,
+  COMPLETE,
 }
 
 class InvalidGoalStateException(
@@ -39,6 +40,9 @@ class InvalidGoalStateException(
   val action: GoalAction,
 ) :
   RuntimeException("Could not ${action.name.lowercase()} goal with reference [$goalReference] for prisoner [$prisonNumber]: Goal was in state [$status] that can't be ${action.name.lowercase()}d")
+
+class ActiveGoalStepsException(val goalReference: UUID, val prisonNumber: String) :
+  RuntimeException(("Could not complete goal with reference [$goalReference] for prisoner [$prisonNumber]: As it has active or not started steps"))
 
 /**
  * Thrown when a specified Goal is archived with reason other but no reason description.

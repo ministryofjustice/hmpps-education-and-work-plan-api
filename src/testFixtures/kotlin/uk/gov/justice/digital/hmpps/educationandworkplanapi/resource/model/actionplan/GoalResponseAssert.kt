@@ -160,6 +160,17 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
+  fun hasNoCompletedNote(): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val completionNotesCount = goalNotes.count { it.type == NoteType.GOAL_COMPLETION }
+      if (completionNotesCount > 0) {
+        failWithMessage("Expected goal to have no completion notes, but there were $completionNotesCount")
+      }
+    }
+    return this
+  }
+
   fun hasReference(expected: UUID): GoalResponseAssert {
     isNotNull
     with(actual!!) {
@@ -168,6 +179,10 @@ class GoalResponseAssert(actual: GoalResponse?) :
       }
     }
     return this
+  }
+
+  fun hasCompletedNote(expected: String): GoalResponseAssert {
+    return hasNoteOfType(NoteType.GOAL_COMPLETION, expected, "completion")
   }
 
   fun hasArchiveNote(expected: String): GoalResponseAssert {
