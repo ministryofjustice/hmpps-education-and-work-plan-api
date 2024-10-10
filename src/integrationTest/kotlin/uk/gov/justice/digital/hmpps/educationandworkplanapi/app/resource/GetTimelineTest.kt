@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherTimelineValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.timelineValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -74,7 +73,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should not get timeline given prisoner has no timeline`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineNotFound(prisonNumber)
 
     // When
@@ -101,7 +100,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline for prisoner`() {
     // Given
-    val prisonNumber = timelineValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
@@ -190,7 +189,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline with multiple events in order`() {
     // Given
-    val prisonNumber = anotherTimelineValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
@@ -323,7 +322,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline for prisoner with no plp events`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(

@@ -11,8 +11,17 @@ fun aValidPrisonNumber() = "A1234BC"
 
 fun anotherValidPrisonNumber() = "B5678CD"
 
-fun timelineValidPrisonNumber() = "C5578CD"
+fun randomValidPrisonNumber(): String {
+  val letters = ('A'..'Z')
+  val numbers = ('0'..'9')
 
-fun anotherTimelineValidPrisonNumber() = "D6678CD"
+  val firstLetter = letters.random()
+  val secondLetter = letters.random()
+  val thirdLetter = letters.random()
+
+  val numberPart = (1..9999).random().toString().padStart(4, '0')
+
+  return "$firstLetter$numberPart$secondLetter$thirdLetter"
+}
 
 fun aValidReference() = UUID.randomUUID()
