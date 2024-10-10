@@ -234,7 +234,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           sequenceNumber = 2,
         ),
       ),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
+      notes = "Chris would like to improve his listening skills, not just his verbal communication - updated",
       prisonId = "MDI",
     )
 
@@ -274,6 +274,127 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasUpdatedAtPrison("MDI")
           .wasCreatedBy("auser_gen")
           .wasUpdatedBy("buser_gen")
+          .hasGoalNote("Chris would like to improve his listening skills, not just his verbal communication - updated")
+      }
+
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+          it.hasEventType(TimelineEventType.GOAL_UPDATED)
+            .wasActionedBy("buser_gen")
+            .hasActionedByDisplayName("Bernie User")
+        }
+
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+
+      verify(telemetryClient).trackEvent(
+        eq("goal-updated"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+      verify(telemetryClient).trackEvent(
+        eq("step-removed"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+
+      val goalUpdatedEventProperties = eventPropertiesCaptor.firstValue
+      val stepRemovedEventProperties = eventPropertiesCaptor.secondValue
+      assertThat(goalUpdatedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+      assertThat(stepRemovedEventProperties)
+        .containsEntry("reference", goalReference.toString())
+        .containsEntry("stepCount", "2")
+      assertThat(goalUpdatedEventProperties["correlationId"])
+        .isEqualTo(stepRemovedEventProperties["correlationId"])
+    }
+  }
+
+  @Test
+  fun `should update goal and delete goal note`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createGoalRequest = aValidCreateGoalRequest(
+      title = "Learn French",
+      steps = listOf(
+        aValidCreateStepRequest(
+          title = "Book course",
+        ),
+        aValidCreateStepRequest(
+          title = "Attend course",
+        ),
+      ),
+    )
+    createGoal(
+      username = "auser_gen",
+      displayName = "Albert User",
+      prisonNumber = prisonNumber,
+      createGoalRequest = createGoalRequest,
+    )
+
+    val actionPlan = getActionPlan(prisonNumber)
+    val goal = actionPlan.goals[0]
+    val goalReference = goal.goalReference
+    val step1 = goal.steps[0]
+    val stepReference = step1.stepReference
+
+    val updateGoalRequest = aValidUpdateGoalRequest(
+      goalReference = goalReference,
+      title = "Learn French to GCSE standard",
+      steps = listOf(
+        aValidUpdateStepRequest(
+          stepReference = stepReference,
+          title = "Book course before December 2023",
+          sequenceNumber = 1,
+        ),
+        aValidUpdateStepRequest(
+          stepReference = null,
+          title = "Attend course before March 2024",
+          sequenceNumber = 2,
+        ),
+      ),
+      notes = "",
+      prisonId = "MDI",
+    )
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber, goalReference)
+      .withBody(updateGoalRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RW,
+          username = "buser_gen",
+          displayName = "Bernie User",
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent()
+
+    // Then
+    val actual = getActionPlan(prisonNumber)
+    assertThat(actual)
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasTitle("Learn French to GCSE standard")
+          .hasNumberOfSteps(2)
+          .step(1) { step ->
+            step.hasTitle("Book course before December 2023")
+          }
+          .step(2) { step ->
+            step.hasTitle("Attend course before March 2024")
+          }
+          .wasCreatedAtPrison("BXI")
+          .wasUpdatedAtPrison("MDI")
+          .wasCreatedBy("auser_gen")
+          .wasUpdatedBy("buser_gen")
+          .hasNoGoalNote()
       }
 
     await.untilAsserted {
