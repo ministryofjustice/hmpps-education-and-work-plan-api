@@ -19,7 +19,7 @@ fun randomValidPrisonNumber(): String {
   val secondLetter = letters.random()
   val thirdLetter = letters.random()
 
-  val numberPart = (1..9999).random().toString().padStart(4, '0')
+  val numberPart = numbers.random().toString().padStart(4, '0')
 
   return "$firstLetter$numberPart$secondLetter$thirdLetter"
 }

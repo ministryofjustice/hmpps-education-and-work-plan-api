@@ -128,6 +128,8 @@ class GetTimelineTest : IntegrationTestBase() {
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]
 
+    Thread.sleep(3000)
+
     // When
     await.untilAsserted {
       val response = webTestClient.get()
@@ -234,6 +236,8 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
     updateGoal(prisonNumber, updateGoalRequest)
+
+    Thread.sleep(3000)
 
     // When
     await.untilAsserted {
