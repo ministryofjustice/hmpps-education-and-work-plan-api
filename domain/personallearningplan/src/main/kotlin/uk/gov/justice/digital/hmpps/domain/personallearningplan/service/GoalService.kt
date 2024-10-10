@@ -117,8 +117,8 @@ class GoalService(
       existingNote == null && updatedNote != null -> {
         goalNotesService.createNotes(prisonNumber, listOf(goal))
       }
-      existingNote != updatedNote && updatedNote != null -> {
-        if (updatedNote.isEmpty()) {
+      existingNote != updatedNote -> {
+        if (updatedNote.isNullOrEmpty()) {
           goalNotesService.deleteNote(goal.reference)
         } else {
           goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
