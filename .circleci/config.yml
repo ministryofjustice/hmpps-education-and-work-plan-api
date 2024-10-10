@@ -19,9 +19,7 @@ parameters:
   localstack-version:
     type: string
     default: "3.6.0"
-  java-options:
-    type: string
-    default: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=2
+
 
 jobs:
   validate:
