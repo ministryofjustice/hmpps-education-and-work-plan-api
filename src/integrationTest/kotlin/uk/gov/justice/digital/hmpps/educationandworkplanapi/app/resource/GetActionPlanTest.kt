@@ -105,9 +105,8 @@ class GetActionPlanTest : IntegrationTestBase() {
           .wasUpdatedAtPrison("BXI")
           .wasUpdatedBy("auser_gen")
           .hasUpdatedByDisplayName("Albert User")
-          .hasNotes("Chris would like to improve his listening skills, not just his verbal communication")
           .hasGoalNote("Chris would like to improve his listening skills, not just his verbal communication")
-          .hasArchiveNote(null)
+          .hasNoArchiveNote()
       }
   }
 

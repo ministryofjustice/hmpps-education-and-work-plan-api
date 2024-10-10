@@ -86,7 +86,7 @@ class CompleteGoalTest : IntegrationTestBase() {
       .goal(1) { goal ->
         goal
           .hasStatus(GoalStatus.COMPLETED)
-          .hasCompletedNote(null)
+          .hasNoCompletedNote()
       }
 
     await.untilAsserted {

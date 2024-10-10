@@ -16,9 +16,8 @@ class GoalNoteService(
 ) : GoalNotesService {
 
   override fun createNotes(prisonNumber: String, createdGoals: List<Goal>) {
-    val goalsCopy = ArrayList(createdGoals)
-    goalsCopy.forEach { createdGoal ->
-      createdGoal.notes?.let {
+    createdGoals.forEach { createdGoal ->
+      if (!createdGoal.notes.isNullOrEmpty()) {
         noteService.createNote(createdGoal.mapToNotesDTO(prisonNumber))
       }
     }
@@ -26,6 +25,10 @@ class GoalNoteService(
 
   override fun getNotes(entityReference: UUID): String? {
     return noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL).firstOrNull()?.content
+  }
+
+  override fun deleteNote(entityReference: UUID) {
+    noteService.deleteNote(entityReference, EntityType.GOAL, NoteType.GOAL)
   }
 
   override fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String?) {
