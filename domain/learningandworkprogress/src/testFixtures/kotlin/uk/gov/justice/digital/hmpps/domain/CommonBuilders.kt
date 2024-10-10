@@ -13,4 +13,6 @@ fun anotherValidPrisonNumber() = "B5678CD"
 
 fun timelineValidPrisonNumber() = "C5578CD"
 
+fun anotherTimelineValidPrisonNumber() = "D6678CD"
+
 fun aValidReference() = UUID.randomUUID()
