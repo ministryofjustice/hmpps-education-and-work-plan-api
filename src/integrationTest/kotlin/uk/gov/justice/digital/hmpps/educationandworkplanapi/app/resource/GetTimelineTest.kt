@@ -4,6 +4,7 @@ import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.test.annotation.DirtiesContext
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
@@ -31,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class GetTimelineTest : IntegrationTestBase() {
 
   companion object {
