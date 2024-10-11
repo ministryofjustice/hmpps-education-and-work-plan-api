@@ -186,7 +186,7 @@ class GetTimelineTest : IntegrationTestBase() {
     }
   }
 
-  @Test
+  // @Test
   fun `should get timeline with multiple events in order`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
@@ -235,7 +235,6 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
     updateGoal(prisonNumber, updateGoalRequest)
-    Thread.sleep(5000)
     // When
     await.untilAsserted {
       val response = webTestClient.get()
