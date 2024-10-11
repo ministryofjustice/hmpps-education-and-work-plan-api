@@ -32,7 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 class UpdateGoalTest : IntegrationTestBase() {
 
   companion object {
-    const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}"
+    private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}"
   }
 
   @Test
