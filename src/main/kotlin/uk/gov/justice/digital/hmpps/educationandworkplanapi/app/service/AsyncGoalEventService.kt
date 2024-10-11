@@ -55,11 +55,15 @@ class AsyncGoalEventService(
     trackGoalArchivedTelemetryEvent(archivedGoal)
   }
 
-  override fun goalCompleted(prisonNumber: String, completedGoal: Goal) {
+  override fun goalCompleted(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
     log.debug { "Goal complete event for prisoner [$prisonNumber]" }
 
-    recordGoalCompletedTimelineEvent(prisonNumber, completedGoal)
-    trackGoalCompletedTelemetryEvent(completedGoal)
+    recordGoalCompletedTimelineEvent(
+      prisonNumber = prisonNumber,
+      updatedGoal = updatedGoal,
+      previousGoal = previousGoal,
+    )
+    trackGoalCompletedTelemetryEvent(updatedGoal)
   }
 
   override fun goalUnArchived(prisonNumber: String, unArchivedGoal: Goal) {
@@ -111,12 +115,18 @@ class AsyncGoalEventService(
 
   private fun recordGoalCompletedTimelineEvent(
     prisonNumber: String,
-    goal: Goal,
+    previousGoal: Goal,
+    updatedGoal: Goal,
     correlationId: UUID = UUID.randomUUID(),
   ) {
-    timelineService.recordTimelineEvent(
+    val timelineEvents = timelineEventFactory.getStepUpdatedEvents(
+      updatedGoal,
+      previousGoal,
+      correlationId,
+    ) + timelineEventFactory.goalCompletedTimelineEvent(updatedGoal, correlationId)
+    timelineService.recordTimelineEvents(
       prisonNumber,
-      timelineEventFactory.goalCompletedTimelineEvent(goal, correlationId),
+      timelineEvents,
     )
   }
 

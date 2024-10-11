@@ -265,7 +265,6 @@ paths:
         
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
           - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
@@ -291,7 +290,6 @@ paths:
         
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
           - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
@@ -318,7 +316,6 @@ paths:
         
         **Role Requirements:**
                 Access to this endpoint requires one of the following roles:
-                  - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
                   - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
@@ -345,7 +342,6 @@ paths:
 
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
           - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals

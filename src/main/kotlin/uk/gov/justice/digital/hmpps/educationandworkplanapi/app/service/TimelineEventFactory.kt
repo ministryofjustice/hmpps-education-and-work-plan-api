@@ -132,7 +132,7 @@ class TimelineEventFactory {
       updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
       updatedGoal.notes != previousGoal.notes
 
-  private fun getStepUpdatedEvents(
+  fun getStepUpdatedEvents(
     updatedGoal: Goal,
     previousGoal: Goal,
     correlationId: UUID,

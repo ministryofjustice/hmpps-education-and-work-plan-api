@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import mu.KotlinLogging
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActiveGoalStepsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalAction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -9,7 +8,6 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CompleteGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
@@ -120,6 +118,7 @@ class GoalService(
       existingNote == null && updatedNote != null -> {
         goalNotesService.createNotes(prisonNumber, listOf(goal))
       }
+
       existingNote != updatedNote -> {
         if (updatedNote.isNullOrEmpty()) {
           goalNotesService.deleteNote(goal.reference)
@@ -197,7 +196,7 @@ class GoalService(
   }
 
   /**
-   * Complete a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
+   * Complete a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [CompleteGoalDto].
    *
    * Returns the completed [Goal]
    */
@@ -211,6 +210,7 @@ class GoalService(
           log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
         }
       }
+
       existingGoal.status != GoalStatus.ACTIVE -> { // Archived too?
         throw InvalidGoalStateException(
           prisonNumber,
@@ -219,15 +219,16 @@ class GoalService(
           GoalAction.COMPLETE,
         )
       }
-      existingGoal.steps.any { it.status != StepStatus.COMPLETE } -> {
-        throw ActiveGoalStepsException(
-          goalReference,
-          prisonNumber,
-        )
-      }
+
       else -> {
         goalPersistenceAdapter.completeGoal(prisonNumber, completeGoalDto)
-          ?.also { goalEventService.goalCompleted(prisonNumber, it) }
+          ?.also {
+            goalEventService.goalCompleted(
+              prisonNumber = prisonNumber,
+              updatedGoal = it,
+              previousGoal = existingGoal,
+            )
+          }
           ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
             log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
           }

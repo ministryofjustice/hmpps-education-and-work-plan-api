@@ -31,7 +31,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Edu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActiveGoalStepsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
@@ -141,7 +140,6 @@ class GlobalExceptionHandler(
     value = [
       EducationAlreadyExistsException::class,
       InvalidGoalStateException::class,
-      ActiveGoalStepsException::class,
     ],
   )
   protected fun handleExceptionReturnConflictErrorResponse(

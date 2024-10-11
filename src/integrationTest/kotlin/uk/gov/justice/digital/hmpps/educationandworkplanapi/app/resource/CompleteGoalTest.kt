@@ -22,14 +22,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
@@ -73,7 +70,6 @@ class CompleteGoalTest : IntegrationTestBase() {
     val completeGoalRequest = aValidCompleteGoalRequest(
       goalReference = goalReference,
     )
-    completeSteps(prisonNumber)
     // when
     completeAGoal(prisonNumber, goalReference, completeGoalRequest)
       .expectStatus()
@@ -87,12 +83,13 @@ class CompleteGoalTest : IntegrationTestBase() {
         goal
           .hasStatus(GoalStatus.COMPLETED)
           .hasNoCompletedNote()
+          .hasCompletedSteps()
       }
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) {
+        .event(5) {
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -121,8 +118,6 @@ class CompleteGoalTest : IntegrationTestBase() {
       goalReference = goalReference,
       note = noteText,
     )
-    completeSteps(prisonNumber)
-
     // when
     completeAGoal(prisonNumber, goalReference, completeGoalRequest)
       .expectStatus()
@@ -141,7 +136,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
+        .event(5) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -236,31 +231,10 @@ class CompleteGoalTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return 409 if goal still has active or not started steps`() {
-    // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
-    val completeGoalRequest = aValidCompleteGoalRequest(
-      goalReference = goalReference,
-    )
-    // when
-    val response = completeAGoal(prisonNumber, goalReference, completeGoalRequest)
-      .expectStatus()
-      .isEqualTo(HttpStatus.CONFLICT)
-      .returnResult(ErrorResponse::class.java)
-
-    // then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasStatus(HttpStatus.CONFLICT.value())
-      .hasUserMessageContaining("Could not complete goal with reference [$goalReference] for prisoner [$prisonNumber]: As it has active or not started steps")
-  }
-
-  @Test
   fun `should return 409 if goal is already completed`() {
     // given
     val goalReference = createAGoalAndGetTheReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(goalReference = goalReference)
-    completeSteps(prisonNumber)
     completeAGoal(prisonNumber, goalReference, completeGoalRequest)
       .expectStatus()
       .isNoContent()
@@ -318,51 +292,5 @@ class CompleteGoalTest : IntegrationTestBase() {
     val goal = actionPlan.goals[0]
     val goalReference = goal.goalReference
     return goalReference
-  }
-
-  fun completeSteps(prisonNumber: String) {
-    val actionPlan = getActionPlan(prisonNumber)
-    val goal = actionPlan.goals[0]
-    val goalReference = goal.goalReference
-    val step1 = goal.steps[0]
-    val stepReference = step1.stepReference
-
-    val updateGoalRequest = aValidUpdateGoalRequest(
-      goalReference = goalReference,
-      title = "Learn French to GCSE standard",
-      steps = listOf(
-        aValidUpdateStepRequest(
-          stepReference = stepReference,
-          title = "Book course before December 2023",
-          sequenceNumber = 1,
-          status = StepStatus.COMPLETE,
-        ),
-        aValidUpdateStepRequest(
-          stepReference = null,
-          title = "Attend course before March 2024",
-          sequenceNumber = 2,
-          status = StepStatus.COMPLETE,
-        ),
-      ),
-      notes = "Chris would like to improve his listening skills, not just his verbal communication",
-      prisonId = "MDI",
-    )
-
-    // When
-    webTestClient.put()
-      .uri(UpdateGoalTest.URI_TEMPLATE, prisonNumber, goalReference)
-      .withBody(updateGoalRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RW,
-          username = "buser_gen",
-          displayName = "Bernie User",
-          privateKey = keyPair.private,
-        ),
-      )
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isNoContent()
   }
 }

@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.asser
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.Duration
 import java.time.LocalDate
 
 class GetTimelineTest : IntegrationTestBase() {
@@ -130,7 +129,7 @@ class GetTimelineTest : IntegrationTestBase() {
     val goal = actionPlan.goals[0]
 
     // When
-    await.timeout(Duration.ofSeconds(30)).untilAsserted {
+    await.untilAsserted {
       val response = webTestClient.get()
         .uri(URI_TEMPLATE, prisonNumber)
         .bearerToken(
@@ -237,7 +236,7 @@ class GetTimelineTest : IntegrationTestBase() {
     )
     updateGoal(prisonNumber, updateGoalRequest)
     // When
-    await.timeout(Duration.ofSeconds(30)).untilAsserted {
+    await.untilAsserted {
       val response = webTestClient.get()
         .uri(URI_TEMPLATE, prisonNumber)
         .bearerToken(
