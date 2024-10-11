@@ -204,35 +204,24 @@ class GoalService(
     val goalReference = completeGoalDto.reference
     log.info { "Completing Goal with reference [$goalReference] for prisoner [$prisonNumber]" }
     val existingGoal = goalPersistenceAdapter.getGoal(prisonNumber, goalReference)
-    return when {
-      existingGoal == null -> {
-        throw GoalNotFoundException(prisonNumber, goalReference).also {
-          log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
-        }
+      ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
+        log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
       }
 
-      existingGoal.status != GoalStatus.ACTIVE -> { // Archived too?
+    return when (existingGoal.status) {
+      GoalStatus.COMPLETED, GoalStatus.ARCHIVED ->
         throw InvalidGoalStateException(
           prisonNumber,
           goalReference,
           existingGoal.status,
           GoalAction.COMPLETE,
         )
-      }
-
-      else -> {
+      GoalStatus.ACTIVE ->
         goalPersistenceAdapter.completeGoal(prisonNumber, completeGoalDto)
-          ?.also {
-            goalEventService.goalCompleted(
-              prisonNumber = prisonNumber,
-              updatedGoal = it,
-              previousGoal = existingGoal,
-            )
-          }
+          ?.also { goalEventService.goalCompleted(prisonNumber, previousGoal = existingGoal, updatedGoal = it) }
           ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
             log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
           }
-      }
     }
   }
 
