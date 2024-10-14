@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalR
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.*
@@ -160,6 +161,28 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
+  fun hasNoCompletedNote(): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val completionNotesCount = goalNotes.count { it.type == NoteType.GOAL_COMPLETION }
+      if (completionNotesCount > 0) {
+        failWithMessage("Expected goal to have no completion notes, but there were $completionNotesCount")
+      }
+    }
+    return this
+  }
+
+  fun hasCompletedSteps(): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val incompleteStepsCount = steps.count { it.status != StepStatus.COMPLETE }
+      if (incompleteStepsCount > 0) {
+        failWithMessage("Expected goal to have no incomplete steps, but there were $incompleteStepsCount")
+      }
+    }
+    return this
+  }
+
   fun hasReference(expected: UUID): GoalResponseAssert {
     isNotNull
     with(actual!!) {
@@ -168,6 +191,10 @@ class GoalResponseAssert(actual: GoalResponse?) :
       }
     }
     return this
+  }
+
+  fun hasCompletedNote(expected: String): GoalResponseAssert {
+    return hasNoteOfType(NoteType.GOAL_COMPLETION, expected, "completion")
   }
 
   fun hasArchiveNote(expected: String): GoalResponseAssert {

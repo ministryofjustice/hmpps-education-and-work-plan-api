@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.16.3'
+  version: '1.16.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -265,7 +265,6 @@ paths:
         
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
           - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
@@ -291,7 +290,6 @@ paths:
         
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
           - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
@@ -318,7 +316,6 @@ paths:
         
         **Role Requirements:**
                 Access to this endpoint requires one of the following roles:
-                  - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RO` (Read-Only)
                   - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
       tags:
         - Goals
@@ -334,6 +331,32 @@ paths:
       operationId: unarchive-goal
       requestBody:
         $ref: '#/components/requestBodies/UnarchiveGoal'
+  '/action-plans/{prisonNumber}/goals/{goalReference}/complete':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - $ref: "#/components/parameters/goalReferencePathParameter"
+    put:
+      summary: Completes a Goal
+      description: |
+        Changes a goals status to 'COMPLETE' and records the completion note.
+
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__GOALS__RW` (Read-Write)
+      tags:
+        - Goals
+      responses:
+        '204':
+          description: The Goal was completed successfully.
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+        '409':
+          $ref: '#/components/responses/409ErrorResponse'
+      operationId: complete-goal
+      requestBody:
+        $ref: '#/components/requestBodies/CompleteGoal'
 
   #
   # Timeline
@@ -1789,6 +1812,22 @@ components:
         - goalReference
         - reason
 
+    CompleteGoalRequest:
+      title: CompleteGoalRequest
+      type: object
+      description: A request to complete an individual Goal.
+      properties:
+        goalReference:
+          type: string
+          format: uuid
+          description: The Goal's unique reference. This is used as an identifier to complete the required Goal.
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        note:
+          type: string
+          description: An optional note to accompany the completion
+      required:
+        - goalReference
+
     NoteResponse:
       title: NoteResponse
       type: object
@@ -2933,6 +2972,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UnarchiveGoalRequest'
+    CompleteGoal:
+      description: Request body to complete a single Goal.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CompleteGoalRequest'
     GetCiagInductionSummaries:
       description: Request body to retrieve a list of CIAG Induction summaries for one or more Prisoners.
       content:

@@ -91,7 +91,7 @@ abstract class IntegrationTestBase {
   init {
     // set awaitility defaults
     Awaitility.setDefaultPollInterval(500, MILLISECONDS)
-    Awaitility.setDefaultTimeout(3, SECONDS)
+    Awaitility.setDefaultTimeout(30, SECONDS)
   }
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")

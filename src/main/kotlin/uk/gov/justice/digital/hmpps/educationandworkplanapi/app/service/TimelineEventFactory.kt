@@ -107,6 +107,15 @@ class TimelineEventFactory {
       correlationId = correlationId,
     )
 
+  fun goalCompletedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
+    buildTimelineEvent(
+      goal = goal,
+      sourceReference = goal.reference,
+      eventType = TimelineEventType.GOAL_COMPLETED,
+      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goal.title),
+      correlationId = correlationId,
+    )
+
   fun goalUnArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
     buildTimelineEvent(
       goal = goal,
@@ -123,7 +132,7 @@ class TimelineEventFactory {
       updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
       updatedGoal.notes != previousGoal.notes
 
-  private fun getStepUpdatedEvents(
+  fun getStepUpdatedEvents(
     updatedGoal: Goal,
     previousGoal: Goal,
     correlationId: UUID,

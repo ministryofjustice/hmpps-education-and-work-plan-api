@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -73,7 +73,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should not get timeline given prisoner has no timeline`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineNotFound(prisonNumber)
 
     // When
@@ -100,7 +100,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline for prisoner`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
@@ -189,7 +189,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline with multiple events in order`() {
     // Given
-    val prisonNumber = anotherValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
@@ -217,7 +217,8 @@ class GetTimelineTest : IntegrationTestBase() {
     val induction = getInduction(prisonNumber)
     val actionPlan = getActionPlan(prisonNumber)
     val actionPlanReference = actionPlan.reference
-    val goal1Reference = actionPlan.goals[1].goalReference // The Action Plan returned by the API has Goals in reverse chronological order. The first Goal created is the 2nd in the list
+    val goal1Reference =
+      actionPlan.goals[1].goalReference // The Action Plan returned by the API has Goals in reverse chronological order. The first Goal created is the 2nd in the list
     val goal2Reference = actionPlan.goals[0].goalReference // and the 2nd Goal created is the first in the list.
     val stepToUpdate = actionPlan.goals[1].steps[0]
 
@@ -234,7 +235,6 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
     updateGoal(prisonNumber, updateGoalRequest)
-
     // When
     await.untilAsserted {
       val response = webTestClient.get()
@@ -322,7 +322,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline for prisoner with no plp events`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(

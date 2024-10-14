@@ -55,6 +55,17 @@ class AsyncGoalEventService(
     trackGoalArchivedTelemetryEvent(archivedGoal)
   }
 
+  override fun goalCompleted(prisonNumber: String, previousGoal: Goal, updatedGoal: Goal) {
+    log.debug { "Goal complete event for prisoner [$prisonNumber]" }
+
+    recordGoalCompletedTimelineEvent(
+      prisonNumber = prisonNumber,
+      updatedGoal = updatedGoal,
+      previousGoal = previousGoal,
+    )
+    trackGoalCompletedTelemetryEvent(updatedGoal)
+  }
+
   override fun goalUnArchived(prisonNumber: String, unArchivedGoal: Goal) {
     log.debug { "Goal un-archived event for prisoner [$prisonNumber]" }
 
@@ -102,6 +113,23 @@ class AsyncGoalEventService(
     )
   }
 
+  private fun recordGoalCompletedTimelineEvent(
+    prisonNumber: String,
+    previousGoal: Goal,
+    updatedGoal: Goal,
+    correlationId: UUID = UUID.randomUUID(),
+  ) {
+    val timelineEvents = timelineEventFactory.getStepUpdatedEvents(
+      updatedGoal,
+      previousGoal,
+      correlationId,
+    ) + timelineEventFactory.goalCompletedTimelineEvent(updatedGoal, correlationId)
+    timelineService.recordTimelineEvents(
+      prisonNumber,
+      timelineEvents,
+    )
+  }
+
   private fun trackGoalCreatedTelemetryEvent(createdGoal: Goal) {
     telemetryService.trackGoalCreatedEvent(createdGoal)
   }
@@ -112,6 +140,10 @@ class AsyncGoalEventService(
 
   private fun trackGoalArchivedTelemetryEvent(archivedGoal: Goal) {
     telemetryService.trackGoalArchivedEvent(archivedGoal)
+  }
+
+  private fun trackGoalCompletedTelemetryEvent(archivedGoal: Goal) {
+    telemetryService.trackGoalCompletedEvent(archivedGoal)
   }
 
   private fun trackGoalUnArchivedTelemetryEvent(unArchivedGoal: Goal) {

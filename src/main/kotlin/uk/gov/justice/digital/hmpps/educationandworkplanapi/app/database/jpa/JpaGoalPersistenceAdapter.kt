@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ArchiveGoalDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CompleteGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UnarchiveGoalDto
@@ -13,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.UpdateGoalDt
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.GoalEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.GoalRepository
@@ -90,6 +92,17 @@ class JpaGoalPersistenceAdapter(
       archiveGoalDto.reason,
       archiveGoalDto.reasonOther,
     )
+  }
+
+  override fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal? {
+    return getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, completeGoalDto.reference)?.let { goalEntity ->
+      goalEntity.apply {
+        status = GoalStatus.COMPLETED
+      }
+      goalEntity.steps().forEach { it.apply { it.status = StepStatus.COMPLETE } }
+      val persistedEntity = goalRepository.saveAndFlush(goalEntity)
+      goalMapper.fromEntityToDomain(persistedEntity)
+    }
   }
 
   override fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal? {
