@@ -16,7 +16,9 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreate
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateStepDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateStepDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
@@ -33,13 +35,16 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalS
 internal class GoalResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: GoalResourceMapperImpl
+  private lateinit var mapper: GoalResourceMapper
 
   @Mock
   private lateinit var stepMapper: StepResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map from CreateGoalRequest model to DTO`() {
@@ -108,16 +113,21 @@ internal class GoalResourceMapperTest {
       targetCompletionDate = LocalDate.now().plusMonths(6),
       steps = mutableListOf(step),
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       createdAtPrison = "BXI",
       lastUpdatedBy = "bjones_gen",
-      lastUpdatedByDisplayName = "Barry Jones",
       lastUpdatedAtPrison = "MDI",
     )
+
     val expectedStepResponse = aValidStepResponse()
     val expectedDateTime = OffsetDateTime.now()
     given(stepMapper.fromDomainToModel(any())).willReturn(expectedStepResponse)
     given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
+
     val expected = aValidGoalResponse(
       reference = goal.reference,
       title = goal.title,
@@ -142,5 +152,7 @@ internal class GoalResourceMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     verify(stepMapper).fromDomainToModel(step)
+    verify(userService).getUserDetails("asmith_gen")
+    verify(userService).getUserDetails("bjones_gen")
   }
 }
