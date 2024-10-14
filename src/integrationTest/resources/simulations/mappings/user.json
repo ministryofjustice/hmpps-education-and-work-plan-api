@@ -10,7 +10,20 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "bodyFileName": "user.json"
+        "bodyFileName": "user-auser_gen.json"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPath": "/users/buser_gen"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "user-buser_gen.json"
       }
     }
   ]

@@ -17,13 +17,13 @@ import java.util.UUID
 @ExtendWith(MockitoExtension::class)
 class TimelineResourceMapperTest {
   @InjectMocks
-  private lateinit var mapper: TimelineResourceMapperImpl
+  private lateinit var mapper: TimelineResourceMapper
 
   @Mock
-  private lateinit var timelineEventMapper: TimelineEventResourceMapperImpl
+  private lateinit var timelineEventMapper: TimelineEventResourceMapper
 
   @Test
-  fun `should map from domain to model`() {
+  fun `should map from domain to model given user is successfully looked up`() {
     // Given
     val reference = UUID.randomUUID()
     val prisonNumber = aValidPrisonNumber()
