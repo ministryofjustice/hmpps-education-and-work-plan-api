@@ -22,7 +22,7 @@ import java.time.ZoneOffset
 @ExtendWith(MockitoExtension::class)
 class PrisonMovementEventsMapperTest {
   @InjectMocks
-  private lateinit var prisonMovementEventsMapper: PrisonMovementEventsMapperImpl
+  private lateinit var prisonMovementEventsMapper: PrisonMovementEventsMapper
 
   @Spy
   private lateinit var instantMapper: InstantMapper

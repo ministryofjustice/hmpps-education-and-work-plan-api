@@ -1,9 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.mapper
 
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.NullValueMappingStrategy
-import org.mapstruct.ValueMapping
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
@@ -11,20 +8,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import java.time.Instant
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerApiTimelineService.Companion.SYSTEM_USER
 import java.util.UUID
 
-@Mapper(
-  uses = [
-    InstantMapper::class,
-  ],
-  imports = [
-    Instant::class,
-    UUID::class,
-  ],
-  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-)
-abstract class PrisonMovementEventsMapper {
+@Component
+class PrisonMovementEventsMapper(
+  private val instantMapper: InstantMapper,
+) {
 
   fun toTimelineEvents(prisonMovementEvents: PrisonMovementEvents): List<TimelineEvent> {
     return prisonMovementEvents.prisonBookings.flatMap { booking ->
@@ -35,23 +25,27 @@ abstract class PrisonMovementEventsMapper {
     }
   }
 
-  @Mapping(target = "reference", expression = "java( java.util.UUID.randomUUID() )")
-  @Mapping(target = "sourceReference", source = "bookingId")
-  @Mapping(target = "eventType", source = "prisonMovement.movementType")
-  @Mapping(target = "contextualInfo", expression = "java( getContextualInfo(prisonMovement) )")
-  @Mapping(target = "prisonId", expression = "java( getPrisonId(prisonMovement) )")
-  @Mapping(target = "actionedBy", constant = "system")
-  @Mapping(target = "actionedByDisplayName", ignore = true)
-  @Mapping(target = "timestamp", source = "prisonMovement.date")
-  @Mapping(target = "correlationId", expression = "java( java.util.UUID.randomUUID() )")
-  abstract fun toTimelineEvent(bookingId: String, prisonMovement: PrisonMovementEvent): TimelineEvent
+  private fun toTimelineEvent(bookingId: String, prisonMovement: PrisonMovementEvent): TimelineEvent =
+    TimelineEvent(
+      reference = UUID.randomUUID(),
+      correlationId = UUID.randomUUID(),
+      sourceReference = bookingId,
+      eventType = toEventType(prisonMovement.movementType),
+      timestamp = instantMapper.toInstant(prisonMovement.date)!!,
+      contextualInfo = getContextualInfo(prisonMovement),
+      prisonId = getPrisonId(prisonMovement),
+      actionedBy = SYSTEM_USER,
+      actionedByDisplayName = null,
+    )
 
-  @ValueMapping(target = "PRISON_ADMISSION", source = "ADMISSION")
-  @ValueMapping(target = "PRISON_RELEASE", source = "RELEASE")
-  @ValueMapping(target = "PRISON_TRANSFER", source = "TRANSFER")
-  abstract fun toEventType(movementType: PrisonMovementType): TimelineEventType
+  private fun toEventType(movementType: PrisonMovementType): TimelineEventType =
+    when (movementType) {
+      PrisonMovementType.ADMISSION -> TimelineEventType.PRISON_ADMISSION
+      PrisonMovementType.RELEASE -> TimelineEventType.PRISON_RELEASE
+      PrisonMovementType.TRANSFER -> TimelineEventType.PRISON_TRANSFER
+    }
 
-  protected fun getContextualInfo(prisonMovement: PrisonMovementEvent): Map<TimelineEventContext, String>? =
+  private fun getContextualInfo(prisonMovement: PrisonMovementEvent): Map<TimelineEventContext, String>? =
     // For transfers, this is the ID of the prison they were transferred from. Otherwise, null
     if (prisonMovement.movementType == PrisonMovementType.TRANSFER) {
       mapOf(TimelineEventContext.PRISON_TRANSFERRED_FROM to prisonMovement.fromPrisonId!!)
@@ -59,7 +53,7 @@ abstract class PrisonMovementEventsMapper {
       null
     }
 
-  protected fun getPrisonId(prisonMovement: PrisonMovementEvent): String =
+  private fun getPrisonId(prisonMovement: PrisonMovementEvent): String =
     // Either the ID of the prison they entered (including transferred into), or the one they were released from
     when (prisonMovement.movementType) {
       PrisonMovementType.TRANSFER -> prisonMovement.toPrisonId!!
