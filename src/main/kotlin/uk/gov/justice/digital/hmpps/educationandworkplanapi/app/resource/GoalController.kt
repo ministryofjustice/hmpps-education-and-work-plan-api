@@ -106,9 +106,7 @@ class GoalController(
       prisonNumber = prisonNumber,
       archiveGoalDto = goalResourceMapper.fromModelToDto(archiveGoalRequest),
     )
-    archiveGoalRequest.note?.let {
-      createGoalNote(prisonNumber, goal, it, NoteType.GOAL_ARCHIVAL)
-    }
+    createGoalNote(prisonNumber, goal, archiveGoalRequest.note, NoteType.GOAL_ARCHIVAL)
   }
 
   @PutMapping("{goalReference}/complete")
@@ -124,23 +122,23 @@ class GoalController(
       prisonNumber = prisonNumber,
       completeGoalDto = goalResourceMapper.fromModelToDto(completeGoalRequest),
     )
-    completeGoalRequest.note?.let {
-      createGoalNote(prisonNumber, goal, it, NoteType.GOAL_COMPLETION)
-    }
+    createGoalNote(prisonNumber, goal, completeGoalRequest.note, NoteType.GOAL_COMPLETION)
   }
 
-  private fun createGoalNote(prisonNumber: String, goal: Goal, noteText: String, noteType: NoteType) {
-    noteService.createNote(
-      CreateNoteDto(
-        prisonNumber = prisonNumber,
-        entityReference = goal.reference,
-        entityType = EntityType.GOAL,
-        noteType = noteType,
-        content = noteText,
-        createdAtPrison = goal.createdAtPrison,
-        lastUpdatedAtPrison = goal.lastUpdatedAtPrison,
-      ),
-    )
+  private fun createGoalNote(prisonNumber: String, goal: Goal, noteText: String?, noteType: NoteType) {
+    if (!noteText.isNullOrEmpty()) {
+      noteService.createNote(
+        CreateNoteDto(
+          prisonNumber = prisonNumber,
+          entityReference = goal.reference,
+          entityType = EntityType.GOAL,
+          noteType = noteType,
+          content = noteText,
+          createdAtPrison = goal.createdAtPrison,
+          lastUpdatedAtPrison = goal.lastUpdatedAtPrison,
+        ),
+      )
+    }
   }
 
   @PutMapping("{goalReference}/unarchive")
