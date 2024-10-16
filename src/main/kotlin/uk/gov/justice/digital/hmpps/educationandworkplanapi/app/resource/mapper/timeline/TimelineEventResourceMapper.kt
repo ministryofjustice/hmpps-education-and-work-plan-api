@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerApiTimelineService.Companion.SYSTEM_USER
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventResponse
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType as TimelineEventTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType as TimelineEventTypeApi
@@ -25,9 +26,7 @@ class TimelineEventResourceMapper(
         contextualInfo = buildContextualInfo(contextualInfo),
         actionedBy = actionedBy,
         timestamp = instantMapper.toOffsetDateTime(timestamp)!!,
-        actionedByDisplayName = userService.getUserDetails(actionedBy).let {
-          if (it.active) it.name else null
-        },
+        actionedByDisplayName = if (actionedBy !== SYSTEM_USER) userService.getUserDetails(actionedBy).name else null,
       )
     }
 
