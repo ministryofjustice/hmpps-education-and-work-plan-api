@@ -16,7 +16,9 @@ class GoalNoteService(
 ) : GoalNotesService {
 
   override fun createNotes(prisonNumber: String, createdGoals: List<Goal>) {
-    createdGoals.forEach { createdGoal ->
+    // This copy is created to prevent a concurrent modification exception which sometimes happens.
+    val goalsCopy = ArrayList(createdGoals)
+    goalsCopy.forEach { createdGoal ->
       if (!createdGoal.notes.isNullOrEmpty()) {
         noteService.createNote(createdGoal.mapToNotesDTO(prisonNumber))
       }
