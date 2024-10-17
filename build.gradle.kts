@@ -29,7 +29,7 @@ val wiremockVersion = "3.9.1"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "9.41.2"
 val testContainersVersion = "1.20.2"
-val awsSdkVersion = "1.12.773"
+val awsSdkVersion = "1.12.775"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
