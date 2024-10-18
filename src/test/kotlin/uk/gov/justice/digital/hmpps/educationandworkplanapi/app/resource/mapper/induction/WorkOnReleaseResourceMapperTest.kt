@@ -8,10 +8,13 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateWorkOnReleaseRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateWorkOnReleaseRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidWorkOnReleaseResponseForPrisonerNotLookingToWork
@@ -26,10 +29,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Hopin
 class WorkOnReleaseResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: WorkOnReleaseResourceMapperImpl
+  private lateinit var mapper: WorkOnReleaseResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreateWorkOnReleaseDto`() {
@@ -59,6 +65,12 @@ class WorkOnReleaseResourceMapperTest {
       affectAbilityToWork = listOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Employers aren't interested",
     )
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
+
     val expectedDateTime = OffsetDateTime.now()
     val expected = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
       reference = domain.reference,
@@ -66,6 +78,8 @@ class WorkOnReleaseResourceMapperTest {
       affectAbilityToWork = listOf(AffectAbilityToWorkApi.OTHER),
       affectAbilityToWorkOther = "Employers aren't interested",
       createdAt = expectedDateTime,
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
       updatedAt = expectedDateTime,
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
@@ -77,6 +91,8 @@ class WorkOnReleaseResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
+    verify(userService).getUserDetails("asmith_gen")
+    verify(userService).getUserDetails("bjones_gen")
   }
 
   @Test
