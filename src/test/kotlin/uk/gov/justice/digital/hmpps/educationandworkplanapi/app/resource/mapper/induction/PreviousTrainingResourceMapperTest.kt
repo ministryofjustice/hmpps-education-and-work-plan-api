@@ -8,10 +8,13 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousTraining
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousTrainingRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousTrainingResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePreviousTrainingRequest
@@ -23,10 +26,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Train
 class PreviousTrainingResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: PreviousTrainingResourceMapperImpl
+  private lateinit var mapper: PreviousTrainingResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreatePreviousTrainingDto`() {
@@ -52,12 +58,20 @@ class PreviousTrainingResourceMapperTest {
       trainingTypes = listOf(TrainingTypeDomain.OTHER),
       trainingTypeOther = "Certified Kotlin Developer",
     )
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
+
     val expectedDateTime = OffsetDateTime.now()
     val expected = aValidPreviousTrainingResponse(
       reference = domain.reference,
       trainingTypes = listOf(TrainingTypeApi.OTHER),
       trainingTypeOther = "Certified Kotlin Developer",
       createdAt = expectedDateTime,
+      createdBy = "asmith_gen",
+      createdByDisplayName = "Alex Smith",
       updatedAt = expectedDateTime,
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
@@ -69,6 +83,8 @@ class PreviousTrainingResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
+    verify(userService).getUserDetails("asmith_gen")
+    verify(userService).getUserDetails("bjones_gen")
   }
 
   @Test
