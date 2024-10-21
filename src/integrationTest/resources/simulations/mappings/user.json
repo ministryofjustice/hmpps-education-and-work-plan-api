@@ -3,6 +3,19 @@
     {
       "request": {
         "method": "GET",
+        "urlPath": "/users/asmith_gen"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "user-asmith_gen.json"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
         "urlPath": "/users/auser_gen"
       },
       "response": {
