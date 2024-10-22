@@ -55,7 +55,7 @@ class InductionResourceMapper(
         workOnRelease = workOnReleaseMapper.toWorkOnReleaseResponse(workOnRelease),
         previousQualifications = qualificationsMapper.toPreviousQualificationsResponse(previousQualifications),
         previousTraining = previousTrainingMapper.toPreviousTrainingResponse(previousTraining),
-        previousWorkExperiences = workExperiencesMapper.toPreviousWorkExperiencesResponse(previousWorkExperiences),
+        previousWorkExperiences = previousWorkExperiences?.let { workExperiencesMapper.toPreviousWorkExperiencesResponse(it) },
         inPrisonInterests = inPrisonInterestsMapper.toInPrisonInterestsResponse(inPrisonInterests),
         personalSkillsAndInterests = skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(personalSkillsAndInterests),
         futureWorkInterests = workInterestsMapper.toFutureWorkInterestsResponse(futureWorkInterests),
