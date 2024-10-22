@@ -11,7 +11,9 @@ import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInPrisonInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInPrisonInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdateInPrisonInterestsRequest
@@ -21,10 +23,13 @@ import java.time.OffsetDateTime
 class InPrisonInterestsResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: InPrisonInterestsResourceMapperImpl
+  private lateinit var mapper: InPrisonInterestsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreateInPrisonInterestsDto`() {
@@ -43,6 +48,11 @@ class InPrisonInterestsResourceMapperTest {
   @Test
   fun `should map to InPrisonInterestsResponse`() {
     // Given
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
     val domain = aValidInPrisonInterests()
     val expectedDateTime = OffsetDateTime.now()
     val expected = aValidInPrisonInterestsResponse(
