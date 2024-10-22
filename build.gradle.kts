@@ -5,7 +5,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.7"
   id("org.openapi.generator") version "7.9.0"
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
@@ -25,11 +25,11 @@ val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.6.0"
 val hmppsSqsVersion = "5.0.1"
 val awaitilityVersion = "4.2.2"
-val wiremockVersion = "3.9.1"
+val wiremockVersion = "3.9.2"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "9.41.2"
 val testContainersVersion = "1.20.2"
-val awsSdkVersion = "1.12.773"
+val awsSdkVersion = "1.12.777"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
