@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.UpdateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateOrUpdateAchievedQualificationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
@@ -20,9 +21,16 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Educa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
 @Component
-class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
+class QualificationsResourceMapper(
+  private val instantMapper: InstantMapper,
+  private val userService: ManageUserService,
+) {
 
-  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto =
+  fun toCreatePreviousQualificationsDto(
+    request: CreatePreviousQualificationsRequest,
+    prisonNumber: String,
+    prisonId: String,
+  ): CreatePreviousQualificationsDto =
     CreatePreviousQualificationsDto(
       prisonNumber = prisonNumber,
       prisonId = prisonId,
@@ -37,17 +45,21 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
         qualifications = toAchievedQualificationResponses(it.qualifications),
         educationLevel = toEducationLevel(it.educationLevel),
         createdBy = it.createdBy!!,
-        createdByDisplayName = it.createdByDisplayName!!,
+        createdByDisplayName = userService.getUserDetails(it.createdBy!!).name,
         createdAt = instantMapper.toOffsetDateTime(it.createdAt)!!,
         createdAtPrison = it.createdAtPrison,
         updatedBy = it.lastUpdatedBy!!,
-        updatedByDisplayName = it.lastUpdatedByDisplayName!!,
+        updatedByDisplayName = userService.getUserDetails(it.createdBy!!).name,
         updatedAt = instantMapper.toOffsetDateTime(it.lastUpdatedAt)!!,
         updatedAtPrison = it.lastUpdatedAtPrison,
       )
     }
 
-  fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String, prisonNumber: String): UpdatePreviousQualificationsDto =
+  fun toUpdatePreviousQualificationsDto(
+    request: UpdatePreviousQualificationsRequest,
+    prisonId: String,
+    prisonNumber: String,
+  ): UpdatePreviousQualificationsDto =
     UpdatePreviousQualificationsDto(
       reference = request.reference,
       prisonNumber = prisonNumber,
@@ -56,7 +68,10 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList(), prisonId),
     )
 
-  fun toUpdateOrCreateQualificationDto(achievedQualification: CreateOrUpdateAchievedQualificationRequest, prisonId: String): UpdateOrCreateQualificationDto =
+  fun toUpdateOrCreateQualificationDto(
+    achievedQualification: CreateOrUpdateAchievedQualificationRequest,
+    prisonId: String,
+  ): UpdateOrCreateQualificationDto =
     if (achievedQualification.reference == null) {
       CreateQualificationDto(
         prisonId = prisonId,
@@ -74,7 +89,10 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       )
     }
 
-  fun toUpdateOrCreateQualificationDtos(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>, prisonId: String): List<UpdateOrCreateQualificationDto> =
+  fun toUpdateOrCreateQualificationDtos(
+    achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>,
+    prisonId: String,
+  ): List<UpdateOrCreateQualificationDto> =
     achievedQualifications.map { toUpdateOrCreateQualificationDto(it, prisonId) }
 
   fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
