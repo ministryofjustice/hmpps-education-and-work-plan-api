@@ -15,7 +15,9 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aVa
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePersonalSkillsAndInterestsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePersonalSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPersonalSkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidUpdatePersonalSkillsAndInterestsRequest
@@ -25,10 +27,13 @@ import java.time.OffsetDateTime
 class SkillsAndInterestsResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: SkillsAndInterestsResourceMapperImpl
+  private lateinit var mapper: SkillsAndInterestsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreatePersonalSkillsAndInterestsDto`() {
@@ -60,6 +65,10 @@ class SkillsAndInterestsResourceMapperTest {
   @Test
   fun `should map to PersonalSkillsAndInterestsResponse`() {
     // Given
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
     val domain = aValidPersonalSkillsAndInterests()
     val expectedDateTime = OffsetDateTime.now()
     val expected = aValidPersonalSkillsAndInterestsResponse(
