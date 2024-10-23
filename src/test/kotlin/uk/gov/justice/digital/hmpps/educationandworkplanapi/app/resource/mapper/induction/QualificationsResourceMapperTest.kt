@@ -15,7 +15,9 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdateQualificationDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.anotherValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidAchievedQualification
@@ -38,6 +40,9 @@ class QualificationsResourceMapperTest {
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreatePreviousQualificationsDto given qualification without a reference`() {
@@ -108,6 +113,10 @@ class QualificationsResourceMapperTest {
   @Test
   fun `should map to PreviousQualificationsResponse`() {
     // Given
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
     val domain = aValidPreviousQualifications(
       reference = UUID.fromString("52ac8188-f372-4a7a-8de1-14b8160f0a2b"),
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS,

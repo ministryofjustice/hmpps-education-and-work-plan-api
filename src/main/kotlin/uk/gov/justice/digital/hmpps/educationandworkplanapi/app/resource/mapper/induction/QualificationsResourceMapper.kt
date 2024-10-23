@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.UpdateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateOrUpdateAchievedQualificationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousQualificationsRequest
@@ -20,43 +21,61 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Educa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
 @Component
-class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
+class QualificationsResourceMapper(
+  private val instantMapper: InstantMapper,
+  private val userService: ManageUserService,
+) {
 
-  fun toCreatePreviousQualificationsDto(request: CreatePreviousQualificationsRequest, prisonNumber: String, prisonId: String): CreatePreviousQualificationsDto =
-    CreatePreviousQualificationsDto(
-      prisonNumber = prisonNumber,
-      prisonId = prisonId,
-      educationLevel = request.educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
-      qualifications = request.qualifications?.let { toUpdateOrCreateQualificationDtos(it, prisonId) } ?: emptyList(),
-    )
-
-  fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse? =
-    previousQualifications?.let {
-      PreviousQualificationsResponse(
-        reference = it.reference,
-        qualifications = toAchievedQualificationResponses(it.qualifications),
-        educationLevel = toEducationLevel(it.educationLevel),
-        createdBy = it.createdBy!!,
-        createdByDisplayName = it.createdByDisplayName!!,
-        createdAt = instantMapper.toOffsetDateTime(it.createdAt)!!,
-        createdAtPrison = it.createdAtPrison,
-        updatedBy = it.lastUpdatedBy!!,
-        updatedByDisplayName = it.lastUpdatedByDisplayName!!,
-        updatedAt = instantMapper.toOffsetDateTime(it.lastUpdatedAt)!!,
-        updatedAtPrison = it.lastUpdatedAtPrison,
+  fun toCreatePreviousQualificationsDto(
+    request: CreatePreviousQualificationsRequest,
+    prisonNumber: String,
+    prisonId: String,
+  ): CreatePreviousQualificationsDto =
+    with(request) {
+      CreatePreviousQualificationsDto(
+        prisonNumber = prisonNumber,
+        prisonId = prisonId,
+        educationLevel = educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
+        qualifications = qualifications?.let { toUpdateOrCreateQualificationDtos(it, prisonId) } ?: emptyList(),
       )
     }
 
-  fun toUpdatePreviousQualificationsDto(request: UpdatePreviousQualificationsRequest, prisonId: String, prisonNumber: String): UpdatePreviousQualificationsDto =
-    UpdatePreviousQualificationsDto(
-      reference = request.reference,
-      prisonNumber = prisonNumber,
-      prisonId = prisonId,
-      educationLevel = toEducationLevel(request.educationLevel),
-      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList(), prisonId),
-    )
+  fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications): PreviousQualificationsResponse =
+    with(previousQualifications) {
+      PreviousQualificationsResponse(
+        reference = reference,
+        qualifications = toAchievedQualificationResponses(qualifications),
+        educationLevel = toEducationLevel(educationLevel),
+        createdBy = createdBy!!,
+        createdByDisplayName = userService.getUserDetails(createdBy!!).name,
+        createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
+        createdAtPrison = createdAtPrison,
+        updatedBy = lastUpdatedBy!!,
+        updatedByDisplayName = userService.getUserDetails(createdBy!!).name,
+        updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
+        updatedAtPrison = lastUpdatedAtPrison,
+      )
+    }
 
-  fun toUpdateOrCreateQualificationDto(achievedQualification: CreateOrUpdateAchievedQualificationRequest, prisonId: String): UpdateOrCreateQualificationDto =
+  fun toUpdatePreviousQualificationsDto(
+    request: UpdatePreviousQualificationsRequest,
+    prisonId: String,
+    prisonNumber: String,
+  ): UpdatePreviousQualificationsDto =
+    with(request) {
+      UpdatePreviousQualificationsDto(
+        reference = reference,
+        prisonNumber = prisonNumber,
+        prisonId = prisonId,
+        educationLevel = toEducationLevel(request.educationLevel),
+        qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList(), prisonId),
+      )
+    }
+
+  fun toUpdateOrCreateQualificationDto(
+    achievedQualification: CreateOrUpdateAchievedQualificationRequest,
+    prisonId: String,
+  ): UpdateOrCreateQualificationDto =
     if (achievedQualification.reference == null) {
       CreateQualificationDto(
         prisonId = prisonId,
@@ -74,7 +93,10 @@ class QualificationsResourceMapper(private val instantMapper: InstantMapper) {
       )
     }
 
-  fun toUpdateOrCreateQualificationDtos(achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>, prisonId: String): List<UpdateOrCreateQualificationDto> =
+  fun toUpdateOrCreateQualificationDtos(
+    achievedQualifications: List<CreateOrUpdateAchievedQualificationRequest>,
+    prisonId: String,
+  ): List<UpdateOrCreateQualificationDto> =
     achievedQualifications.map { toUpdateOrCreateQualificationDto(it, prisonId) }
 
   fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
