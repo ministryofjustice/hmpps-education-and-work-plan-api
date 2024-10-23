@@ -58,7 +58,7 @@ class InductionResourceMapper(
         previousWorkExperiences = previousWorkExperiences?.let { workExperiencesMapper.toPreviousWorkExperiencesResponse(it) },
         inPrisonInterests = inPrisonInterests?.let { inPrisonInterestsMapper.toInPrisonInterestsResponse(it) },
         personalSkillsAndInterests = personalSkillsAndInterests?.let { skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(it) },
-        futureWorkInterests = workInterestsMapper.toFutureWorkInterestsResponse(futureWorkInterests),
+        futureWorkInterests = futureWorkInterests?.let { workInterestsMapper.toFutureWorkInterestsResponse(it) },
         createdBy = createdBy!!,
         createdByDisplayName = createdByDisplayName!!,
         createdAt = createdAt!!.atOffset(ZoneOffset.UTC),

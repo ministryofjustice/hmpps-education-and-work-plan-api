@@ -13,7 +13,9 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aVa
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateFutureWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidFutureWorkInterest
@@ -25,10 +27,13 @@ import java.time.OffsetDateTime
 class WorkInterestsResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: WorkInterestsResourceMapperImpl
+  private lateinit var mapper: WorkInterestsResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreateFutureWorkInterestsDto`() {
@@ -55,6 +60,10 @@ class WorkInterestsResourceMapperTest {
   @Test
   fun `should map to FutureWorkInterestsResponse`() {
     // Given
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
     val domain = aValidFutureWorkInterests()
     val expectedDateTime = OffsetDateTime.now()
     val expected = aValidFutureWorkInterestsResponse(
