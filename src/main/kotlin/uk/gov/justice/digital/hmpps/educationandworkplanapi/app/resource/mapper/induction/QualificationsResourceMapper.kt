@@ -31,27 +31,29 @@ class QualificationsResourceMapper(
     prisonNumber: String,
     prisonId: String,
   ): CreatePreviousQualificationsDto =
-    CreatePreviousQualificationsDto(
-      prisonNumber = prisonNumber,
-      prisonId = prisonId,
-      educationLevel = request.educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
-      qualifications = request.qualifications?.let { toUpdateOrCreateQualificationDtos(it, prisonId) } ?: emptyList(),
-    )
+    with(request) {
+      CreatePreviousQualificationsDto(
+        prisonNumber = prisonNumber,
+        prisonId = prisonId,
+        educationLevel = educationLevel?.let { toEducationLevel(it) } ?: EducationLevelDomain.NOT_SURE,
+        qualifications = qualifications?.let { toUpdateOrCreateQualificationDtos(it, prisonId) } ?: emptyList(),
+      )
+    }
 
-  fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications?): PreviousQualificationsResponse? =
-    previousQualifications?.let {
+  fun toPreviousQualificationsResponse(previousQualifications: PreviousQualifications): PreviousQualificationsResponse =
+    with(previousQualifications) {
       PreviousQualificationsResponse(
-        reference = it.reference,
-        qualifications = toAchievedQualificationResponses(it.qualifications),
-        educationLevel = toEducationLevel(it.educationLevel),
-        createdBy = it.createdBy!!,
-        createdByDisplayName = userService.getUserDetails(it.createdBy!!).name,
-        createdAt = instantMapper.toOffsetDateTime(it.createdAt)!!,
-        createdAtPrison = it.createdAtPrison,
-        updatedBy = it.lastUpdatedBy!!,
-        updatedByDisplayName = userService.getUserDetails(it.createdBy!!).name,
-        updatedAt = instantMapper.toOffsetDateTime(it.lastUpdatedAt)!!,
-        updatedAtPrison = it.lastUpdatedAtPrison,
+        reference = reference,
+        qualifications = toAchievedQualificationResponses(qualifications),
+        educationLevel = toEducationLevel(educationLevel),
+        createdBy = createdBy!!,
+        createdByDisplayName = userService.getUserDetails(createdBy!!).name,
+        createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
+        createdAtPrison = createdAtPrison,
+        updatedBy = lastUpdatedBy!!,
+        updatedByDisplayName = userService.getUserDetails(createdBy!!).name,
+        updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
+        updatedAtPrison = lastUpdatedAtPrison,
       )
     }
 
@@ -60,13 +62,15 @@ class QualificationsResourceMapper(
     prisonId: String,
     prisonNumber: String,
   ): UpdatePreviousQualificationsDto =
-    UpdatePreviousQualificationsDto(
-      reference = request.reference,
-      prisonNumber = prisonNumber,
-      prisonId = prisonId,
-      educationLevel = toEducationLevel(request.educationLevel),
-      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList(), prisonId),
-    )
+    with(request) {
+      UpdatePreviousQualificationsDto(
+        reference = reference,
+        prisonNumber = prisonNumber,
+        prisonId = prisonId,
+        educationLevel = toEducationLevel(request.educationLevel),
+        qualifications = toUpdateOrCreateQualificationDtos(request.qualifications ?: emptyList(), prisonId),
+      )
+    }
 
   fun toUpdateOrCreateQualificationDto(
     achievedQualification: CreateOrUpdateAchievedQualificationRequest,

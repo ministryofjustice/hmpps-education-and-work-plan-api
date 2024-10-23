@@ -53,7 +53,7 @@ class InductionResourceMapper(
         reference = reference,
         prisonNumber = prisonNumber,
         workOnRelease = workOnReleaseMapper.toWorkOnReleaseResponse(workOnRelease),
-        previousQualifications = qualificationsMapper.toPreviousQualificationsResponse(previousQualifications),
+        previousQualifications = previousQualifications?.let { qualificationsMapper.toPreviousQualificationsResponse(it) },
         previousTraining = previousTrainingMapper.toPreviousTrainingResponse(previousTraining),
         previousWorkExperiences = previousWorkExperiences?.let { workExperiencesMapper.toPreviousWorkExperiencesResponse(it) },
         inPrisonInterests = inPrisonInterests?.let { inPrisonInterestsMapper.toInPrisonInterestsResponse(it) },
