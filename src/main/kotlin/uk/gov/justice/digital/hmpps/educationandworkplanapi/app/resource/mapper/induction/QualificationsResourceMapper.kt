@@ -51,7 +51,7 @@ class QualificationsResourceMapper(
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
         createdAtPrison = createdAtPrison,
         updatedBy = lastUpdatedBy!!,
-        updatedByDisplayName = userService.getUserDetails(createdBy!!).name,
+        updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
         updatedAtPrison = lastUpdatedAtPrison,
       )

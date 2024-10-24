@@ -26,6 +26,9 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedUpdateInductionRequest
@@ -56,6 +59,12 @@ class InductionResourceMapperTest {
 
   @Mock
   private lateinit var workInterestsMapper: WorkInterestsResourceMapper
+
+  @Mock
+  private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map to CreateInductionDto`() {
@@ -100,7 +109,16 @@ class InductionResourceMapperTest {
   @Test
   fun `should map to InductionResponse`() {
     // Given
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
     val induction = aFullyPopulatedInduction()
+    given(instantMapper.toOffsetDateTime(any())).willReturn(
+      induction.createdAt!!.atOffset(ZoneOffset.UTC),
+      induction.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+    )
+
     val expectedInduction = aFullyPopulatedInductionResponse(
       reference = induction.reference,
       prisonNumber = induction.prisonNumber,

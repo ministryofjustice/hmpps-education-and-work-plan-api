@@ -4,10 +4,11 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
-import java.time.ZoneOffset
 
 @Component
 class InductionResourceMapper(
@@ -18,6 +19,8 @@ class InductionResourceMapper(
   private val inPrisonInterestsMapper: InPrisonInterestsResourceMapper,
   private val skillsAndInterestsMapper: SkillsAndInterestsResourceMapper,
   private val workInterestsMapper: WorkInterestsResourceMapper,
+  private val instantMapper: InstantMapper,
+  private val userService: ManageUserService,
 ) {
 
   fun toCreateInductionDto(prisonNumber: String, request: CreateInductionRequest): CreateInductionDto {
@@ -60,12 +63,12 @@ class InductionResourceMapper(
         personalSkillsAndInterests = personalSkillsAndInterests?.let { skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(it) },
         futureWorkInterests = futureWorkInterests?.let { workInterestsMapper.toFutureWorkInterestsResponse(it) },
         createdBy = createdBy!!,
-        createdByDisplayName = createdByDisplayName!!,
-        createdAt = createdAt!!.atOffset(ZoneOffset.UTC),
+        createdByDisplayName = userService.getUserDetails(createdBy!!).name,
+        createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
         createdAtPrison = createdAtPrison,
         updatedBy = lastUpdatedBy!!,
-        updatedByDisplayName = lastUpdatedByDisplayName!!,
-        updatedAt = lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
+        updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
+        updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
         updatedAtPrison = lastUpdatedAtPrison,
       )
     }
