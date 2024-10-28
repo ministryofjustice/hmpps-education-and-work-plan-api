@@ -19,23 +19,23 @@ class JpaNotePersistenceAdapter(
 
   @Transactional
   override fun createNote(createNoteDto: CreateNoteDto): NoteDto {
-    val noteEntity = noteRepository.save(NoteMapper.toEntity(createNoteDto))
-    return NoteMapper.toModel(noteEntity)
+    val noteEntity = noteRepository.save(NoteMapper.fromDomainToEntity(createNoteDto))
+    return NoteMapper.fromEntityToDomain(noteEntity)
   }
 
   override fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> {
     return noteRepository.findAllByEntityReferenceAndEntityType(
       entityReference,
-      NoteMapper.toEntity(entityType),
-    ).map { NoteMapper.toModel(it) }
+      NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+    ).map { NoteMapper.fromEntityToDomain(it) }
   }
 
   override fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> {
     return noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
       entityReference,
-      NoteMapper.toEntity(entityType),
-      NoteMapper.toEntity(noteType),
-    ).map { NoteMapper.toModel(it) }
+      NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+      NoteMapper.fromDomainNoteTypeToEntityNoteType(noteType),
+    ).map { NoteMapper.fromEntityToDomain(it) }
   }
 
   override fun updateNote(updateNoteDto: UpdateNoteDto): NoteDto {
@@ -43,14 +43,14 @@ class JpaNotePersistenceAdapter(
     noteEntity.content = updateNoteDto.content
     noteEntity.updatedAtPrison = updateNoteDto.lastUpdatedAtPrison
     noteRepository.save(noteEntity)
-    return NoteMapper.toModel(noteEntity)
+    return NoteMapper.fromEntityToDomain(noteEntity)
   }
 
   override fun deleteNoteByEntityReference(entityReference: UUID, entityType: EntityType, noteType: NoteType) {
     noteRepository.deleteNoteEntityByEntityReferenceAndEntityTypeAndNoteType(
       entityReference,
-      NoteMapper.toEntity(entityType),
-      NoteMapper.toEntity(noteType),
+      NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+      NoteMapper.fromDomainNoteTypeToEntityNoteType(noteType),
     )
   }
 }

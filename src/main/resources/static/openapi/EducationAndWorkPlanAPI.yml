@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.16.4'
+  version: '1.17.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -165,6 +165,37 @@ paths:
         '200':
           $ref: '#/components/responses/ActionPlan'
       operationId: get-action-plan-by-prison-number
+
+  #
+  # Action Plan Reviews
+  # --------------------------------------------------------------------------------
+  '/action-plans/{prisonNumber}/reviews':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    get:
+      summary: Lists all Action Plan Reviews (past and scheduled) for a prisoner
+      description: |
+        Returns all Action Plan Reviews for the specified prisoner. The response data will contain all previously
+        completed reviews (if any), plus the next scheduled review.
+        
+        The prisoner must have an Action Plan (consisting of their completed Induction plus at least 1 Goal) in order to
+        have any Reviews. If the prisoner does not yet have an Action Plan a 404 is returned.
+        
+        Given a prisoner has an Action Plan they will have exactly 1 scheduled review, and zero or more completed reviews.
+
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
+
+      tags:
+        - Action Plan Reviews
+      responses:
+        '200':
+          $ref: '#/components/responses/GetActionPlanReviews'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-action-plan-reviews
 
   #
   # Goals
@@ -1832,6 +1863,8 @@ components:
       title: NoteResponse
       type: object
       description: An object representing a note.
+      allOf:
+        - $ref: '#/components/schemas/AuditedResource'
       properties:
         reference:
           type: string
@@ -1840,64 +1873,25 @@ components:
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         content:
           type: string
-          description: The content of the note.
+          example: Peter would like to work in the library to help with his English levels.
         type:
           $ref: '#/components/schemas/NoteType'
-        createdBy:
-          type: string
-          description: The DPS username of the person who created the Note.
-          example: 'asmith_gen'
-        createdByDisplayName:
-          type: string
-          description: The display name of the person who created the Note.
-          example: 'Alex Smith'
-        createdAt:
-          type: string
-          format: date-time
-          description: An ISO-8601 timestamp representing when the Note was created.
-          example: '2023-06-19T09:39:44Z'
-        createdAtPrison:
-          type: string
-          description: The identifier of the prison that the prisoner was resident at when the Note was created.
-          example: 'BXI'
-        updatedBy:
-          type: string
-          description: The DPS username of the person who last updated the Note.
-          example: 'asmith_gen'
-        updatedByDisplayName:
-          type: string
-          description: The display name of the person who last updated the Note.
-          example: 'Alex Smith'
-        updatedAt:
-          type: string
-          format: date-time
-          description: An ISO-8601 timestamp representing when the Note was last updated. This will be the same as the created date if it has not yet been updated.
-          example: '2023-06-19T09:39:44Z'
-        updatedAtPrison:
-          type: string
-          description: The identifier of the prison that the prisoner was resident at when the Note was updated.
-          example: 'BXI'
       required:
         - reference
         - content
         - type
-        - createdAt
-        - createdBy
-        - createdByDisplayName
-        - createdAtPrison
-        - updatedAt
-        - updatedBy
-        - updatedByDisplayName
-        - updatedAtPrison
 
     NoteType:
       title: NoteType
       description: Enum describing the various note types.
       type: string
+      example: GOAL
       enum:
         - GOAL
         - GOAL_ARCHIVAL
         - GOAL_COMPLETION
+        - REVIEW
+        - INDUCTION
 
     UnarchiveGoalRequest:
       title: UnarchiveGoalRequest
@@ -2698,6 +2692,169 @@ components:
         - educationLevel
         - qualifications
 
+    ### Action Plan Reviews ###
+    ActionPlanReviewsResponse:
+      title: ActionPlanReviewsResponse
+      description: The next scheduled review and a list of zero or more completed reviews for a prisoner.
+      type: object
+      properties:
+        scheduledReview:
+          $ref: '#/components/schemas/ScheduledActionPlanReviewResponse'
+        completedReviews:
+          type: array
+          description: A List containing zero or more CompletedReviews.
+          items:
+            $ref: '#/components/schemas/CompletedActionPlanReviewResponse'
+      required:
+        - scheduledReview
+        - completedReviews
+
+    CompletedActionPlanReviewResponse:
+      title: CompletedActionPlanReviewResponse
+      type: object
+      description: An individual Completed Review of a Prisoner's Action Plan.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The unique reference of this Review
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        deadlineDate:
+          type: string
+          format: date
+          description: An ISO-8601 date representing the deadline for this Review to have been completed by.
+          example: '2023-12-19'
+        completedDate:
+          type: string
+          format: date
+          description: |
+            An ISO-8601 date representing the date that this Review was completed on.
+            
+            Clients can infer whether this Review was completed on time or not by comparing the deadlineDate and completedDate.
+          example: '2023-12-04'
+        note:
+          $ref: '#/components/schemas/NoteResponse'
+        createdBy:
+          type: string
+          description: The DPS username of the person who entered the Review in the system.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who entered the Review in the system.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Review was entered in the system.
+          example: '2023-06-19T09:39:44Z'
+        createdAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Review was ented in the system.
+          example: 'BXI'
+        conductedBy:
+          type: string
+          description: | 
+            The name of the person who actually conducted the Review session with the Prisoner. 
+            
+            Only populated if the person who conducted the Review was not the person who keyed it into the system.
+          example: 'Albert Mozzarella'
+        conductedByRole:
+          type: string
+          description: | 
+            The role of the person who actually conducted the Review session with the Prisoner.
+            
+            Only populated if the person who conducted the Review was not the person who keyed it into the system.
+          example: 'Peer mentor'
+      required:
+        - reference
+        - deadlineDate
+        - completedDate
+        - note
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+
+    ScheduledActionPlanReviewResponse:
+      title: ScheduledActionPlanReviewResponse
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AuditedResource'
+      description: | 
+        A Scheduled Review of a Prisoner's Action Plan.
+        
+        A DPS user will create a new Review Schedule (and therefore they will be recorded in the `createdBy...` fields)
+        when they complete a prisoner's Induction or their previous Review. IE. completing an Induction will create
+        the prisoner's first Review Schedule. Completing their Review will create their next Review Schedule.
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: The unique reference of this Review
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        reviewDateFrom:
+          type: string
+          format: date
+          description: | 
+            An ISO-8601 date representing date that the Review window starts.
+            
+            A prisoner's Review should be conducted within a given timeframe and this field represents the date that the
+            Review window starts from.
+          example: '2023-11-19'
+        reviewDateTo:
+          type: string
+          format: date
+          description: |
+            An ISO-8601 date representing date that the Review window ends. This is the Review deadline date.
+            
+            A prisoner's Review should be conducted within a given timeframe and this field represents the date that the
+            Review window ends, and that the Review should be completed by.
+          example: '2023-12-19'
+        status:
+          $ref: '#/components/schemas/ReviewScheduleStatus'
+        calculationRule:
+          $ref: '#/components/schemas/ReviewScheduleCalculationRule'
+      required:
+        - reference
+        - reviewDateFrom
+        - reviewDateTo
+        - status
+        - calculationRule
+
+    ReviewScheduleStatus:
+      title: ReviewScheduleStatus
+      description: Enum of the various Review Schedule statuses.
+      type: string
+      enum:
+        - SCHEDULED
+        - EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+        - EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
+        - EXEMPT_PRISONER_FAILED_TO_ENGAGE
+        - EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
+        - EXEMPT_PRISONER_SAFETY_ISSUES
+        - EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+        - EXEMPT_PRISON_STAFF_REDEPLOYMENT
+        - EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
+        - EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
+        - EXEMPT_SYSTEM_TECHNICAL_ISSUE
+        - EXEMPT_PRISONER_TRANSFER
+        - EXEMPT_PRISONER_RELEASE
+        - EXEMPT_PRISONER_DEATH
+
+    ReviewScheduleCalculationRule:
+      title: ReviewScheduleCalculationRule
+      description: Enum of the rules that are used to calculate a prisoner's Review Schedule
+      type: string
+      enum:
+        - PRISONER_READMISSION
+        - PRISONER_TRANSFER
+        - LESS_THAN_6_MONTHS_TO_SERVE
+        - BETWEEN_6_AND_12_MONTHS_TO_SERVE
+        - BETWEEN_12_AND_60_MONTHS_TO_SERVE
+        - INDETERMINATE_SENTENCE
+        - PRISONER_ON_REMAND
+        - PRISONER_UN_SENTENCED
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -2931,6 +3088,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/EducationResponse'
+
+    GetActionPlanReviews:
+      description: Response body containing the next scheduled review and a list of zero or more completed reviews.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ActionPlanReviewsResponse'
 
   #
   # Request Body Definitions

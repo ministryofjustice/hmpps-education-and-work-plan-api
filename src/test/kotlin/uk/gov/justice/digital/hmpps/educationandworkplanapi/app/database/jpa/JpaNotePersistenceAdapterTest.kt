@@ -34,8 +34,8 @@ class JpaNotePersistenceAdapterTest {
   fun `createNote should save note and return NoteDto`() {
     // given
     val createNoteDto = aValidCreateNoteDto()
-    val createNoteEntity = NoteMapper.toEntity(createNoteDto)
-    val expected = NoteMapper.toModel(createNoteEntity)
+    val createNoteEntity = NoteMapper.fromDomainToEntity(createNoteDto)
+    val expected = NoteMapper.fromEntityToDomain(createNoteEntity)
 
     given(noteRepository.save(any<NoteEntity>())).willReturn(createNoteEntity)
 
@@ -59,8 +59,8 @@ class JpaNotePersistenceAdapterTest {
     given(
       noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
         entityReference,
-        NoteMapper.toEntity(entityType),
-        NoteMapper.toEntity(noteType),
+        NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+        NoteMapper.fromDomainNoteTypeToEntityNoteType(noteType),
       ),
     ).willReturn(
       listOf(noteEntity),
@@ -73,8 +73,8 @@ class JpaNotePersistenceAdapterTest {
     Assertions.assertThat(result[0].content).isEqualTo(noteDTO.content)
     verify(noteRepository, times(1)).findAllByEntityReferenceAndEntityTypeAndNoteType(
       entityReference,
-      NoteMapper.toEntity(entityType),
-      NoteMapper.toEntity(noteType),
+      NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+      NoteMapper.fromDomainNoteTypeToEntityNoteType(noteType),
     )
   }
 
@@ -83,7 +83,7 @@ class JpaNotePersistenceAdapterTest {
     // Given
     val updateNoteDto = UpdateNoteDto(UUID.randomUUID(), "new content", "some prison")
     val noteEntity = aValidNoteEntity()
-    val expected = NoteMapper.toModel(noteEntity)
+    val expected = NoteMapper.fromEntityToDomain(noteEntity)
       .copy(content = updateNoteDto.content!!, lastUpdatedAtPrison = updateNoteDto.lastUpdatedAtPrison)
 
     given(noteRepository.findByReference(updateNoteDto.reference)).willReturn(noteEntity)

@@ -71,6 +71,9 @@ class InductionScheduleEntityMapper {
       InductionScheduleStatusEntity.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatusDomain.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
       InductionScheduleStatusEntity.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
       InductionScheduleStatusEntity.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE
+      InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
+      InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
+      InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH
     }
 
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusDomain): InductionScheduleStatusEntity =
@@ -87,5 +90,8 @@ class InductionScheduleEntityMapper {
       InductionScheduleStatusDomain.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatusEntity.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
       InductionScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusEntity.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
       InductionScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusEntity.EXEMPT_SYSTEM_TECHNICAL_ISSUE
+      InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
+      InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
+      InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH
     }
 }
