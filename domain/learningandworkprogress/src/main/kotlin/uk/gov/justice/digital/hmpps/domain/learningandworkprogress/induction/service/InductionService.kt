@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
@@ -25,6 +26,7 @@ private val log = KotlinLogging.logger {}
 class InductionService(
   private val persistenceAdapter: InductionPersistenceAdapter,
   private val inductionEventService: InductionEventService,
+  private val inductionScheduleEventService: InductionScheduleEventService,
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
 ) {
 
@@ -86,12 +88,11 @@ class InductionService(
       }
 
       val inductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
-      generateInductionScheduleUpdate(createInductionScheduleDto)
+      generateInductionScheduleCreated(inductionSchedule)
       return inductionSchedule
     }
 
-  private fun generateInductionScheduleUpdate(createInductionScheduleDto: CreateInductionScheduleDto) {
-    TODO("Not yet implemented")
-    // Create an outbound induction schedule update message using the inductionEventService... possibly or maybe create a inductionScheduleEventService
+  private fun generateInductionScheduleCreated(inductionSchedule: InductionSchedule) {
+    inductionScheduleEventService.inductionScheduleCreated(inductionSchedule)
   }
 }

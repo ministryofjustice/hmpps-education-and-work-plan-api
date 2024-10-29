@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
@@ -37,6 +38,9 @@ class InductionServiceTest {
 
   @Mock
   private lateinit var inductionEventService: InductionEventService
+
+  @Mock
+  private lateinit var inductionScheduleEventService: InductionScheduleEventService
 
   @Mock
   private lateinit var inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter

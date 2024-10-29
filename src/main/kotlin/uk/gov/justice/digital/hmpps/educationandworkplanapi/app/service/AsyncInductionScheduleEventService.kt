@@ -20,7 +20,7 @@ class AsyncInductionScheduleEventService(
     log.debug { "Induction schedule created event for prisoner [${createdInductionSchedule.prisonNumber}]" }
     log.debug { "About to send induction schedule created message" }
     telemetryService.trackInductionScheduleCreated(inductionSchedule = createdInductionSchedule)
-    // create the induction created message will look something like
+    // create the induction schedule created message will look something like
 
     """
       {
@@ -41,14 +41,11 @@ class AsyncInductionScheduleEventService(
         }
       }
     """.trimIndent()
-
-    TODO() // send the message
   }
 
   override fun inductionScheduleUpdated(updatedInductionSchedule: InductionSchedule) {
     log.debug { "Induction updated event for prisoner [${updatedInductionSchedule.prisonNumber}]" }
     log.debug { "About to send induction schedule updated message" }
     telemetryService.trackInductionScheduleUpdated(inductionSchedule = updatedInductionSchedule)
-    TODO() // send the message (similar to above)
   }
 }
