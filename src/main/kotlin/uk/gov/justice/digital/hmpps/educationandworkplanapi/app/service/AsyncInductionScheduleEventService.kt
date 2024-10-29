@@ -27,7 +27,7 @@ class AsyncInductionScheduleEventService(
         "eventType": "plp.induction-schedule.created",
         "version": 1,
         "description": "An induction schedule was created in plp",
-        "detailUrl": "/v1/persons/{prisonerId}/plp-induction-schedule",
+        "detailUrl": "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk/v1/persons/{prisonerId}/plp-induction-schedule",
         "occurredAt": "2024-10-29T12:16:04+01:00",
         "additionalInformation": {
         },

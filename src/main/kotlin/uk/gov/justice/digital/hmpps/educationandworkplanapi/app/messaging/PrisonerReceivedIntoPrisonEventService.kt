@@ -33,6 +33,8 @@ class PrisonerReceivedIntoPrisonEventService(private val inductionService: Induc
           )
         } catch (inductionAlreadyExistsException: InductionAlreadyExistsException) {
           log.info { "An induction already exists for prisoner with id ${inboundEvent.prisonNumber()}" }
+          // update existing deadline date
+          // TODO
         } catch (inductionScheduleAlreadyExistsException: InductionScheduleAlreadyExistsException) {
           log.info { "An induction schedule exists for prisoner with id ${inboundEvent.prisonNumber()}" }
         }
@@ -40,6 +42,7 @@ class PrisonerReceivedIntoPrisonEventService(private val inductionService: Induc
 
       TRANSFERRED -> {
         log.info { "Processing Prisoner Received Into Prison Event with reason ${additionalInformation.reason}" }
+        // Should already have an induction but Create induction or update existing deadline date if one exists
         // TODO - process prisoner transfer event in respect of what PLP needs to do on this event
       }
 
@@ -53,7 +56,7 @@ class PrisonerReceivedIntoPrisonEventService(private val inductionService: Induc
   // prison plus an agreed number of days.
   private fun calculateDeadlineDate(inboundEvent: InboundEvent): LocalDate {
     val europeLondon: ZoneId = ZoneId.of("Europe/London")
-    val numberOfDaysToAdd = 10
+    val numberOfDaysToAdd = 20
     return inboundEvent.occurredAt.atZone(europeLondon).toLocalDate().plusDays(numberOfDaysToAdd.toLong())
   }
 }
