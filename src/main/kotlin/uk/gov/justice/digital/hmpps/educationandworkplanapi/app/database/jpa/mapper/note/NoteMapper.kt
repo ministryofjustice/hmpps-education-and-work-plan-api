@@ -11,20 +11,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 object NoteMapper {
 
-  fun toEntity(createNoteDto: CreateNoteDto): NoteEntity {
+  fun fromDomainToEntity(createNoteDto: CreateNoteDto): NoteEntity {
     return NoteEntity(
       reference = UUID.randomUUID(),
       prisonNumber = createNoteDto.prisonNumber,
       content = createNoteDto.content,
-      noteType = toEntity(createNoteDto.noteType),
-      entityType = toEntity(createNoteDto.entityType),
+      noteType = fromDomainNoteTypeToEntityNoteType(createNoteDto.noteType),
+      entityType = fromDomainEntityTypeToEntityEntityType(createNoteDto.entityType),
       entityReference = createNoteDto.entityReference,
       createdAtPrison = createNoteDto.createdAtPrison,
       updatedAtPrison = createNoteDto.lastUpdatedAtPrison,
     )
   }
 
-  fun toModel(noteEntity: NoteEntity): NoteDto {
+  fun fromEntityToDomain(noteEntity: NoteEntity): NoteDto {
     return NoteDto(
       reference = noteEntity.reference!!,
       content = noteEntity.content.orEmpty(),
@@ -34,33 +34,41 @@ object NoteMapper {
       lastUpdatedBy = noteEntity.updatedBy,
       lastUpdatedAt = noteEntity.updatedAt,
       lastUpdatedAtPrison = noteEntity.updatedAtPrison.orEmpty(),
-      noteType = toModel(noteEntity.noteType!!),
-      entityType = toModel(noteEntity.entityType!!),
+      noteType = toNoteType(noteEntity.noteType!!),
+      entityType = toEntityType(noteEntity.entityType!!),
       entityReference = noteEntity.reference!!,
     )
   }
 
-  fun toEntity(noteType: DomainNoteType) =
+  fun fromDomainNoteTypeToEntityNoteType(noteType: DomainNoteType): EntityNoteType =
     when (noteType) {
       DomainNoteType.GOAL -> EntityNoteType.GOAL
       DomainNoteType.GOAL_ARCHIVAL -> EntityNoteType.GOAL_ARCHIVAL
       DomainNoteType.GOAL_COMPLETION -> EntityNoteType.GOAL_COMPLETION
+      DomainNoteType.REVIEW -> EntityNoteType.REVIEW
+      DomainNoteType.INDUCTION -> EntityNoteType.INDUCTION
     }
 
-  fun toModel(noteType: EntityNoteType) =
+  fun fromDomainEntityTypeToEntityEntityType(entityType: DomainEntityType): EntityEntityType =
+    when (entityType) {
+      DomainEntityType.GOAL -> EntityEntityType.GOAL
+      DomainEntityType.REVIEW -> EntityEntityType.REVIEW
+      DomainEntityType.INDUCTION -> EntityEntityType.INDUCTION
+    }
+
+  private fun toNoteType(noteType: EntityNoteType): DomainNoteType =
     when (noteType) {
       EntityNoteType.GOAL -> DomainNoteType.GOAL
       EntityNoteType.GOAL_ARCHIVAL -> DomainNoteType.GOAL_ARCHIVAL
       EntityNoteType.GOAL_COMPLETION -> DomainNoteType.GOAL_COMPLETION
+      EntityNoteType.REVIEW -> DomainNoteType.REVIEW
+      EntityNoteType.INDUCTION -> DomainNoteType.INDUCTION
     }
 
-  fun toEntity(entityType: DomainEntityType) =
-    when (entityType) {
-      DomainEntityType.GOAL -> EntityEntityType.GOAL
-    }
-
-  fun toModel(entityType: EntityEntityType) =
+  private fun toEntityType(entityType: EntityEntityType): DomainEntityType =
     when (entityType) {
       EntityEntityType.GOAL -> DomainEntityType.GOAL
+      EntityEntityType.REVIEW -> DomainEntityType.REVIEW
+      EntityEntityType.INDUCTION -> DomainEntityType.INDUCTION
     }
 }

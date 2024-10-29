@@ -19,10 +19,14 @@ data class NoteDto(
 
 enum class EntityType {
   GOAL,
+  INDUCTION,
+  REVIEW,
 }
 
 enum class NoteType(val entityType: EntityType) {
   GOAL(EntityType.GOAL),
   GOAL_ARCHIVAL(EntityType.GOAL),
   GOAL_COMPLETION(EntityType.GOAL),
+  REVIEW(EntityType.REVIEW),
+  INDUCTION(EntityType.INDUCTION),
 }

@@ -34,5 +34,7 @@ class NoteResourceMapper(
       DomainNoteType.GOAL -> ApiNoteType.GOAL
       DomainNoteType.GOAL_ARCHIVAL -> ApiNoteType.GOAL_ARCHIVAL
       DomainNoteType.GOAL_COMPLETION -> ApiNoteType.GOAL_COMPLETION
+      DomainNoteType.REVIEW -> ApiNoteType.REVIEW
+      DomainNoteType.INDUCTION -> ApiNoteType.INDUCTION
     }
 }
