@@ -85,6 +85,13 @@ class InductionService(
         throw InductionAlreadyExistsException(prisonNumber)
       }
 
-      inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
+      val inductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
+      generateInductionScheduleUpdate(createInductionScheduleDto)
+      return inductionSchedule
     }
+
+  private fun generateInductionScheduleUpdate(createInductionScheduleDto: CreateInductionScheduleDto) {
+    TODO("Not yet implemented")
+    // Create an outbound induction schedule update message using the inductionEventService... possibly or maybe create a inductionScheduleEventService
+  }
 }
