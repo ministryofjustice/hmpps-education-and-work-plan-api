@@ -26,9 +26,6 @@ class ReviewEntityMapper {
     }
 
   private fun toReviewConductedBy(reviewEntity: ReviewEntity): ReviewConductedBy? =
-    if (reviewEntity.conductedBy != null && reviewEntity.conductedByRole != null) {
-      ReviewConductedBy(name = reviewEntity.conductedBy, role = reviewEntity.conductedByRole)
-    } else {
-      null
-    }
+    reviewEntity.takeIf { reviewEntity.conductedBy != null && reviewEntity.conductedByRole != null }
+      ?.let { ReviewConductedBy(name = it.conductedBy!!, role = it.conductedByRole!!) }
 }
