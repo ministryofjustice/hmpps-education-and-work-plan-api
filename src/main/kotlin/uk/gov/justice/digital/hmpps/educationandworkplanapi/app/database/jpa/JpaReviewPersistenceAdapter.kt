@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -15,6 +16,7 @@ class JpaReviewPersistenceAdapter(
   private val noteRepository: NoteRepository,
 ) : ReviewPersistenceAdapter {
 
+  @Transactional(readOnly = true)
   override fun getCompletedReviews(prisonNumber: String): List<CompletedReview> =
     reviewRepository.getAllByPrisonNumber(prisonNumber).map {
       val reviewNoteEntity = noteRepository.findAllByEntityReferenceAndEntityType(

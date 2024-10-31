@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -170,6 +171,7 @@ class GlobalExceptionHandler(
       PrisonerConversationNotFoundException::class,
       EducationNotFoundException::class,
       PrisonerHasNoGoalsException::class,
+      ReviewScheduleNotFoundException::class,
     ],
   )
   fun handleExceptionReturnNotFoundErrorResponse(

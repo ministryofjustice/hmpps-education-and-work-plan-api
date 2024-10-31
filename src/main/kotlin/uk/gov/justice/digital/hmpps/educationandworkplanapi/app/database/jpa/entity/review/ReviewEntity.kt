@@ -6,7 +6,6 @@ import jakarta.persistence.EntityListeners
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -49,27 +48,22 @@ data class ReviewEntity(
   @Id
   @GeneratedValue
   @UuidGenerator
-  @field:NotNull
   var id: UUID? = null
 
   @Column(updatable = false)
   @CreatedBy
-  @field:NotNull
   var createdBy: String? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  @field:NotNull
   var createdAt: Instant? = null
 
   @Column(updatable = false)
   @LastModifiedBy
-  @field:NotNull
   var updatedBy: String? = null
 
   @Column(updatable = false)
   @UpdateTimestamp
-  @field:NotNull
   var updatedAt: Instant? = null
 
   override fun equals(other: Any?): Boolean {

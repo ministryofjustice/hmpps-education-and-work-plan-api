@@ -13,6 +13,9 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
@@ -83,4 +86,11 @@ class DomainConfiguration {
     educationEventService: EducationEventService,
   ): EducationService =
     EducationService(educationPersistenceAdapter, educationEventService)
+
+  @Bean
+  fun reviewDomainService(
+    reviewPersistenceAdapter: ReviewPersistenceAdapter,
+    reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
+  ): ReviewService =
+    ReviewService(reviewPersistenceAdapter, reviewSchedulePersistenceAdapter)
 }
