@@ -17,3 +17,6 @@ class InductionAlreadyExistsException(val prisonNumber: String) :
  */
 class InductionScheduleAlreadyExistsException(val prisonNumber: String) :
   RuntimeException("An Induction Schedule already exists for prisoner $prisonNumber")
+
+class InductionScheduleNotFoundException(val prisonNumber: String) :
+  RuntimeException("Induction schedule not found for prisoner [$prisonNumber]")

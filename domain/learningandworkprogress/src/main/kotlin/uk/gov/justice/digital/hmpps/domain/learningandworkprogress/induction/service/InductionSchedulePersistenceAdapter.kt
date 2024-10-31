@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
+import java.time.LocalDate
 
 /**
  * Persistence Adapter for [InductionSchedule] instances.
@@ -24,4 +26,9 @@ interface InductionSchedulePersistenceAdapter {
    * Retrieves an [InductionSchedule] for a given Prisoner. Returns `null` if the [InductionSchedule] does not exist.
    */
   fun getInductionSchedule(prisonNumber: String): InductionSchedule?
+  fun updateSchedule(
+    prisonNumber: String,
+    calculationRule: InductionScheduleCalculationRule,
+    deadlineDate: LocalDate,
+  ): InductionSchedule
 }

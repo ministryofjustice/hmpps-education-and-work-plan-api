@@ -6,11 +6,15 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 private val log = KotlinLogging.logger {}
 
@@ -86,13 +90,66 @@ class InductionService(
       if (persistenceAdapter.getInduction(prisonNumber) != null) {
         throw InductionAlreadyExistsException(prisonNumber)
       }
-
-      val inductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
-      generateInductionScheduleCreated(inductionSchedule)
-      return inductionSchedule
+      return inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
     }
 
-  private fun generateInductionScheduleCreated(inductionSchedule: InductionSchedule) {
-    inductionScheduleEventService.inductionScheduleCreated(inductionSchedule)
+  fun createOrUpdateInductionSchedule(prisonNumber: String, eventDate: Instant) {
+    log.info { "Creating or updating induction schedule for prisoner [$prisonNumber]" }
+
+    // Check if an induction schedule already exists.
+    val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+    if (existingSchedule != null) {
+      // Update existing schedule with the correct calculation rule and deadline date.
+      val calculationRule = determineCalculationRule(prisonNumber)
+      val updatedDeadlineDate = calculateDeadlineDate(eventDate)
+
+      inductionSchedulePersistenceAdapter.updateSchedule(
+        prisonNumber,
+        calculationRule,
+        updatedDeadlineDate,
+      )
+      return
+    }
+
+    // If no induction schedule exists, check for an existing induction.
+    if (persistenceAdapter.getInduction(prisonNumber) != null) {
+      log.info { "Induction already exists for prisoner [$prisonNumber], creating a review." }
+      // TODO: Implement review creation
+      return
+    }
+
+    // Create a new induction schedule.
+    val newInductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(
+      CreateInductionScheduleDto(
+        prisonNumber,
+        calculateDeadlineDate(eventDate),
+        InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+      ),
+    )
+    inductionScheduleEventService.inductionScheduleCreated(newInductionSchedule)
+  }
+
+  private fun determineCalculationRule(prisonNumber: String): InductionScheduleCalculationRule {
+    // TODO
+    // Based on how long the prisoner has left to serve set the calculation rule
+    // get the prisoners release date and use it to determine which of the following rules to apply:
+    //    NEW_PRISON_ADMISSION
+    //    EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE
+    //    EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE
+    //    EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE
+    //    EXISTING_PRISONER_INDETERMINATE_SENTENCE
+    //    EXISTING_PRISONER_ON_REMAND
+    //    EXISTING_PRISONER_UN_SENTENCED
+
+    // return a default one for now:
+    return InductionScheduleCalculationRule.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE
+  }
+
+  // This function will need to calculate the deadline date initially this will be the date the prisoner entered
+  // prison plus an agreed number of days.
+  private fun calculateDeadlineDate(eventDate: Instant): LocalDate {
+    val europeLondon: ZoneId = ZoneId.of("Europe/London")
+    val numberOfDaysToAdd = 20
+    return eventDate.atZone(europeLondon).toLocalDate().plusDays(numberOfDaysToAdd.toLong())
   }
 }
