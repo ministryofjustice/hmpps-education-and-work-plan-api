@@ -20,7 +20,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-@Table(name = "review")
+@Table(name = "review_schedule")
 @Entity
 @EntityListeners(value = [AuditingEntityListener::class])
 data class ReviewScheduleEntity(
