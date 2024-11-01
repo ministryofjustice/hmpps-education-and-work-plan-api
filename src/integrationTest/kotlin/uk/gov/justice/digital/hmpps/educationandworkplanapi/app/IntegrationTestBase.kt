@@ -21,6 +21,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
@@ -116,6 +118,12 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var conversationRepository: ConversationRepository
 
+  @Autowired
+  lateinit var reviewRepository: ReviewRepository
+
+  @Autowired
+  lateinit var reviewScheduleRepository: ReviewScheduleRepository
+
   @SpyBean
   lateinit var telemetryClient: TelemetryClient
 
@@ -135,6 +143,8 @@ abstract class IntegrationTestBase {
     inductionRepository.deleteAll()
     previousQualificationsRepository.deleteAll()
     conversationRepository.deleteAll()
+    reviewRepository.deleteAll()
+    reviewScheduleRepository.deleteAll()
   }
 
   @BeforeEach
