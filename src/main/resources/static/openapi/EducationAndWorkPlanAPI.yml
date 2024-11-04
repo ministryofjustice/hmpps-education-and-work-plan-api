@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.0'
+  version: '1.17.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -196,6 +196,33 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-action-plan-reviews
+
+    post:
+      summary: Creates an Action Plan Review for a prisoner
+      description: |
+        Submits and records an Action Plan Reviews for the specified prisoner.
+        
+        The prisoner must have an Action Plan (consisting of their completed Induction plus at least 1 Goal) in order to
+        have a Review. If the prisoner does not yet have an Action Plan a 404 is returned.
+        
+        Given a prisoner has an Action Plan they will have exactly 1 scheduled review, and zero or more completed reviews.
+
+        **Role Requirements:**
+        Access to this endpoint requires the following role:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
+
+      tags:
+        - Action Plan Reviews
+      requestBody:
+        $ref: '#/components/requestBodies/CreateActionPlanReview'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreateActionPlanReview'
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: create-action-plan-review
 
   #
   # Goals
@@ -2693,6 +2720,51 @@ components:
         - qualifications
 
     ### Action Plan Reviews ###
+    CreateActionPlanReviewRequest:
+      title: CreateActionPlanReviewRequest
+      description: A request to create and record an Action Plan Review for a prisoner.
+      type: object
+      properties:
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
+        note:
+          type: string
+          description: The notes taken by the Reviewer when conducting the prisoner's Review.
+          example: Now he has settled into prison life Peter's attitude has improved and he is making excellent progress towards his goals.
+        conductedBy:
+          type: string
+          description: |
+            The name of the person who actually conducted the Review session with the Prisoner. 
+            
+            Only populated if the person who conducted the Review was not the person who keyed it into the system.
+          example: 'Albert Mozzarella'
+        conductedByRole:
+          type: string
+          description: |
+            The role of the person who actually conducted the Review session with the Prisoner.
+            
+            Only populated if the person who conducted the Review was not the person who keyed it into the system.
+          example: 'Peer mentor'
+      required:
+        - prisonId
+        - note
+
+    CreateActionPlanReviewResponse:
+      title: CreateActionPlanReviewResponse
+      description: Response body detailing whether this was the prisoner's last review before release, and if not the next scheduled review.
+      properties:
+        wasLastReviewBeforeRelease:
+          type: boolean
+          example: false
+          description: | 
+            Indicates whether the Review just submitted was the prisoner's last review before release.
+            
+            If this was the prisoner's last review before release a new Review Schedule will not have been created and retured in the property `nextReviewSchedule`
+        nextReviewSchedule:
+          $ref: '#/components/schemas/ScheduledActionPlanReviewResponse'
+      required:
+        - wasLastReviewBeforeRelease
+
     ActionPlanReviewsResponse:
       title: ActionPlanReviewsResponse
       description: The next scheduled review and a list of zero or more completed reviews for a prisoner.
@@ -3106,6 +3178,23 @@ components:
           schema:
             $ref: '#/components/schemas/ActionPlanReviewsResponse'
 
+    CreateActionPlanReview:
+      description: Response body detailing whether this was the prisoner's last review before release, and if not the next scheduled review.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateActionPlanReviewResponse'
+
   #
   # Request Body Definitions
   # --------------------------------------------------------------------------------
@@ -3194,7 +3283,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateEducationRequest'
-
+    CreateActionPlanReview:
+      description: Request body to create and record an Action Plan Review.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateActionPlanReviewRequest'
   parameters:
     prisonNumberPathParameter:
       name: prisonNumber
