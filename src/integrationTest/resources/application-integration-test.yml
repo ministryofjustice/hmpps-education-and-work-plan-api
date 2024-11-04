@@ -61,3 +61,5 @@ apis:
 hmpps:
   auth:
     url: http://localhost:9093/auth
+
+ciag-kpi-processing-rule: PEF
