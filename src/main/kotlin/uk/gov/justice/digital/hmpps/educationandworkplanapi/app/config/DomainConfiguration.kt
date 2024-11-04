@@ -103,9 +103,11 @@ class DomainConfiguration {
   fun ciagKpiService(
     @Value("\${ciag-kpi-processing-rule}") ciagKpiProcessingRule: String?,
     prisonerSearchApiClient: PrisonerSearchApiClient,
+    inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
+    inductionPersistenceAdapter: InductionPersistenceAdapter,
   ): CiagKpiService? =
     when (ciagKpiProcessingRule) {
-      "PEF" -> PefCiagKpiService(prisonerSearchApiClient)
+      "PEF" -> PefCiagKpiService(prisonerSearchApiClient, inductionSchedulePersistenceAdapter, inductionPersistenceAdapter)
       "PES" -> PesCiagKpiService(prisonerSearchApiClient)
       else -> null
     }

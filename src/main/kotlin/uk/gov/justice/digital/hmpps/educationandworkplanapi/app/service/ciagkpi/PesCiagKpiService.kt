@@ -13,6 +13,10 @@ import java.time.LocalDate
 class PesCiagKpiService(
   private val prisonerSearchApiClient: PrisonerSearchApiClient,
 ) : CiagKpiService() {
+  override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
+    TODO("Not yet implemented")
+  }
+
   override fun calculateInductionDeadlineDate(prisonNumber: String, eventDate: Instant): LocalDate {
     TODO("Not yet implemented")
   }

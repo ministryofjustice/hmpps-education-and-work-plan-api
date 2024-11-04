@@ -35,7 +35,7 @@ class InductionScheduleEntityMapper {
       )
     }
 
-  private fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleEntity): InductionScheduleCalculationRuleDomain =
+  fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleEntity): InductionScheduleCalculationRuleDomain =
     when (inductionScheduleCalculationRule) {
       InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION
       InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE
@@ -46,7 +46,7 @@ class InductionScheduleEntityMapper {
       InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_UN_SENTENCED -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_UN_SENTENCED
     }
 
-  private fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleDomain): InductionScheduleCalculationRuleEntity =
+  fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleDomain): InductionScheduleCalculationRuleEntity =
     when (inductionScheduleCalculationRule) {
       InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION
       InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE

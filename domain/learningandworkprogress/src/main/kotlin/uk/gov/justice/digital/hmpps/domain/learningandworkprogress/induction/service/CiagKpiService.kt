@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
+import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import java.time.Instant
 import java.time.LocalDate
@@ -7,12 +8,11 @@ import java.time.LocalDate
 /**
  * Abstract superclass for CIAG KPI service methods
  */
+
+private val log = KotlinLogging.logger {}
 abstract class CiagKpiService {
 
-  fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String) {
-    // TODO - implement
-  }
-
+  abstract fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant)
   fun processPrisonerTransfer(prisonNumber: String, prisonTransferredTo: String) {
     // TODO - implement
   }

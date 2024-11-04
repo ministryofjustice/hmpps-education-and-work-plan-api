@@ -24,6 +24,7 @@ class PrisonerReceivedIntoPrisonEventService(
         ciagKpiService?.processPrisonerAdmission(
           prisonNumber = additionalInformation.nomsNumber,
           prisonAdmittedTo = additionalInformation.prisonId,
+          eventDate = inboundEvent.occurredAt,
         )
       }
 
