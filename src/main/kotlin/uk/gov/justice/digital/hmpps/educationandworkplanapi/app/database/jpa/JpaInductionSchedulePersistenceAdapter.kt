@@ -41,7 +41,6 @@ class JpaInductionSchedulePersistenceAdapter(
     // Update the induction schedule with the new values.
     existingSchedule.apply {
       deadlineDate = newDeadlineDate
-      scheduleCalculationRule = inductionScheduleEntityMapper.toInductionScheduleCalculationRule(newCalculationRule)
     }
 
     // Save the updated schedule and return the mapped domain object.
