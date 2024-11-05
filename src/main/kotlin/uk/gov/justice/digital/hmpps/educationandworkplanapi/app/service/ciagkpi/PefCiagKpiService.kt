@@ -35,15 +35,7 @@ class PefCiagKpiService(
     // Check if an induction schedule already exists.
     val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
     if (existingSchedule != null) {
-      // Update existing schedule with the correct calculation rule and deadline date.
-      val calculationRule = determineInductionScheduleCalculationRule(prisonNumber)
-      val updatedDeadlineDate = calculateInductionDeadlineDate(prisonNumber, eventDate)
-
-      inductionSchedulePersistenceAdapter.updateSchedule(
-        prisonNumber,
-        calculationRule,
-        updatedDeadlineDate,
-      )
+      log.info { "Induction schedule already exists for prisoner [$prisonNumber], ignoring this message." }
       return
     }
 
