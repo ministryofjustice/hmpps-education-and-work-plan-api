@@ -36,6 +36,7 @@ generic-service:
     PRISONER_SEARCH_API_URL: https://prisoner-search.prison.service.justice.gov.uk
     HMPPS_SAR_ADDITIONALACCESSROLE: ROLE_EDUCATION_WORK_PLAN_VIEWER
     HMPPS_SQS_ENABLED: true
+    CIAG_KPI_PROCESSING_RULE: "" # Set to PEF or PES depending on Curious support; or empty string to disable CIAG KPI Processing support
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

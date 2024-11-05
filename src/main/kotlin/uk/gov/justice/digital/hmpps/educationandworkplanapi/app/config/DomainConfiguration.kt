@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationEventService
@@ -8,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
@@ -26,7 +28,10 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalServ
 import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PefCiagKpiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PesCiagKpiService
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -93,4 +98,17 @@ class DomainConfiguration {
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   ): ReviewService =
     ReviewService(reviewPersistenceAdapter, reviewSchedulePersistenceAdapter)
+
+  @Bean
+  fun ciagKpiService(
+    @Value("\${ciag-kpi-processing-rule}") ciagKpiProcessingRule: String?,
+    prisonerSearchApiClient: PrisonerSearchApiClient,
+    inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
+    inductionPersistenceAdapter: InductionPersistenceAdapter,
+  ): CiagKpiService? =
+    when (ciagKpiProcessingRule) {
+      "PEF" -> PefCiagKpiService(prisonerSearchApiClient, inductionSchedulePersistenceAdapter, inductionPersistenceAdapter)
+      "PES" -> PesCiagKpiService(prisonerSearchApiClient)
+      else -> null
+    }
 }

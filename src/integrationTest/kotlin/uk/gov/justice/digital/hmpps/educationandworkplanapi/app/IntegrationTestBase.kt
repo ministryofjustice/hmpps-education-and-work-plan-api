@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewRepository
@@ -52,6 +53,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
+import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -135,6 +138,19 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var noteRepository: NoteRepository
+
+  @Autowired
+  lateinit var inductionScheduleRepository: InductionScheduleRepository
+
+  @Autowired
+  lateinit var hmppsQueueService: HmppsQueueService
+
+  val domainEventQueue by lazy {
+    hmppsQueueService.findByQueueId("educationandworkplan")
+      ?: throw MissingQueueException("HmppsQueue educationandworkplan not found")
+  }
+  val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
+  val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
 
   @BeforeEach
   fun clearDatabase() {

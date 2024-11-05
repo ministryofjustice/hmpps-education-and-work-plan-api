@@ -122,3 +122,4 @@ apis:
   prisoner-search-api:
     url: ${PRISONER_SEARCH_API_URL}
 
+ciag-kpi-processing-rule: ${CIAG_KPI_PROCESSING_RULE}
