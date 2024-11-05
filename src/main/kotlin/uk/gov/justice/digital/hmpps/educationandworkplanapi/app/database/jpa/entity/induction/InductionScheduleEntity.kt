@@ -31,7 +31,7 @@ data class InductionScheduleEntity(
   val prisonNumber: String,
 
   @Column(updatable = false)
-  val scheduleCalculationRule: InductionScheduleCalculationRule,
+  var scheduleCalculationRule: InductionScheduleCalculationRule,
 
   @Column(updatable = true)
   var deadlineDate: LocalDate,

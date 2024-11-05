@@ -29,7 +29,7 @@ interface InductionSchedulePersistenceAdapter {
 
   fun updateSchedule(
     prisonNumber: String,
-    calculationRule: InductionScheduleCalculationRule,
-    deadlineDate: LocalDate,
+    newCalculationRule: InductionScheduleCalculationRule,
+    newDeadlineDate: LocalDate,
   ): InductionSchedule
 }

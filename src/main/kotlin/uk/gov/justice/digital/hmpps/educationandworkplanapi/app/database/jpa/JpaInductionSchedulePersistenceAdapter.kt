@@ -31,21 +31,21 @@ class JpaInductionSchedulePersistenceAdapter(
   @Transactional
   override fun updateSchedule(
     prisonNumber: String,
-    calculationRule: InductionScheduleCalculationRule,
-    deadlineDate: LocalDate,
+    newCalculationRule: InductionScheduleCalculationRule,
+    newDeadlineDate: LocalDate,
   ): InductionSchedule {
     // Retrieve and validate the existing induction schedule exists.
     val existingSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
 
     // Update the induction schedule with the new values.
-    val updatedSchedule = existingSchedule.copy(
-      deadlineDate = deadlineDate,
-      scheduleCalculationRule = inductionScheduleEntityMapper.toInductionScheduleCalculationRule(calculationRule),
-    )
+    existingSchedule.apply {
+      deadlineDate = newDeadlineDate
+      scheduleCalculationRule = inductionScheduleEntityMapper.toInductionScheduleCalculationRule(newCalculationRule)
+    }
 
     // Save the updated schedule and return the mapped domain object.
-    inductionScheduleRepository.saveAndFlush(updatedSchedule)
-    return inductionScheduleEntityMapper.fromEntityToDomain(updatedSchedule)
+    inductionScheduleRepository.saveAndFlush(existingSchedule)
+    return inductionScheduleEntityMapper.fromEntityToDomain(existingSchedule)
   }
 }
