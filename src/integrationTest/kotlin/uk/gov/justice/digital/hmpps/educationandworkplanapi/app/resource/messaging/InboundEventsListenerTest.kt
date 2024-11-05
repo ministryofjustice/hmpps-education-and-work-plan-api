@@ -22,6 +22,9 @@ class InboundEventsListenerTest : IntegrationTestBase() {
   @Test
   fun `should send message to service given message is a Notification message`() {
     // Given
+    val inductionScheduleBefore = inductionScheduleRepository.findByPrisonNumber("A6099EA")
+    assertThat(inductionScheduleBefore).isNull()
+
     val prisonNumber = "A6099EA"
     val sqsMessage = SqsMessage(
       Type = "Notification",
@@ -48,7 +51,7 @@ class InboundEventsListenerTest : IntegrationTestBase() {
       domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
     } matches { it == 0 }
 
-    val result = await.atMost(10, TimeUnit.SECONDS).until {
+    await.atMost(10, TimeUnit.SECONDS).until {
       inductionScheduleRepository.findByPrisonNumber(prisonNumber) != null
     }
 
