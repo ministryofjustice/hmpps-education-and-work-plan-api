@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
@@ -31,12 +33,14 @@ data class InductionScheduleEntity(
   val prisonNumber: String,
 
   @Column(updatable = false)
+  @Enumerated(value = EnumType.STRING)
   val scheduleCalculationRule: InductionScheduleCalculationRule,
 
   @Column(updatable = true)
   var deadlineDate: LocalDate,
 
   @Column(updatable = true)
+  @Enumerated(value = EnumType.STRING)
   var scheduleStatus: InductionScheduleStatus,
 ) {
   @Id
