@@ -5,15 +5,19 @@ import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
+import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
 class ReviewServiceTest {
@@ -28,6 +32,7 @@ class ReviewServiceTest {
 
   companion object {
     private const val PRISON_NUMBER = "A1234AB"
+    private val TODAY = LocalDate.now()
   }
 
   @Nested
@@ -77,6 +82,275 @@ class ReviewServiceTest {
       // Then
       assertThat(actual).isEqualTo(expected)
       verify(reviewPersistenceAdapter).getCompletedReviews(PRISON_NUMBER)
+    }
+  }
+
+  @Nested
+  inner class DetermineReviewScheduleCalculationRule {
+    @Test
+    fun `it should determine calculation rule given prisoner has been re-admitted`() {
+      // Given
+      val releaseDate = LocalDate.now().plusYears(2)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = true
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has been transferred`() {
+      // Given
+      val releaseDate = LocalDate.now().plusYears(2)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = true
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.PRISONER_TRANSFER)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has an indeterminate sentence`() {
+      // Given
+      val releaseDate = null
+      val sentenceType = SentenceType.INDETERMINATE_SENTENCE
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner is on remand`() {
+      // Given
+      val releaseDate = null
+      val sentenceType = SentenceType.REMAND
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.PRISONER_ON_REMAND)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner is un-sentenced`() {
+      // Given
+      val releaseDate = null
+      val sentenceType = SentenceType.CONVICTED_UNSENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has less than 6 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(6).minusDays(1)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has exactly 6 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(6)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has between 6 and 12 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(6).plusDays(1)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has exactly 12 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(12)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has between 12 and 60 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(12).plusDays(1)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has exactly 60 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(60)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE)
+    }
+
+    @Test
+    fun `it should determine calculation rule given prisoner has more than 60 months left to serve`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(60).plusDays(1)
+      val sentenceType = SentenceType.SENTENCED
+      val isReAdmission = false
+      val isTransfer = false
+
+      // When
+      val actual = service.determineReviewScheduleCalculationRule(releaseDate, sentenceType, isReAdmission, isTransfer)
+
+      // Then
+      assertThat(actual).isEqualTo(ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE)
+    }
+  }
+
+  @Nested
+  inner class CalculateReviewWindow {
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        "PRISONER_TRANSFER",
+        "PRISONER_READMISSION",
+      ],
+    )
+    fun `should calculate a 'today to today + 10 days' review window`(calculationRule: ReviewScheduleCalculationRule) {
+      // Given
+      val expected = ReviewScheduleWindow(TODAY, TODAY.plusDays(10))
+
+      // When
+      val actual = service.calculateReviewWindow(calculationRule)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `should calculate a '1 to 3 months' review window`() {
+      // Given
+      val calculationRule = ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE
+
+      val expected = ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3))
+
+      // When
+      val actual = service.calculateReviewWindow(calculationRule)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        "BETWEEN_6_AND_12_MONTHS_TO_SERVE",
+        "PRISONER_ON_REMAND",
+        "PRISONER_UN_SENTENCED",
+      ],
+    )
+    fun `should calculate a '2 to 3 months' review window`(calculationRule: ReviewScheduleCalculationRule) {
+      // Given
+      val expected = ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3))
+
+      // When
+      val actual = service.calculateReviewWindow(calculationRule)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `should calculate a '4 to 6 months' review window`() {
+      // Given
+      val calculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+
+      val expected = ReviewScheduleWindow(TODAY.plusMonths(4), TODAY.plusMonths(6))
+
+      // When
+      val actual = service.calculateReviewWindow(calculationRule)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        "MORE_THAN_60_MONTHS_TO_SERVE",
+        "INDETERMINATE_SENTENCE",
+      ],
+    )
+    fun `should calculate a '10 to 12 months' review window`(calculationRule: ReviewScheduleCalculationRule) {
+      // Given
+      val expected = ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12))
+
+      // When
+      val actual = service.calculateReviewWindow(calculationRule)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
     }
   }
 }
