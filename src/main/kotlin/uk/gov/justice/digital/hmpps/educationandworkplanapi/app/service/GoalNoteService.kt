@@ -33,7 +33,7 @@ class GoalNoteService(
     noteService.deleteNote(entityReference, EntityType.GOAL, NoteType.GOAL)
   }
 
-  override fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String?) {
+  override fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String) {
     val note = noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL).firstOrNull()
     // If no note exists, return early
     note?.let {

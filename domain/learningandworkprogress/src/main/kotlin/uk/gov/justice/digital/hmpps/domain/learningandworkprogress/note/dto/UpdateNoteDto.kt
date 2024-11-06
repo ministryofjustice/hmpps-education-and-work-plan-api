@@ -4,6 +4,6 @@ import java.util.UUID
 
 data class UpdateNoteDto(
   val reference: UUID,
-  val content: String?,
+  val content: String,
   val lastUpdatedAtPrison: String,
 )
