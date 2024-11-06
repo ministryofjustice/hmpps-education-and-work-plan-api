@@ -35,22 +35,17 @@ class InductionScheduleUpdateEventPusher(
       occurredAt
         .atZone(ZoneId.of("Europe/London")).toLocalDateTime(),
     )
-
-    try {
-      log.info("Pushing induction schedule updated event to event topic person reference $prisonerNumber")
-      val publishResponse = eventTopic.publish(
-        cne.eventType,
-        objectMapper.writeValueAsString(cne),
-        attributes = mapOf(
-          "eventType" to MessageAttributeValue.builder().dataType("String").stringValue(cne.eventType).build(),
-          "contentType" to MessageAttributeValue.builder().dataType("String")
-            .stringValue(CONTENT_TYPE).build(),
-        ),
-      )
-      log.debug("Sent case induction schedule updated with message id {}", publishResponse.messageId())
-    } catch (ex: Exception) {
-      log.error("Failed to send induction schedule updated message for prisoner $prisonerNumber", ex)
-    }
+    log.info("Pushing induction schedule updated event to event topic person reference $prisonerNumber")
+    val publishResponse = eventTopic.publish(
+      cne.eventType,
+      objectMapper.writeValueAsString(cne),
+      attributes = mapOf(
+        "eventType" to MessageAttributeValue.builder().dataType("String").stringValue(cne.eventType).build(),
+        "contentType" to MessageAttributeValue.builder().dataType("String")
+          .stringValue(CONTENT_TYPE).build(),
+      ),
+    )
+    log.debug("Sent case induction schedule updated with message id {}", publishResponse.messageId())
   }
 
   data class HmppsDomainEvent(

@@ -23,7 +23,6 @@ class InductionScheduleUpdateEventPusherTest {
   private val hmppsQueueService: HmppsQueueService = mock()
   private val snsClient: SnsAsyncClient = mock()
   private val objectMapper: ObjectMapper = mock()
-  private val publishRequest: PublishRequest = PublishRequest.builder().build()
   private val service = InductionScheduleUpdateEventPusher(hmppsQueueService, objectMapper, "http://localhost:8080")
 
   @Test
@@ -36,7 +35,7 @@ class InductionScheduleUpdateEventPusherTest {
     completableFuture.complete(publishResponse)
     val occurredAt = Instant.now()
 
-    whenever(snsClient.publish(publishRequest)).thenReturn(completableFuture)
+    whenever(snsClient.publish(any<PublishRequest>())).thenReturn(completedFuture(publishResponse))
     service.sendEvent("A1234AC", occurredAt)
     verify(objectMapper).writeValueAsString(
       check<InductionScheduleUpdateEventPusher.HmppsDomainEvent> {

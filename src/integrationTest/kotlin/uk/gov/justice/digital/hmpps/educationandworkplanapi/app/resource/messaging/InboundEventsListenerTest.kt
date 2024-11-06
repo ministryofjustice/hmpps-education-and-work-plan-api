@@ -62,6 +62,11 @@ class InboundEventsListenerTest : IntegrationTestBase() {
       assertThat(prisonNumber).isEqualTo("A6099EA")
       assertThat(scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
     }
+
+    // test that outbound event is also created:
+    val inductionScheduleEvent = inductionScheduleEventQueue.receiveInductionScheduleEvent()
+    assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo("A6099EA")
+    assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/A6099EA/induction-schedule")
   }
 
   fun sendDomainEvent(

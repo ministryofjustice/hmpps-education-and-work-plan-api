@@ -28,6 +28,13 @@ hmpps.sqs:
       subscribeTopicId: domainevents
       dlqMaxReceiveCount: 1
       visibilityTimeout: 1
+    inductionscheduleeventqueue:
+      queueName: induction-schedule-event-queue
+      subscribeFilter: "{\"eventType\":[\"plp.induction-schedule.updated\"]}"
+      dlqName: test-event-queue-dlq
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
     domaineventsqueue:
       queueName: domainevents-queue
       subscribeTopicId: domainevents
