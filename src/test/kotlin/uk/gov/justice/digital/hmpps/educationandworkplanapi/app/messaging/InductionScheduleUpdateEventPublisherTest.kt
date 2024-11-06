@@ -69,8 +69,6 @@ class InductionScheduleUpdateEventPublisherTest {
             "eventType" to MessageAttributeValue.builder().dataType("String")
               .stringValue("plp.induction-schedule.updated")
               .build(),
-            "contentType" to MessageAttributeValue.builder().dataType("String").stringValue("text/plain;charset=UTF-8")
-              .build(),
           ),
         )
         .build(),
