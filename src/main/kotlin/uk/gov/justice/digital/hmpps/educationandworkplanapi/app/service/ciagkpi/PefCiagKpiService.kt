@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InductionScheduleUpdateEventPusher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InductionScheduleUpdateEventPublisher
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -23,7 +23,7 @@ class PefCiagKpiService(
   private val prisonerSearchApiClient: PrisonerSearchApiClient,
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionPersistenceAdapter: InductionPersistenceAdapter,
-  private val inductionScheduleUpdateEventPusher: InductionScheduleUpdateEventPusher,
+  private val inductionScheduleUpdateEventPublisher: InductionScheduleUpdateEventPublisher,
 
 ) : CiagKpiService() {
 
@@ -57,7 +57,7 @@ class PefCiagKpiService(
       ),
     )
     // send update event to domain event topic
-    inductionScheduleUpdateEventPusher.sendEvent(prisonNumber, eventDate)
+    inductionScheduleUpdateEventPublisher.sendEvent(prisonNumber, eventDate)
 
     // TODO Implement follow on telemetry
   }

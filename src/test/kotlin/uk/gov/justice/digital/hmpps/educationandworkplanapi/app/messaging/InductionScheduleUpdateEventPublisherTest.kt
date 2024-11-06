@@ -19,11 +19,11 @@ import java.time.ZoneId
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletableFuture.completedFuture
 
-class InductionScheduleUpdateEventPusherTest {
+class InductionScheduleUpdateEventPublisherTest {
   private val hmppsQueueService: HmppsQueueService = mock()
   private val snsClient: SnsAsyncClient = mock()
   private val objectMapper: ObjectMapper = mock()
-  private val service = InductionScheduleUpdateEventPusher(hmppsQueueService, objectMapper, "http://localhost:8080")
+  private val service = InductionScheduleUpdateEventPublisher(hmppsQueueService, objectMapper, "http://localhost:8080")
 
   @Test
   fun `send event converts to induction schedule event update event`() {
@@ -38,9 +38,9 @@ class InductionScheduleUpdateEventPusherTest {
     whenever(snsClient.publish(any<PublishRequest>())).thenReturn(completedFuture(publishResponse))
     service.sendEvent("A1234AC", occurredAt)
     verify(objectMapper).writeValueAsString(
-      check<InductionScheduleUpdateEventPusher.HmppsDomainEvent> {
+      check<InductionScheduleUpdateEventPublisher.HmppsDomainEvent> {
         assertThat(it).isEqualTo(
-          InductionScheduleUpdateEventPusher.HmppsDomainEvent(
+          InductionScheduleUpdateEventPublisher.HmppsDomainEvent(
             eventType = "plp.induction-schedule.updated",
             detailUrl = "http://localhost:8080/inductions/A1234AC/induction-schedule",
             occurredAt = occurredAt
