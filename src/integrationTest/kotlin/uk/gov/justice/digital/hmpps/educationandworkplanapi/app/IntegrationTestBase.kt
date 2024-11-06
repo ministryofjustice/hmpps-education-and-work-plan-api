@@ -1,8 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter
+import com.fasterxml.jackson.annotation.JsonAnySetter
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.microsoft.applicationinsights.TelemetryClient
 import org.awaitility.Awaitility
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -14,6 +21,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
@@ -25,6 +34,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InductionScheduleUpdateEventPublisher.HmppsDomainEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.CONVERSATIONS_RW
@@ -53,8 +63,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
+import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
 import java.security.KeyPair
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -149,8 +161,15 @@ abstract class IntegrationTestBase {
     hmppsQueueService.findByQueueId("educationandworkplan")
       ?: throw MissingQueueException("HmppsQueue educationandworkplan not found")
   }
-  val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
   val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
+  val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
+
+  val inductionScheduleEventQueue by lazy {
+    hmppsQueueService.findByQueueId("inductionscheduleeventqueue")
+      ?: throw MissingQueueException("HmppsQueue testeventqueue not found")
+  }
+  val testInductionScheduleEventQueueClient by lazy { inductionScheduleEventQueue.sqsClient }
+  val testInductionScheduleEventQueueDlqClient by lazy { inductionScheduleEventQueue.sqsDlqClient }
 
   @BeforeEach
   fun clearDatabase() {
@@ -161,6 +180,15 @@ abstract class IntegrationTestBase {
     conversationRepository.deleteAll()
     reviewRepository.deleteAll()
     reviewScheduleRepository.deleteAll()
+
+    // clear all the queues just in case there are any messages hanging around
+    domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()
+    domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
+      .get()
+
+    testInductionScheduleEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build()).get()
+    testInductionScheduleEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.dlqUrl).build())
+      .get()
   }
 
   @BeforeEach
@@ -325,4 +353,37 @@ abstract class IntegrationTestBase {
       .expectStatus()
       .isCreated
   }
+
+  internal fun HmppsQueue.receiveInductionScheduleEvent(): HmppsDomainEvent {
+    val event = receiveInductionScheduleEventsOnQueue().single()
+    sqsClient.purgeQueue { it.queueUrl(queueUrl) }
+    return event
+  }
+
+  internal fun HmppsQueue.receiveInductionScheduleEventsOnQueue(maxMessages: Int = 10): List<HmppsDomainEvent> {
+    await untilCallTo { inductionScheduleEventQueue.countAllMessagesOnQueue() } matches { (it ?: 0) > 0 }
+    return sqsClient.receiveMessage(
+      ReceiveMessageRequest.builder().queueUrl(queueUrl).maxNumberOfMessages(maxMessages).build(),
+    ).get().messages().map { objectMapper.readValue<Notification>(it.body()) }
+      .map { objectMapper.readValue<HmppsDomainEvent>(it.message) }
+  }
+
+  internal fun HmppsQueue.countAllMessagesOnQueue() = sqsClient.countAllMessagesOnQueue(queueUrl).get()
 }
+
+data class Notification(
+  @JsonProperty("Message") val message: String,
+  @JsonProperty("MessageAttributes") val attributes: MessageAttributes = MessageAttributes(),
+)
+
+data class MessageAttributes(
+  @JsonAnyGetter @JsonAnySetter
+  private val attributes: MutableMap<String, MessageAttribute> = mutableMapOf(),
+) : MutableMap<String, MessageAttribute> by attributes {
+  override operator fun get(key: String): MessageAttribute? = attributes[key]
+  operator fun set(key: String, value: MessageAttribute) {
+    attributes[key] = value
+  }
+}
+
+data class MessageAttribute(@JsonProperty("Type") val type: String, @JsonProperty("Value") val value: String)

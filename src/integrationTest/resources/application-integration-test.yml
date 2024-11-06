@@ -28,6 +28,13 @@ hmpps.sqs:
       subscribeTopicId: domainevents
       dlqMaxReceiveCount: 1
       visibilityTimeout: 1
+    inductionscheduleeventqueue:
+      queueName: induction-schedule-event-queue
+      subscribeFilter: "{\"eventType\":[\"plp.induction-schedule.updated\"]}"
+      dlqName: test-event-queue-dlq
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
     domaineventsqueue:
       queueName: domainevents-queue
       subscribeTopicId: domainevents
@@ -63,3 +70,6 @@ hmpps:
     url: http://localhost:9093/auth
 
 ciag-kpi-processing-rule: PEF
+
+
+service.base-url: http://localhost:8080
