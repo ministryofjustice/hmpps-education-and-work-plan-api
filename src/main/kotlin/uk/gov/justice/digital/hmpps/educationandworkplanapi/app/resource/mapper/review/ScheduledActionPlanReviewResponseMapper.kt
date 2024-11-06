@@ -60,6 +60,7 @@ class ScheduledActionPlanReviewResponseMapper(
       ReviewScheduleCalculationRuleDomain.LESS_THAN_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.LESS_THAN_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.MORE_THAN_60_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRuleApi.INDETERMINATE_SENTENCE
       ReviewScheduleCalculationRuleDomain.PRISONER_ON_REMAND -> ReviewScheduleCalculationRuleApi.PRISONER_ON_REMAND
       ReviewScheduleCalculationRuleDomain.PRISONER_UN_SENTENCED -> ReviewScheduleCalculationRuleApi.PRISONER_UN_SENTENCED

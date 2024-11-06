@@ -36,6 +36,7 @@ class ReviewScheduleEntityMapper {
       ReviewScheduleCalculationRuleEntity.LESS_THAN_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.LESS_THAN_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleEntity.MORE_THAN_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRuleDomain.INDETERMINATE_SENTENCE
       ReviewScheduleCalculationRuleEntity.PRISONER_ON_REMAND -> ReviewScheduleCalculationRuleDomain.PRISONER_ON_REMAND
       ReviewScheduleCalculationRuleEntity.PRISONER_UN_SENTENCED -> ReviewScheduleCalculationRuleDomain.PRISONER_UN_SENTENCED
