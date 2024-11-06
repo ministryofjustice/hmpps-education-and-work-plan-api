@@ -63,3 +63,6 @@ hmpps:
     url: http://localhost:9093/auth
 
 ciag-kpi-processing-rule: PEF
+
+
+service.base-url: http://localhost:8080

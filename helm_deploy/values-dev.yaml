@@ -20,6 +20,7 @@ generic-service:
     PRISONER_SEARCH_API_URL: https://prisoner-search-dev.prison.service.justice.gov.uk
     SPRING_PROFILES_ACTIVE: dev
     CIAG_KPI_PROCESSING_RULE: PEF
+    SERVICE_BASE_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
 
   allowlist:
     groups:
