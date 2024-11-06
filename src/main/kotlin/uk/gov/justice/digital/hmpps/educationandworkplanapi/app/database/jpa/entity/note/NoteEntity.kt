@@ -8,7 +8,6 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -22,60 +21,54 @@ import java.util.UUID
 @Table(name = "note")
 @Entity
 @EntityListeners(value = [AuditingEntityListener::class])
-class NoteEntity(
+data class NoteEntity(
+  @Column(updatable = false)
+  val prisonNumber: String,
+
+  @Column(updatable = false)
+  val reference: UUID,
+
+  @Column
+  var content: String,
+
+  @Column(updatable = false)
+  @Enumerated(value = EnumType.STRING)
+  val noteType: NoteType,
+
+  @Column(updatable = false)
+  @Enumerated(value = EnumType.STRING)
+  val entityType: EntityType,
+
+  @Column(updatable = false)
+  val entityReference: UUID,
+
+  @Column(updatable = false)
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
+) {
   @Id
   @GeneratedValue
   @UuidGenerator
-  var id: UUID? = null,
-
-  @Column
-  var prisonNumber: String? = null,
-
-  @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @Column
-  @field:NotNull
-  var content: String? = null,
-
-  @Column
-  @field:NotNull
-  @Enumerated(value = EnumType.STRING)
-  var noteType: NoteType? = null,
-
-  @Column
-  @field:NotNull
-  @Enumerated(value = EnumType.STRING)
-  var entityType: EntityType? = null,
-
-  @Column
-  var entityReference: UUID? = null,
-
-  @Column(updatable = false)
-  @CreationTimestamp
-  var createdAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
-  @Column
-  @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  @Column(updatable = false)
+  @CreationTimestamp
+  var createdAt: Instant? = null
 
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
-
-  @Column
+  @Column(updatable = false)
   @LastModifiedBy
-  var updatedBy: String? = null,
-) {
+  var updatedBy: String? = null
+
+  @Column(updatable = false)
+  @UpdateTimestamp
+  var updatedAt: Instant? = null
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false

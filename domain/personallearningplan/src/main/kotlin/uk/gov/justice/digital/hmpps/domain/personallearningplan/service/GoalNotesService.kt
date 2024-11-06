@@ -11,5 +11,5 @@ interface GoalNotesService {
 
   fun deleteNote(entityReference: UUID)
 
-  fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String?)
+  fun updateNotes(entityReference: UUID, lastUpdatedAtPrison: String, updatedText: String)
 }
