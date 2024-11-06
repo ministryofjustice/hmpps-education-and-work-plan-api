@@ -62,17 +62,16 @@ class ReviewService(
   private fun reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate: LocalDate): ReviewScheduleCalculationRule {
     val today = LocalDate.now()
     val timeLeftToServe = Period.between(today, releaseDate)
-    val timeLeftToServeInMonths = timeLeftToServe.toTotalMonths()
-    val timeLeftToServeRemainderDays = timeLeftToServe.minusMonths(timeLeftToServeInMonths).days
+    val monthsLeft = timeLeftToServe.toTotalMonths()
+    val remainderDays = timeLeftToServe.minusMonths(monthsLeft).days
 
-    return if (timeLeftToServeInMonths < 6 || (timeLeftToServeInMonths == 6L && timeLeftToServeRemainderDays == 0)) {
-      ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE
-    } else if (timeLeftToServeInMonths < 12 || (timeLeftToServeInMonths == 12L && timeLeftToServeRemainderDays == 0)) {
-      ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
-    } else if (timeLeftToServeInMonths < 60 || (timeLeftToServeInMonths == 60L && timeLeftToServeRemainderDays == 0)) {
-      ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
-    } else {
-      ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
+    fun isExactMonths(months: Long) = monthsLeft == months && remainderDays == 0
+
+    return when {
+      monthsLeft < 6 || isExactMonths(6) -> ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE
+      monthsLeft < 12 || isExactMonths(12) -> ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
+      monthsLeft < 60 || isExactMonths(60) -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+      else -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
     }
   }
 }
