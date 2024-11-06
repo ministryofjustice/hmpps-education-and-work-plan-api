@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.sns.model.PublishResponse
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
 import java.time.Instant
+import java.time.ZoneId
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletableFuture.completedFuture
 
@@ -34,6 +35,7 @@ class InductionScheduleUpdateEventPusherTest {
     val completableFuture = CompletableFuture<PublishResponse>()
     completableFuture.complete(publishResponse)
     val occurredAt = Instant.now()
+
     whenever(snsClient.publish(publishRequest)).thenReturn(completableFuture)
     service.sendEvent("A1234AC", occurredAt)
     verify(objectMapper).writeValueAsString(
@@ -42,7 +44,8 @@ class InductionScheduleUpdateEventPusherTest {
           InductionScheduleUpdateEventPusher.HmppsDomainEvent(
             eventType = "plp.induction-schedule.updated",
             detailUrl = "http://localhost:8080/inductions/A1234AC/induction-schedule",
-            occurredAt = occurredAt,
+            occurredAt = occurredAt
+              .atZone(ZoneId.of("Europe/London")).toLocalDateTime(),
             personReference = PersonReference(identifiers = listOf(Identifier("NOMS", "A1234AC"))),
           ),
         )
