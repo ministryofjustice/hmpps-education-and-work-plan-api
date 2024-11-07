@@ -29,25 +29,25 @@ data class ReviewScheduleEntity(
   @Column(updatable = false)
   val prisonNumber: String,
 
-  @Column(updatable = false)
-  val earliestReviewDate: LocalDate,
+  @Column
+  var earliestReviewDate: LocalDate,
 
-  @Column(updatable = false)
-  val latestReviewDate: LocalDate,
+  @Column
+  var latestReviewDate: LocalDate,
 
-  @Column(updatable = false)
+  @Column
   @Enumerated(value = EnumType.STRING)
-  val scheduleCalculationRule: ReviewScheduleCalculationRule,
+  var scheduleCalculationRule: ReviewScheduleCalculationRule,
 
-  @Column(updatable = false)
+  @Column
   @Enumerated(value = EnumType.STRING)
-  val scheduleStatus: ReviewScheduleStatus,
+  var scheduleStatus: ReviewScheduleStatus,
 
   @Column(updatable = false)
   val createdAtPrison: String,
 
-  @Column(updatable = false)
-  val updatedAtPrison: String,
+  @Column
+  var updatedAtPrison: String,
 ) {
   @Id
   @GeneratedValue

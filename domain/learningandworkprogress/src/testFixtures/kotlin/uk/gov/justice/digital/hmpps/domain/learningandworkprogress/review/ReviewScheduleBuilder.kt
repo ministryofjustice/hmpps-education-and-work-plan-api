@@ -22,8 +22,7 @@ fun aValidReviewSchedule(
   ReviewSchedule(
     reference = reference,
     prisonNumber = prisonNumber,
-    earliestReviewDate = earliestReviewDate,
-    latestReviewDate = latestReviewDate,
+    reviewScheduleWindow = ReviewScheduleWindow(earliestReviewDate, latestReviewDate),
     scheduleCalculationRule = scheduleCalculationRule,
     scheduleStatus = scheduleStatus,
     createdBy = createdBy,

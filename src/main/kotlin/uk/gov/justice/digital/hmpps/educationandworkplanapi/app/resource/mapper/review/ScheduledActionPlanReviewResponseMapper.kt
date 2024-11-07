@@ -20,8 +20,8 @@ class ScheduledActionPlanReviewResponseMapper(
     with(reviewSchedule) {
       ScheduledActionPlanReviewResponse(
         reference = reference,
-        reviewDateFrom = earliestReviewDate,
-        reviewDateTo = latestReviewDate,
+        reviewDateFrom = reviewScheduleWindow.dateFrom,
+        reviewDateTo = reviewScheduleWindow.dateTo,
         status = toReviewScheduleStatus(scheduleStatus),
         calculationRule = toReviewScheduleCalculationRule(scheduleCalculationRule),
         createdBy = createdBy,
