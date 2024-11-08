@@ -9,19 +9,32 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsMessage
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RO
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
+import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
 @ExtendWith(MockitoExtension::class)
 class InboundEventsListenerTest : IntegrationTestBase() {
 
+  companion object {
+    private const val URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule"
+  }
+
   @Test
   fun `should send message to service given message is a Notification message`() {
     // Given
+    val initialDateTime = OffsetDateTime.now()
     val inductionScheduleBefore = inductionScheduleRepository.findByPrisonNumber("A6099EA")
     assertThat(inductionScheduleBefore).isNull()
 
@@ -67,6 +80,31 @@ class InboundEventsListenerTest : IntegrationTestBase() {
     val inductionScheduleEvent = inductionScheduleEventQueue.receiveInductionScheduleEvent()
     assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo("A6099EA")
     assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/A6099EA/induction-schedule")
+
+    // also test that the endpoint returns an induction schedule
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(InductionScheduleResponse::class.java)
+
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .wasCreatedAfter(initialDateTime)
+      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedBy("system")
+      .wasCreatedByDisplayName("system not found")
+      .wasUpdatedBy("system")
+      .wasUpdatedByDisplayName("system not found")
+      .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
+      .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
   }
 
   fun sendDomainEvent(
