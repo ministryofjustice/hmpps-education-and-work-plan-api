@@ -1672,8 +1672,6 @@ components:
       title: InductionScheduleResponse
       type: object
       description: Represents an induction schedule response .
-      allOf:
-        - $ref: '#/components/schemas/AuditedResource'
       properties:
         reference:
           type: string
@@ -1692,12 +1690,44 @@ components:
           $ref: '#/components/schemas/InductionScheduleCalculationRule'
         scheduleStatus:
           $ref: '#/components/schemas/InductionScheduleStatus'
+        createdBy:
+          type: string
+          description: The DPS username of the person who created this resource.
+          example: 'asmith_gen'
+        createdByDisplayName:
+          type: string
+          description: The display name of the person who created this resource.
+          example: 'Alex Smith'
+        createdAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was created.
+          example: '2023-06-19T09:39:44Z'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who last updated this resource.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who last updated this resource.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when this resource was updated.
+          example: '2023-06-19T09:39:44Z'
       required:
         - reference
         - prisonNumber
         - deadlineDate
         - scheduleCalculationRule
         - scheduleStatus
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
 
     ConversationsResponse:
       title: ConversationsResponse

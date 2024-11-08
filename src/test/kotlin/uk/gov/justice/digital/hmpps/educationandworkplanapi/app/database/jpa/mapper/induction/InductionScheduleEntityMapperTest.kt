@@ -2,11 +2,20 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aPersistedInductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.anUnPersistedInductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -15,12 +24,26 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule as InductionScheduleCalculationRuleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus as InductionScheduleStatusEntity
 
+@ExtendWith(MockitoExtension::class)
 class InductionScheduleEntityMapperTest {
-  private val mapper = InductionScheduleEntityMapper()
+  @InjectMocks
+  private lateinit var mapper: InductionScheduleEntityMapper
+
+  @Mock
+  private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map entity to domain`() {
     // Given
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
+
     val id = UUID.randomUUID()
     val reference = UUID.randomUUID()
     val deadlineDate = LocalDate.now().plusMonths(3)
@@ -34,9 +57,9 @@ class InductionScheduleEntityMapperTest {
       scheduleCalculationRule = InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatusEntity.SCHEDULED,
       createdAt = Instant.now(),
-      createdBy = "auser_gen",
+      createdBy = "asmith_gen",
       updatedAt = Instant.now(),
-      updatedBy = "auser_gen",
+      updatedBy = "bjones_gen",
     )
 
     val expected = aValidInductionSchedule(
@@ -45,13 +68,18 @@ class InductionScheduleEntityMapperTest {
       deadlineDate = deadlineDate,
       scheduleCalculationRule = InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatusDomain.SCHEDULED,
+      createdBy = "asmith_gen",
+      lastUpdatedBy = "bjones_gen",
     )
 
     // When
     val actual = mapper.fromEntityToDomain(inductionScheduleEntity)
 
     // Then
-    assertThat(actual).isEqualTo(expected)
+    assertThat(actual)
+      .usingRecursiveComparison()
+      .ignoringFields("createdAt", "lastUpdatedAt")
+      .isEqualTo(expected)
   }
 
   @Test
