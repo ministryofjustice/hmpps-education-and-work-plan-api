@@ -528,6 +528,30 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/UpdateInduction'
 
+    #
+    # Induction schedule
+    #
+  '/inductions/{prisonNumber}/induction-schedule':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    get:
+      summary: Return a Prisoner's Induction schedule.
+      description: |
+        Returns a Prisoner's Induction schedule.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
+      tags:
+        - Inductions
+      responses:
+        '200':
+          $ref: '#/components/responses/InductionSchedule'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-prisoner-induction-schedule
+
   #
   # Conversations
   # --------------------------------------------------------------------------------
@@ -1643,6 +1667,37 @@ components:
         - reference
         - prisonNumber
         - note
+
+    InductionScheduleResponse:
+      title: InductionScheduleResponse
+      type: object
+      description: Represents an induction schedule response .
+      allOf:
+        - $ref: '#/components/schemas/AuditedResource'
+      properties:
+        reference:
+          type: string
+          format: uuid
+          description: A unique reference for this InductionScheduleResponse.
+          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
+        deadlineDate:
+          type: string
+          format: date
+          description: The deadline for the induction to be completed
+        scheduleCalculationRule:
+          $ref: '#/components/schemas/InductionScheduleCalculationRule'
+        scheduleStatus:
+          $ref: '#/components/schemas/InductionScheduleStatus'
+      required:
+        - reference
+        - prisonNumber
+        - deadlineDate
+        - scheduleCalculationRule
+        - scheduleStatus
 
     ConversationsResponse:
       title: ConversationsResponse
@@ -2928,6 +2983,41 @@ components:
         - PRISONER_ON_REMAND
         - PRISONER_UN_SENTENCED
 
+    InductionScheduleCalculationRule:
+      title: InductionScheduleCalculationRule
+      description: Enum of the rules that are used to calculate a prisoner's Induction Schedule
+      type: string
+      enum:
+        - NEW_PRISON_ADMISSION
+        - EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE
+        - EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE
+        - EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE
+        - EXISTING_PRISONER_INDETERMINATE_SENTENCE
+        - EXISTING_PRISONER_ON_REMAND
+        - EXISTING_PRISONER_UN_SENTENCED
+
+    InductionScheduleStatus:
+      title: InductionScheduleStatus
+      description: Enum of the various Induction Schedule statuses.
+      type: string
+      enum:
+        - SCHEDULED
+        - COMPLETE
+        - EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+        - EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
+        - EXEMPT_PRISONER_FAILED_TO_ENGAGE
+        - EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
+        - EXEMPT_PRISONER_SAFETY_ISSUES
+        - EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+        - EXEMPT_PRISON_STAFF_REDEPLOYMENT
+        - EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
+        - EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
+        - EXEMPT_SYSTEM_TECHNICAL_ISSUE
+        - EXEMPT_PRISONER_TRANSFER
+        - EXEMPT_PRISONER_RELEASE
+        - EXEMPT_PRISONER_DEATH
+
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -3103,6 +3193,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InductionResponse'
+    InductionSchedule:
+      description: Response body containing a Prisoner's Induction Schedule.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InductionScheduleResponse'
     Conversation:
       description: Response body containing a Prisoner's Learning and Work Progress conversation.
       headers:
