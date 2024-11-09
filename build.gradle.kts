@@ -19,7 +19,7 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val mapstructVersion = "1.6.2"
+val mapstructVersion = "1.6.3"
 val postgresqlVersion = "42.7.4"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.6.0"
@@ -27,7 +27,7 @@ val hmppsSqsVersion = "5.1.0"
 val awaitilityVersion = "4.2.2"
 val wiremockVersion = "3.9.2"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "9.42"
+val nimbusJwtVersion = "9.46"
 val testContainersVersion = "1.20.3"
 val awsSdkVersion = "1.12.777"
 val buildDirectory: Directory = layout.buildDirectory.get()
