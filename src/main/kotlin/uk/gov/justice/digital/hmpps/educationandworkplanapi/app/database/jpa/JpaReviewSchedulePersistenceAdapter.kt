@@ -33,12 +33,9 @@ class JpaReviewSchedulePersistenceAdapter(
   override fun updateReviewSchedule(updateReviewScheduleDto: UpdateReviewScheduleDto): ReviewSchedule? {
     val reviewScheduleEntity = reviewScheduleRepository.findByReference(updateReviewScheduleDto.reference)
 
-    return if (reviewScheduleEntity != null) {
-      reviewScheduleEntityMapper.updateExistingEntityFromDto(reviewScheduleEntity, updateReviewScheduleDto)
-      val persistedEntity = reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
-      return reviewScheduleEntityMapper.fromEntityToDomain(persistedEntity)
-    } else {
-      null
+    return reviewScheduleEntity?.let {
+      reviewScheduleEntityMapper.updateExistingEntityFromDto(it, updateReviewScheduleDto)
+      reviewScheduleEntityMapper.fromEntityToDomain(reviewScheduleRepository.saveAndFlush(it))
     }
   }
 
