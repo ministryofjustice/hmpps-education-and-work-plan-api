@@ -3,9 +3,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewConductedBy
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
+import java.time.LocalDate
+import java.util.UUID
 
 @Component
 class ReviewEntityMapper {
@@ -22,6 +25,20 @@ class ReviewEntityMapper {
         createdAt = createdAt!!,
         createdAtPrison = createdAtPrison,
         conductedBy = toReviewConductedBy(this),
+      )
+    }
+
+  fun fromDomainToEntity(createCompletedReviewDto: CreateCompletedReviewDto, deadlineDate: LocalDate): ReviewEntity =
+    with(createCompletedReviewDto) {
+      ReviewEntity(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        deadlineDate = deadlineDate,
+        completedDate = conductedAt,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
+        conductedBy = conductedBy,
+        conductedByRole = conductedByRole,
       )
     }
 

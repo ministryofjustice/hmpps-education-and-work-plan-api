@@ -12,12 +12,16 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateCompletedReviewDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.aValidNoteEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewRepository
+import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
 class JpaReviewPersistenceAdapterTest {
@@ -85,5 +89,33 @@ class JpaReviewPersistenceAdapterTest {
     verify(reviewRepository).getAllByPrisonNumber(prisonNumber)
     verifyNoInteractions(noteRepository)
     verifyNoInteractions(reviewEntityMapper)
+  }
+
+  @Test
+  fun `should create completed review`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    val createCompletedReviewDto = aValidCreateCompletedReviewDto()
+    val deadlineDate = LocalDate.now().plusDays(3)
+
+    val reviewEntity = aValidReviewEntity()
+    given(reviewEntityMapper.fromDomainToEntity(any(), any())).willReturn(reviewEntity)
+    given(reviewRepository.saveAndFlush(any<ReviewEntity>())).willReturn(reviewEntity)
+
+    val noteEntity = aValidNoteEntity()
+    given(noteRepository.saveAndFlush(any<NoteEntity>())).willReturn(noteEntity)
+
+    val expectedCompletedReview = aValidCompletedReview()
+    given(reviewEntityMapper.fromEntityToDomain(any(), any())).willReturn(expectedCompletedReview)
+
+    // When
+    val actual = persistenceAdapter.createCompletedReview(createCompletedReviewDto, deadlineDate)
+
+    // Then
+    assertThat(actual).isEqualTo(expectedCompletedReview)
+    verify(reviewEntityMapper).fromDomainToEntity(createCompletedReviewDto, deadlineDate)
+    verify(reviewRepository).saveAndFlush(reviewEntity)
+    verify(reviewEntityMapper).fromEntityToDomain(reviewEntity, noteEntity)
   }
 }
