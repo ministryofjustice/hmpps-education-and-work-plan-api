@@ -9,6 +9,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import java.time.LocalDate
 import java.util.stream.Stream
 

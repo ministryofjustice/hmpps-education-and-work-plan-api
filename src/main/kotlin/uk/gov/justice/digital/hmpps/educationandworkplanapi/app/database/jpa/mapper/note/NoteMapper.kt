@@ -26,17 +26,17 @@ object NoteMapper {
 
   fun fromEntityToDomain(noteEntity: NoteEntity): NoteDto {
     return NoteDto(
-      reference = noteEntity.reference!!,
-      content = noteEntity.content.orEmpty(),
+      reference = noteEntity.reference,
+      content = noteEntity.content,
       createdBy = noteEntity.createdBy,
       createdAt = noteEntity.createdAt,
-      createdAtPrison = noteEntity.createdAtPrison.orEmpty(),
+      createdAtPrison = noteEntity.createdAtPrison,
       lastUpdatedBy = noteEntity.updatedBy,
       lastUpdatedAt = noteEntity.updatedAt,
-      lastUpdatedAtPrison = noteEntity.updatedAtPrison.orEmpty(),
-      noteType = toNoteType(noteEntity.noteType!!),
-      entityType = toEntityType(noteEntity.entityType!!),
-      entityReference = noteEntity.reference!!,
+      lastUpdatedAtPrison = noteEntity.updatedAtPrison,
+      noteType = toNoteType(noteEntity.noteType),
+      entityType = toEntityType(noteEntity.entityType),
+      entityReference = noteEntity.entityReference,
     )
   }
 

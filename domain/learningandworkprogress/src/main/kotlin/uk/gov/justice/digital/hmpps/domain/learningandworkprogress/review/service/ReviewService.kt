@@ -4,6 +4,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Comple
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import java.time.LocalDate
 import java.time.Period
 
@@ -73,31 +75,5 @@ class ReviewService(
       monthsLeft < 60 || isExactMonths(60) -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
       else -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
     }
-  }
-}
-
-enum class SentenceType {
-  RECALL,
-  DEAD,
-  INDETERMINATE_SENTENCE,
-  SENTENCED,
-  CONVICTED_UNSENTENCED,
-  CIVIL_PRISONER,
-  IMMIGRATION_DETAINEE,
-  REMAND,
-  UNKNOWN,
-  OTHER,
-}
-
-data class ReviewScheduleWindow(
-  val dateFrom: LocalDate,
-  val dateTo: LocalDate,
-) {
-  companion object {
-    fun fromTodayToTenDays(): ReviewScheduleWindow = with(LocalDate.now()) { ReviewScheduleWindow(this, this.plusDays(10)) }
-    fun fromOneToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) { ReviewScheduleWindow(this.plusMonths(1), this.plusMonths(3)) }
-    fun fromTwoToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) { ReviewScheduleWindow(this.plusMonths(2), this.plusMonths(3)) }
-    fun fromFourToSixMonths(): ReviewScheduleWindow = with(LocalDate.now()) { ReviewScheduleWindow(this.plusMonths(4), this.plusMonths(6)) }
-    fun fromTenToTwelveMonths(): ReviewScheduleWindow = with(LocalDate.now()) { ReviewScheduleWindow(this.plusMonths(10), this.plusMonths(12)) }
   }
 }
