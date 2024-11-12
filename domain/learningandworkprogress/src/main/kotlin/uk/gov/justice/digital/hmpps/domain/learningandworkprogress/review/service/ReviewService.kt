@@ -1,13 +1,21 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service
 
+import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
 import java.time.LocalDate
 import java.time.Period
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Service class exposing methods that implement the business rules for the Review domain.
@@ -46,6 +54,72 @@ class ReviewService(
   fun getCompletedReviewsForPrisoner(prisonNumber: String): List<CompletedReview> =
     reviewPersistenceAdapter.getCompletedReviews(prisonNumber)
 
+  /**
+   * Creates a [CompletedReview] for the prisoner. and updates their current [ReviewSchedule] to be COMPLETED.
+   *
+   * Returns a [CompletedReviewDto] containing the completed review, a flag indicating whether this was the prisoner's
+   * last review or not, and the prisoners latest [ReviewSchedule].
+   *
+   * If this was the prisoner's last review before release a new [ReviewSchedule] is not created, and their latest
+   * [ReviewSchedule] is the one that was updated to be COMPLETED.
+   * If this is not the prisoner's last review and a new Review Schedule Window is calculated for them, a new [ReviewSchedule]
+   * is created with a status of SCHEDULED. This therefore becomes their latest Review Schedule.
+   *
+   * If the prisoner does not already have an active [ReviewSchedule] a [ReviewScheduleNotFoundException] is thrown.
+   */
+  fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto {
+    // Get the active review schedule
+    val currentReviewSchedule = getActiveReviewScheduleForPrisoner(createCompletedReviewDto.prisonNumber)
+
+    // Persist a new CompletedReview
+    val completedReview = reviewPersistenceAdapter.createCompletedReview(
+      createCompletedReviewDto = createCompletedReviewDto,
+      reviewSchedule = currentReviewSchedule,
+    )
+
+    // Update the current review schedule to mark it as Completed
+    val completedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewSchedule(
+      UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, createCompletedReviewDto.prisonId),
+    )
+
+    // Work out the next review schedule calculation rule and schedule window
+    val reviewScheduleCalculationRule = determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
+      sentenceType = createCompletedReviewDto.prisonerSentenceType,
+      releaseDate = createCompletedReviewDto.prisonerReleaseDate,
+    )
+    val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule)
+
+    return CompletedReviewDto(
+      completedReview = completedReview,
+      wasLastReviewBeforeRelease = reviewScheduleWindow == null,
+      latestReviewSchedule = reviewScheduleWindow?.let {
+        // If a new ReviewScheduleWindow was calculated, create a new ReviewSchedule with it
+        reviewSchedulePersistenceAdapter.createReviewSchedule(
+          CreateReviewScheduleDto(
+            prisonNumber = createCompletedReviewDto.prisonNumber,
+            prisonId = createCompletedReviewDto.prisonId,
+            reviewScheduleWindow = it,
+            scheduleCalculationRule = reviewScheduleCalculationRule,
+            scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+          ),
+        )
+      } ?: let {
+        // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
+        completedReviewSchedule!!
+      },
+    )
+  }
+
+  private fun determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(sentenceType: SentenceType, releaseDate: LocalDate?): ReviewScheduleCalculationRule =
+    when (sentenceType) {
+      SentenceType.REMAND -> ReviewScheduleCalculationRule.PRISONER_ON_REMAND
+      SentenceType.CONVICTED_UNSENTENCED -> ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
+      SentenceType.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
+
+      else -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
+    }
+
+  // TODO - refactor (possibly delete or make private) this method private when calculating the next review for a transfer or readmission has a dedicated service method
   fun determineReviewScheduleCalculationRule(releaseDate: LocalDate?, sentenceType: SentenceType, isReAdmission: Boolean, isTransfer: Boolean): ReviewScheduleCalculationRule =
     if (isReAdmission) {
       ReviewScheduleCalculationRule.PRISONER_READMISSION
@@ -61,13 +135,20 @@ class ReviewService(
       }
     }
 
-  fun calculateReviewWindow(reviewScheduleCalculationRule: ReviewScheduleCalculationRule): ReviewScheduleWindow =
+  // TODO - make this method private when calculating the next review for a transfer or readmission has a dedicated service method
+  fun calculateReviewWindow(reviewScheduleCalculationRule: ReviewScheduleCalculationRule): ReviewScheduleWindow? =
     when (reviewScheduleCalculationRule) {
+      ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
       ReviewScheduleCalculationRule.PRISONER_READMISSION, ReviewScheduleCalculationRule.PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays()
-      ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
+      ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.PRISONER_ON_REMAND, ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
       ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths()
+    }.also {
+      when {
+        it == null -> log.debug { "Returning no ReviewScheduleWindow because ReviewScheduleCalculationRule is $reviewScheduleCalculationRule" }
+        else -> log.debug { "Returning ReviewScheduleWindow $it based on ReviewScheduleCalculationRule $reviewScheduleCalculationRule" }
+      }
     }
 
   private fun reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate: LocalDate): ReviewScheduleCalculationRule {
@@ -79,10 +160,13 @@ class ReviewService(
     fun isExactMonths(months: Long) = monthsLeft == months && remainderDays == 0
 
     return when {
-      monthsLeft < 6 || isExactMonths(6) -> ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE
+      monthsLeft < 3 || isExactMonths(3) -> ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
+      monthsLeft < 6 || isExactMonths(6) -> ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE
       monthsLeft < 12 || isExactMonths(12) -> ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       monthsLeft < 60 || isExactMonths(60) -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
       else -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
+    }.also {
+      log.debug { "Returning ReviewScheduleCalculationRule $it based on release date of $releaseDate" }
     }
   }
 }

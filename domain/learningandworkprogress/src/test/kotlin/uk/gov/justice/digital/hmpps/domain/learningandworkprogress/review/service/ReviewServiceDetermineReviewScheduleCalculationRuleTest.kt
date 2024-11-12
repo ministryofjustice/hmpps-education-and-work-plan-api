@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Senten
 import java.time.LocalDate
 import java.util.stream.Stream
 
+// TODO - delete this test when calculating the next review for a transfer or readmission have a service method - this logic will be tested by the tests for the service method
 @ExtendWith(MockitoExtension::class)
 class ReviewServiceDetermineReviewScheduleCalculationRuleTest {
 
@@ -45,9 +46,6 @@ class ReviewServiceDetermineReviewScheduleCalculationRuleTest {
   }
 
   companion object {
-    private const val PRISON_NUMBER = "A1234AB"
-    private val TODAY = LocalDate.now()
-
     @JvmStatic
     fun testCases(): Stream<Arguments> =
       Stream.of(
@@ -66,86 +64,6 @@ class ReviewServiceDetermineReviewScheduleCalculationRuleTest {
           false,
           true,
           ReviewScheduleCalculationRule.PRISONER_TRANSFER,
-        ),
-        Arguments.of(
-          "prisoner has an indeterminate sentence",
-          null,
-          SentenceType.INDETERMINATE_SENTENCE,
-          false,
-          false,
-          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
-        ),
-        Arguments.of(
-          "prisoner is on remand",
-          null,
-          SentenceType.REMAND,
-          false,
-          false,
-          ReviewScheduleCalculationRule.PRISONER_ON_REMAND,
-        ),
-        Arguments.of(
-          "prisoner is un-sentenced",
-          null,
-          SentenceType.CONVICTED_UNSENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED,
-        ),
-        Arguments.of(
-          "prisoner has less than 6 months left to serve",
-          TODAY.plusMonths(6).minusDays(1),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner has exactly 6 months left to serve",
-          TODAY.plusMonths(6),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner has between 6 and 12 months left to serve",
-          TODAY.plusMonths(6).plusDays(1),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner has exactly 12 months left to serve",
-          TODAY.plusMonths(12),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner has between 12 and 60 months left to serve",
-          TODAY.plusMonths(12).plusDays(1),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner has exactly 60 months left to serve",
-          TODAY.plusMonths(60),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner has more than 60 months left to serve",
-          TODAY.plusMonths(60).plusDays(1),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
         ),
       )
   }

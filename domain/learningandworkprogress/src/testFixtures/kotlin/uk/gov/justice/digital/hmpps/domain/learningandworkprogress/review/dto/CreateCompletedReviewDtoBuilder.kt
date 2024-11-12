@@ -11,7 +11,7 @@ fun aValidCreateCompletedReviewDto(
   conductedAt: LocalDate = LocalDate.now(),
   conductedBy: String? = "Barnie Jones",
   conductedByRole: String? = "Peer mentor",
-  prisonerReleaseDate: LocalDate = LocalDate.now().plusYears(1),
+  prisonerReleaseDate: LocalDate? = LocalDate.now().plusYears(1),
   prisonerSentenceType: SentenceType = SentenceType.SENTENCED,
 ): CreateCompletedReviewDto =
   CreateCompletedReviewDto(

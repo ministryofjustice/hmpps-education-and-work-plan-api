@@ -142,7 +142,7 @@ class ReviewServiceTest {
     @Test
     fun `should calculate a '1 to 3 months' review window`() {
       // Given
-      val calculationRule = ReviewScheduleCalculationRule.LESS_THAN_6_MONTHS_TO_SERVE
+      val calculationRule = ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE
 
       val expected = ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3))
 

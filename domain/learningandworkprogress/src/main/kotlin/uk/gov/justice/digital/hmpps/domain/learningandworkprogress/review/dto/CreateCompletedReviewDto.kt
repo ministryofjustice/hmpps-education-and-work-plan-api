@@ -10,6 +10,6 @@ data class CreateCompletedReviewDto(
   val conductedAt: LocalDate,
   val conductedBy: String?,
   val conductedByRole: String?,
-  val prisonerReleaseDate: LocalDate,
+  val prisonerReleaseDate: LocalDate?,
   val prisonerSentenceType: SentenceType,
 )

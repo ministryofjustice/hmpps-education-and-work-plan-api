@@ -59,7 +59,8 @@ class ReviewScheduleEntityMapper {
     when (calculationRule) {
       ReviewScheduleCalculationRuleEntity.PRISONER_READMISSION -> ReviewScheduleCalculationRuleDomain.PRISONER_READMISSION
       ReviewScheduleCalculationRuleEntity.PRISONER_TRANSFER -> ReviewScheduleCalculationRuleDomain.PRISONER_TRANSFER
-      ReviewScheduleCalculationRuleEntity.LESS_THAN_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.LESS_THAN_6_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleEntity.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleEntity.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_3_AND_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_12_AND_60_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.MORE_THAN_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE
@@ -72,7 +73,8 @@ class ReviewScheduleEntityMapper {
     when (calculationRule) {
       ReviewScheduleCalculationRuleDomain.PRISONER_READMISSION -> ReviewScheduleCalculationRuleEntity.PRISONER_READMISSION
       ReviewScheduleCalculationRuleDomain.PRISONER_TRANSFER -> ReviewScheduleCalculationRuleEntity.PRISONER_TRANSFER
-      ReviewScheduleCalculationRuleDomain.LESS_THAN_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.LESS_THAN_6_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleDomain.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleDomain.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_3_AND_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_12_AND_60_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.MORE_THAN_60_MONTHS_TO_SERVE
