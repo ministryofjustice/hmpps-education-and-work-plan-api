@@ -73,7 +73,6 @@ generic-service:
   allowlist:
     groups:
       - internal
-      - circleci
 
 generic-prometheus-alerts:
   targetApplication: hmpps-education-and-work-plan-api
