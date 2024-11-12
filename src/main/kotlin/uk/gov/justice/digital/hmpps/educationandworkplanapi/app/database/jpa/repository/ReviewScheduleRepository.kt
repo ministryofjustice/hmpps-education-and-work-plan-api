@@ -7,5 +7,7 @@ import java.util.UUID
 
 @Repository
 interface ReviewScheduleRepository : JpaRepository<ReviewScheduleEntity, UUID> {
+  fun findByReference(reference: UUID): ReviewScheduleEntity?
+
   fun findByPrisonNumber(prisonNumber: String): ReviewScheduleEntity?
 }

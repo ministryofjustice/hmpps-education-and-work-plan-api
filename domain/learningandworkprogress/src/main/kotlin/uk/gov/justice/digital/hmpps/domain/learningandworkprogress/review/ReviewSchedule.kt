@@ -10,8 +10,7 @@ import java.util.UUID
 data class ReviewSchedule(
   val reference: UUID,
   val prisonNumber: String,
-  val earliestReviewDate: LocalDate,
-  val latestReviewDate: LocalDate,
+  val reviewScheduleWindow: ReviewScheduleWindow,
   val scheduleCalculationRule: ReviewScheduleCalculationRule,
   val scheduleStatus: ReviewScheduleStatus,
   val createdBy: String,
@@ -49,4 +48,27 @@ enum class ReviewScheduleStatus(val inScope: Boolean) {
   EXEMPT_PRISONER_TRANSFER(false),
   EXEMPT_PRISONER_RELEASE(false),
   EXEMPT_PRISONER_DEATH(false),
+}
+
+data class ReviewScheduleWindow(
+  val dateFrom: LocalDate,
+  val dateTo: LocalDate,
+) {
+  companion object {
+    fun fromTodayToTenDays(): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(this, plusDays(10))
+    }
+    fun fromOneToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(plusMonths(1), plusMonths(3))
+    }
+    fun fromTwoToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(plusMonths(2), plusMonths(3))
+    }
+    fun fromFourToSixMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(plusMonths(4), plusMonths(6))
+    }
+    fun fromTenToTwelveMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(plusMonths(10), plusMonths(12))
+    }
+  }
 }
