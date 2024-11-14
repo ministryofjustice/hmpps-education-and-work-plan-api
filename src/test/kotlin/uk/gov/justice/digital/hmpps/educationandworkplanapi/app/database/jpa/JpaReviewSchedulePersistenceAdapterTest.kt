@@ -112,7 +112,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
         scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
         updatedAt = Instant.now(),
       )
-      given(reviewScheduleRepository.findLatestReviewSchedule(any())).willReturn(latestReviewScheduleEntity)
+      given(reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(any())).willReturn(latestReviewScheduleEntity)
 
       val latestReviewSchedule = aValidReviewSchedule()
       given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(latestReviewSchedule)
@@ -122,7 +122,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
       // Then
       assertThat(actual).isEqualTo(latestReviewSchedule)
-      verify(reviewScheduleRepository).findLatestReviewSchedule(prisonNumber)
+      verify(reviewScheduleRepository).findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
       verify(reviewScheduleEntityMapper).fromEntityToDomain(latestReviewScheduleEntity)
     }
 
@@ -131,14 +131,14 @@ class JpaReviewSchedulePersistenceAdapterTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
 
-      given(reviewScheduleRepository.findLatestReviewSchedule(any())).willReturn(null)
+      given(reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(any())).willReturn(null)
 
       // When
       val actual = persistenceAdapter.getLatestReviewSchedule(prisonNumber)
 
       // Then
       assertThat(actual).isNull()
-      verify(reviewScheduleRepository).findLatestReviewSchedule(prisonNumber)
+      verify(reviewScheduleRepository).findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
       verifyNoInteractions(reviewScheduleEntityMapper)
     }
   }

@@ -55,6 +55,6 @@ class JpaReviewSchedulePersistenceAdapter(
 
   @Transactional(readOnly = true)
   override fun getLatestReviewSchedule(prisonNumber: String): ReviewSchedule? =
-    reviewScheduleRepository.findLatestReviewSchedule(prisonNumber)
+    reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
       ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
 }

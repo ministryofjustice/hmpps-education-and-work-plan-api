@@ -15,6 +15,5 @@ interface ReviewScheduleRepository : JpaRepository<ReviewScheduleEntity, UUID> {
   @Query("select rse from ReviewScheduleEntity rse where rse.prisonNumber = :prisonNumber and rse.scheduleStatus != 'COMPLETED'")
   fun findActiveReviewSchedule(prisonNumber: String): ReviewScheduleEntity?
 
-  @Query("select rse from ReviewScheduleEntity rse where rse.prisonNumber = :prisonNumber order by rse.updatedAt desc limit 1")
-  fun findLatestReviewSchedule(prisonNumber: String): ReviewScheduleEntity?
+  fun findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber: String): ReviewScheduleEntity?
 }
