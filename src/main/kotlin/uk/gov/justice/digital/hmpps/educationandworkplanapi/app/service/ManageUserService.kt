@@ -12,5 +12,9 @@ class ManageUserService(
 ) {
   @Cacheable(USER_DETAILS)
   fun getUserDetails(username: String): UserDetailsDto =
-    manageUsersApiClient.getUserDetails(username)
+    if (username == "system") {
+      UserDetailsDto(username, true, username)
+    } else {
+      manageUsersApiClient.getUserDetails(username)
+    }
 }

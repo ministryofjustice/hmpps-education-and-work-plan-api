@@ -100,9 +100,9 @@ class InboundEventsListenerTest : IntegrationTestBase() {
       .wasCreatedAfter(initialDateTime)
       .wasUpdatedAfter(initialDateTime)
       .wasCreatedBy("system")
-      .wasCreatedByDisplayName("system not found")
+      .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
-      .wasUpdatedByDisplayName("system not found")
+      .wasUpdatedByDisplayName("system")
       .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
       .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
   }
