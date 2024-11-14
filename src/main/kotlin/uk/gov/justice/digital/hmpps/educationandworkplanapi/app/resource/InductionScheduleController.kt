@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
+import java.time.ZoneId
 
 @RestController
 @Validated
@@ -29,8 +30,14 @@ class InductionScheduleController(
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_INDUCTIONS)
-  fun getInductionSchedule(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): InductionScheduleResponse =
-    with(inductionService.getInductionScheduleForPrisoner(prisonNumber)) {
-      inductionScheduleMapper.toInductionResponse(this)
-    }
+  fun getInductionSchedule(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): InductionScheduleResponse {
+    val (inductionPerformedBy, inductionPerformedAt) = runCatching {
+      inductionService.getInductionForPrisoner(prisonNumber).let { induction ->
+        induction.createdByDisplayName to induction.createdAt?.atZone(ZoneId.systemDefault())?.toLocalDate()
+      }
+    }.getOrElse { null to null } // If InductionNotFoundException is thrown, returns null for inductionPerformedBy and inductionPerformedAt
+
+    val inductionSchedule = inductionService.getInductionScheduleForPrisoner(prisonNumber)
+    return inductionScheduleMapper.toInductionResponse(inductionSchedule, inductionPerformedBy, inductionPerformedAt)
+  }
 }

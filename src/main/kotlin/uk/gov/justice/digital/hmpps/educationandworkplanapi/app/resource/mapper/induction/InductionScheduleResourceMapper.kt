@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
+import java.time.LocalDate
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
@@ -16,7 +17,7 @@ class InductionScheduleResourceMapper(
   private val userService: ManageUserService,
 
 ) {
-  fun toInductionResponse(inductionSchedule: InductionSchedule): InductionScheduleResponse {
+  fun toInductionResponse(inductionSchedule: InductionSchedule, inductionPerformedBy: String?, inductionPerformedAt: LocalDate?): InductionScheduleResponse {
     with(inductionSchedule) {
       return InductionScheduleResponse(
         reference = reference,
@@ -30,6 +31,8 @@ class InductionScheduleResourceMapper(
         updatedBy = lastUpdatedBy!!,
         updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
+        inductionPerformedBy = inductionPerformedBy,
+        inductionPerformedAt = inductionPerformedAt,
       )
     }
   }
