@@ -25,10 +25,10 @@ class ReviewController(
   fun getActionPlanReviews(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ): ActionPlanReviewsResponse {
-    val scheduledReview = reviewService.getReviewScheduleForPrisoner(prisonNumber)
+    val latestReviewSchedule = reviewService.getLatestReviewScheduleForPrisoner(prisonNumber)
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
     return ActionPlanReviewsResponse(
-      scheduledReview = scheduledActionPlanReviewResponseMapper.fromDomainToModel(scheduledReview),
+      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(latestReviewSchedule),
       completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
     )
   }

@@ -86,8 +86,8 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
   @Test
   fun `should return prisoner review schedule and completed reviews`() {
     // Given
-    createReviewScheduleRecord(prisonNumber)
-    createCompletedReviewRecord(prisonNumber)
+    val reviewSchedule = createReviewScheduleRecord(prisonNumber)
+    createCompletedReviewRecord(prisonNumber, reviewSchedule.reference)
 
     // When
     val response = webTestClient.get()
@@ -107,12 +107,12 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     // TODO - enhance assertions to assert detail of the response once we have service code/REST APIs to create/submit reviews etc
     assertThat(actual).isNotNull()
-    assertThat(actual!!.scheduledReview).isNotNull()
+    assertThat(actual!!.latestReviewSchedule).isNotNull()
     assertThat(actual.completedReviews).size().isEqualTo(1)
   }
 
   // TODO - replace with a relevant service call once we have that developed
-  private fun createReviewScheduleRecord(prisonNumber: String) {
+  private fun createReviewScheduleRecord(prisonNumber: String): ReviewScheduleEntity {
     val reviewScheduleEntity = ReviewScheduleEntity(
       reference = UUID.randomUUID(),
       prisonNumber = prisonNumber,
@@ -123,23 +123,24 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+    return reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
   }
 
   // TODO - replace with a relevant service call once we have that developed
-  private fun createCompletedReviewRecord(prisonNumber: String) {
+  private fun createCompletedReviewRecord(prisonNumber: String, reviewScheduleReference: UUID): ReviewEntity {
     val reviewReference = UUID.randomUUID()
     val completedReview = ReviewEntity(
       reference = reviewReference,
       prisonNumber = prisonNumber,
       deadlineDate = LocalDate.now().minusMonths(12),
       completedDate = LocalDate.now().minusMonths(13),
+      reviewScheduleReference = reviewScheduleReference,
       conductedBy = null,
       conductedByRole = null,
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    reviewRepository.saveAndFlush(completedReview)
+    val completedReviewEntity = reviewRepository.saveAndFlush(completedReview)
 
     val reviewNoteEntity = NoteEntity(
       reference = UUID.randomUUID(),
@@ -152,5 +153,7 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
       updatedAtPrison = "BXI",
     )
     noteRepository.saveAndFlush(reviewNoteEntity)
+
+    return completedReviewEntity
   }
 }

@@ -7,7 +7,7 @@ class ReviewScheduleNotFoundException(val prisonNumber: String) :
   RuntimeException("Review Schedule not found for prisoner [$prisonNumber]")
 
 /**
- * Thrown when a Review Schedule already exists for a given Prisoner.
+ * Thrown when a prisoner already has an active Review Schedule. A Prisoner cannot have more than 1 active Review Schedules.
  */
-class ReviewScheduleAlreadyExistsException(val prisonNumber: String) :
-  RuntimeException("Review Schedule already exists for prisoner [$prisonNumber]")
+class ActiveReviewScheduleAlreadyExistsException(val prisonNumber: String) :
+  RuntimeException("Prisoner [$prisonNumber] already has an active Review Schedule.")

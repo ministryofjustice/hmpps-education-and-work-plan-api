@@ -84,6 +84,7 @@ class ReviewScheduleEntityMapper {
   private fun toReviewScheduleStatus(reviewScheduleStatus: ReviewScheduleStatusEntity): ReviewScheduleStatusDomain =
     when (reviewScheduleStatus) {
       ReviewScheduleStatusEntity.SCHEDULED -> ReviewScheduleStatusDomain.SCHEDULED
+      ReviewScheduleStatusEntity.COMPLETED -> ReviewScheduleStatusDomain.COMPLETED
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -102,6 +103,7 @@ class ReviewScheduleEntityMapper {
   private fun toReviewScheduleStatus(reviewScheduleStatus: ReviewScheduleStatusDomain): ReviewScheduleStatusEntity =
     when (reviewScheduleStatus) {
       ReviewScheduleStatusDomain.SCHEDULED -> ReviewScheduleStatusEntity.SCHEDULED
+      ReviewScheduleStatusDomain.COMPLETED -> ReviewScheduleStatusEntity.COMPLETED
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE

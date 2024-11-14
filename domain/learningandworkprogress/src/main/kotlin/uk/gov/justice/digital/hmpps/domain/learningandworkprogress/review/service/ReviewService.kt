@@ -24,11 +24,20 @@ class ReviewService(
 ) {
 
   /**
-   * Returns the [ReviewSchedule] for the prisoner identified by their prison number. Otherwise, throws
-   * [ReviewScheduleNotFoundException] if it cannot be found.
+   * Returns the active [ReviewSchedule] for the prisoner identified by their prison number, where "active" is defined
+   * as not having the status "COMPLETED".
+   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
    */
-  fun getReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
+  fun getActiveReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
+  /**
+   * Returns the latest [ReviewSchedule] for the prisoner identified by their prison number. The latest (most recently
+   * updated) [ReviewSchedule] is returned irrespective of status.
+   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
+   */
+  fun getLatestReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
+    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
   /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is
