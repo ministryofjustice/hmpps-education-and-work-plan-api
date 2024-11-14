@@ -48,6 +48,7 @@ enum class ReviewScheduleStatus(val inScope: Boolean) {
   EXEMPT_PRISONER_TRANSFER(false),
   EXEMPT_PRISONER_RELEASE(false),
   EXEMPT_PRISONER_DEATH(false),
+  COMPLETED(false),
 }
 
 data class ReviewScheduleWindow(

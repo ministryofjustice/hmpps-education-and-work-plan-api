@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -11,7 +12,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewRepository
-import java.time.LocalDate
 import java.util.UUID
 
 @Component
@@ -32,10 +32,10 @@ class JpaReviewPersistenceAdapter(
     }
 
   @Transactional
-  override fun createCompletedReview(createCompletedReviewDto: CreateCompletedReviewDto, deadlineDate: LocalDate): CompletedReview =
+  override fun createCompletedReview(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): CompletedReview =
     with(createCompletedReviewDto) {
       val completedReviewEntity = reviewRepository.saveAndFlush(
-        reviewEntityMapper.fromDomainToEntity(this, deadlineDate),
+        reviewEntityMapper.fromDomainToEntity(this, reviewSchedule),
       )
       val noteEntity = noteRepository.saveAndFlush(
         NoteEntity(

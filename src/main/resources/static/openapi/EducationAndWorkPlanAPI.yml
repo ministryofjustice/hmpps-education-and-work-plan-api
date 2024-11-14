@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.2'
+  version: '1.17.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2852,10 +2852,10 @@ components:
 
     ActionPlanReviewsResponse:
       title: ActionPlanReviewsResponse
-      description: The next scheduled review and a list of zero or more completed reviews for a prisoner.
+      description: The latest review schedule and a list of zero or more completed reviews for a prisoner.
       type: object
       properties:
-        scheduledReview:
+        latestReviewSchedule:
           $ref: '#/components/schemas/ScheduledActionPlanReviewResponse'
         completedReviews:
           type: array
@@ -2863,7 +2863,7 @@ components:
           items:
             $ref: '#/components/schemas/CompletedActionPlanReviewResponse'
       required:
-        - scheduledReview
+        - latestReviewSchedule
         - completedReviews
 
     CompletedActionPlanReviewResponse:
@@ -2997,6 +2997,7 @@ components:
         - EXEMPT_PRISONER_TRANSFER
         - EXEMPT_PRISONER_RELEASE
         - EXEMPT_PRISONER_DEATH
+        - COMPLETED
 
     ReviewScheduleCalculationRule:
       title: ReviewScheduleCalculationRule

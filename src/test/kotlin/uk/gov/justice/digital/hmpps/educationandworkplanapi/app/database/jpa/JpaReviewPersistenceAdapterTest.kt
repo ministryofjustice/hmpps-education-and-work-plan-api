@@ -12,6 +12,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateCompletedReviewDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
@@ -94,10 +95,12 @@ class JpaReviewPersistenceAdapterTest {
   @Test
   fun `should create completed review`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val deadlineDate = LocalDate.now().plusDays(3)
 
     val createCompletedReviewDto = aValidCreateCompletedReviewDto()
-    val deadlineDate = LocalDate.now().plusDays(3)
+    val reviewSchedule = aValidReviewSchedule(
+      latestReviewDate = deadlineDate,
+    )
 
     val reviewEntity = aValidReviewEntity()
     given(reviewEntityMapper.fromDomainToEntity(any(), any())).willReturn(reviewEntity)
@@ -110,11 +113,11 @@ class JpaReviewPersistenceAdapterTest {
     given(reviewEntityMapper.fromEntityToDomain(any(), any())).willReturn(expectedCompletedReview)
 
     // When
-    val actual = persistenceAdapter.createCompletedReview(createCompletedReviewDto, deadlineDate)
+    val actual = persistenceAdapter.createCompletedReview(createCompletedReviewDto, reviewSchedule)
 
     // Then
     assertThat(actual).isEqualTo(expectedCompletedReview)
-    verify(reviewEntityMapper).fromDomainToEntity(createCompletedReviewDto, deadlineDate)
+    verify(reviewEntityMapper).fromDomainToEntity(createCompletedReviewDto, reviewSchedule)
     verify(reviewRepository).saveAndFlush(reviewEntity)
     verify(reviewEntityMapper).fromEntityToDomain(reviewEntity, noteEntity)
   }

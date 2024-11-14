@@ -38,6 +38,7 @@ class ScheduledActionPlanReviewResponseMapper(
   private fun toReviewScheduleStatus(reviewStatus: ReviewScheduleStatusDomain): ReviewScheduleStatusApi =
     when (reviewStatus) {
       ReviewScheduleStatusDomain.SCHEDULED -> ReviewScheduleStatusApi.SCHEDULED
+      ReviewScheduleStatusDomain.COMPLETED -> ReviewScheduleStatusApi.COMPLETED
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> ReviewScheduleStatusApi.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> ReviewScheduleStatusApi.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> ReviewScheduleStatusApi.EXEMPT_PRISONER_FAILED_TO_ENGAGE

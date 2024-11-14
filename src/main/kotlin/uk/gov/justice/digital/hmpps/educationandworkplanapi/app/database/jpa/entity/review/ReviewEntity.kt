@@ -34,6 +34,9 @@ data class ReviewEntity(
   val completedDate: LocalDate,
 
   @Column(updatable = false)
+  val reviewScheduleReference: UUID,
+
+  @Column(updatable = false)
   val conductedBy: String?,
 
   @Column(updatable = false)

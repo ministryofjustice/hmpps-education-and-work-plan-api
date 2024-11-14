@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
+import jakarta.persistence.NonUniqueResultException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Nested
@@ -15,7 +16,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidUpdateReviewScheduleDto
@@ -23,6 +24,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
+import java.time.Instant
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus as ReviewScheduleStatusDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 
 @ExtendWith(MockitoExtension::class)
 class JpaReviewSchedulePersistenceAdapterTest {
@@ -37,40 +41,104 @@ class JpaReviewSchedulePersistenceAdapterTest {
   private lateinit var reviewScheduleEntityMapper: ReviewScheduleEntityMapper
 
   @Nested
-  inner class GetReviewSchedule {
+  inner class GetActiveReviewSchedule {
     @Test
-    fun `should get review schedule given review schedule exists for prisoner`() {
+    fun `should get active review schedule given review schedules exists for prisoner`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
 
-      val reviewScheduleEntity = aValidReviewScheduleEntity()
-      given(reviewScheduleRepository.findByPrisonNumber(any())).willReturn(reviewScheduleEntity)
+      val activeReviewScheduleEntity = aValidReviewScheduleEntity(
+        scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
+      )
+      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(activeReviewScheduleEntity)
 
-      val reviewSchedule = aValidReviewSchedule()
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(reviewSchedule)
+      val activeReviewSchedule = aValidReviewSchedule(
+        scheduleStatus = ReviewScheduleStatusDomain.SCHEDULED,
+      )
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(activeReviewSchedule)
 
       // When
-      val actual = persistenceAdapter.getReviewSchedule(prisonNumber)
+      val actual = persistenceAdapter.getActiveReviewSchedule(prisonNumber)
 
       // Then
-      assertThat(actual).isEqualTo(reviewSchedule)
-      verify(reviewScheduleRepository).findByPrisonNumber(prisonNumber)
-      verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
+      assertThat(actual).isEqualTo(activeReviewSchedule)
+      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verify(reviewScheduleEntityMapper).fromEntityToDomain(activeReviewScheduleEntity)
     }
 
     @Test
-    fun `should not get review schedule given review schedule does not exist for prisoner`() {
+    fun `should not get active review schedule given review schedule does not exist for prisoner`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
 
-      given(reviewScheduleRepository.findByPrisonNumber(any())).willReturn(null)
+      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(null)
 
       // When
-      val actual = persistenceAdapter.getReviewSchedule(prisonNumber)
+      val actual = persistenceAdapter.getActiveReviewSchedule(prisonNumber)
 
       // Then
       assertThat(actual).isNull()
-      verify(reviewScheduleRepository).findByPrisonNumber(prisonNumber)
+      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verifyNoInteractions(reviewScheduleEntityMapper)
+    }
+
+    @Test
+    fun `should not get active review schedule given prisoner has multiple active review schedule records`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+
+      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willThrow(NonUniqueResultException())
+
+      // When
+      val exception = assertThrows(IllegalStateException::class.java) {
+        persistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      }
+
+      // Then
+      assertThat(exception).hasMessage("A prisoner cannot have more than one active ReviewSchedule. Please investigate the ReviewSchedule data for prisoner A1234BC")
+      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verifyNoInteractions(reviewScheduleEntityMapper)
+    }
+  }
+
+  @Nested
+  inner class GetLatestReviewSchedule {
+    @Test
+    fun `should get latest review schedule given review schedules exists for prisoner`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+
+      val latestReviewScheduleEntity = aValidReviewScheduleEntity(
+        scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
+        updatedAt = Instant.now(),
+      )
+      given(reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(any())).willReturn(latestReviewScheduleEntity)
+
+      val latestReviewSchedule = aValidReviewSchedule()
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(latestReviewSchedule)
+
+      // When
+      val actual = persistenceAdapter.getLatestReviewSchedule(prisonNumber)
+
+      // Then
+      assertThat(actual).isEqualTo(latestReviewSchedule)
+      verify(reviewScheduleRepository).findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
+      verify(reviewScheduleEntityMapper).fromEntityToDomain(latestReviewScheduleEntity)
+    }
+
+    @Test
+    fun `should not get latest review schedule given review schedule does not exist for prisoner`() {
+      // Given
+      val prisonNumber = aValidPrisonNumber()
+
+      given(reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(any())).willReturn(null)
+
+      // When
+      val actual = persistenceAdapter.getLatestReviewSchedule(prisonNumber)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(reviewScheduleRepository).findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
       verifyNoInteractions(reviewScheduleEntityMapper)
     }
   }
@@ -86,7 +154,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
         prisonNumber = prisonNumber,
       )
 
-      given(reviewScheduleRepository.findByPrisonNumber(any())).willReturn(null)
+      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(null)
 
       val reviewScheduleEntity = aValidReviewScheduleEntity(
         prisonNumber = prisonNumber,
@@ -102,7 +170,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
       // Then
       assertThat(actual).isEqualTo(expectedReviewSchedule)
-      verify(reviewScheduleRepository).findByPrisonNumber(prisonNumber)
+      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
       verify(reviewScheduleEntityMapper).fromDomainToEntity(createReviewScheduleDto)
       verify(reviewScheduleRepository).saveAndFlush(reviewScheduleEntity)
       verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
@@ -110,7 +178,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
   }
 
   @Test
-  fun `should not create review schedule given prisoner already has one`() {
+  fun `should not create review schedule given prisoner already has an active Review Schedule`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
 
@@ -120,19 +188,23 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
     val reviewScheduleEntity = aValidReviewScheduleEntity(
       prisonNumber = prisonNumber,
+      scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
     )
-    given(reviewScheduleRepository.findByPrisonNumber(any())).willReturn(reviewScheduleEntity)
+    given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(reviewScheduleEntity)
+
+    val reviewSchedule = aValidReviewSchedule()
+    given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(reviewSchedule)
 
     // When
-    val exception = assertThrows(ReviewScheduleAlreadyExistsException::class.java) {
+    val exception = assertThrows(ActiveReviewScheduleAlreadyExistsException::class.java) {
       persistenceAdapter.createReviewSchedule(createReviewScheduleDto)
     }
 
     // Then
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-    verify(reviewScheduleRepository).findByPrisonNumber(prisonNumber)
+    verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+    verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
     verifyNoMoreInteractions(reviewScheduleRepository)
-    verifyNoInteractions(reviewScheduleEntityMapper)
   }
 
   @Nested
