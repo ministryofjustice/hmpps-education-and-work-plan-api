@@ -25,7 +25,8 @@ enum class ReviewScheduleCalculationRule {
   PRISONER_READMISSION,
   PRISONER_TRANSFER,
   BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE,
-  BETWEEN_3_AND_6_MONTHS_TO_SERVE,
+  BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
+  BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE,
   BETWEEN_6_AND_12_MONTHS_TO_SERVE,
   BETWEEN_12_AND_60_MONTHS_TO_SERVE,
   MORE_THAN_60_MONTHS_TO_SERVE,
@@ -62,6 +63,9 @@ data class ReviewScheduleWindow(
     }
     fun fromOneToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
       ReviewScheduleWindow(plusMonths(1), plusMonths(3))
+    }
+    fun fromOneToThreeMonthsMinusDays(daysToSubtract: Int): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(plusMonths(1), plusMonths(3).minusDays(daysToSubtract.toLong()))
     }
     fun fromTwoToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
       ReviewScheduleWindow(plusMonths(2), plusMonths(3))

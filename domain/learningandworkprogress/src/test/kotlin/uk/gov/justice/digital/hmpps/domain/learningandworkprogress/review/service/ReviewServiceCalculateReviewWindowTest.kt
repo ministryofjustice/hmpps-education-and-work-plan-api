@@ -32,10 +32,11 @@ class ReviewServiceCalculateReviewWindowTest {
   )
   fun `should calculate a 'today to today + 10 days' review window`(calculationRule: ReviewScheduleCalculationRule) {
     // Given
+    val releaseDate = LocalDate.now().plusYears(10)
     val expected = ReviewScheduleWindow(TODAY, TODAY.plusDays(10))
 
     // When
-    val actual = service.calculateReviewWindow(calculationRule)
+    val actual = service.calculateReviewWindow(calculationRule, releaseDate)
 
     // Then
     assertThat(actual).isEqualTo(expected)
