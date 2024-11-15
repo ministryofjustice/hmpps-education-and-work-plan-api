@@ -60,7 +60,7 @@ class ScheduledActionPlanReviewResponseMapper(
       ReviewScheduleCalculationRuleDomain.PRISONER_TRANSFER -> ReviewScheduleCalculationRuleApi.PRISONER_TRANSFER
       ReviewScheduleCalculationRuleDomain.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
-      ReviewScheduleCalculationRuleDomain.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_3_AND_6_MONTHS_TO_SERVE
+      ReviewScheduleCalculationRuleDomain.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.BETWEEN_12_AND_60_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleApi.MORE_THAN_60_MONTHS_TO_SERVE

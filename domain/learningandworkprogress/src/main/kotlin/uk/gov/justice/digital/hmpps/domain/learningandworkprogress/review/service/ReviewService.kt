@@ -150,7 +150,7 @@ class ReviewService(
         val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate!!)
         ReviewScheduleWindow.fromOneToThreeMonthsMinusDays(8 - timeLeftToServe.days)
       }
-      ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
+      ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.PRISONER_ON_REMAND, ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
       ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths()
@@ -167,7 +167,7 @@ class ReviewService(
     return when {
       timeLeftToServe.isNoMoreThan3Months() -> ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
       timeLeftToServe.isBetween3MonthsAnd3Months7Days() -> ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
-      timeLeftToServe.isBetween3Months8DaysAnd6Months() -> ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween3Months8DaysAnd6Months() -> ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
       timeLeftToServe.isBetween6And12Months() -> ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
       timeLeftToServe.isBetween12And60Months() -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
       timeLeftToServe.isMoreThan60Months() -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
