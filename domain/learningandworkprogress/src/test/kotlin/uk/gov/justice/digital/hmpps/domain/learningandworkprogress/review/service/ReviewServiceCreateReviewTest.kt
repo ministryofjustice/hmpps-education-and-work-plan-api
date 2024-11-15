@@ -225,8 +225,22 @@ class ReviewServiceCreateReviewTest {
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
         Arguments.of(
-          "prisoner has between 3 and 6 months left to serve - next review 1 to 3 months",
+          "prisoner has 3 months 1 day left to serve - next review 1 to 3 months minus 7 days",
           TODAY.plusMonths(3).plusDays(1),
+          SentenceType.SENTENCED,
+          ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
+          ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(7)),
+        ),
+        Arguments.of(
+          "prisoner has 3 months 7 days left to serve - next review 1 to 3 months minus 1 day",
+          TODAY.plusMonths(3).plusDays(7),
+          SentenceType.SENTENCED,
+          ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
+          ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(1)),
+        ),
+        Arguments.of(
+          "prisoner has between 3 months 8 days and 6 months left to serve - next review 1 to 3 months",
+          TODAY.plusMonths(3).plusDays(8),
           SentenceType.SENTENCED,
           ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3)),

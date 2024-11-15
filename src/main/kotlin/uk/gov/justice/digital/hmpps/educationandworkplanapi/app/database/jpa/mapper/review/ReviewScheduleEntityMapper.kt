@@ -59,6 +59,7 @@ class ReviewScheduleEntityMapper {
     when (calculationRule) {
       ReviewScheduleCalculationRuleEntity.PRISONER_READMISSION -> ReviewScheduleCalculationRuleDomain.PRISONER_READMISSION
       ReviewScheduleCalculationRuleEntity.PRISONER_TRANSFER -> ReviewScheduleCalculationRuleDomain.PRISONER_TRANSFER
+      ReviewScheduleCalculationRuleEntity.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_3_AND_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleEntity.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE
@@ -73,6 +74,7 @@ class ReviewScheduleEntityMapper {
     when (calculationRule) {
       ReviewScheduleCalculationRuleDomain.PRISONER_READMISSION -> ReviewScheduleCalculationRuleEntity.PRISONER_READMISSION
       ReviewScheduleCalculationRuleDomain.PRISONER_TRANSFER -> ReviewScheduleCalculationRuleEntity.PRISONER_TRANSFER
+      ReviewScheduleCalculationRuleDomain.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_3_AND_6_MONTHS_TO_SERVE
       ReviewScheduleCalculationRuleDomain.BETWEEN_6_AND_12_MONTHS_TO_SERVE -> ReviewScheduleCalculationRuleEntity.BETWEEN_6_AND_12_MONTHS_TO_SERVE

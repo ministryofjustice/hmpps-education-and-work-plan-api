@@ -83,11 +83,12 @@ class ReviewService(
     )
 
     // Work out the next review schedule calculation rule and schedule window
+    val releaseDate = createCompletedReviewDto.prisonerReleaseDate
     val reviewScheduleCalculationRule = determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
       sentenceType = createCompletedReviewDto.prisonerSentenceType,
-      releaseDate = createCompletedReviewDto.prisonerReleaseDate,
+      releaseDate = releaseDate,
     )
-    val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule)
+    val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
 
     return CompletedReviewDto(
       completedReview = completedReview,
@@ -136,10 +137,19 @@ class ReviewService(
     }
 
   // TODO - make this method private when calculating the next review for a transfer or readmission has a dedicated service method
-  fun calculateReviewWindow(reviewScheduleCalculationRule: ReviewScheduleCalculationRule): ReviewScheduleWindow? =
+  fun calculateReviewWindow(reviewScheduleCalculationRule: ReviewScheduleCalculationRule, releaseDate: LocalDate?): ReviewScheduleWindow? =
     when (reviewScheduleCalculationRule) {
       ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
       ReviewScheduleCalculationRule.PRISONER_READMISSION, ReviewScheduleCalculationRule.PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays()
+      ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> {
+        // If the prisoner has between 3 months and 3 months 7 days left to serve their Review Schedule Window would be between 1 and 3 months
+        // as they would fall into the "between 3 and 6 months left to serve" rule. This would mean their deadline date would be within the last
+        // week before release.
+        // Prisoners and CIAGs need a clear 7 days between their final review deadline and release (their last week in prison is busy), so
+        // we need to reduce the deadline date to give 7 days before release.
+        val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate!!)
+        ReviewScheduleWindow.fromOneToThreeMonthsMinusDays(8 - timeLeftToServe.days)
+      }
       ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.PRISONER_ON_REMAND, ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
@@ -152,21 +162,42 @@ class ReviewService(
     }
 
   private fun reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate: LocalDate): ReviewScheduleCalculationRule {
-    val today = LocalDate.now()
-    val timeLeftToServe = Period.between(today, releaseDate)
-    val monthsLeft = timeLeftToServe.toTotalMonths()
-    val remainderDays = timeLeftToServe.minusMonths(monthsLeft).days
-
-    fun isExactMonths(months: Long) = monthsLeft == months && remainderDays == 0
+    val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate)
 
     return when {
-      monthsLeft < 3 || isExactMonths(3) -> ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
-      monthsLeft < 6 || isExactMonths(6) -> ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE
-      monthsLeft < 12 || isExactMonths(12) -> ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
-      monthsLeft < 60 || isExactMonths(60) -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+      timeLeftToServe.isNoMoreThan3Months() -> ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween3MonthsAnd3Months7Days() -> ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
+      timeLeftToServe.isBetween3Months8DaysAnd6Months() -> ReviewScheduleCalculationRule.BETWEEN_3_AND_6_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween6And12Months() -> ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween12And60Months() -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+      timeLeftToServe.isMoreThan60Months() -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
       else -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
     }.also {
       log.debug { "Returning ReviewScheduleCalculationRule $it based on release date of $releaseDate" }
     }
+  }
+
+  private data class MonthsAndDaysLeftToServe(
+    val months: Long,
+    val days: Int,
+  ) {
+    companion object {
+      fun until(releaseDate: LocalDate): MonthsAndDaysLeftToServe {
+        val today = LocalDate.now()
+        val timeLeftToServe = Period.between(today, releaseDate)
+        val monthsLeft = timeLeftToServe.toTotalMonths()
+        val remainderDays = timeLeftToServe.minusMonths(monthsLeft).days
+        return MonthsAndDaysLeftToServe(monthsLeft, remainderDays)
+      }
+    }
+
+    private fun isExactMonths(value: Long) = months == value && days == 0
+
+    fun isNoMoreThan3Months(): Boolean = months < 3 || isExactMonths(3)
+    fun isBetween3MonthsAnd3Months7Days(): Boolean = months == 3L && days in 1..7
+    fun isBetween3Months8DaysAnd6Months(): Boolean = ((months == 3L && days >= 8) || months >= 4) && (months < 6 || isExactMonths(6))
+    fun isBetween6And12Months(): Boolean = months >= 6 && !isExactMonths(6) && (months < 12 || isExactMonths(12))
+    fun isBetween12And60Months(): Boolean = months >= 12 && !isExactMonths(12) && (months < 60 || isExactMonths(60))
+    fun isMoreThan60Months(): Boolean = months >= 60 && !isExactMonths(60)
   }
 }

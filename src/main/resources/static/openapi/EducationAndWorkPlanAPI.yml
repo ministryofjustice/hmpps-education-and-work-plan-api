@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.3'
+  version: '1.17.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3015,6 +3015,7 @@ components:
       enum:
         - PRISONER_READMISSION
         - PRISONER_TRANSFER
+        - BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
         - BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
         - BETWEEN_3_AND_6_MONTHS_TO_SERVE
         - BETWEEN_6_AND_12_MONTHS_TO_SERVE
