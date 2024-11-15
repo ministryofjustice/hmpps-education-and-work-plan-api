@@ -25,6 +25,9 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
@@ -68,6 +71,8 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
 import java.security.KeyPair
+import java.time.LocalDate
+import java.util.UUID
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -186,8 +191,12 @@ abstract class IntegrationTestBase {
     domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
       .get()
 
-    testInductionScheduleEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build()).get()
-    testInductionScheduleEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.dlqUrl).build())
+    testInductionScheduleEventQueueClient.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build(),
+    ).get()
+    testInductionScheduleEventQueueDlqClient!!.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.dlqUrl).build(),
+    )
       .get()
   }
 
@@ -369,6 +378,17 @@ abstract class IntegrationTestBase {
   }
 
   internal fun HmppsQueue.countAllMessagesOnQueue() = sqsClient.countAllMessagesOnQueue(queueUrl).get()
+  fun createInductionSchedule(prisonNumber: String, status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED) {
+    inductionScheduleRepository.save(
+      InductionScheduleEntity(
+        prisonNumber = prisonNumber,
+        deadlineDate = LocalDate.now().plusMonths(1),
+        reference = UUID.randomUUID(),
+        scheduleStatus = status,
+        scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+      ),
+    )
+  }
 }
 
 data class Notification(

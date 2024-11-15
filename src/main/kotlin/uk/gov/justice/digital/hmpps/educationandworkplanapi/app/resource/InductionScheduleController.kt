@@ -29,8 +29,12 @@ class InductionScheduleController(
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_INDUCTIONS)
-  fun getInductionSchedule(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): InductionScheduleResponse =
-    with(inductionService.getInductionScheduleForPrisoner(prisonNumber)) {
-      inductionScheduleMapper.toInductionResponse(this)
-    }
+  fun getInductionSchedule(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): InductionScheduleResponse {
+    val induction = runCatching {
+      inductionService.getInductionForPrisoner(prisonNumber)
+    }.getOrNull()
+
+    val inductionSchedule = inductionService.getInductionScheduleForPrisoner(prisonNumber)
+    return inductionScheduleMapper.toInductionResponse(inductionSchedule, induction)
+  }
 }

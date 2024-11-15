@@ -1716,6 +1716,15 @@ components:
           format: date-time
           description: An ISO-8601 timestamp representing when this resource was updated.
           example: '2023-06-19T09:39:44Z'
+        inductionPerformedBy:
+          type: string
+          description: The name of the person who completed the review.
+          example: 'John smith'
+        inductionPerformedAt:
+          type: string
+          format: date
+          description: the date when this resource was updated.
+          example: '2023-06-19'
       required:
         - reference
         - prisonNumber
