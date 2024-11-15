@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
@@ -103,6 +104,26 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     with(actual!!) {
       if (updatedByDisplayName != expected) {
         failWithMessage("Expected updatedByDisplayName to be $expected, but was $updatedByDisplayName")
+      }
+    }
+    return this
+  }
+
+  fun wasInductionPerformedBy(expected: String): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (inductionPerformedBy != expected) {
+        failWithMessage("Expected inductionPerformedBy to be $expected, but was $inductionPerformedBy")
+      }
+    }
+    return this
+  }
+
+  fun wasInductionPerformedAt(date: LocalDate): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (inductionPerformedAt != date) {
+        failWithMessage("Expected inductionPerformedAt to be equal to $date, but was $inductionPerformedAt")
       }
     }
     return this

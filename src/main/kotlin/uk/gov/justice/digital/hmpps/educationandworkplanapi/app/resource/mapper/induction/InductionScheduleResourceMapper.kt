@@ -1,13 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
-import java.time.LocalDate
+import java.time.ZoneId
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
@@ -17,7 +18,7 @@ class InductionScheduleResourceMapper(
   private val userService: ManageUserService,
 
 ) {
-  fun toInductionResponse(inductionSchedule: InductionSchedule, inductionPerformedBy: String?, inductionPerformedAt: LocalDate?): InductionScheduleResponse {
+  fun toInductionResponse(inductionSchedule: InductionSchedule, induction: Induction?): InductionScheduleResponse {
     with(inductionSchedule) {
       return InductionScheduleResponse(
         reference = reference,
@@ -31,8 +32,8 @@ class InductionScheduleResourceMapper(
         updatedBy = lastUpdatedBy!!,
         updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
-        inductionPerformedBy = inductionPerformedBy,
-        inductionPerformedAt = inductionPerformedAt,
+        inductionPerformedBy = induction?.let { userService.getUserDetails(it.lastUpdatedBy!!).name },
+        inductionPerformedAt = induction?.lastUpdatedAt?.atZone(ZoneId.systemDefault())?.toLocalDate(),
       )
     }
   }
