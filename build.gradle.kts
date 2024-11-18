@@ -12,7 +12,7 @@ plugins {
   kotlin("kapt") version "2.0.21"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.1.2"
+  id("name.remal.integration-tests") version "4.1.3"
 
   `java-test-fixtures`
 }
@@ -23,13 +23,13 @@ val mapstructVersion = "1.6.3"
 val postgresqlVersion = "42.7.4"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.6.0"
-val hmppsSqsVersion = "5.1.0"
+val hmppsSqsVersion = "5.1.1"
 val awaitilityVersion = "4.2.2"
 val wiremockVersion = "3.9.2"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "9.46"
+val nimbusJwtVersion = "9.47"
 val testContainersVersion = "1.20.3"
-val awsSdkVersion = "1.12.777"
+val awsSdkVersion = "1.12.778"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
