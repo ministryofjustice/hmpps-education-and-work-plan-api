@@ -46,12 +46,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.EDUCATI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GOALS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.REVIEWS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.TIMELINE_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
@@ -85,6 +87,7 @@ abstract class IntegrationTestBase {
     const val CREATE_GOALS_URI_TEMPLATE = "/action-plans/{prisonNumber}/goals"
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
+    const val GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
     const val EDUCATION_URI_TEMPLATE = "/person/{prisonNumber}/education"
@@ -362,6 +365,14 @@ abstract class IntegrationTestBase {
       .expectStatus()
       .isCreated
   }
+
+  fun getActionPlanReviews(prisonNumber: String): ActionPlanReviewsResponse =
+    webTestClient.get()
+      .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .exchange()
+      .returnResult(ActionPlanReviewsResponse::class.java)
+      .responseBody.blockFirst()!!
 
   internal fun HmppsQueue.receiveInductionScheduleEvent(): HmppsDomainEvent {
     val event = receiveInductionScheduleEventsOnQueue().single()
