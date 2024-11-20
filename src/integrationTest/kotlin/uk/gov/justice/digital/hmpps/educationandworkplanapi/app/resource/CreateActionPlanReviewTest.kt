@@ -175,7 +175,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
-      .isOk
+      .isCreated
       .returnResult(CreateActionPlanReviewResponse::class.java)
 
     // Then
