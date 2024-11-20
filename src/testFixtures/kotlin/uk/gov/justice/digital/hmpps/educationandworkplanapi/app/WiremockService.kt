@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
 
 /**
@@ -37,6 +38,29 @@ class WiremockService(private val wireMockServer: WireMockServer) {
   fun stubGetPrisonTimelineNotFound(prisonNumber: String) {
     wireMockServer.stubFor(
       get(urlPathMatching("/api/offenders/$prisonNumber/prison-timeline"))
+        .willReturn(
+          responseDefinition()
+            .withStatus(404)
+            .withHeader("Content-Type", "application/json"),
+        ),
+    )
+  }
+
+  fun stubGetPrisonerFromPrisonerSearchApi(prisonNumber: String, response: Prisoner) {
+    wireMockServer.stubFor(
+      get(urlPathMatching("/prisoner/$prisonNumber"))
+        .willReturn(
+          responseDefinition()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(response)),
+        ),
+    )
+  }
+
+  fun stubGetPrisonerNotFound(prisonNumber: String) {
+    wireMockServer.stubFor(
+      get(urlPathMatching("/prisoner/$prisonNumber"))
         .willReturn(
           responseDefinition()
             .withStatus(404)

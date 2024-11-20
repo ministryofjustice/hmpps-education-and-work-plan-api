@@ -38,6 +38,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
 private val log = KotlinLogging.logger {}
@@ -174,6 +175,7 @@ class GlobalExceptionHandler(
       PrisonerHasNoGoalsException::class,
       ReviewScheduleNotFoundException::class,
       InductionScheduleNotFoundException::class,
+      PrisonerNotFoundException::class,
     ],
   )
   fun handleExceptionReturnNotFoundErrorResponse(

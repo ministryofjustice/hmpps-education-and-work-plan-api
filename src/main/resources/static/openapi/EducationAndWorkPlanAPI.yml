@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.4'
+  version: '1.17.5'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2825,6 +2825,11 @@ components:
           type: string
           description: The notes taken by the Reviewer when conducting the prisoner's Review.
           example: Now he has settled into prison life Peter's attitude has improved and he is making excellent progress towards his goals.
+        conductedAt:
+          type: string
+          format: date
+          description: An ISO-8601 date representing the date that this Review was conducted on.
+          example: '2023-12-19'
         conductedBy:
           type: string
           description: |
@@ -2842,22 +2847,21 @@ components:
       required:
         - prisonId
         - note
+        - conductedAt
 
     CreateActionPlanReviewResponse:
       title: CreateActionPlanReviewResponse
-      description: Response body detailing whether this was the prisoner's last review before release, and if not the next scheduled review.
+      description: Response body detailing whether this was the prisoner's last review before release, and the latest scheduled review.
       properties:
         wasLastReviewBeforeRelease:
           type: boolean
           example: false
-          description: | 
-            Indicates whether the Review just submitted was the prisoner's last review before release.
-            
-            If this was the prisoner's last review before release a new Review Schedule will not have been created and retured in the property `nextReviewSchedule`
-        nextReviewSchedule:
+          description: Indicates whether the Review just submitted was the prisoner's last review before release.
+        latestReviewSchedule:
           $ref: '#/components/schemas/ScheduledActionPlanReviewResponse'
       required:
         - wasLastReviewBeforeRelease
+        - latestReviewSchedule
 
     ActionPlanReviewsResponse:
       title: ActionPlanReviewsResponse
