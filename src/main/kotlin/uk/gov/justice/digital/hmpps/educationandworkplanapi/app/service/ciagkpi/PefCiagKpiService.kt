@@ -6,9 +6,12 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
+import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -26,6 +29,8 @@ class PefCiagKpiService(
   private val inductionPersistenceAdapter: InductionPersistenceAdapter,
   private val eventPublisher: EventPublisher,
   private val telemetryService: TelemetryService,
+  private val timelineService: TimelineService,
+  private val timelineEventFactory: TimelineEventFactory,
 
 ) : CiagKpiService() {
 
@@ -59,6 +64,11 @@ class PefCiagKpiService(
       prisonerNumber = prisonNumber,
     )
     telemetryService.trackInductionScheduleCreated(inductionSchedule)
+    val timelineEvent = timelineEventFactory.inductionScheduleTimelineEvent(
+      inductionSchedule,
+      TimelineEventType.INDUCTION_SCHEDULE_CREATED,
+    )
+    timelineService.recordTimelineEvent(inductionSchedule.prisonNumber, timelineEvent)
   }
 
   // This function will need to calculate the deadline date initially this will be the date the prisoner entered
