@@ -216,7 +216,6 @@ class TimelineEventFactory {
       eventType = eventType,
       prisonId = "N/A",
       actionedBy = inductionSchedule.lastUpdatedBy!!,
-      actionedByDisplayName = inductionSchedule.lastUpdatedByDisplayName!!,
       contextualInfo = mapOf(
         TimelineEventContext.INDUCTION_SCHEDULE_STATUS to inductionSchedule.scheduleStatus.name,
         TimelineEventContext.INDUCTION_SCHEDULE_DEADLINE_DATE to inductionSchedule.deadlineDate.toString(),
