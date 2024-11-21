@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTele
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionScheduleTelemetryEventType.INDUCTION_SCHEDULE_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionScheduleTelemetryEventType.INDUCTION_SCHEDULE_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_UPDATED
 import java.util.UUID
@@ -88,6 +89,13 @@ class TelemetryService(
     sendTelemetryEventForInductionSchedule(
       inductionSchedule = inductionSchedule,
       telemetryEventType = INDUCTION_SCHEDULE_CREATED,
+    )
+  }
+
+  fun trackInductionScheduleUpdated(inductionSchedule: InductionSchedule) {
+    sendTelemetryEventForInductionSchedule(
+      inductionSchedule = inductionSchedule,
+      telemetryEventType = INDUCTION_SCHEDULE_UPDATED,
     )
   }
 
