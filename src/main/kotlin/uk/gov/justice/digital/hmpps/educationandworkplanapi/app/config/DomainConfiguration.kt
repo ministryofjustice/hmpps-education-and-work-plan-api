@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PefCiagKpiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PesCiagKpiService
 
@@ -107,9 +108,10 @@ class DomainConfiguration {
     inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     eventPublisher: EventPublisher,
+    telemetryService: TelemetryService,
   ): CiagKpiService? =
     when (ciagKpiProcessingRule) {
-      "PEF" -> PefCiagKpiService(prisonerSearchApiClient, inductionSchedulePersistenceAdapter, inductionPersistenceAdapter, eventPublisher)
+      "PEF" -> PefCiagKpiService(prisonerSearchApiClient, inductionSchedulePersistenceAdapter, inductionPersistenceAdapter, eventPublisher, telemetryService)
       "PES" -> PesCiagKpiService(prisonerSearchApiClient)
       else -> null
     }

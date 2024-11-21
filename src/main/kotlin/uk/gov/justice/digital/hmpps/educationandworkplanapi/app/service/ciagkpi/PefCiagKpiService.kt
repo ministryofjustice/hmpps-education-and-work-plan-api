@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -24,14 +25,11 @@ class PefCiagKpiService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionPersistenceAdapter: InductionPersistenceAdapter,
   private val eventPublisher: EventPublisher,
+  private val telemetryService: TelemetryService,
 
 ) : CiagKpiService() {
 
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
-    createOrUpdateInductionSchedule(prisonNumber, eventDate)
-  }
-
-  fun createOrUpdateInductionSchedule(prisonNumber: String, eventDate: Instant) {
     log.info { "Creating or updating induction schedule for prisoner [$prisonNumber]" }
 
     // Check if an induction schedule already exists.
@@ -44,12 +42,12 @@ class PefCiagKpiService(
     // If no induction schedule exists, check for an existing induction.
     if (inductionPersistenceAdapter.getInduction(prisonNumber) != null) {
       log.info { "Induction already exists for prisoner [$prisonNumber], creating a review." }
-      // TODO: Implement review creation
+      // TODO: Implement review creation/ TODO: Implement review creation
       return
     }
 
     // Create a new induction schedule.
-    inductionSchedulePersistenceAdapter.createInductionSchedule(
+    val inductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(
       CreateInductionScheduleDto(
         prisonNumber,
         calculateInductionDeadlineDate(prisonNumber, eventDate),
@@ -60,8 +58,7 @@ class PefCiagKpiService(
     eventPublisher.createAndPublishInductionEvent(
       prisonerNumber = prisonNumber,
     )
-
-    // TODO Implement follow on telemetry
+    telemetryService.trackInductionScheduleCreated(inductionSchedule)
   }
 
   // This function will need to calculate the deadline date initially this will be the date the prisoner entered
