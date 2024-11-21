@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PefCiagKpiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PesCiagKpiService
 
@@ -49,7 +50,13 @@ class DomainConfiguration {
     actionPlanEventService: ActionPlanEventService,
     goalNotesService: GoalNotesService,
   ): GoalService =
-    GoalService(goalPersistenceAdapter, goalEventService, actionPlanPersistenceAdapter, actionPlanEventService, goalNotesService)
+    GoalService(
+      goalPersistenceAdapter,
+      goalEventService,
+      actionPlanPersistenceAdapter,
+      actionPlanEventService,
+      goalNotesService,
+    )
 
   @Bean
   fun actionPlanDomainService(
@@ -109,9 +116,20 @@ class DomainConfiguration {
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     eventPublisher: EventPublisher,
     telemetryService: TelemetryService,
+    timelineEventFactory: TimelineEventFactory,
+    timelineService: TimelineService,
   ): CiagKpiService? =
     when (ciagKpiProcessingRule) {
-      "PEF" -> PefCiagKpiService(prisonerSearchApiClient, inductionSchedulePersistenceAdapter, inductionPersistenceAdapter, eventPublisher, telemetryService)
+      "PEF" -> PefCiagKpiService(
+        prisonerSearchApiClient,
+        inductionSchedulePersistenceAdapter,
+        inductionPersistenceAdapter,
+        eventPublisher,
+        telemetryService,
+        timelineService,
+        timelineEventFactory,
+      )
+
       "PES" -> PesCiagKpiService(prisonerSearchApiClient)
       else -> null
     }
