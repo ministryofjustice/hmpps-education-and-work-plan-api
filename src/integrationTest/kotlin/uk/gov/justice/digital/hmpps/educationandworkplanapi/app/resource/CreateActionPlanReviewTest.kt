@@ -125,6 +125,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       prisonerNumber = prisonNumber,
       legalStatus = LegalStatus.SENTENCED,
       releaseDate = LocalDate.now().plusYears(1),
+      prisonId = "BXI",
     )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
@@ -155,6 +156,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       prisonerNumber = prisonNumber,
       legalStatus = LegalStatus.SENTENCED,
       releaseDate = LocalDate.now().plusYears(1),
+      prisonId = "BXI",
     )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 

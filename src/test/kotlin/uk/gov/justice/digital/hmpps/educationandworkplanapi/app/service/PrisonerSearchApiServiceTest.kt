@@ -37,11 +37,13 @@ class PrisonerSearchApiServiceTest {
         prisonerNumber = "A1234BC",
         legalStatus = LegalStatus.SENTENCED,
         releaseDate = LocalDate.now().plusYears(1),
+        prisonId = "BXI",
       ),
       Prisoner(
         prisonerNumber = "A9999XX",
         legalStatus = LegalStatus.SENTENCED,
         releaseDate = LocalDate.now().plusYears(2),
+        prisonId = "BXI",
       ),
     )
 
@@ -85,6 +87,7 @@ class PrisonerSearchApiServiceTest {
       prisonerNumber = "A1234BC",
       legalStatus = LegalStatus.SENTENCED,
       releaseDate = LocalDate.now().plusYears(1),
+      prisonId = "BXI",
     )
     given(prisonerSearchApiClient.getPrisoner(any())).willReturn(expectedPrisoner)
 
