@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
@@ -39,40 +41,28 @@ class PefCiagKpiService(
 
 ) : CiagKpiService() {
 
+  /**
+   * Process an prisoner admission.
+   *
+   * - If the prisoner is brand new create a new Induction schedule
+   * - If the prisoner already has an incomplete induction schedule (this will most likely be
+   * a duplicate message) then do nothing.
+   * - If the prisoner already has had their Induction created. Then this person is likely to
+   * be a coming back into prison and needs to resume their Reviews.
+   */
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
     log.info { "Creating or updating induction schedule for prisoner [$prisonNumber]" }
 
-    // Check if an induction schedule already exists.
-    val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
-    if (existingSchedule != null) {
-      log.info { "Induction schedule already exists for prisoner [$prisonNumber], ignoring this message." }
+    if (activeInductionScheduleAlreadyExists(prisonNumber)) return
+
+    if (inductionExists(prisonNumber)) {
+      createReviewScheduleForPrisoner(prisonNumber)
       return
     }
+    createNewInductionSchedule(prisonNumber, eventDate)
+  }
 
-    // Check for an existing induction before proceeding.
-    inductionPersistenceAdapter.getInduction(prisonNumber)?.let {
-      log.info { "Induction already exists for prisoner [$prisonNumber]. Creating a review schedule." }
-
-      val prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
-      val prisonerReleaseDate = prisoner.releaseDate
-      val prisonerSentenceType = toSentenceType(prisoner.legalStatus)
-      val prisonId = prisoner.prisonId ?: "N/A"
-
-      reviewService.createInitialReviewSchedule(
-        CreateInitialReviewScheduleDto(
-          prisonNumber = prisonNumber,
-          prisonerReleaseDate = prisonerReleaseDate,
-          prisonerSentenceType = prisonerSentenceType,
-          prisonId = prisonId,
-          isReadmission = true,
-          isTransfer = false,
-        ),
-      )
-      eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
-      return
-    }
-
-    // Create a new induction schedule.
+  private fun createNewInductionSchedule(prisonNumber: String, eventDate: Instant) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(
       CreateInductionScheduleDto(
         prisonNumber,
@@ -80,11 +70,43 @@ class PefCiagKpiService(
         InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       ),
     )
-    // send update event to domain event topic
-    eventPublisher.createAndPublishInductionEvent(
-      prisonerNumber = prisonNumber,
-    )
+    eventPublisher.createAndPublishInductionEvent(prisonNumber)
     telemetryService.trackInductionScheduleCreated(inductionSchedule)
+    recordInductionTimelineEvent(inductionSchedule)
+  }
+
+  private fun createReviewScheduleForPrisoner(prisonNumber: String) {
+    val prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
+    reviewService.createInitialReviewSchedule(
+      CreateInitialReviewScheduleDto(
+        prisonNumber = prisonNumber,
+        prisonerReleaseDate = prisoner.releaseDate,
+        prisonerSentenceType = toSentenceType(prisoner.legalStatus),
+        prisonId = prisoner.prisonId ?: "N/A",
+        isReadmission = true,
+        isTransfer = false,
+      ),
+    )
+    eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
+  }
+
+  private fun activeInductionScheduleAlreadyExists(prisonNumber: String): Boolean {
+    val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+    if (existingSchedule != null && existingSchedule.scheduleStatus != InductionScheduleStatus.COMPLETE) {
+      log.info { "Induction schedule already exists for prisoner [$prisonNumber], ignoring this message." }
+      return true
+    }
+    return false
+  }
+
+  private fun inductionExists(prisonNumber: String): Boolean {
+    return inductionPersistenceAdapter.getInduction(prisonNumber)?.let {
+      log.info { "Induction already exists for prisoner [$prisonNumber]. Creating a review schedule." }
+      true
+    } ?: false
+  }
+
+  private fun recordInductionTimelineEvent(inductionSchedule: InductionSchedule) {
     val timelineEvent = timelineEventFactory.inductionScheduleTimelineEvent(
       inductionSchedule,
       TimelineEventType.INDUCTION_SCHEDULE_CREATED,
@@ -100,7 +122,7 @@ class PefCiagKpiService(
     return eventDate.atZone(europeLondon).toLocalDate().plusDays(numberOfDaysToAdd.toLong())
   }
 
-  fun toSentenceType(legalStatus: LegalStatus): SentenceType =
+  private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
     when (legalStatus) {
       LegalStatus.RECALL -> SentenceType.RECALL
       LegalStatus.DEAD -> SentenceType.DEAD
