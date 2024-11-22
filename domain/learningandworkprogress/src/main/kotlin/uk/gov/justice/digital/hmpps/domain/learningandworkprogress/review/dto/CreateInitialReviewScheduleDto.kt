@@ -8,4 +8,6 @@ data class CreateInitialReviewScheduleDto(
   val prisonId: String,
   val prisonerReleaseDate: LocalDate?,
   val prisonerSentenceType: SentenceType,
+  val isTransfer: Boolean,
+  val isReadmission: Boolean,
 )

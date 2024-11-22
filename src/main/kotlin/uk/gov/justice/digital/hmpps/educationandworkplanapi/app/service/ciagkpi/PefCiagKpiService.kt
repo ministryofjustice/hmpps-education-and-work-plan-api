@@ -64,6 +64,8 @@ class PefCiagKpiService(
           prisonerReleaseDate = prisonerReleaseDate,
           prisonerSentenceType = prisonerSentenceType,
           prisonId = prisonId,
+          isReadmission = true,
+          isTransfer = false,
         ),
       )
       eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)

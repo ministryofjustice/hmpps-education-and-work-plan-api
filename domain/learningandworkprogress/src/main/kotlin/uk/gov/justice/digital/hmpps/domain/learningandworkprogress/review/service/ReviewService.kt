@@ -128,9 +128,11 @@ class ReviewService(
 
     // Calculate the review schedule window and rule
     val releaseDate = createInitialReviewScheduleDto.prisonerReleaseDate
-    val reviewScheduleCalculationRule = determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
+    val reviewScheduleCalculationRule = determineReviewScheduleCalculationRule(
       sentenceType = createInitialReviewScheduleDto.prisonerSentenceType,
       releaseDate = releaseDate,
+      isReAdmission = createInitialReviewScheduleDto.isReadmission,
+      isTransfer = createInitialReviewScheduleDto.isTransfer,
     )
     val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
       ?: throw RuntimeException("Unable to determine review schedule for release date $releaseDate.")
