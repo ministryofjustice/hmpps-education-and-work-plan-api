@@ -13,26 +13,26 @@ enum class InductionScheduleTelemetryEventType(
 ) {
   INDUCTION_SCHEDULE_CREATED(
     "INDUCTION_SCHEDULE_CREATED",
-    { induction ->
+    { inductionSchedule ->
       mapOf(
-        "reference" to induction.reference.toString(),
-        "userId" to induction.createdBy!!,
-        "deadlineDate" to induction.deadlineDate.toString(),
-        "scheduleStatus" to induction.scheduleStatus.name,
-        "scheduleCalculationRule" to induction.scheduleCalculationRule.name,
+        "reference" to inductionSchedule.reference.toString(),
+        "userId" to inductionSchedule.lastUpdatedBy!!,
+        "deadlineDate" to inductionSchedule.deadlineDate.toString(),
+        "scheduleStatus" to inductionSchedule.scheduleStatus.name,
+        "scheduleCalculationRule" to inductionSchedule.scheduleCalculationRule.name,
       )
     },
   ),
 
   INDUCTION_SCHEDULE_UPDATED(
     "INDUCTION_SCHEDULE_UPDATED",
-    { induction ->
+    { inductionSchedule ->
       mapOf(
-        "reference" to induction.reference.toString(),
-        "userId" to induction.createdBy!!,
-        "deadlineDate" to induction.deadlineDate.toString(),
-        "scheduleStatus" to induction.scheduleStatus.name,
-        "scheduleCalculationRule" to induction.scheduleCalculationRule.name,
+        "reference" to inductionSchedule.reference.toString(),
+        "userId" to inductionSchedule.lastUpdatedBy!!,
+        "deadlineDate" to inductionSchedule.deadlineDate.toString(),
+        "scheduleStatus" to inductionSchedule.scheduleStatus.name,
+        "scheduleCalculationRule" to inductionSchedule.scheduleCalculationRule.name,
       )
     },
   ),
