@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
 import java.time.LocalDate
@@ -37,7 +38,9 @@ class ReviewService(
    * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
    */
   fun getActiveReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
+      prisonNumber,
+    )
 
   /**
    * Returns the latest [ReviewSchedule] for the prisoner identified by their prison number. The latest (most recently
@@ -45,7 +48,9 @@ class ReviewService(
    * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
    */
   fun getLatestReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
+      prisonNumber,
+    )
 
   /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is
@@ -111,7 +116,41 @@ class ReviewService(
     )
   }
 
-  private fun determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(sentenceType: SentenceType, releaseDate: LocalDate?): ReviewScheduleCalculationRule =
+  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto) {
+    // Check for an existing active review schedule
+    val existingReviewSchedule = runCatching {
+      getActiveReviewScheduleForPrisoner(createInitialReviewScheduleDto.prisonNumber)
+    }.getOrNull()
+
+    if (existingReviewSchedule != null) {
+      throw RuntimeException("An active review schedule already exists for prisoner ${createInitialReviewScheduleDto.prisonNumber}.")
+    }
+
+    // Calculate the review schedule window and rule
+    val releaseDate = createInitialReviewScheduleDto.prisonerReleaseDate
+    val reviewScheduleCalculationRule = determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
+      sentenceType = createInitialReviewScheduleDto.prisonerSentenceType,
+      releaseDate = releaseDate,
+    )
+    val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
+      ?: throw RuntimeException("Unable to determine review schedule for release date $releaseDate.")
+
+    // Persist the initial review schedule
+    reviewSchedulePersistenceAdapter.createReviewSchedule(
+      CreateReviewScheduleDto(
+        prisonNumber = createInitialReviewScheduleDto.prisonNumber,
+        prisonId = createInitialReviewScheduleDto.prisonId,
+        reviewScheduleWindow = reviewScheduleWindow,
+        scheduleCalculationRule = reviewScheduleCalculationRule,
+        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+      ),
+    )
+  }
+
+  private fun determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
+    sentenceType: SentenceType,
+    releaseDate: LocalDate?,
+  ): ReviewScheduleCalculationRule =
     when (sentenceType) {
       SentenceType.REMAND -> ReviewScheduleCalculationRule.PRISONER_ON_REMAND
       SentenceType.CONVICTED_UNSENTENCED -> ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
@@ -121,7 +160,12 @@ class ReviewService(
     }
 
   // TODO - refactor (possibly delete or make private) this method private when calculating the next review for a transfer or readmission has a dedicated service method
-  fun determineReviewScheduleCalculationRule(releaseDate: LocalDate?, sentenceType: SentenceType, isReAdmission: Boolean, isTransfer: Boolean): ReviewScheduleCalculationRule =
+  fun determineReviewScheduleCalculationRule(
+    releaseDate: LocalDate?,
+    sentenceType: SentenceType,
+    isReAdmission: Boolean,
+    isTransfer: Boolean,
+  ): ReviewScheduleCalculationRule =
     if (isReAdmission) {
       ReviewScheduleCalculationRule.PRISONER_READMISSION
     } else if (isTransfer) {
@@ -137,7 +181,10 @@ class ReviewService(
     }
 
   // TODO - make this method private when calculating the next review for a transfer or readmission has a dedicated service method
-  fun calculateReviewWindow(reviewScheduleCalculationRule: ReviewScheduleCalculationRule, releaseDate: LocalDate?): ReviewScheduleWindow? =
+  fun calculateReviewWindow(
+    reviewScheduleCalculationRule: ReviewScheduleCalculationRule,
+    releaseDate: LocalDate?,
+  ): ReviewScheduleWindow? =
     when (reviewScheduleCalculationRule) {
       ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
       ReviewScheduleCalculationRule.PRISONER_READMISSION, ReviewScheduleCalculationRule.PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays()
@@ -150,6 +197,7 @@ class ReviewService(
         val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate!!)
         ReviewScheduleWindow.fromOneToThreeMonthsMinusDays(8 - timeLeftToServe.days)
       }
+
       ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.PRISONER_ON_REMAND, ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
       ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
@@ -195,7 +243,9 @@ class ReviewService(
 
     fun isNoMoreThan3Months(): Boolean = months < 3 || isExactMonths(3)
     fun isBetween3MonthsAnd3Months7Days(): Boolean = months == 3L && days in 1..7
-    fun isBetween3Months8DaysAnd6Months(): Boolean = ((months == 3L && days >= 8) || months >= 4) && (months < 6 || isExactMonths(6))
+    fun isBetween3Months8DaysAnd6Months(): Boolean =
+      ((months == 3L && days >= 8) || months >= 4) && (months < 6 || isExactMonths(6))
+
     fun isBetween6And12Months(): Boolean = months >= 6 && !isExactMonths(6) && (months < 12 || isExactMonths(12))
     fun isBetween12And60Months(): Boolean = months >= 12 && !isExactMonths(12) && (months < 60 || isExactMonths(60))
     fun isMoreThan60Months(): Boolean = months >= 60 && !isExactMonths(60)

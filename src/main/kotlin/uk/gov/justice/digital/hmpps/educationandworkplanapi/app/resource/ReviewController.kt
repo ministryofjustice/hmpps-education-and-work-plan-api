@@ -75,7 +75,7 @@ class ReviewController(
     )
   }
 
-  private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
+  fun toSentenceType(legalStatus: LegalStatus): SentenceType =
     when (legalStatus) {
       LegalStatus.RECALL -> SentenceType.RECALL
       LegalStatus.DEAD -> SentenceType.DEAD

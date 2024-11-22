@@ -6,8 +6,12 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
@@ -31,6 +35,7 @@ class PefCiagKpiService(
   private val telemetryService: TelemetryService,
   private val timelineService: TimelineService,
   private val timelineEventFactory: TimelineEventFactory,
+  private val reviewService: ReviewService,
 
 ) : CiagKpiService() {
 
@@ -44,10 +49,24 @@ class PefCiagKpiService(
       return
     }
 
-    // If no induction schedule exists, check for an existing induction.
-    if (inductionPersistenceAdapter.getInduction(prisonNumber) != null) {
-      log.info { "Induction already exists for prisoner [$prisonNumber], creating a review." }
-      // TODO: Implement review creation/ TODO: Implement review creation
+    // Check for an existing induction before proceeding.
+    inductionPersistenceAdapter.getInduction(prisonNumber)?.let {
+      log.info { "Induction already exists for prisoner [$prisonNumber]. Creating a review schedule." }
+
+      val prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
+      val prisonerReleaseDate = prisoner.releaseDate
+      val prisonerSentenceType = toSentenceType(prisoner.legalStatus)
+      val prisonId = prisoner.prisonId ?: "N/A"
+
+      reviewService.createInitialReviewSchedule(
+        CreateInitialReviewScheduleDto(
+          prisonNumber = prisonNumber,
+          prisonerReleaseDate = prisonerReleaseDate,
+          prisonerSentenceType = prisonerSentenceType,
+          prisonId = prisonId,
+        ),
+      )
+      eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
       return
     }
 
@@ -78,4 +97,18 @@ class PefCiagKpiService(
     val numberOfDaysToAdd = 20
     return eventDate.atZone(europeLondon).toLocalDate().plusDays(numberOfDaysToAdd.toLong())
   }
+
+  fun toSentenceType(legalStatus: LegalStatus): SentenceType =
+    when (legalStatus) {
+      LegalStatus.RECALL -> SentenceType.RECALL
+      LegalStatus.DEAD -> SentenceType.DEAD
+      LegalStatus.INDETERMINATE_SENTENCE -> SentenceType.INDETERMINATE_SENTENCE
+      LegalStatus.SENTENCED -> SentenceType.SENTENCED
+      LegalStatus.CONVICTED_UNSENTENCED -> SentenceType.CONVICTED_UNSENTENCED
+      LegalStatus.CIVIL_PRISONER -> SentenceType.CIVIL_PRISONER
+      LegalStatus.IMMIGRATION_DETAINEE -> SentenceType.IMMIGRATION_DETAINEE
+      LegalStatus.REMAND -> SentenceType.REMAND
+      LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
+      LegalStatus.OTHER -> SentenceType.OTHER
+    }
 }

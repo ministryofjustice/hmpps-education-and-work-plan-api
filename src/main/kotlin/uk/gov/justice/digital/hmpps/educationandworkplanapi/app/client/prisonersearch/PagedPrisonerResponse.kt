@@ -11,6 +11,7 @@ data class Prisoner(
   val prisonerNumber: String,
   val legalStatus: LegalStatus,
   val releaseDate: LocalDate?,
+  val prisonId: String?,
 )
 
 enum class LegalStatus {
