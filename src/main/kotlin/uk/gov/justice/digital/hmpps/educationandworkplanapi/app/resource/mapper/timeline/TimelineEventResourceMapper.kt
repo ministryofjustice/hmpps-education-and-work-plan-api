@@ -37,6 +37,8 @@ class TimelineEventResourceMapper(
     when (timelineEventType) {
       TimelineEventTypeDomain.INDUCTION_CREATED -> TimelineEventTypeApi.INDUCTION_CREATED
       TimelineEventTypeDomain.INDUCTION_UPDATED -> TimelineEventTypeApi.INDUCTION_UPDATED
+      TimelineEventTypeDomain.INDUCTION_SCHEDULE_CREATED -> TimelineEventTypeApi.INDUCTION_SCHEDULE_CREATED
+      TimelineEventTypeDomain.INDUCTION_SCHEDULE_UPDATED -> TimelineEventTypeApi.INDUCTION_SCHEDULE_UPDATED
       TimelineEventTypeDomain.ACTION_PLAN_CREATED -> TimelineEventTypeApi.ACTION_PLAN_CREATED
       TimelineEventTypeDomain.GOAL_CREATED -> TimelineEventTypeApi.GOAL_CREATED
       TimelineEventTypeDomain.GOAL_UPDATED -> TimelineEventTypeApi.GOAL_UPDATED

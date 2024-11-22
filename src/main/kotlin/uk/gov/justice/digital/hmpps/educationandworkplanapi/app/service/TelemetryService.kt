@@ -4,6 +4,7 @@ import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_CREATED
@@ -14,6 +15,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTele
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UNARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionScheduleTelemetryEventType.INDUCTION_SCHEDULE_CREATED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionScheduleTelemetryEventType.INDUCTION_SCHEDULE_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_UPDATED
 import java.util.UUID
@@ -82,6 +85,20 @@ class TelemetryService(
     )
   }
 
+  fun trackInductionScheduleCreated(inductionSchedule: InductionSchedule) {
+    sendTelemetryEventForInductionSchedule(
+      inductionSchedule = inductionSchedule,
+      telemetryEventType = INDUCTION_SCHEDULE_CREATED,
+    )
+  }
+
+  fun trackInductionScheduleUpdated(inductionSchedule: InductionSchedule) {
+    sendTelemetryEventForInductionSchedule(
+      inductionSchedule = inductionSchedule,
+      telemetryEventType = INDUCTION_SCHEDULE_UPDATED,
+    )
+  }
+
   fun trackInductionUpdated(induction: Induction) {
     sendTelemetryEventForInduction(
       induction = induction,
@@ -128,4 +145,7 @@ class TelemetryService(
 
   private fun sendTelemetryEventForConversation(conversation: Conversation, telemetryEventType: ConversationTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(conversation))
+
+  private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) =
+    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
 }

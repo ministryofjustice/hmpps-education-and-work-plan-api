@@ -2050,6 +2050,8 @@ components:
       enum:
         - INDUCTION_CREATED
         - INDUCTION_UPDATED
+        - INDUCTION_SCHEDULE_CREATED
+        - INDUCTION_SCHEDULE_UPDATED
         - ACTION_PLAN_CREATED
         - GOAL_CREATED
         - GOAL_UPDATED

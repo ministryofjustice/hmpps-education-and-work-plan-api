@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
@@ -202,6 +203,23 @@ class TimelineEventFactory {
       actionedBy = goal.lastUpdatedBy!!,
       actionedByDisplayName = goal.lastUpdatedByDisplayName!!,
       contextualInfo = contextualInfo,
+      correlationId = correlationId,
+    )
+
+  fun inductionScheduleTimelineEvent(
+    inductionSchedule: InductionSchedule,
+    eventType: TimelineEventType,
+    correlationId: UUID = UUID.randomUUID(),
+  ) =
+    TimelineEvent.newTimelineEvent(
+      sourceReference = inductionSchedule.reference.toString(),
+      eventType = eventType,
+      prisonId = "N/A",
+      actionedBy = inductionSchedule.lastUpdatedBy!!,
+      contextualInfo = mapOf(
+        TimelineEventContext.INDUCTION_SCHEDULE_STATUS to inductionSchedule.scheduleStatus.name,
+        TimelineEventContext.INDUCTION_SCHEDULE_DEADLINE_DATE to inductionSchedule.deadlineDate.toString(),
+      ),
       correlationId = correlationId,
     )
 }
