@@ -118,6 +118,7 @@ class DomainConfiguration {
     telemetryService: TelemetryService,
     timelineEventFactory: TimelineEventFactory,
     timelineService: TimelineService,
+    reviewService: ReviewService,
   ): CiagKpiService? =
     when (ciagKpiProcessingRule) {
       "PEF" -> PefCiagKpiService(
@@ -128,6 +129,7 @@ class DomainConfiguration {
         telemetryService,
         timelineService,
         timelineEventFactory,
+        reviewService,
       )
 
       "PES" -> PesCiagKpiService(prisonerSearchApiClient)

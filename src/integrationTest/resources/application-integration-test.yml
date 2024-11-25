@@ -31,7 +31,14 @@ hmpps.sqs:
     inductionscheduleeventqueue:
       queueName: induction-schedule-event-queue
       subscribeFilter: "{\"eventType\":[\"plp.induction-schedule.updated\"]}"
-      dlqName: test-event-queue-dlq
+      dlqName: test-induction-event-queue-dlq
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
+    reviewscheduleeventqueue:
+      queueName: review-schedule-event-queue
+      subscribeFilter: "{\"eventType\":[\"plp.review-schedule.updated\"]}"
+      dlqName: test-review-event-queue-dlq
       subscribeTopicId: domainevents
       dlqMaxReceiveCount: 1
       visibilityTimeout: 1

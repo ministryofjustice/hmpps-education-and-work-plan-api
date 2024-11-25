@@ -1,13 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
@@ -31,27 +37,31 @@ class PefCiagKpiService(
   private val telemetryService: TelemetryService,
   private val timelineService: TimelineService,
   private val timelineEventFactory: TimelineEventFactory,
+  private val reviewService: ReviewService,
 
 ) : CiagKpiService() {
 
+  /**
+   * Process an prisoner admission.
+   *
+   * - If the prisoner is brand new create a new Induction schedule
+   * - If the prisoner already has an incomplete induction schedule (this will most likely be
+   * a duplicate message) then do nothing.
+   * - If the prisoner already has had their Induction created. Then this person is likely to
+   * be a coming back into prison and needs to resume their Reviews.
+   */
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
     log.info { "Creating or updating induction schedule for prisoner [$prisonNumber]" }
+    if (activeInductionScheduleAlreadyExists(prisonNumber)) return
 
-    // Check if an induction schedule already exists.
-    val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
-    if (existingSchedule != null) {
-      log.info { "Induction schedule already exists for prisoner [$prisonNumber], ignoring this message." }
+    if (inductionExists(prisonNumber)) {
+      createReviewScheduleForPrisoner(prisonNumber)
       return
     }
+    createNewInductionSchedule(prisonNumber, eventDate)
+  }
 
-    // If no induction schedule exists, check for an existing induction.
-    if (inductionPersistenceAdapter.getInduction(prisonNumber) != null) {
-      log.info { "Induction already exists for prisoner [$prisonNumber], creating a review." }
-      // TODO: Implement review creation/ TODO: Implement review creation
-      return
-    }
-
-    // Create a new induction schedule.
+  private fun createNewInductionSchedule(prisonNumber: String, eventDate: Instant) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.createInductionSchedule(
       CreateInductionScheduleDto(
         prisonNumber,
@@ -59,11 +69,44 @@ class PefCiagKpiService(
         InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       ),
     )
-    // send update event to domain event topic
-    eventPublisher.createAndPublishInductionEvent(
-      prisonerNumber = prisonNumber,
-    )
+    eventPublisher.createAndPublishInductionEvent(prisonNumber)
     telemetryService.trackInductionScheduleCreated(inductionSchedule)
+    recordInductionTimelineEvent(inductionSchedule)
+  }
+
+  private fun createReviewScheduleForPrisoner(prisonNumber: String) {
+    log.info { "Creating a review schedule for prisoner [$prisonNumber]" }
+    val prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
+    reviewService.createInitialReviewSchedule(
+      CreateInitialReviewScheduleDto(
+        prisonNumber = prisonNumber,
+        prisonerReleaseDate = prisoner.releaseDate,
+        prisonerSentenceType = toSentenceType(prisoner.legalStatus),
+        prisonId = prisoner.prisonId ?: "N/A",
+        isReadmission = true,
+        isTransfer = false,
+      ),
+    )
+    eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
+  }
+
+  private fun activeInductionScheduleAlreadyExists(prisonNumber: String): Boolean {
+    val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+    if (existingSchedule != null && existingSchedule.scheduleStatus != InductionScheduleStatus.COMPLETE) {
+      log.info { "Induction schedule already exists for prisoner [$prisonNumber], ignoring this message." }
+      return true
+    }
+    return false
+  }
+
+  private fun inductionExists(prisonNumber: String): Boolean {
+    return inductionPersistenceAdapter.getInduction(prisonNumber)?.let {
+      log.info { "Induction already exists for prisoner [$prisonNumber]. Creating a review schedule." }
+      true
+    } ?: false
+  }
+
+  private fun recordInductionTimelineEvent(inductionSchedule: InductionSchedule) {
     val timelineEvent = timelineEventFactory.inductionScheduleTimelineEvent(
       inductionSchedule,
       TimelineEventType.INDUCTION_SCHEDULE_CREATED,
@@ -78,4 +121,18 @@ class PefCiagKpiService(
     val numberOfDaysToAdd = 20
     return eventDate.atZone(europeLondon).toLocalDate().plusDays(numberOfDaysToAdd.toLong())
   }
+
+  private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
+    when (legalStatus) {
+      LegalStatus.RECALL -> SentenceType.RECALL
+      LegalStatus.DEAD -> SentenceType.DEAD
+      LegalStatus.INDETERMINATE_SENTENCE -> SentenceType.INDETERMINATE_SENTENCE
+      LegalStatus.SENTENCED -> SentenceType.SENTENCED
+      LegalStatus.CONVICTED_UNSENTENCED -> SentenceType.CONVICTED_UNSENTENCED
+      LegalStatus.CIVIL_PRISONER -> SentenceType.CIVIL_PRISONER
+      LegalStatus.IMMIGRATION_DETAINEE -> SentenceType.IMMIGRATION_DETAINEE
+      LegalStatus.REMAND -> SentenceType.REMAND
+      LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
+      LegalStatus.OTHER -> SentenceType.OTHER
+    }
 }
