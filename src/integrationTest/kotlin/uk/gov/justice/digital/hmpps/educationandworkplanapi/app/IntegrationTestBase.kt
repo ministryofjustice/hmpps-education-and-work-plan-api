@@ -25,6 +25,7 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
@@ -174,10 +175,17 @@ abstract class IntegrationTestBase {
 
   val inductionScheduleEventQueue by lazy {
     hmppsQueueService.findByQueueId("inductionscheduleeventqueue")
-      ?: throw MissingQueueException("HmppsQueue testeventqueue not found")
+      ?: throw MissingQueueException("HmppsQueue inductionscheduleeventqueue not found")
   }
   val testInductionScheduleEventQueueClient by lazy { inductionScheduleEventQueue.sqsClient }
   val testInductionScheduleEventQueueDlqClient by lazy { inductionScheduleEventQueue.sqsDlqClient }
+
+  val reviewScheduleEventQueue by lazy {
+    hmppsQueueService.findByQueueId("reviewscheduleeventqueue")
+      ?: throw MissingQueueException("HmppsQueue reviewscheduleeventqueue not found")
+  }
+  val testReviewScheduleEventQueueClient by lazy { reviewScheduleEventQueue.sqsClient }
+  val testReviewScheduleEventQueueDlqClient by lazy { reviewScheduleEventQueue.sqsDlqClient }
 
   @BeforeEach
   fun clearDatabase() {
@@ -199,8 +207,13 @@ abstract class IntegrationTestBase {
     ).get()
     testInductionScheduleEventQueueDlqClient!!.purgeQueue(
       PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.dlqUrl).build(),
-    )
-      .get()
+    ).get()
+    testReviewScheduleEventQueueClient.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.queueUrl).build(),
+    ).get()
+    testReviewScheduleEventQueueDlqClient!!.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.dlqUrl).build(),
+    ).get()
   }
 
   @BeforeEach
@@ -240,6 +253,15 @@ abstract class IntegrationTestBase {
         .exchange()
         .returnResult(TimelineResponse::class.java)
         .responseBody.blockFirst()!!
+    }
+
+  fun createPrisonerAPIStub(prisonNumber: String, prisoner: Prisoner): Prisoner =
+    run {
+      wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+        prisonNumber,
+        prisoner,
+      )
+      return prisoner
     }
 
   fun createInduction(
@@ -374,18 +396,35 @@ abstract class IntegrationTestBase {
       .returnResult(ActionPlanReviewsResponse::class.java)
       .responseBody.blockFirst()!!
 
-  internal fun HmppsQueue.receiveInductionScheduleEvent(): HmppsDomainEvent {
-    val event = receiveInductionScheduleEventsOnQueue().single()
-    sqsClient.purgeQueue { it.queueUrl(queueUrl) }
+  internal fun HmppsQueue.receiveEvent(queueType: QueueType): HmppsDomainEvent {
+    val event = receiveEventsOnQueue(queueType).single()
+    sqsClient.purgeQueue { it.queueUrl(queueType.queueUrl) }
     return event
   }
 
-  internal fun HmppsQueue.receiveInductionScheduleEventsOnQueue(maxMessages: Int = 10): List<HmppsDomainEvent> {
-    await untilCallTo { inductionScheduleEventQueue.countAllMessagesOnQueue() } matches { (it ?: 0) > 0 }
+  internal fun HmppsQueue.receiveEventsOnQueue(queueType: QueueType, maxMessages: Int = 10): List<HmppsDomainEvent> {
+    val messageCount = when (queueType) {
+      QueueType.INDUCTION -> inductionScheduleEventQueue.countAllMessagesOnQueue()
+      QueueType.REVIEW -> reviewScheduleEventQueue.countAllMessagesOnQueue()
+    }
+
+    val queueUrl = when (queueType) {
+      QueueType.INDUCTION -> inductionScheduleEventQueue.queueUrl
+      QueueType.REVIEW -> reviewScheduleEventQueue.queueUrl
+    }
+    await untilCallTo { messageCount } matches { (it ?: 0) > 0 }
     return sqsClient.receiveMessage(
-      ReceiveMessageRequest.builder().queueUrl(queueUrl).maxNumberOfMessages(maxMessages).build(),
+      ReceiveMessageRequest.builder()
+        .queueUrl(queueUrl)
+        .maxNumberOfMessages(maxMessages)
+        .build(),
     ).get().messages().map { objectMapper.readValue<Notification>(it.body()) }
       .map { objectMapper.readValue<HmppsDomainEvent>(it.message) }
+  }
+
+  enum class QueueType(val queueUrl: String) {
+    INDUCTION("inductionscheduleeventqueue"),
+    REVIEW("reviewQueueUrl"),
   }
 
   internal fun HmppsQueue.countAllMessagesOnQueue() = sqsClient.countAllMessagesOnQueue(queueUrl).get()

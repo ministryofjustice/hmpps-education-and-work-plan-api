@@ -52,7 +52,6 @@ class PefCiagKpiService(
    */
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
     log.info { "Creating or updating induction schedule for prisoner [$prisonNumber]" }
-
     if (activeInductionScheduleAlreadyExists(prisonNumber)) return
 
     if (inductionExists(prisonNumber)) {
@@ -76,6 +75,7 @@ class PefCiagKpiService(
   }
 
   private fun createReviewScheduleForPrisoner(prisonNumber: String) {
+    log.info { "Creating a review schedule for prisoner [$prisonNumber]" }
     val prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
     reviewService.createInitialReviewSchedule(
       CreateInitialReviewScheduleDto(

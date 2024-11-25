@@ -24,9 +24,10 @@ class EventPublisher(
 
   internal val eventTopic by lazy { hmppsQueueService.findByTopicId("domainevents") as HmppsTopic }
 
-  fun createAndPublishInductionEvent(prisonerNumber: String, occurredAt: Instant = Instant.now()) {
+  fun createAndPublishInductionEvent(prisonNumber: String, occurredAt: Instant = Instant.now()) {
+    log.info { "Publishing induction schedule for prisoner [$prisonNumber]" }
     createAndPublishEvent(
-      prisonerNumber = prisonerNumber,
+      prisonNumber = prisonNumber,
       occurredAt = occurredAt,
       eventType = "plp.induction-schedule.updated",
       description = "A prisoner learning plan induction schedule created or amended",
@@ -34,9 +35,10 @@ class EventPublisher(
     )
   }
 
-  fun createAndPublishReviewScheduleEvent(prisonerNumber: String) {
+  fun createAndPublishReviewScheduleEvent(prisonNumber: String) {
+    log.info { "Publishing review schedule for prisoner [$prisonNumber]" }
     createAndPublishEvent(
-      prisonerNumber = prisonerNumber,
+      prisonNumber = prisonNumber,
       occurredAt = Instant.now(),
       eventType = "plp.review-schedule.updated",
       description = "A prisoner learning plan review schedule created or amended",
@@ -57,7 +59,7 @@ class EventPublisher(
   }
 
   fun createAndPublishEvent(
-    prisonerNumber: String,
+    prisonNumber: String,
     occurredAt: Instant,
     eventType: String,
     description: String,
@@ -66,9 +68,9 @@ class EventPublisher(
     val event = HmppsDomainEvent(
       eventType = eventType,
       description = description,
-      detailUrl = constructDetailUrl(detailPath, prisonerNumber),
+      detailUrl = constructDetailUrl(detailPath, prisonNumber),
       occurredAt = occurredAt.atZone(ZoneId.of("Europe/London")).toLocalDateTime(),
-      personReference = PersonReference(identifiers = listOf(Identifier("NOMS", prisonerNumber))),
+      personReference = PersonReference(identifiers = listOf(Identifier("NOMS", prisonNumber))),
     )
     publishEvent(event)
   }
