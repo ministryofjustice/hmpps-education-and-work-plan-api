@@ -62,11 +62,11 @@ data class ReviewScheduleEntity(
   @CreationTimestamp
   var createdAt: Instant? = null
 
-  @Column(updatable = false)
+  @Column
   @LastModifiedBy
   var updatedBy: String? = null
 
-  @Column(updatable = false)
+  @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null
 
