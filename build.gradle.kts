@@ -5,14 +5,14 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.8"
-  id("org.openapi.generator") version "7.9.0"
-  kotlin("plugin.spring") version "2.0.21"
-  kotlin("plugin.jpa") version "2.0.21"
-  kotlin("kapt") version "2.0.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.0"
+  id("org.openapi.generator") version "7.10.0"
+  kotlin("plugin.spring") version "2.1.0"
+  kotlin("plugin.jpa") version "2.1.0"
+  kotlin("kapt") version "2.1.0"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.1.3"
+  id("name.remal.integration-tests") version "4.1.5"
 
   `java-test-fixtures`
 }
@@ -22,14 +22,14 @@ apply(plugin = "org.openapi.generator")
 val mapstructVersion = "1.6.3"
 val postgresqlVersion = "42.7.4"
 val kotlinLoggingVersion = "3.0.5"
-val springdocOpenapiVersion = "2.6.0"
-val hmppsSqsVersion = "5.1.1"
+val springdocOpenapiVersion = "2.7.0"
+val hmppsSqsVersion = "5.2.0"
 val awaitilityVersion = "4.2.2"
-val wiremockVersion = "3.9.2"
+val wiremockVersion = "3.10.0"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "9.47"
-val testContainersVersion = "1.20.3"
-val awsSdkVersion = "1.12.778"
+val testContainersVersion = "1.20.4"
+val awsSdkVersion = "1.12.779"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.16.1"
@@ -61,7 +61,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.8")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.1.0")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
