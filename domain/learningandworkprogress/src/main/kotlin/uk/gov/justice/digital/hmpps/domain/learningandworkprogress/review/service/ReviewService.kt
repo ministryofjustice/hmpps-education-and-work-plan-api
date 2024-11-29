@@ -116,7 +116,7 @@ class ReviewService(
     )
   }
 
-  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto) {
+  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? {
     // Check for an existing active review schedule
     val existingReviewSchedule = runCatching {
       getActiveReviewScheduleForPrisoner(createInitialReviewScheduleDto.prisonNumber)
@@ -128,25 +128,26 @@ class ReviewService(
 
     // Calculate the review schedule window and rule
     val releaseDate = createInitialReviewScheduleDto.prisonerReleaseDate
+    val sentenceType = createInitialReviewScheduleDto.prisonerSentenceType
     val reviewScheduleCalculationRule = determineReviewScheduleCalculationRule(
-      sentenceType = createInitialReviewScheduleDto.prisonerSentenceType,
+      sentenceType = sentenceType,
       releaseDate = releaseDate,
       isReAdmission = createInitialReviewScheduleDto.isReadmission,
       isTransfer = createInitialReviewScheduleDto.isTransfer,
     )
-    val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
-      ?: throw RuntimeException("Unable to determine review schedule for release date $releaseDate.")
-
-    // Persist the initial review schedule
-    reviewSchedulePersistenceAdapter.createReviewSchedule(
-      CreateReviewScheduleDto(
-        prisonNumber = createInitialReviewScheduleDto.prisonNumber,
-        prisonId = createInitialReviewScheduleDto.prisonId,
-        reviewScheduleWindow = reviewScheduleWindow,
-        scheduleCalculationRule = reviewScheduleCalculationRule,
-        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
-      ),
-    )
+    // Persist the initial review schedule if a ReviewScheduleWindow is calculated
+    return calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
+      ?.let {
+        reviewSchedulePersistenceAdapter.createReviewSchedule(
+          CreateReviewScheduleDto(
+            prisonNumber = createInitialReviewScheduleDto.prisonNumber,
+            prisonId = createInitialReviewScheduleDto.prisonId,
+            reviewScheduleWindow = it,
+            scheduleCalculationRule = reviewScheduleCalculationRule,
+            scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+          ),
+        )
+      }
   }
 
   private fun determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
@@ -157,8 +158,10 @@ class ReviewService(
       SentenceType.REMAND -> ReviewScheduleCalculationRule.PRISONER_ON_REMAND
       SentenceType.CONVICTED_UNSENTENCED -> ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
       SentenceType.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
+      SentenceType.SENTENCED, SentenceType.RECALL -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
 
-      else -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
+      SentenceType.DEAD, SentenceType.CIVIL_PRISONER, SentenceType.IMMIGRATION_DETAINEE, SentenceType.UNKNOWN, SentenceType.OTHER ->
+        throw UnsupportedOperationException("Calculating a review schedule for prisoner with sentence type $sentenceType is not supported")
     }
 
   // TODO - refactor (possibly delete or make private) this method private when calculating the next review for a transfer or readmission has a dedicated service method
@@ -173,13 +176,7 @@ class ReviewService(
     } else if (isTransfer) {
       ReviewScheduleCalculationRule.PRISONER_TRANSFER
     } else {
-      when (sentenceType) {
-        SentenceType.REMAND -> ReviewScheduleCalculationRule.PRISONER_ON_REMAND
-        SentenceType.CONVICTED_UNSENTENCED -> ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
-        SentenceType.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-
-        else -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
-      }
+      determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(sentenceType, releaseDate)
     }
 
   // TODO - make this method private when calculating the next review for a transfer or readmission has a dedicated service method

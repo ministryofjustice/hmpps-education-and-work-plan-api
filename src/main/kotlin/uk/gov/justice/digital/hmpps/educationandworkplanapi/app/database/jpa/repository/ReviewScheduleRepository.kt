@@ -16,4 +16,6 @@ interface ReviewScheduleRepository : JpaRepository<ReviewScheduleEntity, UUID> {
   fun findActiveReviewSchedule(prisonNumber: String): ReviewScheduleEntity?
 
   fun findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber: String): ReviewScheduleEntity?
+
+  fun findByPrisonNumberIn(prisonNumbers: List<String>): List<ReviewScheduleEntity>
 }
