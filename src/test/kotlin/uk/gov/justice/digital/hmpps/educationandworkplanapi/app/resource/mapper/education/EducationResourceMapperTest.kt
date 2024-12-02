@@ -2,6 +2,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.given
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
@@ -9,7 +16,9 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdateQualificationDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualification
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidAchievedQualificationToCreate
@@ -26,9 +35,17 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Qua
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel as EducationLevelApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
+@ExtendWith(MockitoExtension::class)
 class EducationResourceMapperTest {
 
-  private val educationResourceMapper = EducationResourceMapper(InstantMapper())
+  @InjectMocks
+  private lateinit var educationResourceMapper: EducationResourceMapper
+
+  @Mock
+  private lateinit var instantMapper: InstantMapper
+
+  @Mock
+  private lateinit var userService: ManageUserService
 
   @Test
   fun `should map PreviousQualifications to EducationResponse`() {
@@ -61,16 +78,23 @@ class EducationResourceMapperTest {
       ),
     )
 
+    val expectedDateTime = OffsetDateTime.now()
+    given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
+
     val expected = aValidEducationResponse(
       reference = educationReference,
       educationLevel = EducationLevelApi.FURTHER_EDUCATION_COLLEGE,
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
-      createdAt = OffsetDateTime.parse("2024-08-12T09:32:45.123Z"),
+      createdAt = expectedDateTime,
       createdAtPrison = "BXI",
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
-      updatedAt = OffsetDateTime.parse("2024-08-12T10:03:34.987Z"),
+      updatedAt = expectedDateTime,
       updatedAtPrison = "BXI",
       qualifications = listOf(
         aValidAchievedQualificationResponse(
@@ -79,9 +103,9 @@ class EducationResourceMapperTest {
           level = QualificationLevelApi.LEVEL_1,
           grade = "C",
           createdBy = "asmith_gen",
-          createdAt = OffsetDateTime.parse("2024-08-12T09:32:45.123Z"),
+          createdAt = expectedDateTime,
           updatedBy = "bjones_gen",
-          updatedAt = OffsetDateTime.parse("2024-08-12T10:03:34.987Z"),
+          updatedAt = expectedDateTime,
         ),
       ),
     )
@@ -91,6 +115,8 @@ class EducationResourceMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
+    verify(userService).getUserDetails("asmith_gen")
+    verify(userService).getUserDetails("bjones_gen")
   }
 
   @Test

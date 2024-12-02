@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdateOrCreateQualificationDto.UpdateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.AchievedQualificationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateAchievedQualificationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
@@ -21,7 +22,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Educa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.QualificationLevel as QualificationLevelApi
 
 @Component
-class EducationResourceMapper(private val instantMapper: InstantMapper) {
+class EducationResourceMapper(
+  private val instantMapper: InstantMapper,
+  private val userService: ManageUserService,
+) {
 
   fun toEducationResponse(previousQualifications: PreviousQualifications): EducationResponse =
     EducationResponse(
@@ -29,11 +33,11 @@ class EducationResourceMapper(private val instantMapper: InstantMapper) {
       createdAt = instantMapper.toOffsetDateTime(previousQualifications.createdAt)!!,
       createdAtPrison = previousQualifications.createdAtPrison,
       createdBy = previousQualifications.createdBy!!,
-      createdByDisplayName = previousQualifications.createdByDisplayName!!,
+      createdByDisplayName = userService.getUserDetails(previousQualifications.createdBy!!).name,
       updatedAt = instantMapper.toOffsetDateTime(previousQualifications.lastUpdatedAt)!!,
       updatedAtPrison = previousQualifications.lastUpdatedAtPrison,
       updatedBy = previousQualifications.lastUpdatedBy!!,
-      updatedByDisplayName = previousQualifications.lastUpdatedByDisplayName!!,
+      updatedByDisplayName = userService.getUserDetails(previousQualifications.lastUpdatedBy!!).name,
       educationLevel = toEducationLevel(previousQualifications.educationLevel),
       qualifications = toAchievedQualificationResponses(previousQualifications.qualifications),
     )
