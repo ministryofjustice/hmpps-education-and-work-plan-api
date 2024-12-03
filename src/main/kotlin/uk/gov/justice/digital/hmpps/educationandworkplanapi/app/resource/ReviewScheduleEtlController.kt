@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import io.swagger.v3.oas.annotations.Hidden
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,6 +22,7 @@ private val log = KotlinLogging.logger {}
 /**
  * Temporary controller class exposing REST API method that triggers the ETL of ReviewSchedule records
  */
+@Hidden
 @RestController
 class ReviewScheduleEtlController(
   private val prisonerSearchApiService: PrisonerSearchApiService,
