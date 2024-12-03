@@ -19,10 +19,6 @@ generic-service:
           deny all;
           return 401;
         }
-        location /action-plans/review-schedules/etl/**  {
-          deny all;
-          return 401;
-        }
 
   # Used to access resources like SQS queues and SNS topics
   serviceAccountName: hmpps-education-and-work-plan

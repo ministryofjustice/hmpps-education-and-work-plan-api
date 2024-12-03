@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import io.swagger.v3.oas.annotations.Hidden
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -34,6 +35,7 @@ class ReviewScheduleEtlController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
   @RequestMapping(value = ["/action-plans/review-schedules/etl/{prisonId}"])
   fun createReviewSchedulesForPrisonersInPrison(@PathVariable("prisonId") prisonId: String): ReviewSchedulesEtlResponse {
     // Create a ReviewSchedule for all prisoners in the given prison who need one

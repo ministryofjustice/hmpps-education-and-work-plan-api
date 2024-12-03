@@ -34,7 +34,6 @@ class ResourceServerConfiguration {
           "/swagger-ui.html",
           "/openapi/**",
           "/queue-admin/retry-all-dlqs",
-          "/action-plans/review-schedules/etl/**",
         ).forEach { authorize(it, permitAll) }
         authorize(anyRequest, authenticated)
       }

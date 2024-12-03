@@ -34,8 +34,6 @@ class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientT
         "/openapi/**",
         // HMPPS queue housekeeping endpoint
         "/queue-admin/retry-all-dlqs",
-        // temporary ETL endpoints
-        "/action-plans/review-schedules/etl/**",
       )
   }
 }

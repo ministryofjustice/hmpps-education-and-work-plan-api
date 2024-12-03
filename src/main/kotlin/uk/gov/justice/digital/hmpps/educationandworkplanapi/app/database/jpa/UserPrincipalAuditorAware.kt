@@ -26,7 +26,7 @@ class CurrentUser {
 
   init {
     with(SecurityContextHolder.getContext()?.authentication) {
-      if (this != null && this.isAuthenticated && this.principal !is String) {
+      if (this != null && this.isAuthenticated) {
         val principal = this.principal as DpsPrincipal
         username = principal.name
         displayName = principal.displayName
