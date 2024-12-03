@@ -35,7 +35,7 @@ class ReviewScheduleEtlController(
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @RequestMapping(value = ["/action-plans/review-schedules/etl/{prisonId}"])
-  fun createReviewSchedulesForPrisonersInPrison(@PathVariable("prisonId") prisonId: String) {
+  fun createReviewSchedulesForPrisonersInPrison(@PathVariable("prisonId") prisonId: String): ReviewSchedulesEtlResponse {
     // Create a ReviewSchedule for all prisoners in the given prison who need one
 
     val totalPrisonersInPrison: Int
@@ -112,28 +112,17 @@ class ReviewScheduleEtlController(
           }
         }
       }
-      .run {
-        log.debug {
-          """
-  
-            Prisoners requiring a Review Schedule
-            -------------------------------------
-            Total of $totalPrisonersInPrison prisoners in $prisonId.
-            Of those, $totalPrisonersWithReviewSchedule already have a Review Schedule, leaving ${totalPrisonersInPrison - totalPrisonersWithReviewSchedule} candidate prisoners.
-            Of those, $totalPrisonersWithInduction have an Induction, and $totalPrisonersWithActionPlan have an Induction and an Action Plan.
-            The $totalPrisonersWithActionPlan prisoners with both an Induction and an Action Plan are the candidate prisoners.
-            Of those, $totalSentencedPrisonersWithNoReleaseDate are SENTENCED but have no release date, leaving ${totalPrisonersWithActionPlan - totalSentencedPrisonersWithNoReleaseDate} prisoners as the candidate prisoners for having a Review Schedule created.
-            
-            Created Review Schedules
-            ------------------------          
-            Review Schedules for ${prisonersWithoutReviewSchedules.size} prisoners were not created:
-            $prisonersWithoutReviewSchedules
-            
-            Review Schedules for ${prisonersWithCreatedReviewSchedules.size} prisoners were successfully created:
-            $prisonersWithCreatedReviewSchedules
-          """.trimIndent()
-        }
-      }
+
+    return ReviewSchedulesEtlResponse(
+      prisonId = prisonId,
+      totalPrisonersInPrison = totalPrisonersInPrison,
+      totalPrisonersWithReviewSchedule = totalPrisonersWithReviewSchedule,
+      totalPrisonersWithInduction = totalPrisonersWithInduction,
+      totalPrisonersWithActionPlan = totalPrisonersWithActionPlan,
+      totalSentencedPrisonersWithNoReleaseDate = totalSentencedPrisonersWithNoReleaseDate,
+      prisonersWithCreatedReviewSchedules = prisonersWithCreatedReviewSchedules.toList(),
+      prisonersWithoutReviewSchedules = prisonersWithoutReviewSchedules.toList(),
+    )
   }
 
   private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
@@ -149,4 +138,35 @@ class ReviewScheduleEtlController(
       LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
       LegalStatus.OTHER -> SentenceType.OTHER
     }
+}
+
+data class ReviewSchedulesEtlResponse(
+  val prisonId: String,
+  val totalPrisonersInPrison: Int,
+  val totalPrisonersWithReviewSchedule: Int,
+  val totalPrisonersWithInduction: Int,
+  val totalPrisonersWithActionPlan: Int,
+  val totalSentencedPrisonersWithNoReleaseDate: Int,
+  val prisonersWithCreatedReviewSchedules: List<String>,
+  val prisonersWithoutReviewSchedules: List<String>,
+) {
+  val summary: String
+    get() =
+      """
+        Prisoners requiring a Review Schedule
+        -------------------------------------
+        Total of $totalPrisonersInPrison prisoners in $prisonId.
+        Of those, $totalPrisonersWithReviewSchedule already have a Review Schedule, leaving ${totalPrisonersInPrison - totalPrisonersWithReviewSchedule} candidate prisoners.
+        Of those, $totalPrisonersWithInduction have an Induction, and $totalPrisonersWithActionPlan have an Induction and an Action Plan.
+        The $totalPrisonersWithActionPlan prisoners with both an Induction and an Action Plan are the candidate prisoners.
+        Of those, $totalSentencedPrisonersWithNoReleaseDate are SENTENCED but have no release date, leaving ${totalPrisonersWithActionPlan - totalSentencedPrisonersWithNoReleaseDate} prisoners as the candidate prisoners for having a Review Schedule created.
+        
+        Created Review Schedules
+        ------------------------          
+        Review Schedules for ${prisonersWithoutReviewSchedules.size} prisoners were not created:
+        $prisonersWithoutReviewSchedules
+        
+        Review Schedules for ${prisonersWithCreatedReviewSchedules.size} prisoners were successfully created:
+        $prisonersWithCreatedReviewSchedules
+      """.trimIndent()
 }
