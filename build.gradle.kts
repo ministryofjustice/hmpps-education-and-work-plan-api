@@ -7,9 +7,9 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.0"
   id("org.openapi.generator") version "7.10.0"
-  kotlin("plugin.spring") version "2.1.0"
-  kotlin("plugin.jpa") version "2.1.0"
-  kotlin("kapt") version "2.1.0"
+  kotlin("plugin.spring") version "2.0.21"
+  kotlin("plugin.jpa") version "2.0.21"
+  kotlin("kapt") version "2.0.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "4.1.5"
@@ -32,7 +32,7 @@ val testContainersVersion = "1.20.4"
 val awsSdkVersion = "1.12.779"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
-ext["jackson-bom.version"] = "2.16.1"
+ext["jackson-bom.version"] = "2.18.1"
 
 allOpen {
   annotations(
