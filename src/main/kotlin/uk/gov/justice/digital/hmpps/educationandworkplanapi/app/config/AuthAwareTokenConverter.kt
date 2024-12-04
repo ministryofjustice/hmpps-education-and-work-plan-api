@@ -30,7 +30,7 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
     return if (claims.containsKey("user_name")) {
       claims["user_name"] as String
     } else {
-      claims["client_id"] as String
+      "system"
     }
   }
 
