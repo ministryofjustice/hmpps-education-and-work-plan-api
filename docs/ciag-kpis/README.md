@@ -26,9 +26,16 @@ Files in this folder with the extension `.mermaid` are Mermaid Charts.
 You can either install the intellij plugin to be able to edit and view the resultant charts in your IDE, or you can 
 copy and paste the file content into the [online Mermaid editor](https://www.mermaidchart.com/).
 
+**Please note** - In the sequence diagrams coloured boxes are used to group together and designate higher level
+processes. Without the boxes it is hard to see where one process ends and another starts.
+* Blue boxes represent PLP based processing
+* Green boxes represent the HMPPS Integration API
+* Red boxes represent Curious based processes
+
 ## CIAG KPI 1
 KPI 1 is about measuring the CIAGs performance in respect of completing Inductions on time.
 
+### PEF vs PES
 The new CIAG contracts technically start from April 2025, but Curious 2 won't go live until October 2025, so between 
 April 2025 and October 2025, even though technically the CIAGs are under the new contracts, not all of it can be 
 supported because Curious 1 is still being used. IE. PEF will still be in place which does not support the Curious data 
@@ -49,11 +56,6 @@ but TBC); without any regard for when screenings and assessments might or might 
 This folder contains 2 sequence diagrams that cover KPI 1, one for PEF April 2025 to October 2025, and one for
 PES October 2025 onwards.
 
-**Please note** - In the sequence diagrams coloured boxes are used to group together and designate higher level
-processes. Without the boxes it is hard to see where one process ends and another starts.
-* Blue boxes represent PLP based processing
-* Green boxes represent the HMPPS Integration API
-* Red boxes represent Curious based processes
-
 ## CIAG KPI 2
-TODO ....
+KPI 2 is about measuring the CIAGs performance in respect of completing Reviews on time.
+
