@@ -3,7 +3,7 @@
 %%
 
 sequenceDiagram
-  title : KPI 1 (PEF - April 2025 to October 2025)
+  title : KPI 2
 
   actor Prisoner as Prisoner
   actor CIAG as CIAG
@@ -22,14 +22,14 @@ sequenceDiagram
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.received event<br/>reason: admission
       DomainEvents -) PLP: prison-offender-events.prisoner.received event
-      alt Prisoner does not have a PLP
+      alt Prisoner already has a PLP
         activate PLPDB
-          PLP ->> PLPDB: Create new Induction Schedule record
-          note right of PLPDB: Induction deadline date<br/>set to today + 20 days
+          PLP ->> PLPDB: Create or update Review Schedule record
+          note right of PLPDB: Review deadline date<br/>set to today + 10 days
         deactivate PLPDB
-        PLP -) DomainEvents: plp.induction-schedule.updated event
-      else Prisoner already has a PLP<br/>eg. re-offending prisoner
-        note over PLP: Refer to Review process for KPI2 - CIAG KPI2.mermaid
+        PLP -) DomainEvents: plp.review-schedule.updated event
+      else Prisoner does not have a PLP<br/>eg. new prisoner, or re-offending prisoner from before PLP existed
+        note over PLP: Refer to Induction process for KPI1 - CIAG KPI1 - PEF Apr 25 to Oct 25.mermaid
       end
     deactivate PLP
   end
@@ -43,14 +43,14 @@ sequenceDiagram
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.received event<br/>reason: transferred
       DomainEvents -) PLP: prison-offender-events.prisoner.received event
-      alt Prisoner does not have a PLP
+      alt Prisoner already has a PLP
         activate PLPDB
-          PLP ->> PLPDB: Create new Induction Schedule record
-          note right of PLPDB: Induction deadline date<br/>set to today + 20 days
+          PLP ->> PLPDB: Create or update Review Schedule record
+          note right of PLPDB: Review deadline date<br/>set to today + 10 days
         deactivate PLPDB
-        PLP -) DomainEvents: plp.induction-schedule.updated event
-      else Prisoner already has a PLP<br/>eg. PLP was done in previous prison
-        note over PLP: Refer to Review process for KPI2 - CIAG KPI2.mermaid
+        PLP -) DomainEvents: plp.review-schedule.updated event
+      else Prisoner does not have a PLP<br/>eg. new prisoner, or re-offending prisoner from before PLP existed
+        note over PLP: Refer to Induction process for KPI1 - CIAG KPI1 - PEF Apr 25 to Oct 25.mermaid
       end
     deactivate PLP
   end
@@ -63,9 +63,9 @@ sequenceDiagram
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.released event
       DomainEvents -) PLP: prison-offender-events.prisoner.released event
-      opt Prisoner has a PLP
+      opt Prisoner has a Review scheduled
         PLP ->> PLPDB: Record exemption reason
-        PLP -) DomainEvents: plp.induction-schedule.updated event
+        PLP -) DomainEvents: plp.review-schedule.updated event
       end
     deactivate PLP
   end
@@ -78,9 +78,9 @@ sequenceDiagram
     activate PLP
       note left of PLP: PLP API processes<br/>prisoner.released event<br/>nomisMovementReasonCode: DEC
       DomainEvents -) PLP: prison-offender-events.prisoner.released event
-      opt Prisoner has a PLP
+      opt Prisoner has a Review scheduled
         PLP ->> PLPDB: Record exemption reason
-        PLP -) DomainEvents: plp.induction-schedule.updated event
+        PLP -) DomainEvents: plp.review-schedule.updated event
       end
     deactivate PLP
   end
@@ -88,13 +88,13 @@ sequenceDiagram
   rect rgba(0, 200, 255, 0.4)
     activate CIAG
       activate PLP
-        CIAG ->> PLP: Do prisoner's Induction
-        alt Prisoners Induction could not be completed due to exemptions
+        CIAG ->> PLP: Do prisoner's Review
+        alt Prisoners Review could not be completed due to exemptions
           PLP ->> PLPDB: Record exemption reason
         else
-          PLP ->> PLPDB: Record prisoner's induction
+          PLP ->> PLPDB: Record prisoner's review
         end
-        PLP -) DomainEvents: plp.induction-schedule.updated event
+        PLP -) DomainEvents: plp.review-schedule.updated event
       deactivate PLP
     deactivate CIAG
   end
@@ -102,39 +102,39 @@ sequenceDiagram
   rect rgba(0, 200, 255, 0.4)
     activate CIAG
       activate PLP
-        CIAG ->> PLP: Clear prisoner's Induction exemption
+        CIAG ->> PLP: Clear prisoner's Review exemption
         PLP ->> PLPDB: Clear exemption reason
-        PLP ->> PLPDB: Update Induction Schedule record
-        note right of PLPDB: Induction deadline date<br/>set to today + 5 days
-        PLP -) DomainEvents: plp.induction-schedule.updated event
+        PLP ->> PLPDB: Update Review Schedule record
+        note right of PLPDB: Review deadline date<br/>set to today + 5 days (exclusions), or today + 10 days (exemptions)
+        PLP -) DomainEvents: plp.review-schedule.updated event
       deactivate PLP
     deactivate CIAG
   end
 
   rect rgba(0, 255, 200, 0.4)
     activate Integration
-      note left of Integration: HMPPS Integration API processes<br/>plp.induction-schedule.updated event
-      DomainEvents -) Integration: plp.induction-schedule.updated event
-      Integration -) DomainEvents: PLP_INDUCTION_SCHEDULE_CHANGED event
+      note left of Integration: HMPPS Integration API processes<br/>plp.review-schedule.updated event
+      DomainEvents -) Integration: plp.review-schedule.updated event
+      Integration -) DomainEvents: PLP_REVIEW_SCHEDULE_CHANGED event
     deactivate Integration
   end
 
   rect rgba(255, 100, 100, 0.4)
     activate Curious
-      note left of Curious: Curious processes<br/>PLP_INDUCTION_SCHEDULE_CHANGED event
-      DomainEvents -) Curious: PLP_INDUCTION_SCHEDULE_CHANGED event
-      Curious ->> Integration: get prisoner's Induction Schedule
+      note left of Curious: Curious processes<br/>PLP_REVIEW_SCHEDULE_CHANGED event
+      DomainEvents -) Curious: PLP_REVIEW_SCHEDULE_CHANGED event
+      Curious ->> Integration: get prisoner's Review Schedule
       activate Integration
-        Integration ->> PLP: get prisoner's Induction Schedule
+        Integration ->> PLP: get prisoner's Review Schedule
         activate PLP
-          PLP ->> PLPDB: get prisoner's Induction Schedule
-          PLPDB ->> PLP: prisoner's Induction Schedule
-          PLP ->> Integration: prisoner's Induction Schedule
+          PLP ->> PLPDB: get prisoner's Review Schedule
+          PLPDB ->> PLP: prisoner's Review Schedule
+          PLP ->> Integration: prisoner's Review Schedule
         deactivate PLP
-        Integration ->> Integration: Map prisoner's PLP Induction Schedule into Integration API Induction Schedule response
-        Integration ->> Curious: prisoner's Induction Schedule
+        Integration ->> Integration: Map prisoner's PLP Review Schedule into Integration API Review Schedule response
+        Integration ->> Curious: prisoner's Review Schedule
       deactivate Integration
-      note left of Curious: Curious processes prisoner's Induction Schedule<br/>in order to produce reports
+      note left of Curious: Curious processes prisoner's Review Schedule<br/>in order to produce reports
     deactivate Curious
   end
 
