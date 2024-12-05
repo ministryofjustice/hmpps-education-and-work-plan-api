@@ -49,6 +49,7 @@ class TimelineEventResourceMapper(
       TimelineEventTypeDomain.STEP_NOT_STARTED -> TimelineEventTypeApi.STEP_NOT_STARTED
       TimelineEventTypeDomain.STEP_STARTED -> TimelineEventTypeApi.STEP_STARTED
       TimelineEventTypeDomain.STEP_COMPLETED -> TimelineEventTypeApi.STEP_COMPLETED
+      TimelineEventTypeDomain.ACTION_PLAN_REVIEW_COMPLETED -> TimelineEventTypeApi.ACTION_PLAN_REVIEW_COMPLETED
       TimelineEventTypeDomain.CONVERSATION_CREATED -> TimelineEventTypeApi.CONVERSATION_CREATED
       TimelineEventTypeDomain.CONVERSATION_UPDATED -> TimelineEventTypeApi.CONVERSATION_UPDATED
       TimelineEventTypeDomain.PRISON_ADMISSION -> TimelineEventTypeApi.PRISON_ADMISSION

@@ -22,6 +22,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
@@ -368,6 +369,26 @@ class TelemetryServiceTest {
 
       // Then
       verify(telemetryClient).trackEvent("CONVERSATION_UPDATED", expectedEventProperties)
+    }
+  }
+
+  @Nested
+  inner class TrackReviewCompletedEvents {
+    @Test
+    fun `should track review completed event`() {
+      // Given
+      val completedReview = aValidCompletedReview()
+      val expectedEventProperties = mapOf(
+        "reference" to completedReview.reference.toString(),
+        "prisonId" to completedReview.createdAtPrison,
+        "userId" to completedReview.createdBy,
+      )
+
+      // When
+      telemetryService.trackReviewCompleted(completedReview)
+
+      // Then
+      verify(telemetryClient).trackEvent("REVIEW_COMPLETED", expectedEventProperties)
     }
   }
 }

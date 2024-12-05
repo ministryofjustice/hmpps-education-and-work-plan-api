@@ -28,6 +28,7 @@ private val log = KotlinLogging.logger {}
  * domain.
  */
 class ReviewService(
+  private val reviewEventService: ReviewEventService,
   private val reviewPersistenceAdapter: ReviewPersistenceAdapter,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
 ) {
@@ -113,7 +114,9 @@ class ReviewService(
         // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
         completedReviewSchedule!!
       },
-    )
+    ).also {
+      reviewEventService.reviewCompleted(it.completedReview)
+    }
   }
 
   fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? {
