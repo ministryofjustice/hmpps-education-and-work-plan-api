@@ -16,7 +16,9 @@ class TimelineEventEntityMapper {
         reference = reference,
         sourceReference = sourceReference,
         eventType = toTimelineEventType(eventType),
-        contextualInfo = contextualInfo?.let { toEntityContextualInfo(it) },
+        contextualInfo = contextualInfo?.let { contextualInfo ->
+          contextualInfo.keys.associate { toTimelineEventContext(it) to contextualInfo.getValue(it) }
+        },
         prisonId = prisonId,
         actionedBy = actionedBy,
         actionedByDisplayName = actionedByDisplayName,
@@ -31,7 +33,9 @@ class TimelineEventEntityMapper {
         reference = reference!!,
         sourceReference = sourceReference!!,
         eventType = toTimelineEventType(eventType!!),
-        contextualInfo = contextualInfo?.let { toDomainContextualInfo(it) },
+        contextualInfo = contextualInfo?.let { contextualInfo ->
+          contextualInfo.keys.associate { toTimelineEventContext(it) to contextualInfo.getValue(it) }
+        },
         prisonId = prisonId!!,
         actionedBy = actionedBy!!,
         // TODO, this display name field will be removed from the domain as part of the RBAC work, so no point mapping it
@@ -122,14 +126,4 @@ class TimelineEventEntityMapper {
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE
     }
-
-  private fun toDomainContextualInfo(contextualInfo: Map<TimelineEventContextEntity, String>): Map<TimelineEventContextDomain, String> =
-    mapOf(
-      *contextualInfo.keys.map { toTimelineEventContext(it) to contextualInfo.getValue(it) }.toTypedArray(),
-    )
-
-  private fun toEntityContextualInfo(contextualInfo: Map<TimelineEventContextDomain, String>): Map<TimelineEventContextEntity, String> =
-    mapOf(
-      *contextualInfo.keys.map { toTimelineEventContext(it) to contextualInfo.getValue(it) }.toTypedArray(),
-    )
 }
