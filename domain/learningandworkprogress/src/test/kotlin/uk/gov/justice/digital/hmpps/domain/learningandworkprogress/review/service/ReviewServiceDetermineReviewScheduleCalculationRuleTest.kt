@@ -21,6 +21,9 @@ class ReviewServiceDetermineReviewScheduleCalculationRuleTest {
   private lateinit var service: ReviewService
 
   @Mock
+  private lateinit var reviewEventService: ReviewEventService
+
+  @Mock
   private lateinit var reviewPersistenceAdapter: ReviewPersistenceAdapter
 
   @Mock

@@ -1,6 +1,13 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -15,9 +22,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -236,6 +245,28 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
               .hasContent("A great review today; prisoner is making good progress towards his goals")
           }
       }
+
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(1) {
+          it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_COMPLETED)
+            .wasActionedBy("auser_gen")
+            .hasActionedByDisplayName("Albert User")
+        }
+
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+
+      verify(telemetryClient).trackEvent(
+        eq("REVIEW_COMPLETED"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+
+      val reviewCompleteEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(reviewCompleteEventProperties)
+        .containsEntry("reference", reviews.completedReviews.first().reference.toString())
+    }
   }
 
   // TODO - replace with a relevant service call once we have that developed

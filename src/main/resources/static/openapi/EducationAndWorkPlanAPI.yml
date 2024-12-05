@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.5'
+  version: '1.17.6'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2062,6 +2062,7 @@ components:
         - STEP_NOT_STARTED
         - STEP_STARTED
         - STEP_COMPLETED
+        - ACTION_PLAN_REVIEW_COMPLETED
         - CONVERSATION_CREATED
         - CONVERSATION_UPDATED
         - PRISON_ADMISSION
