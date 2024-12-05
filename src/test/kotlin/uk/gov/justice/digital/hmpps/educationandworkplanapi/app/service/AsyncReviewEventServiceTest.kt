@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLET
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_ENTERED_ONLINE_AT
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_ENTERED_ONLINE_BY
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_NOTES
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
@@ -75,6 +76,7 @@ class AsyncReviewEventServiceTest {
         COMPLETED_REVIEW_ENTERED_ONLINE_AT to completedReview.createdAt.toString(),
         COMPLETED_REVIEW_ENTERED_ONLINE_BY to "Alex Smith",
         COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE to completedReview.completedDate.toString(),
+        COMPLETED_REVIEW_NOTES to completedReview.note.content,
       ),
     )
 
@@ -118,6 +120,7 @@ class AsyncReviewEventServiceTest {
         COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE to completedReview.completedDate.toString(),
         COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY to "Fred Bloggs",
         COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE to "Peer Mentor",
+        COMPLETED_REVIEW_NOTES to completedReview.note.content,
       ),
     )
 

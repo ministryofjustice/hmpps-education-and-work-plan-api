@@ -105,6 +105,7 @@ class TimelineEventEntityMapper {
       TimelineEventContextEntity.INDUCTION_SCHEDULE_DEADLINE_DATE -> TimelineEventContextDomain.INDUCTION_SCHEDULE_DEADLINE_DATE
       TimelineEventContextEntity.COMPLETED_REVIEW_ENTERED_ONLINE_AT -> TimelineEventContextDomain.COMPLETED_REVIEW_ENTERED_ONLINE_AT
       TimelineEventContextEntity.COMPLETED_REVIEW_ENTERED_ONLINE_BY -> TimelineEventContextDomain.COMPLETED_REVIEW_ENTERED_ONLINE_BY
+      TimelineEventContextEntity.COMPLETED_REVIEW_NOTES -> TimelineEventContextDomain.COMPLETED_REVIEW_NOTES
       TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE -> TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE
       TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY -> TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY
       TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE -> TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE
@@ -122,6 +123,7 @@ class TimelineEventEntityMapper {
       TimelineEventContextDomain.INDUCTION_SCHEDULE_DEADLINE_DATE -> TimelineEventContextEntity.INDUCTION_SCHEDULE_DEADLINE_DATE
       TimelineEventContextDomain.COMPLETED_REVIEW_ENTERED_ONLINE_AT -> TimelineEventContextEntity.COMPLETED_REVIEW_ENTERED_ONLINE_AT
       TimelineEventContextDomain.COMPLETED_REVIEW_ENTERED_ONLINE_BY -> TimelineEventContextEntity.COMPLETED_REVIEW_ENTERED_ONLINE_BY
+      TimelineEventContextDomain.COMPLETED_REVIEW_NOTES -> TimelineEventContextEntity.COMPLETED_REVIEW_NOTES
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE
