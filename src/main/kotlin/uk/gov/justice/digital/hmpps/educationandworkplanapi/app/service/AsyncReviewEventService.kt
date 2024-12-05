@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLET
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_ENTERED_ONLINE_AT
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_ENTERED_ONLINE_BY
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_NOTES
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 
@@ -45,6 +46,7 @@ class AsyncReviewEventService(
           COMPLETED_REVIEW_ENTERED_ONLINE_AT to createdAt.toString(),
           COMPLETED_REVIEW_ENTERED_ONLINE_BY to userService.getUserDetails(createdBy).name,
           COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
+          COMPLETED_REVIEW_NOTES to note.content,
           *conductedBy
             ?.let {
               arrayOf(
