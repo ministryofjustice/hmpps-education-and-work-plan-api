@@ -7,12 +7,12 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.0"
   id("org.openapi.generator") version "7.10.0"
-  kotlin("plugin.spring") version "2.0.21"
-  kotlin("plugin.jpa") version "2.0.21"
-  kotlin("kapt") version "2.0.21"
+  kotlin("plugin.spring") version "2.1.0"
+  kotlin("plugin.jpa") version "2.1.0"
+  kotlin("kapt") version "2.1.0"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.1.5"
+  id("name.remal.integration-tests") version "4.1.6"
 
   `java-test-fixtures`
 }
