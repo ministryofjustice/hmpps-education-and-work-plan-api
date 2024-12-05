@@ -2886,9 +2886,12 @@ components:
       description: A request to update the status of the current review schedule for example to set an exemption.
       type: object
       properties:
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
         status:
           $ref: '#/components/schemas/ReviewScheduleStatus'
       required:
+        - prisonId
         - status
 
     CreateActionPlanReviewResponse:
