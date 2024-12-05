@@ -12,15 +12,26 @@ class PrisonerSearchApiService(
   private val prisonerSearchApiClient: PrisonerSearchApiClient,
 ) {
 
-  fun getAllPrisonersInPrison(prisonId: String): List<Prisoner> =
-    prisonerSearchApiClient.getPrisonersByPrisonId(
-      prisonId = prisonId,
-      page = PrisonerSearchApiClient.FIRST_PAGE,
-      pageSize = PrisonerSearchApiClient.DEFAULT_PAGE_SIZE,
-    ).content
+  fun getAllPrisonersInPrison(prisonId: String): List<Prisoner> {
+    var page = 0
+    val pageSize = 250
+
+    val prisoners = mutableListOf<Prisoner>()
+
+    do {
+      val apiResponse = prisonerSearchApiClient.getPrisonersByPrisonId(
+        prisonId = prisonId,
+        page = page++,
+        pageSize = pageSize,
+      )
+      prisoners.addAll(apiResponse.content)
+    } while (apiResponse.last != true)
+
+    return prisoners.toList()
       .also {
-        log.debug { "Returned ${it.size} prisoners for prison $prisonId from Prisoner Search API" }
+        log.debug { "Returned ${it.size} prisoners for prison $prisonId from $page calls to Prisoner Search API" }
       }
+  }
 
   fun getPrisoner(prisonNumber: String): Prisoner =
     prisonerSearchApiClient.getPrisoner(prisonNumber)

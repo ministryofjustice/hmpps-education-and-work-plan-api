@@ -28,7 +28,7 @@ class PrisonerSearchApiServiceTest {
   private lateinit var prisonerSearchApiClient: PrisonerSearchApiClient
 
   @Test
-  fun `should get all prisoners in a given prison`() {
+  fun `should get all prisoners in a prison given they are all returned in the first request`() {
     // Given
     val prisonId = "BXI"
 
@@ -55,7 +55,53 @@ class PrisonerSearchApiServiceTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedPrisoners)
-    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 0, 9999)
+    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 0, 250)
+  }
+
+  @Test
+  fun `should get all prisoners in a prison given they are returned over multiple requests`() {
+    // Given
+    val prisonId = "BXI"
+
+    val prisonersReturnedInFirstPage = List(250) { index ->
+      Prisoner(
+        prisonerNumber = "A${index.toString().padEnd(4, '0')}BC",
+        legalStatus = LegalStatus.SENTENCED,
+        releaseDate = LocalDate.now().plusYears(1),
+        prisonId = "BXI",
+      )
+    }
+    val prisonersReturnedInSecondPage = List(250) { index ->
+      Prisoner(
+        prisonerNumber = "A${(250 + index).toString().padEnd(4, '0')}BC",
+        legalStatus = LegalStatus.SENTENCED,
+        releaseDate = LocalDate.now().plusYears(1),
+        prisonId = "BXI",
+      )
+    }
+    val prisonersReturnedInThirdPage = List(50) { index ->
+      Prisoner(
+        prisonerNumber = "A${(500 + index).toString().padEnd(4, '0')}BC",
+        legalStatus = LegalStatus.SENTENCED,
+        releaseDate = LocalDate.now().plusYears(1),
+        prisonId = "BXI",
+      )
+    }
+
+    given(prisonerSearchApiClient.getPrisonersByPrisonId(any(), any(), any())).willReturn(
+      PagedPrisonerResponse(false, prisonersReturnedInFirstPage),
+      PagedPrisonerResponse(false, prisonersReturnedInSecondPage),
+      PagedPrisonerResponse(true, prisonersReturnedInThirdPage),
+    )
+
+    // When
+    val actual = service.getAllPrisonersInPrison(prisonId)
+
+    // Then
+    assertThat(actual.size).isEqualTo(550)
+    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 0, 250)
+    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 1, 250)
+    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 2, 250)
   }
 
   @Test
@@ -76,7 +122,7 @@ class PrisonerSearchApiServiceTest {
 
     // Then
     assertThat(exception).isEqualTo(expectedException)
-    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 0, 9999)
+    verify(prisonerSearchApiClient).getPrisonersByPrisonId("BXI", 0, 250)
   }
 
   @Test
