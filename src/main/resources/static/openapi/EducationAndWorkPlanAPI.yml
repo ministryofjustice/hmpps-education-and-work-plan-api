@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.6'
+  version: '1.17.7'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -223,6 +223,34 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: create-action-plan-review
+
+  #
+  # Action Plan Review status update
+  # --------------------------------------------------------------------------------
+  '/action-plans/{prisonNumber}/reviews/shedule-status':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    put:
+      summary: updates the status for the current review schedule.
+      description: |
+        This is used to exempt or remove an exemption from a review schedule.
+        
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
+
+      tags:
+        - Action Plan Reviews
+      responses:
+        '204':
+          description: The review schedule status update request was processed successfully.
+        '409':
+          description: Invalid review schedule status change.
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: review-schedule-status
+      requestBody:
+        $ref: '#/components/requestBodies/ReviewScheduleStatus'
 
   #
   # Goals
@@ -2852,6 +2880,20 @@ components:
         - note
         - conductedAt
 
+    ### Action Plan Review Exemption ###
+    CreateReviewScheduleStatusRequest:
+      title: CreateReviewScheduleStatusRequest
+      description: A request to update the status of the current review schedule for example to set an exemption.
+      type: object
+      properties:
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
+        status:
+          $ref: '#/components/schemas/ReviewScheduleStatus'
+      required:
+        - prisonId
+        - status
+
     CreateActionPlanReviewResponse:
       title: CreateActionPlanReviewResponse
       description: Response body detailing whether this was the prisoner's last review before release, and the latest scheduled review.
@@ -3445,6 +3487,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateActionPlanReviewRequest'
+    ReviewScheduleStatus:
+      description: Request body to update a review schedule status.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateReviewScheduleStatusRequest'
   parameters:
     prisonNumberPathParameter:
       name: prisonNumber
