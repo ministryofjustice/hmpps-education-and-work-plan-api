@@ -201,6 +201,9 @@ abstract class IntegrationTestBase {
     conversationRepository.deleteAll()
     reviewRepository.deleteAll()
     reviewScheduleRepository.deleteAll()
+    reviewScheduleHistoryRepository.deleteAll()
+    noteRepository.deleteAll()
+    inductionScheduleRepository.deleteAll()
 
     // clear all the queues just in case there are any messages hanging around
     domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()

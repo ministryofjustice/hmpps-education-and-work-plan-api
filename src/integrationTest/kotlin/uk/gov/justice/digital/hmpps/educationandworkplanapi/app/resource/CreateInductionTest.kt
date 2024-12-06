@@ -19,12 +19,15 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkExperiencesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class CreateInductionTest : IntegrationTestBase() {
@@ -262,5 +265,73 @@ class CreateInductionTest : IntegrationTestBase() {
         it.hasWorkedBefore(HasWorkedBefore.NOT_RELEVANT)
           .hasWorkedBeforeNotRelevantReason("Prisoner is not looking for work so feels previous work experience is not relevant")
       }
+  }
+
+  @Test
+  fun `should create an induction and not create a review schedule given the prisoner does not goals created before the induction`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    val createRequest = aValidCreateInductionRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction).isNotNull
+    // assert that there are no Action Plan Reviews (ie. no Review Schedule)
+    webTestClient.get()
+      .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNotFound
+
+    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+  }
+
+  @Test
+  fun `should create an induction and create the initial review schedule given the prisoner already has goals created before the induction`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
+
+    val createRequest = aValidCreateInductionRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction).isNotNull
+    // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
+    val actionPlanReviews = getActionPlanReviews(prisonNumber)
+    assertThat(actionPlanReviews)
+      .hasNumberOfCompletedReviews(0)
+      .latestReviewSchedule {
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+      }
+    val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
+
+    assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
+    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
   }
 }
