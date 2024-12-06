@@ -51,6 +51,11 @@ enum class ReviewScheduleStatus(val inScope: Boolean, val isExclusion: Boolean =
   EXEMPT_PRISONER_RELEASE(false, isExemption = true),
   EXEMPT_PRISONER_DEATH(false, isExemption = true),
   COMPLETED(false),
+  ;
+
+  fun isExemptionOrExclusion(): Boolean {
+    return isExemption || isExclusion
+  }
 }
 
 data class ReviewScheduleWindow(

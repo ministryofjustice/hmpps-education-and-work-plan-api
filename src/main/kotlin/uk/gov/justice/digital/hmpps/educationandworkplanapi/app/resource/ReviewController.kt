@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
@@ -31,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 class ReviewController(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val reviewService: ReviewService,
+  private val reviewScheduleService: ReviewScheduleService,
   private val scheduledActionPlanReviewResponseMapper: ScheduledActionPlanReviewResponseMapper,
   private val completedActionPlanReviewResponseMapper: CompletedActionPlanReviewResponseMapper,
   private val createActionPlanReviewRequestMapper: CreateActionPlanReviewRequestMapper,
@@ -86,7 +88,7 @@ class ReviewController(
     @RequestBody createReviewScheduleStatusRequest: CreateReviewScheduleStatusRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
-    reviewService.updateLatestReviewScheduleStatus(
+    reviewScheduleService.updateLatestReviewScheduleStatus(
       prisonNumber,
       createReviewScheduleStatusRequest.prisonId,
       createReviewScheduleStatusRequest.status.value,
