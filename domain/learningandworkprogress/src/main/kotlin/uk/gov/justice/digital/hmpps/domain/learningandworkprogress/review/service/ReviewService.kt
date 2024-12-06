@@ -13,10 +13,15 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.Cr
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
 import java.time.LocalDate
 import java.time.Period
 
 private val log = KotlinLogging.logger {}
+
+private const val EXCEPTION_ADDITIONAL_DAYS = 5L
+private const val EXCLUSION_ADDITIONAL_DAYS = 5L
+private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
 
 /**
  * Service class exposing methods that implement the business rules for the Review domain.
@@ -32,6 +37,7 @@ class ReviewService(
   private val reviewPersistenceAdapter: ReviewPersistenceAdapter,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
 ) {
+  private val statusTransitionValidator = StatusTransitionValidator()
 
   /**
    * Returns the active [ReviewSchedule] for the prisoner identified by their prison number, where "active" is defined
@@ -225,6 +231,66 @@ class ReviewService(
     }.also {
       log.debug { "Returning ReviewScheduleCalculationRule $it based on release date of $releaseDate" }
     }
+  }
+
+  fun updateLatestReviewScheduleStatus(
+    prisonNumber: String,
+    prisonId: String,
+    newStatus: String,
+  ) {
+    val reviewSchedule =
+      reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
+        prisonNumber,
+      )
+    // validate the from --> to transition
+    statusTransitionValidator.validate(
+      prisonNumber,
+      reviewSchedule.scheduleStatus.name,
+      newStatus,
+    )
+
+    if (newStatus == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE.name) {
+      // For the EXEMPT_SYSTEM_TECHNICAL_ISSUE case we need to do two updates
+      // 1. update the review schedule status
+      reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(reviewSchedule.reference, ReviewScheduleStatus.valueOf(newStatus), prisonId, prisonNumber = prisonNumber),
+      )
+      performFollowOnEvents(prisonNumber, ReviewScheduleStatus.valueOf(newStatus), prisonId)
+      // 2  then update the review schedule to be SCHEDULED
+      val newReviewDate = reviewSchedule.reviewScheduleWindow.dateTo.takeIf { it <= LocalDate.now() }
+        ?.let { LocalDate.now().plusDays(SYSTEM_OUTAGE_ADDITIONAL_DAYS) }
+
+      reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(reviewSchedule.reference, ReviewScheduleStatus.SCHEDULED, prisonId, latestReviewDate = newReviewDate, prisonNumber = prisonNumber),
+      )
+      performFollowOnEvents(prisonNumber, ReviewScheduleStatus.SCHEDULED, prisonId, newReviewDate)
+    } else if (newStatus.startsWith("EXEMPT_")) {
+      // Simply update the status and the prisonId
+      reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(reviewSchedule.reference, ReviewScheduleStatus.valueOf(newStatus), prisonId, prisonNumber = prisonNumber),
+      )
+      performFollowOnEvents(prisonNumber, ReviewScheduleStatus.valueOf(newStatus), prisonId)
+    } else {
+      // the only status left was back to SCHEDULED
+      val newReviewDate = reviewSchedule.reviewScheduleWindow.dateTo.takeIf { it <= LocalDate.now() }
+        ?.let { LocalDate.now().plusDays(EXCEPTION_ADDITIONAL_DAYS) }
+
+      reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(reviewSchedule.reference, ReviewScheduleStatus.SCHEDULED, prisonId, latestReviewDate = newReviewDate, prisonNumber = prisonNumber),
+      )
+      performFollowOnEvents(prisonNumber, ReviewScheduleStatus.valueOf(newStatus), prisonId, newReviewDate)
+    }
+  }
+
+  private fun performFollowOnEvents(
+    prisonNumber: String,
+    valueOf: ReviewScheduleStatus,
+    prisonId: String,
+    newReviewDate: LocalDate? = null,
+  ) {
+    // TODO telemetry
+    // TODO timeline
+    // TODO generate outbound message
   }
 
   private data class MonthsAndDaysLeftToServe(

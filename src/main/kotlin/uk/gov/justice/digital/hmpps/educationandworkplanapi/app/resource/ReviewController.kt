@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -23,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateReviewScheduleStatusRequest
 
 @RestController
 @RequestMapping(value = ["/action-plans/{prisonNumber}/reviews"])
@@ -72,6 +74,22 @@ class ReviewController(
     return CreateActionPlanReviewResponse(
       wasLastReviewBeforeRelease = completedReview.wasLastReviewBeforeRelease,
       latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(completedReview.latestReviewSchedule),
+    )
+  }
+
+  @PutMapping("/schedule-status")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @Transactional
+  fun updateLatestReviewScheduleStatus(
+    @Valid
+    @RequestBody createReviewScheduleStatusRequest: CreateReviewScheduleStatusRequest,
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+  ) {
+    reviewService.updateLatestReviewScheduleStatus(
+      prisonNumber,
+      createReviewScheduleStatusRequest.prisonId,
+      createReviewScheduleStatusRequest.status.value,
     )
   }
 

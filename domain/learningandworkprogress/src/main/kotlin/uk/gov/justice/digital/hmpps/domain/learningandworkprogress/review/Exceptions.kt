@@ -11,3 +11,6 @@ class ReviewScheduleNotFoundException(val prisonNumber: String) :
  */
 class ActiveReviewScheduleAlreadyExistsException(val prisonNumber: String) :
   RuntimeException("Prisoner [$prisonNumber] already has an active Review Schedule.")
+
+class InvalidReviewScheduleStatusException(val prisonNumber: String, val fromStatus: String, val toStatus: String) :
+  RuntimeException("Invalid Review Schedule status for prisoner [$prisonNumber] status from $fromStatus to $toStatus")
