@@ -227,7 +227,7 @@ paths:
   #
   # Action Plan Review status update
   # --------------------------------------------------------------------------------
-  '/action-plans/{prisonNumber}/reviews/shedule-status':
+  '/action-plans/{prisonNumber}/reviews/schedule-status':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     put:
