@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.acti
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
-import java.time.LocalDate
 import java.util.function.Consumer
 
 fun assertThat(actual: ActionPlanResponse?) = ActionPlanResponseAssert(actual)
@@ -18,26 +17,6 @@ class ActionPlanResponseAssert(actual: ActionPlanResponse?) :
     with(actual!!) {
       if (prisonNumber != expected) {
         failWithMessage("Expected prisonNumber to be $expected, but was $prisonNumber")
-      }
-    }
-    return this
-  }
-
-  fun hasReviewDate(expected: LocalDate): ActionPlanResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (reviewDate != expected) {
-        failWithMessage("Expected reviewDate to be $expected, but was $reviewDate")
-      }
-    }
-    return this
-  }
-
-  fun hasNoReviewDate(): ActionPlanResponseAssert {
-    isNotNull
-    with(actual!!) {
-      if (reviewDate != null) {
-        failWithMessage("Expected reviewDate to be null, but was $reviewDate")
       }
     }
     return this

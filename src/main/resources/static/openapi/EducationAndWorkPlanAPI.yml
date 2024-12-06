@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.7'
+  version: '1.17.8'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -836,11 +836,6 @@ components:
           type: string
           description: The ID of the prisoner
           example: 'A1234BC'
-        reviewDate:
-          type: string
-          format: date
-          description: An optional ISO-8601 date representing when the Action Plan is up for review.
-          example: '2024-12-19'
       required:
         - reference
         - prisonNumber
@@ -858,11 +853,6 @@ components:
           type: string
           description: The ID of the prisoner
           example: 'A1234BC'
-        reviewDate:
-          type: string
-          format: date
-          description: An optional ISO-8601 date representing when the Action Plan is up for review.
-          example: '2024-12-19'
         goals:
           type: array
           description: A List of at least one or more Goals.
@@ -1839,13 +1829,6 @@ components:
       description: A request to create an Action Plan with at least one or more Goals that a Prisoner aims to complete.
       allOf:
         - $ref: '#/components/schemas/CreateGoalsRequest'
-      properties:
-        reviewDate:
-          type: string
-          format: date
-          x-constraints: 'NotInPast'
-          description: An optional ISO-8601 date representing when the Action Plan is up for review.
-          example: '2023-12-19'
 
     CreateGoalRequest:
       title: CreateGoalRequest

@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.LocalDate
 
 class CreateActionPlanTest : IntegrationTestBase() {
 
@@ -101,31 +100,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should fail to create action plan given review date is in the past`() {
-    val prisonNumber = aValidPrisonNumber()
-    val invalidReviewDate = LocalDate.now().minusDays(1)
-    val createRequest = aValidCreateActionPlanRequest(reviewDate = invalidReviewDate)
-
-    // When
-    val response = webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isBadRequest
-      .returnResult(ErrorResponse::class.java)
-
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasStatus(BAD_REQUEST.value())
-      .hasUserMessage("Validation failed for object='createActionPlanRequest'. Error count: 1")
-      .hasDeveloperMessageContaining("Error on field 'reviewDate': rejected value [$invalidReviewDate], Cannot be in the past")
-  }
-
-  @Test
   fun `should fail to create action plan given null fields`() {
     val prisonNumber = aValidPrisonNumber()
 
@@ -186,7 +160,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val createStepRequest = aValidCreateStepRequest()
     val createGoalRequest = aValidCreateGoalRequest(steps = listOf(createStepRequest))
     val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest))
-    val expectedReviewDate = createActionPlanRequest.reviewDate!!
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
 
@@ -211,7 +184,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
     assertThat(actionPlan)
       .isForPrisonNumber(prisonNumber)
-      .hasReviewDate(expectedReviewDate)
       .hasNumberOfGoals(1)
       .wasCreatedBy(dpsUsername)
     val goal = actionPlan!!.goals!![0]
@@ -237,40 +209,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
 
   @Test
   @Transactional
-  fun `should create a new action plan with no review date`() {
-    // Given
-    val prisonNumber = aValidPrisonNumber()
-    val createActionPlanRequest = aValidCreateActionPlanRequest(reviewDate = null)
-    val dpsUsername = "auser_gen"
-    val displayName = "Albert User"
-
-    // When
-    webTestClient.post()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(createActionPlanRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          ACTIONPLANS_RW,
-          username = dpsUsername,
-          displayName = displayName,
-          privateKey = keyPair.private,
-        ),
-      )
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
-
-    // Then
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actionPlan)
-      .isForPrisonNumber(prisonNumber)
-      .hasNoReviewDate()
-      .wasCreatedBy(dpsUsername)
-  }
-
-  @Test
-  @Transactional
   fun `should create a new action plan with multiple goals given prisoner does not have an action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
@@ -287,7 +225,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val createGoalRequest4 = aValidCreateGoalRequest(steps = listOf(createStepRequest4), notes = "Goal4 text")
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest1, createGoalRequest2, createGoalRequest3, createGoalRequest4))
-    val expectedReviewDate = createActionPlanRequest.reviewDate!!
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
 
@@ -312,7 +249,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
     assertThat(actionPlan)
       .isForPrisonNumber(prisonNumber)
-      .hasReviewDate(expectedReviewDate)
       .hasNumberOfGoals(4)
       .wasCreatedBy(dpsUsername)
     val goal = actionPlan!!.goals!![0]

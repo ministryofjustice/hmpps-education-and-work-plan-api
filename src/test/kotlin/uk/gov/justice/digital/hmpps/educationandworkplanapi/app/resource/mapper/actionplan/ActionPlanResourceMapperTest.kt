@@ -38,7 +38,6 @@ internal class ActionPlanResourceMapperTest {
     val expectedCreateGoalDto = aValidCreateGoalDto()
     val expectedCreateActionPlanDto = aValidCreateActionPlanDto(
       prisonNumber = prisonNumber,
-      reviewDate = request.reviewDate,
       goals = listOf(expectedCreateGoalDto),
     )
     given(goalMapper.fromModelToDto(any<CreateGoalRequest>())).willReturn(expectedCreateGoalDto)
@@ -59,7 +58,6 @@ internal class ActionPlanResourceMapperTest {
     val expectedActionPlan = aValidActionPlanResponse(
       reference = actionPlan.reference,
       prisonNumber = actionPlan.prisonNumber,
-      reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoal),
     )
     given(goalMapper.fromDomainToModel(any<Goal>())).willReturn(expectedGoal)
@@ -81,12 +79,10 @@ internal class ActionPlanResourceMapperTest {
       aValidActionPlanSummaryResponse(
         prisonNumber = summary1.prisonNumber,
         reference = summary1.reference,
-        reviewDate = summary1.reviewDate,
       ),
       aValidActionPlanSummaryResponse(
         prisonNumber = summary2.prisonNumber,
         reference = summary2.reference,
-        reviewDate = summary2.reviewDate,
       ),
     )
 
