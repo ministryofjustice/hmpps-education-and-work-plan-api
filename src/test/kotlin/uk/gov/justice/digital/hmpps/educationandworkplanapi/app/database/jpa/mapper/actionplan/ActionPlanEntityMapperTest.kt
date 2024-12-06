@@ -40,7 +40,6 @@ class ActionPlanEntityMapperTest {
     val expected = aValidActionPlanEntity(
       reference = actionPlan.reference,
       prisonNumber = prisonNumber,
-      reviewDate = actionPlan.reviewDate,
       goals = mutableListOf(expectedGoalEntity),
       // JPA managed fields - expect these all to be null, implying a new db entity
       id = null,
@@ -72,7 +71,6 @@ class ActionPlanEntityMapperTest {
     val expected = aValidActionPlan(
       reference = actionPlanEntity.reference!!,
       prisonNumber = prisonNumber,
-      reviewDate = actionPlanEntity.reviewDate,
       goals = mutableListOf(goalDomain),
     )
 
@@ -93,12 +91,10 @@ class ActionPlanEntityMapperTest {
       aValidActionPlanSummary(
         prisonNumber = summaryProjection1.prisonNumber,
         reference = summaryProjection1.reference,
-        reviewDate = summaryProjection1.reviewDate,
       ),
       aValidActionPlanSummary(
         prisonNumber = summaryProjection2.prisonNumber,
         reference = summaryProjection2.reference,
-        reviewDate = summaryProjection2.reviewDate,
       ),
     )
 

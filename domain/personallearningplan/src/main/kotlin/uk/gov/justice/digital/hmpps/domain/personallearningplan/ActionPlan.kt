@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
-import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -9,7 +8,6 @@ import java.util.UUID
 class ActionPlan(
   val reference: UUID,
   val prisonNumber: String,
-  val reviewDate: LocalDate?,
   goals: List<Goal> = emptyList(),
 ) {
 
@@ -34,6 +32,6 @@ class ActionPlan(
     goals.add(goal)
 
   override fun toString(): String {
-    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', reviewDate='$reviewDate', goals=$goals)"
+    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', goals=$goals)"
   }
 }

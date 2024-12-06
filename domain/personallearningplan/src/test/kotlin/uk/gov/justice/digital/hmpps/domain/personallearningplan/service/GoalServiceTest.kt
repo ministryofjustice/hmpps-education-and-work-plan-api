@@ -89,7 +89,7 @@ class GoalServiceTest {
       given(actionPlanPersistenceAdapter.createActionPlan(any())).willReturn(actionPlan)
       val createGoalDto = aValidCreateGoalDto()
       val expectedCreateActionPlanDto =
-        aValidCreateActionPlanDto(prisonNumber = prisonNumber, reviewDate = null, goals = listOf(createGoalDto))
+        aValidCreateActionPlanDto(prisonNumber = prisonNumber, goals = listOf(createGoalDto))
 
       // When
       val actual = service.createGoal(prisonNumber, createGoalDto)
@@ -147,7 +147,7 @@ class GoalServiceTest {
       val createGoalDtos = listOf(createGoalDto1, createGoalDto2)
 
       val expectedCreateActionPlanDto =
-        aValidCreateActionPlanDto(prisonNumber = prisonNumber, reviewDate = null, goals = createGoalDtos)
+        aValidCreateActionPlanDto(prisonNumber = prisonNumber, goals = createGoalDtos)
 
       // When
       val actual = service.createGoals(prisonNumber, createGoalDtos)

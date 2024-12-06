@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
-import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -10,5 +9,4 @@ import java.util.UUID
 data class ActionPlanSummary(
   val reference: UUID,
   val prisonNumber: String,
-  val reviewDate: LocalDate?,
 )

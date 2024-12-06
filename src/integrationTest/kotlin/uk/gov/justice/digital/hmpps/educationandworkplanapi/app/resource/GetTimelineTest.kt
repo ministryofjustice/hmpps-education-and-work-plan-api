@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.asser
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.LocalDate
 
 class GetTimelineTest : IntegrationTestBase() {
 
@@ -120,7 +119,6 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
     val createActionPlanRequest = aValidCreateActionPlanRequest(
-      reviewDate = LocalDate.now(),
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
@@ -208,7 +206,6 @@ class GetTimelineTest : IntegrationTestBase() {
     )
     createInduction(prisonNumber, aValidCreateInductionRequest())
     val createActionPlanRequest = aValidCreateActionPlanRequest(
-      reviewDate = LocalDate.now(),
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)

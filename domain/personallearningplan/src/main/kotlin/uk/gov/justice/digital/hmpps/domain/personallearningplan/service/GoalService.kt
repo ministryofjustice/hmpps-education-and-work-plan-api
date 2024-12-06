@@ -234,7 +234,6 @@ class GoalService(
   private fun newActionPlan(prisonNumber: String, createGoalDtos: List<CreateGoalDto>) =
     CreateActionPlanDto(
       prisonNumber = prisonNumber,
-      reviewDate = null,
       goals = createGoalDtos,
     )
 }

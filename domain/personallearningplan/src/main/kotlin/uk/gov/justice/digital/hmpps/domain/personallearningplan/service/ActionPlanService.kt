@@ -52,7 +52,6 @@ class ActionPlanService(
       ?: ActionPlan(
         reference = UUID.randomUUID(),
         prisonNumber = prisonNumber,
-        reviewDate = null,
         goals = emptyList(),
       )
     actionPlan.goals.onEach { it.notes = goalNotesService.getNotes(it.reference) }
