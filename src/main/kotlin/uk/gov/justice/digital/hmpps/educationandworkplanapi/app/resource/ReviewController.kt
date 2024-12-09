@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateReviewScheduleStatusRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus as ReviewScheduleStatusAPI
 
 @RestController
 @RequestMapping(value = ["/action-plans/{prisonNumber}/reviews"])
@@ -91,9 +93,28 @@ class ReviewController(
     reviewScheduleService.updateLatestReviewScheduleStatus(
       prisonNumber,
       createReviewScheduleStatusRequest.prisonId,
-      createReviewScheduleStatusRequest.status.value,
+      toReviewScheduleStatus(createReviewScheduleStatusRequest.status),
     )
   }
+
+  private fun toReviewScheduleStatus(reviewStatus: ReviewScheduleStatusAPI): ReviewScheduleStatus =
+    when (reviewStatus) {
+      ReviewScheduleStatusAPI.SCHEDULED -> ReviewScheduleStatus.SCHEDULED
+      ReviewScheduleStatusAPI.COMPLETED -> ReviewScheduleStatus.COMPLETED
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> ReviewScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> ReviewScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> ReviewScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_SAFETY_ISSUES -> ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
+      ReviewScheduleStatusAPI.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+      ReviewScheduleStatusAPI.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> ReviewScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT
+      ReviewScheduleStatusAPI.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> ReviewScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
+      ReviewScheduleStatusAPI.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
+      ReviewScheduleStatusAPI.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
+      ReviewScheduleStatusAPI.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
+    }
 
   private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
     when (legalStatus) {

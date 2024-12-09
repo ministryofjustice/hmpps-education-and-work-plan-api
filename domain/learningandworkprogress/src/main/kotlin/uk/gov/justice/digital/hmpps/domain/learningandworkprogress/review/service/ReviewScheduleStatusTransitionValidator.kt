@@ -18,8 +18,8 @@ class ReviewScheduleStatusTransitionValidator {
       ?.let { rule ->
         throw InvalidReviewScheduleStatusException(
           prisonNumber,
-          currentStatus.name,
-          newStatus.name,
+          currentStatus,
+          newStatus,
         ).also {
           logInvalidTransition(prisonNumber, currentStatus, newStatus, rule.reason)
         }

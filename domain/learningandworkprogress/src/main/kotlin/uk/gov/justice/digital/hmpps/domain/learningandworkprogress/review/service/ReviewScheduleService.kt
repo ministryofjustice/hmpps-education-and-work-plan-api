@@ -19,9 +19,8 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
   fun updateLatestReviewScheduleStatus(
     prisonNumber: String,
     prisonId: String,
-    newStatusString: String,
+    newStatus: ReviewScheduleStatus,
   ) {
-    val newStatus = ReviewScheduleStatus.valueOf(newStatusString)
     val reviewSchedule = reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber)
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
