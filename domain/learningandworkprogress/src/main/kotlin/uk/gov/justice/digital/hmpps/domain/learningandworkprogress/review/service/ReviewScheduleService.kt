@@ -14,7 +14,7 @@ private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
 private val log = KotlinLogging.logger {}
 class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter) {
 
-  private val statusTransitionValidator = StatusTransitionValidator()
+  private val reviewScheduleStatusTransitionValidator = ReviewScheduleStatusTransitionValidator()
 
   fun updateLatestReviewScheduleStatus(
     prisonNumber: String,
@@ -26,11 +26,11 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
     // Validate the status transition
-    statusTransitionValidator.validate(prisonNumber, reviewSchedule.scheduleStatus, newStatus)
+    reviewScheduleStatusTransitionValidator.validate(prisonNumber, reviewSchedule.scheduleStatus, newStatus)
 
     when {
       newStatus == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
-        handleSystemException(reviewSchedule, newStatus, prisonId, prisonNumber)
+        updateReviewScheduleFollowingSystemTechnicalIssue(reviewSchedule, prisonId, prisonNumber)
       }
       newStatus.isExemptionOrExclusion() -> {
         updateExemptStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
@@ -77,9 +77,8 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
     performFollowOnEvents(prisonNumber, newStatus, prisonId, newReviewDate)
   }
 
-  private fun handleSystemException(
+  private fun updateReviewScheduleFollowingSystemTechnicalIssue(
     reviewSchedule: ReviewSchedule,
-    newStatus: ReviewScheduleStatus,
     prisonId: String,
     prisonNumber: String,
   ) {
@@ -87,12 +86,12 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
     reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reviewSchedule.reference,
-        newStatus,
+        ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         prisonId,
         prisonNumber = prisonNumber,
       ),
     )
-    performFollowOnEvents(prisonNumber, newStatus, prisonId)
+    performFollowOnEvents(prisonNumber, ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE, prisonId)
 
     // Then update the review schedule to be SCHEDULED with a new review date
     val newReviewDate = calculateNewReviewDate(reviewSchedule, SYSTEM_OUTAGE_ADDITIONAL_DAYS)
