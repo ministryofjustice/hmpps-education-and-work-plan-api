@@ -29,6 +29,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
@@ -428,7 +431,10 @@ abstract class IntegrationTestBase {
   }
 
   internal fun HmppsQueue.countAllMessagesOnQueue() = sqsClient.countAllMessagesOnQueue(queueUrl).get()
-  fun createInductionSchedule(prisonNumber: String, status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED) {
+  fun createInductionSchedule(
+    prisonNumber: String,
+    status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+  ) {
     inductionScheduleRepository.save(
       InductionScheduleEntity(
         prisonNumber = prisonNumber,
@@ -438,6 +444,25 @@ abstract class IntegrationTestBase {
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       ),
     )
+  }
+
+  fun createReviewScheduleRecord(
+    prisonNumber: String,
+    status: String = ReviewScheduleStatus.SCHEDULED.name,
+    earliestDate: LocalDate = LocalDate.now().minusMonths(1),
+    latestDate: LocalDate = LocalDate.now().plusMonths(1),
+  ) {
+    val reviewScheduleEntity = ReviewScheduleEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      earliestReviewDate = earliestDate,
+      latestReviewDate = latestDate,
+      scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
+      scheduleStatus = ReviewScheduleStatus.valueOf(status),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
+    )
+    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
   }
 }
 

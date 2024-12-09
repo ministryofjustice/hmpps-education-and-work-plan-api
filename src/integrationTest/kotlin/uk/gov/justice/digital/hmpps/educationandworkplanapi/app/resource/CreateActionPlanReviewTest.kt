@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -30,9 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.util.UUID
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleCalculationRule as ReviewScheduleCalculationRuleEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule as ReviewScheduleCalculationRuleApi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus as ReviewScheduleStatusApi
 
@@ -267,20 +263,5 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       assertThat(reviewCompleteEventProperties)
         .containsEntry("reference", reviews.completedReviews.first().reference.toString())
     }
-  }
-
-  // TODO - replace with a relevant service call once we have that developed
-  private fun createReviewScheduleRecord(prisonNumber: String) {
-    val reviewScheduleEntity = ReviewScheduleEntity(
-      reference = UUID.randomUUID(),
-      prisonNumber = prisonNumber,
-      earliestReviewDate = LocalDate.now().minusMonths(1),
-      latestReviewDate = LocalDate.now().plusMonths(1),
-      scheduleCalculationRule = ReviewScheduleCalculationRuleEntity.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
-      scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
-      createdAtPrison = "BXI",
-      updatedAtPrison = "BXI",
-    )
-    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
   }
 }
