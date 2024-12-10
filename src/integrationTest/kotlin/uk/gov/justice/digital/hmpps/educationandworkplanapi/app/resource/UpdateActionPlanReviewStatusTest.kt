@@ -1,7 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONFLICT
@@ -13,9 +18,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateActionPlanReviewStatusRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 
@@ -345,5 +352,67 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     assertThat(reviewSchedule.size).isEqualTo(1)
     assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
     assertThat(reviewSchedule[0].latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
+  }
+
+  @Test
+  fun `Test follow on events occur`() {
+    // Given
+    createReviewScheduleRecord(
+      prisonNumber,
+      status = ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES.name,
+      earliestDate = LocalDate.now().minusDays(5),
+      latestDate = LocalDate.now(),
+    )
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidUpdateActionPlanReviewStatusRequest(
+          prisonId = "MDI",
+          status = ReviewScheduleStatus.SCHEDULED,
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val reviewSchedule = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedule.size).isEqualTo(1)
+    assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
+    assertThat(reviewSchedule[0].latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
+
+    val today = LocalDate.now().toString()
+    val todayPlusTen = LocalDate.now().plusDays(10).toString()
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(1) { // the 3rd Timeline event will be the GOAL_UPDATED event
+          it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED)
+            .hasContextualInfo(
+              mapOf(
+                "REVIEW_SCHEDULE_DEADLINE_NEW" to todayPlusTen,
+                "REVIEW_SCHEDULE_DEADLINE_OLD" to today,
+                "REVIEW_SCHEDULE_STATUS_OLD" to "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
+                "REVIEW_SCHEDULE_STATUS_NEW" to "SCHEDULED",
+              ),
+            )
+        }
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient).trackEvent(
+        eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+    }
+
+    // test that outbound event is also created:
+    val reviewScheduleEvent = reviewScheduleEventQueue.receiveEvent(QueueType.REVIEW)
+    assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+    assertThat(reviewScheduleEvent.detailUrl)
+      .isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
   }
 }

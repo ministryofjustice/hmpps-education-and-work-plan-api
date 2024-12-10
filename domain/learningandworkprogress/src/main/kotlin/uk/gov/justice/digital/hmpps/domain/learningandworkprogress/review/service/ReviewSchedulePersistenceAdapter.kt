@@ -44,5 +44,5 @@ interface ReviewSchedulePersistenceAdapter {
   /**
    * Update the Review schedule status, prisonId and if present the latestReviewDate.
    */
-  fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto)
+  fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule
 }

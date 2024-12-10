@@ -60,7 +60,7 @@ class JpaReviewSchedulePersistenceAdapter(
     reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
       ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
 
-  override fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto) {
+  override fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule {
     val reviewScheduleEntity = reviewScheduleRepository.findByReference(updateReviewScheduleStatusDto.reference)
       ?: throw ReviewScheduleNotFoundException(updateReviewScheduleStatusDto.prisonNumber)
 
@@ -71,6 +71,6 @@ class JpaReviewSchedulePersistenceAdapter(
       updatedAtPrison = updateReviewScheduleStatusDto.prisonId
     }
 
-    reviewScheduleRepository.save(reviewScheduleEntity)
+    return reviewScheduleEntityMapper.fromEntityToDomain(reviewScheduleRepository.save(reviewScheduleEntity))
   }
 }
