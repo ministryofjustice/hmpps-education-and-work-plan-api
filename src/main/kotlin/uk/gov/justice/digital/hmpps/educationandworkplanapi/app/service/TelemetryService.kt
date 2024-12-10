@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_CREATED
@@ -145,6 +146,13 @@ class TelemetryService(
     )
   }
 
+  fun trackReviewScheduleStatusUpdated(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus) {
+    sendTelemetryEventForUpdatedReviewScheduleStatus(
+      updatedReviewScheduleStatus = updatedReviewScheduleStatus,
+      telemetryEventType = UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED,
+    )
+  }
+
   private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: GoalTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
 
@@ -159,4 +167,7 @@ class TelemetryService(
 
   private fun sendTelemetryEventForCompletedReview(completedReview: CompletedReview, telemetryEventType: CompletedReviewTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(completedReview))
+
+  private fun sendTelemetryEventForUpdatedReviewScheduleStatus(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus, telemetryEventType: UpdatedReviewScheduleStatusTelemetryEventType) =
+    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(updatedReviewScheduleStatus))
 }

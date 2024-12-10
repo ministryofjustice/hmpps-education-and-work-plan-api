@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
@@ -114,8 +115,9 @@ class DomainConfiguration {
   @Bean
   fun reviewScheduleDomainService(
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
+    reviewScheduleEventService: ReviewScheduleEventService,
   ): ReviewScheduleService =
-    ReviewScheduleService(reviewSchedulePersistenceAdapter)
+    ReviewScheduleService(reviewSchedulePersistenceAdapter, reviewScheduleEventService)
 
   @Bean
   fun ciagKpiService(

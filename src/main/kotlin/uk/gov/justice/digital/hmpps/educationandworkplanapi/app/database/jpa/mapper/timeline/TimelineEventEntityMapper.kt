@@ -62,6 +62,7 @@ class TimelineEventEntityMapper {
       TimelineEventTypeEntity.STEP_STARTED -> TimelineEventTypeDomain.STEP_STARTED
       TimelineEventTypeEntity.STEP_COMPLETED -> TimelineEventTypeDomain.STEP_COMPLETED
       TimelineEventTypeEntity.ACTION_PLAN_REVIEW_COMPLETED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_COMPLETED
+      TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
       TimelineEventTypeEntity.CONVERSATION_CREATED -> TimelineEventTypeDomain.CONVERSATION_CREATED
       TimelineEventTypeEntity.CONVERSATION_UPDATED -> TimelineEventTypeDomain.CONVERSATION_UPDATED
       TimelineEventTypeEntity.PRISON_ADMISSION -> TimelineEventTypeDomain.PRISON_ADMISSION
@@ -91,6 +92,7 @@ class TimelineEventEntityMapper {
       TimelineEventTypeDomain.PRISON_ADMISSION -> TimelineEventTypeEntity.PRISON_ADMISSION
       TimelineEventTypeDomain.PRISON_RELEASE -> TimelineEventTypeEntity.PRISON_RELEASE
       TimelineEventTypeDomain.PRISON_TRANSFER -> TimelineEventTypeEntity.PRISON_TRANSFER
+      TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
     }
 
   private fun toTimelineEventContext(eventType: TimelineEventContextEntity): TimelineEventContextDomain =
@@ -109,6 +111,10 @@ class TimelineEventEntityMapper {
       TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE -> TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE
       TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY -> TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY
       TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE -> TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE
+      TimelineEventContextEntity.REVIEW_SCHEDULE_STATUS_OLD -> TimelineEventContextDomain.REVIEW_SCHEDULE_STATUS_OLD
+      TimelineEventContextEntity.REVIEW_SCHEDULE_STATUS_NEW -> TimelineEventContextDomain.REVIEW_SCHEDULE_STATUS_NEW
+      TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_OLD -> TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_OLD
+      TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_NEW -> TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_NEW
     }
 
   private fun toTimelineEventContext(eventType: TimelineEventContextDomain): TimelineEventContextEntity =
@@ -127,5 +133,9 @@ class TimelineEventEntityMapper {
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY
       TimelineEventContextDomain.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE -> TimelineEventContextEntity.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE
+      TimelineEventContextDomain.REVIEW_SCHEDULE_STATUS_OLD -> TimelineEventContextEntity.REVIEW_SCHEDULE_STATUS_OLD
+      TimelineEventContextDomain.REVIEW_SCHEDULE_STATUS_NEW -> TimelineEventContextEntity.REVIEW_SCHEDULE_STATUS_NEW
+      TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_OLD -> TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_OLD
+      TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_NEW -> TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_NEW
     }
 }

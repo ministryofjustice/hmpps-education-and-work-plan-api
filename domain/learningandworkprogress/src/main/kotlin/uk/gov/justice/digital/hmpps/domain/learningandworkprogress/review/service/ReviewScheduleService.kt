@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
 import java.time.LocalDate
 
@@ -12,7 +13,11 @@ private const val EXCLUSION_ADDITIONAL_DAYS = 10L
 private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
 
 private val log = KotlinLogging.logger {}
-class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter) {
+
+class ReviewScheduleService(
+  private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
+  private val reviewScheduleEventService: ReviewScheduleEventService,
+) {
 
   private val reviewScheduleStatusTransitionValidator = ReviewScheduleStatusTransitionValidator()
 
@@ -31,9 +36,11 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
       newStatus == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
         updateReviewScheduleFollowingSystemTechnicalIssue(reviewSchedule, prisonId, prisonNumber)
       }
+
       newStatus.isExemptionOrExclusion() -> {
         updateExemptStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
       }
+
       else -> {
         updateScheduledStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
       }
@@ -46,7 +53,7 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
     prisonId: String,
     prisonNumber: String,
   ) {
-    reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+    val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reviewSchedule.reference,
         newStatus,
@@ -54,7 +61,11 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
         prisonNumber = prisonNumber,
       ),
     )
-    performFollowOnEvents(prisonNumber, newStatus, prisonId)
+    performFollowOnEvents(
+      updatedReviewSchedule = updatedReviewSchedule,
+      oldStatus = reviewSchedule.scheduleStatus,
+      oldReviewDate = reviewSchedule.reviewScheduleWindow.dateTo,
+    )
   }
 
   private fun updateScheduledStatus(
@@ -64,7 +75,7 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
     prisonNumber: String,
   ) {
     val newReviewDate = calculateNewReviewDate(reviewSchedule)
-    reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+    val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reviewSchedule.reference,
         ReviewScheduleStatus.SCHEDULED,
@@ -73,7 +84,11 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
         prisonNumber = prisonNumber,
       ),
     )
-    performFollowOnEvents(prisonNumber, newStatus, prisonId, newReviewDate)
+    performFollowOnEvents(
+      updatedReviewSchedule = updatedReviewSchedule,
+      oldStatus = reviewSchedule.scheduleStatus,
+      oldReviewDate = reviewSchedule.reviewScheduleWindow.dateTo,
+    )
   }
 
   private fun updateReviewScheduleFollowingSystemTechnicalIssue(
@@ -82,7 +97,7 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
     prisonNumber: String,
   ) {
     // Update the review schedule status to EXEMPT_SYSTEM_TECHNICAL_ISSUE
-    reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+    val updatedReviewScheduleFirst = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reviewSchedule.reference,
         ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
@@ -90,11 +105,15 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
         prisonNumber = prisonNumber,
       ),
     )
-    performFollowOnEvents(prisonNumber, ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE, prisonId)
+    performFollowOnEvents(
+      updatedReviewSchedule = updatedReviewScheduleFirst,
+      oldStatus = reviewSchedule.scheduleStatus,
+      oldReviewDate = reviewSchedule.reviewScheduleWindow.dateTo,
+    )
 
     // Then update the review schedule to be SCHEDULED with a new review date
     val newReviewDate = calculateNewReviewDate(reviewSchedule, SYSTEM_OUTAGE_ADDITIONAL_DAYS)
-    reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+    val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reviewSchedule.reference,
         ReviewScheduleStatus.SCHEDULED,
@@ -103,7 +122,11 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
         prisonNumber = prisonNumber,
       ),
     )
-    performFollowOnEvents(prisonNumber, ReviewScheduleStatus.SCHEDULED, prisonId, newReviewDate)
+    performFollowOnEvents(
+      updatedReviewSchedule = updatedReviewScheduleSecond,
+      oldStatus = updatedReviewScheduleFirst.scheduleStatus,
+      oldReviewDate = updatedReviewScheduleFirst.reviewScheduleWindow.dateTo,
+    )
   }
 
   private fun calculateNewReviewDate(
@@ -123,11 +146,22 @@ class ReviewScheduleService(private val reviewSchedulePersistenceAdapter: Review
   }
 
   private fun performFollowOnEvents(
-    prisonNumber: String,
-    status: ReviewScheduleStatus,
-    prisonId: String,
-    newReviewDate: LocalDate? = null,
+    oldStatus: ReviewScheduleStatus,
+    oldReviewDate: LocalDate,
+    updatedReviewSchedule: ReviewSchedule,
   ) {
-    // TODO: Handle telemetry, timeline, and outbound message
+    reviewScheduleEventService.reviewScheduleStatusUpdated(
+      UpdatedReviewScheduleStatus(
+        reference = updatedReviewSchedule.reference,
+        prisonNumber = updatedReviewSchedule.prisonNumber,
+        updatedAtPrison = updatedReviewSchedule.lastUpdatedAtPrison,
+        oldStatus = oldStatus,
+        newStatus = updatedReviewSchedule.scheduleStatus,
+        oldReviewDate = oldReviewDate,
+        newReviewDate = updatedReviewSchedule.reviewScheduleWindow.dateTo,
+        updatedAt = updatedReviewSchedule.lastUpdatedAt,
+        updatedBy = updatedReviewSchedule.lastUpdatedBy,
+      ),
+    )
   }
 }
