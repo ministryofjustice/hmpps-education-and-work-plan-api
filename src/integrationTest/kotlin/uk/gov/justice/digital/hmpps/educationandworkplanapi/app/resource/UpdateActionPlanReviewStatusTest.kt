@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
@@ -384,29 +385,29 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
     assertThat(reviewSchedule[0].latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
 
-    val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
-    verify(telemetryClient).trackEvent(
-      eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
-      capture(eventPropertiesCaptor),
-      eq(null),
-    )
-
     val today = LocalDate.now().toString()
     val todayPlusTen = LocalDate.now().plusDays(10).toString()
-
-    val timeline = getTimeline(prisonNumber)
-    assertThat(timeline)
-      .event(1) { // the 3rd Timeline event will be the GOAL_UPDATED event
-        it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED)
-          .hasContextualInfo(
-            mapOf(
-              "REVIEW_SCHEDULE_DEADLINE_NEW" to todayPlusTen,
-              "REVIEW_SCHEDULE_DEADLINE_OLD" to today,
-              "REVIEW_SCHEDULE_STATUS_OLD" to "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
-              "REVIEW_SCHEDULE_STATUS_NEW" to "SCHEDULED",
-            ),
-          )
-      }
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .event(1) { // the 3rd Timeline event will be the GOAL_UPDATED event
+          it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED)
+            .hasContextualInfo(
+              mapOf(
+                "REVIEW_SCHEDULE_DEADLINE_NEW" to todayPlusTen,
+                "REVIEW_SCHEDULE_DEADLINE_OLD" to today,
+                "REVIEW_SCHEDULE_STATUS_OLD" to "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
+                "REVIEW_SCHEDULE_STATUS_NEW" to "SCHEDULED",
+              ),
+            )
+        }
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient).trackEvent(
+        eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+    }
 
     // test that outbound event is also created:
     val reviewScheduleEvent = reviewScheduleEventQueue.receiveEvent(QueueType.REVIEW)
