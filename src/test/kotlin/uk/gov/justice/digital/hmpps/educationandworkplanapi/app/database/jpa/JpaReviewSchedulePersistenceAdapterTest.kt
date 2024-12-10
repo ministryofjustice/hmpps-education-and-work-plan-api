@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aV
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import java.time.Instant
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus as ReviewScheduleStatusDomain
@@ -36,6 +37,9 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
   @Mock
   private lateinit var reviewScheduleRepository: ReviewScheduleRepository
+
+  @Mock
+  private lateinit var reviewScheduleHistoryRepository: ReviewScheduleHistoryRepository
 
   @Mock
   private lateinit var reviewScheduleEntityMapper: ReviewScheduleEntityMapper
@@ -170,10 +174,12 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
       // Then
       assertThat(actual).isEqualTo(expectedReviewSchedule)
+      verify(reviewScheduleHistoryRepository).findMaxVersionByReviewScheduleReference(reviewScheduleEntity.reference)
       verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
       verify(reviewScheduleEntityMapper).fromDomainToEntity(createReviewScheduleDto)
       verify(reviewScheduleRepository).saveAndFlush(reviewScheduleEntity)
       verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
+      verify(reviewScheduleHistoryRepository).save(any())
     }
   }
 
@@ -205,6 +211,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
     verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
     verifyNoMoreInteractions(reviewScheduleRepository)
+    verifyNoInteractions(reviewScheduleHistoryRepository)
   }
 
   @Nested
@@ -236,6 +243,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       verify(reviewScheduleEntityMapper).updateExistingEntityFromDto(reviewScheduleEntity, updateReviewScheduleDto)
       verify(reviewScheduleRepository).saveAndFlush(reviewScheduleEntity)
       verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
+      verify(reviewScheduleHistoryRepository).save(any())
     }
 
     @Test
@@ -257,6 +265,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       verify(reviewScheduleRepository).findByReference(reference)
       verifyNoMoreInteractions(reviewScheduleRepository)
       verifyNoInteractions(reviewScheduleEntityMapper)
+      verifyNoInteractions(reviewScheduleHistoryRepository)
     }
   }
 }

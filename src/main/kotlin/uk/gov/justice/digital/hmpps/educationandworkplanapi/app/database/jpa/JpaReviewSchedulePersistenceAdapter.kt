@@ -11,7 +11,10 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.Cr
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 
 private val log = KotlinLogging.logger {}
@@ -19,6 +22,7 @@ private val log = KotlinLogging.logger {}
 @Component
 class JpaReviewSchedulePersistenceAdapter(
   private val reviewScheduleRepository: ReviewScheduleRepository,
+  private val reviewScheduleHistoryRepository: ReviewScheduleHistoryRepository,
   private val reviewScheduleEntityMapper: ReviewScheduleEntityMapper,
 ) : ReviewSchedulePersistenceAdapter {
 
@@ -28,10 +32,10 @@ class JpaReviewSchedulePersistenceAdapter(
       if (getActiveReviewSchedule(prisonNumber) != null) {
         throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
       }
-
       val persistedEntity = reviewScheduleRepository.saveAndFlush(
         reviewScheduleEntityMapper.fromDomainToEntity(this),
       )
+      saveReviewScheduleHistory(persistedEntity)
       reviewScheduleEntityMapper.fromEntityToDomain(persistedEntity)
     }
 
@@ -41,7 +45,9 @@ class JpaReviewSchedulePersistenceAdapter(
 
     return reviewScheduleEntity?.let {
       reviewScheduleEntityMapper.updateExistingEntityFromDto(it, updateReviewScheduleDto)
-      reviewScheduleEntityMapper.fromEntityToDomain(reviewScheduleRepository.saveAndFlush(it))
+      val saved = reviewScheduleRepository.saveAndFlush(it)
+      saveReviewScheduleHistory(saved)
+      reviewScheduleEntityMapper.fromEntityToDomain(saved)
     }
   }
 
@@ -71,6 +77,30 @@ class JpaReviewSchedulePersistenceAdapter(
       updatedAtPrison = updateReviewScheduleStatusDto.prisonId
     }
 
-    return reviewScheduleEntityMapper.fromEntityToDomain(reviewScheduleRepository.save(reviewScheduleEntity))
+    val savedReviewScheduleEntity = reviewScheduleRepository.save(reviewScheduleEntity)
+    saveReviewScheduleHistory(savedReviewScheduleEntity)
+    return reviewScheduleEntityMapper.fromEntityToDomain(savedReviewScheduleEntity)
+  }
+
+  fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
+    with(reviewScheduleEntity) {
+      val historyEntry = ReviewScheduleHistoryEntity(
+        version = reviewScheduleHistoryRepository.findMaxVersionByReviewScheduleReference(reference)
+          ?.plus(1) ?: 1,
+        reference = reference,
+        prisonNumber = prisonNumber,
+        createdAtPrison = createdAtPrison,
+        updatedAtPrison = updatedAtPrison,
+        updatedAt = updatedAt,
+        createdAt = createdAt,
+        updatedBy = updatedBy,
+        createdBy = createdBy,
+        scheduleStatus = scheduleStatus,
+        earliestReviewDate = earliestReviewDate,
+        latestReviewDate = latestReviewDate,
+        scheduleCalculationRule = scheduleCalculationRule,
+      )
+      reviewScheduleHistoryRepository.save(historyEntry)
+    }
   }
 }
