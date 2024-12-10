@@ -15,6 +15,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
@@ -104,11 +105,13 @@ class ActionPlanServiceTest {
       given(persistenceAdapter.getActionPlan(any())).willReturn(null)
 
       // When
-      val retrievedActionPlan = service.getActionPlan(prisonNumber)
+      val exception = catchThrowableOfType(ActionPlanNotFoundException::class.java) {
+        service.getActionPlan(prisonNumber)
+      }
 
       // Then
-      assertThat(retrievedActionPlan.prisonNumber).isEqualTo(prisonNumber)
-      assertThat(retrievedActionPlan.goals).isEmpty()
+      assertThat(exception)
+        .hasMessage("ActionPlan for prisoner [$prisonNumber] not found")
       verify(persistenceAdapter).getActionPlan(prisonNumber)
     }
   }

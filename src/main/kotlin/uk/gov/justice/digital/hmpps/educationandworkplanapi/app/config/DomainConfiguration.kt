@@ -50,14 +50,12 @@ class DomainConfiguration {
     goalPersistenceAdapter: GoalPersistenceAdapter,
     goalEventService: GoalEventService,
     actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
-    actionPlanEventService: ActionPlanEventService,
     goalNotesService: GoalNotesService,
   ): GoalService =
     GoalService(
       goalPersistenceAdapter,
       goalEventService,
       actionPlanPersistenceAdapter,
-      actionPlanEventService,
       goalNotesService,
     )
 

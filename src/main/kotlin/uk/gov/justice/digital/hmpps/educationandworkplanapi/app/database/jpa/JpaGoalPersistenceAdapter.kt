@@ -32,7 +32,7 @@ class JpaGoalPersistenceAdapter(
   @Transactional
   override fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal> {
     val actionPlanEntity = actionPlanRepository.findByPrisonNumber(prisonNumber)
-      ?: throw ActionPlanNotFoundException("Unable to find ActionPlan for prisoner [$prisonNumber]")
+      ?: throw ActionPlanNotFoundException(prisonNumber)
 
     val goalEntities = createGoalDtos.map { goalMapper.fromDtoToEntity(it) }
     with(actionPlanEntity) {

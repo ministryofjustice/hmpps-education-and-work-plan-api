@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
@@ -195,22 +196,25 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createGoalRequest = aValidCreateGoalRequest(
-      title = "Learn French",
-      steps = listOf(
-        aValidCreateStepRequest(
-          title = "Book course",
-        ),
-        aValidCreateStepRequest(
-          title = "Attend course",
-        ),
-      ),
-    )
-    createGoal(
+    createActionPlan(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
-      createGoalRequest = createGoalRequest,
+      createActionPlanRequest = aValidCreateActionPlanRequest(
+        goals = listOf(
+          aValidCreateGoalRequest(
+            title = "Learn French",
+            steps = listOf(
+              aValidCreateStepRequest(
+                title = "Book course",
+              ),
+              aValidCreateStepRequest(
+                title = "Attend course",
+              ),
+            ),
+          ),
+        ),
+      ),
     )
 
     val actionPlan = getActionPlan(prisonNumber)
@@ -315,22 +319,25 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal and delete goal note`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createGoalRequest = aValidCreateGoalRequest(
-      title = "Learn French",
-      steps = listOf(
-        aValidCreateStepRequest(
-          title = "Book course",
-        ),
-        aValidCreateStepRequest(
-          title = "Attend course",
-        ),
-      ),
-    )
-    createGoal(
+    createActionPlan(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
-      createGoalRequest = createGoalRequest,
+      createActionPlanRequest = aValidCreateActionPlanRequest(
+        goals = listOf(
+          aValidCreateGoalRequest(
+            title = "Learn French",
+            steps = listOf(
+              aValidCreateStepRequest(
+                title = "Book course",
+              ),
+              aValidCreateStepRequest(
+                title = "Attend course",
+              ),
+            ),
+          ),
+        ),
+      ),
     )
 
     val actionPlan = getActionPlan(prisonNumber)
@@ -435,16 +442,19 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal given the goal fields are unchanged and the only change is to add a step`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createGoalRequest = aValidCreateGoalRequest(
-      steps = listOf(
-        aValidCreateStepRequest(title = "Book course"),
-      ),
-    )
-    createGoal(
+    createActionPlan(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
-      createGoalRequest = createGoalRequest,
+      createActionPlanRequest = aValidCreateActionPlanRequest(
+        goals = listOf(
+          aValidCreateGoalRequest(
+            steps = listOf(
+              aValidCreateStepRequest(title = "Book course"),
+            ),
+          ),
+        ),
+      ),
     )
 
     val actionPlan = getActionPlan(prisonNumber)

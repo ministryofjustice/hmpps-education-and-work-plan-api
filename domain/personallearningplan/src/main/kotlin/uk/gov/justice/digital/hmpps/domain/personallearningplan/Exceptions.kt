@@ -9,14 +9,21 @@ import java.util.UUID
 class InvalidGoalException(message: String) : RuntimeException(message)
 
 /**
+ * Thrown when an Action Plan cannot be created, for example because it is missing mandatory data.
+ */
+class InvalidActionPlanException(message: String) : RuntimeException(message)
+
+/**
  * Thrown when an ActionPlan cannot be found.
  */
-class ActionPlanNotFoundException(message: String) : RuntimeException(message)
+class ActionPlanNotFoundException(prisonNumber: String) :
+  RuntimeException("ActionPlan for prisoner [$prisonNumber] not found")
 
 /**
  * Thrown when an Attempt is made to create an ActionPlan for a prisoner who already has one.
  */
-class ActionPlanAlreadyExistsException(message: String) : RuntimeException(message)
+class ActionPlanAlreadyExistsException(prisonNumber: String) :
+  RuntimeException("An Action Plan already exists for prisoner $prisonNumber.")
 
 /**
  * Thrown when a specified Goal cannot be found.

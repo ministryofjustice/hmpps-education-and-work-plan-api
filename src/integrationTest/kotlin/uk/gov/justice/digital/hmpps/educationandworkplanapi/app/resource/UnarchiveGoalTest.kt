@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Reaso
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUnarchiveGoalRequest
@@ -32,7 +33,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.util.*
+import java.util.UUID
 
 class UnarchiveGoalTest : IntegrationTestBase() {
 
@@ -73,7 +74,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and unarchive a goal and reset the reason and other text `() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val archiveRequestWithOtherReason = aValidArchiveGoalRequest(
       goalReference = goalReference,
@@ -124,7 +125,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and unarchive a goal and reset the reason and other text and archive note is deleted `() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val archiveNote = "an archive note"
     val archiveRequestWithOtherReason = aValidArchiveGoalRequest(
@@ -207,7 +208,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal is for a different prisoner`() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val unarchiveGoalRequest = aValidUnarchiveGoalRequest(goalReference)
     val aDifferentPrisonNumber = "Z9876YX"
 
@@ -260,7 +261,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 409 if goal is not archived`() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val archiveGoalRequest = aValidUnarchiveGoalRequest(goalReference)
 
     // when
@@ -314,23 +315,27 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     .expectStatus()
     .isNoContent()
 
-  private fun createAGoalAndGetTheReference(prisonNumber: String): UUID {
-    val createGoalRequest = aValidCreateGoalRequest(
-      title = "Learn French",
-      steps = listOf(
-        aValidCreateStepRequest(
-          title = "Book course",
-        ),
-        aValidCreateStepRequest(
-          title = "Attend course",
+  private fun createAnActionPlanAndGetTheGoalReference(prisonNumber: String): UUID {
+    val createActionPlanRequest = aValidCreateActionPlanRequest(
+      goals = listOf(
+        aValidCreateGoalRequest(
+          title = "Learn French",
+          steps = listOf(
+            aValidCreateStepRequest(
+              title = "Book course",
+            ),
+            aValidCreateStepRequest(
+              title = "Attend course",
+            ),
+          ),
         ),
       ),
     )
-    createGoal(
+    createActionPlan(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
-      createGoalRequest = createGoalRequest,
+      createActionPlanRequest = createActionPlanRequest,
     )
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]

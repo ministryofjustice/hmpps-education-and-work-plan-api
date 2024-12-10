@@ -25,13 +25,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCompleteGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.util.*
+import java.util.UUID
 
 class CompleteGoalTest : IntegrationTestBase() {
 
@@ -66,7 +67,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and complete a goal`() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(
       goalReference = goalReference,
     )
@@ -112,7 +113,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and complete a goal and create an completion note`() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val noteText = "Completed the goal! "
     val completeGoalRequest = aValidCompleteGoalRequest(
       goalReference = goalReference,
@@ -185,7 +186,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal is for a different prisoner`() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(goalReference)
     val aDifferentPrisonNumber = "Z9876YX"
 
@@ -233,7 +234,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 409 if goal is already completed`() {
     // given
-    val goalReference = createAGoalAndGetTheReference(prisonNumber)
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(goalReference = goalReference)
     completeAGoal(prisonNumber, goalReference, completeGoalRequest)
       .expectStatus()
@@ -270,23 +271,27 @@ class CompleteGoalTest : IntegrationTestBase() {
     .contentType(APPLICATION_JSON)
     .exchange()
 
-  private fun createAGoalAndGetTheReference(prisonNumber: String): UUID {
-    val createGoalRequest = aValidCreateGoalRequest(
-      title = "Learn French",
-      steps = listOf(
-        aValidCreateStepRequest(
-          title = "Book course",
-        ),
-        aValidCreateStepRequest(
-          title = "Attend course",
+  private fun createAnActionPlanAndGetTheGoalReference(prisonNumber: String): UUID {
+    val createActionPlanRequest = aValidCreateActionPlanRequest(
+      goals = listOf(
+        aValidCreateGoalRequest(
+          title = "Learn French",
+          steps = listOf(
+            aValidCreateStepRequest(
+              title = "Book course",
+            ),
+            aValidCreateStepRequest(
+              title = "Attend course",
+            ),
+          ),
         ),
       ),
     )
-    createGoal(
+    createActionPlan(
       username = "auser_gen",
       displayName = "Albert User",
       prisonNumber = prisonNumber,
-      createGoalRequest = createGoalRequest,
+      createActionPlanRequest = createActionPlanRequest,
     )
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]

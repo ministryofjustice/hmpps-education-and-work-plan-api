@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalAction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -35,7 +36,6 @@ class GoalService(
   private val goalPersistenceAdapter: GoalPersistenceAdapter,
   private val goalEventService: GoalEventService,
   private val actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
-  private val actionPlanEventService: ActionPlanEventService,
   private val goalNotesService: GoalNotesService,
 ) {
 
@@ -52,13 +52,8 @@ class GoalService(
   fun createGoals(prisonNumber: String, createGoalDtos: List<CreateGoalDto>): List<Goal> {
     log.info { "Creating new ${if (createGoalDtos.size == 1) "Goal" else "Goals"} for prisoner [$prisonNumber]" }
 
-    // TODO RR-227 - We need to change throw a 404 once the create action plan endpoint is being called by the UI (with an optional review date)
     return if (actionPlanDoesNotExist(prisonNumber)) {
-      actionPlanPersistenceAdapter.createActionPlan(newActionPlan(prisonNumber, createGoalDtos))
-        .apply {
-          actionPlanEventService.actionPlanCreated(this)
-          goalNotesService.createNotes(prisonNumber, goals)
-        }.goals
+      throw ActionPlanNotFoundException(prisonNumber)
     } else {
       goalPersistenceAdapter.createGoals(prisonNumber, createGoalDtos).apply {
         goalNotesService.createNotes(prisonNumber, this)
