@@ -18,10 +18,9 @@ class ActionPlan(
     get() = field.also { goals -> goals.sortByDescending { it.createdAt } }
 
   init {
-    // TODO - RR-227 enable once we are returning a 404, rather than a "dummy" Action Plan
-    // if (goals.isEmpty()) {
-    //  throw InvalidActionPlanException("Cannot create ActionPlan with reference [$reference]. At least one Goal is required.")
-    // }
+    if (goals.isEmpty()) {
+      throw InvalidActionPlanException("Cannot create ActionPlan with reference [$reference]. At least one Goal is required.")
+    }
     this.goals = goals.toMutableList()
   }
 

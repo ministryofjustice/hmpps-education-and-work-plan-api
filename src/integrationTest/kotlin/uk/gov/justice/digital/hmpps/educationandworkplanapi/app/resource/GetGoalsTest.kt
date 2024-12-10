@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 
@@ -247,8 +248,8 @@ class GetGoalsTest : IntegrationTestBase() {
   }
 
   private fun anActionPlanExistsWithAnArchivedGoal(): ActionPlanResponse {
-    prisonerGoals.forEach { title ->
-      val createGoalRequest = aValidCreateGoalRequest(
+    val createGoalsRequests = prisonerGoals.map { title ->
+      aValidCreateGoalRequest(
         title = title,
         steps = listOf(
           aValidCreateStepRequest(
@@ -259,13 +260,15 @@ class GetGoalsTest : IntegrationTestBase() {
           ),
         ),
       )
-      createGoal(
-        username = "auser_gen",
-        displayName = "Albert User",
-        prisonNumber = prisonNumber,
-        createGoalRequest = createGoalRequest,
-      )
     }
+    createActionPlan(
+      username = "auser_gen",
+      displayName = "Albert User",
+      prisonNumber = prisonNumber,
+      createActionPlanRequest = aValidCreateActionPlanRequest(
+        goals = createGoalsRequests,
+      ),
+    )
     val actionPlan = getActionPlan(prisonNumber)
     val goalToArchive = actionPlan.goals.first { it.title == archivedGoal }
     archiveGoal(prisonNumber, aValidArchiveGoalRequest(goalToArchive.goalReference))

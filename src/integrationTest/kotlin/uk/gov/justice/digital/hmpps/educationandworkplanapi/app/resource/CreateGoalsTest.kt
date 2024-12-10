@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -19,7 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
@@ -128,74 +126,6 @@ class CreateGoalsTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should add goals and create a new action plan given prisoner does not have an action plan`() {
-    // Given
-    val prisonNumber = aValidPrisonNumber()
-    val stepRequest = aValidCreateStepRequest()
-    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(stepRequest), notes = "Notes about the goal...")
-    val createGoalsRequest = aValidCreateGoalsRequest(
-      goals = listOf(createGoalRequest),
-    )
-
-    val dpsUsername = "auser_gen"
-    val displayName = "Albert User"
-
-    // When
-    webTestClient.post()
-      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
-      .withBody(createGoalsRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RW,
-          username = dpsUsername,
-          displayName = displayName,
-          privateKey = keyPair.private,
-        ),
-      )
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
-
-    // Then
-    val actionPlanResponse = getActionPlan(prisonNumber)
-    assertThat(actionPlanResponse)
-      .isForPrisonNumber(prisonNumber)
-      .hasNumberOfGoals(1)
-      .goal(1) { goal ->
-        goal.hasTitle(createGoalRequest.title)
-          .hasNumberOfSteps(createGoalRequest.steps.size)
-          .wasCreatedAtPrison(createGoalRequest.prisonId)
-          .wasCreatedBy(dpsUsername)
-          .hasCreatedByDisplayName(displayName)
-          .wasUpdatedAtPrison(createGoalRequest.prisonId)
-          .wasUpdatedBy(dpsUsername)
-          .hasUpdatedByDisplayName(displayName)
-          .step(1) { step ->
-            step.hasTitle(stepRequest.title)
-              .hasStatus(StepStatus.NOT_STARTED)
-          }
-      }
-
-    val goal = actionPlanResponse.goals[0]
-    await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
-      // Event should be triggered only once for the new goal created
-      verify(telemetryClient, times(1)).trackEvent(
-        eq("goal-created"),
-        capture(eventPropertiesCaptor),
-        eq(null),
-      )
-      val createGoalEventProperties = eventPropertiesCaptor.firstValue
-      assertThat(createGoalEventProperties)
-        .containsEntry("status", "ACTIVE")
-        .containsEntry("stepCount", "1")
-        .containsEntry("reference", goal.goalReference.toString())
-        .containsKey("correlationId")
-    }
-  }
-
-  @Test
   fun `should add goal to prisoner's existing action plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
@@ -277,8 +207,10 @@ class CreateGoalsTest : IntegrationTestBase() {
     val actual = getActionPlan(prisonNumber)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
+      // Creating the Action Plan created 1 goal, and we have just created another, which is why we now expect there to be 2 goals.
       .hasNumberOfGoals(2)
-      .goal(1) { goal -> // goals are returned in creation date descending order, so to get the most recently added goal we need the first goal
+      // The goals are returned in date order descending, so even though we are interested in the 2nd goal to be created, it is element 1 in the returned data
+      .goal(1) { goal ->
         goal.hasTitle(createGoalRequest.title)
           .hasNumberOfSteps(createGoalRequest.steps.size)
           .hasNoNotes()
@@ -307,6 +239,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   fun `should add goal with no notes`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(
       notes = null,
@@ -327,7 +260,9 @@ class CreateGoalsTest : IntegrationTestBase() {
     val actual = getActionPlan(prisonNumber)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .hasNumberOfGoals(1)
+      // Creating the Action Plan created 1 goal, and we have just created another, which is why we now expect there to be 2 goals.
+      .hasNumberOfGoals(2)
+      // The goals are returned in date order descending, so even though we are interested in the 2nd goal to be created, it is element 1 in the returned data
       .goal(1) { goal ->
         goal
           .hasNoGoalNote()
@@ -339,6 +274,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   fun `should add goal with notes`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(
       notes = "This feels like an appropriate and achievable goal for Chris",
@@ -359,7 +295,9 @@ class CreateGoalsTest : IntegrationTestBase() {
     val actual = getActionPlan(prisonNumber)
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .hasNumberOfGoals(1)
+      // Creating the Action Plan created 1 goal, and we have just created another, which is why we now expect there to be 2 goals.
+      .hasNumberOfGoals(2)
+      // The goals are returned in date order descending, so even though we are interested in the 2nd goal to be created, it is element 1 in the returned data
       .goal(1) { goal ->
         goal.hasGoalNote("This feels like an appropriate and achievable goal for Chris")
       }

@@ -65,7 +65,7 @@ class JpaGoalPersistenceAdapterTest {
       }
 
       // Then
-      assertThat(exception).hasMessage("Unable to find ActionPlan for prisoner [$prisonNumber]")
+      assertThat(exception).hasMessage("ActionPlan for prisoner [$prisonNumber] not found")
       verifyNoInteractions(goalMapper)
     }
 

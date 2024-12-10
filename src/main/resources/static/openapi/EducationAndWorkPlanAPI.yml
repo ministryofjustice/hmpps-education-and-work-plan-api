@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.17.9'
+  version: '1.18.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -154,8 +154,9 @@ paths:
     get:
       summary: Return a Prisoner's Action Plan
       description: | 
-        Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, then an Action Plan with no goals (empty array) is returned.
-        **Role Requirements:**
+        Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, a 404 is returned.
+
+        **Role Requirements:**  
         Access to this endpoint requires one of the following roles:
           - `ROLE_EDUCATION_AND_WORK_PLAN__ACTIONPLANS__RO` (Read-Only)
           - `ROLE_EDUCATION_AND_WORK_PLAN__ACTIONPLANS__RW` (Read-Write)
@@ -164,6 +165,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/ActionPlan'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
       operationId: get-action-plan-by-prison-number
 
   #
@@ -301,7 +304,7 @@ paths:
     post:
       summary: Creates one or more Goals.
       description: |
-        Creates one or more Goals and saves them to the Prisoner's Action Plan (the latter will be created if it doesn't already exist).
+        Creates one or more Goals and saves them to the Prisoner's Action Plan. Returns a 404 if the Prisoner does not have an Action Plan.
         
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
