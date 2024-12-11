@@ -32,6 +32,7 @@ class ReviewScheduleHistoryResponseMapper(
         updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
         updatedAtPrison = lastUpdatedAtPrison,
+        version = version,
       )
     }
 

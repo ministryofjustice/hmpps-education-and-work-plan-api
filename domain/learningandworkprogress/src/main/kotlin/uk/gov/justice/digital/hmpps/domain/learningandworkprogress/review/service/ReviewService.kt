@@ -57,13 +57,15 @@ class ReviewService(
   /**
    * Returns a list of [ReviewSchedule] for the prisoner identified by their prison number.
    */
-  fun getReviewSchedulesForPrisoner(prisonNumber: String): List<ReviewScheduleHistory> =
-    reviewSchedulePersistenceAdapter
+  fun getReviewSchedulesForPrisoner(prisonNumber: String): List<ReviewScheduleHistory> {
+    val responses = reviewSchedulePersistenceAdapter
       .getReviewScheduleHistory(prisonNumber)
-      .sortedWith(
-        compareByDescending<ReviewScheduleHistory> { it.lastUpdatedBy }
-          .thenByDescending { it.version },
-      )
+
+    return responses.sortedWith(
+      compareByDescending<ReviewScheduleHistory> { it.lastUpdatedAt }
+        .thenByDescending { it.version },
+    )
+  }
 
   /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is
