@@ -6,6 +6,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.junit.jupiter.MockitoExtension
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
+@Isolated
 @ExtendWith(MockitoExtension::class)
 class InboundEventsListenerTest : IntegrationTestBase() {
   companion object {

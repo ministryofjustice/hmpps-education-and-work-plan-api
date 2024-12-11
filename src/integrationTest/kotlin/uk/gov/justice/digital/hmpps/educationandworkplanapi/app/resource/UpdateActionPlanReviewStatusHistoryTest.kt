@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Isolated
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
@@ -14,6 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 
+@Isolated
 class UpdateActionPlanReviewStatusHistoryTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/schedule-status"

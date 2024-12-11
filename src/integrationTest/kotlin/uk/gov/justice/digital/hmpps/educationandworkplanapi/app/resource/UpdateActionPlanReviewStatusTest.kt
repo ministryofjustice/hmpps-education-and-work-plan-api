@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 
+@Isolated
 class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/schedule-status"
