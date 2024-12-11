@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.19.0'
+  version: '1.19.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -251,9 +251,9 @@ paths:
           description: Invalid review schedule status change.
         '404':
           $ref: '#/components/responses/404ErrorResponse'
-      operationId: review-schedule-status
+      operationId: update-review-schedule-status
       requestBody:
-        $ref: '#/components/requestBodies/ReviewScheduleStatus'
+        $ref: '#/components/requestBodies/UpdateReviewScheduleStatus'
 
   #
   # Action Plan Review schedules
@@ -2898,8 +2898,8 @@ components:
         - conductedAt
 
     ### Action Plan Review Exemption ###
-    CreateReviewScheduleStatusRequest:
-      title: CreateReviewScheduleStatusRequest
+    UpdateReviewScheduleStatusRequest:
+      title: UpdateReviewScheduleStatusRequest
       description: A request to update the status of the current review schedule for example to set an exemption.
       type: object
       properties:
@@ -3537,12 +3537,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateActionPlanReviewRequest'
-    ReviewScheduleStatus:
+    UpdateReviewScheduleStatus:
       description: Request body to update a review schedule status.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/CreateReviewScheduleStatusRequest'
+            $ref: '#/components/schemas/UpdateReviewScheduleStatusRequest'
   parameters:
     prisonNumberPathParameter:
       name: prisonNumber
