@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.LocalDate
 
 class GetActionPlanSummariesTest : IntegrationTestBase() {
 
@@ -83,14 +82,13 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
     // Given
     val prisonNumber1 = aValidPrisonNumber()
     val prisonNumber2 = anotherValidPrisonNumber()
-    val reviewDate = LocalDate.now().plusMonths(6)
-    createActionPlan(prisonNumber1, aValidCreateActionPlanRequest(reviewDate = reviewDate))
-    createActionPlan(prisonNumber2, aValidCreateActionPlanRequest(reviewDate = null))
+    createActionPlan(prisonNumber1, aValidCreateActionPlanRequest())
+    createActionPlan(prisonNumber2, aValidCreateActionPlanRequest())
     val request = aValidGetActionPlanSummariesRequest(listOf(prisonNumber1, prisonNumber2))
     val expectedResponse = ActionPlanSummaryListResponse(
       actionPlanSummaries = listOf(
-        aValidActionPlanSummaryResponse(prisonNumber = prisonNumber1, reviewDate = reviewDate),
-        aValidActionPlanSummaryResponse(prisonNumber = prisonNumber2, reviewDate = null),
+        aValidActionPlanSummaryResponse(prisonNumber = prisonNumber1),
+        aValidActionPlanSummaryResponse(prisonNumber = prisonNumber2),
       ),
     )
 

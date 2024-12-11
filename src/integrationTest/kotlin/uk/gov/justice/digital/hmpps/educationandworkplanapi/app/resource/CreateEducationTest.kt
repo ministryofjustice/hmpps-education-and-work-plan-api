@@ -105,11 +105,7 @@ class CreateEducationTest : IntegrationTestBase() {
     assertThat(education)
       .wasCreatedAtOrAfter(earliestCreateTime)
       .hasNumberOfQualifications(2)
-      .qualification(1) {
-        it.wasCreatedAtPrison("MDI")
-          .wasUpdatedAtPrison("MDI")
-      }
-      .qualification(2) {
+      .allQualifications {
         it.wasCreatedAtPrison("MDI")
           .wasUpdatedAtPrison("MDI")
       }

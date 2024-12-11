@@ -29,6 +29,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
@@ -36,6 +39,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher.HmppsDomainEvent
@@ -59,13 +63,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Archi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -147,6 +149,9 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var reviewScheduleRepository: ReviewScheduleRepository
+
+  @Autowired
+  lateinit var reviewScheduleHistoryRepository: ReviewScheduleHistoryRepository
 
   @SpyBean
   lateinit var telemetryClient: TelemetryClient
@@ -232,11 +237,20 @@ abstract class IntegrationTestBase {
   fun createActionPlan(
     prisonNumber: String,
     createActionPlanRequest: CreateActionPlanRequest = aValidCreateActionPlanRequest(),
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
   ) {
     webTestClient.post()
       .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(
+        aValidTokenWithAuthority(
+          ACTIONPLANS_RW,
+          privateKey = keyPair.private,
+          username = username,
+          displayName = displayName,
+        ),
+      )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
   }
@@ -297,25 +311,6 @@ abstract class IntegrationTestBase {
       .returnResult(InductionResponse::class.java)
       .responseBody.blockFirst()!!
 
-  fun createGoal(
-    prisonNumber: String,
-    createGoalRequest: CreateGoalRequest,
-    username: String = "auser_gen",
-    displayName: String = "Albert User",
-  ) {
-    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
-    webTestClient.post()
-      .uri("/action-plans/{prisonNumber}/goals", prisonNumber)
-      .withBody(createGoalsRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private),
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
-  }
-
   fun archiveGoal(
     prisonNumber: String,
     archiveGoalRequest: ArchiveGoalRequest,
@@ -326,7 +321,12 @@ abstract class IntegrationTestBase {
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/archive", prisonNumber, archiveGoalRequest.goalReference)
       .withBody(archiveGoalRequest)
       .bearerToken(
-        aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(
+          GOALS_RW,
+          privateKey = keyPair.private,
+          username = username,
+          displayName = displayName,
+        ),
       )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
@@ -344,7 +344,12 @@ abstract class IntegrationTestBase {
       .uri("/conversations/{prisonNumber}", prisonNumber)
       .withBody(createConversationRequest)
       .bearerToken(
-        aValidTokenWithAuthority(CONVERSATIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(
+          CONVERSATIONS_RW,
+          privateKey = keyPair.private,
+          username = username,
+          displayName = displayName,
+        ),
       )
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
@@ -428,7 +433,10 @@ abstract class IntegrationTestBase {
   }
 
   internal fun HmppsQueue.countAllMessagesOnQueue() = sqsClient.countAllMessagesOnQueue(queueUrl).get()
-  fun createInductionSchedule(prisonNumber: String, status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED) {
+  fun createInductionSchedule(
+    prisonNumber: String,
+    status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+  ) {
     inductionScheduleRepository.save(
       InductionScheduleEntity(
         prisonNumber = prisonNumber,
@@ -438,6 +446,25 @@ abstract class IntegrationTestBase {
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       ),
     )
+  }
+
+  fun createReviewScheduleRecord(
+    prisonNumber: String,
+    status: String = ReviewScheduleStatus.SCHEDULED.name,
+    earliestDate: LocalDate = LocalDate.now().minusMonths(1),
+    latestDate: LocalDate = LocalDate.now().plusMonths(1),
+  ) {
+    val reviewScheduleEntity = ReviewScheduleEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      earliestReviewDate = earliestDate,
+      latestReviewDate = latestDate,
+      scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
+      scheduleStatus = ReviewScheduleStatus.valueOf(status),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
+    )
+    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
   }
 }
 

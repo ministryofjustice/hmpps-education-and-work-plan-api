@@ -15,8 +15,11 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
@@ -47,14 +50,12 @@ class DomainConfiguration {
     goalPersistenceAdapter: GoalPersistenceAdapter,
     goalEventService: GoalEventService,
     actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
-    actionPlanEventService: ActionPlanEventService,
     goalNotesService: GoalNotesService,
   ): GoalService =
     GoalService(
       goalPersistenceAdapter,
       goalEventService,
       actionPlanPersistenceAdapter,
-      actionPlanEventService,
       goalNotesService,
     )
 
@@ -103,10 +104,18 @@ class DomainConfiguration {
 
   @Bean
   fun reviewDomainService(
+    reviewEventService: ReviewEventService,
     reviewPersistenceAdapter: ReviewPersistenceAdapter,
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   ): ReviewService =
-    ReviewService(reviewPersistenceAdapter, reviewSchedulePersistenceAdapter)
+    ReviewService(reviewEventService, reviewPersistenceAdapter, reviewSchedulePersistenceAdapter)
+
+  @Bean
+  fun reviewScheduleDomainService(
+    reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
+    reviewScheduleEventService: ReviewScheduleEventService,
+  ): ReviewScheduleService =
+    ReviewScheduleService(reviewSchedulePersistenceAdapter, reviewScheduleEventService)
 
   @Bean
   fun ciagKpiService(

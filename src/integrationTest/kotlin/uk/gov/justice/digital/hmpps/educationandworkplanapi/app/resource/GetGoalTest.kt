@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidArchiveGoalRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 
@@ -86,9 +86,9 @@ class GetGoalTest : IntegrationTestBase() {
   fun `should return not found given goal exists but for a different prisoner`() {
     // Given
     val someOtherPrisonNumber = anotherValidPrisonNumber()
-    createGoal(
+    createActionPlan(
       prisonNumber = someOtherPrisonNumber,
-      createGoalRequest = aValidCreateGoalRequest(),
+      createActionPlanRequest = aValidCreateActionPlanRequest(),
     )
     val actionPlan = getActionPlan(someOtherPrisonNumber)
     val goal = actionPlan.goals[0]
@@ -118,9 +118,9 @@ class GetGoalTest : IntegrationTestBase() {
   @Test
   fun `should return goal given prison number and goal reference`() {
     // Given
-    createGoal(
+    createActionPlan(
       prisonNumber = prisonNumber,
-      createGoalRequest = aValidCreateGoalRequest(),
+      createActionPlanRequest = aValidCreateActionPlanRequest(),
     )
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]
@@ -151,9 +151,9 @@ class GetGoalTest : IntegrationTestBase() {
   @Test
   fun `should return goal given prison number with archive note`() {
     // Given a goal is created and archived.
-    createGoal(
+    createActionPlan(
       prisonNumber = prisonNumber,
-      createGoalRequest = aValidCreateGoalRequest(),
+      createActionPlanRequest = aValidCreateActionPlanRequest(),
     )
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]

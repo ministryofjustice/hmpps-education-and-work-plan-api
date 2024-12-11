@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Comple
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
@@ -28,6 +28,7 @@ private val log = KotlinLogging.logger {}
  * domain.
  */
 class ReviewService(
+  private val reviewEventService: ReviewEventService,
   private val reviewPersistenceAdapter: ReviewPersistenceAdapter,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
 ) {
@@ -106,14 +107,16 @@ class ReviewService(
             prisonId = createCompletedReviewDto.prisonId,
             reviewScheduleWindow = it,
             scheduleCalculationRule = reviewScheduleCalculationRule,
-            scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+            scheduleStatus = SCHEDULED,
           ),
         )
       } ?: let {
         // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
         completedReviewSchedule!!
       },
-    )
+    ).also {
+      reviewEventService.reviewCompleted(it.completedReview)
+    }
   }
 
   fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? {
@@ -144,7 +147,7 @@ class ReviewService(
             prisonId = createInitialReviewScheduleDto.prisonId,
             reviewScheduleWindow = it,
             scheduleCalculationRule = reviewScheduleCalculationRule,
-            scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+            scheduleStatus = SCHEDULED,
           ),
         )
       }

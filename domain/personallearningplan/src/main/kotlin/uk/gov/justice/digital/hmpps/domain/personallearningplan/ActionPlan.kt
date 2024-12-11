@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
-import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -9,7 +8,6 @@ import java.util.UUID
 class ActionPlan(
   val reference: UUID,
   val prisonNumber: String,
-  val reviewDate: LocalDate?,
   goals: List<Goal> = emptyList(),
 ) {
 
@@ -20,10 +18,9 @@ class ActionPlan(
     get() = field.also { goals -> goals.sortByDescending { it.createdAt } }
 
   init {
-    // TODO - RR-227 enable once we are returning a 404, rather than a "dummy" Action Plan
-    // if (goals.isEmpty()) {
-    //  throw InvalidActionPlanException("Cannot create ActionPlan with reference [$reference]. At least one Goal is required.")
-    // }
+    if (goals.isEmpty()) {
+      throw InvalidActionPlanException("Cannot create ActionPlan with reference [$reference]. At least one Goal is required.")
+    }
     this.goals = goals.toMutableList()
   }
 
@@ -34,6 +31,6 @@ class ActionPlan(
     goals.add(goal)
 
   override fun toString(): String {
-    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', reviewDate='$reviewDate', goals=$goals)"
+    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', goals=$goals)"
   }
 }

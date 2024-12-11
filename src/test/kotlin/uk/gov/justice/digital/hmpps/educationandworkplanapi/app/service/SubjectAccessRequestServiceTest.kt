@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
@@ -221,8 +222,7 @@ class SubjectAccessRequestServiceTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(null)
-    val emptyActionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = emptyList())
-    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(emptyActionPlan)
+    given(actionPlanService.getActionPlan(prisonNumber)).willThrow(ActionPlanNotFoundException(prisonNumber))
 
     // When
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)

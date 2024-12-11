@@ -104,7 +104,7 @@ class ReviewScheduleEntityMapper {
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH
     }
 
-  private fun toReviewScheduleStatus(reviewScheduleStatus: ReviewScheduleStatusDomain): ReviewScheduleStatusEntity =
+  fun toReviewScheduleStatus(reviewScheduleStatus: ReviewScheduleStatusDomain): ReviewScheduleStatusEntity =
     when (reviewScheduleStatus) {
       ReviewScheduleStatusDomain.SCHEDULED -> ReviewScheduleStatusEntity.SCHEDULED
       ReviewScheduleStatusDomain.COMPLETED -> ReviewScheduleStatusEntity.COMPLETED

@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
@@ -27,9 +28,13 @@ class SubjectAccessRequestService(
     val fromDateInstance = fromDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
     val toDateInstance = toDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
 
-    val goals = actionPlanService.getActionPlan(prisonNumber).goals
-      .filter { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
-      .filter { toDateInstance == null || it.createdAt?.isBefore(toDateInstance) ?: true }
+    val goals = try {
+      actionPlanService.getActionPlan(prisonNumber).goals
+        .filter { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
+        .filter { toDateInstance == null || it.createdAt?.isBefore(toDateInstance) ?: true }
+    } catch (e: ActionPlanNotFoundException) {
+      emptyList()
+    }
 
     val induction = try {
       inductionService.getInductionForPrisoner(prisonNumber)

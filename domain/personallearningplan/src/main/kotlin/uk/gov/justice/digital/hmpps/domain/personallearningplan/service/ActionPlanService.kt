@@ -3,9 +3,9 @@ package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
-import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -32,7 +32,7 @@ class ActionPlanService(
       log.info { "Creating ActionPlan for prisoner [$prisonNumber]" }
 
       if (persistenceAdapter.getActionPlan(prisonNumber) != null) {
-        throw ActionPlanAlreadyExistsException("An Action Plan already exists for prisoner $prisonNumber.")
+        throw ActionPlanAlreadyExistsException(prisonNumber)
       }
 
       return persistenceAdapter.createActionPlan(createActionPlanDto)
@@ -47,16 +47,11 @@ class ActionPlanService(
    */
   fun getActionPlan(prisonNumber: String): ActionPlan {
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }
-    // TODO RR-227 - return 404 if not found
-    val actionPlan = persistenceAdapter.getActionPlan(prisonNumber)
-      ?: ActionPlan(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        reviewDate = null,
-        goals = emptyList(),
-      )
-    actionPlan.goals.onEach { it.notes = goalNotesService.getNotes(it.reference) }
-    return actionPlan
+    return persistenceAdapter.getActionPlan(prisonNumber)
+      ?.apply {
+        goals.onEach { it.notes = goalNotesService.getNotes(it.reference) }
+      }
+      ?: throw ActionPlanNotFoundException(prisonNumber)
   }
 
   fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> {

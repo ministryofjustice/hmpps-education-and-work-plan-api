@@ -18,8 +18,10 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalStateException
@@ -30,7 +32,6 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiveGoalDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
@@ -48,9 +49,6 @@ class GoalServiceTest {
 
   @Mock
   private lateinit var actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter
-
-  @Mock
-  private lateinit var actionPlanEventService: ActionPlanEventService
 
   @Mock
   private lateinit var goalNotesService: GoalNotesService
@@ -76,29 +74,25 @@ class GoalServiceTest {
       verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
       verify(goalPersistenceAdapter).createGoals(prisonNumber, listOf(createGoalDto))
       verify(goalEventService).goalsCreated(prisonNumber, createdGoals)
-      verifyNoInteractions(actionPlanEventService)
     }
 
     @Test
-    fun `should add goal to new action plan given prisoner does not have an action plan`() {
+    fun `should not add goal to action plan given prisoner does not have an action plan`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
-      val goal = aValidGoal()
-      val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal))
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(null)
-      given(actionPlanPersistenceAdapter.createActionPlan(any())).willReturn(actionPlan)
       val createGoalDto = aValidCreateGoalDto()
-      val expectedCreateActionPlanDto =
-        aValidCreateActionPlanDto(prisonNumber = prisonNumber, reviewDate = null, goals = listOf(createGoalDto))
 
       // When
-      val actual = service.createGoal(prisonNumber, createGoalDto)
+      val exception = catchThrowableOfType(ActionPlanNotFoundException::class.java) {
+        service.createGoal(prisonNumber, createGoalDto)
+      }
 
       // Then
-      assertThat(actual).isEqualTo(goal)
+      assertThat(exception)
+        .hasMessage("ActionPlan for prisoner [$prisonNumber] not found")
       verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
-      verify(actionPlanPersistenceAdapter).createActionPlan(expectedCreateActionPlanDto)
-      verify(actionPlanEventService).actionPlanCreated(actionPlan)
+      verifyNoMoreInteractions(actionPlanPersistenceAdapter)
       verifyNoInteractions(goalPersistenceAdapter)
       verifyNoInteractions(goalEventService)
     }
@@ -129,34 +123,28 @@ class GoalServiceTest {
       verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
       verify(goalPersistenceAdapter).createGoals(prisonNumber, createGoalDtos)
       verify(goalEventService).goalsCreated(prisonNumber, createdGoals)
-      verifyNoInteractions(actionPlanEventService)
     }
 
     @Test
     fun `should add goals to new action plan given prisoner does not have an action plan`() {
       // Given
       val prisonNumber = aValidPrisonNumber()
-      val goal1 = aValidGoal(title = "Goal 1")
-      val goal2 = aValidGoal(title = "Goal 2")
-      val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal1, goal2))
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(null)
-      given(actionPlanPersistenceAdapter.createActionPlan(any())).willReturn(actionPlan)
 
       val createGoalDto1 = aValidCreateGoalDto(title = "Goal 1")
       val createGoalDto2 = aValidCreateGoalDto(title = "Goal 2")
       val createGoalDtos = listOf(createGoalDto1, createGoalDto2)
 
-      val expectedCreateActionPlanDto =
-        aValidCreateActionPlanDto(prisonNumber = prisonNumber, reviewDate = null, goals = createGoalDtos)
-
       // When
-      val actual = service.createGoals(prisonNumber, createGoalDtos)
+      val exception = catchThrowableOfType(ActionPlanNotFoundException::class.java) {
+        service.createGoals(prisonNumber, createGoalDtos)
+      }
 
       // Then
-      assertThat(actual).containsExactlyInAnyOrder(goal1, goal2)
+      assertThat(exception)
+        .hasMessage("ActionPlan for prisoner [$prisonNumber] not found")
       verify(actionPlanPersistenceAdapter).getActionPlan(prisonNumber)
-      verify(actionPlanPersistenceAdapter).createActionPlan(expectedCreateActionPlanDto)
-      verify(actionPlanEventService).actionPlanCreated(actionPlan)
+      verifyNoMoreInteractions(actionPlanPersistenceAdapter)
       verifyNoInteractions(goalPersistenceAdapter)
       verifyNoInteractions(goalEventService)
     }

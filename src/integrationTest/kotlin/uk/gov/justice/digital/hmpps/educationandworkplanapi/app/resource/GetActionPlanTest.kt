@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
@@ -17,7 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.LocalDate
 
 class GetActionPlanTest : IntegrationTestBase() {
 
@@ -67,21 +67,21 @@ class GetActionPlanTest : IntegrationTestBase() {
       .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
       .exchange()
       .expectStatus()
-      .isOk
-      .returnResult(ActionPlanResponse::class.java)
+      .isNotFound
+      .returnResult(ErrorResponse::class.java)
 
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .isForPrisonNumber(prisonNumber)
-      .hasNoGoalsSet()
+      .hasStatus(NOT_FOUND.value())
+      .hasUserMessage("ActionPlan for prisoner [$prisonNumber] not found")
   }
 
   @Test
   fun `should get action plan for prisoner`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createActionPlanRequest = aValidCreateActionPlanRequest(reviewDate = null)
+    val createActionPlanRequest = aValidCreateActionPlanRequest()
     createActionPlan(prisonNumber, createActionPlanRequest)
 
     // When
@@ -97,7 +97,6 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .hasNoReviewDate()
       .goal(1) {
         it.wasCreatedAtPrison("BXI")
           .wasCreatedBy("auser_gen")
@@ -115,13 +114,11 @@ class GetActionPlanTest : IntegrationTestBase() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createActionPlanRequest = aValidCreateActionPlanRequest(
-      reviewDate = LocalDate.now(),
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn Spanish"))
-    val expectedReviewDate = LocalDate.now()
 
     // When
     val response = webTestClient.get()
@@ -136,7 +133,6 @@ class GetActionPlanTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
-      .hasReviewDate(expectedReviewDate)
       .goal(1) {
         it.hasTitle("Learn Spanish")
       }

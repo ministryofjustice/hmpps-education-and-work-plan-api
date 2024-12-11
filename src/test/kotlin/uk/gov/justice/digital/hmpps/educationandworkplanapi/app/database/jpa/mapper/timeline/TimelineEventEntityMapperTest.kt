@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class TimelineEventEntityMapperTest {
 
-  private val mapper = TimelineEventEntityMapperImpl()
+  private val mapper = TimelineEventEntityMapper()
 
   @Test
   fun `should map from domain to entity`() {
@@ -69,6 +69,7 @@ class TimelineEventEntityMapperTest {
       prisonId = prisonId,
       timestamp = timelineEventEntity.timestamp!!,
       correlationId = timelineEventEntity.correlationId!!,
+      actionedByDisplayName = null,
     )
 
     // When

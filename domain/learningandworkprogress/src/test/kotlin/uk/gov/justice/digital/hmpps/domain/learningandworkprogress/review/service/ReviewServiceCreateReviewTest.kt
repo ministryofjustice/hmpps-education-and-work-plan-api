@@ -39,6 +39,9 @@ class ReviewServiceCreateReviewTest {
   private lateinit var service: ReviewService
 
   @Mock
+  private lateinit var reviewEventService: ReviewEventService
+
+  @Mock
   private lateinit var reviewPersistenceAdapter: ReviewPersistenceAdapter
 
   @Mock
@@ -111,6 +114,8 @@ class ReviewServiceCreateReviewTest {
       assertThat(reviewScheduleWindow).isEqualTo(expectedReviewScheduleWindow)
       assertThat(scheduleStatus).isEqualTo(ReviewScheduleStatus.SCHEDULED)
     }
+
+    verify(reviewEventService).reviewCompleted(completedReview)
   }
 
   @ParameterizedTest(name = "[{index}] {0}")
@@ -170,6 +175,7 @@ class ReviewServiceCreateReviewTest {
     }
 
     verify(reviewSchedulePersistenceAdapter, never()).createReviewSchedule(any())
+    verify(reviewEventService).reviewCompleted(completedReview)
   }
 
   @Test
@@ -194,6 +200,7 @@ class ReviewServiceCreateReviewTest {
     verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
     verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
     verifyNoInteractions(reviewPersistenceAdapter)
+    verifyNoInteractions(reviewEventService)
   }
 
   companion object {
