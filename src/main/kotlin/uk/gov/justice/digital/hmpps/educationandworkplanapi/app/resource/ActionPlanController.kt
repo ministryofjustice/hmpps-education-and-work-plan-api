@@ -14,16 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
@@ -37,10 +34,7 @@ class ActionPlanController(
   private val actionPlanMapper: ActionPlanResourceMapper,
   private val noteService: NoteService,
   private val noteResourceMapper: NoteResourceMapper,
-  private val inductionService: InductionService,
-  private val prisonerSearchApiService: PrisonerSearchApiService,
-  private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
-  private val reviewService: ReviewService,
+  private val reviewScheduleService: ReviewScheduleService,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -53,22 +47,8 @@ class ActionPlanController(
     request: CreateActionPlanRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
-    val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
-
     actionPlanService.createActionPlan(actionPlanMapper.fromModelToDto(prisonNumber, request))
-
-    // Action Plan has just been created. If there is an Induction for this prisoner
-    // we need to create the prisoner's initial Review Schedule
-    try {
-      inductionService.getInductionForPrisoner(prisonNumber)
-      val createInitialReviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
-        prisoner = prisoner,
-        isReadmission = false,
-        isTransfer = false,
-      )
-      reviewService.createInitialReviewSchedule(createInitialReviewScheduleDto)
-    } finally {}
-
+    reviewScheduleService.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
   }
 
   @GetMapping("/{prisonNumber}")

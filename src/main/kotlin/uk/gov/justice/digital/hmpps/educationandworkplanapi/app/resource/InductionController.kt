@@ -16,12 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
@@ -32,10 +29,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 class InductionController(
   private val inductionService: InductionService,
   private val inductionMapper: InductionResourceMapper,
-  private val actionPlanService: ActionPlanService,
-  private val prisonerSearchApiService: PrisonerSearchApiService,
-  private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
-  private val reviewService: ReviewService,
+  private val reviewScheduleService: ReviewScheduleService,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -48,22 +42,8 @@ class InductionController(
     request: CreateInductionRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
-    val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
-
     inductionService.createInduction(inductionMapper.toCreateInductionDto(prisonNumber, request))
-
-    // Induction has just been created. If there are already goals for this prisoner (whilst the Goals would have been created out of sequence with the main Induction)
-    // we need to create the prisoner's initial Review Schedule
-    runCatching {
-      actionPlanService.getActionPlan(prisonNumber)
-    }.getOrNull()?.run {
-      val createInitialReviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
-        prisoner = prisoner,
-        isReadmission = false,
-        isTransfer = false,
-      )
-      reviewService.createInitialReviewSchedule(createInitialReviewScheduleDto)
-    }
+    reviewScheduleService.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
   }
 
   @GetMapping("/{prisonNumber}")

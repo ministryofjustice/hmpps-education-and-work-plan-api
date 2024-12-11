@@ -207,7 +207,6 @@ class GetTimelineTest : IntegrationTestBase() {
     )
 
     createInduction(prisonNumber, aValidCreateInductionRequest())
-    Thread.sleep(1000)
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
