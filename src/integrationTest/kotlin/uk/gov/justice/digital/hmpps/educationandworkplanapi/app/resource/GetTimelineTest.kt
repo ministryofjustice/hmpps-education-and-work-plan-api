@@ -256,10 +256,12 @@ class GetTimelineTest : IntegrationTestBase() {
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
 
-      println("timeline events: ${actual.events}")
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
         .hasNumberOfEvents(8)
+        .event(3) {
+          it.hasNoContextualInfo()
+        }
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
