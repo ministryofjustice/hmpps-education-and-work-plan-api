@@ -82,7 +82,7 @@ class JpaReviewSchedulePersistenceAdapter(
     return reviewScheduleEntityMapper.fromEntityToDomain(savedReviewScheduleEntity)
   }
 
-  fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
+  private fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
     with(reviewScheduleEntity) {
       val historyEntry = ReviewScheduleHistoryEntity(
         version = reviewScheduleHistoryRepository.findMaxVersionByReviewScheduleReference(reference)
