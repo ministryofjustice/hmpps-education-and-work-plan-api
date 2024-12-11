@@ -8,9 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateActionPlanReviewStatusRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 
@@ -35,7 +33,7 @@ class UpdateActionPlanReviewStatusHistoryTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),

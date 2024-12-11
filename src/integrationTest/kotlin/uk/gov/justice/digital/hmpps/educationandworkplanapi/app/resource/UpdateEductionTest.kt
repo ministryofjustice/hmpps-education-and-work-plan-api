@@ -217,10 +217,9 @@ class UpdateEductionTest : IntegrationTestBase() {
       .wasCreatedAtOrAfter(earliestExpectedCreateTime)
       .wasUpdatedAtOrAfter(earliestExpectedUpdateTime)
       .hasNumberOfQualifications(3)
-      .qualification(1) {
+      .qualificationBySubject("English") {
         // Expect the English qualification to have been updated
-        it.hasSubject("English")
-          .hasLevel(QualificationLevel.LEVEL_3)
+        it.hasLevel(QualificationLevel.LEVEL_3)
           .hasGrade("B")
           .wasCreatedAtPrison("BXI")
           .wasCreatedBy("auser_gen")
@@ -229,10 +228,9 @@ class UpdateEductionTest : IntegrationTestBase() {
           .wasCreatedAtOrAfter(earliestExpectedCreateTime)
           .wasUpdatedAtOrAfter(earliestExpectedUpdateTime)
       }
-      .qualification(2) {
+      .qualificationBySubject("Maths") {
         // Expect the Maths qualification not to have been updated
-        it.hasSubject("Maths")
-          .hasLevel(QualificationLevel.LEVEL_3)
+        it.hasLevel(QualificationLevel.LEVEL_3)
           .hasGrade("B")
           .wasCreatedAtPrison("BXI")
           .wasCreatedBy("auser_gen")
@@ -241,10 +239,9 @@ class UpdateEductionTest : IntegrationTestBase() {
           .wasCreatedAtOrAfter(earliestExpectedCreateTime)
           .wasUpdatedAtOrAfter(earliestExpectedCreateTime)
       }
-      .qualification(3) {
+      .qualificationBySubject("Pottery") {
         // Expect a new qualification for Pottery
-        it.hasSubject("Pottery")
-          .hasLevel(QualificationLevel.LEVEL_1)
+        it.hasLevel(QualificationLevel.LEVEL_1)
           .hasGrade("Pass")
           .wasCreatedAtPrison("LFI")
           .wasCreatedBy("buser_gen")

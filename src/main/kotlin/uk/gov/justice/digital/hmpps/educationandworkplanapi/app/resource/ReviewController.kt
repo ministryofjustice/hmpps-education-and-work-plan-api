@@ -28,7 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateReviewScheduleStatusRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus as ReviewScheduleStatusAPI
 
 @RestController
@@ -90,13 +90,13 @@ class ReviewController(
   @Transactional
   fun updateLatestReviewScheduleStatus(
     @Valid
-    @RequestBody createReviewScheduleStatusRequest: CreateReviewScheduleStatusRequest,
+    @RequestBody updateReviewScheduleStatusRequest: UpdateReviewScheduleStatusRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     reviewScheduleService.updateLatestReviewScheduleStatus(
       prisonNumber,
-      createReviewScheduleStatusRequest.prisonId,
-      toReviewScheduleStatus(createReviewScheduleStatusRequest.status),
+      updateReviewScheduleStatusRequest.prisonId,
+      toReviewScheduleStatus(updateReviewScheduleStatusRequest.status),
     )
   }
 
