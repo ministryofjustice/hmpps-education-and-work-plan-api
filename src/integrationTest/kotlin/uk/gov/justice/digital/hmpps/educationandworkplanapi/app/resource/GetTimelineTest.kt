@@ -206,16 +206,13 @@ class GetTimelineTest : IntegrationTestBase() {
     )
 
     createInduction(prisonNumber, aValidCreateInductionRequest())
-    Thread.sleep(200)
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
-    Thread.sleep(200)
 
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
-    Thread.sleep(200)
 
     val induction = getInduction(prisonNumber)
     val actionPlan = getActionPlan(prisonNumber)
@@ -258,6 +255,8 @@ class GetTimelineTest : IntegrationTestBase() {
       val actual = response.responseBody.blockFirst()!!
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
+
+      println("timeline events: ${actual.events}")
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
         .hasNumberOfEvents(8)
