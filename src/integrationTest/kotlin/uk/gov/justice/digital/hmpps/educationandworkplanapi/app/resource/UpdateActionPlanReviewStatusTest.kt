@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Revie
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateActionPlanReviewStatusRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
@@ -54,7 +54,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .contentType(APPLICATION_JSON)
-      .withBody(aValidUpdateActionPlanReviewStatusRequest())
+      .withBody(aValidUpdateReviewScheduleStatusRequest())
       .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
       .exchange()
       .expectStatus()
@@ -104,7 +104,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // When
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(aValidUpdateActionPlanReviewStatusRequest())
+      .withBody(aValidUpdateReviewScheduleStatusRequest())
       .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -128,7 +128,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
         ),
@@ -157,7 +157,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.SCHEDULED,
         ),
@@ -186,7 +186,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE,
         ),
@@ -216,7 +216,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.COMPLETED,
         ),
@@ -243,7 +243,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
@@ -274,7 +274,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
@@ -306,7 +306,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.SCHEDULED,
         ),
@@ -338,7 +338,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.SCHEDULED,
         ),
@@ -370,7 +370,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
-        aValidUpdateActionPlanReviewStatusRequest(
+        aValidUpdateReviewScheduleStatusRequest(
           prisonId = "MDI",
           status = ReviewScheduleStatus.SCHEDULED,
         ),
