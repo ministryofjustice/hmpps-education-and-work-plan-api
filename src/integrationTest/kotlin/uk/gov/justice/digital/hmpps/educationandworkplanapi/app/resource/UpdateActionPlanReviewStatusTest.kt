@@ -410,9 +410,9 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     }
 
     // test that outbound event is also created:
-    val reviewScheduleEvent = reviewScheduleEventQueue.receiveEvent(QueueType.REVIEW)
-    assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-    assertThat(reviewScheduleEvent.detailUrl)
+    val reviewScheduleEvents = reviewScheduleEventQueue.receiveEventsOnQueue(QueueType.REVIEW)
+    assertThat(reviewScheduleEvents[0].personReference.identifiers[0].value).isEqualTo(prisonNumber)
+    assertThat(reviewScheduleEvents[0].detailUrl)
       .isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
   }
 }
