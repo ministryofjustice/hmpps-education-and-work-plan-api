@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.18.0'
+  version: '1.19.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -198,7 +198,7 @@ paths:
           $ref: '#/components/responses/GetActionPlanReviews'
         '404':
           $ref: '#/components/responses/404ErrorResponse'
-      operationId: get-action-plan-reviews
+      operationId: get-action-plan-review
 
     post:
       summary: Creates an Action Plan Review for a prisoner
@@ -254,6 +254,36 @@ paths:
       operationId: review-schedule-status
       requestBody:
         $ref: '#/components/requestBodies/ReviewScheduleStatus'
+
+  #
+  # Action Plan Review schedules
+  # --------------------------------------------------------------------------------
+  '/action-plans/{prisonNumber}/reviews/review-schedules':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    get:
+      summary: Lists all Action Plan Review Schedules (past and scheduled) for a prisoner
+      description: |
+        Returns all Action Plan Review schedules for the specified prisoner. 
+        
+        The data will be returned as a list ordered by last updated date then by version number. 
+        
+        It is possible for a review schedule to be updated therefore this endpoint will return all versions of a
+        review schedule - the highest version number will be the most recent schedule. 
+              
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
+
+      tags:
+        - Action Plan Reviews
+      responses:
+        '200':
+          $ref: '#/components/responses/GetActionPlanReviewSchedules'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-action-plan-review-schedules
 
   #
   # Goals
@@ -2911,6 +2941,19 @@ components:
         - latestReviewSchedule
         - completedReviews
 
+    ActionPlanReviewSchedulesResponse:
+      title: ActionPlanReviewSchedulesResponse
+      description: A list of review schedules for a prisoner.
+      type: object
+      properties:
+        reviewSchedules:
+          type: array
+          description: A List containing zero or more ReviewSchedules.
+          items:
+            $ref: '#/components/schemas/ScheduledActionPlanReviewResponse'
+      required:
+        - reviewSchedules
+
     CompletedActionPlanReviewResponse:
       title: CompletedActionPlanReviewResponse
       type: object
@@ -3016,6 +3059,9 @@ components:
           $ref: '#/components/schemas/ReviewScheduleStatus'
         calculationRule:
           $ref: '#/components/schemas/ReviewScheduleCalculationRule'
+        version:
+          type: number
+          description: the version number of this schedule (the highest number is the most recent version of this review schedule)
       required:
         - reference
         - reviewDateFrom
@@ -3362,6 +3408,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ActionPlanReviewsResponse'
+
+    GetActionPlanReviewSchedules:
+      description: Response body containing the a list of review schedules.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ActionPlanReviewSchedulesResponse'
 
     CreateActionPlanReview:
       description: Response body detailing whether this was the prisoner's last review before release, and if not the next scheduled review.
