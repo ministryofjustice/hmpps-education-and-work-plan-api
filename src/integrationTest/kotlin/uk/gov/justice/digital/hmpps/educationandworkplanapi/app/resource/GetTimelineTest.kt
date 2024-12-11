@@ -207,6 +207,7 @@ class GetTimelineTest : IntegrationTestBase() {
     )
 
     createInduction(prisonNumber, aValidCreateInductionRequest())
+    Thread.sleep(1000)
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
@@ -257,14 +258,7 @@ class GetTimelineTest : IntegrationTestBase() {
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
 
-      val debug = with(actual.events) {
-        with(get(2)) {
-          "Event 3 = $eventType, $contextualInfo, ${this.timestamp}"
-        } +
-        with(get(3)) {
-          "Event 4 = $eventType, $contextualInfo, ${this.timestamp}"
-        }
-      }
+      val debug = actual.events.mapIndexed { idx, event -> "[Event ${idx+1} = ${event.eventType}, ${event.contextualInfo}, ${event.timestamp}] "}
       Assertions.assertThat(debug).isEqualTo("debug")
 
       assertThat(actual)
