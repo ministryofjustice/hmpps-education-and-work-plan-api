@@ -60,17 +60,32 @@ class EducationResponseAssert(actual: EducationResponse?) :
   }
 
   /**
+   * Allows for assertion chaining into all child [AchievedQualificationResponse]s. Takes a lambda as the method argument
+   * to call assertion methods provided by [AchievedQualificationResponseAssert].
+   * Returns this [EducationResponseAssert] to allow further chained assertions on the parent [EducationResponse]
+   * The assertions on all [AchievedQualificationResponse]s must pass as true.
+   */
+  fun allQualifications(consumer: Consumer<AchievedQualificationResponseAssert>): EducationResponseAssert {
+    isNotNull
+    with(actual!!) {
+      qualifications.onEach {
+        consumer.accept(assertThat(it))
+      }
+    }
+    return this
+  }
+
+  /**
    * Allows for assertion chaining into the specified child [AchievedQualificationResponse]. Takes a lambda as the method argument
    * to call assertion methods provided by [AchievedQualificationResponseAssert].
    * Returns this [EducationResponseAssert] to allow further chained assertions on the parent [EducationResponse]
    *
-   * The `qualificationNumber` parameter is not zero indexed to make for better readability in tests. IE. the first qualification
-   * should be referenced as `.qualification(1) { .... }`
+   * The `subject` parameter is to find the specific qualification to assert by its subject name
    */
-  fun qualification(qualificationNumber: Int, consumer: Consumer<AchievedQualificationResponseAssert>): EducationResponseAssert {
+  fun qualificationBySubject(subject: String, consumer: Consumer<AchievedQualificationResponseAssert>): EducationResponseAssert {
     isNotNull
     with(actual!!) {
-      val qualification = this.qualifications[qualificationNumber - 1]
+      val qualification = this.qualifications.find { it.subject == subject }
       consumer.accept(assertThat(qualification))
     }
     return this
