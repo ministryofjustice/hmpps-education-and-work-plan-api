@@ -1,25 +1,25 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class CreateActionPlanTest : IntegrationTestBase() {
@@ -153,13 +153,16 @@ class CreateActionPlanTest : IntegrationTestBase() {
   }
 
   @Test
-  @Transactional
-  fun `should create a new action plan given prisoner does not have an action plan`() {
+  fun `should create a new action plan with multiple goals`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createStepRequest = aValidCreateStepRequest()
-    val createGoalRequest = aValidCreateGoalRequest(steps = listOf(createStepRequest))
-    val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest))
+    val createStepRequest1 = aValidCreateStepRequest(title = "Step 1 of Goal 1")
+    val createGoalRequest1 = aValidCreateGoalRequest(title = "Goal 1", steps = listOf(createStepRequest1), notes = null)
+
+    val createStepRequest2 = aValidCreateStepRequest(title = "Step 1 of Goal 2")
+    val createGoalRequest2 = aValidCreateGoalRequest(title = "Goal 2", steps = listOf(createStepRequest2), notes = "Goal2 notes")
+
+    val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest1, createGoalRequest2))
     val dpsUsername = "auser_gen"
     val displayName = "Albert User"
 
@@ -181,64 +184,53 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
+    val actionPlan = getActionPlan(prisonNumber)
     assertThat(actionPlan)
       .isForPrisonNumber(prisonNumber)
-      .hasNumberOfGoals(1)
-      .wasCreatedBy(dpsUsername)
-    val goal = actionPlan!!.goals!![0]
-    assertThat(goal)
-      .hasTitle(createGoalRequest.title)
-      .hasNumberOfSteps(createGoalRequest.steps.size)
-      .wasCreatedAtPrison(createGoalRequest.prisonId)
-      .wasCreatedBy(dpsUsername)
-      .hasCreatedByDisplayName(displayName)
-      .wasUpdatedBy(dpsUsername)
-      .hasUpdatedByDisplayName(displayName)
-      .wasUpdatedAtPrison(createGoalRequest.prisonId)
-    val step = goal.steps!![0]
-    assertThat(step)
-      .hasTitle(createStepRequest.title)
-      .hasStatus(StepStatus.NOT_STARTED)
-      .wasCreatedBy(dpsUsername)
-
-    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actionPlan.goals!![0].reference!!, EntityType.GOAL, NoteType.GOAL)
-    Assertions.assertThat(notes.size).isGreaterThan(0)
-    Assertions.assertThat(notes[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
+      .hasNumberOfGoals(2)
+      // Because the goals are returned in date created order, the first goal in the response will be Goal 2, because it was the most recently created.
+      .goal(1) {
+        it.hasTitle("Goal 2")
+          .hasNumberOfSteps(1)
+          .step(1) {
+            it.hasTitle("Step 1 of Goal 2")
+              .hasStatus(StepStatus.NOT_STARTED)
+          }
+          .hasGoalNote("Goal2 notes")
+      }
+      // The 2nd goal in the response data is the first goal to have been created
+      .goal(2) {
+        it.hasTitle("Goal 1")
+          .hasNumberOfSteps(1)
+          .step(1) {
+            it.hasTitle("Step 1 of Goal 1")
+              .hasStatus(StepStatus.NOT_STARTED)
+          }
+          .hasNoNotes()
+      }
+      .allGoals {
+        it.wasCreatedAtPrison(createGoalRequest1.prisonId)
+          .wasCreatedBy(dpsUsername)
+          .hasCreatedByDisplayName(displayName)
+          .wasUpdatedBy(dpsUsername)
+          .hasUpdatedByDisplayName(displayName)
+          .wasUpdatedAtPrison(createGoalRequest1.prisonId)
+      }
   }
 
   @Test
-  @Transactional
-  fun `should create a new action plan with multiple goals given prisoner does not have an action plan`() {
+  fun `should create a new action plan and not create a review schedule given the prisoner does not have an Induction created before the Action Plan`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
-    val createStepRequest1 = aValidCreateStepRequest()
-    val createGoalRequest1 = aValidCreateGoalRequest(steps = listOf(createStepRequest1))
 
-    val createStepRequest2 = aValidCreateStepRequest()
-    val createGoalRequest2 = aValidCreateGoalRequest(steps = listOf(createStepRequest2), notes = "Goal2 text")
-
-    val createStepRequest3 = aValidCreateStepRequest()
-    val createGoalRequest3 = aValidCreateGoalRequest(steps = listOf(createStepRequest3), notes = "Goal3 text")
-
-    val createStepRequest4 = aValidCreateStepRequest()
-    val createGoalRequest4 = aValidCreateGoalRequest(steps = listOf(createStepRequest4), notes = "Goal4 text")
-
-    val createActionPlanRequest = aValidCreateActionPlanRequest(goals = listOf(createGoalRequest1, createGoalRequest2, createGoalRequest3, createGoalRequest4))
-    val dpsUsername = "auser_gen"
-    val displayName = "Albert User"
+    val createActionPlanRequest = aValidCreateActionPlanRequest()
 
     // When
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithAuthority(
-          ACTIONPLANS_RW,
-          username = dpsUsername,
-          displayName = displayName,
-          privateKey = keyPair.private,
-        ),
+        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -246,33 +238,46 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val actionPlan = actionPlanRepository.findByPrisonNumber(prisonNumber)
-    assertThat(actionPlan)
-      .isForPrisonNumber(prisonNumber)
-      .hasNumberOfGoals(4)
-      .wasCreatedBy(dpsUsername)
-    val goal = actionPlan!!.goals!![0]
-    assertThat(goal)
-      .hasTitle(createGoalRequest1.title)
-      .hasNumberOfSteps(createGoalRequest1.steps.size)
-      .wasCreatedAtPrison(createGoalRequest1.prisonId)
-      .wasCreatedBy(dpsUsername)
-      .hasCreatedByDisplayName(displayName)
-      .wasUpdatedBy(dpsUsername)
-      .hasUpdatedByDisplayName(displayName)
-      .wasUpdatedAtPrison(createGoalRequest1.prisonId)
-    val step = goal.steps!![0]
-    assertThat(step)
-      .hasTitle(createStepRequest1.title)
-      .hasStatus(StepStatus.NOT_STARTED)
-      .wasCreatedBy(dpsUsername)
+    val actionPlan = getActionPlan(prisonNumber)
+    assertThat(actionPlan).isNotNull
 
-    val notesForGoal1 = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actionPlan.goals!![0].reference!!, EntityType.GOAL, NoteType.GOAL)
-    Assertions.assertThat(notesForGoal1.size).isGreaterThan(0)
-    Assertions.assertThat(notesForGoal1[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
+    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+  }
 
-    val notesForGoal2 = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actionPlan.goals!![1].reference!!, EntityType.GOAL, NoteType.GOAL)
-    Assertions.assertThat(notesForGoal2.size).isGreaterThan(0)
-    Assertions.assertThat(notesForGoal2[0].content).isEqualTo("Goal2 text")
+  @Test
+  fun `should create a new action plan and create the initial review schedule given the prisoner already has an induction created before the action plan`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
+
+    val createActionPlanRequest = aValidCreateActionPlanRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createActionPlanRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val actionPlan = getActionPlan(prisonNumber)
+    assertThat(actionPlan).isNotNull
+
+    // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
+    val actionPlanReviews = getActionPlanReviews(prisonNumber)
+    assertThat(actionPlanReviews)
+      .hasNumberOfCompletedReviews(0)
+      .latestReviewSchedule {
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+      }
+    val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
+
+    assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
+    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
   }
 }

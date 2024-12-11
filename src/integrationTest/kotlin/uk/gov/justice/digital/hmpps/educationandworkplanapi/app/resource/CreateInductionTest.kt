@@ -268,7 +268,7 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should create an induction and not create a review schedule given the prisoner does not goals created before the induction`() {
+  fun `should create an induction and not create a review schedule given the prisoner does not have goals created before the induction`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val createRequest = aValidCreateInductionRequest()
