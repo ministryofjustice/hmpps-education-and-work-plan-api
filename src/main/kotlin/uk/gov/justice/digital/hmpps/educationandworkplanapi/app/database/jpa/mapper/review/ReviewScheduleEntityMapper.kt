@@ -2,10 +2,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleHistoryEntity
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule as ReviewScheduleCalculationRuleDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus as ReviewScheduleStatusDomain
@@ -29,6 +31,25 @@ class ReviewScheduleEntityMapper {
         lastUpdatedBy = updatedBy!!,
         lastUpdatedAt = updatedAt!!,
         lastUpdatedAtPrison = updatedAtPrison,
+      )
+    }
+
+  fun fromScheduleHistoryEntityToDomain(reviewScheduleHistoryEntity: ReviewScheduleHistoryEntity): ReviewScheduleHistory =
+    with(reviewScheduleHistoryEntity) {
+      ReviewScheduleHistory(
+        reference = reference,
+        prisonNumber = prisonNumber,
+        earliestReviewDate = earliestReviewDate,
+        latestReviewDate = latestReviewDate,
+        scheduleCalculationRule = toReviewScheduleCalculationRule(scheduleCalculationRule),
+        scheduleStatus = toReviewScheduleStatus(scheduleStatus),
+        createdBy = createdBy!!,
+        createdAt = createdAt!!,
+        createdAtPrison = createdAtPrison,
+        lastUpdatedBy = updatedBy!!,
+        lastUpdatedAt = updatedAt!!,
+        lastUpdatedAtPrison = updatedAtPrison,
+        version = version,
       )
     }
 

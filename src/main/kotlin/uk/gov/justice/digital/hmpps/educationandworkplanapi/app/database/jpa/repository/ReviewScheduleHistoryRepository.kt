@@ -12,4 +12,6 @@ interface ReviewScheduleHistoryRepository : JpaRepository<ReviewScheduleHistoryE
   fun findMaxVersionByReviewScheduleReference(reviewScheduleReference: UUID): Int?
 
   fun findAllByReference(reviewScheduleReference: UUID): List<ReviewScheduleHistoryEntity>
+
+  fun findAllByPrisonNumber(prisonNumber: String): List<ReviewScheduleHistoryEntity>
 }

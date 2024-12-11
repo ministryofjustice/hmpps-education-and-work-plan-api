@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
@@ -40,6 +41,11 @@ interface ReviewSchedulePersistenceAdapter {
    * Returns `null` if no [ReviewSchedule]s exist.
    */
   fun getLatestReviewSchedule(prisonNumber: String): ReviewSchedule?
+
+  /**
+   * Retrieves the history of a Prisoner's [ReviewSchedule]s.
+   */
+  fun getReviewScheduleHistory(prisonNumber: String): List<ReviewScheduleHistory>
 
   /**
    * Update the Review schedule status, prisonId and if present the latestReviewDate.
