@@ -97,14 +97,12 @@ class GetEducationTest : IntegrationTestBase() {
     assertThat(actual)
       .hasEducationLevel(EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS)
       .hasNumberOfQualifications(2)
-      .qualification(1) {
-        it.hasSubject("English")
-          .hasLevel(QualificationLevel.LEVEL_3)
+      .qualificationBySubject("English") {
+        it.hasLevel(QualificationLevel.LEVEL_3)
           .hasGrade("A")
       }
-      .qualification(2) {
-        it.hasSubject("Maths")
-          .hasLevel(QualificationLevel.LEVEL_3)
+      .qualificationBySubject("Maths") {
+        it.hasLevel(QualificationLevel.LEVEL_3)
           .hasGrade("B")
       }
   }
