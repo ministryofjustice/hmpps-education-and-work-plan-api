@@ -59,16 +59,16 @@ class ActionPlanController(
 
     // Action Plan has just been created. If there is an Induction for this prisoner
     // we need to create the prisoner's initial Review Schedule
-    runCatching {
-      // inductionService.getInductionForPrisoner(prisonNumber)
-    }.getOrNull()?.run {
+    try {
+      inductionService.getInductionForPrisoner(prisonNumber)
       val createInitialReviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
         prisoner = prisoner,
         isReadmission = false,
         isTransfer = false,
       )
       reviewService.createInitialReviewSchedule(createInitialReviewScheduleDto)
-    }
+    } finally {}
+
   }
 
   @GetMapping("/{prisonNumber}")
