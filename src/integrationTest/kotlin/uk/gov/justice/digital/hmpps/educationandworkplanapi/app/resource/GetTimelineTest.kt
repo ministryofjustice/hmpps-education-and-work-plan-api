@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
@@ -256,12 +257,19 @@ class GetTimelineTest : IntegrationTestBase() {
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
 
+      val debug = with(actual.events) {
+        with(get(2)) {
+          "Event 3 = $eventType, $contextualInfo, ${this.timestamp}"
+        } +
+        with(get(3)) {
+          "Event 4 = $eventType, $contextualInfo, ${this.timestamp}"
+        }
+      }
+      Assertions.assertThat(debug).isEqualTo("debug")
+
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
         .hasNumberOfEvents(8)
-        .event(3) {
-          it.hasNoContextualInfo()
-        }
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
