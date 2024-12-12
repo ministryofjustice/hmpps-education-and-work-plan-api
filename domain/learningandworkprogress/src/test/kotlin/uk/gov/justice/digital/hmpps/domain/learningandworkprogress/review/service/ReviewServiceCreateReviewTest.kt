@@ -112,7 +112,6 @@ class ReviewServiceCreateReviewTest {
     with(createReviewScheduleCaptor.firstValue) {
       assertThat(scheduleCalculationRule).isEqualTo(expectedRule)
       assertThat(reviewScheduleWindow).isEqualTo(expectedReviewScheduleWindow)
-      assertThat(scheduleStatus).isEqualTo(ReviewScheduleStatus.SCHEDULED)
     }
 
     verify(reviewEventService).reviewCompleted(completedReview)

@@ -15,6 +15,7 @@ data class UpdatedReviewScheduleStatus(
   val updatedAtPrison: String,
   val oldStatus: ReviewScheduleStatus,
   val newStatus: ReviewScheduleStatus,
+  val exemptionReason: String?,
   val oldReviewDate: LocalDate,
   val newReviewDate: LocalDate,
 

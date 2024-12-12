@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
@@ -121,7 +120,6 @@ class ReviewService(
             prisonId = createCompletedReviewDto.prisonId,
             reviewScheduleWindow = it,
             scheduleCalculationRule = reviewScheduleCalculationRule,
-            scheduleStatus = SCHEDULED,
           ),
         )
       } ?: let {
@@ -161,7 +159,6 @@ class ReviewService(
             prisonId = createInitialReviewScheduleDto.prisonId,
             reviewScheduleWindow = it,
             scheduleCalculationRule = reviewScheduleCalculationRule,
-            scheduleStatus = SCHEDULED,
           ),
         )
       }

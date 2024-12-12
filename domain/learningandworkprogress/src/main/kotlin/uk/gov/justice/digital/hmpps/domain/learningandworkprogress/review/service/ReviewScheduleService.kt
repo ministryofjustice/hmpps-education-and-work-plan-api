@@ -25,6 +25,7 @@ class ReviewScheduleService(
     prisonNumber: String,
     prisonId: String,
     newStatus: ReviewScheduleStatus,
+    exemptionReason: String?,
   ) {
     val reviewSchedule = reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber)
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
@@ -34,15 +35,15 @@ class ReviewScheduleService(
 
     when {
       newStatus == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
-        updateReviewScheduleFollowingSystemTechnicalIssue(reviewSchedule, prisonId, prisonNumber)
+        updateReviewScheduleFollowingSystemTechnicalIssue(reviewSchedule, exemptionReason, prisonId, prisonNumber)
       }
 
       newStatus.isExemptionOrExclusion() -> {
-        updateExemptStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
+        updateExemptStatus(reviewSchedule, newStatus, exemptionReason, prisonId, prisonNumber)
       }
 
       else -> {
-        updateScheduledStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
+        updateScheduledStatus(reviewSchedule, prisonId, prisonNumber)
       }
     }
   }
@@ -50,14 +51,16 @@ class ReviewScheduleService(
   private fun updateExemptStatus(
     reviewSchedule: ReviewSchedule,
     newStatus: ReviewScheduleStatus,
+    exemptionReason: String?,
     prisonId: String,
     prisonNumber: String,
   ) {
     val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        newStatus,
-        prisonId,
+        reference = reviewSchedule.reference,
+        scheduleStatus = newStatus,
+        exemptionReason = exemptionReason,
+        prisonId = prisonId,
         prisonNumber = prisonNumber,
       ),
     )
@@ -70,16 +73,15 @@ class ReviewScheduleService(
 
   private fun updateScheduledStatus(
     reviewSchedule: ReviewSchedule,
-    newStatus: ReviewScheduleStatus,
     prisonId: String,
     prisonNumber: String,
   ) {
     val newReviewDate = calculateNewReviewDate(reviewSchedule)
     val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        ReviewScheduleStatus.SCHEDULED,
-        prisonId,
+        reference = reviewSchedule.reference,
+        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
         latestReviewDate = newReviewDate,
         prisonNumber = prisonNumber,
       ),
@@ -93,15 +95,17 @@ class ReviewScheduleService(
 
   private fun updateReviewScheduleFollowingSystemTechnicalIssue(
     reviewSchedule: ReviewSchedule,
+    exemptionReason: String?,
     prisonId: String,
     prisonNumber: String,
   ) {
     // Update the review schedule status to EXEMPT_SYSTEM_TECHNICAL_ISSUE
     val updatedReviewScheduleFirst = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
-        prisonId,
+        reference = reviewSchedule.reference,
+        scheduleStatus = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
+        exemptionReason = exemptionReason,
+        prisonId = prisonId,
         prisonNumber = prisonNumber,
       ),
     )
@@ -115,9 +119,9 @@ class ReviewScheduleService(
     val newReviewDate = calculateNewReviewDate(reviewSchedule, SYSTEM_OUTAGE_ADDITIONAL_DAYS)
     val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        ReviewScheduleStatus.SCHEDULED,
-        prisonId,
+        reference = reviewSchedule.reference,
+        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
         latestReviewDate = newReviewDate,
         prisonNumber = prisonNumber,
       ),
@@ -157,6 +161,7 @@ class ReviewScheduleService(
         updatedAtPrison = updatedReviewSchedule.lastUpdatedAtPrison,
         oldStatus = oldStatus,
         newStatus = updatedReviewSchedule.scheduleStatus,
+        exemptionReason = updatedReviewSchedule.exemptionReason,
         oldReviewDate = oldReviewDate,
         newReviewDate = updatedReviewSchedule.reviewScheduleWindow.dateTo,
         updatedAt = updatedReviewSchedule.lastUpdatedAt,

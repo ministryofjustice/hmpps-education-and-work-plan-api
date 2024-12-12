@@ -74,6 +74,7 @@ class JpaReviewSchedulePersistenceAdapter(
     // Update the schedule status and optionally the latest review date
     reviewScheduleEntity.apply {
       scheduleStatus = reviewScheduleEntityMapper.toReviewScheduleStatus(updateReviewScheduleStatusDto.scheduleStatus)
+      exemptionReason = updateReviewScheduleStatusDto.exemptionReason
       updateReviewScheduleStatusDto.latestReviewDate?.let { latestReviewDate = it }
       updatedAtPrison = updateReviewScheduleStatusDto.prisonId
     }
@@ -97,6 +98,7 @@ class JpaReviewSchedulePersistenceAdapter(
         updatedBy = updatedBy,
         createdBy = createdBy,
         scheduleStatus = scheduleStatus,
+        exemptionReason = exemptionReason,
         earliestReviewDate = earliestReviewDate,
         latestReviewDate = latestReviewDate,
         scheduleCalculationRule = scheduleCalculationRule,

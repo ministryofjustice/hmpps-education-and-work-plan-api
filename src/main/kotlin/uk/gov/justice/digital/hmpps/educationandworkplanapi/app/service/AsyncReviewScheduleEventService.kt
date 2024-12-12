@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
-import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_DEADLINE_NEW
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_DEADLINE_OLD
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_EXEMPTION_REASON
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_STATUS_NEW
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_STATUS_OLD
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
@@ -43,10 +47,14 @@ class AsyncReviewScheduleEventService(
         actionedBy = updatedBy,
         timestamp = updatedAt,
         contextualInfo = mapOf(
-          TimelineEventContext.REVIEW_SCHEDULE_STATUS_OLD to oldStatus.name,
-          TimelineEventContext.REVIEW_SCHEDULE_STATUS_NEW to newStatus.name,
-          TimelineEventContext.REVIEW_SCHEDULE_DEADLINE_OLD to oldReviewDate.toString(),
-          TimelineEventContext.REVIEW_SCHEDULE_DEADLINE_NEW to newReviewDate.toString(),
+          REVIEW_SCHEDULE_STATUS_OLD to oldStatus.name,
+          REVIEW_SCHEDULE_STATUS_NEW to newStatus.name,
+          REVIEW_SCHEDULE_DEADLINE_OLD to oldReviewDate.toString(),
+          REVIEW_SCHEDULE_DEADLINE_NEW to newReviewDate.toString(),
+          *exemptionReason
+            ?.let {
+              arrayOf(REVIEW_SCHEDULE_EXEMPTION_REASON to it)
+            } ?: arrayOf(),
         ),
       )
     }
