@@ -47,7 +47,7 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew check --stacktrace --debug
+          command: ./gradlew check -Dkotlin.compiler.execution.strategy=in-process
       - run:
           command: ./gradlew combineJacocoReports
       - save_cache:
