@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.19.2'
+  version: '1.19.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2907,6 +2907,13 @@ components:
           $ref: '#/components/schemas/PrisonId'
         status:
           $ref: '#/components/schemas/ReviewScheduleStatus'
+        exemptionReason:
+          type: string
+          description: |
+            An optional reason as to why the Review Schedule is exempted.
+            
+            Only relevant and processed when the `status` field is one of the `EXEMPTION_` statuses.  
+            This field is not mandatory, even when the `status` field is one of the `EXEMPTION_` statuses.
       required:
         - prisonId
         - status
@@ -3059,6 +3066,13 @@ components:
           $ref: '#/components/schemas/ReviewScheduleStatus'
         calculationRule:
           $ref: '#/components/schemas/ReviewScheduleCalculationRule'
+        exemptionReason:
+          type: string
+          description: |
+            An optional reason as to why the Review Schedule is exempted.
+            
+            Only present when the `status` field is one of the `EXEMPTION_` statuses and the user entered an exemption 
+            reason when marking the Review as Exempted.
         version:
           type: integer
           description: the version number of this schedule (the highest number is the most recent version of this review schedule)

@@ -23,6 +23,7 @@ class ScheduledActionPlanReviewResponseMapper(
         reviewDateFrom = reviewScheduleWindow.dateFrom,
         reviewDateTo = reviewScheduleWindow.dateTo,
         status = toReviewScheduleStatus(scheduleStatus),
+        exemptionReason = exemptionReason,
         calculationRule = toReviewScheduleCalculationRule(scheduleCalculationRule),
         createdBy = createdBy,
         createdByDisplayName = userService.getUserDetails(createdBy).name,

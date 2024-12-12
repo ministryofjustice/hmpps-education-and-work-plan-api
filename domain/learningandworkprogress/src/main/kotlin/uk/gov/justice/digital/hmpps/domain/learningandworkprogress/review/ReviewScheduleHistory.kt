@@ -14,6 +14,7 @@ data class ReviewScheduleHistory(
   val latestReviewDate: LocalDate,
   val scheduleCalculationRule: ReviewScheduleCalculationRule,
   val scheduleStatus: ReviewScheduleStatus,
+  val exemptionReason: String?,
   val createdBy: String,
   val createdAt: Instant,
   val createdAtPrison: String,

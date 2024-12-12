@@ -43,6 +43,9 @@ data class ReviewScheduleEntity(
   @Enumerated(value = EnumType.STRING)
   var scheduleStatus: ReviewScheduleStatus,
 
+  @Column
+  var exemptionReason: String?,
+
   @Column(updatable = false)
   val createdAtPrison: String,
 

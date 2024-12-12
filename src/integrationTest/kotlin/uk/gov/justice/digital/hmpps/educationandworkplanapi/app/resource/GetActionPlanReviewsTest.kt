@@ -121,6 +121,7 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
         latestReviewDate = LocalDate.now().plusMonths(1),
         scheduleCalculationRule = ReviewScheduleCalculationRule.PRISONER_TRANSFER,
         scheduleStatus = if (it == 3) ReviewScheduleStatus.SCHEDULED else ReviewScheduleStatus.COMPLETED,
+        exemptionReason = null,
         createdAtPrison = "BXI",
         updatedAtPrison = "BXI",
       )

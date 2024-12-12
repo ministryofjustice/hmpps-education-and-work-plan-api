@@ -94,9 +94,10 @@ class ReviewController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     reviewScheduleService.updateLatestReviewScheduleStatus(
-      prisonNumber,
-      updateReviewScheduleStatusRequest.prisonId,
-      toReviewScheduleStatus(updateReviewScheduleStatusRequest.status),
+      prisonNumber = prisonNumber,
+      prisonId = updateReviewScheduleStatusRequest.prisonId,
+      newStatus = toReviewScheduleStatus(updateReviewScheduleStatusRequest.status),
+      exemptionReason = updateReviewScheduleStatusRequest.exemptionReason,
     )
   }
 

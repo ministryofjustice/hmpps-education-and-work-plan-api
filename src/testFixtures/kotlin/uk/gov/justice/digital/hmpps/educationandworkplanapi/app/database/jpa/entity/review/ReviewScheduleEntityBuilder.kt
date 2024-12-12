@@ -13,6 +13,7 @@ fun aValidReviewScheduleEntity(
   latestReviewDate: LocalDate = LocalDate.now().plusMonths(1),
   scheduleCalculationRule: ReviewScheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
   scheduleStatus: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
+  exemptionReason: String? = null,
   createdBy: String? = "asmith_gen",
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
@@ -27,6 +28,7 @@ fun aValidReviewScheduleEntity(
     latestReviewDate = latestReviewDate,
     scheduleCalculationRule = scheduleCalculationRule,
     scheduleStatus = scheduleStatus,
+    exemptionReason = exemptionReason,
     createdAtPrison = createdAtPrison,
     updatedAtPrison = updatedAtPrison,
   ).apply {
@@ -44,6 +46,7 @@ fun aValidUnPersistedReviewScheduleEntity(
   latestReviewDate: LocalDate = LocalDate.now().plusMonths(1),
   scheduleCalculationRule: ReviewScheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
   scheduleStatus: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
+  exemptionReason: String? = null,
   createdAtPrison: String = "BXI",
   updatedAtPrison: String = "BXI",
 ): ReviewScheduleEntity =
@@ -55,6 +58,7 @@ fun aValidUnPersistedReviewScheduleEntity(
     latestReviewDate = latestReviewDate,
     scheduleCalculationRule = scheduleCalculationRule,
     scheduleStatus = scheduleStatus,
+    exemptionReason = exemptionReason,
     createdBy = null,
     createdAt = null,
     createdAtPrison = createdAtPrison,

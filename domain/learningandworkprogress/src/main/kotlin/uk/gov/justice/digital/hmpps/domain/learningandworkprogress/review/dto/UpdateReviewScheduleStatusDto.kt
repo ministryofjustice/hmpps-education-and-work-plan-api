@@ -7,6 +7,7 @@ import java.util.UUID
 data class UpdateReviewScheduleStatusDto(
   val reference: UUID,
   val scheduleStatus: ReviewScheduleStatus,
+  val exemptionReason: String? = null,
   val prisonId: String,
   val latestReviewDate: LocalDate? = null,
   val prisonNumber: String,

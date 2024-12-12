@@ -13,6 +13,7 @@ data class ReviewSchedule(
   val reviewScheduleWindow: ReviewScheduleWindow,
   val scheduleCalculationRule: ReviewScheduleCalculationRule,
   val scheduleStatus: ReviewScheduleStatus,
+  val exemptionReason: String?,
   val createdBy: String,
   val createdAt: Instant,
   val createdAtPrison: String,

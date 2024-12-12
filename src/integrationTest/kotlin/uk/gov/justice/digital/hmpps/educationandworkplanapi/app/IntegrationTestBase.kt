@@ -455,7 +455,8 @@ abstract class IntegrationTestBase {
 
   fun createReviewScheduleRecord(
     prisonNumber: String,
-    status: String = ReviewScheduleStatus.SCHEDULED.name,
+    status: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
+    exemptionReason: String? = null,
     earliestDate: LocalDate = LocalDate.now().minusMonths(1),
     latestDate: LocalDate = LocalDate.now().plusMonths(1),
   ) {
@@ -465,7 +466,8 @@ abstract class IntegrationTestBase {
       earliestReviewDate = earliestDate,
       latestReviewDate = latestDate,
       scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
-      scheduleStatus = ReviewScheduleStatus.valueOf(status),
+      scheduleStatus = status,
+      exemptionReason = exemptionReason,
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
@@ -474,7 +476,8 @@ abstract class IntegrationTestBase {
 
   fun createReviewScheduleHistoryRecord(
     prisonNumber: String,
-    status: String = ReviewScheduleStatus.SCHEDULED.name,
+    status: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
+    exemptionReason: String? = null,
     earliestDate: LocalDate = LocalDate.now().minusMonths(1),
     latestDate: LocalDate = LocalDate.now().plusMonths(1),
     version: Int = 1,
@@ -488,7 +491,8 @@ abstract class IntegrationTestBase {
       earliestReviewDate = earliestDate,
       latestReviewDate = latestDate,
       scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
-      scheduleStatus = ReviewScheduleStatus.valueOf(status),
+      scheduleStatus = status,
+      exemptionReason = exemptionReason,
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
       version = version,

@@ -115,6 +115,7 @@ class TimelineEventEntityMapper {
       TimelineEventContextEntity.REVIEW_SCHEDULE_STATUS_NEW -> TimelineEventContextDomain.REVIEW_SCHEDULE_STATUS_NEW
       TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_OLD -> TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_OLD
       TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_NEW -> TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_NEW
+      TimelineEventContextEntity.REVIEW_SCHEDULE_EXEMPTION_REASON -> TimelineEventContextDomain.REVIEW_SCHEDULE_EXEMPTION_REASON
     }
 
   private fun toTimelineEventContext(eventType: TimelineEventContextDomain): TimelineEventContextEntity =
@@ -137,5 +138,6 @@ class TimelineEventEntityMapper {
       TimelineEventContextDomain.REVIEW_SCHEDULE_STATUS_NEW -> TimelineEventContextEntity.REVIEW_SCHEDULE_STATUS_NEW
       TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_OLD -> TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_OLD
       TimelineEventContextDomain.REVIEW_SCHEDULE_DEADLINE_NEW -> TimelineEventContextEntity.REVIEW_SCHEDULE_DEADLINE_NEW
+      TimelineEventContextDomain.REVIEW_SCHEDULE_EXEMPTION_REASON -> TimelineEventContextEntity.REVIEW_SCHEDULE_EXEMPTION_REASON
     }
 }

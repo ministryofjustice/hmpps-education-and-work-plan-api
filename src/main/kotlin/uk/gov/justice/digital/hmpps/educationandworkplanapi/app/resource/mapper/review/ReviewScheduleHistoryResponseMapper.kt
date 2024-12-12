@@ -23,6 +23,7 @@ class ReviewScheduleHistoryResponseMapper(
         reviewDateFrom = reviewSchedule.earliestReviewDate,
         reviewDateTo = reviewSchedule.latestReviewDate,
         status = toReviewScheduleStatus(scheduleStatus),
+        exemptionReason = exemptionReason,
         calculationRule = toReviewScheduleCalculationRule(scheduleCalculationRule),
         createdBy = createdBy,
         createdByDisplayName = userService.getUserDetails(createdBy).name,

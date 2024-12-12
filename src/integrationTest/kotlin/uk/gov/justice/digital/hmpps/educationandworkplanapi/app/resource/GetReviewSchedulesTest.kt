@@ -7,6 +7,9 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -55,14 +58,14 @@ class GetReviewSchedulesTest : IntegrationTestBase() {
   fun `should return a list of review schedules`() {
     // Given
     val reference1 = UUID.randomUUID()
-    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 1, status = "SCHEDULED", reference = reference1, updatedAt = Instant.now().minusSeconds(6))
-    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 2, status = "COMPLETED", reference = reference1, updatedAt = Instant.now().minusSeconds(5))
+    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 1, status = SCHEDULED, reference = reference1, updatedAt = Instant.now().minusSeconds(6))
+    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 2, status = COMPLETED, reference = reference1, updatedAt = Instant.now().minusSeconds(5))
 
     val reference2 = UUID.randomUUID()
-    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 1, status = "SCHEDULED", reference = reference2, updatedAt = Instant.now().minusSeconds(4))
-    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 2, status = "EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY", reference = reference2, updatedAt = Instant.now().minusSeconds(3))
-    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 3, status = "SCHEDULED", reference = reference2, updatedAt = Instant.now().minusSeconds(3))
-    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 4, status = "COMPLETED", reference = reference2, updatedAt = Instant.now().minusSeconds(1))
+    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 1, status = SCHEDULED, reference = reference2, updatedAt = Instant.now().minusSeconds(4))
+    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 2, status = EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY, reference = reference2, updatedAt = Instant.now().minusSeconds(3))
+    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 3, status = SCHEDULED, reference = reference2, updatedAt = Instant.now().minusSeconds(3))
+    createReviewScheduleHistoryRecord(prisonNumber = prisonNumber, version = 4, status = COMPLETED, reference = reference2, updatedAt = Instant.now().minusSeconds(1))
 
     // When
     val response = webTestClient.get()

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -25,6 +26,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.revie
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 
 class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
   companion object {
@@ -148,7 +150,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY.name,
+      status = ReviewScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
     )
 
     // When
@@ -177,7 +179,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY.name,
+      status = ReviewScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
     )
 
     // When
@@ -207,7 +209,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY.name,
+      status = ReviewScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
     )
 
     // When
@@ -235,7 +237,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
   @Test
   fun `should update review schedule from Scheduled to technical issue`() {
     // Given
-    createReviewScheduleRecord(prisonNumber, status = ReviewScheduleStatus.SCHEDULED.name)
+    createReviewScheduleRecord(prisonNumber, status = ReviewScheduleStatusEntity.SCHEDULED)
 
     // When
     webTestClient.put()
@@ -263,7 +265,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.SCHEDULED.name,
+      status = ReviewScheduleStatusEntity.SCHEDULED,
       earliestDate = LocalDate.now().minusDays(5),
       latestDate = LocalDate.now(),
     )
@@ -295,7 +297,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE.name,
+      status = ReviewScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE,
       earliestDate = LocalDate.now().minusDays(5),
       latestDate = LocalDate.now(),
     )
@@ -327,7 +329,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES.name,
+      status = ReviewScheduleStatusEntity.EXEMPT_PRISON_REGIME_CIRCUMSTANCES,
       earliestDate = LocalDate.now().minusDays(5),
       latestDate = LocalDate.now(),
     )
@@ -357,14 +359,72 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
   @Test
   fun `Test follow on events occur`() {
     // Given
+    val today = LocalDate.now()
+    val fiveDaysAgo = today.minusDays(5)
+
+    // Create a review schedule record, scheduled to be completed by today
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES.name,
-      earliestDate = LocalDate.now().minusDays(5),
-      latestDate = LocalDate.now(),
+      status = ReviewScheduleStatusEntity.SCHEDULED,
+      earliestDate = fiveDaysAgo,
+      latestDate = today,
     )
 
+    with(reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)) {
+      assertThat(size).isEqualTo(1)
+      assertThat(get(0).scheduleStatus).isEqualTo(ReviewScheduleStatusEntity.SCHEDULED)
+      assertThat(get(0).latestReviewDate).isEqualTo(today)
+    }
+
     // When
+    // Update the schedule to exempted with an optional reason
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidUpdateReviewScheduleStatusRequest(
+          prisonId = "MDI",
+          status = ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES,
+          exemptionReason = "Something happened in the prison which meant we could not do the review today",
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    with(reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)) {
+      assertThat(size).isEqualTo(1)
+      assertThat(get(0).scheduleStatus).isEqualTo(ReviewScheduleStatusEntity.EXEMPT_PRISON_REGIME_CIRCUMSTANCES)
+      assertThat(get(0).latestReviewDate).isEqualTo(today)
+    }
+
+    await.untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .hasNumberOfEvents(1)
+        .event(1) {
+          it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED)
+            .hasContextualInfo(
+              mapOf(
+                "REVIEW_SCHEDULE_DEADLINE_NEW" to today.toString(),
+                "REVIEW_SCHEDULE_DEADLINE_OLD" to today.toString(),
+                "REVIEW_SCHEDULE_STATUS_NEW" to "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
+                "REVIEW_SCHEDULE_STATUS_OLD" to "SCHEDULED",
+                "REVIEW_SCHEDULE_EXEMPTION_REASON" to "Something happened in the prison which meant we could not do the review today",
+              ),
+            )
+        }
+      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      verify(telemetryClient).trackEvent(
+        eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
+        capture(eventPropertiesCaptor),
+        eq(null),
+      )
+    }
+
+    // Now update the schedule again to clear the exemption
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(
@@ -379,40 +439,37 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
       .expectStatus()
       .isNoContent
 
-    // Then
-    val reviewSchedule = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
-    assertThat(reviewSchedule.size).isEqualTo(1)
-    assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
-    assertThat(reviewSchedule[0].latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
-
-    val today = LocalDate.now().toString()
-    val todayPlusTen = LocalDate.now().plusDays(10).toString()
+    val todayPlusTen = today.plusDays(10).toString()
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(1) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        .hasNumberOfEvents(2)
+        .event(2) {
           it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED)
             .hasContextualInfo(
               mapOf(
                 "REVIEW_SCHEDULE_DEADLINE_NEW" to todayPlusTen,
-                "REVIEW_SCHEDULE_DEADLINE_OLD" to today,
+                "REVIEW_SCHEDULE_DEADLINE_OLD" to today.toString(),
                 "REVIEW_SCHEDULE_STATUS_OLD" to "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
                 "REVIEW_SCHEDULE_STATUS_NEW" to "SCHEDULED",
               ),
             )
         }
       val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
-      verify(telemetryClient).trackEvent(
+      verify(telemetryClient, times(2)).trackEvent(
         eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
         capture(eventPropertiesCaptor),
         eq(null),
       )
     }
 
-    // test that outbound event is also created:
+    // test that outbound events were also created
     val reviewScheduleEvents = reviewScheduleEventQueue.receiveEventsOnQueue(QueueType.REVIEW)
     assertThat(reviewScheduleEvents[0].personReference.identifiers[0].value).isEqualTo(prisonNumber)
     assertThat(reviewScheduleEvents[0].detailUrl)
+      .isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+    assertThat(reviewScheduleEvents[1].personReference.identifiers[0].value).isEqualTo(prisonNumber)
+    assertThat(reviewScheduleEvents[1].detailUrl)
       .isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
   }
 }
