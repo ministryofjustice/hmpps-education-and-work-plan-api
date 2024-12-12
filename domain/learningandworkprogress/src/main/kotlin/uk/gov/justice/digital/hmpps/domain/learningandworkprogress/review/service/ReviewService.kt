@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
@@ -52,6 +53,19 @@ class ReviewService(
     reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
       prisonNumber,
     )
+
+  /**
+   * Returns a list of [ReviewSchedule] for the prisoner identified by their prison number.
+   */
+  fun getReviewSchedulesForPrisoner(prisonNumber: String): List<ReviewScheduleHistory> {
+    val responses = reviewSchedulePersistenceAdapter
+      .getReviewScheduleHistory(prisonNumber)
+
+    return responses.sortedWith(
+      compareByDescending<ReviewScheduleHistory> { it.lastUpdatedAt }
+        .thenByDescending { it.version },
+    )
+  }
 
   /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is

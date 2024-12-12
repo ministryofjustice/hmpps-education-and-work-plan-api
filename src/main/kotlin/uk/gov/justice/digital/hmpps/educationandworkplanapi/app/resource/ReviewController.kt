@@ -20,9 +20,11 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servic
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateActionPlanReviewRequestMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ReviewScheduleHistoryResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ScheduledActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
@@ -38,6 +40,7 @@ class ReviewController(
   private val scheduledActionPlanReviewResponseMapper: ScheduledActionPlanReviewResponseMapper,
   private val completedActionPlanReviewResponseMapper: CompletedActionPlanReviewResponseMapper,
   private val createActionPlanReviewRequestMapper: CreateActionPlanReviewRequestMapper,
+  private val reviewScheduleHistoryResponseMapper: ReviewScheduleHistoryResponseMapper,
 ) {
 
   @GetMapping
@@ -94,6 +97,17 @@ class ReviewController(
       prisonNumber,
       updateReviewScheduleStatusRequest.prisonId,
       toReviewScheduleStatus(updateReviewScheduleStatusRequest.status),
+    )
+  }
+
+  @GetMapping("/review-schedules")
+  @PreAuthorize(HAS_VIEW_REVIEWS)
+  fun getActionPlanReviewSchedules(
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+  ): ActionPlanReviewSchedulesResponse {
+    val reviewSchedules = reviewService.getReviewSchedulesForPrisoner(prisonNumber)
+    return ActionPlanReviewSchedulesResponse(
+      reviewSchedules = reviewSchedules.map { reviewScheduleHistoryResponseMapper.fromDomainToModel(it) },
     )
   }
 

@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
@@ -76,6 +77,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
 import java.security.KeyPair
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -468,6 +470,34 @@ abstract class IntegrationTestBase {
       updatedAtPrison = "BXI",
     )
     reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+  }
+
+  fun createReviewScheduleHistoryRecord(
+    prisonNumber: String,
+    status: String = ReviewScheduleStatus.SCHEDULED.name,
+    earliestDate: LocalDate = LocalDate.now().minusMonths(1),
+    latestDate: LocalDate = LocalDate.now().plusMonths(1),
+    version: Int = 1,
+    reference: UUID = UUID.randomUUID(),
+    createdAt: Instant = Instant.now(),
+    updatedAt: Instant = Instant.now(),
+  ) {
+    val reviewScheduleEntity = ReviewScheduleHistoryEntity(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      earliestReviewDate = earliestDate,
+      latestReviewDate = latestDate,
+      scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
+      scheduleStatus = ReviewScheduleStatus.valueOf(status),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
+      version = version,
+      createdBy = "auser_gen",
+      updatedBy = "auser_gen",
+      createdAt = createdAt,
+      updatedAt = updatedAt,
+    )
+    reviewScheduleHistoryRepository.saveAndFlush(reviewScheduleEntity)
   }
 }
 

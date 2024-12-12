@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
@@ -102,5 +103,10 @@ class JpaReviewSchedulePersistenceAdapter(
       )
       reviewScheduleHistoryRepository.save(historyEntry)
     }
+  }
+
+  override fun getReviewScheduleHistory(prisonNumber: String): List<ReviewScheduleHistory> {
+    return reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
+      .map { reviewScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
   }
 }
