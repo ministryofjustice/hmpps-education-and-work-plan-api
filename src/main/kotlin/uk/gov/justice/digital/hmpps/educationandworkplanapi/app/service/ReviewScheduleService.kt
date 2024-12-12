@@ -18,8 +18,8 @@ class ReviewScheduleService(
 
   fun createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber: String): ReviewSchedule? =
     if (
-      inductionPersistenceAdapter.getInduction(prisonNumber) != null
-      && actionPlanPersistenceAdapter.getActionPlan(prisonNumber) != null
+      inductionPersistenceAdapter.getInduction(prisonNumber) != null &&
+      actionPlanPersistenceAdapter.getActionPlan(prisonNumber) != null
     ) {
       val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
       val createInitialReviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
