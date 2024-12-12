@@ -204,12 +204,18 @@ class GetTimelineTest : IntegrationTestBase() {
         ),
       ),
     )
+
     createInduction(prisonNumber, aValidCreateInductionRequest())
+    Thread.sleep(200)
+
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
+    Thread.sleep(200)
+
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
+    Thread.sleep(200)
 
     val induction = getInduction(prisonNumber)
     val actionPlan = getActionPlan(prisonNumber)
@@ -232,6 +238,7 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
     updateGoal(prisonNumber, updateGoalRequest)
+
     // When
     await.untilAsserted {
       val response = webTestClient.get()
