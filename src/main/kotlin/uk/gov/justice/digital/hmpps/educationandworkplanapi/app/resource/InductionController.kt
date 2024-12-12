@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
@@ -28,6 +29,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 class InductionController(
   private val inductionService: InductionService,
   private val inductionMapper: InductionResourceMapper,
+  private val reviewScheduleService: ReviewScheduleService,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -41,6 +43,7 @@ class InductionController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     inductionService.createInduction(inductionMapper.toCreateInductionDto(prisonNumber, request))
+    reviewScheduleService.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
   }
 
   @GetMapping("/{prisonNumber}")

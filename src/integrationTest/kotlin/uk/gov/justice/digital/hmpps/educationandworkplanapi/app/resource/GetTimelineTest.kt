@@ -163,7 +163,9 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasNoActionedByDisplayName()
             .hasContextualInfo(mapOf("PRISON_TRANSFERRED_FROM" to "MDI"))
         }
-        .event(3) {
+        // Events 3 and 4 were all created as part of the same Action Plan created event so will all have the same timestamp
+        // so we cannot guarantee their order
+        .anyOfEventNumber(3, 4) {
           it.hasSourceReference(actionPlan.reference.toString())
             .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
@@ -172,7 +174,7 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasNoContextualInfo()
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
-        .event(4) {
+        .anyOfEventNumber(3, 4) {
           it.hasSourceReference(goal.goalReference.toString())
             .hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
@@ -206,16 +208,13 @@ class GetTimelineTest : IntegrationTestBase() {
     )
 
     createInduction(prisonNumber, aValidCreateInductionRequest())
-    Thread.sleep(200)
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
     createActionPlan(prisonNumber, createActionPlanRequest)
-    Thread.sleep(200)
 
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
-    Thread.sleep(200)
 
     val induction = getInduction(prisonNumber)
     val actionPlan = getActionPlan(prisonNumber)
@@ -258,6 +257,7 @@ class GetTimelineTest : IntegrationTestBase() {
       val actual = response.responseBody.blockFirst()!!
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
+
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
         .hasNumberOfEvents(8)
@@ -277,14 +277,16 @@ class GetTimelineTest : IntegrationTestBase() {
             .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
             .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
         }
-        .event(3) {
+        // Events 3 and 4 were all created as part of the same Action Plan created event so will all have the same timestamp
+        // so we cannot guarantee their order
+        .anyOfEventNumber(3, 4) {
           it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(actionPlanReference.toString())
             .hasNoContextualInfo() // creating an action plan has no contextual info
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
-        .event(4) {
+        .anyOfEventNumber(3, 4) {
           it.hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal1Reference.toString())
@@ -299,21 +301,23 @@ class GetTimelineTest : IntegrationTestBase() {
             .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
             .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
         }
-        .event(6) {
+        // Events 6, 7 and 8 were all created as part of the same Goal Update event so will all have the same timestamp
+        // so we cannot guarantee their order
+        .anyOfEventNumber(6, 7, 8) {
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal1Reference.toString())
             .hasContextualInfo(mapOf("GOAL_TITLE" to "Learn Spanish")) // Learn German changed to Learn Spanish
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
-        .event(7) {
+        .anyOfEventNumber(6, 7, 8) {
           it.hasEventType(TimelineEventType.STEP_STARTED)
             .hasPrisonId("BXI")
             .hasSourceReference(stepToUpdate.stepReference.toString())
             .hasContextualInfo(mapOf("STEP_TITLE" to "Research course options"))
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
-        .event(8) {
+        .anyOfEventNumber(6, 7, 8) {
           it.hasEventType(TimelineEventType.STEP_UPDATED)
             .hasPrisonId("BXI")
             .hasSourceReference(stepToUpdate.stepReference.toString())
