@@ -47,7 +47,7 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew check --stacktrace
+          command: ./gradlew check --stacktrace --debug
       - run:
           command: ./gradlew combineJacocoReports
       - save_cache:
