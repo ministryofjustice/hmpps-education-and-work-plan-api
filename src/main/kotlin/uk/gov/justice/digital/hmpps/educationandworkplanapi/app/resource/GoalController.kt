@@ -69,7 +69,7 @@ class GoalController(
     @PathVariable goalReference: UUID,
   ): GoalResponse {
     val response = goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
-    // Get the archive note and update the response if present
+    // Get the goal note and update the response if present
     val notes = noteService.getNotes(response.goalReference, EntityType.GOAL)
     return response.copy(goalNotes = notes.map { noteResourceMapper.fromDomainToModel(it) })
   }
@@ -165,12 +165,27 @@ class GoalController(
   fun getGoals(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @RequestParam(required = false, name = "status") statuses: Set<GoalStatus>?,
-  ) =
-    GetGoalsResponse(
+  ): GetGoalsResponse {
+    val response = GetGoalsResponse(
       goalService.getGoals(
         GetGoalsDto(prisonNumber, convertStatuses(statuses)),
       ).map { goal -> goalResourceMapper.fromDomainToModel(goal) },
     )
+
+    // Map each goal response to its corresponding version with notes
+    val goalResponsesWithNotes = response.goals.map { goalResponse ->
+      val notes = noteService.getNotes(goalResponse.goalReference, EntityType.GOAL)
+
+      // Map the notes into their respective models
+      val mappedNotes = notes.map { noteResourceMapper.fromDomainToModel(it) }
+
+      // Return a new goal response with the updated notes
+      goalResponse.copy(goalNotes = mappedNotes)
+    }
+
+    // Return the response with the updated goals
+    return response.copy(goals = goalResponsesWithNotes)
+  }
 
   // convert from the generated enum to the one we use in persistence
   private fun convertStatuses(statuses: Set<GoalStatus>?) =

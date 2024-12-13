@@ -61,6 +61,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
@@ -325,6 +326,29 @@ abstract class IntegrationTestBase {
     webTestClient.put()
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/archive", prisonNumber, archiveGoalRequest.goalReference)
       .withBody(archiveGoalRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          GOALS_RW,
+          privateKey = keyPair.private,
+          username = username,
+          displayName = displayName,
+        ),
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent
+  }
+
+  fun completeGoal(
+    prisonNumber: String,
+    completeGoalRequest: CompleteGoalRequest,
+    username: String = "auser_gen",
+    displayName: String = "Albert User",
+  ) {
+    webTestClient.put()
+      .uri("/action-plans/{prisonNumber}/goals/{goalReference}/complete", prisonNumber, completeGoalRequest.goalReference)
+      .withBody(completeGoalRequest)
       .bearerToken(
         aValidTokenWithAuthority(
           GOALS_RW,
