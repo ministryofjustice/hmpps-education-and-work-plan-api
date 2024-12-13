@@ -97,6 +97,7 @@ enum class TimelineEventType {
   // Action Plan Review events
   ACTION_PLAN_REVIEW_COMPLETED,
   ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED,
+  ACTION_PLAN_REVIEW_SCHEDULE_CREATED,
 
   // Conversation/Notes events
   CONVERSATION_CREATED,

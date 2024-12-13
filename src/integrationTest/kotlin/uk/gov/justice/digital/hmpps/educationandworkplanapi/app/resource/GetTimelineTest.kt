@@ -260,7 +260,7 @@ class GetTimelineTest : IntegrationTestBase() {
 
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(8)
+        .hasNumberOfEvents(9)
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
@@ -294,6 +294,10 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .event(5) {
+          it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_CREATED)
+            .hasPrisonId("BXI")
+        }
+        .event(6) {
           it.hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal2Reference.toString())
@@ -303,21 +307,21 @@ class GetTimelineTest : IntegrationTestBase() {
         }
         // Events 6, 7 and 8 were all created as part of the same Goal Update event so will all have the same timestamp
         // so we cannot guarantee their order
-        .anyOfEventNumber(6, 7, 8) {
+        .anyOfEventNumber(7, 8, 9) {
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .hasPrisonId("BXI")
             .hasSourceReference(goal1Reference.toString())
             .hasContextualInfo(mapOf("GOAL_TITLE" to "Learn Spanish")) // Learn German changed to Learn Spanish
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
-        .anyOfEventNumber(6, 7, 8) {
+        .anyOfEventNumber(7, 8, 9) {
           it.hasEventType(TimelineEventType.STEP_STARTED)
             .hasPrisonId("BXI")
             .hasSourceReference(stepToUpdate.stepReference.toString())
             .hasContextualInfo(mapOf("STEP_TITLE" to "Research course options"))
             .hasCorrelationId(goalUpdatedCorrelationId)
         }
-        .anyOfEventNumber(6, 7, 8) {
+        .anyOfEventNumber(7, 8, 9) {
           it.hasEventType(TimelineEventType.STEP_UPDATED)
             .hasPrisonId("BXI")
             .hasSourceReference(stepToUpdate.stepReference.toString())
