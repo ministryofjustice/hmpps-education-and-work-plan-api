@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPl
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
@@ -34,7 +34,7 @@ class ActionPlanController(
   private val actionPlanMapper: ActionPlanResourceMapper,
   private val noteService: NoteService,
   private val noteResourceMapper: NoteResourceMapper,
-  private val reviewScheduleService: ReviewScheduleService,
+  private val reviewScheduleAdapter: ReviewScheduleAdapter,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -48,7 +48,7 @@ class ActionPlanController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     actionPlanService.createActionPlan(actionPlanMapper.fromModelToDto(prisonNumber, request))
-    reviewScheduleService.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
+    reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
   }
 
   @GetMapping("/{prisonNumber}")

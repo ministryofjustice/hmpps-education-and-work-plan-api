@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import java.time.Instant
 import java.time.LocalDate
 
@@ -10,9 +9,7 @@ import java.time.LocalDate
  *
  * Enabled when the property `ciag-kpi-processing-rule` is set to `PES` via [CiagKpiServiceFactory]
  */
-class PesCiagKpiService(
-  private val prisonerSearchApiClient: PrisonerSearchApiClient,
-) : CiagKpiService() {
+class PesCiagKpiService : CiagKpiService() {
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
     TODO("Not yet implemented")
   }

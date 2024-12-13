@@ -7,6 +7,7 @@ import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
@@ -122,6 +123,12 @@ class InboundEventsListenerTest : IntegrationTestBase() {
       status = InductionScheduleStatus.COMPLETE,
     )
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
+    createActionPlan(prisonNumber)
+
+    // The above two calls set the data up but they will also generate events so clear these out before starting the test
+    testReviewScheduleEventQueueClient.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.queueUrl).build(),
+    ).get()
 
     val expectedPrisoner = Prisoner(
       prisonerNumber = prisonNumber,

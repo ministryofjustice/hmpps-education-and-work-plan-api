@@ -31,9 +31,9 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalServ
 import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PefCiagKpiService
@@ -120,28 +120,26 @@ class DomainConfiguration {
   @Bean
   fun ciagKpiService(
     @Value("\${ciag-kpi-processing-rule}") ciagKpiProcessingRule: String?,
-    prisonerSearchApiClient: PrisonerSearchApiClient,
     inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     eventPublisher: EventPublisher,
     telemetryService: TelemetryService,
     timelineEventFactory: TimelineEventFactory,
     timelineService: TimelineService,
-    reviewService: ReviewService,
+    reviewScheduleAdapter: ReviewScheduleAdapter,
   ): CiagKpiService? =
     when (ciagKpiProcessingRule) {
       "PEF" -> PefCiagKpiService(
-        prisonerSearchApiClient,
         inductionSchedulePersistenceAdapter,
         inductionPersistenceAdapter,
         eventPublisher,
         telemetryService,
         timelineService,
         timelineEventFactory,
-        reviewService,
+        reviewScheduleAdapter,
       )
 
-      "PES" -> PesCiagKpiService(prisonerSearchApiClient)
+      "PES" -> PesCiagKpiService()
       else -> null
     }
 }

@@ -9,13 +9,11 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 import java.time.Instant
@@ -30,14 +28,13 @@ private val log = KotlinLogging.logger {}
  * Enabled when the property `ciag-kpi-processing-rule` is set to `PEF` via [CiagKpiServiceFactory]
  */
 class PefCiagKpiService(
-  private val prisonerSearchApiClient: PrisonerSearchApiClient,
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionPersistenceAdapter: InductionPersistenceAdapter,
   private val eventPublisher: EventPublisher,
   private val telemetryService: TelemetryService,
   private val timelineService: TimelineService,
   private val timelineEventFactory: TimelineEventFactory,
-  private val reviewService: ReviewService,
+  private val reviewScheduleAdapter: ReviewScheduleAdapter,
 
 ) : CiagKpiService() {
 
@@ -55,7 +52,7 @@ class PefCiagKpiService(
     if (activeInductionScheduleAlreadyExists(prisonNumber)) return
 
     if (inductionExists(prisonNumber)) {
-      createReviewScheduleForPrisoner(prisonNumber)
+      reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
       return
     }
     createNewInductionSchedule(prisonNumber, eventDate)
@@ -72,22 +69,6 @@ class PefCiagKpiService(
     eventPublisher.createAndPublishInductionEvent(prisonNumber)
     telemetryService.trackInductionScheduleCreated(inductionSchedule)
     recordInductionTimelineEvent(inductionSchedule)
-  }
-
-  private fun createReviewScheduleForPrisoner(prisonNumber: String) {
-    log.info { "Creating a review schedule for prisoner [$prisonNumber]" }
-    val prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
-    reviewService.createInitialReviewSchedule(
-      CreateInitialReviewScheduleDto(
-        prisonNumber = prisonNumber,
-        prisonerReleaseDate = prisoner.releaseDate,
-        prisonerSentenceType = toSentenceType(prisoner.legalStatus),
-        prisonId = prisoner.prisonId ?: "N/A",
-        isReadmission = true,
-        isTransfer = false,
-      ),
-    )
-    eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
   }
 
   private fun activeInductionScheduleAlreadyExists(prisonNumber: String): Boolean {
