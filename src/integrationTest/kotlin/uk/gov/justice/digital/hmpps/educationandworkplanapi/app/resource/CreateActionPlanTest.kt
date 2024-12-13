@@ -25,7 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 class CreateActionPlanTest : IntegrationTestBase() {
 
   companion object {
-    private const val URI_TEMPLATE = "/action-plans/{prisonNumber}"
+    const val URI_TEMPLATE = "/action-plans/{prisonNumber}"
   }
 
   @Test
