@@ -63,6 +63,7 @@ class TimelineEventEntityMapper {
       TimelineEventTypeEntity.STEP_COMPLETED -> TimelineEventTypeDomain.STEP_COMPLETED
       TimelineEventTypeEntity.ACTION_PLAN_REVIEW_COMPLETED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_COMPLETED
       TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
+      TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_CREATED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
       TimelineEventTypeEntity.CONVERSATION_CREATED -> TimelineEventTypeDomain.CONVERSATION_CREATED
       TimelineEventTypeEntity.CONVERSATION_UPDATED -> TimelineEventTypeDomain.CONVERSATION_UPDATED
       TimelineEventTypeEntity.PRISON_ADMISSION -> TimelineEventTypeDomain.PRISON_ADMISSION
@@ -93,6 +94,7 @@ class TimelineEventEntityMapper {
       TimelineEventTypeDomain.PRISON_RELEASE -> TimelineEventTypeEntity.PRISON_RELEASE
       TimelineEventTypeDomain.PRISON_TRANSFER -> TimelineEventTypeEntity.PRISON_TRANSFER
       TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
+      TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_CREATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
     }
 
   private fun toTimelineEventContext(eventType: TimelineEventContextEntity): TimelineEventContextDomain =
