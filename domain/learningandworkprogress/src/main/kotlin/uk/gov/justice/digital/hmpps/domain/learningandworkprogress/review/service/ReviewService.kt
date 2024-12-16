@@ -1,13 +1,36 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException.ReviewScheduleInvalidSentenceTypeException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_ON_REMAND
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_READMISSION
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_TRANSFER
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.CIVIL_PRISONER
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.CONVICTED_UNSENTENCED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.DEAD
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.IMMIGRATION_DETAINEE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.OTHER
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.RECALL
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.REMAND
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.SENTENCED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.UNKNOWN
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
@@ -32,6 +55,11 @@ class ReviewService(
   private val reviewPersistenceAdapter: ReviewPersistenceAdapter,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
 ) {
+
+  companion object {
+    private val UNSUPPORTED_SENTENCE_TYPES = listOf(DEAD, CIVIL_PRISONER, IMMIGRATION_DETAINEE, UNKNOWN, OTHER)
+    private val SENTENCE_TYPES_REQUIRING_RELEASE_DATE = listOf(SENTENCED, RECALL)
+  }
 
   /**
    * Returns the active [ReviewSchedule] for the prisoner identified by their prison number, where "active" is defined
@@ -85,8 +113,16 @@ class ReviewService(
    * is created with a status of SCHEDULED. This therefore becomes their latest Review Schedule.
    *
    * If the prisoner does not already have an active [ReviewSchedule] a [ReviewScheduleNotFoundException] is thrown.
+   *
+   * Only certain sentence types are supported to be able to create a new [ReviewSchedule], and of those SENTENCED and
+   * RECALL require the prisoner to have a release date. Throws a subclass of [InvalidReviewScheduleException] if these
+   * validation rules are not met.
    */
   fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto {
+    with(createCompletedReviewDto) {
+      validateSentenceTypeAndReleaseDate(prisonNumber, prisonerSentenceType, prisonerReleaseDate)
+    }
+
     // Get the active review schedule
     val currentReviewSchedule = getActiveReviewScheduleForPrisoner(createCompletedReviewDto.prisonNumber)
 
@@ -131,14 +167,27 @@ class ReviewService(
     }
   }
 
+  /**
+   * Creates and returns the prisoner's initial [ReviewSchedule].
+   * Returns null if the prisoner has less than 3 months to serve, in which case no Review is necessary and one is not
+   * scheduled for them.
+   *
+   * Only certain sentence types are supported to be able to create a [ReviewSchedule], and of those SENTENCED and
+   * RECALL require the prisoner to have a release date. Throws a subclass of [InvalidReviewScheduleException] if these
+   * validation rules are not met.
+   */
   fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? {
-    // Check for an existing active review schedule
-    val existingReviewSchedule = runCatching {
-      getActiveReviewScheduleForPrisoner(createInitialReviewScheduleDto.prisonNumber)
-    }.getOrNull()
+    with(createInitialReviewScheduleDto) {
+      validateSentenceTypeAndReleaseDate(prisonNumber, prisonerSentenceType, prisonerReleaseDate)
 
-    if (existingReviewSchedule != null) {
-      throw RuntimeException("An active review schedule already exists for prisoner ${createInitialReviewScheduleDto.prisonNumber}.")
+      // Check for an existing active review schedule
+      val existingReviewSchedule = runCatching {
+        getActiveReviewScheduleForPrisoner(prisonNumber)
+      }.getOrNull()
+
+      if (existingReviewSchedule != null) {
+        throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
+      }
     }
 
     // Calculate the review schedule window and rule
@@ -164,44 +213,48 @@ class ReviewService(
       }
   }
 
+  private fun validateSentenceTypeAndReleaseDate(prisonNumber: String, sentenceType: SentenceType, releaseDate: LocalDate?) {
+    when {
+      sentenceType in UNSUPPORTED_SENTENCE_TYPES ->
+        throw ReviewScheduleInvalidSentenceTypeException(prisonNumber, sentenceType)
+      sentenceType in SENTENCE_TYPES_REQUIRING_RELEASE_DATE && releaseDate == null ->
+        throw ReviewScheduleNoReleaseDateForSentenceTypeException(prisonNumber, sentenceType)
+    }
+  }
+
   private fun determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
     sentenceType: SentenceType,
     releaseDate: LocalDate?,
   ): ReviewScheduleCalculationRule =
-    when (sentenceType) {
-      SentenceType.REMAND -> ReviewScheduleCalculationRule.PRISONER_ON_REMAND
-      SentenceType.CONVICTED_UNSENTENCED -> ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
-      SentenceType.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-      SentenceType.SENTENCED, SentenceType.RECALL -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
-
-      SentenceType.DEAD, SentenceType.CIVIL_PRISONER, SentenceType.IMMIGRATION_DETAINEE, SentenceType.UNKNOWN, SentenceType.OTHER ->
-        throw UnsupportedOperationException("Calculating a review schedule for prisoner with sentence type $sentenceType is not supported")
+    when {
+      sentenceType == REMAND -> PRISONER_ON_REMAND
+      sentenceType == CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
+      sentenceType == SentenceType.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
+      else -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
     }
 
-  // TODO - refactor (possibly delete or make private) this method private when calculating the next review for a transfer or readmission has a dedicated service method
-  fun determineReviewScheduleCalculationRule(
+  private fun determineReviewScheduleCalculationRule(
     releaseDate: LocalDate?,
     sentenceType: SentenceType,
     isReAdmission: Boolean,
     isTransfer: Boolean,
   ): ReviewScheduleCalculationRule =
     if (isReAdmission) {
-      ReviewScheduleCalculationRule.PRISONER_READMISSION
+      PRISONER_READMISSION
     } else if (isTransfer) {
-      ReviewScheduleCalculationRule.PRISONER_TRANSFER
+      PRISONER_TRANSFER
     } else {
       determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(sentenceType, releaseDate)
     }
 
-  // TODO - make this method private when calculating the next review for a transfer or readmission has a dedicated service method
-  fun calculateReviewWindow(
+  private fun calculateReviewWindow(
     reviewScheduleCalculationRule: ReviewScheduleCalculationRule,
     releaseDate: LocalDate?,
   ): ReviewScheduleWindow? =
     when (reviewScheduleCalculationRule) {
-      ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
-      ReviewScheduleCalculationRule.PRISONER_READMISSION, ReviewScheduleCalculationRule.PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays()
-      ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> {
+      BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
+      PRISONER_READMISSION, PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays()
+      BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> {
         // If the prisoner has between 3 months and 3 months 7 days left to serve their Review Schedule Window would be between 1 and 3 months
         // as they would fall into the "between 3 and 6 months left to serve" rule. This would mean their deadline date would be within the last
         // week before release.
@@ -211,10 +264,10 @@ class ReviewService(
         ReviewScheduleWindow.fromOneToThreeMonthsMinusDays(8 - timeLeftToServe.days)
       }
 
-      ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
-      ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.PRISONER_ON_REMAND, ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
-      ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
-      ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths()
+      BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
+      BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
+      BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
+      MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths()
     }.also {
       when {
         it == null -> log.debug { "Returning no ReviewScheduleWindow because ReviewScheduleCalculationRule is $reviewScheduleCalculationRule" }
@@ -226,13 +279,13 @@ class ReviewService(
     val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate)
 
     return when {
-      timeLeftToServe.isNoMoreThan3Months() -> ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
-      timeLeftToServe.isBetween3MonthsAnd3Months7Days() -> ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
-      timeLeftToServe.isBetween3Months8DaysAnd6Months() -> ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
-      timeLeftToServe.isBetween6And12Months() -> ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
-      timeLeftToServe.isBetween12And60Months() -> ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
-      timeLeftToServe.isMoreThan60Months() -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
-      else -> ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
+      timeLeftToServe.isNoMoreThan3Months() -> BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween3MonthsAnd3Months7Days() -> BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
+      timeLeftToServe.isBetween3Months8DaysAnd6Months() -> BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween6And12Months() -> BETWEEN_6_AND_12_MONTHS_TO_SERVE
+      timeLeftToServe.isBetween12And60Months() -> BETWEEN_12_AND_60_MONTHS_TO_SERVE
+      timeLeftToServe.isMoreThan60Months() -> MORE_THAN_60_MONTHS_TO_SERVE
+      else -> MORE_THAN_60_MONTHS_TO_SERVE
     }.also {
       log.debug { "Returning ReviewScheduleCalculationRule $it based on release date of $releaseDate" }
     }

@@ -1,6 +1,20 @@
 {
   "mappings": [
     {
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPath": "/prisoner/Z9999ZZ"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prisoner-Z9999ZZ-sentenced-without-release-date.json"
+      }
+    },
+    {
       "request": {
         "method": "GET",
         "urlPattern": "/prisoner/.*"

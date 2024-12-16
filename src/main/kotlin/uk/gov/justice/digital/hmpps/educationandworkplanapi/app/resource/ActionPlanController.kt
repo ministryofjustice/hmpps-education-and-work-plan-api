@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
+import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
@@ -25,6 +27,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetActionPlanSummariesRequest
+
+private val log = KotlinLogging.logger {}
 
 @RestController
 @Validated
@@ -48,7 +52,12 @@ class ActionPlanController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     actionPlanService.createActionPlan(actionPlanMapper.fromModelToDto(prisonNumber, request))
-    reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
+
+    try {
+      reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
+    } catch (e: InvalidReviewScheduleException) {
+      log.warn { "Action Plan created, but could not create initial Review Schedule: ${e.message}" }
+    }
   }
 
   @GetMapping("/{prisonNumber}")

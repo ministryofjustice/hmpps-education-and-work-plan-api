@@ -14,3 +14,12 @@ class ActiveReviewScheduleAlreadyExistsException(val prisonNumber: String) :
 
 class InvalidReviewScheduleStatusException(val prisonNumber: String, fromStatus: ReviewScheduleStatus, toStatus: ReviewScheduleStatus) :
   RuntimeException("Invalid Review Schedule status transition for prisoner [$prisonNumber] status from $fromStatus to $toStatus")
+
+sealed class InvalidReviewScheduleException(val prisonNumber: String, val sentenceType: SentenceType, message: String) : RuntimeException(message) {
+
+  class ReviewScheduleInvalidSentenceTypeException(prisonNumber: String, sentenceType: SentenceType) :
+    InvalidReviewScheduleException(prisonNumber, sentenceType, "Cannot create Review Schedule for prisoner [$prisonNumber]. Sentence type $sentenceType is not supported")
+
+  class ReviewScheduleNoReleaseDateForSentenceTypeException(prisonNumber: String, sentenceType: SentenceType) :
+    InvalidReviewScheduleException(prisonNumber, sentenceType, "Cannot create Review Schedule for prisoner [$prisonNumber]. Sentence type $sentenceType with no release date is not supported")
+}

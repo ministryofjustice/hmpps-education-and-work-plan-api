@@ -334,4 +334,38 @@ class CreateInductionTest : IntegrationTestBase() {
     assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
     assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
   }
+
+  @Test
+  fun `should create induction and not create initial review schedule given prisoner already has goals created before the induction, but is an unsupported sentence type for the release schedule`() {
+    // Given
+    val prisonNumber = "Z9999ZZ" // Prisoner Z9999ZZ is sentenced, but with no release date, which is an unsupported combination when creating the release schedule
+    createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
+
+    val createRequest = aValidCreateInductionRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction).isNotNull
+    // assert that there are no Action Plan Reviews (ie. no Review Schedule)
+    webTestClient.get()
+      .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .exchange()
+      .expectStatus()
+      .isNotFound
+
+    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+  }
 }
