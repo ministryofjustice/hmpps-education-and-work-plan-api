@@ -50,6 +50,7 @@ class TimelineEventResourceMapper(
       TimelineEventTypeDomain.STEP_STARTED -> TimelineEventTypeApi.STEP_STARTED
       TimelineEventTypeDomain.STEP_COMPLETED -> TimelineEventTypeApi.STEP_COMPLETED
       TimelineEventTypeDomain.ACTION_PLAN_REVIEW_COMPLETED -> TimelineEventTypeApi.ACTION_PLAN_REVIEW_COMPLETED
+      TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_CREATED -> TimelineEventTypeApi.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
       TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeApi.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
       TimelineEventTypeDomain.CONVERSATION_CREATED -> TimelineEventTypeApi.CONVERSATION_CREATED
       TimelineEventTypeDomain.CONVERSATION_UPDATED -> TimelineEventTypeApi.CONVERSATION_UPDATED

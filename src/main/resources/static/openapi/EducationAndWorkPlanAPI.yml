@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.19.3'
+  version: '1.19.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2107,6 +2107,7 @@ components:
         - STEP_STARTED
         - STEP_COMPLETED
         - ACTION_PLAN_REVIEW_COMPLETED
+        - ACTION_PLAN_REVIEW_SCHEDULE_CREATED
         - ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
         - CONVERSATION_CREATED
         - CONVERSATION_UPDATED

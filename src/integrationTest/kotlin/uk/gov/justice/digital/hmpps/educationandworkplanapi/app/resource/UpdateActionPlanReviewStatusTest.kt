@@ -419,7 +419,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
             )
         }
       val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
-      verify(telemetryClient).trackEvent(
+      verify(telemetryClient, times(1)).trackEvent(
         eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
         capture(eventPropertiesCaptor),
         eq(null),
