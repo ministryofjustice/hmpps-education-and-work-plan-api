@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -126,12 +126,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
   @Test
   fun `should fail to create review given prisoner does not have a review schedule`() {
     // Given
-    val prisonerFromApi = Prisoner(
-      prisonerNumber = prisonNumber,
-      legalStatus = LegalStatus.SENTENCED,
-      releaseDate = LocalDate.now().plusYears(1),
-      prisonId = "BXI",
-    )
+    val prisonerFromApi = aValidPrisoner(prisonerNumber = prisonNumber)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
     // When
@@ -157,11 +152,10 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     // Given
     val earliestCreationTime = OffsetDateTime.now()
 
-    val prisonerFromApi = Prisoner(
+    val prisonerFromApi = aValidPrisoner(
       prisonerNumber = prisonNumber,
       legalStatus = LegalStatus.SENTENCED,
       releaseDate = LocalDate.now().plusYears(1),
-      prisonId = "BXI",
     )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
