@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.19.4'
+  version: '1.20.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -284,6 +284,35 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-action-plan-review-schedules
+
+  #
+  # Induction schedule status update
+  # --------------------------------------------------------------------------------
+  '/action-plans/{prisonNumber}/induction/schedule-status':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    put:
+      summary: updates the status for the induction schedule.
+      description: |
+        This is used to exempt or remove an exemption from a induction schedule.
+
+        **Role Requirements:**
+        Access to this endpoint requires the following role:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
+
+      tags:
+        - Action Plan Inductions
+      responses:
+        '204':
+          description: The induction schedule status update request was processed successfully.
+        '409':
+          description: Invalid induction schedule status change.
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: update-induction-schedule-status
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateInductionScheduleStatus'
+
 
   #
   # Goals
@@ -2898,7 +2927,7 @@ components:
         - note
         - conductedAt
 
-    ### Action Plan Review Exemption ###
+    ### Update Action Plan Review Status ###
     UpdateReviewScheduleStatusRequest:
       title: UpdateReviewScheduleStatusRequest
       description: A request to update the status of the current review schedule for example to set an exemption.
@@ -3084,6 +3113,27 @@ components:
         - status
         - calculationRule
 
+    ### Update Induction Schedule Status ###
+    UpdateInductionScheduleStatusRequest:
+      title: UpdateInductionScheduleStatusRequest
+      description: A request to update the status of the Induction schedule for example to set an exemption.
+      type: object
+      properties:
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
+        status:
+          $ref: '#/components/schemas/InductionScheduleStatus'
+        exemptionReason:
+          type: string
+          description: |
+            An optional reason as to why the Induction Schedule is exempted.
+
+            Only relevant and processed when the `status` field is one of the `EXEMPTION_` statuses.  
+            This field is not mandatory, even when the `status` field is one of the `EXEMPTION_` statuses.
+      required:
+        - prisonId
+        - status
+
     ReviewScheduleStatus:
       title: ReviewScheduleStatus
       description: Enum of the various Review Schedule statuses.
@@ -3155,6 +3205,8 @@ components:
         - EXEMPT_PRISONER_TRANSFER
         - EXEMPT_PRISONER_RELEASE
         - EXEMPT_PRISONER_DEATH
+        - EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
+        - EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
 
 
   #
@@ -3558,6 +3610,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateReviewScheduleStatusRequest'
+    UpdateInductionScheduleStatus:
+      description: Request body to update a induction schedule status.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateInductionScheduleStatusRequest'
   parameters:
     prisonNumberPathParameter:
       name: prisonNumber
