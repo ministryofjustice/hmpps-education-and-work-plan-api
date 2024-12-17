@@ -288,7 +288,7 @@ paths:
   #
   # Induction schedule status update
   # --------------------------------------------------------------------------------
-  '/action-plans/{prisonNumber}/induction/schedule-status':
+  '/inductions/{prisonerNumber}/induction-schedule':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     put:
