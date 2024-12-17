@@ -24,7 +24,6 @@ class ReviewScheduleAdapter(
   private val reviewService: ReviewService,
   private val eventPublisher: EventPublisher,
   private val telemetryService: TelemetryService,
-  private val timelineEventFactory: TimelineEventFactory,
   private val timelineService: TimelineService,
 ) {
 

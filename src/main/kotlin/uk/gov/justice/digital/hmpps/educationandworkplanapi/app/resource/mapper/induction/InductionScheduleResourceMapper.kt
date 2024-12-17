@@ -66,5 +66,7 @@ class InductionScheduleResourceMapper(
       InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusResponse.EXEMPT_PRISONER_TRANSFER
       InductionScheduleStatus.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_RELEASE
       InductionScheduleStatus.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DEATH
+      InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
+      InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
     }
 }
