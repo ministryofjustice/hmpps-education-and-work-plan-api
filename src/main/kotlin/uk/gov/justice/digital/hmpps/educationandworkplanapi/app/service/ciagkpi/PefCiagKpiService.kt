@@ -8,10 +8,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
@@ -102,18 +100,4 @@ class PefCiagKpiService(
     val numberOfDaysToAdd = 20
     return eventDate.atZone(europeLondon).toLocalDate().plusDays(numberOfDaysToAdd.toLong())
   }
-
-  private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
-    when (legalStatus) {
-      LegalStatus.RECALL -> SentenceType.RECALL
-      LegalStatus.DEAD -> SentenceType.DEAD
-      LegalStatus.INDETERMINATE_SENTENCE -> SentenceType.INDETERMINATE_SENTENCE
-      LegalStatus.SENTENCED -> SentenceType.SENTENCED
-      LegalStatus.CONVICTED_UNSENTENCED -> SentenceType.CONVICTED_UNSENTENCED
-      LegalStatus.CIVIL_PRISONER -> SentenceType.CIVIL_PRISONER
-      LegalStatus.IMMIGRATION_DETAINEE -> SentenceType.IMMIGRATION_DETAINEE
-      LegalStatus.REMAND -> SentenceType.REMAND
-      LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
-      LegalStatus.OTHER -> SentenceType.OTHER
-    }
 }
