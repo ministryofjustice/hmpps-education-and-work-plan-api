@@ -83,6 +83,8 @@ class InductionScheduleEntityMapper(
       InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
       InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
       InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH
+      InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
+      InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
     }
 
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusDomain): InductionScheduleStatusEntity =
@@ -102,5 +104,7 @@ class InductionScheduleEntityMapper(
       InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
       InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
       InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH
+      InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
+      InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
     }
 }
