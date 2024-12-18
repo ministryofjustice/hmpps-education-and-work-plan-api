@@ -13,6 +13,8 @@ class CreateActionPlanReviewRequestMapper {
     prisonNumber: String,
     releaseDate: LocalDate?,
     sentenceType: SentenceType,
+    isIndeterminateSentence: Boolean,
+    isRecall: Boolean,
     request: CreateActionPlanReviewRequest,
   ): CreateCompletedReviewDto =
     with(request) {
@@ -25,6 +27,8 @@ class CreateActionPlanReviewRequestMapper {
         conductedByRole = conductedByRole,
         prisonerReleaseDate = releaseDate,
         prisonerSentenceType = sentenceType,
+        prisonerHasIndeterminateFlag = isIndeterminateSentence,
+        prisonerHasRecallFlag = isRecall,
       )
     }
 }

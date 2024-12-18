@@ -282,6 +282,43 @@ class CreateActionPlanTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should create action plan and create initial review schedule given prisoner already has an induction created before the action plan, is sentenced without a release date and has the indeterminate flag`() {
+    // Given
+    val prisonNumber = "X9999XX" // Prisoner X9999XX is sentenced, but with no release date, and the has the `indeterminate` flag set
+    createInduction(prisonNumber, aValidCreateInductionRequest())
+
+    val createActionPlanRequest = aValidCreateActionPlanRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createActionPlanRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val actionPlan = getActionPlan(prisonNumber)
+    assertThat(actionPlan).isNotNull
+
+    // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
+    val actionPlanReviews = getActionPlanReviews(prisonNumber)
+    assertThat(actionPlanReviews)
+      .hasNumberOfCompletedReviews(0)
+      .latestReviewSchedule {
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+      }
+    val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
+
+    assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
+    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
+  }
+
+  @Test
   fun `should create action plan and not create initial review schedule given prisoner already has an induction created before the action plan, but is an unsupported sentence type for the release schedule`() {
     // Given
     val prisonNumber = "Z9999ZZ" // Prisoner Z9999ZZ is sentenced, but with no release date, which is an unsupported combination when creating the release schedule
