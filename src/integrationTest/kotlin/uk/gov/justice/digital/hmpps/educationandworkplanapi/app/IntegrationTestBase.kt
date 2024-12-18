@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
@@ -172,6 +173,9 @@ abstract class IntegrationTestBase {
   lateinit var inductionScheduleRepository: InductionScheduleRepository
 
   @Autowired
+  lateinit var inductionScheduleHistoryRepository: InductionScheduleHistoryRepository
+
+  @Autowired
   lateinit var hmppsQueueService: HmppsQueueService
 
   val domainEventQueue by lazy {
@@ -208,6 +212,10 @@ abstract class IntegrationTestBase {
     noteRepository.deleteAll()
     inductionScheduleRepository.deleteAll()
 
+    clearQueues()
+  }
+
+  fun clearQueues() {
     // clear all the queues just in case there are any messages hanging around
     domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()
     domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
@@ -224,6 +232,13 @@ abstract class IntegrationTestBase {
     ).get()
     testReviewScheduleEventQueueDlqClient!!.purgeQueue(
       PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.dlqUrl).build(),
+    ).get()
+
+    testReviewScheduleEventQueueClient.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.queueUrl).build(),
+    ).get()
+    testInductionScheduleEventQueueClient.purgeQueue(
+      PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build(),
     ).get()
   }
 

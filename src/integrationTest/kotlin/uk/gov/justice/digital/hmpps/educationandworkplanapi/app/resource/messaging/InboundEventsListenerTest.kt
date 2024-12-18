@@ -6,8 +6,8 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.junit.jupiter.MockitoExtension
-import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
 @ExtendWith(MockitoExtension::class)
+@Isolated
 class InboundEventsListenerTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule"
@@ -72,12 +73,23 @@ class InboundEventsListenerTest : IntegrationTestBase() {
       inductionScheduleRepository.findByPrisonNumber(prisonNumber) != null
     }
 
+    // test induction schedule is created
     val inductionSchedule = inductionScheduleRepository.findByPrisonNumber("A6099EA")
     checkNotNull(inductionSchedule) { "Expected a record with prisonNumber 'A6099EA' to exist in the database" }
 
     with(inductionSchedule) {
       assertThat(prisonNumber).isEqualTo("A6099EA")
       assertThat(scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+    }
+
+    // test induction schedule history is created
+    val inductionScheduleHistories = inductionScheduleHistoryRepository.findAllByPrisonNumber("A6099EA")
+    assertThat(inductionScheduleHistories).size().isEqualTo(1)
+
+    with(inductionScheduleHistories[0]) {
+      assertThat(prisonNumber).isEqualTo("A6099EA")
+      assertThat(scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+      assertThat(version).isEqualTo(1)
     }
 
     // test that outbound event is also created:
@@ -124,9 +136,7 @@ class InboundEventsListenerTest : IntegrationTestBase() {
     createActionPlan(prisonNumber)
 
     // The above two calls set the data up but they will also generate events so clear these out before starting the test
-    testReviewScheduleEventQueueClient.purgeQueue(
-      PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.queueUrl).build(),
-    ).get()
+    clearQueues()
 
     val expectedPrisoner = aValidPrisoner(prisonerNumber = prisonNumber)
     createPrisonerAPIStub(prisonNumber, expectedPrisoner)

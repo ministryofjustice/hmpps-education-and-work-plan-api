@@ -1805,6 +1805,13 @@ components:
           format: date
           description: the date when this resource was updated.
           example: '2023-06-19'
+        exemptionReason:
+          type: string
+          description: |
+            An optional reason as to why the induction Schedule is exempted.
+
+            Only relevant and processed when the `status` field is one of the `EXEMPTION_` statuses.  
+            This field is not mandatory, even when the `status` field is one of the `EXEMPTION_` statuses.
       required:
         - reference
         - prisonNumber

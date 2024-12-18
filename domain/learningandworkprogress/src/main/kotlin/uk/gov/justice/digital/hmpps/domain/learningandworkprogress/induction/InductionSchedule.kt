@@ -37,6 +37,8 @@ data class InductionSchedule(
    * The timestamp when this Induction was updated.
    */
   val lastUpdatedAt: Instant?,
+
+  var exemptionReason: String?,
 )
 
 enum class InductionScheduleCalculationRule(val existingPrisonerWhenScheduleCreated: Boolean) {

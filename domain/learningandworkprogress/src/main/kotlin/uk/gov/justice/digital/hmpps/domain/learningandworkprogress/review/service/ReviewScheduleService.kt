@@ -137,6 +137,8 @@ class ReviewScheduleService(
     reviewSchedule: ReviewSchedule,
     additionalDays: Long = getExtensionDays(reviewSchedule.scheduleStatus),
   ): LocalDate? {
+    // TODO this needs to change slightly so that it's the grater of the the existing schedule plus additional days
+    // or today plus the additional days. There is a bug incoming.
     return reviewSchedule.reviewScheduleWindow.dateTo.takeIf { it <= LocalDate.now() }
       ?.let { LocalDate.now().plusDays(additionalDays) }
   }

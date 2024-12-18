@@ -29,7 +29,8 @@ class InductionScheduleEntityMapper(
         createdAt = createdAt,
         lastUpdatedBy = updatedBy,
         lastUpdatedByDisplayName = userService.getUserDetails(updatedBy!!).name,
-        lastUpdatedAt = entity.updatedAt,
+        lastUpdatedAt = updatedAt,
+        exemptionReason = exemptionReason,
       )
     }
 

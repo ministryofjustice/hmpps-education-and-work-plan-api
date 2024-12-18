@@ -7,18 +7,23 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionScheduleEntityMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import java.time.LocalDate
 
 @Component
 class JpaInductionSchedulePersistenceAdapter(
   private val inductionScheduleRepository: InductionScheduleRepository,
+  private val inductionScheduleHistoryRepository: InductionScheduleHistoryRepository,
   private val inductionScheduleEntityMapper: InductionScheduleEntityMapper,
 ) : InductionSchedulePersistenceAdapter {
   @Transactional
   override fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule =
     inductionScheduleRepository.saveAndFlush(inductionScheduleEntityMapper.fromCreateDtoToEntity(createInductionScheduleDto)).let {
+      saveInductionScheduleHistory(it)
       inductionScheduleEntityMapper.fromEntityToDomain(it)
     }
 
@@ -45,7 +50,28 @@ class JpaInductionSchedulePersistenceAdapter(
     )
 
     // Save the updated schedule and return the mapped domain object.
-    inductionScheduleRepository.saveAndFlush(updatedSchedule)
-    return inductionScheduleEntityMapper.fromEntityToDomain(updatedSchedule)
+    val inductionSchedule = inductionScheduleRepository.saveAndFlush(updatedSchedule)
+    saveInductionScheduleHistory(inductionSchedule)
+    return inductionScheduleEntityMapper.fromEntityToDomain(inductionSchedule)
+  }
+
+  private fun saveInductionScheduleHistory(inductionScheduleEntity: InductionScheduleEntity) {
+    with(inductionScheduleEntity) {
+      val historyEntry = InductionScheduleHistoryEntity(
+        version = inductionScheduleHistoryRepository.findMaxVersionByInductionScheduleReference(reference)
+          ?.plus(1) ?: 1,
+        reference = reference,
+        prisonNumber = prisonNumber,
+        updatedAt = updatedAt,
+        createdAt = createdAt,
+        updatedBy = updatedBy,
+        createdBy = createdBy,
+        scheduleStatus = scheduleStatus,
+        exemptionReason = exemptionReason,
+        scheduleCalculationRule = scheduleCalculationRule,
+        deadlineDate = deadlineDate,
+      )
+      inductionScheduleHistoryRepository.save(historyEntry)
+    }
   }
 }
