@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
@@ -50,7 +50,7 @@ class InductionController(
 
     try {
       reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
-    } catch (e: InvalidReviewScheduleException) {
+    } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
       log.warn { "Induction created, but could not create initial Review Schedule: ${e.message}" }
     }
   }

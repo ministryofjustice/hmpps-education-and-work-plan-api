@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
@@ -114,7 +114,7 @@ class ReviewScheduleEtlController(
         } catch (e: Exception) {
           when (e) {
             is NullPointerException -> log.error { "NPE creating Review Schedule for $prisonNumber, likely a problem with missing releaseDate. $e" }
-            is InvalidReviewScheduleException, is ActiveReviewScheduleAlreadyExistsException -> { /* ignore, these are expected exceptions given the prisoner data in certain circumstances (SentenceType, releaseDate) */ }
+            is ReviewScheduleNoReleaseDateForSentenceTypeException, is ActiveReviewScheduleAlreadyExistsException -> { /* ignore, these are expected exceptions given the prisoner data in certain circumstances (SentenceType, releaseDate) */ }
 
             else -> log.error { "Failed to create Review Schedule for $prisonNumber. $e" }
           }

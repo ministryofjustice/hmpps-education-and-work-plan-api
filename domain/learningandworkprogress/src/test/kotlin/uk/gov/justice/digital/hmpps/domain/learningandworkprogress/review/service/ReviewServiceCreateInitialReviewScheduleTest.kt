@@ -17,8 +17,8 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
@@ -216,30 +216,8 @@ class ReviewServiceCreateInitialReviewScheduleTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = ["DEAD", "CIVIL_PRISONER", "IMMIGRATION_DETAINEE", "UNKNOWN", "OTHER"])
-  fun `should not create a review given prisoner has sentence type`(sentenceType: SentenceType) {
-    // Given
-    val createInitialReviewScheduleDto = aValidCreateInitialReviewScheduleDto(
-      prisonNumber = PRISON_NUMBER,
-      prisonerReleaseDate = TODAY.plusYears(1),
-      prisonerSentenceType = sentenceType,
-    )
-
-    // When
-    val exception = catchThrowableOfType(InvalidReviewScheduleException::class.java) {
-      service.createInitialReviewSchedule(createInitialReviewScheduleDto)
-    }
-
-    // Then
-    assertThat(exception)
-      .isInstanceOf(InvalidReviewScheduleException.ReviewScheduleInvalidSentenceTypeException::class.java)
-      .extracting("prisonNumber", "sentenceType")
-      .containsExactly(PRISON_NUMBER, sentenceType)
-  }
-
-  @ParameterizedTest
-  @CsvSource(value = ["SENTENCED", "RECALL"])
-  fun `should not create a review given prisoner without indeterminate and recall flags, and with no release date has sentence type`(sentenceType: SentenceType) {
+  @CsvSource(value = ["SENTENCED", "RECALL", "CIVIL_PRISONER", "IMMIGRATION_DETAINEE", "UNKNOWN", "OTHER"])
+  fun `should not create a review given prisoner with no release date has sentence type`(sentenceType: SentenceType) {
     // Given
     val createInitialReviewScheduleDto = aValidCreateInitialReviewScheduleDto(
       prisonNumber = PRISON_NUMBER,
@@ -250,13 +228,13 @@ class ReviewServiceCreateInitialReviewScheduleTest {
     )
 
     // When
-    val exception = catchThrowableOfType(InvalidReviewScheduleException::class.java) {
+    val exception = catchThrowableOfType(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java) {
       service.createInitialReviewSchedule(createInitialReviewScheduleDto)
     }
 
     // Then
     assertThat(exception)
-      .isInstanceOf(InvalidReviewScheduleException.ReviewScheduleNoReleaseDateForSentenceTypeException::class.java)
+      .isInstanceOf(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java)
       .extracting("prisonNumber", "sentenceType")
       .containsExactly(PRISON_NUMBER, sentenceType)
   }
@@ -392,6 +370,42 @@ class ReviewServiceCreateInitialReviewScheduleTest {
           true,
           false,
           ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+        ),
+        Arguments.of(
+          "prisoner with CIVIL_PRISONER sentence has more than 60 months left to serve - review scheduled for 10 to 12 months",
+          TODAY.plusMonths(60).plusDays(1),
+          SentenceType.CIVIL_PRISONER,
+          false,
+          false,
+          ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+        ),
+        Arguments.of(
+          "prisoner with IMMIGRATION_DETAINEE sentence has more than 60 months left to serve - review scheduled for 10 to 12 months",
+          TODAY.plusMonths(60).plusDays(1),
+          SentenceType.IMMIGRATION_DETAINEE,
+          false,
+          false,
+          ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+        ),
+        Arguments.of(
+          "prisoner with UNKNOWN sentence has more than 60 months left to serve - review scheduled for 10 to 12 months",
+          TODAY.plusMonths(60).plusDays(1),
+          SentenceType.UNKNOWN,
+          false,
+          false,
+          ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+        ),
+        Arguments.of(
+          "prisoner with OTHER sentence has more than 60 months left to serve - review scheduled for 10 to 12 months",
+          TODAY.plusMonths(60).plusDays(1),
+          SentenceType.OTHER,
+          false,
+          false,
+          ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
         ),
       )
