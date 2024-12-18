@@ -336,6 +336,43 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should create induction and create initial review schedule given prisoner already has goals created before the induction, is sentenced without a release date and has the indeterminate flag`() {
+    // Given
+    val prisonNumber = "X9999XX" // Prisoner X9999XX is sentenced, but with no release date, and the has the `indeterminate` flag set
+    createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
+
+    val createRequest = aValidCreateInductionRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction).isNotNull
+    // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
+    val actionPlanReviews = getActionPlanReviews(prisonNumber)
+    assertThat(actionPlanReviews)
+      .hasNumberOfCompletedReviews(0)
+      .latestReviewSchedule {
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+      }
+    val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
+
+    assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
+    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
+  }
+
+  @Test
   fun `should create induction and not create initial review schedule given prisoner already has goals created before the induction, but is an unsupported sentence type for the release schedule`() {
     // Given
     val prisonNumber = "Z9999ZZ" // Prisoner Z9999ZZ is sentenced, but with no release date, which is an unsupported combination when creating the release schedule

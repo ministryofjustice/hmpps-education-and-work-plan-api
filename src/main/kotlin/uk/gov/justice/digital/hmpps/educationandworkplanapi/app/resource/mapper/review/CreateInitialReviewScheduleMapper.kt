@@ -16,6 +16,8 @@ class CreateInitialReviewScheduleMapper {
         prisonId = prisonId ?: "N/A",
         prisonerReleaseDate = releaseDate,
         prisonerSentenceType = toSentenceType(legalStatus),
+        prisonerHasIndeterminateFlag = isIndeterminateSentence,
+        prisonerHasRecallFlag = isRecall,
         isTransfer = isTransfer,
         isReadmission = isReadmission,
       )

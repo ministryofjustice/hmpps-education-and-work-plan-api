@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Senten
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.CONVICTED_UNSENTENCED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.DEAD
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.IMMIGRATION_DETAINEE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.INDETERMINATE_SENTENCE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.OTHER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.RECALL
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.REMAND
@@ -118,54 +119,54 @@ class ReviewService(
    * RECALL require the prisoner to have a release date. Throws a subclass of [InvalidReviewScheduleException] if these
    * validation rules are not met.
    */
-  fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto {
+  fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto =
     with(createCompletedReviewDto) {
-      validateSentenceTypeAndReleaseDate(prisonNumber, prisonerSentenceType, prisonerReleaseDate)
+      val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
+      validateSentenceTypeAndReleaseDate(prisonNumber, sentenceType, prisonerReleaseDate)
+
+      // Get the active review schedule
+      val currentReviewSchedule = getActiveReviewScheduleForPrisoner(prisonNumber)
+
+      // Persist a new CompletedReview
+      val completedReview = reviewPersistenceAdapter.createCompletedReview(
+        createCompletedReviewDto = this,
+        reviewSchedule = currentReviewSchedule,
+      )
+
+      // Update the current review schedule to mark it as Completed
+      val completedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewSchedule(
+        UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, prisonId),
+      )
+
+      // Work out the next review schedule calculation rule and schedule window
+      val releaseDate = prisonerReleaseDate
+      val reviewScheduleCalculationRule = determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
+        sentenceType = sentenceType,
+        releaseDate = releaseDate,
+      )
+      val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
+
+      CompletedReviewDto(
+        completedReview = completedReview,
+        wasLastReviewBeforeRelease = reviewScheduleWindow == null,
+        latestReviewSchedule = reviewScheduleWindow?.let {
+          // If a new ReviewScheduleWindow was calculated, create a new ReviewSchedule with it
+          reviewSchedulePersistenceAdapter.createReviewSchedule(
+            CreateReviewScheduleDto(
+              prisonNumber = prisonNumber,
+              prisonId = prisonId,
+              reviewScheduleWindow = it,
+              scheduleCalculationRule = reviewScheduleCalculationRule,
+            ),
+          )
+        } ?: let {
+          // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
+          completedReviewSchedule!!
+        },
+      ).also {
+        reviewEventService.reviewCompleted(it.completedReview)
+      }
     }
-
-    // Get the active review schedule
-    val currentReviewSchedule = getActiveReviewScheduleForPrisoner(createCompletedReviewDto.prisonNumber)
-
-    // Persist a new CompletedReview
-    val completedReview = reviewPersistenceAdapter.createCompletedReview(
-      createCompletedReviewDto = createCompletedReviewDto,
-      reviewSchedule = currentReviewSchedule,
-    )
-
-    // Update the current review schedule to mark it as Completed
-    val completedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewSchedule(
-      UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, createCompletedReviewDto.prisonId),
-    )
-
-    // Work out the next review schedule calculation rule and schedule window
-    val releaseDate = createCompletedReviewDto.prisonerReleaseDate
-    val reviewScheduleCalculationRule = determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
-      sentenceType = createCompletedReviewDto.prisonerSentenceType,
-      releaseDate = releaseDate,
-    )
-    val reviewScheduleWindow = calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
-
-    return CompletedReviewDto(
-      completedReview = completedReview,
-      wasLastReviewBeforeRelease = reviewScheduleWindow == null,
-      latestReviewSchedule = reviewScheduleWindow?.let {
-        // If a new ReviewScheduleWindow was calculated, create a new ReviewSchedule with it
-        reviewSchedulePersistenceAdapter.createReviewSchedule(
-          CreateReviewScheduleDto(
-            prisonNumber = createCompletedReviewDto.prisonNumber,
-            prisonId = createCompletedReviewDto.prisonId,
-            reviewScheduleWindow = it,
-            scheduleCalculationRule = reviewScheduleCalculationRule,
-          ),
-        )
-      } ?: let {
-        // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
-        completedReviewSchedule!!
-      },
-    ).also {
-      reviewEventService.reviewCompleted(it.completedReview)
-    }
-  }
 
   /**
    * Creates and returns the prisoner's initial [ReviewSchedule].
@@ -176,9 +177,10 @@ class ReviewService(
    * RECALL require the prisoner to have a release date. Throws a subclass of [InvalidReviewScheduleException] if these
    * validation rules are not met.
    */
-  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? {
+  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? =
     with(createInitialReviewScheduleDto) {
-      validateSentenceTypeAndReleaseDate(prisonNumber, prisonerSentenceType, prisonerReleaseDate)
+      val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
+      validateSentenceTypeAndReleaseDate(prisonNumber, sentenceType, prisonerReleaseDate)
 
       // Check for an existing active review schedule
       val existingReviewSchedule = runCatching {
@@ -188,30 +190,28 @@ class ReviewService(
       if (existingReviewSchedule != null) {
         throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
       }
-    }
 
-    // Calculate the review schedule window and rule
-    val releaseDate = createInitialReviewScheduleDto.prisonerReleaseDate
-    val sentenceType = createInitialReviewScheduleDto.prisonerSentenceType
-    val reviewScheduleCalculationRule = determineReviewScheduleCalculationRule(
-      sentenceType = sentenceType,
-      releaseDate = releaseDate,
-      isReAdmission = createInitialReviewScheduleDto.isReadmission,
-      isTransfer = createInitialReviewScheduleDto.isTransfer,
-    )
-    // Persist the initial review schedule if a ReviewScheduleWindow is calculated
-    return calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
-      ?.let {
-        reviewSchedulePersistenceAdapter.createReviewSchedule(
-          CreateReviewScheduleDto(
-            prisonNumber = createInitialReviewScheduleDto.prisonNumber,
-            prisonId = createInitialReviewScheduleDto.prisonId,
-            reviewScheduleWindow = it,
-            scheduleCalculationRule = reviewScheduleCalculationRule,
-          ),
-        )
-      }
-  }
+      // Calculate the review schedule window and rule
+      val releaseDate = prisonerReleaseDate
+      val reviewScheduleCalculationRule = determineReviewScheduleCalculationRule(
+        sentenceType = sentenceType,
+        releaseDate = releaseDate,
+        isReAdmission = isReadmission,
+        isTransfer = isTransfer,
+      )
+      // Persist the initial review schedule if a ReviewScheduleWindow is calculated
+      calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
+        ?.let {
+          reviewSchedulePersistenceAdapter.createReviewSchedule(
+            CreateReviewScheduleDto(
+              prisonNumber = prisonNumber,
+              prisonId = prisonId,
+              reviewScheduleWindow = it,
+              scheduleCalculationRule = reviewScheduleCalculationRule,
+            ),
+          )
+        }
+    }
 
   private fun validateSentenceTypeAndReleaseDate(prisonNumber: String, sentenceType: SentenceType, releaseDate: LocalDate?) {
     when {
@@ -229,7 +229,7 @@ class ReviewService(
     when {
       sentenceType == REMAND -> PRISONER_ON_REMAND
       sentenceType == CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
-      sentenceType == SentenceType.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
+      sentenceType == INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
       else -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
     }
 
@@ -244,7 +244,10 @@ class ReviewService(
     } else if (isTransfer) {
       PRISONER_TRANSFER
     } else {
-      determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(sentenceType, releaseDate)
+      determineReviewScheduleCalculationRuleBasedOnSentenceTypeAndReleaseDate(
+        sentenceType = sentenceType,
+        releaseDate = releaseDate,
+      )
     }
 
   private fun calculateReviewWindow(
@@ -290,6 +293,20 @@ class ReviewService(
       log.debug { "Returning ReviewScheduleCalculationRule $it based on release date of $releaseDate" }
     }
   }
+
+  /**
+   * Return the prisoner's effective sentence type.
+   * There is an order or precedence:
+   *   * If they have the `isIndeterminate` flag set, they are considered INDETERMINATE_SENTENCE, regardless of anything else
+   *   * If they have the `isRecall` flag set, they are considered RECALL
+   *   * Else return the sentence type from the prisoner record
+   */
+  private fun effectiveSentenceType(prisonerSentenceType: SentenceType, prisonerHasIndeterminateFlag: Boolean, prisonerHasRecallFlag: Boolean) =
+    when {
+      prisonerHasIndeterminateFlag -> INDETERMINATE_SENTENCE
+      prisonerHasRecallFlag -> RECALL
+      else -> prisonerSentenceType
+    }
 
   private data class MonthsAndDaysLeftToServe(
     val months: Long,

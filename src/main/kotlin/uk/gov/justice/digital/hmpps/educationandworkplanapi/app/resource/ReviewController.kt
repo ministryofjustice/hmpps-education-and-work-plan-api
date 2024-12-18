@@ -75,6 +75,8 @@ class ReviewController(
         releaseDate = prisonerReleaseDate,
         sentenceType = prisonerSentenceType,
         request = createActionPlanReviewRequest,
+        isIndeterminateSentence = prisoner.isIndeterminateSentence,
+        isRecall = prisoner.isRecall,
       ),
     )
 

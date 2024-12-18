@@ -55,6 +55,8 @@ class ReviewServiceCreateReviewTest {
     scenario: String,
     releaseDate: LocalDate?,
     sentenceType: SentenceType,
+    prisonerHasIndeterminateFlag: Boolean,
+    prisonerHasRecallFlag: Boolean,
     expectedRule: ReviewScheduleCalculationRule,
     expectedReviewScheduleWindow: ReviewScheduleWindow,
   ) {
@@ -64,6 +66,8 @@ class ReviewServiceCreateReviewTest {
       conductedAt = TODAY,
       prisonerReleaseDate = releaseDate,
       prisonerSentenceType = sentenceType,
+      prisonerHasIndeterminateFlag = prisonerHasIndeterminateFlag,
+      prisonerHasRecallFlag = prisonerHasRecallFlag,
     )
 
     val activeReviewSchedule = aValidReviewSchedule(
@@ -132,6 +136,8 @@ class ReviewServiceCreateReviewTest {
       conductedAt = TODAY,
       prisonerReleaseDate = releaseDate,
       prisonerSentenceType = SentenceType.SENTENCED,
+      prisonerHasIndeterminateFlag = false,
+      prisonerHasRecallFlag = false,
     )
 
     val activeReviewSchedule = aValidReviewSchedule(
@@ -229,13 +235,15 @@ class ReviewServiceCreateReviewTest {
 
   @ParameterizedTest
   @CsvSource(value = ["SENTENCED", "RECALL"])
-  fun `should not create a review given prisoner with no release date has sentence type`(sentenceType: SentenceType) {
+  fun `should not create a review given prisoner without indeterminate and recall flags, and with no release date has sentence type`(sentenceType: SentenceType) {
     // Given
     val createCompletedReviewDto = aValidCreateCompletedReviewDto(
       prisonNumber = PRISON_NUMBER,
       conductedAt = TODAY,
       prisonerReleaseDate = null,
       prisonerSentenceType = sentenceType,
+      prisonerHasIndeterminateFlag = false,
+      prisonerHasRecallFlag = false,
     )
 
     // When
@@ -261,6 +269,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has an indeterminate sentence - next review 10 to 12 months",
           null,
           SentenceType.INDETERMINATE_SENTENCE,
+          true,
+          false,
           ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
           ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
         ),
@@ -268,6 +278,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner is on remand - next review 2 to 3 months",
           null,
           SentenceType.REMAND,
+          false,
+          false,
           ReviewScheduleCalculationRule.PRISONER_ON_REMAND,
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
@@ -275,6 +287,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner is un-sentenced - next review 2 to 3 months",
           null,
           SentenceType.CONVICTED_UNSENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED,
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
@@ -282,6 +296,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has 3 months 1 day left to serve - next review 1 to 3 months minus 7 days",
           TODAY.plusMonths(3).plusDays(1),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(7)),
         ),
@@ -289,6 +305,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has 3 months 7 days left to serve - next review 1 to 3 months minus 1 day",
           TODAY.plusMonths(3).plusDays(7),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(1)),
         ),
@@ -296,6 +314,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has between 3 months 8 days and 6 months left to serve - next review 1 to 3 months",
           TODAY.plusMonths(3).plusDays(8),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3)),
         ),
@@ -303,6 +323,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has exactly 6 months left to serve - next review 1 to 3 months",
           TODAY.plusMonths(6),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3)),
         ),
@@ -310,6 +332,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has between 6 and 12 months left to serve - next review 2 to 3 months",
           TODAY.plusMonths(6).plusDays(1),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
@@ -317,6 +341,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has exactly 12 months left to serve - next review 2 to 3 months",
           TODAY.plusMonths(12),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
@@ -324,6 +350,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has between 12 and 60 months left to serve - next review 4 to 6 months",
           TODAY.plusMonths(12).plusDays(1),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(4), TODAY.plusMonths(6)),
         ),
@@ -331,6 +359,8 @@ class ReviewServiceCreateReviewTest {
           "prisoner has exactly 60 months left to serve - next review 4 to 6 months",
           TODAY.plusMonths(60),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
           ReviewScheduleWindow(TODAY.plusMonths(4), TODAY.plusMonths(6)),
         ),
@@ -338,7 +368,27 @@ class ReviewServiceCreateReviewTest {
           "prisoner has more than 60 months left to serve - next review 10 to 12 months",
           TODAY.plusMonths(60).plusDays(1),
           SentenceType.SENTENCED,
+          false,
+          false,
           ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+        ),
+        Arguments.of(
+          "prisoner is sentenced with a release date, but has the indeterminate flag set - review scheduled for 10 to 12 months",
+          TODAY.plusMonths(60).plusDays(1),
+          SentenceType.SENTENCED,
+          true,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+        ),
+        Arguments.of(
+          "prisoner is sentenced without a release date, but has the indeterminate flag set - review scheduled for 10 to 12 months",
+          null,
+          SentenceType.SENTENCED,
+          true,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
           ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
         ),
       )

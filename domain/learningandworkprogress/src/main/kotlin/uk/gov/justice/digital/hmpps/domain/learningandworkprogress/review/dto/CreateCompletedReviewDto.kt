@@ -12,4 +12,6 @@ data class CreateCompletedReviewDto(
   val conductedByRole: String?,
   val prisonerReleaseDate: LocalDate?,
   val prisonerSentenceType: SentenceType,
+  val prisonerHasIndeterminateFlag: Boolean,
+  val prisonerHasRecallFlag: Boolean,
 )
