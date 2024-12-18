@@ -13,8 +13,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsMessage
@@ -24,7 +23,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
-import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -130,13 +128,7 @@ class InboundEventsListenerTest : IntegrationTestBase() {
       PurgeQueueRequest.builder().queueUrl(reviewScheduleEventQueue.queueUrl).build(),
     ).get()
 
-    val expectedPrisoner = Prisoner(
-      prisonerNumber = prisonNumber,
-      legalStatus = LegalStatus.SENTENCED,
-      releaseDate = LocalDate.now().plusYears(1),
-      prisonId = "BXI",
-
-    )
+    val expectedPrisoner = aValidPrisoner(prisonerNumber = prisonNumber)
     createPrisonerAPIStub(prisonNumber, expectedPrisoner)
 
     val sqsMessage = SqsMessage(

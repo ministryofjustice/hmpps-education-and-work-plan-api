@@ -11,13 +11,11 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PagedPrisonerResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerSearchApiException
-import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 
 @ExtendWith((MockitoExtension::class))
 class PrisonerSearchApiServiceTest {
@@ -33,17 +31,13 @@ class PrisonerSearchApiServiceTest {
     val prisonId = "BXI"
 
     val expectedPrisoners = listOf(
-      Prisoner(
+      aValidPrisoner(
         prisonerNumber = "A1234BC",
-        legalStatus = LegalStatus.SENTENCED,
-        releaseDate = LocalDate.now().plusYears(1),
-        prisonId = "BXI",
+        prisonId = prisonId,
       ),
-      Prisoner(
+      aValidPrisoner(
         prisonerNumber = "A9999XX",
-        legalStatus = LegalStatus.SENTENCED,
-        releaseDate = LocalDate.now().plusYears(2),
-        prisonId = "BXI",
+        prisonId = prisonId,
       ),
     )
 
@@ -64,27 +58,21 @@ class PrisonerSearchApiServiceTest {
     val prisonId = "BXI"
 
     val prisonersReturnedInFirstPage = List(250) { index ->
-      Prisoner(
+      aValidPrisoner(
         prisonerNumber = "A${index.toString().padEnd(4, '0')}BC",
-        legalStatus = LegalStatus.SENTENCED,
-        releaseDate = LocalDate.now().plusYears(1),
-        prisonId = "BXI",
+        prisonId = prisonId,
       )
     }
     val prisonersReturnedInSecondPage = List(250) { index ->
-      Prisoner(
+      aValidPrisoner(
         prisonerNumber = "A${(250 + index).toString().padEnd(4, '0')}BC",
-        legalStatus = LegalStatus.SENTENCED,
-        releaseDate = LocalDate.now().plusYears(1),
-        prisonId = "BXI",
+        prisonId = prisonId,
       )
     }
     val prisonersReturnedInThirdPage = List(50) { index ->
-      Prisoner(
+      aValidPrisoner(
         prisonerNumber = "A${(500 + index).toString().padEnd(4, '0')}BC",
-        legalStatus = LegalStatus.SENTENCED,
-        releaseDate = LocalDate.now().plusYears(1),
-        prisonId = "BXI",
+        prisonId = prisonId,
       )
     }
 
@@ -129,12 +117,7 @@ class PrisonerSearchApiServiceTest {
   fun `should get prisoner by their prison number`() {
     // Given
     val prisonNumber = "A1234BC"
-    val expectedPrisoner = Prisoner(
-      prisonerNumber = "A1234BC",
-      legalStatus = LegalStatus.SENTENCED,
-      releaseDate = LocalDate.now().plusYears(1),
-      prisonId = "BXI",
-    )
+    val expectedPrisoner = aValidPrisoner(prisonerNumber = prisonNumber)
     given(prisonerSearchApiClient.getPrisoner(any())).willReturn(expectedPrisoner)
 
     // When
