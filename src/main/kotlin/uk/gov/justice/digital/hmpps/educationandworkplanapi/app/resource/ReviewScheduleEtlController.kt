@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
@@ -54,7 +53,6 @@ class ReviewScheduleEtlController(
     val totalPrisonersWithReviewSchedule: Int
     val totalPrisonersWithInduction: Int
     val totalPrisonersWithActionPlan: Int
-    val totalSentencedPrisonersWithNoReleaseDate: Int
     val prisonersWithCreatedReviewSchedules = mutableListOf<String>()
     val prisonersWithoutReviewSchedules = mutableListOf<String>()
 
@@ -86,14 +84,6 @@ class ReviewScheduleEtlController(
           .map { it.prisonNumber }
           .also { totalPrisonersWithActionPlan = it.size }
         prisoners.filter { prisonersWithAnActionPlan.contains(it.prisonerNumber) }
-      }
-      // Filter out prisoners who are SENTENCED but have no release date. This should only be a problem in dev
-      .let { prisoners ->
-        val sentencedPrisonersWithNoReleaseDate = prisoners
-          .filter { prisoner -> prisoner.legalStatus == LegalStatus.SENTENCED && prisoner.releaseDate == null }
-          .toSet()
-          .also { totalSentencedPrisonersWithNoReleaseDate = it.size }
-        prisoners.subtract(sentencedPrisonersWithNoReleaseDate)
       }
       // Create the Review Schedule for each prisoner who requires one
       .forEach { prisoner ->
@@ -129,7 +119,6 @@ class ReviewScheduleEtlController(
       totalPrisonersWithReviewSchedule = totalPrisonersWithReviewSchedule,
       totalPrisonersWithInduction = totalPrisonersWithInduction,
       totalPrisonersWithActionPlan = totalPrisonersWithActionPlan,
-      totalSentencedPrisonersWithNoReleaseDate = totalSentencedPrisonersWithNoReleaseDate,
       prisonersWithCreatedReviewSchedules = prisonersWithCreatedReviewSchedules.toList(),
       prisonersWithoutReviewSchedules = prisonersWithoutReviewSchedules.toList(),
     )
@@ -157,7 +146,6 @@ data class ReviewSchedulesEtlResponse(
   val totalPrisonersWithReviewSchedule: Int,
   val totalPrisonersWithInduction: Int,
   val totalPrisonersWithActionPlan: Int,
-  val totalSentencedPrisonersWithNoReleaseDate: Int,
   val prisonersWithCreatedReviewSchedules: List<String>,
   val prisonersWithoutReviewSchedules: List<String>,
 ) {
@@ -182,7 +170,6 @@ data class ReviewSchedulesEtlResponse(
           Of those, $totalPrisonersWithReviewSchedule already have a Review Schedule, leaving ${totalPrisonersInPrison - totalPrisonersWithReviewSchedule} candidate prisoners.
           Of those, $totalPrisonersWithInduction have an Induction, and $totalPrisonersWithActionPlan have an Induction and an Action Plan.
           The $totalPrisonersWithActionPlan prisoners with both an Induction and an Action Plan are the candidate prisoners.
-          Of those, $totalSentencedPrisonersWithNoReleaseDate are SENTENCED but have no release date, leaving ${totalPrisonersWithActionPlan - totalSentencedPrisonersWithNoReleaseDate} prisoners as the candidate prisoners for having a Review Schedule created.
           
           Created Review Schedules
           ------------------------          
