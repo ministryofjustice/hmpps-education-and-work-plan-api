@@ -17,6 +17,7 @@ fun aValidInductionSchedule(
   lastUpdatedBy: String? = "bjones_gen",
   lastUpdatedByDisplayName: String? = "Barry Jones",
   lastUpdatedAt: Instant? = Instant.now(),
+  exemptionReason: String? = null,
 ): InductionSchedule =
   InductionSchedule(
     reference = reference,
@@ -30,4 +31,5 @@ fun aValidInductionSchedule(
     lastUpdatedBy = lastUpdatedBy,
     lastUpdatedByDisplayName = lastUpdatedByDisplayName,
     lastUpdatedAt = lastUpdatedAt,
+    exemptionReason = exemptionReason,
   )

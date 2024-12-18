@@ -42,6 +42,9 @@ data class InductionScheduleEntity(
   @Column(updatable = true)
   @Enumerated(value = EnumType.STRING)
   var scheduleStatus: InductionScheduleStatus,
+
+  @Column
+  var exemptionReason: String? = null,
 ) {
   @Id
   @GeneratedValue
