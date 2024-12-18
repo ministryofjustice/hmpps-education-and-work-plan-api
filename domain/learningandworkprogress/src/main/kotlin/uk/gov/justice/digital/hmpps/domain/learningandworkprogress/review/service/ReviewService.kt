@@ -3,9 +3,6 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException.ReviewScheduleInvalidSentenceTypeException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleException.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
@@ -19,19 +16,14 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_TRANSFER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.CIVIL_PRISONER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.CONVICTED_UNSENTENCED
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.DEAD
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.IMMIGRATION_DETAINEE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.INDETERMINATE_SENTENCE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.OTHER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.RECALL
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.REMAND
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.SENTENCED
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.UNKNOWN
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
@@ -58,8 +50,7 @@ class ReviewService(
 ) {
 
   companion object {
-    private val UNSUPPORTED_SENTENCE_TYPES = listOf(DEAD, CIVIL_PRISONER, IMMIGRATION_DETAINEE, UNKNOWN, OTHER)
-    private val SENTENCE_TYPES_REQUIRING_RELEASE_DATE = listOf(SENTENCED, RECALL)
+    private val SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE = listOf(INDETERMINATE_SENTENCE, CONVICTED_UNSENTENCED, REMAND)
   }
 
   /**
@@ -115,9 +106,10 @@ class ReviewService(
    *
    * If the prisoner does not already have an active [ReviewSchedule] a [ReviewScheduleNotFoundException] is thrown.
    *
-   * Only certain sentence types are supported to be able to create a new [ReviewSchedule], and of those SENTENCED and
-   * RECALL require the prisoner to have a release date. Throws a subclass of [InvalidReviewScheduleException] if these
-   * validation rules are not met.
+   * To create a new [ReviewSchedule] the prisoner is required to have a release date for most sentence types. The
+   * exception to this are sentence types REMAND, CONVICTED_UNSENTENCED and INDETERMINATE_SENTENCE. All other sentence
+   * types require a release date. Throws a [ReviewScheduleNoReleaseDateForSentenceTypeException] if this condition
+   * is not satisfied.
    */
   fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto =
     with(createCompletedReviewDto) {
@@ -173,9 +165,10 @@ class ReviewService(
    * Returns null if the prisoner has less than 3 months to serve, in which case no Review is necessary and one is not
    * scheduled for them.
    *
-   * Only certain sentence types are supported to be able to create a [ReviewSchedule], and of those SENTENCED and
-   * RECALL require the prisoner to have a release date. Throws a subclass of [InvalidReviewScheduleException] if these
-   * validation rules are not met.
+   * To create a new [ReviewSchedule] the prisoner is required to have a release date for most sentence types. The
+   * exception to this are sentence types REMAND, CONVICTED_UNSENTENCED and INDETERMINATE_SENTENCE. All other sentence
+   * types require a release date. Throws a [ReviewScheduleNoReleaseDateForSentenceTypeException] if this condition
+   * is not satisfied.
    */
   fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? =
     with(createInitialReviewScheduleDto) {
@@ -215,9 +208,7 @@ class ReviewService(
 
   private fun validateSentenceTypeAndReleaseDate(prisonNumber: String, sentenceType: SentenceType, releaseDate: LocalDate?) {
     when {
-      sentenceType in UNSUPPORTED_SENTENCE_TYPES ->
-        throw ReviewScheduleInvalidSentenceTypeException(prisonNumber, sentenceType)
-      sentenceType in SENTENCE_TYPES_REQUIRING_RELEASE_DATE && releaseDate == null ->
+      sentenceType !in SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE && releaseDate == null ->
         throw ReviewScheduleNoReleaseDateForSentenceTypeException(prisonNumber, sentenceType)
     }
   }
