@@ -148,4 +148,14 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     }
     return this
   }
+
+  fun wasVersion(expected: Int): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (version != expected) {
+        failWithMessage("Expected version to be $expected, but was $version")
+      }
+    }
+    return this
+  }
 }

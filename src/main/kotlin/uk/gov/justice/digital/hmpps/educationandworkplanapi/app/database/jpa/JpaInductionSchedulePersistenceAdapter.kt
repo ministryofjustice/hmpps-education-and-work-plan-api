@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
@@ -53,6 +54,11 @@ class JpaInductionSchedulePersistenceAdapter(
     val inductionSchedule = inductionScheduleRepository.saveAndFlush(updatedSchedule)
     saveInductionScheduleHistory(inductionSchedule)
     return inductionScheduleEntityMapper.fromEntityToDomain(inductionSchedule)
+  }
+
+  override fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory> {
+    return inductionScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
+      .map { inductionScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
   }
 
   private fun saveInductionScheduleHistory(inductionScheduleEntity: InductionScheduleEntity) {
