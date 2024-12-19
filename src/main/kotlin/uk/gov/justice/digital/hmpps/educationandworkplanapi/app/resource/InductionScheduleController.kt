@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionHistoryScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionSchedulesResponse
 
 @RestController
 @Validated
@@ -24,6 +26,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 class InductionScheduleController(
   private val inductionService: InductionService,
   private val inductionScheduleMapper: InductionScheduleResourceMapper,
+  private val inductionHistoryScheduleResourceMapper: InductionHistoryScheduleResourceMapper,
 ) {
 
   @GetMapping
@@ -36,5 +39,24 @@ class InductionScheduleController(
 
     val inductionSchedule = inductionService.getInductionScheduleForPrisoner(prisonNumber)
     return inductionScheduleMapper.toInductionResponse(inductionSchedule, induction)
+  }
+
+  @GetMapping("/history")
+  @PreAuthorize(HAS_VIEW_INDUCTIONS)
+  fun getActionPlanReviewSchedules(
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+  ): InductionSchedulesResponse {
+    val induction = runCatching {
+      inductionService.getInductionForPrisoner(prisonNumber)
+    }.getOrNull()
+    val inductionSchedules = inductionService.getInductionSchedulesForPrisoner(prisonNumber)
+    return InductionSchedulesResponse(
+      inductionSchedules = inductionSchedules.map {
+        inductionHistoryScheduleResourceMapper.toInductionResponse(
+          it,
+          induction,
+        )
+      },
+    )
   }
 }

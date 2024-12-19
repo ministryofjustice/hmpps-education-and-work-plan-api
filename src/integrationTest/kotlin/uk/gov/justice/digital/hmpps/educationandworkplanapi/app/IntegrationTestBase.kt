@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
@@ -488,6 +489,31 @@ abstract class IntegrationTestBase {
         reference = UUID.randomUUID(),
         scheduleStatus = status,
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+      ),
+    )
+  }
+
+  fun createInductionScheduleHistory(
+    prisonNumber: String,
+    status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+    version: Int = 0,
+    exemptionReason: String? = null,
+    createdAt: Instant = Instant.now(),
+    updatedAt: Instant = Instant.now(),
+  ) {
+    inductionScheduleHistoryRepository.save(
+      InductionScheduleHistoryEntity(
+        prisonNumber = prisonNumber,
+        deadlineDate = LocalDate.now().plusMonths(1),
+        reference = UUID.randomUUID(),
+        scheduleStatus = status,
+        scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        exemptionReason = exemptionReason,
+        version = version,
+        createdBy = "auser_gen",
+        updatedBy = "auser_gen",
+        createdAt = createdAt,
+        updatedAt = updatedAt,
       ),
     )
   }

@@ -313,6 +313,31 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/UpdateInductionScheduleStatus'
 
+  #
+  # induction schedule history
+  # --------------------------------------------------------------------------------
+  '/inductions/{prisonerNumber}/induction-schedule/history':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    get:
+      summary: Lists Induction Schedule history for a prisoner
+      description: |
+        It is possible for an induction schedule to be updated therefore this endpoint will return all versions of a
+        induction schedule - the highest version number will be the most recent. 
+
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
+
+      tags:
+        - Action Plan Inductions
+      responses:
+        '200':
+          $ref: '#/components/responses/GetInductionSchedules'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-induction-schedule-history
 
   #
   # Goals
@@ -1812,6 +1837,9 @@ components:
 
             Only relevant and processed when the `status` field is one of the `EXEMPTION_` statuses.  
             This field is not mandatory, even when the `status` field is one of the `EXEMPTION_` statuses.
+        version:
+          type: integer
+          description: the version number of this schedule (the highest number is the most recent version of this induction schedule)
       required:
         - reference
         - prisonNumber
@@ -2998,6 +3026,19 @@ components:
       required:
         - reviewSchedules
 
+    InductionSchedulesResponse:
+      title: InductionSchedulesResponse
+      description: A list of induction schedules for a prisoner.
+      type: object
+      properties:
+        inductionSchedules:
+          type: array
+          description: A List containing zero or more InductionSchedules.
+          items:
+            $ref: '#/components/schemas/InductionScheduleResponse'
+      required:
+        - reviewSchedules
+
     CompletedActionPlanReviewResponse:
       title: CompletedActionPlanReviewResponse
       type: object
@@ -3516,6 +3557,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateActionPlanReviewResponse'
+
+    GetInductionSchedules:
+      description: Response body containing a list of induction schedules.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InductionSchedulesResponse'
 
   #
   # Request Body Definitions
