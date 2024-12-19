@@ -23,6 +23,8 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
@@ -46,6 +48,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher.HmppsDomainEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsMessage
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.CONVERSATIONS_RW
@@ -70,6 +73,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
@@ -99,6 +104,8 @@ abstract class IntegrationTestBase {
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
     const val EDUCATION_URI_TEMPLATE = "/person/{prisonNumber}/education"
+    const val GET_INDUCTION_SCHEDULE_URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule"
+    const val GET_INDUCTION_SCHEDULE_HISTORY_URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule/history"
 
     private val postgresContainer = PostgresContainer.instance
 
@@ -212,6 +219,7 @@ abstract class IntegrationTestBase {
     reviewScheduleHistoryRepository.deleteAll()
     noteRepository.deleteAll()
     inductionScheduleRepository.deleteAll()
+    inductionScheduleHistoryRepository.deleteAll()
 
     clearQueues()
   }
@@ -446,6 +454,36 @@ abstract class IntegrationTestBase {
       .returnResult(ActionPlanReviewsResponse::class.java)
       .responseBody.blockFirst()!!
 
+  fun getInductionSchedule(prisonNumber: String): InductionScheduleResponse =
+    webTestClient.get()
+      .uri(GET_INDUCTION_SCHEDULE_URI_TEMPLATE, prisonNumber)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(InductionScheduleResponse::class.java)
+      .responseBody.blockFirst()!!
+
+  fun getInductionScheduleHistory(prisonNumber: String): InductionSchedulesResponse =
+    webTestClient.get()
+      .uri(GET_INDUCTION_SCHEDULE_HISTORY_URI_TEMPLATE, prisonNumber)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(InductionSchedulesResponse::class.java)
+      .responseBody.blockFirst()!!
+
   internal fun HmppsQueue.receiveEvent(queueType: QueueType): HmppsDomainEvent {
     val event = receiveEventsOnQueue(queueType).single()
     sqsClient.purgeQueue { it.queueUrl(queueType.queueUrl) }
@@ -478,6 +516,7 @@ abstract class IntegrationTestBase {
   }
 
   internal fun HmppsQueue.countAllMessagesOnQueue() = sqsClient.countAllMessagesOnQueue(queueUrl).get()
+
   fun createInductionSchedule(
     prisonNumber: String,
     status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
@@ -568,6 +607,17 @@ abstract class IntegrationTestBase {
     )
     reviewScheduleHistoryRepository.saveAndFlush(reviewScheduleEntity)
   }
+
+  fun sendDomainEvent(
+    message: SqsMessage,
+    queueUrl: String = domainEventQueue.queueUrl,
+  ): SendMessageResponse = domainEventQueueClient.sendMessage(
+    SendMessageRequest.builder()
+      .queueUrl(queueUrl)
+      .messageBody(
+        objectMapper.writeValueAsString(message),
+      ).build(),
+  ).get()
 }
 
 data class Notification(

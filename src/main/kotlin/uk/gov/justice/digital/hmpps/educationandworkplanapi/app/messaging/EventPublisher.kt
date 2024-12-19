@@ -46,7 +46,7 @@ class EventPublisher(
     )
   }
 
-  fun publishEvent(event: HmppsDomainEvent) {
+  private fun publishEvent(event: HmppsDomainEvent) {
     log.info("Publishing event of type ${event.eventType} for person reference ${event.personReference.identifiers}")
     eventTopic.snsClient.publish(
       PublishRequest.builder()
@@ -58,7 +58,7 @@ class EventPublisher(
     ).get()
   }
 
-  fun createAndPublishEvent(
+  private fun createAndPublishEvent(
     prisonNumber: String,
     occurredAt: Instant,
     eventType: String,
