@@ -21,7 +21,7 @@ parameters:
     default: "3.6.0"
   java-options:
     type: string
-    default: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=1
+    default: -Xmx4g -XX:MaxMetaspaceSize=1g -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=1
 
 jobs:
   validate:
@@ -47,7 +47,7 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g" --daemon check
+          command: ./gradlew  --daemon check
       - run:
           command: ./gradlew --daemon combineJacocoReports
       - save_cache:
