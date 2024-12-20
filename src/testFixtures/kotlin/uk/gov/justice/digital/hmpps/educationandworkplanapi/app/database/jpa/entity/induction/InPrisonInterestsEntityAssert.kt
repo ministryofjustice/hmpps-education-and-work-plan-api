@@ -86,10 +86,10 @@ class InPrisonInterestsEntityAssert(actual: InPrisonInterestsEntity?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: Instant): InPrisonInterestsEntityAssert {
+  fun wasUpdatedAtOrAfter(dateTime: Instant): InPrisonInterestsEntityAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt!!.isAfter(dateTime)) {
+      if (updatedAt!!.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

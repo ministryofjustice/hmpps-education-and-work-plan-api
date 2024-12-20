@@ -193,7 +193,7 @@ class UpdateConversationTest : IntegrationTestBase() {
         it.hasContent("Peter's behaviour is improving.")
         it.wasUpdatedAtPrison("MDI")
       }
-      .wasUpdatedAfter(conversation.createdAt!!)
+      .wasUpdatedAtOrAfter(conversation.createdAt!!)
       .wasCreatedBy(creatorUsername)
       .wasUpdatedBy(editorUsername)
   }

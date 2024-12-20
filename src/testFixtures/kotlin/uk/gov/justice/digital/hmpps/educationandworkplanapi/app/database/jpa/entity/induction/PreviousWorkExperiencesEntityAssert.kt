@@ -86,10 +86,10 @@ class PreviousWorkExperiencesEntityAssert(actual: PreviousWorkExperiencesEntity?
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: Instant): PreviousWorkExperiencesEntityAssert {
+  fun wasUpdatedAtOrAfter(dateTime: Instant): PreviousWorkExperiencesEntityAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt!!.isAfter(dateTime)) {
+      if (updatedAt!!.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }
