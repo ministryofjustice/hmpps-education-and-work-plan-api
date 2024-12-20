@@ -48,6 +48,44 @@ class ReviewScheduleService(
     }
   }
 
+  /**
+   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_RELEASE
+   *
+   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
+   * A Review Schedule with the status COMPLETE is not considered 'active'
+   */
+  fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateExemptStatus(
+          prisonNumber = prisonNumber,
+          prisonId = prisonId,
+          reviewSchedule = this,
+          newStatus = ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE,
+          exemptionReason = null,
+        )
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
+  /**
+   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_DEATH
+   *
+   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
+   * A Review Schedule with the status COMPLETE is not considered 'active'
+   */
+  fun exemptActiveReviewScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateExemptStatus(
+          prisonNumber = prisonNumber,
+          prisonId = prisonId,
+          reviewSchedule = this,
+          newStatus = ReviewScheduleStatus.EXEMPT_PRISONER_DEATH,
+          exemptionReason = null,
+        )
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
   private fun updateExemptStatus(
     reviewSchedule: ReviewSchedule,
     newStatus: ReviewScheduleStatus,
