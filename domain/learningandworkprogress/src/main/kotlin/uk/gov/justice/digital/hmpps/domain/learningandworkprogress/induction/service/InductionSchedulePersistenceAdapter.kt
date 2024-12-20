@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import java.time.LocalDate
 
 /**
@@ -38,4 +39,9 @@ interface InductionSchedulePersistenceAdapter {
    * Retrieves the history of a Prisoner's [InductionSchedule]s.
    */
   fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory>
+
+  /**
+   * Update the Induction schedule status and the deadlineDate.
+   */
+  fun updateInductionScheduleStatus(updateInductionScheduleStatusDto: UpdateInductionScheduleStatusDto): InductionSchedule
 }

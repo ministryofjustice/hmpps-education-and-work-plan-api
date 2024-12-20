@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.Edu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InvalidInductionScheduleStatusException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleStatusException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
@@ -146,6 +147,7 @@ class GlobalExceptionHandler(
       EducationAlreadyExistsException::class,
       InvalidGoalStateException::class,
       InvalidReviewScheduleStatusException::class,
+      InvalidInductionScheduleStatusException::class,
       ReviewScheduleNoReleaseDateForSentenceTypeException::class,
     ],
   )

@@ -25,7 +25,7 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
   @Test
   fun `should return induction schedule history for given prison number`() {
     // Given
-    val initialDateTime = OffsetDateTime.now()
+    val initialDateTime = OffsetDateTime.now().minusSeconds(1)
     val randomPrisonNumber = randomValidPrisonNumber()
     createInductionScheduleHistory(
       prisonNumber = randomPrisonNumber,
