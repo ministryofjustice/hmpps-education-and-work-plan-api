@@ -5,6 +5,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
@@ -19,6 +20,7 @@ import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
+@Isolated
 class PrisonerReceivedEventTest : IntegrationTestBase() {
   @Test
   fun `should create new Induction Schedule and send outbound message given 'prisoner received' event for prisoner that does not already have an Induction`() {

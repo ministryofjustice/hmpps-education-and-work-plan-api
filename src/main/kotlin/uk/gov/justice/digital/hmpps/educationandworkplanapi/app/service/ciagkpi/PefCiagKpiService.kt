@@ -45,6 +45,14 @@ class PefCiagKpiService(
    * - If the prisoner already has had their Induction created. Then this person is likely to
    * be a coming back into prison and needs to resume their Reviews.
    */
+  /* TODO - the logic is wrong, and needs to be something like:
+     if prisoner has no Induction, Action Plan or Induction Schedule, then create the Induction Schedule
+     if prisoner has an Induction Schedule, and it is not complete, then return and do nothing
+     If prisoner has an Induction Schedule that is complete, but has no Review Schedule, create the initial review schedule with status SCHEDULED, reason PRISONER_READMISSION and due date +20 days
+     If prisoner has an Induction Schedule that is complete, and has a Review Schedule that is not complete, update the Review Schedule with status SCHEDULED, reason PRISONER_READMISSION and due date +20 days
+     If prisoner has an Induction Schedule that is complete, and has a Review Schedule that is complete, create a new Review Schedule with status SCHEDULED, reason PRISONER_READMISSION and due date +20 days
+   */
+
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {
     log.info { "Creating or updating induction schedule for prisoner [$prisonNumber]" }
     if (activeInductionScheduleAlreadyExists(prisonNumber)) return
@@ -53,6 +61,7 @@ class PefCiagKpiService(
       reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
       return
     }
+
     createNewInductionSchedule(prisonNumber, eventDate)
   }
 
