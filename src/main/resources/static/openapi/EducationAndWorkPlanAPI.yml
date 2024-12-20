@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.0'
+  version: '1.20.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3037,7 +3037,7 @@ components:
           items:
             $ref: '#/components/schemas/InductionScheduleResponse'
       required:
-        - reviewSchedules
+        - inductionSchedules
 
     CompletedActionPlanReviewResponse:
       title: CompletedActionPlanReviewResponse
