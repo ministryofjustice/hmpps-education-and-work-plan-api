@@ -7,6 +7,7 @@ import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
@@ -419,10 +420,10 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
             )
         }
       val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
-      verify(telemetryClient, times(1)).trackEvent(
+      verify(telemetryClient).trackEvent(
         eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
     }
 
