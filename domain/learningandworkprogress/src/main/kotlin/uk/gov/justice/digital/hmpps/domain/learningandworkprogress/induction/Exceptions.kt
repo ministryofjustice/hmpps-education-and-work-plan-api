@@ -20,3 +20,6 @@ class InductionScheduleAlreadyExistsException(val prisonNumber: String) :
 
 class InductionScheduleNotFoundException(val prisonNumber: String) :
   RuntimeException("Induction schedule not found for prisoner [$prisonNumber]")
+
+class InvalidInductionScheduleStatusException(val prisonNumber: String, val fromStatus: InductionScheduleStatus, val toStatus: InductionScheduleStatus) :
+  RuntimeException("Invalid Induction Schedule status transition for prisoner [$prisonNumber] status from $fromStatus to $toStatus")

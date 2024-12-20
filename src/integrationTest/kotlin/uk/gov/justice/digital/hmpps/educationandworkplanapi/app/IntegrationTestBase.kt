@@ -520,11 +520,12 @@ abstract class IntegrationTestBase {
   fun createInductionSchedule(
     prisonNumber: String,
     status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+    deadlineDate: LocalDate = LocalDate.now().plusMonths(1),
   ) {
     inductionScheduleRepository.save(
       InductionScheduleEntity(
         prisonNumber = prisonNumber,
-        deadlineDate = LocalDate.now().plusMonths(1),
+        deadlineDate = deadlineDate,
         reference = UUID.randomUUID(),
         scheduleStatus = status,
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,

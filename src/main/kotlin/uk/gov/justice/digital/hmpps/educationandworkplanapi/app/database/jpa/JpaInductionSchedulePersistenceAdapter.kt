@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
@@ -59,6 +60,22 @@ class JpaInductionSchedulePersistenceAdapter(
   override fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory> {
     return inductionScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
       .map { inductionScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
+  }
+
+  override fun updateInductionScheduleStatus(updateInductionScheduleStatusDto: UpdateInductionScheduleStatusDto): InductionSchedule {
+    val inductionScheduleEntity = inductionScheduleRepository.findByPrisonNumber(updateInductionScheduleStatusDto.prisonNumber)
+      ?: throw InductionScheduleNotFoundException(updateInductionScheduleStatusDto.prisonNumber)
+
+    // Update the schedule status and optionally the latest review date
+    inductionScheduleEntity.apply {
+      scheduleStatus = inductionScheduleEntityMapper.toInductionScheduleStatus(updateInductionScheduleStatusDto.scheduleStatus)
+      exemptionReason = updateInductionScheduleStatusDto.exemptionReason
+      updateInductionScheduleStatusDto.latestDeadlineDate?.let { deadlineDate = it }
+    }
+
+    val savedReviewScheduleEntity = inductionScheduleRepository.save(inductionScheduleEntity)
+    saveInductionScheduleHistory(savedReviewScheduleEntity)
+    return inductionScheduleEntityMapper.fromEntityToDomain(savedReviewScheduleEntity)
   }
 
   private fun saveInductionScheduleHistory(inductionScheduleEntity: InductionScheduleEntity) {

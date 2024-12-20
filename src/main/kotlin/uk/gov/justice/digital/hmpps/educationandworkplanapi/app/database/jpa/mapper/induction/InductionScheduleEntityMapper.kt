@@ -109,7 +109,7 @@ class InductionScheduleEntityMapper(
       InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
     }
 
-  private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusDomain): InductionScheduleStatusEntity =
+  fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusDomain): InductionScheduleStatusEntity =
     when (inductionScheduleStatus) {
       InductionScheduleStatusDomain.SCHEDULED -> InductionScheduleStatusEntity.SCHEDULED
       InductionScheduleStatusDomain.COMPLETE -> InductionScheduleStatusEntity.COMPLETE
