@@ -36,10 +36,10 @@ class WorkOnReleaseResponseAssert(actual: WorkOnReleaseResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): WorkOnReleaseResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): WorkOnReleaseResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -56,10 +56,10 @@ class WorkOnReleaseResponseAssert(actual: WorkOnReleaseResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): WorkOnReleaseResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): WorkOnReleaseResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

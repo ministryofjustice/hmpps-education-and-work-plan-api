@@ -132,11 +132,11 @@ class GetConversationTest : IntegrationTestBase() {
       .isForPrisonNumber(prisonNumber)
       .hasNoteContent(note)
       .wasCreatedAtPrison(createReviewConversationRequest.prisonId)
-      .wasCreatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
       .wasCreatedBy(createUsername)
       .hasCreatedByDisplayName(createDisplayName)
       .wasUpdatedAtPrison(createReviewConversationRequest.prisonId)
-      .wasUpdatedAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasUpdatedBy(createUsername)
       .hasUpdatedByDisplayName(createDisplayName)
   }

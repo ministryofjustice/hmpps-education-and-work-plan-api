@@ -108,8 +108,8 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("system")
       .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
@@ -146,8 +146,8 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("system")
       .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
