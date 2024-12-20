@@ -609,6 +609,18 @@ abstract class IntegrationTestBase {
     reviewScheduleHistoryRepository.saveAndFlush(reviewScheduleEntity)
   }
 
+  fun updateReviewScheduleRecordStatus(
+    prisonNumber: String,
+    status: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
+    exemptionReason: String? = null,
+  ) {
+    val reviewScheduleEntity = reviewScheduleRepository.findActiveReviewSchedule(prisonNumber)
+    reviewScheduleEntity?.run {
+      scheduleStatus = status
+      reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+    }
+  }
+
   fun sendDomainEvent(
     message: SqsMessage,
     queueUrl: String = domainEventQueue.queueUrl,

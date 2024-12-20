@@ -10,13 +10,13 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.OffsetDateTime
-import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
@@ -31,7 +31,10 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
 
     val earliestDateTime = OffsetDateTime.now()
 
-    val sqsMessage = prisonerReceivedSqsMessage(prisonNumber)
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+    )
 
     // When
     sendDomainEvent(sqsMessage)
@@ -98,7 +101,10 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
 
     val earliestDateTime = OffsetDateTime.now()
 
-    val sqsMessage = prisonerReceivedSqsMessage(prisonNumber)
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+    )
 
     // When
     sendDomainEvent(sqsMessage)
@@ -124,21 +130,4 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
     assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
     assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
   }
-
-  private fun prisonerReceivedSqsMessage(prisonNumber: String): SqsMessage =
-    SqsMessage(
-      Type = "Notification",
-      Message = """
-        {
-          "eventType": "prison-offender-events.prisoner.received",
-          "personReference": { "identifiers": [ { "type": "NOMS", "value": "$prisonNumber" } ] },
-          "occurredAt": "2024-08-08T09:07:55+01:00",
-          "publishedAt": "2024-08-08T09:08:55.673395103+01:00",
-          "description": "A prisoner has been received into prison",
-          "version": "1.0",
-          "additionalInformation": { "nomsNumber": "$prisonNumber", "reason": "ADMISSION", "details": "ACTIVE IN:ADM-N", "currentLocation": "IN_PRISON", "prisonId": "SWI", "nomisMovementReasonCode": "N", "currentPrisonStatus": "UNDER_PRISON_CARE" }
-        }        
-      """.trimIndent(),
-      MessageId = UUID.randomUUID(),
-    )
 }
