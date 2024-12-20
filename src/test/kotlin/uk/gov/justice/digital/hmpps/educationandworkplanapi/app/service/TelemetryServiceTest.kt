@@ -15,6 +15,7 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.given
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.thirdValue
 import org.mockito.kotlin.times
@@ -281,8 +282,8 @@ class TelemetryServiceTest {
       // Then
       verify(telemetryEventTypeResolver).resolveUpdateEventTypes(previousGoal, updatedGoal)
 
-      verify(telemetryClient).trackEvent(eq("goal-updated"), capture(eventPropertiesCaptor), eq(null))
-      verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), capture(eventPropertiesCaptor), eq(null))
+      verify(telemetryClient).trackEvent(eq("goal-updated"), capture(eventPropertiesCaptor), isNull())
+      verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), capture(eventPropertiesCaptor), isNull())
       verifyNoMoreInteractions(telemetryClient)
 
       val propertiesForGoalUpdatedEvent = eventPropertiesCaptor.firstValue

@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -250,7 +251,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("REVIEW_COMPLETED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val reviewCompleteEventProperties = eventPropertiesCaptor.firstValue

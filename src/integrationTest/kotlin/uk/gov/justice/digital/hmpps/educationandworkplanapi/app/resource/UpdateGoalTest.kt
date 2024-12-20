@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
@@ -295,12 +296,12 @@ class UpdateGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("goal-updated"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       verify(telemetryClient).trackEvent(
         eq("step-removed"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalUpdatedEventProperties = eventPropertiesCaptor.firstValue
@@ -418,12 +419,12 @@ class UpdateGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("goal-updated"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       verify(telemetryClient).trackEvent(
         eq("step-removed"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalUpdatedEventProperties = eventPropertiesCaptor.firstValue
