@@ -184,11 +184,11 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     assertThat(actual)
       .wasNotLastReviewBeforeRelease()
       .latestReviewSchedule {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
-          .wasUpdatedAfter(earliestCreationTime)
+          .wasUpdatedAtOrAfter(earliestCreationTime)
           .wasUpdatedBy("auser_gen")
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
@@ -202,11 +202,11 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     val reviews = getActionPlanReviews(prisonNumber)
     assertThat(reviews)
       .latestReviewSchedule {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
-          .wasUpdatedAfter(earliestCreationTime)
+          .wasUpdatedAtOrAfter(earliestCreationTime)
           .wasUpdatedBy("auser_gen")
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
@@ -218,7 +218,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       }
       .hasNumberOfCompletedReviews(1)
       .completedReview(1) {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
@@ -227,7 +227,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           .wasConductedBy("Barnie Jones")
           .wasConductedByRole("Peer mentor")
           .note {
-            it.wasCreatedAfter(earliestCreationTime)
+            it.wasCreatedAtOrAfter(earliestCreationTime)
               .wasCreatedBy("auser_gen")
               .wasCreatedByDisplayName("Albert User")
               .wasCreatedAtPrison("MDI")

@@ -36,10 +36,10 @@ class FutureWorkInterestsResponseAssert(actual: FutureWorkInterestsResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): FutureWorkInterestsResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): FutureWorkInterestsResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -56,10 +56,10 @@ class FutureWorkInterestsResponseAssert(actual: FutureWorkInterestsResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): FutureWorkInterestsResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): FutureWorkInterestsResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

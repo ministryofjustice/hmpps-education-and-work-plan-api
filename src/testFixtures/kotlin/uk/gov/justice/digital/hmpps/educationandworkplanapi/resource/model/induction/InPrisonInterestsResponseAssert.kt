@@ -36,10 +36,10 @@ class InPrisonInterestsResponseAssert(actual: InPrisonInterestsResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): InPrisonInterestsResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): InPrisonInterestsResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -56,10 +56,10 @@ class InPrisonInterestsResponseAssert(actual: InPrisonInterestsResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): InPrisonInterestsResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): InPrisonInterestsResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

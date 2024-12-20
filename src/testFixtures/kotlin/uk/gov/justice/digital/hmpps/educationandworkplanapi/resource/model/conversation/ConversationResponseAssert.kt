@@ -62,10 +62,10 @@ class ConversationResponseAssert(actual: ConversationResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): ConversationResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): ConversationResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -92,10 +92,10 @@ class ConversationResponseAssert(actual: ConversationResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): ConversationResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): ConversationResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

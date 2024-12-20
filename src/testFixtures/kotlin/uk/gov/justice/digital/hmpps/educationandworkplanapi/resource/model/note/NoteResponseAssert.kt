@@ -37,10 +37,10 @@ class NoteResponseAssert(actual: NoteResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): NoteResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): NoteResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }

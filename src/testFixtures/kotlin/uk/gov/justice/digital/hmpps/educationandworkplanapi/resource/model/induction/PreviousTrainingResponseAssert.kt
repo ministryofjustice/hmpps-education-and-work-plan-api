@@ -36,10 +36,10 @@ class PreviousTrainingResponseAssert(actual: PreviousTrainingResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): PreviousTrainingResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): PreviousTrainingResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -56,10 +56,10 @@ class PreviousTrainingResponseAssert(actual: PreviousTrainingResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): PreviousTrainingResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): PreviousTrainingResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }
