@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -101,7 +102,7 @@ class CompleteGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("goal-completed"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalCompleteEventProperties = eventPropertiesCaptor.firstValue
@@ -148,7 +149,7 @@ class CompleteGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("goal-completed"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue

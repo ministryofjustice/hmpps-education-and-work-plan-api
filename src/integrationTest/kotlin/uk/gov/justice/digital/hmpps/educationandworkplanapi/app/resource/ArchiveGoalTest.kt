@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -104,7 +105,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("goal-archived"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
@@ -156,7 +157,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("goal-archived"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue

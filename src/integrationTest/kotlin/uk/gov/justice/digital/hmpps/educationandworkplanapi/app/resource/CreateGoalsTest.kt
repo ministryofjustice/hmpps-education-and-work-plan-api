@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -159,7 +160,7 @@ class CreateGoalsTest : IntegrationTestBase() {
       verify(telemetryClient, times(2)).trackEvent(
         eq("goal-created"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val createGoalEventProperties = eventPropertiesCaptor.secondValue
       assertThat(createGoalEventProperties)
@@ -223,7 +224,7 @@ class CreateGoalsTest : IntegrationTestBase() {
       verify(telemetryClient, times(2)).trackEvent(
         eq("goal-created"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val createGoalEventProperties = eventPropertiesCaptor.secondValue
       assertThat(createGoalEventProperties)

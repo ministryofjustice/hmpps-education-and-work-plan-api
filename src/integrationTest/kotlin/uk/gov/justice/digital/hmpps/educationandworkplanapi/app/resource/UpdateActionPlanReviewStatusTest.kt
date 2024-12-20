@@ -462,7 +462,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
       verify(telemetryClient, times(2)).trackEvent(
         eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
     }
 
