@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
@@ -141,23 +142,30 @@ class TelemetryService(
   }
 
   fun trackReviewCompleted(completedReview: CompletedReview) {
-    sendTelemetryEventForCompletedReview(
-      completedReview = completedReview,
-      telemetryEventType = CompletedReviewTelemetryEventType.REVIEW_COMPLETED,
+    telemetryClient.trackEvent(
+      CompletedReviewTelemetryEventType.REVIEW_COMPLETED.value,
+      CompletedReviewTelemetryEventType.REVIEW_COMPLETED.customDimensions(completedReview),
     )
   }
 
   fun trackReviewScheduleStatusUpdated(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus) {
-    sendTelemetryEventForUpdatedReviewScheduleStatus(
-      updatedReviewScheduleStatus = updatedReviewScheduleStatus,
-      telemetryEventType = UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED,
+    telemetryClient.trackEvent(
+      UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED.value,
+      UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED.customDimensions(updatedReviewScheduleStatus),
     )
   }
 
   fun trackReviewScheduleStatusCreated(reviewSchedule: ReviewSchedule) {
-    sendTelemetryEventForCreateReviewSchedule(
-      reviewSchedule = reviewSchedule,
-      telemetryEventType = ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED,
+    telemetryClient.trackEvent(
+      ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED.value,
+      ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED.customDimensions(reviewSchedule),
+    )
+  }
+
+  fun trackInductionScheduleStatusUpdated(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus) {
+    telemetryClient.trackEvent(
+      UpdatedInductionScheduleStatusTelemetryEventType.INDUCTION_SCHEDULE_STATUS_UPDATED.value,
+      UpdatedInductionScheduleStatusTelemetryEventType.INDUCTION_SCHEDULE_STATUS_UPDATED.customDimensions(updatedInductionScheduleStatus),
     )
   }
 
@@ -172,12 +180,4 @@ class TelemetryService(
 
   private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
-
-  private fun sendTelemetryEventForCompletedReview(completedReview: CompletedReview, telemetryEventType: CompletedReviewTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(completedReview))
-
-  private fun sendTelemetryEventForUpdatedReviewScheduleStatus(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus, telemetryEventType: UpdatedReviewScheduleStatusTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(updatedReviewScheduleStatus))
-  private fun sendTelemetryEventForCreateReviewSchedule(reviewSchedule: ReviewSchedule, telemetryEventType: ReviewScheduleCreatedTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(reviewSchedule))
 }
