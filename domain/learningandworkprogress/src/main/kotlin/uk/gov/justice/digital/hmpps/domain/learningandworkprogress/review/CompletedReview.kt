@@ -18,6 +18,7 @@ data class CompletedReview(
   val createdAt: Instant,
   val createdAtPrison: String,
   val conductedBy: ReviewConductedBy?,
+  val reviewScheduleReference: UUID?,
 )
 
 data class ReviewConductedBy(

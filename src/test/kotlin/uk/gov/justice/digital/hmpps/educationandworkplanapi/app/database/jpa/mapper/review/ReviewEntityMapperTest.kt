@@ -28,6 +28,8 @@ class ReviewEntityMapperTest {
       conductedByRole = "Peer mentor",
       createdAt = createdAt,
     )
+    val reviewScheduleReference = reviewEntity.reviewScheduleReference
+
     val reviewNoteEntity = aValidNoteEntity(
       entityReference = reference,
       entityType = EntityTypeEntity.REVIEW,
@@ -39,6 +41,7 @@ class ReviewEntityMapperTest {
       note = expectedNote,
       conductedBy = ReviewConductedBy(name = "Barnie Jones", role = "Peer mentor"),
       createdAt = createdAt,
+      reviewScheduleReference = reviewScheduleReference,
     )
 
     // When
@@ -60,6 +63,8 @@ class ReviewEntityMapperTest {
       conductedByRole = null,
       createdAt = createdAt,
     )
+
+    val reviewScheduleReference = reviewEntity.reviewScheduleReference
     val reviewNoteEntity = aValidNoteEntity(
       entityReference = reference,
       entityType = EntityTypeEntity.REVIEW,
@@ -71,6 +76,7 @@ class ReviewEntityMapperTest {
       note = expectedNote,
       conductedBy = null,
       createdAt = createdAt,
+      reviewScheduleReference = reviewScheduleReference,
     )
 
     // When
@@ -93,6 +99,8 @@ class ReviewEntityMapperTest {
       createdAt = reviewCreatedAt,
       createdAtPrison = reviewCreatedAtPrison,
     )
+
+    val reviewScheduleReference = reviewEntity.reviewScheduleReference
 
     val noteReference = UUID.randomUUID()
     val noteCreatedBy = "asmith_gen"
@@ -118,6 +126,7 @@ class ReviewEntityMapperTest {
       createdBy = reviewCreatedBy,
       createdAt = reviewCreatedAt,
       createdAtPrison = reviewCreatedAtPrison,
+      reviewScheduleReference = reviewScheduleReference,
       note = aValidNoteDto(
         reference = noteReference,
         entityType = EntityTypeDomain.REVIEW,
