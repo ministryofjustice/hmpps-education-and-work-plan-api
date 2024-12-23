@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.2'
+  version: '1.20.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3049,6 +3049,11 @@ components:
           type: string
           format: uuid
           description: The unique reference of this Review
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        reviewScheduleReference:
+          type: string
+          format: uuid
+          description: The unique reference of the review schedule that corresponds to this Review
           example: c88a6c48-97e2-4c04-93b5-98619966447b
         deadlineDate:
           type: string
