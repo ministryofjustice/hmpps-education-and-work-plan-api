@@ -26,6 +26,9 @@ class ReviewEntityMapper {
         createdAtPrison = createdAtPrison,
         conductedBy = toReviewConductedBy(this),
         reviewScheduleReference = reviewScheduleReference,
+        updatedBy = updatedBy!!,
+        updatedAt = updatedAt!!,
+        updatedAtPrison = updatedAtPrison,
       )
     }
 

@@ -21,12 +21,14 @@ class ReviewEntityMapperTest {
     // Given
     val reference = UUID.randomUUID()
     val createdAt = Instant.now()
+    val updatedAt = Instant.now()
 
     val reviewEntity = aValidReviewEntity(
       reference = reference,
       conductedBy = "Barnie Jones",
       conductedByRole = "Peer mentor",
       createdAt = createdAt,
+      updatedAt = updatedAt,
     )
     val reviewScheduleReference = reviewEntity.reviewScheduleReference
 
@@ -41,6 +43,7 @@ class ReviewEntityMapperTest {
       note = expectedNote,
       conductedBy = ReviewConductedBy(name = "Barnie Jones", role = "Peer mentor"),
       createdAt = createdAt,
+      updatedAt = updatedAt,
       reviewScheduleReference = reviewScheduleReference,
     )
 
@@ -56,12 +59,14 @@ class ReviewEntityMapperTest {
     // Given
     val reference = UUID.randomUUID()
     val createdAt = Instant.now()
+    val updatedAt = Instant.now()
 
     val reviewEntity = aValidReviewEntity(
       reference = reference,
       conductedBy = null,
       conductedByRole = null,
       createdAt = createdAt,
+      updatedAt = updatedAt,
     )
 
     val reviewScheduleReference = reviewEntity.reviewScheduleReference
@@ -76,6 +81,7 @@ class ReviewEntityMapperTest {
       note = expectedNote,
       conductedBy = null,
       createdAt = createdAt,
+      updatedAt = updatedAt,
       reviewScheduleReference = reviewScheduleReference,
     )
 
@@ -98,6 +104,9 @@ class ReviewEntityMapperTest {
       createdBy = reviewCreatedBy,
       createdAt = reviewCreatedAt,
       createdAtPrison = reviewCreatedAtPrison,
+      updatedBy = reviewCreatedBy,
+      updatedAt = reviewCreatedAt,
+      updatedAtPrison = reviewCreatedAtPrison,
     )
 
     val reviewScheduleReference = reviewEntity.reviewScheduleReference
@@ -126,6 +135,9 @@ class ReviewEntityMapperTest {
       createdBy = reviewCreatedBy,
       createdAt = reviewCreatedAt,
       createdAtPrison = reviewCreatedAtPrison,
+      updatedBy = reviewCreatedBy,
+      updatedAt = reviewCreatedAt,
+      updatedAtPrison = reviewCreatedAtPrison,
       reviewScheduleReference = reviewScheduleReference,
       note = aValidNoteDto(
         reference = noteReference,
