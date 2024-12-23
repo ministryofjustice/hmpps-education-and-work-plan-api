@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCompletedActionPlanReviewResponse
+import java.time.Instant
 import java.time.ZoneOffset
 
 @ExtendWith(MockitoExtension::class)
@@ -40,11 +41,15 @@ class CompletedActionPlanReviewResponseMapperTest {
     // Given
     val reference = aValidReference()
     val note = aValidNoteDto()
+    val createdAt = Instant.now()
+    val updatedAt = Instant.now()
     val completedReview = aValidCompletedReview(
       reference = reference,
       note = note,
       createdBy = "asmith_gen",
       conductedBy = ReviewConductedBy("Barnie Jones", "Peer mentor"),
+      createdAt = createdAt,
+      updatedAt = updatedAt,
     )
 
     given(userService.getUserDetails(any())).willReturn(
@@ -59,7 +64,8 @@ class CompletedActionPlanReviewResponseMapperTest {
     val expected = aValidCompletedActionPlanReviewResponse(
       reference = reference,
       note = expectedNote,
-      createdAt = completedReview.createdAt.atOffset(ZoneOffset.UTC),
+      createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
+      updatedAt = instantMapper.toOffsetDateTime(updatedAt)!!,
       conductedBy = "Barnie Jones",
       conductedByRole = "Peer mentor",
     )
@@ -71,6 +77,5 @@ class CompletedActionPlanReviewResponseMapperTest {
     assertThat(actual).isEqualTo(expected)
     verify(noteResourceMapper).fromDomainToModel(note)
     verify(userService).getUserDetails("asmith_gen")
-    verify(instantMapper).toOffsetDateTime(completedReview.createdAt)
   }
 }

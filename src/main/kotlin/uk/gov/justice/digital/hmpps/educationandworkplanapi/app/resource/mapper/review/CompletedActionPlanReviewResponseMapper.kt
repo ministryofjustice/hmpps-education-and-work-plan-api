@@ -21,12 +21,16 @@ class CompletedActionPlanReviewResponseMapper(
         completedDate = completedDate,
         deadlineDate = deadlineDate,
         note = noteResourceMapper.fromDomainToModel(note),
-        conductedBy = conductedBy?.name ?: userService.getUserDetails(updatedBy).name,
-        conductedByRole = conductedBy?.role ?: "CIAG",
+        conductedBy = conductedBy?.name,
+        conductedByRole = conductedBy?.role,
         createdBy = createdBy,
         createdByDisplayName = userService.getUserDetails(createdBy).name,
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
         createdAtPrison = createdAtPrison,
+        updatedBy = updatedBy,
+        updatedByDisplayName = userService.getUserDetails(updatedBy).name,
+        updatedAt = instantMapper.toOffsetDateTime(updatedAt)!!,
+        updatedAtPrison = updatedAtPrison,
         reviewScheduleReference = reviewScheduleReference,
       )
     }
