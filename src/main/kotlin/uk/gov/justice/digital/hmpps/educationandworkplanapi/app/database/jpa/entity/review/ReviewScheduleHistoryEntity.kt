@@ -63,7 +63,4 @@ data class ReviewScheduleHistoryEntity(
 
   @Column
   var updatedAt: Instant? = null,
-
-  @Column
-  val completedReviewReference: UUID? = null,
 )

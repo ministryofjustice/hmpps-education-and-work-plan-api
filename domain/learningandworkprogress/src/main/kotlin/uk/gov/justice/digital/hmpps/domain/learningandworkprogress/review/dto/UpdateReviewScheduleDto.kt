@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto
 
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
@@ -13,10 +12,9 @@ data class UpdateReviewScheduleDto(
   val scheduleCalculationRule: ReviewScheduleCalculationRule,
   val scheduleStatus: ReviewScheduleStatus,
   val prisonId: String,
-  val completedReviewReference: UUID,
 ) {
   companion object {
-    fun setStatusToCompletedAtPrison(reviewSchedule: ReviewSchedule, prisonId: String, completedReview: CompletedReview) =
+    fun setStatusToCompletedAtPrison(reviewSchedule: ReviewSchedule, prisonId: String) =
       with(reviewSchedule) {
         UpdateReviewScheduleDto(
           reference = reference,
@@ -24,7 +22,6 @@ data class UpdateReviewScheduleDto(
           reviewScheduleWindow = reviewScheduleWindow,
           scheduleCalculationRule = scheduleCalculationRule,
           scheduleStatus = ReviewScheduleStatus.COMPLETED,
-          completedReviewReference = completedReview.reference,
         )
       }
   }

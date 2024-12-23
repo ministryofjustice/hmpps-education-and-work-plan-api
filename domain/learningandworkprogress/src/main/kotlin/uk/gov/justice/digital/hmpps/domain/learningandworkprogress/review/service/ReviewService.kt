@@ -127,7 +127,7 @@ class ReviewService(
 
       // Update the current review schedule to mark it as Completed
       val completedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewSchedule(
-        UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, prisonId, completedReview),
+        UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, prisonId),
       )
 
       // Work out the next review schedule calculation rule and schedule window

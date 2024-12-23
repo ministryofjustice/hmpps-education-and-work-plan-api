@@ -77,7 +77,6 @@ class ReviewScheduleEntityMapper {
       scheduleCalculationRule = toReviewScheduleCalculationRule(dto.scheduleCalculationRule)
       scheduleStatus = toReviewScheduleStatus(dto.scheduleStatus)
       updatedAtPrison = dto.prisonId
-      completedReviewReference = dto.completedReviewReference
     }
 
   private fun toReviewScheduleCalculationRule(calculationRule: ReviewScheduleCalculationRuleEntity): ReviewScheduleCalculationRuleDomain =

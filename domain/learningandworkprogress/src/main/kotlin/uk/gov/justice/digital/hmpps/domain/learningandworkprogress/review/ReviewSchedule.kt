@@ -20,7 +20,6 @@ data class ReviewSchedule(
   val lastUpdatedBy: String,
   val lastUpdatedAt: Instant,
   val lastUpdatedAtPrison: String,
-  val completedReviewReference: UUID?,
 )
 
 enum class ReviewScheduleCalculationRule {
