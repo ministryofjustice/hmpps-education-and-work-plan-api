@@ -17,6 +17,7 @@ fun aValidCompletedReview(
   createdAt: Instant = Instant.now(),
   createdAtPrison: String = "BXI",
   conductedBy: ReviewConductedBy? = ReviewConductedBy(name = "Barnie Jones", role = "Peer mentor"),
+  reviewScheduleReference: UUID? = null,
 ): CompletedReview =
   CompletedReview(
     reference = reference,
@@ -28,4 +29,5 @@ fun aValidCompletedReview(
     createdAt = createdAt,
     createdAtPrison = createdAtPrison,
     conductedBy = conductedBy,
+    reviewScheduleReference = reviewScheduleReference,
   )
