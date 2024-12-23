@@ -160,7 +160,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
-    createReviewScheduleRecord(prisonNumber)
+    val reviewSchedule = createReviewScheduleRecord(prisonNumber)
 
     // When
     val response = webTestClient.post()
@@ -236,6 +236,9 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
               .hasContent("A great review today; prisoner is making good progress towards his goals")
           }
       }
+
+    // Test that the completed review has the correct review schedule reference
+    assertThat(reviews.completedReviews[0].reviewScheduleReference).isEqualTo(reviewSchedule.reference)
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)

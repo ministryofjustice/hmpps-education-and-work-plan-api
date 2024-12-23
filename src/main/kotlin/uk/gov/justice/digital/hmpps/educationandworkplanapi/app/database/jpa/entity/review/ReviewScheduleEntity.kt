@@ -51,6 +51,9 @@ data class ReviewScheduleEntity(
 
   @Column
   var updatedAtPrison: String,
+
+  @Column
+  var completedReviewReference: UUID? = null,
 ) {
   @Id
   @GeneratedValue

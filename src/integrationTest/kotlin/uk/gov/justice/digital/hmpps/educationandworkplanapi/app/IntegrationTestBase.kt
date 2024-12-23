@@ -562,7 +562,7 @@ abstract class IntegrationTestBase {
     exemptionReason: String? = null,
     earliestDate: LocalDate = LocalDate.now().minusMonths(1),
     latestDate: LocalDate = LocalDate.now().plusMonths(1),
-  ) {
+  ): ReviewScheduleEntity {
     val reviewScheduleEntity = ReviewScheduleEntity(
       reference = UUID.randomUUID(),
       prisonNumber = prisonNumber,
@@ -574,7 +574,7 @@ abstract class IntegrationTestBase {
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+    return reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
   }
 
   fun createReviewScheduleHistoryRecord(
