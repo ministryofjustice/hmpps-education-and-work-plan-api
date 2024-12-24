@@ -27,6 +27,10 @@ class CompletedActionPlanReviewResponseMapper(
         createdByDisplayName = userService.getUserDetails(createdBy).name,
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
         createdAtPrison = createdAtPrison,
+        updatedBy = updatedBy,
+        updatedByDisplayName = userService.getUserDetails(updatedBy).name,
+        updatedAt = instantMapper.toOffsetDateTime(updatedAt)!!,
+        updatedAtPrison = updatedAtPrison,
         reviewScheduleReference = reviewScheduleReference,
       )
     }

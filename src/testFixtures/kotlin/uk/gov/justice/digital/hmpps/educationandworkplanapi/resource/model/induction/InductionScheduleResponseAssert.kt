@@ -44,8 +44,9 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     isNotNull
     with(actual!!) {
       val createdAtRounded = createdAt.truncatedTo(ChronoUnit.MILLIS)
-      if (createdAtRounded.isBefore(dateTime)) {
-        failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
+      val dateTimeRounded = dateTime.truncatedTo(ChronoUnit.MILLIS)
+      if (createdAtRounded.isBefore(dateTimeRounded)) {
+        failWithMessage("Expected createdAt to be after $dateTimeRounded, but was $createdAtRounded")
       }
     }
     return this
