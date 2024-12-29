@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -20,34 +19,30 @@ import java.util.UUID
 
 @Table(name = "timeline")
 @Entity
-class TimelineEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
+data class TimelineEntity(
+  @Column(updatable = false)
+  val reference: UUID,
 
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @Column(updatable = false)
-  @field:NotNull
-  var prisonNumber: String,
+  val prisonNumber: String,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "timeline_id", nullable = false)
   @OrderBy(value = "createdAt")
-  @field:NotNull
-  var events: MutableList<TimelineEventEntity>? = null,
+  val events: MutableList<TimelineEventEntity>,
+) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-) {
+  var updatedAt: Instant? = null
 
   companion object {
 
@@ -64,7 +59,7 @@ class TimelineEntity(
   }
 
   fun addEvent(timelineEvent: TimelineEventEntity): TimelineEntity {
-    events!!.add(timelineEvent)
+    events.add(timelineEvent)
     return this
   }
 

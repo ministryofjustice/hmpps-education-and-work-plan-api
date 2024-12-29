@@ -17,10 +17,9 @@ fun aValidTimelineEvent(
   reference: UUID = UUID.randomUUID(),
   sourceReference: String = UUID.randomUUID().toString(),
   eventType: TimelineEventType = TimelineEventType.GOAL_CREATED,
-  contextualInfo: Map<TimelineEventContext, String>? = null,
+  contextualInfo: Map<TimelineEventContext, String> = emptyMap(),
   prisonId: String = "BXI",
   actionedBy: String = "asmith_gen",
-  actionedByDisplayName: String? = "Alex Smith",
   timestamp: Instant = Instant.now(),
   correlationId: UUID = UUID.randomUUID(),
 ) = TimelineEvent(
@@ -30,7 +29,6 @@ fun aValidTimelineEvent(
   contextualInfo = contextualInfo,
   prisonId = prisonId,
   actionedBy = actionedBy,
-  actionedByDisplayName = actionedByDisplayName,
   timestamp = timestamp,
   correlationId = correlationId,
 )
@@ -39,10 +37,9 @@ fun aValidPrisonMovementTimelineEvent(
   reference: UUID = UUID.randomUUID(),
   sourceReference: String = "1",
   eventType: TimelineEventType = TimelineEventType.PRISON_ADMISSION,
-  contextualInfo: Map<TimelineEventContext, String>? = null,
+  contextualInfo: Map<TimelineEventContext, String> = emptyMap(),
   prisonId: String = "BXI",
   actionedBy: String = "system",
-  actionedByDisplayName: String? = null,
   timestamp: Instant = Instant.now(),
   correlationId: UUID = UUID.randomUUID(),
 ) = TimelineEvent(
@@ -52,7 +49,6 @@ fun aValidPrisonMovementTimelineEvent(
   contextualInfo = contextualInfo,
   prisonId = prisonId,
   actionedBy = actionedBy,
-  actionedByDisplayName = actionedByDisplayName,
   timestamp = timestamp,
   correlationId = correlationId,
 )

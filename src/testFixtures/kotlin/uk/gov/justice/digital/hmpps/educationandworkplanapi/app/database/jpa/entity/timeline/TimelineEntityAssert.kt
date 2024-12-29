@@ -63,21 +63,11 @@ class TimelineEntityAssert(actual: TimelineEntity?) :
     return this
   }
 
-  fun hasAReference(): TimelineEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun hasNumberOfEvents(numberOfEvents: Int): TimelineEntityAssert {
     isNotNull
     with(actual!!) {
-      if (events!!.size != numberOfEvents) {
-        failWithMessage("Expected Timeline to be have $numberOfEvents events, but has ${events!!.size}")
+      if (events.size != numberOfEvents) {
+        failWithMessage("Expected Timeline to be have $numberOfEvents events, but has ${events.size}")
       }
     }
     return this
@@ -91,7 +81,7 @@ class TimelineEntityAssert(actual: TimelineEntity?) :
   fun event(eventNumber: Int, consumer: Consumer<TimelineEventEntityAssert>): TimelineEntityAssert {
     isNotNull
     with(actual!!) {
-      val event = events!![eventNumber]
+      val event = events[eventNumber]
       consumer.accept(assertThat(event))
     }
     return this

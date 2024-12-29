@@ -30,8 +30,8 @@ class TimelineEventResourceMapper(
       )
     }
 
-  private fun buildContextualInfo(contextualInfo: Map<TimelineEventContext, String>?): Map<String, String> =
-    contextualInfo?.mapKeys { it.key.toString() } ?: emptyMap()
+  private fun buildContextualInfo(contextualInfo: Map<TimelineEventContext, String>): Map<String, String> =
+    contextualInfo.mapKeys { it.key.toString() } ?: emptyMap()
 
   private fun toTimelineEventType(timelineEventType: TimelineEventTypeDomain): TimelineEventTypeApi =
     when (timelineEventType) {
