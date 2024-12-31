@@ -15,29 +15,26 @@ fun aValidGoalEntity(
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",
-  createdByDisplayName: String? = "Alex Smith",
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-  updatedByDisplayName: String? = "Barry Jones",
   archiveReason: ReasonToArchiveGoal? = null,
   archiveReasonOther: String? = null,
 ): GoalEntity =
   GoalEntity(
-    id = id,
     reference = reference,
     title = title,
     targetCompletionDate = targetCompletionDate,
     status = status,
     steps = steps.toMutableList(),
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
     archiveReason = archiveReason,
     archiveReasonOther = archiveReasonOther,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }

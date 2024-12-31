@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -19,75 +18,36 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Table(name = "goal")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class GoalEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+@EntityListeners(value = [AuditingEntityListener::class])
+data class GoalEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
+  val reference: UUID,
 
   @Column
-  @field:NotNull
-  var title: String? = null,
+  var title: String,
 
   @Column
-  @field:NotNull
-  var targetCompletionDate: LocalDate? = null,
+  var targetCompletionDate: LocalDate,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var status: GoalStatus? = null,
+  var status: GoalStatus,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @field:NotNull
-  var steps: MutableList<StepEntity>? = null,
+  var steps: MutableList<StepEntity>,
 
   @Column(updatable = false)
-  @CreationTimestamp
-  var createdAt: Instant? = null,
+  val createdAtPrison: String,
 
   @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
-
-  @Column(updatable = false)
-  @CreatedBy
-  var createdBy: String? = null,
-
-  @Column
-  @CreatedByDisplayName
-  var createdByDisplayName: String? = null,
-
-  @Column
-  @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
-
-  @Column
-  @LastModifiedBy
-  var updatedBy: String? = null,
-
-  @Column
-  @LastModifiedByDisplayName
-  var updatedByDisplayName: String? = null,
+  var updatedAtPrison: String,
 
   @Column
   @Enumerated(value = EnumType.STRING)
@@ -99,13 +59,26 @@ class GoalEntity(
   @Column
   var archiveReasonOther: String? = null,
 ) : ParentEntity {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
-  fun steps(): MutableList<StepEntity> {
-    if (steps == null) {
-      steps = mutableListOf()
-    }
-    return steps!!
-  }
+  @Column(updatable = false)
+  @CreationTimestamp
+  var createdAt: Instant? = null
+
+  @Column(updatable = false)
+  @CreatedBy
+  var createdBy: String? = null
+
+  @Column
+  @UpdateTimestamp
+  var updatedAt: Instant? = null
+
+  @Column
+  @LastModifiedBy
+  var updatedBy: String? = null
 
   override fun childEntityUpdated() {
     updatedAt = Instant.now()

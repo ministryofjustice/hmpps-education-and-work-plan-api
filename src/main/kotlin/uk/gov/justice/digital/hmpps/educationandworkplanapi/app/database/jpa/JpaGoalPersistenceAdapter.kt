@@ -99,7 +99,7 @@ class JpaGoalPersistenceAdapter(
       goalEntity.apply {
         status = GoalStatus.COMPLETED
       }
-      goalEntity.steps().forEach { it.apply { it.status = StepStatus.COMPLETE } }
+      goalEntity.steps.forEach { it.apply { it.status = StepStatus.COMPLETE } }
       val persistedEntity = goalRepository.saveAndFlush(goalEntity)
       goalMapper.fromEntityToDomain(persistedEntity)
     }

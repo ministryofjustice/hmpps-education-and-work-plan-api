@@ -2,11 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidStepEntity
@@ -25,18 +23,7 @@ import java.time.LocalDate
  */
 class GoalEntityMapperUpdateEntityFromDtoTest {
 
-  private val mapper: GoalEntityMapper = GoalEntityMapperImpl().also {
-    with(GoalEntityMapper::class.java) {
-      getDeclaredField("stepEntityMapper").apply {
-        isAccessible = true
-        set(it, StepEntityMapperImpl())
-      }
-      getDeclaredField("entityListManager").apply {
-        isAccessible = true
-        set(it, GoalEntityListManager<StepEntity, Step>())
-      }
-    }
-  }
+  private val mapper: GoalEntityMapper = GoalEntityMapper(StepEntityMapper(), GoalEntityListManager())
 
   @Test
   fun `should update entity from UpdateGoalDto given DTO has updates to goal fields`() {
@@ -76,19 +63,15 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       ),
     )
 
-    val expectedGoalEntity = goalEntity.deepCopy().apply {
-      title = "Improve communication skills within first 3 months"
-      targetCompletionDate = LocalDate.now().plusMonths(3)
-      status = GoalStatus.ACTIVE
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
-
     // When
     mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
-    assertThat(goalEntity).isEqualToComparingAllFieldsExceptNotes(expectedGoalEntity)
+    assertThat(goalEntity)
+      .hasTitle("Improve communication skills within first 3 months")
+      .hasTargetCompletionDate(LocalDate.now().plusMonths(3))
+      .hasStatus(GoalStatus.ACTIVE)
+      .wasUpdatedAtPrison("MDI")
   }
 
   @Test
@@ -128,22 +111,18 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
       ),
     )
 
-    val expectedGoalEntity = goalEntity.deepCopy().apply {
-      steps = mutableListOf(
-        stepEntity.deepCopy().apply {
-          reference = stepReference
-          title = "Book communication skills course within 6 months"
-          status = StepStatus.COMPLETE
-          sequenceNumber = 1
-        },
-      )
-    }
-
     // When
     mapper.updateEntityFromDto(goalEntity, updateGoalDto)
 
     // Then
-    assertThat(goalEntity).isEqualToComparingAllFieldsExceptNotes(expectedGoalEntity)
+    assertThat(goalEntity)
+      .hasTitle("Improve communication skills")
+      .hasTargetCompletionDate(LocalDate.now().plusMonths(6))
+      .hasNumberOfSteps(1)
+      .stepWithSequenceNumber(1) {
+        it.hasTitle("Book communication skills course within 6 months")
+          .hasStatus(StepStatus.COMPLETE)
+      }
   }
 
   @Test
@@ -205,8 +184,8 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     assertThat(goalEntity)
       .hasNumberOfSteps(2)
       .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
-    assertThat(goalEntity.steps!![0]).isEqualToComparingAllFields(step1Entity)
-    assertThat(goalEntity.steps!![1])
+    assertThat(goalEntity.steps[0]).isEqualToComparingAllFields(step1Entity)
+    assertThat(goalEntity.steps[1])
       .doesNotHaveJpaManagedFieldsPopulated()
       .isEqualToIgnoringJpaManagedFields(expectedStep2Entity)
   }
@@ -278,14 +257,14 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     assertThat(goalEntity)
       .hasNumberOfSteps(3)
       .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
-    assertThat(goalEntity.steps!![0]).isEqualToComparingAllFields(step1Entity)
-    assertThat(goalEntity.steps!![1])
+    assertThat(goalEntity.steps[0]).isEqualToComparingAllFields(step1Entity)
+    assertThat(goalEntity.steps[1])
       .doesNotHaveJpaManagedFieldsPopulated()
       .hasReference(newStepReference)
       .hasTitle("Do pre-course homework and preparation")
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(2)
-    assertThat(goalEntity.steps!![2])
+    assertThat(goalEntity.steps[2])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
       .hasTitle("Attend skills course")
@@ -352,13 +331,13 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     assertThat(goalEntity)
       .hasNumberOfSteps(2)
       .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
-    assertThat(goalEntity.steps!![0])
+    assertThat(goalEntity.steps[0])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
       .hasTitle("Attend skills course")
       .hasStatus(StepStatus.ACTIVE)
       .hasSequenceNumber(1)
-    assertThat(goalEntity.steps!![1])
+    assertThat(goalEntity.steps[1])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step1Reference)
       .hasTitle("Book communication skills course")
@@ -419,7 +398,7 @@ class GoalEntityMapperUpdateEntityFromDtoTest {
     assertThat(goalEntity)
       .hasNumberOfSteps(1)
       .isEqualToIgnoringStepsAndNotes(expectedGoalEntity)
-    assertThat(goalEntity.steps!![0])
+    assertThat(goalEntity.steps[0])
       .hasJpaManagedFieldsPopulated()
       .hasReference(step2Reference)
       .hasTitle("Attend skills course")
