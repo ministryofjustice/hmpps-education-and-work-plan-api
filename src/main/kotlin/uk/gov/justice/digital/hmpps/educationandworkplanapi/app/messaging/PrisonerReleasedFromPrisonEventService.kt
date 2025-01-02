@@ -24,23 +24,35 @@ class PrisonerReleasedFromPrisonEventService(
   ) =
     with(additionalInformation) {
       when (reason) {
-        RELEASED -> {
-          log.info { "Processing Prisoner Released From Prison Event with reason RELEASED for prisoner [$nomsNumber]" }
-          try {
-            reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerRelease(
-              prisonNumber = nomsNumber,
-              prisonId = prisonId,
-            ).also {
-              log.debug { "Review Schedule for prisoner [$nomsNumber] set to exempt: EXEMPT_PRISONER_RELEASE" }
-            }
-          } catch (e: ReviewScheduleNotFoundException) {
-            log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
-          }
-        }
+        RELEASED ->
+          if (releaseTriggeredByPrisonerDeath) processPrisonerReleaseEventDueToDeath() else processPrisonerReleaseEvent()
 
-        TEMPORARY_ABSENCE_RELEASE, RELEASED_TO_HOSPITAL, SENT_TO_COURT, TRANSFERRED, UNKNOWN -> {
+        TEMPORARY_ABSENCE_RELEASE, RELEASED_TO_HOSPITAL, SENT_TO_COURT, TRANSFERRED, UNKNOWN ->
           log.debug { "Ignoring Processing Prisoner Released From Prison Event with reason $reason" }
-        }
       }
     }
+
+  private fun PrisonerReleasedAdditionalInformation.processPrisonerReleaseEvent() {
+    log.info { "Processing Prisoner Released From Prison Event for prisoner [$nomsNumber]" }
+    try {
+      reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerRelease(
+        prisonNumber = nomsNumber,
+        prisonId = prisonId,
+      )
+    } catch (e: ReviewScheduleNotFoundException) {
+      log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
+    }
+  }
+
+  private fun PrisonerReleasedAdditionalInformation.processPrisonerReleaseEventDueToDeath() {
+    log.info { "Processing Prisoner Released From Prison Event (due to death) for prisoner [$nomsNumber]" }
+    try {
+      reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerDeath(
+        prisonNumber = nomsNumber,
+        prisonId = prisonId,
+      )
+    } catch (e: ReviewScheduleNotFoundException) {
+      log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
+    }
+  }
 }

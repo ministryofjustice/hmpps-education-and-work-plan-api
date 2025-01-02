@@ -52,6 +52,9 @@ sealed class AdditionalInformation {
     val prisonId: String,
     val nomisMovementReasonCode: String,
   ) : AdditionalInformation() {
+
+    val releaseTriggeredByPrisonerDeath: Boolean = nomisMovementReasonCode == "DEC"
+
     enum class Reason {
       TEMPORARY_ABSENCE_RELEASE,
       RELEASED_TO_HOSPITAL,

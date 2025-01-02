@@ -54,6 +54,30 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   }
 
   @Test
+  fun `should process event given reason is prisoner released due to death`() {
+    // Given
+    val additionalInformation = PrisonerReleasedAdditionalInformation(
+      nomsNumber = "A1234BC",
+      reason = RELEASED,
+      prisonId = "BXI",
+      nomisMovementReasonCode = "DEC",
+      details = null,
+      currentLocation = null,
+      currentPrisonStatus = null,
+    )
+    val inboundEvent = anInboundEvent(additionalInformation)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToPrisonerDeath(
+      prisonNumber = "A1234BC",
+      prisonId = "BXI",
+    )
+  }
+
+  @Test
   fun `should process event given reason is prisoner released but prisoner does not have an active Review Schedule`() {
     // Given
     val additionalInformation = PrisonerReleasedAdditionalInformation(
@@ -75,6 +99,33 @@ class PrisonerReleasedFromPrisonEventServiceTest {
 
     // Then
     verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToPrisonerRelease(
+      prisonNumber = "A1234BC",
+      prisonId = "BXI",
+    )
+  }
+
+  @Test
+  fun `should process event given reason is prisoner released due to death but prisoner does not have an active Review Schedule`() {
+    // Given
+    val additionalInformation = PrisonerReleasedAdditionalInformation(
+      nomsNumber = "A1234BC",
+      reason = RELEASED,
+      prisonId = "BXI",
+      nomisMovementReasonCode = "DEC",
+      details = null,
+      currentLocation = null,
+      currentPrisonStatus = null,
+    )
+    val inboundEvent = anInboundEvent(additionalInformation)
+
+    given(reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerDeath(any(), any()))
+      .willThrow(ReviewScheduleNotFoundException("A1234BC"))
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToPrisonerDeath(
       prisonNumber = "A1234BC",
       prisonId = "BXI",
     )

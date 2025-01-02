@@ -15,9 +15,9 @@ import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 
 @Isolated
-class PrisonerReleasedEventTest : IntegrationTestBase() {
+class PrisonerReleasedDueToDeathEventTest : IntegrationTestBase() {
   @Test
-  fun `should update Review Schedule given released prisoner has an active Review Schedule`() {
+  fun `should update Review Schedule given deceased prisoner had an active Review Schedule`() {
     // Given
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
     val prisonNumber = aValidPrisonNumber()
@@ -36,7 +36,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
       eventType = PRISONER_RELEASED_FROM_PRISON,
       additionalInformation = aValidPrisonerReleasedAdditionalInformation(
         prisonNumber = prisonNumber,
-        nomisMovementReasonCode = "CR",
+        nomisMovementReasonCode = "DEC",
       ),
     )
 
@@ -52,7 +52,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
     val actionPlanReviews = getActionPlanReviews(prisonNumber)
     assertThat(actionPlanReviews)
       .latestReviewSchedule {
-        it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE)
+        it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_DEATH)
       }
   }
 
@@ -77,7 +77,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
       eventType = PRISONER_RELEASED_FROM_PRISON,
       additionalInformation = aValidPrisonerReleasedAdditionalInformation(
         prisonNumber = prisonNumber,
-        nomisMovementReasonCode = "CR",
+        nomisMovementReasonCode = "DEC",
       ),
     )
 
@@ -108,7 +108,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
       eventType = PRISONER_RELEASED_FROM_PRISON,
       additionalInformation = aValidPrisonerReleasedAdditionalInformation(
         prisonNumber = prisonNumber,
-        nomisMovementReasonCode = "CR",
+        nomisMovementReasonCode = "DEC",
       ),
     )
 

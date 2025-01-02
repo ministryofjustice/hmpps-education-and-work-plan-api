@@ -63,7 +63,9 @@ class ReviewScheduleService(
           reviewSchedule = this,
           newStatus = ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE,
           exemptionReason = null,
-        )
+        ).also {
+          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_RELEASE" }
+        }
       }
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
@@ -82,7 +84,9 @@ class ReviewScheduleService(
           reviewSchedule = this,
           newStatus = ReviewScheduleStatus.EXEMPT_PRISONER_DEATH,
           exemptionReason = null,
-        )
+        ).also {
+          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_DEATH" }
+        }
       }
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
