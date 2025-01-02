@@ -8,16 +8,18 @@ fun aValidPrisonerReceivedAdditionalInformation(
   prisonNumber: String = aValidPrisonNumber(),
   prisonId: String = "BXI",
   reason: PrisonerReceivedAdditionalInformation.Reason = PrisonerReceivedAdditionalInformation.Reason.ADMISSION,
+  details: String? = "ACTIVE IN:ADM-N",
   currentLocation: PrisonerReceivedAdditionalInformation.Location = PrisonerReceivedAdditionalInformation.Location.IN_PRISON,
   currentPrisonStatus: PrisonerReceivedAdditionalInformation.PrisonStatus = PrisonerReceivedAdditionalInformation.PrisonStatus.UNDER_PRISON_CARE,
+  nomisMovementReasonCode: String = "N",
 ): PrisonerReceivedAdditionalInformation =
   PrisonerReceivedAdditionalInformation(
     nomsNumber = prisonNumber,
     reason = reason,
-    details = "ACTIVE IN:ADM-N",
+    details = details,
     currentLocation = currentLocation,
     prisonId = prisonId,
-    nomisMovementReasonCode = "N",
+    nomisMovementReasonCode = nomisMovementReasonCode,
     currentPrisonStatus = currentPrisonStatus,
   )
 
@@ -25,15 +27,17 @@ fun aValidPrisonerReleasedAdditionalInformation(
   prisonNumber: String = aValidPrisonNumber(),
   prisonId: String = "BXI",
   reason: PrisonerReleasedAdditionalInformation.Reason = PrisonerReleasedAdditionalInformation.Reason.RELEASED,
+  details: String? = "Movement reason code CR",
   currentLocation: PrisonerReleasedAdditionalInformation.Location = PrisonerReleasedAdditionalInformation.Location.OUTSIDE_PRISON,
   currentPrisonStatus: PrisonerReleasedAdditionalInformation.PrisonStatus = PrisonerReleasedAdditionalInformation.PrisonStatus.NOT_UNDER_PRISON_CARE,
+  nomisMovementReasonCode: String = "CR",
 ): PrisonerReleasedAdditionalInformation =
   PrisonerReleasedAdditionalInformation(
     nomsNumber = prisonNumber,
     reason = reason,
-    details = "ACTIVE IN:ADM-N",
+    details = details,
     currentLocation = currentLocation,
     prisonId = prisonId,
-    nomisMovementReasonCode = "N",
+    nomisMovementReasonCode = nomisMovementReasonCode,
     currentPrisonStatus = currentPrisonStatus,
   )
