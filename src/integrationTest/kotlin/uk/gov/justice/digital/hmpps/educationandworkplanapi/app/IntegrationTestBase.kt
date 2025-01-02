@@ -15,11 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.bean.override.mockito.MockReset
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
@@ -165,7 +166,7 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var reviewScheduleHistoryRepository: ReviewScheduleHistoryRepository
 
-  @SpyBean
+  @MockitoSpyBean(reset = MockReset.BEFORE)
   lateinit var telemetryClient: TelemetryClient
 
   @Autowired
@@ -222,6 +223,8 @@ abstract class IntegrationTestBase {
     inductionScheduleHistoryRepository.deleteAll()
 
     clearQueues()
+
+    wiremockService.resetAllStubsAndMappings()
   }
 
   fun clearQueues() {
@@ -249,11 +252,6 @@ abstract class IntegrationTestBase {
     testInductionScheduleEventQueueClient.purgeQueue(
       PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build(),
     ).get()
-  }
-
-  @BeforeEach
-  fun resetWiremock() {
-    wiremockService.resetAllStubsAndMappings()
   }
 
   fun getActionPlan(prisonNumber: String): ActionPlanResponse =
@@ -564,7 +562,7 @@ abstract class IntegrationTestBase {
     exemptionReason: String? = null,
     earliestDate: LocalDate = LocalDate.now().minusMonths(1),
     latestDate: LocalDate = LocalDate.now().plusMonths(1),
-  ) {
+  ): ReviewScheduleEntity {
     val reviewScheduleEntity = ReviewScheduleEntity(
       reference = UUID.randomUUID(),
       prisonNumber = prisonNumber,
@@ -576,7 +574,7 @@ abstract class IntegrationTestBase {
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+    return reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
   }
 
   fun createReviewScheduleHistoryRecord(

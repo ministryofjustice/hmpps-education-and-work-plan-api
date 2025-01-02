@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -159,7 +160,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
-    createReviewScheduleRecord(prisonNumber)
+    val reviewSchedule = createReviewScheduleRecord(prisonNumber)
 
     // When
     val response = webTestClient.post()
@@ -184,11 +185,11 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     assertThat(actual)
       .wasNotLastReviewBeforeRelease()
       .latestReviewSchedule {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
-          .wasUpdatedAfter(earliestCreationTime)
+          .wasUpdatedAtOrAfter(earliestCreationTime)
           .wasUpdatedBy("auser_gen")
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
@@ -202,11 +203,11 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     val reviews = getActionPlanReviews(prisonNumber)
     assertThat(reviews)
       .latestReviewSchedule {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
-          .wasUpdatedAfter(earliestCreationTime)
+          .wasUpdatedAtOrAfter(earliestCreationTime)
           .wasUpdatedBy("auser_gen")
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
@@ -218,7 +219,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       }
       .hasNumberOfCompletedReviews(1)
       .completedReview(1) {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
@@ -227,7 +228,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           .wasConductedBy("Barnie Jones")
           .wasConductedByRole("Peer mentor")
           .note {
-            it.wasCreatedAfter(earliestCreationTime)
+            it.wasCreatedAtOrAfter(earliestCreationTime)
               .wasCreatedBy("auser_gen")
               .wasCreatedByDisplayName("Albert User")
               .wasCreatedAtPrison("MDI")
@@ -235,6 +236,9 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
               .hasContent("A great review today; prisoner is making good progress towards his goals")
           }
       }
+
+    // Test that the completed review has the correct review schedule reference
+    assertThat(reviews.completedReviews[0].reviewScheduleReference).isEqualTo(reviewSchedule.reference)
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
@@ -250,7 +254,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       verify(telemetryClient).trackEvent(
         eq("REVIEW_COMPLETED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val reviewCompleteEventProperties = eventPropertiesCaptor.firstValue

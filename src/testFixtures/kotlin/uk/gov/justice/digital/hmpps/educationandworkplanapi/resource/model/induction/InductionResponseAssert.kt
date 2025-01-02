@@ -37,10 +37,10 @@ class InductionResponseAssert(actual: InductionResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): InductionResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBefore(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -57,10 +57,10 @@ class InductionResponseAssert(actual: InductionResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): InductionResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

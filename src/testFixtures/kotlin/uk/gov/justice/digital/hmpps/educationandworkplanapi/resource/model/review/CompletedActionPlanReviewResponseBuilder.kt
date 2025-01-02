@@ -16,6 +16,10 @@ fun aValidCompletedActionPlanReviewResponse(
   createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
   createdAtPrison: String = "BXI",
+  updatedBy: String = "bjones_gen",
+  updatedByDisplayName: String = "Alex Smith",
+  updatedAt: OffsetDateTime = OffsetDateTime.now(),
+  updatedAtPrison: String = "BXI",
   conductedBy: String? = "Barnie Jones",
   conductedByRole: String? = "Peer mentor",
 ): CompletedActionPlanReviewResponse =
@@ -30,4 +34,8 @@ fun aValidCompletedActionPlanReviewResponse(
     createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
     createdAtPrison = createdAtPrison,
+    updatedBy = updatedBy,
+    updatedAt = updatedAt,
+    updatedAtPrison = updatedAtPrison,
+    updatedByDisplayName = updatedByDisplayName,
   )

@@ -8,8 +8,8 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -156,7 +156,7 @@ class JpaInductionPersistenceAdapterTest {
         prisonNumber = prisonNumber,
         previousQualifications = null,
       )
-      given(inductionMapper.fromEntityToDomain(any(), eq(null))).willReturn(expected)
+      given(inductionMapper.fromEntityToDomain(any(), isNull())).willReturn(expected)
 
       // When
       val actual = persistenceAdapter.createInduction(createInductionDto)
@@ -191,7 +191,7 @@ class JpaInductionPersistenceAdapterTest {
         prisonNumber = prisonNumber,
         previousQualifications = null,
       )
-      given(inductionMapper.fromEntityToDomain(any(), eq(null))).willReturn(expected)
+      given(inductionMapper.fromEntityToDomain(any(), isNull())).willReturn(expected)
 
       // When
       val actual = persistenceAdapter.createInduction(createInductionDto)
@@ -413,7 +413,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), eq(null))).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,

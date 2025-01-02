@@ -66,8 +66,8 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
     assertThat(inductionSchedules).size().isEqualTo(3)
     assertThat(inductionSchedules?.get(0)).isNotNull
     assertThat(inductionSchedules?.get(0))
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("auser_gen")
       .wasCreatedByDisplayName("Albert User")
       .wasUpdatedBy("auser_gen")
@@ -80,8 +80,8 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
 
     assertThat(inductionSchedules?.get(1)).isNotNull
     assertThat(inductionSchedules?.get(1))
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("auser_gen")
       .wasCreatedByDisplayName("Albert User")
       .wasUpdatedBy("auser_gen")
@@ -92,8 +92,8 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
 
     assertThat(inductionSchedules?.get(2)).isNotNull
     assertThat(inductionSchedules?.get(2))
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("auser_gen")
       .wasCreatedByDisplayName("Albert User")
       .wasUpdatedBy("auser_gen")

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.1'
+  version: '1.20.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2160,6 +2160,7 @@ components:
         - INDUCTION_UPDATED
         - INDUCTION_SCHEDULE_CREATED
         - INDUCTION_SCHEDULE_UPDATED
+        - INDUCTION_SCHEDULE_STATUS_UPDATED
         - ACTION_PLAN_CREATED
         - GOAL_CREATED
         - GOAL_UPDATED
@@ -3049,6 +3050,11 @@ components:
           format: uuid
           description: The unique reference of this Review
           example: c88a6c48-97e2-4c04-93b5-98619966447b
+        reviewScheduleReference:
+          type: string
+          format: uuid
+          description: The unique reference of the review schedule that corresponds to this Review
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
         deadlineDate:
           type: string
           format: date
@@ -3079,7 +3085,24 @@ components:
           example: '2023-06-19T09:39:44Z'
         createdAtPrison:
           type: string
-          description: The identifier of the prison that the prisoner was resident at when the Review was ented in the system.
+          description: The identifier of the prison that the prisoner was resident at when the Review was entered in the system.
+          example: 'BXI'
+        updatedBy:
+          type: string
+          description: The DPS username of the person who updated the Review in the system.
+          example: 'asmith_gen'
+        updatedByDisplayName:
+          type: string
+          description: The display name of the person who updated the Review in the system.
+          example: 'Alex Smith'
+        updatedAt:
+          type: string
+          format: date-time
+          description: An ISO-8601 timestamp representing when the Review was updated in the system.
+          example: '2023-06-19T09:39:44Z'
+        updatedAtPrison:
+          type: string
+          description: The identifier of the prison that the prisoner was resident at when the Review was updated in the system.
           example: 'BXI'
         conductedBy:
           type: string

@@ -48,8 +48,8 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
     // test induction schedule was created
     val inductionSchedule = getInductionSchedule(prisonNumber)
     assertThat(inductionSchedule)
-      .wasCreatedAfter(earliestDateTime)
-      .wasUpdatedAfter(earliestDateTime)
+      .wasCreatedAtOrAfter(earliestDateTime)
+      .wasUpdatedAtOrAfter(earliestDateTime)
       .wasCreatedBy("system")
       .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
@@ -61,8 +61,8 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
     val inductionScheduleHistories = getInductionScheduleHistory("A6099EA")
     assertThat(inductionScheduleHistories.inductionSchedules).size().isEqualTo(1)
     assertThat(inductionScheduleHistories.inductionSchedules[0])
-      .wasCreatedAfter(earliestDateTime)
-      .wasUpdatedAfter(earliestDateTime)
+      .wasCreatedAtOrAfter(earliestDateTime)
+      .wasUpdatedAtOrAfter(earliestDateTime)
       .wasCreatedBy("system")
       .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
@@ -121,8 +121,8 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
         it.hasStatus(ReviewScheduleStatus.SCHEDULED)
           // TODO fix the implementation in PefCiagKpiService.processPrisonerAdmission to make this set the correct calculation rule
           // .hasCalculationRule(ReviewScheduleCalculationRule.PRISONER_READMISSION)
-          .wasCreatedAfter(earliestDateTime)
-          .wasUpdatedAfter(earliestDateTime)
+          .wasCreatedAtOrAfter(earliestDateTime)
+          .wasUpdatedAtOrAfter(earliestDateTime)
       }
 
     // test that outbound event is also created:

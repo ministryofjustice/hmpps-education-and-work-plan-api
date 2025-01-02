@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 
@@ -39,11 +40,13 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
-        failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
+      val createdAtRounded = createdAt.truncatedTo(ChronoUnit.MILLIS)
+      val dateTimeRounded = dateTime.truncatedTo(ChronoUnit.MILLIS)
+      if (createdAtRounded.isBefore(dateTimeRounded)) {
+        failWithMessage("Expected createdAt to be after $dateTimeRounded, but was $createdAtRounded")
       }
     }
     return this
@@ -59,10 +62,10 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBefore(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

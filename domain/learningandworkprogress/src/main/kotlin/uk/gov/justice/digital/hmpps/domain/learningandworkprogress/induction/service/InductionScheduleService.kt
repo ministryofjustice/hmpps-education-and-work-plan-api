@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.se
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import java.time.LocalDate
 
@@ -11,6 +12,7 @@ private const val EXCLUSION_ADDITIONAL_DAYS = 10L
 private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
 class InductionScheduleService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
+  private val inductionScheduleEventService: InductionScheduleEventService,
 ) {
 
   private val inductionScheduleStatusTransitionValidator = InductionScheduleStatusTransitionValidator()
@@ -58,7 +60,7 @@ class InductionScheduleService(
     performFollowOnEvents(
       updatedInductionSchedule = updatedInductionSchedule,
       oldStatus = inductionSchedule.scheduleStatus,
-      oldInductionDate = inductionSchedule.deadlineDate,
+      oldDeadlineDate = inductionSchedule.deadlineDate,
     )
   }
 
@@ -78,7 +80,7 @@ class InductionScheduleService(
     performFollowOnEvents(
       updatedInductionSchedule = updatedInductionSchedule,
       oldStatus = inductionSchedule.scheduleStatus,
-      oldInductionDate = inductionSchedule.deadlineDate,
+      oldDeadlineDate = inductionSchedule.deadlineDate,
     )
   }
 
@@ -99,7 +101,7 @@ class InductionScheduleService(
     performFollowOnEvents(
       updatedInductionSchedule = updatedInductionScheduleFirst,
       oldStatus = inductionSchedule.scheduleStatus,
-      oldInductionDate = inductionSchedule.deadlineDate,
+      oldDeadlineDate = inductionSchedule.deadlineDate,
     )
 
     // Then update the induction schedule to be SCHEDULED with a new induction date
@@ -115,7 +117,7 @@ class InductionScheduleService(
     performFollowOnEvents(
       updatedInductionSchedule = updatedInductionScheduleSecond,
       oldStatus = inductionSchedule.scheduleStatus,
-      oldInductionDate = inductionSchedule.deadlineDate,
+      oldDeadlineDate = inductionSchedule.deadlineDate,
     )
   }
 
@@ -137,9 +139,21 @@ class InductionScheduleService(
 
   private fun performFollowOnEvents(
     oldStatus: InductionScheduleStatus,
-    oldInductionDate: LocalDate,
+    oldDeadlineDate: LocalDate,
     updatedInductionSchedule: InductionSchedule,
   ) {
-    // TODO perform follow on events: message generation, timeline and telemetry
+    inductionScheduleEventService.inductionScheduleStatusUpdated(
+      UpdatedInductionScheduleStatus(
+        reference = updatedInductionSchedule.reference,
+        prisonNumber = updatedInductionSchedule.prisonNumber,
+        oldStatus = oldStatus,
+        newStatus = updatedInductionSchedule.scheduleStatus,
+        exemptionReason = updatedInductionSchedule.exemptionReason,
+        newDeadlineDate = updatedInductionSchedule.deadlineDate,
+        oldDeadlineDate = oldDeadlineDate,
+        updatedAt = updatedInductionSchedule.lastUpdatedAt!!,
+        updatedBy = updatedInductionSchedule.lastUpdatedBy!!,
+      ),
+    )
   }
 }

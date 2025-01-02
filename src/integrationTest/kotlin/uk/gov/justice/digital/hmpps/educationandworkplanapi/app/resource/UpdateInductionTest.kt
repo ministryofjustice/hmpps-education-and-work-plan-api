@@ -9,6 +9,7 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -268,7 +269,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .wasCreatedAt(persistedInduction.createdAt)
-      .wasUpdatedAfter(persistedInduction.updatedAt)
+      .wasUpdatedAtOrAfter(persistedInduction.updatedAt)
       .wasCreatedBy(createUsername)
       .wasCreatedByDisplayName(createDisplayName)
       .wasUpdatedBy(updateUsername)
@@ -299,7 +300,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val updateInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(updateInductionEventProperties)
@@ -416,7 +417,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .wasCreatedAt(persistedInduction.createdAt)
-      .wasUpdatedAfter(persistedInduction.updatedAt)
+      .wasUpdatedAtOrAfter(persistedInduction.updatedAt)
       .wasCreatedBy(createUsername)
       .wasCreatedByDisplayName(createDisplayName)
       .wasUpdatedBy(updateUsername)
@@ -449,7 +450,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val updateInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(updateInductionEventProperties)

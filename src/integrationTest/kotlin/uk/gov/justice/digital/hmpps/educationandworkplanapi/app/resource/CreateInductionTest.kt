@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -176,7 +177,7 @@ class CreateInductionTest : IntegrationTestBase() {
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_CREATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val createInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(createInductionEventProperties)
@@ -224,7 +225,7 @@ class CreateInductionTest : IntegrationTestBase() {
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_CREATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val createInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(createInductionEventProperties)
