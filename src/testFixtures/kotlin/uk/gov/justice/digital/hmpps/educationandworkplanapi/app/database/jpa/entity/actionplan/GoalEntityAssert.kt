@@ -18,8 +18,8 @@ class GoalEntityAssert(actual: GoalEntity?) :
   fun hasJpaManagedFieldsPopulated(): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id == null || createdAt == null || createdBy == null || createdByDisplayName == null || updatedAt == null || updatedBy == null || updatedByDisplayName == null) {
-        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, createdByDisplayName = $createdByDisplayName, updatedAt = $updatedAt, updatedBy = $updatedBy, updatedByDisplayName = $updatedByDisplayName")
+      if (id == null || createdAt == null || createdBy == null || updatedAt == null || updatedBy == null) {
+        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
       }
     }
     return this
@@ -28,8 +28,8 @@ class GoalEntityAssert(actual: GoalEntity?) :
   fun doesNotHaveJpaManagedFieldsPopulated(): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id != null || createdAt != null || createdBy != null || createdByDisplayName != null || updatedAt != null || updatedBy != null || updatedByDisplayName != null) {
-        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, createdByDisplayName = $createdByDisplayName, updatedAt = $updatedAt, updatedBy = $updatedBy, updatedByDisplayName = $updatedByDisplayName")
+      if (id != null || createdAt != null || createdBy != null || updatedAt != null || updatedBy != null) {
+        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
       }
     }
     return this
@@ -86,16 +86,6 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
-  fun hasCreatedByDisplayName(expected: String): GoalEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (createdByDisplayName != expected) {
-        failWithMessage("Expected createdByDisplayName to be $expected, but was $createdByDisplayName")
-      }
-    }
-    return this
-  }
-
   fun wasCreatedAt(expected: Instant): GoalEntityAssert {
     isNotNull
     with(actual!!) {
@@ -121,16 +111,6 @@ class GoalEntityAssert(actual: GoalEntity?) :
     with(actual!!) {
       if (updatedBy != expected) {
         failWithMessage("Expected updatedBy to be $expected, but was $updatedBy")
-      }
-    }
-    return this
-  }
-
-  fun hasUpdatedByDisplayName(expected: String): GoalEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (updatedByDisplayName != expected) {
-        failWithMessage("Expected updatedByDisplayName to be $expected, but was $updatedByDisplayName")
       }
     }
     return this
@@ -176,11 +156,21 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
+  fun hasStatus(expected: GoalStatus): GoalEntityAssert {
+    isNotNull
+    with(actual!!) {
+      if (status != expected) {
+        failWithMessage("Expected status to be $expected, but was $status")
+      }
+    }
+    return this
+  }
+
   fun hasNumberOfSteps(expected: Int): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      if (steps!!.size != expected) {
-        failWithMessage("Expected goal to have $expected Steps, but was ${steps!!.size}")
+      if (steps.size != expected) {
+        failWithMessage("Expected goal to have $expected Steps, but was ${steps.size}")
       }
     }
     return this
@@ -196,16 +186,6 @@ class GoalEntityAssert(actual: GoalEntity?) :
     return this
   }
 
-  fun hasAReference(): GoalEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   /**
    * Allows for assertion chaining into the specified child [StepEntity]. Takes a lambda as the method argument
    * to call assertion methods provided by [StepEntityAssert].
@@ -214,7 +194,7 @@ class GoalEntityAssert(actual: GoalEntity?) :
   fun stepWithSequenceNumber(sequenceNumber: Int, consumer: Consumer<StepEntityAssert>): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      val step = steps!!.find { it.sequenceNumber == sequenceNumber }
+      val step = steps.find { it.sequenceNumber == sequenceNumber }
       consumer.accept(assertThat(step))
     }
     return this
@@ -229,7 +209,7 @@ class GoalEntityAssert(actual: GoalEntity?) :
   fun allSteps(consumer: Consumer<StepEntityAssert>): GoalEntityAssert {
     isNotNull
     with(actual!!) {
-      steps!!.onEach {
+      steps.onEach {
         consumer.accept(assertThat(it))
       }
     }
