@@ -25,7 +25,7 @@ class TimelineEventFactory {
         actionPlan.goals[0],
         actionPlan.reference,
         TimelineEventType.ACTION_PLAN_CREATED,
-        contextualInfo = null,
+        contextualInfo = emptyMap(),
         correlationId = correlationId,
       ),
     )
@@ -192,7 +192,7 @@ class TimelineEventFactory {
     goal: Goal,
     sourceReference: UUID,
     eventType: TimelineEventType,
-    contextualInfo: Map<TimelineEventContext, String>?,
+    contextualInfo: Map<TimelineEventContext, String>,
     correlationId: UUID = UUID.randomUUID(),
   ) =
     TimelineEvent.newTimelineEvent(
@@ -201,7 +201,6 @@ class TimelineEventFactory {
       // we can use the lastUpdatedBy fields for create action plan/create goal events, since it will be the same as the actionedBy fields initially
       prisonId = goal.lastUpdatedAtPrison,
       actionedBy = goal.lastUpdatedBy!!,
-      actionedByDisplayName = goal.lastUpdatedByDisplayName!!,
       contextualInfo = contextualInfo,
       correlationId = correlationId,
     )

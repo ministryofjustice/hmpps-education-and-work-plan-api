@@ -35,7 +35,6 @@ class PrisonMovementEventsMapper(
       contextualInfo = getContextualInfo(prisonMovement),
       prisonId = getPrisonId(prisonMovement),
       actionedBy = SYSTEM_USER,
-      actionedByDisplayName = null,
     )
 
   private fun toEventType(movementType: PrisonMovementType): TimelineEventType =
@@ -45,12 +44,12 @@ class PrisonMovementEventsMapper(
       PrisonMovementType.TRANSFER -> TimelineEventType.PRISON_TRANSFER
     }
 
-  private fun getContextualInfo(prisonMovement: PrisonMovementEvent): Map<TimelineEventContext, String>? =
+  private fun getContextualInfo(prisonMovement: PrisonMovementEvent): Map<TimelineEventContext, String> =
     // For transfers, this is the ID of the prison they were transferred from. Otherwise, null
     if (prisonMovement.movementType == PrisonMovementType.TRANSFER) {
       mapOf(TimelineEventContext.PRISON_TRANSFERRED_FROM to prisonMovement.fromPrisonId!!)
     } else {
-      null
+      emptyMap()
     }
 
   private fun getPrisonId(prisonMovement: PrisonMovementEvent): String =

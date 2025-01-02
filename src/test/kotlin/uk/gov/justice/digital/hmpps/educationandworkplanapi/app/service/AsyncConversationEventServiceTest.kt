@@ -49,7 +49,6 @@ class AsyncConversationEventServiceTest {
           eventType = TimelineEventType.CONVERSATION_CREATED,
           prisonId = note.createdAtPrison,
           actionedBy = note.createdBy!!,
-          actionedByDisplayName = note.createdByDisplayName,
           timestamp = note.createdAt!!,
           contextualInfo = mapOf(TimelineEventContext.CONVERSATION_TYPE to "REVIEW"),
         )
@@ -79,7 +78,6 @@ class AsyncConversationEventServiceTest {
           eventType = TimelineEventType.CONVERSATION_UPDATED,
           prisonId = note.lastUpdatedAtPrison,
           actionedBy = note.lastUpdatedBy!!,
-          actionedByDisplayName = note.lastUpdatedByDisplayName,
           timestamp = note.lastUpdatedAt!!,
           contextualInfo = mapOf(TimelineEventContext.CONVERSATION_TYPE to "REVIEW"),
         )

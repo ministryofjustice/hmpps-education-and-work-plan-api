@@ -42,7 +42,6 @@ class AsyncConversationEventService(
         contextualInfo = buildContextualInfo(this),
         prisonId = note.createdAtPrison,
         actionedBy = note.createdBy!!,
-        actionedByDisplayName = note.createdByDisplayName,
         timestamp = note.createdAt!!,
       )
     }
@@ -55,7 +54,6 @@ class AsyncConversationEventService(
         contextualInfo = buildContextualInfo(this),
         prisonId = note.lastUpdatedAtPrison,
         actionedBy = note.lastUpdatedBy!!,
-        actionedByDisplayName = note.lastUpdatedByDisplayName,
         timestamp = note.lastUpdatedAt!!,
       )
     }

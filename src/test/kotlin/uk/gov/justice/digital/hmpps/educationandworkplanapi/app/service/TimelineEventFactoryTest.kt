@@ -45,8 +45,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
-      .hasNoContextualInfo()
 
     val goalCreatedEvent = actual[1]
     assertThat(goalCreatedEvent)
@@ -54,7 +52,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
       .hasCorrelationId(actionPlanCreatedEvent.correlationId)
   }
@@ -73,7 +70,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
   }
 
@@ -89,7 +85,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
       ),
     )
@@ -128,7 +123,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
       ),
       newTimelineEvent(
@@ -136,7 +130,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
     )
@@ -173,7 +166,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
       ),
       newTimelineEvent(
@@ -181,7 +173,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_STARTED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book course"),
       ),
     )
@@ -234,7 +225,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to "Learn Spanish"),
       ),
       newTimelineEvent(
@@ -242,7 +232,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_COMPLETED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
       newTimelineEvent(
@@ -250,7 +239,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
       newTimelineEvent(
@@ -258,7 +246,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_STARTED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Complete course"),
       ),
     )
@@ -292,7 +279,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_ARCHIVED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(
         mapOf(
           TimelineEventContext.GOAL_TITLE to goal.title,
@@ -319,7 +305,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_ARCHIVED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(
         mapOf(
           TimelineEventContext.GOAL_TITLE to goal.title,
@@ -343,7 +328,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_UNARCHIVED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
   }
 }

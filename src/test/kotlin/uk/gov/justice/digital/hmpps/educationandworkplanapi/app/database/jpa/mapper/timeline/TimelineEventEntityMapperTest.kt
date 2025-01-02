@@ -28,10 +28,9 @@ class TimelineEventEntityMapperTest {
       reference = reference,
       sourceReference = sourceReference,
       eventType = TimelineEventTypeEntity.STEP_UPDATED,
-      contextualInfo = null,
+      contextualInfo = emptyMap(),
       prisonId = prisonId,
       actionedBy = timelineEvent.actionedBy,
-      actionedByDisplayName = timelineEvent.actionedByDisplayName,
       timestamp = timelineEvent.timestamp,
       correlationId = timelineEvent.correlationId,
     )
@@ -42,7 +41,6 @@ class TimelineEventEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFields("id", "createdAt")
       .isEqualTo(expected)
@@ -58,18 +56,17 @@ class TimelineEventEntityMapperTest {
       reference = reference,
       sourceReference = sourceReference,
       eventType = TimelineEventTypeEntity.STEP_UPDATED,
-      contextualInfo = null,
+      contextualInfo = emptyMap(),
       prisonId = prisonId,
     )
     val expected = aValidTimelineEvent(
       reference = reference,
       sourceReference = sourceReference,
       eventType = TimelineEventTypeDomain.STEP_UPDATED,
-      contextualInfo = null,
+      contextualInfo = emptyMap(),
       prisonId = prisonId,
-      timestamp = timelineEventEntity.timestamp!!,
-      correlationId = timelineEventEntity.correlationId!!,
-      actionedByDisplayName = null,
+      timestamp = timelineEventEntity.timestamp,
+      correlationId = timelineEventEntity.correlationId,
     )
 
     // When

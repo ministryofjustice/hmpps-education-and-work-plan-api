@@ -40,7 +40,6 @@ class AsyncInductionEventService(
         eventType = TimelineEventType.INDUCTION_CREATED,
         prisonId = createdAtPrison,
         actionedBy = induction.createdBy!!,
-        actionedByDisplayName = induction.createdByDisplayName,
         timestamp = induction.createdAt!!,
       )
     }
@@ -52,7 +51,6 @@ class AsyncInductionEventService(
         eventType = TimelineEventType.INDUCTION_UPDATED,
         prisonId = lastUpdatedAtPrison,
         actionedBy = induction.lastUpdatedBy!!,
-        actionedByDisplayName = induction.lastUpdatedByDisplayName,
         timestamp = induction.lastUpdatedAt!!,
       )
     }

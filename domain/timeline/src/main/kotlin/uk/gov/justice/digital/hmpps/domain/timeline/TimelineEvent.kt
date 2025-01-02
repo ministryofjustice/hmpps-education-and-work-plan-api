@@ -25,7 +25,7 @@ data class TimelineEvent(
   /**
    * A map of useful contextual information about the event.
    */
-  val contextualInfo: Map<TimelineEventContext, String>?,
+  val contextualInfo: Map<TimelineEventContext, String>,
   /**
    * The ID of the Prison where the Prisoner is based at the time of the event.
    */
@@ -34,10 +34,6 @@ data class TimelineEvent(
    * The username of the person who caused this event. Set to 'system' if the event was not actioned by a DPS user.
    */
   val actionedBy: String,
-  /**
-   * The name of the person who caused this event (if applicable).
-   */
-  val actionedByDisplayName: String? = null,
   /**
    * The date and time when the event occurred.
    */
@@ -52,10 +48,9 @@ data class TimelineEvent(
     fun newTimelineEvent(
       sourceReference: String,
       eventType: TimelineEventType,
-      contextualInfo: Map<TimelineEventContext, String>? = null,
+      contextualInfo: Map<TimelineEventContext, String> = emptyMap(),
       prisonId: String,
       actionedBy: String,
-      actionedByDisplayName: String? = null,
       timestamp: Instant = Instant.now(),
       correlationId: UUID = UUID.randomUUID(),
     ) = TimelineEvent(
@@ -65,7 +60,6 @@ data class TimelineEvent(
       contextualInfo = contextualInfo,
       prisonId = prisonId,
       actionedBy = actionedBy,
-      actionedByDisplayName = actionedByDisplayName,
       timestamp = timestamp,
       correlationId = correlationId,
     )

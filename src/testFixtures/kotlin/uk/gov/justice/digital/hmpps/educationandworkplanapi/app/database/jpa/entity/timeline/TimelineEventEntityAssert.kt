@@ -52,16 +52,6 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     return this
   }
 
-  fun wasActionedByDisplayName(expected: String): TimelineEventEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (actionedByDisplayName != expected) {
-        failWithMessage("Expected actionedByDisplayName to be $expected, but was $actionedByDisplayName")
-      }
-    }
-    return this
-  }
-
   fun wasCreatedAt(expected: Instant): TimelineEventEntityAssert {
     isNotNull
     with(actual!!) {
@@ -77,16 +67,6 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     with(actual!!) {
       if (prisonId != expected) {
         failWithMessage("Expected prisonId to be $expected, but was $prisonId")
-      }
-    }
-    return this
-  }
-
-  fun hasAReference(): TimelineEventEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
     return this
@@ -117,16 +97,6 @@ class TimelineEventEntityAssert(actual: TimelineEventEntity?) :
     with(actual!!) {
       if (contextualInfo != expected) {
         failWithMessage("Expected contextualInfo to be $expected, but was $contextualInfo")
-      }
-    }
-    return this
-  }
-
-  fun hasNoContextualInfo(): TimelineEventEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (contextualInfo != null) {
-        failWithMessage("Expected contextualInfo to be null, but was $contextualInfo")
       }
     }
     return this

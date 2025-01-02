@@ -16,12 +16,11 @@ class TimelineEventEntityMapper {
         reference = reference,
         sourceReference = sourceReference,
         eventType = toTimelineEventType(eventType),
-        contextualInfo = contextualInfo?.let { contextualInfo ->
+        contextualInfo = contextualInfo.let { contextualInfo ->
           contextualInfo.keys.associate { toTimelineEventContext(it) to contextualInfo.getValue(it) }
         },
         prisonId = prisonId,
         actionedBy = actionedBy,
-        actionedByDisplayName = actionedByDisplayName,
         timestamp = timestamp,
         correlationId = correlationId,
       )
@@ -30,18 +29,16 @@ class TimelineEventEntityMapper {
   fun fromEntityToDomain(persisted: TimelineEventEntity): TimelineEvent =
     with(persisted) {
       TimelineEvent(
-        reference = reference!!,
-        sourceReference = sourceReference!!,
-        eventType = toTimelineEventType(eventType!!),
-        contextualInfo = contextualInfo?.let { contextualInfo ->
+        reference = reference,
+        sourceReference = sourceReference,
+        eventType = toTimelineEventType(eventType),
+        contextualInfo = contextualInfo.let { contextualInfo ->
           contextualInfo.keys.associate { toTimelineEventContext(it) to contextualInfo.getValue(it) }
         },
-        prisonId = prisonId!!,
-        actionedBy = actionedBy!!,
-        // TODO, this display name field will be removed from the domain as part of the RBAC work, so no point mapping it
-        actionedByDisplayName = null,
-        timestamp = timestamp!!,
-        correlationId = correlationId!!,
+        prisonId = prisonId,
+        actionedBy = actionedBy,
+        timestamp = timestamp,
+        correlationId = correlationId,
       )
     }
 

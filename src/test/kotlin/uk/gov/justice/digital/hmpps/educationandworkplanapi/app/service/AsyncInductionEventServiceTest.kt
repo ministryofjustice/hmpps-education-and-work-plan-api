@@ -48,9 +48,8 @@ class AsyncInductionEventServiceTest {
           eventType = TimelineEventType.INDUCTION_CREATED,
           prisonId = createdAtPrison,
           actionedBy = induction.createdBy!!,
-          actionedByDisplayName = induction.createdByDisplayName,
           timestamp = induction.createdAt!!,
-          contextualInfo = null,
+          contextualInfo = emptyMap(),
         )
       }
 
@@ -75,9 +74,8 @@ class AsyncInductionEventServiceTest {
           eventType = TimelineEventType.INDUCTION_UPDATED,
           prisonId = lastUpdatedAtPrison,
           actionedBy = induction.lastUpdatedBy!!,
-          actionedByDisplayName = induction.lastUpdatedByDisplayName,
           timestamp = induction.lastUpdatedAt!!,
-          contextualInfo = null,
+          contextualInfo = emptyMap(),
         )
       }
 
