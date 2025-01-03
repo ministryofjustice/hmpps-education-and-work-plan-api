@@ -28,7 +28,7 @@ class ReviewScheduleCalculationServiceTest {
         "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
       ],
     )
-    fun `should calculate adjusted review due date given an exception status that is classed as an exclusion and the review due date is later than the calculated date`(
+    fun `should calculate adjusted review due date given an exemption status that is classed as an exclusion and the review due date is later than the calculated date`(
       scheduleStatus: ReviewScheduleStatus,
     ) {
       // Given
@@ -56,7 +56,7 @@ class ReviewScheduleCalculationServiceTest {
         "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
       ],
     )
-    fun `should calculate adjusted review due date given an exception status that is classed as an exclusion and the review due date is earlier than the calculated date`(
+    fun `should calculate adjusted review due date given an exemption status that is classed as an exclusion and the review due date is earlier than the calculated date`(
       scheduleStatus: ReviewScheduleStatus,
     ) {
       // Given
@@ -86,7 +86,7 @@ class ReviewScheduleCalculationServiceTest {
         "EXEMPT_PRISONER_DEATH",
       ],
     )
-    fun `should calculate adjusted review due date given an exception status that is classed as an exception and the review due date is later than the calculated date`(
+    fun `should calculate adjusted review due date given an exemption status that is classed as an exemption and the review due date is later than the calculated date`(
       scheduleStatus: ReviewScheduleStatus,
     ) {
       // Given
@@ -116,7 +116,7 @@ class ReviewScheduleCalculationServiceTest {
         "EXEMPT_PRISONER_DEATH",
       ],
     )
-    fun `should calculate adjusted review due date given an exception status that is classed as an exception and the review due date is earlier than the calculated date`(
+    fun `should calculate adjusted review due date given an exemption status that is classed as an exemption and the review due date is earlier than the calculated date`(
       scheduleStatus: ReviewScheduleStatus,
     ) {
       // Given
