@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 
@@ -43,10 +43,8 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
   fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
     isNotNull
     with(actual!!) {
-      val createdAtRounded = createdAt.truncatedTo(ChronoUnit.MILLIS)
-      val dateTimeRounded = dateTime.truncatedTo(ChronoUnit.MILLIS)
-      if (createdAtRounded.isBefore(dateTimeRounded)) {
-        failWithMessage("Expected createdAt to be after $dateTimeRounded, but was $createdAtRounded")
+      if (createdAt.isBeforeRounded(dateTime)) {
+        failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
     return this
@@ -65,7 +63,7 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
   fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
     isNotNull
     with(actual!!) {
-      if (updatedAt.isBefore(dateTime.truncatedTo(ChronoUnit.MILLIS))) {
+      if (updatedAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }
