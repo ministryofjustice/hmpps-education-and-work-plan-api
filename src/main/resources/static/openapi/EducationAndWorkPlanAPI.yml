@@ -3262,7 +3262,7 @@ components:
       type: string
       enum:
         - SCHEDULED
-        - COMPLETE
+        - COMPLETED
         - EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
         - EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
         - EXEMPT_PRISONER_FAILED_TO_ENGAGE

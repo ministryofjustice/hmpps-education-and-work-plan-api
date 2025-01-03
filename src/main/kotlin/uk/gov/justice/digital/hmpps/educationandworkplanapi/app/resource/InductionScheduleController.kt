@@ -88,7 +88,7 @@ class InductionScheduleController(
   private fun toReviewScheduleStatus(inductionScheduleStatus: InductionScheduleStatusModel): InductionScheduleStatus =
     when (inductionScheduleStatus) {
       InductionScheduleStatusModel.SCHEDULED -> InductionScheduleStatus.SCHEDULED
-      InductionScheduleStatusModel.COMPLETE -> InductionScheduleStatus.COMPLETE
+      InductionScheduleStatusModel.COMPLETED -> InductionScheduleStatus.COMPLETED
       InductionScheduleStatusModel.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatusModel.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatusModel.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE

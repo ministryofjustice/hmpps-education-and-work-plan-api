@@ -184,7 +184,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
       .withBody(
         aValidUpdateInductionScheduleStatusRequest(
           prisonId = "MDI",
-          status = InductionScheduleStatus.COMPLETE,
+          status = InductionScheduleStatus.COMPLETED,
         ),
       )
       .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
@@ -197,7 +197,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(CONFLICT.value())
-      .hasUserMessage("Invalid Induction Schedule status transition for prisoner [$prisonNumber] status from EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY to COMPLETE")
+      .hasUserMessage("Invalid Induction Schedule status transition for prisoner [$prisonNumber] status from EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY to COMPLETED")
   }
 
   @Test

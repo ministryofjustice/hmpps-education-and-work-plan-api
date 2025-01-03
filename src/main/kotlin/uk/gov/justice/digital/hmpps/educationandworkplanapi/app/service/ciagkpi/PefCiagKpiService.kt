@@ -80,7 +80,7 @@ class PefCiagKpiService(
 
   private fun activeInductionScheduleAlreadyExists(prisonNumber: String): Boolean {
     val existingSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
-    if (existingSchedule != null && existingSchedule.scheduleStatus != InductionScheduleStatus.COMPLETE) {
+    if (existingSchedule != null && existingSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) {
       log.info { "Induction schedule already exists for prisoner [$prisonNumber], ignoring this message." }
       return true
     }

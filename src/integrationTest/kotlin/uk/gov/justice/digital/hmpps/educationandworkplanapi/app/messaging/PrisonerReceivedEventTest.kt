@@ -84,7 +84,7 @@ class PrisonerReceivedEventTest : IntegrationTestBase() {
     val prisonNumber = randomValidPrisonNumber()
     createInductionSchedule(
       prisonNumber = prisonNumber,
-      status = InductionScheduleStatus.COMPLETE,
+      status = InductionScheduleStatus.COMPLETED,
     )
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
     createActionPlan(prisonNumber)

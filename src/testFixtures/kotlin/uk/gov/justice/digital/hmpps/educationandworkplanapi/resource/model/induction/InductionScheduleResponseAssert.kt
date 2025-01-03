@@ -65,7 +65,7 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
   fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): InductionScheduleResponseAssert {
     isNotNull
     with(actual!!) {
-      if (updatedAt.isBefore(dateTime)) {
+      if (updatedAt.isBefore(dateTime.truncatedTo(ChronoUnit.MILLIS))) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

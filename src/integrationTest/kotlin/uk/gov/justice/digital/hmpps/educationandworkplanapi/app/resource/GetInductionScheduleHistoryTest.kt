@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETE
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -39,7 +39,7 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
     )
     createInductionScheduleHistory(
       prisonNumber = randomPrisonNumber,
-      status = COMPLETE,
+      status = COMPLETED,
       version = 3,
     )
     createInduction(randomPrisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
@@ -73,7 +73,7 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
       .wasUpdatedBy("auser_gen")
       .wasUpdatedByDisplayName("Albert User")
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .wasStatus(InductionScheduleStatus.COMPLETE)
+      .wasStatus(InductionScheduleStatus.COMPLETED)
       .wasVersion(3)
       .wasInductionPerformedBy("Albert User")
       .wasInductionPerformedAt(LocalDate.now())

@@ -91,7 +91,7 @@ class InductionScheduleEntityMapper(
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusEntity): InductionScheduleStatusDomain =
     when (inductionScheduleStatus) {
       InductionScheduleStatusEntity.SCHEDULED -> InductionScheduleStatusDomain.SCHEDULED
-      InductionScheduleStatusEntity.COMPLETE -> InductionScheduleStatusDomain.COMPLETE
+      InductionScheduleStatusEntity.COMPLETED -> InductionScheduleStatusDomain.COMPLETED
       InductionScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatusEntity.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -112,7 +112,7 @@ class InductionScheduleEntityMapper(
   fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusDomain): InductionScheduleStatusEntity =
     when (inductionScheduleStatus) {
       InductionScheduleStatusDomain.SCHEDULED -> InductionScheduleStatusEntity.SCHEDULED
-      InductionScheduleStatusDomain.COMPLETE -> InductionScheduleStatusEntity.COMPLETE
+      InductionScheduleStatusDomain.COMPLETED -> InductionScheduleStatusEntity.COMPLETED
       InductionScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusEntity.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE
