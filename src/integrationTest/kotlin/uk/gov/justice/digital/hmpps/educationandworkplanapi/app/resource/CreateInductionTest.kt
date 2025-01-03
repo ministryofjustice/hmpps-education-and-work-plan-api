@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
@@ -173,7 +172,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .wasUpdatedAtPrison(createRequest.prisonId)
 
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_CREATED"),
         capture(eventPropertiesCaptor),
@@ -221,7 +220,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .wasUpdatedAtPrison(createRequest.prisonId)
 
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_CREATED"),
         capture(eventPropertiesCaptor),

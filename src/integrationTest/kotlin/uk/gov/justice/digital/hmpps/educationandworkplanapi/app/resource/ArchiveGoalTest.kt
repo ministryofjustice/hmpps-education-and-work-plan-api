@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
@@ -100,7 +99,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
             .hasActionedByDisplayName("Bernie User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("goal-archived"),
@@ -152,7 +151,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
             .hasActionedByDisplayName("Bernie User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("goal-archived"),

@@ -49,7 +49,7 @@ class InductionScheduleResourceMapper(
       InductionScheduleCalculationRule.EXISTING_PRISONER_UN_SENTENCED -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_UN_SENTENCED
     }
 
-  private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =
+  fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =
     when (inductionScheduleStatus) {
       InductionScheduleStatus.SCHEDULED -> InductionScheduleStatusResponse.SCHEDULED
       InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
