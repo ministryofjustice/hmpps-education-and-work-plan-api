@@ -223,6 +223,11 @@ class ReviewServiceCreateReviewTest {
       prisonerHasRecallFlag = false,
     )
 
+    val activeReviewSchedule = aValidReviewSchedule(
+      latestReviewDate = TODAY.plusDays(10),
+    )
+    given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(activeReviewSchedule)
+
     // When
     val exception = catchThrowableOfType(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java) {
       service.createReview(createCompletedReviewDto)
