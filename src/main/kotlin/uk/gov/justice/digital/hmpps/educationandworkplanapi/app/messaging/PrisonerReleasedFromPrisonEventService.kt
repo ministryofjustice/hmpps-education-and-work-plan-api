@@ -27,8 +27,14 @@ class PrisonerReleasedFromPrisonEventService(
         RELEASED ->
           if (releaseTriggeredByPrisonerDeath) processPrisonerReleaseEventDueToDeath() else processPrisonerReleaseEvent()
 
-        TEMPORARY_ABSENCE_RELEASE, RELEASED_TO_HOSPITAL, SENT_TO_COURT, TRANSFERRED, UNKNOWN ->
-          log.debug { "Ignoring Processing Prisoner Released From Prison Event with reason $reason" }
+        TEMPORARY_ABSENCE_RELEASE,
+        RELEASED_TO_HOSPITAL,
+        SENT_TO_COURT,
+        UNKNOWN,
+        // When a prisoner is transferred there are 2 events - a prisoner.released event for the "outbound" from the old prison, and a prisoner.received event for the "inbound" for the new prison
+        // Given these events can come in close succession or potentially out of order, all processing of "transfer" events is handled once in the prisoner.received listener
+        TRANSFERRED,
+        -> log.debug { "Ignoring Processing Prisoner Released From Prison Event with reason $reason" }
       }
     }
 
