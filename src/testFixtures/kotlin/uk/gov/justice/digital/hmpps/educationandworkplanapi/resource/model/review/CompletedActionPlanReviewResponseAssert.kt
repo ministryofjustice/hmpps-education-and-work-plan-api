@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompletedActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.NoteResponseAssert
@@ -44,7 +45,7 @@ class CompletedActionPlanReviewResponseAssert(actual: CompletedActionPlanReviewR
   fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): CompletedActionPlanReviewResponseAssert {
     isNotNull
     with(actual!!) {
-      if (createdAt.isBefore(dateTime)) {
+      if (createdAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }

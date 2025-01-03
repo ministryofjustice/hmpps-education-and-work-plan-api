@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.INTERNALLY_MANAGED_FIELDS
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import java.time.Instant
 import java.util.UUID
 import java.util.function.Consumer
@@ -118,7 +119,7 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
   fun wasUpdatedAtOrAfter(dateTime: Instant): ConversationEntityAssert {
     isNotNull
     with(actual!!) {
-      if (updatedAt!!.isBefore(dateTime)) {
+      if (updatedAt!!.isBeforeRounded(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

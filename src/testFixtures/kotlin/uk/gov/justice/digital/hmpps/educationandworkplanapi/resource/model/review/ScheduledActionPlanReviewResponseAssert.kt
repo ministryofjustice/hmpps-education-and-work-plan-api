@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ScheduledActionPlanReviewResponse
@@ -42,7 +43,7 @@ class ScheduledActionPlanReviewResponseAssert(actual: ScheduledActionPlanReviewR
   fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): ScheduledActionPlanReviewResponseAssert {
     isNotNull
     with(actual!!) {
-      if (createdAt.isBefore(dateTime)) {
+      if (createdAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -62,7 +63,7 @@ class ScheduledActionPlanReviewResponseAssert(actual: ScheduledActionPlanReviewR
   fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): ScheduledActionPlanReviewResponseAssert {
     isNotNull
     with(actual!!) {
-      if (updatedAt.isBefore(dateTime)) {
+      if (updatedAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }
