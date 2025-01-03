@@ -20,7 +20,7 @@ class InductionHistoryScheduleResourceMapper(
 ) {
   fun toInductionResponse(inductionScheduleHistory: InductionScheduleHistory, induction: Induction?): InductionScheduleResponse {
     with(inductionScheduleHistory) {
-      val isCompleted = scheduleStatus == InductionScheduleStatus.COMPLETE
+      val isCompleted = scheduleStatus == InductionScheduleStatus.COMPLETED
       return InductionScheduleResponse(
         reference = reference,
         prisonNumber = prisonNumber,
@@ -54,7 +54,7 @@ class InductionHistoryScheduleResourceMapper(
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =
     when (inductionScheduleStatus) {
       InductionScheduleStatus.SCHEDULED -> InductionScheduleStatusResponse.SCHEDULED
-      InductionScheduleStatus.COMPLETE -> InductionScheduleStatusResponse.COMPLETE
+      InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
       InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_FAILED_TO_ENGAGE

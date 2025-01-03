@@ -53,7 +53,7 @@ enum class InductionScheduleCalculationRule(val existingPrisonerWhenScheduleCrea
 
 enum class InductionScheduleStatus(val inScope: Boolean, val isExclusion: Boolean = false, val isExemption: Boolean = false) {
   SCHEDULED(true),
-  COMPLETE(true),
+  COMPLETED(true),
   EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(false, isExclusion = true),
   EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(false, isExclusion = true),
   EXEMPT_PRISONER_FAILED_TO_ENGAGE(false, isExemption = true),

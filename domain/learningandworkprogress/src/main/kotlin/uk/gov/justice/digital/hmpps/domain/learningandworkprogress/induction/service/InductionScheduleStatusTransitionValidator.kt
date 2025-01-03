@@ -37,7 +37,7 @@ class InductionScheduleStatusTransitionValidator {
 
   private val validationRules = listOf(
     ValidationRule(
-      condition = { current, _ -> current == InductionScheduleStatus.COMPLETE },
+      condition = { current, _ -> current == InductionScheduleStatus.COMPLETED },
       reason = "Cannot transition from COMPLETED to any other status.",
     ),
     ValidationRule(
@@ -59,7 +59,7 @@ class InductionScheduleStatusTransitionValidator {
       InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER,
       InductionScheduleStatus.EXEMPT_PRISONER_RELEASE,
       InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
-      InductionScheduleStatus.COMPLETE,
+      InductionScheduleStatus.COMPLETED,
     )
   }
 }
