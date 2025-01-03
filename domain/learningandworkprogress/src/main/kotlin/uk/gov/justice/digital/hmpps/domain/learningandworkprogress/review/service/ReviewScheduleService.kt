@@ -8,16 +8,14 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Update
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
 import java.time.LocalDate
 
-private const val EXEMPTION_ADDITIONAL_DAYS = 5L
-private const val EXCLUSION_ADDITIONAL_DAYS = 10L
-private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
-
 private val log = KotlinLogging.logger {}
 
 class ReviewScheduleService(
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   private val reviewScheduleEventService: ReviewScheduleEventService,
 ) {
+
+  private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
 
   private val reviewScheduleStatusTransitionValidator = ReviewScheduleStatusTransitionValidator()
 
@@ -118,13 +116,13 @@ class ReviewScheduleService(
     prisonId: String,
     prisonNumber: String,
   ) {
-    val newReviewDate = calculateNewReviewDate(reviewSchedule)
+    val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
     val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reference = reviewSchedule.reference,
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
         prisonId = prisonId,
-        latestReviewDate = newReviewDate,
+        latestReviewDate = adjustedReviewDate,
         prisonNumber = prisonNumber,
       ),
     )
@@ -158,13 +156,13 @@ class ReviewScheduleService(
     )
 
     // Then update the review schedule to be SCHEDULED with a new review date
-    val newReviewDate = calculateNewReviewDate(reviewSchedule, SYSTEM_OUTAGE_ADDITIONAL_DAYS)
+    val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
     val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
         reference = reviewSchedule.reference,
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
         prisonId = prisonId,
-        latestReviewDate = newReviewDate,
+        latestReviewDate = adjustedReviewDate,
         prisonNumber = prisonNumber,
       ),
     )
@@ -173,22 +171,6 @@ class ReviewScheduleService(
       oldStatus = updatedReviewScheduleFirst.scheduleStatus,
       oldReviewDate = updatedReviewScheduleFirst.reviewScheduleWindow.dateTo,
     )
-  }
-
-  private fun calculateNewReviewDate(
-    reviewSchedule: ReviewSchedule,
-    additionalDays: Long = getExtensionDays(reviewSchedule.scheduleStatus),
-  ): LocalDate? {
-    val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
-    return maxOf(todayPlusAdditionalDays, reviewSchedule.reviewScheduleWindow.dateTo)
-  }
-
-  private fun getExtensionDays(status: ReviewScheduleStatus): Long {
-    return when {
-      status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
-      status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-      else -> 0 // Default case, if no condition matches
-    }
   }
 
   private fun performFollowOnEvents(
