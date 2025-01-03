@@ -66,6 +66,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.L
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.PostgresContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
@@ -103,6 +104,7 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
+    const val GET_REVIEW_SCHEDULES_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/review-schedules"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
     const val EDUCATION_URI_TEMPLATE = "/person/{prisonNumber}/education"
@@ -456,6 +458,14 @@ abstract class IntegrationTestBase {
       .returnResult(ActionPlanReviewsResponse::class.java)
       .responseBody.blockFirst()!!
 
+  fun getReviewSchedules(prisonNumber: String): ActionPlanReviewSchedulesResponse =
+    webTestClient.get()
+      .uri(GET_REVIEW_SCHEDULES_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .exchange()
+      .returnResult(ActionPlanReviewSchedulesResponse::class.java)
+      .responseBody.blockFirst()!!
+
   fun getInductionSchedule(prisonNumber: String): InductionScheduleResponse =
     webTestClient.get()
       .uri(GET_INDUCTION_SCHEDULE_URI_TEMPLATE, prisonNumber)
@@ -486,11 +496,8 @@ abstract class IntegrationTestBase {
       .returnResult(InductionSchedulesResponse::class.java)
       .responseBody.blockFirst()!!
 
-  internal fun HmppsQueue.receiveEvent(queueType: QueueType): HmppsDomainEvent {
-    val event = receiveEventsOnQueue(queueType).single()
-    sqsClient.purgeQueue { it.queueUrl(queueType.queueUrl) }
-    return event
-  }
+  internal fun HmppsQueue.receiveEvent(queueType: QueueType): HmppsDomainEvent =
+    receiveEventsOnQueue(queueType).single()
 
   internal fun HmppsQueue.receiveEventsOnQueue(queueType: QueueType, maxMessages: Int = 10): List<HmppsDomainEvent> {
     val messageCount = when (queueType) {
@@ -510,6 +517,9 @@ abstract class IntegrationTestBase {
         .build(),
     ).get().messages().map { objectMapper.readValue<Notification>(it.body()) }
       .map { objectMapper.readValue<HmppsDomainEvent>(it.message) }
+      .also {
+        sqsClient.purgeQueue { it.queueUrl(queueType.queueUrl) }
+      }
   }
 
   enum class QueueType(val queueUrl: String) {
@@ -619,7 +629,18 @@ abstract class IntegrationTestBase {
     val reviewScheduleEntity = reviewScheduleRepository.findActiveReviewSchedule(prisonNumber)
     reviewScheduleEntity?.run {
       scheduleStatus = status
-      reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+      reviewScheduleRepository.saveAndFlush(this)
+    }
+  }
+
+  fun updateReviewScheduleRecordLatestReviewDate(
+    prisonNumber: String,
+    latestReviewDate: LocalDate,
+  ) {
+    val reviewScheduleEntity = reviewScheduleRepository.findActiveReviewSchedule(prisonNumber)
+    reviewScheduleEntity?.run {
+      this.latestReviewDate = latestReviewDate
+      reviewScheduleRepository.saveAndFlush(this)
     }
   }
 

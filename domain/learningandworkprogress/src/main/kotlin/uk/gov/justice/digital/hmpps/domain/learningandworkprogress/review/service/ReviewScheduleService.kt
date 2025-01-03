@@ -88,6 +88,25 @@ class ReviewScheduleService(
       }
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
+  /**
+   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_TRANSFER, then immediately
+   * re-scheduling it.
+   * Applying both status changes in quick succession (EXEMPT_PRISONER_TRANSFER, immediately followed by SCHEDULED) allows
+   * for the full history of state changes of the [ReviewSchedule] to be maintained.
+   *
+   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
+   * A Review Schedule with the status COMPLETE is not considered 'active'
+   */
+  fun exemptAndReScheduleActiveReviewScheduleStatusDueToPrisonerTransfer(prisonNumber: String, prisonTransferredTo: String) =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateReviewScheduleFollowingPrisonerTransfer(this, prisonTransferredTo)
+          .also {
+            log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_TRANSFER, and then re-scheduled" }
+          }
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
   private fun updateExemptStatus(
     reviewSchedule: ReviewSchedule,
     newStatus: ReviewScheduleStatus,
@@ -155,7 +174,7 @@ class ReviewScheduleService(
       oldReviewDate = reviewSchedule.reviewScheduleWindow.dateTo,
     )
 
-    // Then update the review schedule to be SCHEDULED with a new review date
+    // Then update the review schedule to be SCHEDULED with an adjusted review date
     val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
     val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
@@ -171,6 +190,49 @@ class ReviewScheduleService(
       oldStatus = updatedReviewScheduleFirst.scheduleStatus,
       oldReviewDate = updatedReviewScheduleFirst.reviewScheduleWindow.dateTo,
     )
+  }
+
+  private fun updateReviewScheduleFollowingPrisonerTransfer(
+    reviewSchedule: ReviewSchedule,
+    prisonTransferredTo: String,
+  ) {
+    with(reviewSchedule) {
+      // The prison that the prisoner transferred from is not in the event details. We need it when updating the Review Schedule
+      // with the EXEMPT_PRISONER_TRANSFER status to maintain the audit history fields. The best we can do is to use the `lastUpdatedAtPrison`
+      // field from the current ReviewSchedule record before any changes are made.
+      val prisonTransferredFrom = lastUpdatedAtPrison
+      // Update the review schedule status to EXEMPT_PRISONER_TRANSFER
+      val updatedReviewScheduleFirst = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+          prisonId = prisonTransferredFrom,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      performFollowOnEvents(
+        updatedReviewSchedule = updatedReviewScheduleFirst,
+        oldStatus = scheduleStatus,
+        oldReviewDate = reviewScheduleWindow.dateTo,
+      )
+
+      // Then update the review schedule to be SCHEDULED with an adjusted review date
+      val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
+      val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+          prisonId = prisonTransferredTo,
+          latestReviewDate = adjustedReviewDate,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      performFollowOnEvents(
+        updatedReviewSchedule = updatedReviewScheduleSecond,
+        oldStatus = updatedReviewScheduleFirst.scheduleStatus,
+        oldReviewDate = updatedReviewScheduleFirst.reviewScheduleWindow.dateTo,
+      )
+    }
   }
 
   private fun performFollowOnEvents(
