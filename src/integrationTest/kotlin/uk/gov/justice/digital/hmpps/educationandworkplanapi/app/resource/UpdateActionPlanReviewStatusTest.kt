@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -419,7 +418,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
               ),
             )
         }
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient).trackEvent(
         eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
         capture(eventPropertiesCaptor),
@@ -458,7 +457,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
               ),
             )
         }
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(2)).trackEvent(
         eq("REVIEW_SCHEDULE_STATUS_UPDATED"),
         capture(eventPropertiesCaptor),

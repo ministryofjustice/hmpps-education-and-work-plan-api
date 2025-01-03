@@ -11,6 +11,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
+import org.mockito.ArgumentCaptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -253,6 +254,9 @@ abstract class IntegrationTestBase {
       PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build(),
     ).get()
   }
+
+  final inline fun <reified T> createCaptor(): ArgumentCaptor<T> =
+    ArgumentCaptor.forClass(T::class.java)
 
   fun getActionPlan(prisonNumber: String): ActionPlanResponse =
     webTestClient.get()

@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -296,7 +295,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       }
 
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),
@@ -446,7 +445,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       }
 
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),

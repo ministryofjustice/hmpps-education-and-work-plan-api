@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -155,7 +154,7 @@ class CreateGoalsTest : IntegrationTestBase() {
 
     val goal = actual.goals[0]
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       // Event would be triggered twice - once for the original goal create, and once for the new goal created
       verify(telemetryClient, times(2)).trackEvent(
         eq("goal-created"),
@@ -219,7 +218,7 @@ class CreateGoalsTest : IntegrationTestBase() {
 
     val goal = actual.goals[0]
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       // Event would be triggered twice - once for the original goal create, and once for the new goal created
       verify(telemetryClient, times(2)).trackEvent(
         eq("goal-created"),

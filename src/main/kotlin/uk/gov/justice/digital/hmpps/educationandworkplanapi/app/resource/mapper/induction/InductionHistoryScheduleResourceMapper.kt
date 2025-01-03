@@ -10,11 +10,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUs
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
 import java.time.ZoneId
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
 
 @Component
 class InductionHistoryScheduleResourceMapper(
   private val instantMapper: InstantMapper,
+  private val inductionScheduleResourceMapper: InductionScheduleResourceMapper,
   private val userService: ManageUserService,
 
 ) {
@@ -26,7 +26,7 @@ class InductionHistoryScheduleResourceMapper(
         prisonNumber = prisonNumber,
         deadlineDate = deadlineDate,
         scheduleCalculationRule = toInductionScheduleCalculationRule(scheduleCalculationRule),
-        scheduleStatus = toInductionScheduleStatus(scheduleStatus),
+        scheduleStatus = inductionScheduleResourceMapper.toInductionScheduleStatus(scheduleStatus),
         createdBy = createdBy!!,
         createdByDisplayName = userService.getUserDetails(createdBy!!).name,
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
@@ -49,26 +49,5 @@ class InductionHistoryScheduleResourceMapper(
       InductionScheduleCalculationRule.EXISTING_PRISONER_INDETERMINATE_SENTENCE -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_INDETERMINATE_SENTENCE
       InductionScheduleCalculationRule.EXISTING_PRISONER_ON_REMAND -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_ON_REMAND
       InductionScheduleCalculationRule.EXISTING_PRISONER_UN_SENTENCED -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_UN_SENTENCED
-    }
-
-  private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =
-    when (inductionScheduleStatus) {
-      InductionScheduleStatus.SCHEDULED -> InductionScheduleStatusResponse.SCHEDULED
-      InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
-      InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
-      InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
-      InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_FAILED_TO_ENGAGE
-      InductionScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> InductionScheduleStatusResponse.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
-      InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_SAFETY_ISSUES
-      InductionScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> InductionScheduleStatusResponse.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
-      InductionScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> InductionScheduleStatusResponse.EXEMPT_PRISON_STAFF_REDEPLOYMENT
-      InductionScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatusResponse.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
-      InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusResponse.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
-      InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusResponse.EXEMPT_SYSTEM_TECHNICAL_ISSUE
-      InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusResponse.EXEMPT_PRISONER_TRANSFER
-      InductionScheduleStatus.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_RELEASE
-      InductionScheduleStatus.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DEATH
-      InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
-      InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
     }
 }
