@@ -32,14 +32,10 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   @Test
   fun `should process event given reason is prisoner released`() {
     // Given
-    val additionalInformation = PrisonerReleasedAdditionalInformation(
-      nomsNumber = "A1234BC",
+    val additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+      prisonNumber = "A1234BC",
       reason = RELEASED,
       prisonId = "BXI",
-      nomisMovementReasonCode = "",
-      details = null,
-      currentLocation = null,
-      currentPrisonStatus = null,
     )
     val inboundEvent = anInboundEvent(additionalInformation)
 
@@ -56,14 +52,11 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   @Test
   fun `should process event given reason is prisoner released due to death`() {
     // Given
-    val additionalInformation = PrisonerReleasedAdditionalInformation(
-      nomsNumber = "A1234BC",
+    val additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+      prisonNumber = "A1234BC",
       reason = RELEASED,
       prisonId = "BXI",
       nomisMovementReasonCode = "DEC",
-      details = null,
-      currentLocation = null,
-      currentPrisonStatus = null,
     )
     val inboundEvent = anInboundEvent(additionalInformation)
 
@@ -80,14 +73,10 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   @Test
   fun `should process event given reason is prisoner released but prisoner does not have an active Review Schedule`() {
     // Given
-    val additionalInformation = PrisonerReleasedAdditionalInformation(
-      nomsNumber = "A1234BC",
+    val additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+      prisonNumber = "A1234BC",
       reason = RELEASED,
       prisonId = "BXI",
-      nomisMovementReasonCode = "",
-      details = null,
-      currentLocation = null,
-      currentPrisonStatus = null,
     )
     val inboundEvent = anInboundEvent(additionalInformation)
 
@@ -107,14 +96,11 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   @Test
   fun `should process event given reason is prisoner released due to death but prisoner does not have an active Review Schedule`() {
     // Given
-    val additionalInformation = PrisonerReleasedAdditionalInformation(
-      nomsNumber = "A1234BC",
+    val additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+      prisonNumber = "A1234BC",
       reason = RELEASED,
       prisonId = "BXI",
       nomisMovementReasonCode = "DEC",
-      details = null,
-      currentLocation = null,
-      currentPrisonStatus = null,
     )
     val inboundEvent = anInboundEvent(additionalInformation)
 
@@ -135,14 +121,10 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   @CsvSource(value = ["TEMPORARY_ABSENCE_RELEASE", "RELEASED_TO_HOSPITAL", "SENT_TO_COURT", "TRANSFERRED", "UNKNOWN"])
   fun `should process event but not call service given reason is not a prisoner release reason that we should process`(reason: Reason) {
     // Given
-    val additionalInformation = PrisonerReleasedAdditionalInformation(
-      nomsNumber = "A1234BC",
+    val additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+      prisonNumber = "A1234BC",
       reason = reason,
       prisonId = "BXI",
-      nomisMovementReasonCode = "",
-      details = null,
-      currentLocation = null,
-      currentPrisonStatus = null,
     )
     val inboundEvent = anInboundEvent(additionalInformation)
 
