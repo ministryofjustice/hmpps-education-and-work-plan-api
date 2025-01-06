@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -43,6 +44,39 @@ class ReviewScheduleServiceTest {
     private val PRISON_NUMBER = randomValidPrisonNumber()
     private val TODAY = LocalDate.now()
     private val NOW = Instant.now()
+  }
+
+  @Nested
+  inner class GetLatestReviewScheduleForPrisoner {
+    @Test
+    fun `should get latest review schedule for prisoner`() {
+      // Given
+      val expected = aValidReviewSchedule()
+      given(reviewSchedulePersistenceAdapter.getLatestReviewSchedule(any())).willReturn(expected)
+
+      // When
+      val actual = reviewScheduleService.getLatestReviewScheduleForPrisoner(PRISON_NUMBER)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+      verify(reviewSchedulePersistenceAdapter).getLatestReviewSchedule(PRISON_NUMBER)
+    }
+
+    @Test
+    fun `should fail to get review schedule for prisoner given review schedule does not exist`() {
+      // Given
+      given(reviewSchedulePersistenceAdapter.getLatestReviewSchedule(any())).willReturn(null)
+
+      // When
+      val exception = catchThrowableOfType(ReviewScheduleNotFoundException::class.java) {
+        reviewScheduleService.getLatestReviewScheduleForPrisoner(PRISON_NUMBER)
+      }
+
+      // Then
+      assertThat(exception).hasMessage("Review Schedule not found for prisoner [$PRISON_NUMBER]")
+      assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
+      verify(reviewSchedulePersistenceAdapter).getLatestReviewSchedule(PRISON_NUMBER)
+    }
   }
 
   @Nested

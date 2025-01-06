@@ -45,16 +45,6 @@ class ReviewService(
     )
 
   /**
-   * Returns the latest [ReviewSchedule] for the prisoner identified by their prison number. The latest (most recently
-   * updated) [ReviewSchedule] is returned irrespective of status.
-   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
-   */
-  fun getLatestReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
-      prisonNumber,
-    )
-
-  /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is
    * returned if the prisoner has no Completed Reviews.
    */
