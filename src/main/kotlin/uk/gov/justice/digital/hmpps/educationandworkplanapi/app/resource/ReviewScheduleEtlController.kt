@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
@@ -34,7 +34,7 @@ class ReviewScheduleEtlController(
   private val inductionRepository: InductionRepository,
   private val actionPlanRepository: ActionPlanRepository,
   private val reviewScheduleRepository: ReviewScheduleRepository,
-  private val reviewService: ReviewService,
+  private val reviewScheduleService: ReviewScheduleService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
 ) {
 
@@ -98,7 +98,7 @@ class ReviewScheduleEtlController(
         log.debug { "Creating Review Schedule for $prisonNumber" }
 
         try {
-          reviewService.createInitialReviewSchedule(createInitialReviewScheduleDto)
+          reviewScheduleService.createInitialReviewSchedule(createInitialReviewScheduleDto)
             ?.run { prisonersWithCreatedReviewSchedules.add(prisonNumber) }
             ?: run { prisonersWithoutReviewSchedules.add(prisonNumber) }
         } catch (e: Exception) {
