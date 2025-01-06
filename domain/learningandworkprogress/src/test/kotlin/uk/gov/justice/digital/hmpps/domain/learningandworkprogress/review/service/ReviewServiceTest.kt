@@ -68,39 +68,6 @@ class ReviewServiceTest {
   }
 
   @Nested
-  inner class GetLatestReviewScheduleForPrisoner {
-    @Test
-    fun `should get latest review schedule for prisoner`() {
-      // Given
-      val expected = aValidReviewSchedule()
-      given(reviewSchedulePersistenceAdapter.getLatestReviewSchedule(any())).willReturn(expected)
-
-      // When
-      val actual = service.getLatestReviewScheduleForPrisoner(PRISON_NUMBER)
-
-      // Then
-      assertThat(actual).isEqualTo(expected)
-      verify(reviewSchedulePersistenceAdapter).getLatestReviewSchedule(PRISON_NUMBER)
-    }
-
-    @Test
-    fun `should fail to get review schedule for prisoner given review schedule does not exist`() {
-      // Given
-      given(reviewSchedulePersistenceAdapter.getLatestReviewSchedule(any())).willReturn(null)
-
-      // When
-      val exception = catchThrowableOfType(ReviewScheduleNotFoundException::class.java) {
-        service.getLatestReviewScheduleForPrisoner(PRISON_NUMBER)
-      }
-
-      // Then
-      assertThat(exception).hasMessage("Review Schedule not found for prisoner [$PRISON_NUMBER]")
-      assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
-      verify(reviewSchedulePersistenceAdapter).getLatestReviewSchedule(PRISON_NUMBER)
-    }
-  }
-
-  @Nested
   inner class GetCompletedReviewsForPrisoner {
     @Test
     fun `should get completed reviews for a prisoner`() {
