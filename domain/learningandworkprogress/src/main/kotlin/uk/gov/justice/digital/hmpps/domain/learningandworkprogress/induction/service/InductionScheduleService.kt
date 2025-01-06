@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
@@ -15,6 +16,18 @@ class InductionScheduleService(
   private val inductionScheduleDateCalculationService = InductionScheduleDateCalculationService()
 
   private val inductionScheduleStatusTransitionValidator = InductionScheduleStatusTransitionValidator()
+
+  fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =
+    inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+      ?: throw InductionScheduleNotFoundException(prisonNumber)
+
+  fun getInductionScheduleHistoryForPrisoner(prisonNumber: String): List<InductionScheduleHistory> {
+    val responses = inductionSchedulePersistenceAdapter.getInductionScheduleHistory(prisonNumber)
+
+    return responses.sortedWith(
+      compareByDescending { it.version },
+    )
+  }
 
   fun updateLatestInductionScheduleStatus(
     prisonNumber: String,
