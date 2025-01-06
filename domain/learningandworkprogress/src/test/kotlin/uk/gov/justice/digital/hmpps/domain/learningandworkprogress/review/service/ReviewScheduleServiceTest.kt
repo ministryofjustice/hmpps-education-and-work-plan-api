@@ -19,8 +19,14 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import java.time.Instant
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit.DAYS
+import java.time.temporal.ChronoUnit.MINUTES
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class ReviewScheduleServiceTest {
@@ -32,6 +38,12 @@ class ReviewScheduleServiceTest {
 
   @Mock
   private lateinit var reviewScheduleEventService: ReviewScheduleEventService
+
+  companion object {
+    private val PRISON_NUMBER = randomValidPrisonNumber()
+    private val TODAY = LocalDate.now()
+    private val NOW = Instant.now()
+  }
 
   @Nested
   inner class ExemptActiveReviewScheduleStatusDueToPrisonerRelease {
@@ -171,7 +183,7 @@ class ReviewScheduleServiceTest {
       val activeReviewSchedule = aValidReviewSchedule(
         prisonNumber = prisonNumber,
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
-        latestReviewDate = LocalDate.now().plusDays(2),
+        latestReviewDate = TODAY.plusDays(2),
       )
       given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(activeReviewSchedule)
 
@@ -180,7 +192,7 @@ class ReviewScheduleServiceTest {
         lastUpdatedAtPrison = newPrisonId,
       )
 
-      val expectedNewReviewScheduleDeadlineDate = LocalDate.now().plusDays(5)
+      val expectedNewReviewScheduleDeadlineDate = TODAY.plusDays(5)
 
       val secondUpdatedReviewSchedule = firstUpdatedReviewSchedule.copy(
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
@@ -247,6 +259,84 @@ class ReviewScheduleServiceTest {
       assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
       verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(prisonNumber)
       verifyNoInteractions(reviewScheduleEventService)
+    }
+  }
+
+  @Nested
+  inner class GetReviewSchedulesForPrisoner {
+    @Test
+    fun `should get review schedules for prisoner, sorted by last updated and version`() {
+      // Given
+      val reviewSchedule1Reference = UUID.randomUUID()
+      val reviewSchedule2Reference = UUID.randomUUID()
+      val reviewSchedule3Reference = UUID.randomUUID()
+
+      given(reviewSchedulePersistenceAdapter.getReviewScheduleHistory(any())).willReturn(
+        listOf(
+          aValidReviewScheduleHistory(
+            reference = reviewSchedule3Reference,
+            version = 2,
+            lastUpdatedAt = NOW.minus(1, MINUTES),
+          ),
+          aValidReviewScheduleHistory(
+            reference = reviewSchedule3Reference,
+            version = 1,
+            lastUpdatedAt = NOW.minus(10, MINUTES),
+          ),
+          aValidReviewScheduleHistory(
+            reference = reviewSchedule1Reference,
+            version = 2,
+            lastUpdatedAt = NOW.minus(365, DAYS),
+          ),
+          aValidReviewScheduleHistory(
+            reference = reviewSchedule2Reference,
+            version = 1,
+            lastUpdatedAt = NOW.minus(5, DAYS),
+          ),
+          aValidReviewScheduleHistory(
+            reference = reviewSchedule1Reference,
+            version = 1,
+            lastUpdatedAt = NOW.minus(400, DAYS),
+          ),
+          aValidReviewScheduleHistory(
+            reference = reviewSchedule2Reference,
+            version = 2,
+            lastUpdatedAt = NOW.minus(4, DAYS),
+          ),
+        ),
+      )
+
+      val expected = listOf(
+        // Review schedule 3 first as it's updated dates are the most recent
+        "Reference: $reviewSchedule3Reference; Version: 2",
+        "Reference: $reviewSchedule3Reference; Version: 1",
+        // Review schedule 2 next
+        "Reference: $reviewSchedule2Reference; Version: 2",
+        "Reference: $reviewSchedule2Reference; Version: 1",
+        // Review schedule 1 last as it's updated dates are the earliest
+        "Reference: $reviewSchedule1Reference; Version: 2",
+        "Reference: $reviewSchedule1Reference; Version: 1",
+      )
+
+      // When
+      val actual = reviewScheduleService.getReviewSchedulesForPrisoner(PRISON_NUMBER)
+
+      // Then
+      assertThat(actual.map { "Reference: ${it.reference}; Version: ${it.version}" }).isEqualTo(expected)
+      verify(reviewSchedulePersistenceAdapter).getReviewScheduleHistory(PRISON_NUMBER)
+    }
+
+    @Test
+    fun `should get review schedules given prisoner has no previous review schedules`() {
+      // Given
+      given(reviewSchedulePersistenceAdapter.getReviewScheduleHistory(any())).willReturn(emptyList())
+
+      // When
+      val actual = reviewScheduleService.getReviewSchedulesForPrisoner(PRISON_NUMBER)
+
+      // Then
+      assertThat(actual).isEmpty()
+      verify(reviewSchedulePersistenceAdapter).getReviewScheduleHistory(PRISON_NUMBER)
     }
   }
 }
