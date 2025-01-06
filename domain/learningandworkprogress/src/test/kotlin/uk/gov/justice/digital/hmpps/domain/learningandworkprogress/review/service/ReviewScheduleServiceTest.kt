@@ -373,4 +373,37 @@ class ReviewScheduleServiceTest {
       verify(reviewSchedulePersistenceAdapter).getReviewScheduleHistory(PRISON_NUMBER)
     }
   }
+
+  @Nested
+  inner class GetActiveReviewScheduleForPrisoner {
+    @Test
+    fun `should get active review schedule for prisoner`() {
+      // Given
+      val expected = aValidReviewSchedule()
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(expected)
+
+      // When
+      val actual = reviewScheduleService.getActiveReviewScheduleForPrisoner(PRISON_NUMBER)
+
+      // Then
+      assertThat(actual).isEqualTo(expected)
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    }
+
+    @Test
+    fun `should fail to get review schedule for prisoner given review schedule does not exist`() {
+      // Given
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
+
+      // When
+      val exception = catchThrowableOfType(ReviewScheduleNotFoundException::class.java) {
+        reviewScheduleService.getActiveReviewScheduleForPrisoner(PRISON_NUMBER)
+      }
+
+      // Then
+      assertThat(exception).hasMessage("Review Schedule not found for prisoner [$PRISON_NUMBER]")
+      assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    }
+  }
 }

@@ -28,18 +28,15 @@ import java.time.LocalDate
 import java.util.stream.Stream
 
 @ExtendWith(MockitoExtension::class)
-class ReviewServiceCreateInitialReviewScheduleTest {
+class ReviewScheduleServiceCreateInitialReviewScheduleTest {
   @InjectMocks
-  private lateinit var service: ReviewService
-
-  @Mock
-  private lateinit var reviewEventService: ReviewEventService
-
-  @Mock
-  private lateinit var reviewPersistenceAdapter: ReviewPersistenceAdapter
+  private lateinit var service: ReviewScheduleService
 
   @Mock
   private lateinit var reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter
+
+  @Mock
+  private lateinit var reviewEventService: ReviewScheduleEventService
 
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("prisonersInitialReview_testCases")

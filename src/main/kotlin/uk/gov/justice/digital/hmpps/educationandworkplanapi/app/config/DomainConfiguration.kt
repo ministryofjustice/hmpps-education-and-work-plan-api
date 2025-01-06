@@ -116,8 +116,9 @@ class DomainConfiguration {
     reviewEventService: ReviewEventService,
     reviewPersistenceAdapter: ReviewPersistenceAdapter,
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
+    reviewScheduleService: ReviewScheduleService,
   ): ReviewService =
-    ReviewService(reviewEventService, reviewPersistenceAdapter, reviewSchedulePersistenceAdapter)
+    ReviewService(reviewEventService, reviewPersistenceAdapter, reviewSchedulePersistenceAdapter, reviewScheduleService)
 
   @Bean
   fun reviewScheduleDomainService(

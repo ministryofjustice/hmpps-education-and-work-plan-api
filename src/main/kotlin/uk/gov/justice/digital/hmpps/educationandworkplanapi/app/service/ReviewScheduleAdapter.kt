@@ -4,7 +4,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
@@ -21,7 +21,7 @@ class ReviewScheduleAdapter(
   private val actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
-  private val reviewService: ReviewService,
+  private val reviewScheduleService: ReviewScheduleService,
   private val eventPublisher: EventPublisher,
   private val telemetryService: TelemetryService,
   private val timelineService: TimelineService,
@@ -43,7 +43,7 @@ class ReviewScheduleAdapter(
       isReadmission = false,
       isTransfer = false,
     )
-    val reviewSchedule = reviewService.createInitialReviewSchedule(reviewScheduleDto)
+    val reviewSchedule = reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
     if (reviewSchedule != null) {
       followOnEvents(prisonNumber, reviewSchedule)
     }
