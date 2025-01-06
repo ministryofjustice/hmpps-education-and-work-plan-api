@@ -108,7 +108,7 @@ class ReviewController(
   fun getActionPlanReviewSchedules(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ): ActionPlanReviewSchedulesResponse {
-    val reviewSchedules = reviewService.getReviewSchedulesForPrisoner(prisonNumber)
+    val reviewSchedules = reviewScheduleService.getReviewSchedulesForPrisoner(prisonNumber)
     return ActionPlanReviewSchedulesResponse(
       reviewSchedules = reviewSchedules.map { reviewScheduleHistoryResponseMapper.fromDomainToModel(it) },
     )

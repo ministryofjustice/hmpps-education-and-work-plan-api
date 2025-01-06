@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
@@ -18,6 +19,19 @@ class ReviewScheduleService(
   private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
 
   private val reviewScheduleStatusTransitionValidator = ReviewScheduleStatusTransitionValidator()
+
+  /**
+   * Returns a list of [ReviewSchedule] for the prisoner identified by their prison number.
+   */
+  fun getReviewSchedulesForPrisoner(prisonNumber: String): List<ReviewScheduleHistory> {
+    val responses = reviewSchedulePersistenceAdapter
+      .getReviewScheduleHistory(prisonNumber)
+
+    return responses.sortedWith(
+      compareByDescending<ReviewScheduleHistory> { it.lastUpdatedAt }
+        .thenByDescending { it.version },
+    )
+  }
 
   fun updateLatestReviewScheduleStatus(
     prisonNumber: String,
