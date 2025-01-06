@@ -6,8 +6,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
@@ -89,17 +87,4 @@ class InductionService(
 
       inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
     }
-
-  fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =
-    inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
-      ?: throw InductionScheduleNotFoundException(prisonNumber)
-
-  fun getInductionSchedulesForPrisoner(prisonNumber: String): List<InductionScheduleHistory> {
-    val responses = inductionSchedulePersistenceAdapter
-      .getInductionScheduleHistory(prisonNumber)
-
-    return responses.sortedWith(
-      compareByDescending<InductionScheduleHistory> { it.version },
-    )
-  }
 }
