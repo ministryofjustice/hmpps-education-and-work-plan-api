@@ -83,9 +83,8 @@ class ReviewScheduleDateCalculationService {
         // as they would fall into the "between 3 and 6 months left to serve" rule. This would mean their deadline date would be within the last
         // week before release.
         // Prisoners and CIAGs need a clear 7 days between their final review deadline and release (their last week in prison is busy), so
-        // we need to reduce the deadline date to give 7 days before release.
-        val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate!!)
-        ReviewScheduleWindow.fromOneToThreeMonthsMinusDays(8 - timeLeftToServe.days)
+        // we need to set the deadline date to be the prisoner's release date minus 7 days
+        ReviewScheduleWindow.fromOneMonthToSpecificDate(releaseDate!!.minusDays(7))
       }
 
       BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
