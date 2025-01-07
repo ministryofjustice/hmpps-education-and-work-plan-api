@@ -17,8 +17,6 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Implementation of the [CiagKpiService] with PEF (April '25 -> October '25) specific behaviours
- *
- * Enabled when the property `ciag-kpi-processing-rule` is set to `PEF` via [CiagKpiServiceFactory]
  */
 class PefCiagKpiService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
