@@ -13,5 +13,5 @@ interface ReviewRepository : JpaRepository<ReviewEntity, UUID> {
 
   @Modifying
   @Query("UPDATE ReviewEntity SET preRelease = TRUE WHERE reference = :reference")
-  fun setPreRelease(reference: UUID)
+  fun updatePreReleaseFlagToTrue(reference: UUID)
 }
