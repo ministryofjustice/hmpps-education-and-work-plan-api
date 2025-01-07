@@ -22,6 +22,7 @@ data class CompletedReview(
   val updatedAtPrison: String,
   val conductedBy: ReviewConductedBy?,
   val reviewScheduleReference: UUID?,
+  val preRelease: Boolean,
 )
 
 data class ReviewConductedBy(
