@@ -21,6 +21,7 @@ fun aValidCompletedReview(
   updatedAtPrison: String = "BXI",
   conductedBy: ReviewConductedBy? = ReviewConductedBy(name = "Barnie Jones", role = "Peer mentor"),
   reviewScheduleReference: UUID? = null,
+  preRelease: Boolean = false,
 ): CompletedReview =
   CompletedReview(
     reference = reference,
@@ -36,4 +37,5 @@ fun aValidCompletedReview(
     updatedBy = updatedBy,
     updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
+    preRelease = preRelease,
   )

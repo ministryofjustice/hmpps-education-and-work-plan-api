@@ -52,4 +52,9 @@ class JpaReviewPersistenceAdapter(
 
       reviewEntityMapper.fromEntityToDomain(completedReviewEntity, noteEntity)
     }
+
+  @Transactional
+  override fun setPreRelease(reference: UUID) {
+    reviewRepository.setPreRelease(reference)
+  }
 }

@@ -144,4 +144,14 @@ class CompletedActionPlanReviewResponseAssert(actual: CompletedActionPlanReviewR
     }
     return this
   }
+
+  fun wasPreRelease(): CompletedActionPlanReviewResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (!preRelease) {
+        failWithMessage("Expected review to be pre release but was not")
+      }
+    }
+    return this
+  }
 }

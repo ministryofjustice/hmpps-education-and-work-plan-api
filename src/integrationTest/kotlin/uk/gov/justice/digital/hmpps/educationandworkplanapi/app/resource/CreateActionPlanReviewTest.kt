@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
@@ -260,5 +261,63 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       assertThat(reviewCompleteEventProperties)
         .containsEntry("reference", reviews.completedReviews.first().reference.toString())
     }
+  }
+
+  @Test
+  fun `should create a pre release review`() {
+    // Given
+    val earliestCreationTime = OffsetDateTime.now()
+    val prisonerNumber = randomValidPrisonNumber()
+
+    val prisonerFromApi = aValidPrisoner(
+      prisonerNumber = prisonerNumber,
+      legalStatus = LegalStatus.SENTENCED,
+      releaseDate = LocalDate.now().plusMonths(1),
+    )
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
+    val reviewSchedule = createReviewScheduleRecord(prisonNumber)
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidCreateActionPlanReviewRequest(
+          prisonId = "MDI",
+          conductedBy = "Barnie Jones",
+          conductedByRole = "Peer mentor",
+          note = "A great review today; prisoner is making good progress towards his goals",
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated
+      .returnResult(CreateActionPlanReviewResponse::class.java)
+
+    // Then
+    val reviews = getActionPlanReviews(prisonNumber)
+    assertThat(reviews)
+      .hasNumberOfCompletedReviews(1)
+      .completedReview(1) {
+        it.wasPreRelease()
+        it.wasCreatedAtOrAfter(earliestCreationTime)
+          .wasCreatedBy("auser_gen")
+          .wasCreatedByDisplayName("Albert User")
+          .wasCreatedAtPrison("MDI")
+          .wasCompletedOn(LocalDate.now())
+          .hadDeadlineDateOf(LocalDate.now().plusMonths(1))
+          .wasConductedBy("Barnie Jones")
+          .wasConductedByRole("Peer mentor")
+          .note {
+            it.wasCreatedAtOrAfter(earliestCreationTime)
+              .wasCreatedBy("auser_gen")
+              .wasCreatedByDisplayName("Albert User")
+              .wasCreatedAtPrison("MDI")
+              .hasType(NoteType.REVIEW)
+              .hasContent("A great review today; prisoner is making good progress towards his goals")
+          }
+      }
   }
 }

@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
+import java.util.UUID
 
 interface ReviewPersistenceAdapter {
   /**
@@ -15,4 +16,5 @@ interface ReviewPersistenceAdapter {
    * Creates and returns a new [CompletedReview] using the specified [CreateCompletedReviewDto] and [ReviewSchedule].
    */
   fun createCompletedReview(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): CompletedReview
+  fun setPreRelease(reference: UUID)
 }
