@@ -3131,6 +3131,7 @@ components:
         - createdByDisplayName
         - createdAt
         - createdAtPrison
+        - preRelease
 
     ScheduledActionPlanReviewResponse:
       title: ScheduledActionPlanReviewResponse
