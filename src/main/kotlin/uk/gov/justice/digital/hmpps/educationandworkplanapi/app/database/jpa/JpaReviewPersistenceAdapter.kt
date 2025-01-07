@@ -54,7 +54,7 @@ class JpaReviewPersistenceAdapter(
     }
 
   @Transactional
-  override fun setPreRelease(reference: UUID) {
+  override fun markCompletedReviewAsThePrisonersPreReleaseReview(reference: UUID) {
     reviewRepository.setPreRelease(reference)
   }
 }

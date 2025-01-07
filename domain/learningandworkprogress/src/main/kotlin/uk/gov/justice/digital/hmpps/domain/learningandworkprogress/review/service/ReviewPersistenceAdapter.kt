@@ -16,5 +16,5 @@ interface ReviewPersistenceAdapter {
    * Creates and returns a new [CompletedReview] using the specified [CreateCompletedReviewDto] and [ReviewSchedule].
    */
   fun createCompletedReview(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): CompletedReview
-  fun setPreRelease(reference: UUID)
+  fun markCompletedReviewAsThePrisonersPreReleaseReview(reference: UUID)
 }

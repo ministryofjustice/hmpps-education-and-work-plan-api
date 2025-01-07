@@ -99,7 +99,7 @@ class ReviewService(
         } ?: let {
           // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
           // update the completed review to have preRelease flag set to true:
-          reviewPersistenceAdapter.setPreRelease(completedReview.reference)
+          reviewPersistenceAdapter.markCompletedReviewAsThePrisonersPreReleaseReview(completedReview.reference)
           completedReviewSchedule!!
         },
       ).also {
