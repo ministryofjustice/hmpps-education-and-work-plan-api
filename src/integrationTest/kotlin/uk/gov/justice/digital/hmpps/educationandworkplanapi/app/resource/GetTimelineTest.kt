@@ -189,7 +189,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline with multiple events in order`() {
     // Given
-    val prisonNumber = randomValidPrisonNumber()
+    val prisonNumber = "A1234BC" // MUST be "A1234BC" in order to match the "get prisoner" wiremock stub (resources/simulations/mappings/prisoner.json - ref: `urlPattern: /prisoner/.*` )
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(

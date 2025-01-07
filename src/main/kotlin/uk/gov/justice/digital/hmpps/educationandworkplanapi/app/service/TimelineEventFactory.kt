@@ -2,13 +2,45 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.COMPLETE
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.NOT_STARTED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.GOAL_ARCHIVED_REASON
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.GOAL_ARCHIVED_REASON_OTHER
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.GOAL_TITLE
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_DEADLINE_DATE
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_DEADLINE_NEW
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_DEADLINE_OLD
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_EXEMPTION_REASON
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_STATUS
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_STATUS_NEW
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.INDUCTION_SCHEDULE_STATUS_OLD
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_DEADLINE_NEW
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_DEADLINE_OLD
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_EXEMPTION_REASON
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_STATUS_NEW
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.REVIEW_SCHEDULE_STATUS_OLD
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.STEP_TITLE
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_ARCHIVED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_COMPLETED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_UNARCHIVED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_UPDATED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.INDUCTION_SCHEDULE_CREATED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.INDUCTION_SCHEDULE_STATUS_UPDATED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.STEP_COMPLETED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.STEP_NOT_STARTED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.STEP_STARTED
 import java.util.UUID
 
 /**
@@ -40,7 +72,7 @@ class TimelineEventFactory {
       goal = goal,
       sourceReference = goal.reference,
       eventType = TimelineEventType.GOAL_CREATED,
-      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goal.title),
+      contextualInfo = mapOf(GOAL_TITLE to goal.title),
       correlationId = correlationId,
     )
 
@@ -65,8 +97,8 @@ class TimelineEventFactory {
         buildTimelineEvent(
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
-          eventType = TimelineEventType.GOAL_UPDATED,
-          contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
+          eventType = GOAL_UPDATED,
+          contextualInfo = mapOf(GOAL_TITLE to updatedGoal.title),
           correlationId = correlationId,
         ),
       )
@@ -81,8 +113,8 @@ class TimelineEventFactory {
         buildTimelineEvent(
           goal = updatedGoal,
           sourceReference = updatedGoal.reference,
-          eventType = TimelineEventType.GOAL_UPDATED,
-          contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
+          eventType = GOAL_UPDATED,
+          contextualInfo = mapOf(GOAL_TITLE to updatedGoal.title),
           correlationId = correlationId,
         ),
       )
@@ -99,11 +131,11 @@ class TimelineEventFactory {
     buildTimelineEvent(
       goal = goal,
       sourceReference = goal.reference,
-      eventType = TimelineEventType.GOAL_ARCHIVED,
+      eventType = GOAL_ARCHIVED,
       contextualInfo = listOfNotNull(
-        TimelineEventContext.GOAL_TITLE to goal.title,
-        TimelineEventContext.GOAL_ARCHIVED_REASON to goal.archiveReason!!.toString(),
-        goal.archiveReasonOther?.let { TimelineEventContext.GOAL_ARCHIVED_REASON_OTHER to it },
+        GOAL_TITLE to goal.title,
+        GOAL_ARCHIVED_REASON to goal.archiveReason!!.toString(),
+        goal.archiveReasonOther?.let { GOAL_ARCHIVED_REASON_OTHER to it },
       ).toMap(),
       correlationId = correlationId,
     )
@@ -112,8 +144,8 @@ class TimelineEventFactory {
     buildTimelineEvent(
       goal = goal,
       sourceReference = goal.reference,
-      eventType = TimelineEventType.GOAL_COMPLETED,
-      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goal.title),
+      eventType = GOAL_COMPLETED,
+      contextualInfo = mapOf(GOAL_TITLE to goal.title),
       correlationId = correlationId,
     )
 
@@ -121,8 +153,8 @@ class TimelineEventFactory {
     buildTimelineEvent(
       goal = goal,
       sourceReference = goal.reference,
-      eventType = TimelineEventType.GOAL_UNARCHIVED,
-      contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to goal.title),
+      eventType = GOAL_UNARCHIVED,
+      contextualInfo = mapOf(GOAL_TITLE to goal.title),
       correlationId = correlationId,
     )
 
@@ -147,7 +179,7 @@ class TimelineEventFactory {
             goal = updatedGoal,
             sourceReference = previousStep!!.reference,
             eventType = getStepStatusEventType(it),
-            contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to it.title),
+            contextualInfo = mapOf(STEP_TITLE to it.title),
             correlationId = correlationId,
           ),
         )
@@ -158,7 +190,7 @@ class TimelineEventFactory {
             goal = updatedGoal,
             sourceReference = previousStep!!.reference,
             eventType = TimelineEventType.STEP_UPDATED,
-            contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to it.title),
+            contextualInfo = mapOf(STEP_TITLE to it.title),
             correlationId = correlationId,
           ),
         )
@@ -181,9 +213,9 @@ class TimelineEventFactory {
 
   private fun getStepStatusEventType(step: Step): TimelineEventType {
     val eventType = when (step.status) {
-      StepStatus.NOT_STARTED -> TimelineEventType.STEP_NOT_STARTED
-      StepStatus.ACTIVE -> TimelineEventType.STEP_STARTED
-      StepStatus.COMPLETE -> TimelineEventType.STEP_COMPLETED
+      NOT_STARTED -> STEP_NOT_STARTED
+      ACTIVE -> STEP_STARTED
+      COMPLETE -> STEP_COMPLETED
     }
     return eventType
   }
@@ -205,20 +237,81 @@ class TimelineEventFactory {
       correlationId = correlationId,
     )
 
-  fun inductionScheduleTimelineEvent(
+  fun inductionScheduleCreatedTimelineEvent(
     inductionSchedule: InductionSchedule,
-    eventType: TimelineEventType,
     correlationId: UUID = UUID.randomUUID(),
   ) =
-    TimelineEvent.newTimelineEvent(
-      sourceReference = inductionSchedule.reference.toString(),
-      eventType = eventType,
-      prisonId = "N/A",
-      actionedBy = inductionSchedule.lastUpdatedBy!!,
-      contextualInfo = mapOf(
-        TimelineEventContext.INDUCTION_SCHEDULE_STATUS to inductionSchedule.scheduleStatus.name,
-        TimelineEventContext.INDUCTION_SCHEDULE_DEADLINE_DATE to inductionSchedule.deadlineDate.toString(),
-      ),
-      correlationId = correlationId,
-    )
+    with(inductionSchedule) {
+      TimelineEvent.newTimelineEvent(
+        sourceReference = reference.toString(),
+        eventType = INDUCTION_SCHEDULE_CREATED,
+        prisonId = "N/A",
+        actionedBy = lastUpdatedBy!!,
+        contextualInfo = mapOf(
+          INDUCTION_SCHEDULE_STATUS to scheduleStatus.name,
+          INDUCTION_SCHEDULE_DEADLINE_DATE to deadlineDate.toString(),
+        ),
+        correlationId = correlationId,
+      )
+    }
+
+  fun inductionScheduleStatusUpdatedEvent(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus): TimelineEvent =
+    with(updatedInductionScheduleStatus) {
+      TimelineEvent.newTimelineEvent(
+        sourceReference = reference.toString(),
+        eventType = INDUCTION_SCHEDULE_STATUS_UPDATED,
+        actionedBy = updatedBy,
+        timestamp = updatedAt,
+        prisonId = "N/A",
+        contextualInfo = mapOf(
+          INDUCTION_SCHEDULE_STATUS_OLD to oldStatus.name,
+          INDUCTION_SCHEDULE_STATUS_NEW to newStatus.name,
+          INDUCTION_SCHEDULE_DEADLINE_OLD to oldDeadlineDate.toString(),
+          INDUCTION_SCHEDULE_DEADLINE_NEW to newDeadlineDate.toString(),
+          *exemptionReason
+            ?.let {
+              arrayOf(INDUCTION_SCHEDULE_EXEMPTION_REASON to it)
+            } ?: arrayOf(),
+        ),
+      )
+    }
+
+  fun reviewScheduleCreatedTimelineEvent(
+    reviewSchedule: ReviewSchedule,
+    correlationId: UUID = UUID.randomUUID(),
+  ) =
+    with(reviewSchedule) {
+      TimelineEvent.newTimelineEvent(
+        sourceReference = reference.toString(),
+        eventType = ACTION_PLAN_REVIEW_SCHEDULE_CREATED,
+        prisonId = createdAtPrison,
+        actionedBy = createdBy,
+        timestamp = createdAt,
+        contextualInfo = mapOf(
+          REVIEW_SCHEDULE_STATUS_NEW to scheduleStatus.name,
+          REVIEW_SCHEDULE_DEADLINE_NEW to reviewScheduleWindow.dateTo.toString(),
+        ),
+      )
+    }
+
+  fun reviewScheduleStatusUpdatedTimelineEvent(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus): TimelineEvent =
+    with(updatedReviewScheduleStatus) {
+      TimelineEvent.newTimelineEvent(
+        sourceReference = reference.toString(),
+        eventType = ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED,
+        prisonId = updatedAtPrison,
+        actionedBy = updatedBy,
+        timestamp = updatedAt,
+        contextualInfo = mapOf(
+          REVIEW_SCHEDULE_STATUS_OLD to oldStatus.name,
+          REVIEW_SCHEDULE_STATUS_NEW to newStatus.name,
+          REVIEW_SCHEDULE_DEADLINE_OLD to oldReviewDate.toString(),
+          REVIEW_SCHEDULE_DEADLINE_NEW to newReviewDate.toString(),
+          *exemptionReason
+            ?.let {
+              arrayOf(REVIEW_SCHEDULE_EXEMPTION_REASON to it)
+            } ?: arrayOf(),
+        ),
+      )
+    }
 }
