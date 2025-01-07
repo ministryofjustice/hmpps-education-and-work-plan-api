@@ -1,19 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi
 
 import mu.KotlinLogging
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
-import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -28,16 +23,13 @@ private val log = KotlinLogging.logger {}
 class PefCiagKpiService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionPersistenceAdapter: InductionPersistenceAdapter,
-  private val eventPublisher: EventPublisher,
-  private val telemetryService: TelemetryService,
-  private val timelineService: TimelineService,
-  private val timelineEventFactory: TimelineEventFactory,
   private val reviewScheduleAdapter: ReviewScheduleAdapter,
+  private val inductionScheduleEventService: InductionScheduleEventService,
 
 ) : CiagKpiService() {
 
   /**
-   * Process an prisoner admission.
+   * Process a prisoner admission.
    *
    * - If the prisoner is brand new create a new Induction schedule
    * - If the prisoner already has an incomplete induction schedule (this will most likely be
@@ -73,9 +65,7 @@ class PefCiagKpiService(
         InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       ),
     )
-    eventPublisher.createAndPublishInductionEvent(prisonNumber)
-    telemetryService.trackInductionScheduleCreated(inductionSchedule)
-    recordInductionTimelineEvent(inductionSchedule)
+    inductionScheduleEventService.inductionScheduleCreated(inductionSchedule)
   }
 
   private fun activeInductionScheduleAlreadyExists(prisonNumber: String): Boolean {
@@ -92,14 +82,6 @@ class PefCiagKpiService(
       log.info { "Induction already exists for prisoner [$prisonNumber]. Creating a review schedule." }
       true
     } ?: false
-  }
-
-  private fun recordInductionTimelineEvent(inductionSchedule: InductionSchedule) {
-    val timelineEvent = timelineEventFactory.inductionScheduleTimelineEvent(
-      inductionSchedule,
-      TimelineEventType.INDUCTION_SCHEDULE_CREATED,
-    )
-    timelineService.recordTimelineEvent(inductionSchedule.prisonNumber, timelineEvent)
   }
 
   // This function will need to calculate the deadline date initially this will be the date the prisoner entered
