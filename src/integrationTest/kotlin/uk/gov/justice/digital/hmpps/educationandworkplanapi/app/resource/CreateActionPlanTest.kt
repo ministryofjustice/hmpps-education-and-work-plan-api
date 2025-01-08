@@ -188,8 +188,10 @@ class CreateActionPlanTest : IntegrationTestBase() {
     assertThat(actionPlan)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(2)
-      // Because the goals are returned in date created order, the first goal in the response will be Goal 2, because it was the most recently created.
-      .goal(1) {
+      // Because the goals are returned in date created order, the first goal in the response SHOULD be Goal 2, because it was the most recently created.
+      // Sometimes however CI runs fast enough that the 2 goals created have the same timestamp and therefore the ordering is indeterminate,
+      // hence we have to assert that either the first or second is Goal 2
+      .anyOfGoalNumber(1, 2) {
         it.hasTitle("Goal 2")
           .hasNumberOfSteps(1)
           .step(1) {
@@ -198,8 +200,10 @@ class CreateActionPlanTest : IntegrationTestBase() {
           }
           .hasGoalNote("Goal2 notes")
       }
-      // The 2nd goal in the response data is the first goal to have been created
-      .goal(2) {
+      // The 2nd goal in the response data SHOULD be the first goal to have been created.
+      // Sometimes however CI runs fast enough that the 2 goals created have the same timestamp and therefore the ordering is indeterminate,
+      // hence we have to assert that either the first or second is Goal 1
+      .anyOfGoalNumber(1, 2) {
         it.hasTitle("Goal 1")
           .hasNumberOfSteps(1)
           .step(1) {

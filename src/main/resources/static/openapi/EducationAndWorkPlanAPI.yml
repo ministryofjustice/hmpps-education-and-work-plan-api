@@ -3118,6 +3118,10 @@ components:
             
             Only populated if the person who conducted the Review was not the person who keyed it into the system.
           example: 'Peer mentor'
+        preRelease:
+          type: boolean
+          default: false
+          description: This was the last review before the prisoner was due to be released.
       required:
         - reference
         - deadlineDate
@@ -3127,6 +3131,7 @@ components:
         - createdByDisplayName
         - createdAt
         - createdAtPrison
+        - preRelease
 
     ScheduledActionPlanReviewResponse:
       title: ScheduledActionPlanReviewResponse

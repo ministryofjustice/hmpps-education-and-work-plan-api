@@ -49,6 +49,9 @@ class ReviewServiceCreateReviewTest {
   @Mock
   private lateinit var reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter
 
+  @Mock
+  private lateinit var reviewScheduleService: ReviewScheduleService
+
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("notPrisonersLastReview_testCases")
   fun `should create a review and create a new review schedule given this is not the prisoner's last review`(
@@ -73,7 +76,7 @@ class ReviewServiceCreateReviewTest {
     val activeReviewSchedule = aValidReviewSchedule(
       latestReviewDate = TODAY.plusDays(10),
     )
-    given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(activeReviewSchedule)
+    given(reviewScheduleService.getActiveReviewScheduleForPrisoner(any())).willReturn(activeReviewSchedule)
     val updatedReviewSchedule = activeReviewSchedule.copy(scheduleStatus = ReviewScheduleStatus.COMPLETED)
     given(reviewSchedulePersistenceAdapter.updateReviewSchedule(any())).willReturn(updatedReviewSchedule)
 
@@ -94,7 +97,7 @@ class ReviewServiceCreateReviewTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
-    verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(PRISON_NUMBER)
 
     val updateReviewScheduleCaptor = argumentCaptor<UpdateReviewScheduleDto>()
     verify(reviewSchedulePersistenceAdapter).updateReviewSchedule(updateReviewScheduleCaptor.capture())
@@ -143,7 +146,7 @@ class ReviewServiceCreateReviewTest {
     val activeReviewSchedule = aValidReviewSchedule(
       latestReviewDate = TODAY.plusDays(10),
     )
-    given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(activeReviewSchedule)
+    given(reviewScheduleService.getActiveReviewScheduleForPrisoner(any())).willReturn(activeReviewSchedule)
     val updatedReviewSchedule = activeReviewSchedule.copy(scheduleStatus = ReviewScheduleStatus.COMPLETED)
     given(reviewSchedulePersistenceAdapter.updateReviewSchedule(any())).willReturn(updatedReviewSchedule)
 
@@ -161,7 +164,7 @@ class ReviewServiceCreateReviewTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
-    verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(PRISON_NUMBER)
     verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
 
     val updateReviewScheduleCaptor = argumentCaptor<UpdateReviewScheduleDto>()
@@ -182,6 +185,7 @@ class ReviewServiceCreateReviewTest {
     }
 
     verify(reviewSchedulePersistenceAdapter, never()).createReviewSchedule(any())
+    verify(reviewPersistenceAdapter).markCompletedReviewAsThePrisonersPreReleaseReview(completedReview.reference)
     verify(reviewEventService).reviewCompleted(completedReview)
   }
 
@@ -195,7 +199,8 @@ class ReviewServiceCreateReviewTest {
       prisonerSentenceType = SentenceType.SENTENCED,
     )
 
-    given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
+    given(reviewScheduleService.getActiveReviewScheduleForPrisoner(any()))
+      .willThrow(ReviewScheduleNotFoundException(PRISON_NUMBER))
 
     // When
     val exception = catchThrowableOfType(ReviewScheduleNotFoundException::class.java) {
@@ -204,7 +209,7 @@ class ReviewServiceCreateReviewTest {
 
     // Then
     assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
-    verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(PRISON_NUMBER)
     verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
     verifyNoInteractions(reviewPersistenceAdapter)
     verifyNoInteractions(reviewEventService)
@@ -226,7 +231,7 @@ class ReviewServiceCreateReviewTest {
     val activeReviewSchedule = aValidReviewSchedule(
       latestReviewDate = TODAY.plusDays(10),
     )
-    given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(activeReviewSchedule)
+    given(reviewScheduleService.getActiveReviewScheduleForPrisoner(any())).willReturn(activeReviewSchedule)
 
     // When
     val exception = catchThrowableOfType(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java) {
@@ -275,22 +280,22 @@ class ReviewServiceCreateReviewTest {
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
         Arguments.of(
-          "prisoner has 3 months 1 day left to serve - next review 1 to 3 months minus 7 days",
+          "prisoner has 3 months 1 day left to serve - next review 1 month to release date minus 7 days",
           TODAY.plusMonths(3).plusDays(1),
           SentenceType.SENTENCED,
           false,
           false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
-          ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(7)),
+          ReviewScheduleWindow(TODAY.plusMonths(1), (TODAY.plusMonths(3).plusDays(1)).minusDays(7)),
         ),
         Arguments.of(
-          "prisoner has 3 months 7 days left to serve - next review 1 to 3 months minus 1 day",
+          "prisoner has 3 months 7 days left to serve - next review 1 month to release date minus 7 days",
           TODAY.plusMonths(3).plusDays(7),
           SentenceType.SENTENCED,
           false,
           false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
-          ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(1)),
+          ReviewScheduleWindow(TODAY.plusMonths(1), (TODAY.plusMonths(3).plusDays(7)).minusDays(7)),
         ),
         Arguments.of(
           "prisoner has between 3 months 8 days and 6 months left to serve - next review 1 to 3 months",

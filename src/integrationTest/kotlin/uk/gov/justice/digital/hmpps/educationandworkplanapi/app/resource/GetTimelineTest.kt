@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidSignificantMovementAdmission
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidTransferDetail
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -190,6 +191,10 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline with multiple events in order`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
+
+    val prisonerFromApi = aValidPrisoner(prisonerNumber = prisonNumber)
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(

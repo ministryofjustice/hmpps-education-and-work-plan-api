@@ -1,20 +1,15 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service
 
 import mu.KotlinLogging
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.INDETERMINATE_SENTENCE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.RECALL
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CompletedReviewDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateCompletedReviewDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.effectiveSentenceType
 
 private val log = KotlinLogging.logger {}
 
@@ -31,42 +26,10 @@ class ReviewService(
   private val reviewEventService: ReviewEventService,
   private val reviewPersistenceAdapter: ReviewPersistenceAdapter,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
+  private val reviewScheduleService: ReviewScheduleService,
 ) {
 
   private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
-
-  /**
-   * Returns the active [ReviewSchedule] for the prisoner identified by their prison number, where "active" is defined
-   * as not having the status "COMPLETED".
-   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
-   */
-  fun getActiveReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
-      prisonNumber,
-    )
-
-  /**
-   * Returns the latest [ReviewSchedule] for the prisoner identified by their prison number. The latest (most recently
-   * updated) [ReviewSchedule] is returned irrespective of status.
-   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
-   */
-  fun getLatestReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
-      prisonNumber,
-    )
-
-  /**
-   * Returns a list of [ReviewSchedule] for the prisoner identified by their prison number.
-   */
-  fun getReviewSchedulesForPrisoner(prisonNumber: String): List<ReviewScheduleHistory> {
-    val responses = reviewSchedulePersistenceAdapter
-      .getReviewScheduleHistory(prisonNumber)
-
-    return responses.sortedWith(
-      compareByDescending<ReviewScheduleHistory> { it.lastUpdatedAt }
-        .thenByDescending { it.version },
-    )
-  }
 
   /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is
@@ -98,7 +61,7 @@ class ReviewService(
       val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
 
       // Get the active review schedule
-      val currentReviewSchedule = getActiveReviewScheduleForPrisoner(prisonNumber)
+      val currentReviewSchedule = reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber)
 
       // Persist a new CompletedReview
       val completedReview = reviewPersistenceAdapter.createCompletedReview(
@@ -135,70 +98,12 @@ class ReviewService(
           )
         } ?: let {
           // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
+          // update the completed review to have preRelease flag set to true:
+          reviewPersistenceAdapter.markCompletedReviewAsThePrisonersPreReleaseReview(completedReview.reference)
           completedReviewSchedule!!
         },
       ).also {
         reviewEventService.reviewCompleted(it.completedReview)
       }
-    }
-
-  /**
-   * Creates and returns the prisoner's initial [ReviewSchedule].
-   * Returns null if the prisoner has less than 3 months to serve, in which case no Review is necessary and one is not
-   * scheduled for them.
-   *
-   * To create a new [ReviewSchedule] the prisoner is required to have a release date for most sentence types. The
-   * exception to this are sentence types REMAND, CONVICTED_UNSENTENCED and INDETERMINATE_SENTENCE. All other sentence
-   * types require a release date. Throws a [ReviewScheduleNoReleaseDateForSentenceTypeException] if this condition
-   * is not satisfied.
-   */
-  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? =
-    with(createInitialReviewScheduleDto) {
-      val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
-
-      // Check for an existing active review schedule
-      val existingReviewSchedule = runCatching {
-        getActiveReviewScheduleForPrisoner(prisonNumber)
-      }.getOrNull()
-
-      if (existingReviewSchedule != null) {
-        throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
-      }
-
-      // Calculate the review schedule window and rule
-      val releaseDate = prisonerReleaseDate
-      val reviewScheduleCalculationRule = reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
-        prisonNumber = prisonNumber,
-        sentenceType = sentenceType,
-        releaseDate = releaseDate,
-        isReAdmission = isReadmission,
-        isTransfer = isTransfer,
-      )
-      // Persist the initial review schedule if a ReviewScheduleWindow is calculated
-      reviewScheduleDateCalculationService.calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
-        ?.let {
-          reviewSchedulePersistenceAdapter.createReviewSchedule(
-            CreateReviewScheduleDto(
-              prisonNumber = prisonNumber,
-              prisonId = prisonId,
-              reviewScheduleWindow = it,
-              scheduleCalculationRule = reviewScheduleCalculationRule,
-            ),
-          )
-        }
-    }
-
-  /**
-   * Return the prisoner's effective sentence type.
-   * There is an order or precedence:
-   *   * If they have the `isIndeterminate` flag set, they are considered INDETERMINATE_SENTENCE, regardless of anything else
-   *   * If they have the `isRecall` flag set, they are considered RECALL
-   *   * Else return the sentence type from the prisoner record
-   */
-  private fun effectiveSentenceType(prisonerSentenceType: SentenceType, prisonerHasIndeterminateFlag: Boolean, prisonerHasRecallFlag: Boolean) =
-    when {
-      prisonerHasIndeterminateFlag -> INDETERMINATE_SENTENCE
-      prisonerHasRecallFlag -> RECALL
-      else -> prisonerSentenceType
     }
 }

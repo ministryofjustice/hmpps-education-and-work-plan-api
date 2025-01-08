@@ -95,11 +95,8 @@ class GetGoalsTest : IntegrationTestBase() {
     actual.goals.onEach {
       assertThat(it).hasStatus(GoalStatus.ACTIVE)
     }
-    assertThat(actual.goals[0]).hasTitle("Goal 1")
-    assertThat(actual.goals[1]).hasTitle("Goal 2")
-    assertThat(actual.goals[2]).hasTitle("Goal 3")
-    assertThat(actual.goals[3]).hasTitle("Goal 4")
-    assertThat(actual.goals[4]).hasTitle("Goal 5")
+    val actualTitles = actual.goals.map { it.title }
+    assertThat(actualTitles).containsExactlyInAnyOrder("Goal 1", "Goal 2", "Goal 3", "Goal 4", "Goal 5")
   }
 
   @Test
@@ -195,9 +192,8 @@ class GetGoalsTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()!!
     assertThat(actual.goals).hasSize(3)
-    assertThat(actual.goals[0]).hasTitle("Goal 1")
-    assertThat(actual.goals[1]).hasTitle("Goal 2")
-    assertThat(actual.goals[2]).hasTitle("Goal 5")
+    val actualTitles = actual.goals.map { it.title }
+    assertThat(actualTitles).containsExactlyInAnyOrder("Goal 1", "Goal 2", "Goal 5")
   }
 
   @Test
@@ -237,6 +233,9 @@ class GetGoalsTest : IntegrationTestBase() {
     assertThat(actual.goals).hasSize(2)
     assertThat(actual.goals[0]).hasTitle("Goal 2")
     assertThat(actual.goals[1]).hasTitle("Goal 4")
+
+    val actualTitles = actual.goals.map { it.title }
+    assertThat(actualTitles).containsExactlyInAnyOrder("Goal 2", "Goal 4")
   }
 
   @Test

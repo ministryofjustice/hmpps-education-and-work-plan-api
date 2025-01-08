@@ -155,7 +155,7 @@ class TelemetryService(
     )
   }
 
-  fun trackReviewScheduleStatusCreated(reviewSchedule: ReviewSchedule) {
+  fun trackReviewScheduleCreated(reviewSchedule: ReviewSchedule) {
     telemetryClient.trackEvent(
       ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED.value,
       ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED.customDimensions(reviewSchedule),

@@ -70,8 +70,8 @@ data class ReviewScheduleWindow(
     fun fromOneToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
       ReviewScheduleWindow(plusMonths(1), plusMonths(3))
     }
-    fun fromOneToThreeMonthsMinusDays(daysToSubtract: Int): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(1), plusMonths(3).minusDays(daysToSubtract.toLong()))
+    fun fromOneMonthToSpecificDate(dateTo: LocalDate): ReviewScheduleWindow = with(LocalDate.now()) {
+      ReviewScheduleWindow(plusMonths(1), dateTo)
     }
     fun fromTwoToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
       ReviewScheduleWindow(plusMonths(2), plusMonths(3))

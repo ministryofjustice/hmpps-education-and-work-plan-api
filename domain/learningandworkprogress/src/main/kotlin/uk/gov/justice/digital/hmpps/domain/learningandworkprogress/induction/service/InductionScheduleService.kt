@@ -1,21 +1,33 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import java.time.LocalDate
 
-private const val EXEMPTION_ADDITIONAL_DAYS = 5L
-private const val EXCLUSION_ADDITIONAL_DAYS = 10L
-private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
 class InductionScheduleService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionScheduleEventService: InductionScheduleEventService,
 ) {
 
+  private val inductionScheduleDateCalculationService = InductionScheduleDateCalculationService()
+
   private val inductionScheduleStatusTransitionValidator = InductionScheduleStatusTransitionValidator()
+
+  fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =
+    inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+      ?: throw InductionScheduleNotFoundException(prisonNumber)
+
+  fun getInductionScheduleHistoryForPrisoner(prisonNumber: String): List<InductionScheduleHistory> {
+    val responses = inductionSchedulePersistenceAdapter.getInductionScheduleHistory(prisonNumber)
+
+    return responses.sortedWith(
+      compareByDescending { it.version },
+    )
+  }
 
   fun updateLatestInductionScheduleStatus(
     prisonNumber: String,
@@ -68,12 +80,12 @@ class InductionScheduleService(
     inductionSchedule: InductionSchedule,
     prisonNumber: String,
   ) {
-    val newInductionDate = calculateNewInductionDate(inductionSchedule)
+    val adjustedInductionDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
     val updatedInductionSchedule = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
         reference = inductionSchedule.reference,
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
-        latestDeadlineDate = newInductionDate,
+        latestDeadlineDate = adjustedInductionDate,
         prisonNumber = prisonNumber,
       ),
     )
@@ -104,13 +116,13 @@ class InductionScheduleService(
       oldDeadlineDate = inductionSchedule.deadlineDate,
     )
 
-    // Then update the induction schedule to be SCHEDULED with a new induction date
-    val newInductionDate = calculateNewInductionDate(inductionSchedule, SYSTEM_OUTAGE_ADDITIONAL_DAYS)
+    // Then update the induction schedule to be SCHEDULED with an adjusted induction date
+    val adjustedInductionDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(updatedInductionScheduleFirst)
     val updatedInductionScheduleSecond = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
         reference = inductionSchedule.reference,
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
-        latestDeadlineDate = newInductionDate,
+        latestDeadlineDate = adjustedInductionDate,
         prisonNumber = prisonNumber,
       ),
     )
@@ -119,22 +131,6 @@ class InductionScheduleService(
       oldStatus = inductionSchedule.scheduleStatus,
       oldDeadlineDate = inductionSchedule.deadlineDate,
     )
-  }
-
-  private fun calculateNewInductionDate(
-    inductionSchedule: InductionSchedule,
-    additionalDays: Long = getExtensionDays(inductionSchedule.scheduleStatus),
-  ): LocalDate? {
-    val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
-    return maxOf(todayPlusAdditionalDays, inductionSchedule.deadlineDate)
-  }
-
-  private fun getExtensionDays(status: InductionScheduleStatus): Long {
-    return when {
-      status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
-      status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-      else -> 0 // Default case, if no condition matches
-    }
   }
 
   private fun performFollowOnEvents(

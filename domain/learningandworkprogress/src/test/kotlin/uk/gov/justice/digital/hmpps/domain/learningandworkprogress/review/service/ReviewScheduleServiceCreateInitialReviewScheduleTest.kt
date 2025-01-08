@@ -28,18 +28,15 @@ import java.time.LocalDate
 import java.util.stream.Stream
 
 @ExtendWith(MockitoExtension::class)
-class ReviewServiceCreateInitialReviewScheduleTest {
+class ReviewScheduleServiceCreateInitialReviewScheduleTest {
   @InjectMocks
-  private lateinit var service: ReviewService
-
-  @Mock
-  private lateinit var reviewEventService: ReviewEventService
-
-  @Mock
-  private lateinit var reviewPersistenceAdapter: ReviewPersistenceAdapter
+  private lateinit var service: ReviewScheduleService
 
   @Mock
   private lateinit var reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter
+
+  @Mock
+  private lateinit var reviewEventService: ReviewScheduleEventService
 
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("prisonersInitialReview_testCases")
@@ -274,22 +271,22 @@ class ReviewServiceCreateInitialReviewScheduleTest {
           ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
         ),
         Arguments.of(
-          "prisoner has 3 months 1 day left to serve - review scheduled for 1 to 3 months minus 7 days",
+          "prisoner has 3 months 1 day left to serve - review scheduled for 1 month to release date minus 7 days",
           TODAY.plusMonths(3).plusDays(1),
           SentenceType.SENTENCED,
           false,
           false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
-          ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(7)),
+          ReviewScheduleWindow(TODAY.plusMonths(1), (TODAY.plusMonths(3).plusDays(1)).minusDays(7)),
         ),
         Arguments.of(
-          "prisoner has 3 months 7 days left to serve - review scheduled for 1 to 3 months minus 1 day",
+          "prisoner has 3 months 7 days left to serve - review scheduled for 1 month to release date minus 7 days",
           TODAY.plusMonths(3).plusDays(7),
           SentenceType.SENTENCED,
           false,
           false,
           ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE,
-          ReviewScheduleWindow(TODAY.plusMonths(1), TODAY.plusMonths(3).minusDays(1)),
+          ReviewScheduleWindow(TODAY.plusMonths(1), (TODAY.plusMonths(3).plusDays(7)).minusDays(7)),
         ),
         Arguments.of(
           "prisoner has between 3 months 8 days and 6 months left to serve - review scheduled for 1 to 3 months",

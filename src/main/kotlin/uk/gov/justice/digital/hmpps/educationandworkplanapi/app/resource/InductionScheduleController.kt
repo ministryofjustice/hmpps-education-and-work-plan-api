@@ -46,7 +46,7 @@ class InductionScheduleController(
       inductionService.getInductionForPrisoner(prisonNumber)
     }.getOrNull()
 
-    val inductionSchedule = inductionService.getInductionScheduleForPrisoner(prisonNumber)
+    val inductionSchedule = inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
     return inductionScheduleMapper.toInductionResponse(inductionSchedule, induction)
   }
 
@@ -58,7 +58,7 @@ class InductionScheduleController(
     val induction = runCatching {
       inductionService.getInductionForPrisoner(prisonNumber)
     }.getOrNull()
-    val inductionSchedules = inductionService.getInductionSchedulesForPrisoner(prisonNumber)
+    val inductionSchedules = inductionScheduleService.getInductionScheduleHistoryForPrisoner(prisonNumber)
     return InductionSchedulesResponse(
       inductionSchedules = inductionSchedules.map {
         inductionHistoryScheduleResourceMapper.toInductionResponse(
