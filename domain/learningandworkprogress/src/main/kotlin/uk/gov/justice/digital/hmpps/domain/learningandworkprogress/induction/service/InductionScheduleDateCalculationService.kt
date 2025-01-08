@@ -2,20 +2,29 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.se
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import java.time.LocalDate
 
 /**
- * Service class exposing methods that implement the business rules for calculating Induction Schedule dates.
+ * Abstract service class exposing methods that implement the business rules for calculating Induction Schedule dates.
  *
- * This class is deliberately final so that it cannot be subclassed, ensuring that the business rules stay within the
+ * This implemented methods are deliberately final so that they cannot be subclassed, ensuring that the business rules stay within the
  * domain.
+ * The only exception to this are the abstract methods which are intended to be implemented by subclasses.
  */
-class InductionScheduleDateCalculationService {
+abstract class InductionScheduleDateCalculationService {
   companion object {
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
     private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
   }
+
+  /**
+   * Returns a [CreateInductionScheduleDto] suitable for creating the specified prisoner's initial [InductionSchedule].
+   * Known implementations at this time are those for the CIAG PEF and PES contracts, where a prisoner's initial Induction Schedule
+   * is created differently under those contracts.
+   */
+  abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate): CreateInductionScheduleDto
 
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate =
     with(inductionSchedule) {

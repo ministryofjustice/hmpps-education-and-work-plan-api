@@ -61,6 +61,7 @@ class PefCiagKpiService(
         prisonNumber,
         calculateInductionDeadlineDate(prisonNumber, eventDate),
         InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        InductionScheduleStatus.SCHEDULED,
       ),
     )
     inductionScheduleEventService.inductionScheduleCreated(inductionSchedule)

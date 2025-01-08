@@ -87,8 +87,8 @@ class InductionScheduleController(
 
   private fun toReviewScheduleStatus(inductionScheduleStatus: InductionScheduleStatusModel): InductionScheduleStatus =
     when (inductionScheduleStatus) {
+      InductionScheduleStatusModel.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
       InductionScheduleStatusModel.SCHEDULED -> InductionScheduleStatus.SCHEDULED
-      InductionScheduleStatusModel.COMPLETED -> InductionScheduleStatus.COMPLETED
       InductionScheduleStatusModel.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatusModel.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatusModel.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -104,5 +104,6 @@ class InductionScheduleController(
       InductionScheduleStatusModel.EXEMPT_PRISONER_DEATH -> InductionScheduleStatus.EXEMPT_PRISONER_DEATH
       InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
+      InductionScheduleStatusModel.COMPLETED -> InductionScheduleStatus.COMPLETED
     }
 }

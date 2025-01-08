@@ -4,11 +4,8 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 
 private val log = KotlinLogging.logger {}
@@ -73,18 +70,4 @@ class InductionService(
     log.debug { "Retrieving Induction Summaries for ${prisonNumbers.size} prisoners" }
     return if (prisonNumbers.isNotEmpty()) persistenceAdapter.getInductionSummaries(prisonNumbers) else emptyList()
   }
-
-  fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule =
-    with(createInductionScheduleDto) {
-      log.info { "Creating Induction Schedule for prisoner [$prisonNumber]" }
-
-      if (inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber) != null) {
-        throw InductionScheduleAlreadyExistsException(prisonNumber)
-      }
-      if (persistenceAdapter.getInduction(prisonNumber) != null) {
-        throw InductionAlreadyExistsException(prisonNumber)
-      }
-
-      inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
-    }
 }
