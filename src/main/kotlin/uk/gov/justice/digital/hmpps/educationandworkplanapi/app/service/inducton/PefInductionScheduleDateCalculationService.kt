@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducton
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
@@ -12,10 +12,12 @@ import java.time.LocalDate
 
 /**
  * Implementation of [InductionScheduleDateCalculationService] with implemented behaviours specific to the CIAG PEF contracts.
+ *
+ * This bean is enabled when the PES implementation bean ([PesInductionScheduleDateCalculationService]) is not present.
  */
 @Service
 @Primary
-@ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PEF", matchIfMissing = true)
+@ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
 class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
 
   companion object {
