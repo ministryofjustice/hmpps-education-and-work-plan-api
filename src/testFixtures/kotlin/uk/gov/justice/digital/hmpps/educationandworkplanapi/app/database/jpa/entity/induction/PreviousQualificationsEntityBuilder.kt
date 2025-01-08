@@ -13,27 +13,24 @@ fun aValidPreviousQualificationsEntity(
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
-  createdByDisplayName: String? = null,
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-  updatedByDisplayName: String? = null,
 ) =
   PreviousQualificationsEntity(
-    id = id,
     reference = reference,
     prisonNumber = prisonNumber,
     educationLevel = educationLevel,
     qualifications = qualifications,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
 
 fun aValidPreviousQualificationsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -44,33 +41,30 @@ fun aValidPreviousQualificationsEntityWithJpaFieldsPopulated(
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",
-  createdByDisplayName: String? = "Alex Smith",
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-  updatedByDisplayName: String? = "Barry Jones",
 ) =
   PreviousQualificationsEntity(
-    id = id,
     reference = reference,
     prisonNumber = prisonNumber,
     educationLevel = educationLevel,
     qualifications = qualifications,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
 
 fun aValidQualificationEntity(
   reference: UUID = UUID.randomUUID(),
   subject: String = "English",
-  level: QualificationLevel? = QualificationLevel.LEVEL_3,
-  grade: String? = "A",
+  level: QualificationLevel = QualificationLevel.LEVEL_3,
+  grade: String = "A",
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
@@ -83,10 +77,11 @@ fun aValidQualificationEntity(
     subject = subject,
     level = level,
     grade = grade,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-  )
+  ).apply {
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
