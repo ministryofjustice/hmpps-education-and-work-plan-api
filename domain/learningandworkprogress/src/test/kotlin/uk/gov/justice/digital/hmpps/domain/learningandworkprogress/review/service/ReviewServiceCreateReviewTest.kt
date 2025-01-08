@@ -185,6 +185,7 @@ class ReviewServiceCreateReviewTest {
     }
 
     verify(reviewSchedulePersistenceAdapter, never()).createReviewSchedule(any())
+    verify(reviewPersistenceAdapter).markCompletedReviewAsThePrisonersPreReleaseReview(completedReview.reference)
     verify(reviewEventService).reviewCompleted(completedReview)
   }
 

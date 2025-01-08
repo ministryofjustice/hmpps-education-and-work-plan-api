@@ -32,6 +32,7 @@ class CompletedActionPlanReviewResponseMapper(
         updatedAt = instantMapper.toOffsetDateTime(updatedAt)!!,
         updatedAtPrison = updatedAtPrison,
         reviewScheduleReference = reviewScheduleReference,
+        preRelease = preRelease,
       )
     }
 }

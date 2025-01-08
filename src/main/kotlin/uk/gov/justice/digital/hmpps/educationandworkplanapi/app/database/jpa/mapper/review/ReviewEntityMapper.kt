@@ -29,6 +29,7 @@ class ReviewEntityMapper {
         updatedBy = updatedBy!!,
         updatedAt = updatedAt!!,
         updatedAtPrison = updatedAtPrison,
+        preRelease = preRelease,
       )
     }
 
