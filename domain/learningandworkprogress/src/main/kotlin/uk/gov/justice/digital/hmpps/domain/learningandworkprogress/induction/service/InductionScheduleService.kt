@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
+import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
@@ -8,14 +10,37 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Upd
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import java.time.LocalDate
 
+private val log = KotlinLogging.logger {}
+
 class InductionScheduleService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionScheduleEventService: InductionScheduleEventService,
+  private val inductionScheduleDateCalculationService: InductionScheduleDateCalculationService,
 ) {
 
-  private val inductionScheduleDateCalculationService = InductionScheduleDateCalculationService()
-
   private val inductionScheduleStatusTransitionValidator = InductionScheduleStatusTransitionValidator()
+
+  /**
+   * Creates the prisoner's [InductionSchedule].
+   * A prisoner can only have 1 Induction Schedule. Throws [InductionScheduleAlreadyExistsException] if the prisoner
+   * already has an Induction Schedule regardless of status (scheduled, completed, exempt etc.)
+   */
+  fun createInductionSchedule(prisonNumber: String, prisonerAdmissionDate: LocalDate): InductionSchedule {
+    // Check for an existing Induction Schedule
+    val inductionSchedule = runCatching {
+      getInductionScheduleForPrisoner(prisonNumber)
+    }.getOrNull()
+    if (inductionSchedule != null) {
+      throw InductionScheduleAlreadyExistsException(inductionSchedule)
+    }
+
+    log.info { "Creating Induction Schedule for prisoner [$prisonNumber]" }
+    val createInductionScheduleDto = inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(
+      prisonNumber = prisonNumber,
+      admissionDate = prisonerAdmissionDate,
+    )
+    return inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
+  }
 
   fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =
     inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)

@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import java.time.LocalDate
 
 class InductionScheduleDateCalculationServiceTest {
@@ -14,7 +15,16 @@ class InductionScheduleDateCalculationServiceTest {
     private val TODAY = LocalDate.now()
   }
 
-  private val dateCalculationService = InductionScheduleDateCalculationService()
+  // New up an anonymous instance of the abstract class to test the methods implemented in the abstract class
+  // The implementations of determineCreateInductionScheduleDto are tested in the concrete implementations of InductionScheduleDateCalculationService
+  private val dateCalculationService = object : InductionScheduleDateCalculationService() {
+    override fun determineCreateInductionScheduleDto(
+      prisonNumber: String,
+      admissionDate: LocalDate,
+    ): CreateInductionScheduleDto {
+      TODO("Not implemented here")
+    }
+  }
 
   @Nested
   inner class CalculateAdjustedInductionDueDate {

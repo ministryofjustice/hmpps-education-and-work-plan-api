@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.3'
+  version: '1.20.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3266,8 +3266,8 @@ components:
       description: Enum of the various Induction Schedule statuses.
       type: string
       enum:
+        - PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
         - SCHEDULED
-        - COMPLETED
         - EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
         - EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
         - EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -3283,7 +3283,7 @@ components:
         - EXEMPT_PRISONER_DEATH
         - EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
         - EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
-
+        - COMPLETED
 
   #
   # Response Body Definitions

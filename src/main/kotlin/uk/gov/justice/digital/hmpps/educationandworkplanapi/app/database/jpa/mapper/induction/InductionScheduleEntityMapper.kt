@@ -62,7 +62,7 @@ class InductionScheduleEntityMapper(
         prisonNumber = prisonNumber,
         deadlineDate = deadlineDate,
         scheduleCalculationRule = toInductionScheduleCalculationRule(scheduleCalculationRule),
-        scheduleStatus = InductionScheduleStatusEntity.SCHEDULED,
+        scheduleStatus = toInductionScheduleStatus(scheduleStatus),
       )
     }
 
@@ -90,8 +90,8 @@ class InductionScheduleEntityMapper(
 
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusEntity): InductionScheduleStatusDomain =
     when (inductionScheduleStatus) {
+      InductionScheduleStatusEntity.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatusDomain.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
       InductionScheduleStatusEntity.SCHEDULED -> InductionScheduleStatusDomain.SCHEDULED
-      InductionScheduleStatusEntity.COMPLETED -> InductionScheduleStatusDomain.COMPLETED
       InductionScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatusEntity.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -107,12 +107,13 @@ class InductionScheduleEntityMapper(
       InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH
       InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
+      InductionScheduleStatusEntity.COMPLETED -> InductionScheduleStatusDomain.COMPLETED
     }
 
   fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusDomain): InductionScheduleStatusEntity =
     when (inductionScheduleStatus) {
+      InductionScheduleStatusDomain.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatusEntity.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
       InductionScheduleStatusDomain.SCHEDULED -> InductionScheduleStatusEntity.SCHEDULED
-      InductionScheduleStatusDomain.COMPLETED -> InductionScheduleStatusEntity.COMPLETED
       InductionScheduleStatusDomain.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatusDomain.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusEntity.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatusDomain.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -128,5 +129,6 @@ class InductionScheduleEntityMapper(
       InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH
       InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
+      InductionScheduleStatusDomain.COMPLETED -> InductionScheduleStatusEntity.COMPLETED
     }
 }

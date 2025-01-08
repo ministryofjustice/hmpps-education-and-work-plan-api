@@ -11,9 +11,14 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionScheduleHistory
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import java.time.Instant
 import java.time.LocalDate
@@ -32,6 +37,9 @@ class InductionScheduleServiceTest {
 
   @Mock
   private lateinit var inductionScheduleEventService: InductionScheduleEventService
+
+  @Mock
+  private lateinit var inductionScheduleDateCalculationService: InductionScheduleDateCalculationService
 
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
@@ -124,6 +132,58 @@ class InductionScheduleServiceTest {
       // Then
       assertThat(actual).isEmpty()
       verify(inductionSchedulePersistenceAdapter).getInductionScheduleHistory(PRISON_NUMBER)
+    }
+  }
+
+  @Nested
+  inner class CreateInductionSchedule {
+    @Test
+    fun `should create induction schedule given prisoner does not have an induction schedule`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val admissionDate = LocalDate.now()
+
+      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
+
+      val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any())).willReturn(createInductionScheduleDto)
+
+      val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
+      given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
+
+      // When
+      val actual = service.createInductionSchedule(prisonNumber, admissionDate)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedInductionSchedule)
+      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate)
+      verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
+    }
+
+    @Test
+    fun `should not create induction schedule given prisoner already has an induction schedule`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val admissionDate = LocalDate.now()
+
+      val existingInductionSchedule = aValidInductionSchedule(
+        prisonNumber = prisonNumber,
+        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+      )
+      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(existingInductionSchedule)
+
+      // When
+      val exception = catchThrowableOfType(
+        InductionScheduleAlreadyExistsException::class.java,
+        { service.createInductionSchedule(prisonNumber, admissionDate) },
+      )
+
+      // Then
+      assertThat(exception.inductionSchedule).isEqualTo(existingInductionSchedule)
+      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
+      verifyNoMoreInteractions(inductionSchedulePersistenceAdapter)
+      verifyNoInteractions(inductionScheduleDateCalculationService)
     }
   }
 }

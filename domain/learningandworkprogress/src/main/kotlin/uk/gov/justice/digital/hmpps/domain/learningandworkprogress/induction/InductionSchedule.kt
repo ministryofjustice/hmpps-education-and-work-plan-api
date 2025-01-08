@@ -51,24 +51,25 @@ enum class InductionScheduleCalculationRule(val existingPrisonerWhenScheduleCrea
   EXISTING_PRISONER_UN_SENTENCED(true),
 }
 
-enum class InductionScheduleStatus(val inScope: Boolean, val isExclusion: Boolean = false, val isExemption: Boolean = false) {
-  SCHEDULED(true),
-  COMPLETED(true),
-  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(false, isExclusion = true),
-  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(false, isExclusion = true),
-  EXEMPT_PRISONER_FAILED_TO_ENGAGE(false, isExemption = true),
-  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(false, isExemption = true),
-  EXEMPT_PRISONER_SAFETY_ISSUES(false, isExclusion = true),
-  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(false, isExclusion = true),
-  EXEMPT_PRISON_STAFF_REDEPLOYMENT(false, isExemption = true),
-  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(false, isExemption = true),
-  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(false, isExclusion = true),
-  EXEMPT_SYSTEM_TECHNICAL_ISSUE(false), // system down
-  EXEMPT_PRISONER_TRANSFER(false, isExemption = true),
-  EXEMPT_PRISONER_RELEASE(false, isExemption = true),
-  EXEMPT_PRISONER_DEATH(false, isExemption = true),
-  EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(false, isExemption = true),
-  EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE(false, isExemption = true),
+enum class InductionScheduleStatus(val isExclusion: Boolean = false, val isExemption: Boolean = false) {
+  PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+  SCHEDULED,
+  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(isExclusion = true),
+  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(isExclusion = true),
+  EXEMPT_PRISONER_FAILED_TO_ENGAGE(isExemption = true),
+  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(isExemption = true),
+  EXEMPT_PRISONER_SAFETY_ISSUES(isExclusion = true),
+  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(isExclusion = true),
+  EXEMPT_PRISON_STAFF_REDEPLOYMENT(isExemption = true),
+  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(isExemption = true),
+  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(isExclusion = true),
+  EXEMPT_SYSTEM_TECHNICAL_ISSUE, // system down
+  EXEMPT_PRISONER_TRANSFER(isExemption = true),
+  EXEMPT_PRISONER_RELEASE(isExemption = true),
+  EXEMPT_PRISONER_DEATH(isExemption = true),
+  EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(isExemption = true),
+  EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE(isExemption = true),
+  COMPLETED,
   ;
 
   fun isExemptionOrExclusion(): Boolean {
