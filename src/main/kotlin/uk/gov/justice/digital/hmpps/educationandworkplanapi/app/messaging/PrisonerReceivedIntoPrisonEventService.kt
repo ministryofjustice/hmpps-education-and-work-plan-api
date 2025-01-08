@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
@@ -10,15 +12,20 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.RETURN_FROM_COURT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TEMPORARY_ABSENCE_RETURN
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 private val log = KotlinLogging.logger {}
 
 @Service
 class PrisonerReceivedIntoPrisonEventService(
-  // ciagKpiService is nullable because the bean is dependent on the property `ciag-kpi-processing-rule` - when the property is not set this feature/functionality is disabled
-  private val ciagKpiService: CiagKpiService?,
+  private val inductionScheduleService: InductionScheduleService,
   private val reviewScheduleService: ReviewScheduleService,
+  private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
 ) {
   fun process(inboundEvent: InboundEvent, additionalInformation: PrisonerReceivedAdditionalInformation) =
     with(additionalInformation) {
@@ -35,19 +42,25 @@ class PrisonerReceivedIntoPrisonEventService(
   private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
 
-    ciagKpiService?.processPrisonerAdmission(
-      prisonNumber = nomsNumber,
-      prisonAdmittedTo = prisonId,
-      eventDate = eventOccurredAt,
-    )
-
-    /*
-    TODO - replace the above call to the CiagKpiService with the following logic / calls to the InductionScheduleService and ReviewScheduleService
-       - If prisoner has no Induction, Action Plan or Induction Schedule, then create the Induction Schedule
-       - If prisoner has an Induction Schedule that is complete, create or update their Review Schedule with status SCHEDULED, reason PRISONER_READMISSION and due date +10 days
-       - if prisoner has an Induction Schedule, and it is not complete, reschedule it with the same deadline date rules as if it were a new admission (even if it was exempt (exempt thru transfers handled below))
-     (check all of the above rules with Aliki)
-     */
+    try {
+      // Attempt to create the prisoner's Induction Schedule
+      inductionScheduleService.createInductionSchedule(
+        prisonNumber = nomsNumber,
+        prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC),
+      )
+    } catch (e: InductionScheduleAlreadyExistsException) {
+      // Prisoner already has an Induction Schedule
+      when (e.inductionSchedule.scheduleStatus) {
+        COMPLETED -> {
+          // The Induction was completed so we need to reschedule their active Review Schedule if they have one, or create a new Review Schedule.
+          rescheduleOrCreatePrisonersReviewSchedule(nomsNumber)
+        }
+        else -> {
+          // The Induction was not completed so need to reschedule it with a new deadline date.
+          // TODO - reschedule it
+        }
+      }
+    }
   }
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerTransferEvent() {
@@ -63,5 +76,22 @@ class PrisonerReceivedIntoPrisonEventService(
     }
 
     // TODO - RR-1215 - call inductionScheduleService to exempt & reschedule Induction Schedule due to prisoner transfer
+  }
+
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisonNumber: String) {
+    try {
+      val reviewSchedule = reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber)
+      // TODO - reschedule it
+    } catch (e: ReviewScheduleNotFoundException) {
+      // An active Review Schedule does not exist - create a new Review Schedule for the prisoner
+      val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
+      val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
+        prisoner = prisoner,
+        // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)
+        isReadmission = true,
+        isTransfer = false,
+      )
+      reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
+    }
   }
 }

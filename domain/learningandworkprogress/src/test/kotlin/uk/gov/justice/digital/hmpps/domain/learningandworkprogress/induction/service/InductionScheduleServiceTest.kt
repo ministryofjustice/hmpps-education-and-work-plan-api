@@ -159,6 +159,7 @@ class InductionScheduleServiceTest {
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
       verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate)
       verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
+      verify(inductionScheduleEventService).inductionScheduleCreated(actual)
     }
 
     @Test
@@ -184,6 +185,7 @@ class InductionScheduleServiceTest {
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
       verifyNoMoreInteractions(inductionSchedulePersistenceAdapter)
       verifyNoInteractions(inductionScheduleDateCalculationService)
+      verifyNoInteractions(inductionScheduleEventService)
     }
   }
 }

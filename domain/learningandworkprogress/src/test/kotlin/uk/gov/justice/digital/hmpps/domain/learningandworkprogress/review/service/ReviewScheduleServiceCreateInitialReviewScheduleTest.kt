@@ -15,6 +15,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
@@ -76,6 +77,7 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
     // Then
     assertThat(actual).isEqualTo(expectedReviewSchedule)
     verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    verify(reviewEventService).reviewScheduleCreated(expectedReviewSchedule)
 
     val createReviewScheduleCaptor = argumentCaptor<CreateReviewScheduleDto>()
     verify(reviewSchedulePersistenceAdapter).createReviewSchedule(createReviewScheduleCaptor.capture())
@@ -113,6 +115,7 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
     assertThat(actual).isNull()
     verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
     verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
+    verifyNoInteractions(reviewEventService)
   }
 
   @Test
@@ -142,6 +145,7 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
     // Then
     assertThat(actual).isEqualTo(expectedReviewSchedule)
     verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    verify(reviewEventService).reviewScheduleCreated(expectedReviewSchedule)
 
     val createReviewScheduleCaptor = argumentCaptor<CreateReviewScheduleDto>()
     verify(reviewSchedulePersistenceAdapter).createReviewSchedule(createReviewScheduleCaptor.capture())
@@ -179,6 +183,7 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
     // Then
     assertThat(actual).isEqualTo(expectedReviewSchedule)
     verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    verify(reviewEventService).reviewScheduleCreated(expectedReviewSchedule)
 
     val createReviewScheduleCaptor = argumentCaptor<CreateReviewScheduleDto>()
     verify(reviewSchedulePersistenceAdapter).createReviewSchedule(createReviewScheduleCaptor.capture())
@@ -210,6 +215,7 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
     assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
     verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
     verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
+    verifyNoInteractions(reviewEventService)
   }
 
   @ParameterizedTest
@@ -234,6 +240,7 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
       .isInstanceOf(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java)
       .extracting("prisonNumber", "sentenceType")
       .containsExactly(PRISON_NUMBER, sentenceType)
+    verifyNoInteractions(reviewEventService)
   }
 
   companion object {
