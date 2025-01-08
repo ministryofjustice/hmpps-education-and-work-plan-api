@@ -2,15 +2,18 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dt
 
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import java.time.LocalDate
 
 fun aValidCreateInductionScheduleDto(
   prisonNumber: String = aValidPrisonNumber(),
-  deadlineDate: LocalDate = LocalDate.now().plusDays(30),
+  deadlineDate: LocalDate = LocalDate.now().plusDays(20),
   scheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+  scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
 ): CreateInductionScheduleDto =
   CreateInductionScheduleDto(
     prisonNumber = prisonNumber,
     deadlineDate = deadlineDate,
     scheduleCalculationRule = scheduleCalculationRule,
+    scheduleStatus = scheduleStatus,
   )

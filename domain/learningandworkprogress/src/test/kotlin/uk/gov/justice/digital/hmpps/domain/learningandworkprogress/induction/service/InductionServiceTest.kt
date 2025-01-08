@@ -12,18 +12,14 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
 
 @ExtendWith(MockitoExtension::class)
@@ -186,75 +182,6 @@ class InductionServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedInductionSummaries)
       verifyNoInteractions(persistenceAdapter)
-    }
-  }
-
-  @Nested
-  inner class CreateInductionSchedule {
-    @Test
-    fun `should create induction schedule given prisoner does not have an induction schedule or an induction`() {
-      // Given
-      val prisonNumber = aValidPrisonNumber()
-      val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-
-      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
-      given(persistenceAdapter.getInduction(any())).willReturn(null)
-
-      val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
-      given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
-
-      // When
-      val actual = service.createInductionSchedule(createInductionScheduleDto)
-
-      // Then
-      assertThat(actual).isEqualTo(expectedInductionSchedule)
-      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(persistenceAdapter).getInduction(prisonNumber)
-      verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
-    }
-
-    @Test
-    fun `should not create induction schedule given prisoner already has an induction schedule`() {
-      // Given
-      val prisonNumber = aValidPrisonNumber()
-      val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-
-      val existingInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
-      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(existingInductionSchedule)
-
-      // When
-      val exception = catchThrowableOfType(InductionScheduleAlreadyExistsException::class.java, {
-        service.createInductionSchedule(createInductionScheduleDto)
-      })
-
-      // Then
-      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verifyNoInteractions(persistenceAdapter)
-      verifyNoMoreInteractions(inductionSchedulePersistenceAdapter)
-    }
-
-    @Test
-    fun `should not create induction schedule given prisoner already has an induction`() {
-      // Given
-      val prisonNumber = aValidPrisonNumber()
-      val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-
-      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
-
-      val existingInduction = aFullyPopulatedInduction(prisonNumber = prisonNumber)
-      given(persistenceAdapter.getInduction(any())).willReturn(existingInduction)
-
-      // Given
-      val exception = catchThrowableOfType(InductionAlreadyExistsException::class.java, {
-        service.createInductionSchedule(createInductionScheduleDto)
-      })
-
-      // Then
-      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(persistenceAdapter).getInduction(prisonNumber)
-      verifyNoMoreInteractions(inductionSchedulePersistenceAdapter)
     }
   }
 }

@@ -51,8 +51,8 @@ class InductionScheduleResourceMapper(
 
   fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =
     when (inductionScheduleStatus) {
+      InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatusResponse.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
       InductionScheduleStatus.SCHEDULED -> InductionScheduleStatusResponse.SCHEDULED
-      InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
       InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
       InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
       InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -68,5 +68,6 @@ class InductionScheduleResourceMapper(
       InductionScheduleStatus.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DEATH
       InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
+      InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
     }
 }

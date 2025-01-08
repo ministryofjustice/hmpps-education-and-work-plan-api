@@ -92,6 +92,7 @@ class InductionScheduleEntityMapperTest {
       prisonNumber = prisonNumber,
       deadlineDate = deadlineDate,
       scheduleCalculationRule = InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_ON_REMAND,
+      scheduleStatus = InductionScheduleStatusDomain.SCHEDULED,
     )
 
     val expectedInductionScheduleEntity = anUnPersistedInductionScheduleEntity(
