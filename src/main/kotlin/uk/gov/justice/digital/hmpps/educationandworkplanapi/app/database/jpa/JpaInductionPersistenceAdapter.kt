@@ -76,7 +76,7 @@ class JpaInductionPersistenceAdapter(
       if (updateInductionDto.previousQualifications!!.qualifications.isEmpty()) {
         log.info {
           """
-            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications().size}] qualifications recorded, but the Update Induction request contains a PreviousQualifications object containing 0 qualifications. 
+            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications.size}] qualifications recorded, but the Update Induction request contains a PreviousQualifications object containing 0 qualifications. 
             The user has explicitly removed all previously recorded qualifications as part of updating the prisoner's Induction.
           """.trimIndent()
         }
@@ -113,7 +113,7 @@ class JpaInductionPersistenceAdapter(
       previousQualificationsEntity?.also {
         log.info {
           """
-            Prisoner [$prisonNumber] has [${it.qualifications().size}] qualifications recorded pre-induction, but the Create Induction request does not contain a PreviousQualifications object. 
+            Prisoner [$prisonNumber] has [${it.qualifications.size}] qualifications recorded pre-induction, but the Create Induction request does not contain a PreviousQualifications object. 
             Removing the prisoner's PreviousQualificationsEntity from the database.
           """.trimIndent()
         }
@@ -128,7 +128,7 @@ class JpaInductionPersistenceAdapter(
       if (createInductionDto.previousQualifications!!.qualifications.isEmpty()) {
         log.info {
           """
-            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications().size}] qualifications recorded pre-induction, but the Create Induction request contains a PreviousQualifications object containing 0 qualifications. 
+            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications.size}] qualifications recorded pre-induction, but the Create Induction request contains a PreviousQualifications object containing 0 qualifications. 
             The user has explicitly removed all previously recorded qualifications as part of creating the prisoner's Induction.
           """.trimIndent()
         }

@@ -57,11 +57,9 @@ class EducationResourceMapperTest {
       reference = educationReference,
       educationLevel = EducationLevelDomain.FURTHER_EDUCATION_COLLEGE,
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       createdAt = Instant.parse("2024-08-12T09:32:45.123Z"),
       createdAtPrison = "BXI",
       lastUpdatedBy = "bjones_gen",
-      lastUpdatedByDisplayName = "Barry Jones",
       lastUpdatedAt = Instant.parse("2024-08-12T10:03:34.987Z"),
       lastUpdatedAtPrison = "BXI",
       qualifications = listOf(

@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationLevel as EducationLevelDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.QualificationLevel as QualificationLevelDomain
@@ -69,24 +68,22 @@ class UpdatePreviousQualificationsEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingQualificationsEntity.deepCopy().apply {
-      id
-      reference = reference
-      educationLevel = EducationLevelEntity.FURTHER_EDUCATION_COLLEGE
+    val expectedEntity = existingQualificationsEntity.copy(
+      educationLevel = EducationLevelEntity.FURTHER_EDUCATION_COLLEGE,
       qualifications = mutableListOf(
-        existingQualificationEntity1.deepCopy().apply {
-          subject = "English"
-          level = QualificationLevelEntity.LEVEL_3
-          grade = "B"
-          createdAtPrison = "BXI"
-          updatedAtPrison = "MDI"
-        },
+        existingQualificationEntity1.copy(
+          subject = "English",
+          level = QualificationLevelEntity.LEVEL_3,
+          grade = "B",
+          createdAtPrison = "BXI",
+          updatedAtPrison = "MDI",
+        ),
         // qualification 2 should not have been updated at all because it's subject, level and grade had not changed in the request object
-        existingQualificationEntity2.deepCopy(),
-      )
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+        existingQualificationEntity2,
+      ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
@@ -133,9 +130,9 @@ class UpdatePreviousQualificationsEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingQualificationsEntity.deepCopy().apply {
-      reference = existingQualificationsReference
-      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
+    val expectedEntity = existingQualificationsEntity.copy(
+      reference = existingQualificationsReference,
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(
         // updated grade
         aValidQualificationEntity(
@@ -150,10 +147,10 @@ class UpdatePreviousQualificationsEntityMapperTest {
           level = QualificationLevelEntity.LEVEL_2,
           grade = "C",
         ),
-      )
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+      ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)
@@ -197,13 +194,13 @@ class UpdatePreviousQualificationsEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingQualificationsEntity.deepCopy().apply {
-      reference = existingQualificationsReference
-      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
-      qualifications = mutableListOf(firstQualificationEntity)
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingQualificationsEntity.copy(
+      reference = existingQualificationsReference,
+      educationLevel = EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS,
+      qualifications = mutableListOf(firstQualificationEntity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingQualificationsEntity, updatedQualificationsDto)

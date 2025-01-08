@@ -68,17 +68,15 @@ class PreviousQualificationsEntityMapperTest {
     val expectedQualification = aValidQualification()
     val expectedPreviousQualifications = aValidPreviousQualifications(
       prisonNumber = prisonNumber,
-      reference = qualificationsEntity.reference!!,
+      reference = qualificationsEntity.reference,
       educationLevel = EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS,
       qualifications = mutableListOf(expectedQualification),
       createdAt = qualificationsEntity.createdAt!!,
-      createdAtPrison = qualificationsEntity.createdAtPrison!!,
+      createdAtPrison = qualificationsEntity.createdAtPrison,
       createdBy = qualificationsEntity.createdBy!!,
-      createdByDisplayName = qualificationsEntity.createdByDisplayName!!,
       lastUpdatedAt = qualificationsEntity.updatedAt!!,
-      lastUpdatedAtPrison = qualificationsEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = qualificationsEntity.updatedAtPrison,
       lastUpdatedBy = qualificationsEntity.updatedBy!!,
-      lastUpdatedByDisplayName = qualificationsEntity.updatedByDisplayName!!,
     )
     given(qualificationEntityMapper.fromEntityToDomain(any())).willReturn(expectedQualification)
 

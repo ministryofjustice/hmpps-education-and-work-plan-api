@@ -28,7 +28,7 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
         updatedAtPrison = prisonId,
         educationLevel = toEducationLevel(educationLevel),
       ).also { entity ->
-        entity.qualifications().addAll(
+        entity.qualifications.addAll(
           qualifications.map {
             qualificationEntityMapper.fromDomainToEntity(it).apply { parent = entity }
           },
@@ -45,14 +45,14 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
       // updates to individual QualificationEntity's first, then delete any that are not explicitly in the update DTO,
       // then finally add any new QualificationEntity's.
       // It is very important that we process the qualifications in this order.
-      val existingQualificationsReferences = qualifications().map { qualificationEntity -> qualificationEntity.reference }
+      val existingQualificationsReferences = qualifications.map { qualificationEntity -> qualificationEntity.reference }
 
       // Update existing qualifications identified by matching reference of DTO to reference of entity
       val dtosRepresentingUpdatesToExistingQualifications = dto.qualifications
         .filterIsInstance<UpdateQualificationDto>()
         .filter { existingQualificationsReferences.contains(it.reference) }
       dtosRepresentingUpdatesToExistingQualifications.onEach { updateQualificationDto ->
-        val qualificationEntityToUpdate = qualifications().first { qualificationEntity -> qualificationEntity.reference == updateQualificationDto.reference }
+        val qualificationEntityToUpdate = qualifications.first { qualificationEntity -> qualificationEntity.reference == updateQualificationDto.reference }
 
         if (qualificationDataHasChanged(qualificationEntityToUpdate, updateQualificationDto)) {
           qualificationEntityMapper.updateEntityFromDomain(qualificationEntityToUpdate, updateQualificationDto)
@@ -60,14 +60,14 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
       }
 
       // Delete existing qualifications where there is not a corresponding qualification DTO
-      qualifications().removeIf { qualificationEntity ->
+      qualifications.removeIf { qualificationEntity ->
         !dtosRepresentingUpdatesToExistingQualifications.map { it.reference }.contains(qualificationEntity.reference)
       }
 
       // Add new QualificationEntity's
       val dtosRepresentingNewQualifications = dto.qualifications
         .filter { it is CreateQualificationDto || !existingQualificationsReferences.contains((it as UpdateQualificationDto).reference) }
-      qualifications().addAll(
+      qualifications.addAll(
         dtosRepresentingNewQualifications.map {
           qualificationEntityMapper.fromDomainToEntity(it).apply { parent = entity }
         },
@@ -77,18 +77,16 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
   fun fromEntityToDomain(persistedEntity: PreviousQualificationsEntity?): PreviousQualifications? =
     persistedEntity?.let {
       PreviousQualifications(
-        reference = it.reference!!,
-        prisonNumber = it.prisonNumber!!,
-        educationLevel = toEducationLevel(it.educationLevel!!),
-        qualifications = it.qualifications!!.map { qualificationEntityMapper.fromEntityToDomain(it) },
+        reference = it.reference,
+        prisonNumber = it.prisonNumber,
+        educationLevel = toEducationLevel(it.educationLevel),
+        qualifications = it.qualifications.map { qualificationEntityMapper.fromEntityToDomain(it) },
         createdBy = it.createdBy!!,
-        createdByDisplayName = it.createdByDisplayName!!,
         createdAt = it.createdAt!!,
-        createdAtPrison = it.createdAtPrison!!,
+        createdAtPrison = it.createdAtPrison,
         lastUpdatedBy = it.updatedBy!!,
-        lastUpdatedByDisplayName = it.updatedByDisplayName!!,
         lastUpdatedAt = it.updatedAt!!,
-        lastUpdatedAtPrison = it.updatedAtPrison!!,
+        lastUpdatedAtPrison = it.updatedAtPrison,
       )
     }
 
@@ -101,14 +99,14 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
       // updates to individual QualificationEntity's first, then delete any that are not explicitly in the update DTO,
       // then finally add any new QualificationEntity's.
       // It is very important that we process the qualifications in this order.
-      val existingQualificationsReferences = qualifications().map { qualificationEntity -> qualificationEntity.reference }
+      val existingQualificationsReferences = qualifications.map { qualificationEntity -> qualificationEntity.reference }
 
       // Update existing qualifications identified by matching reference of DTO to reference of entity
       val dtosRepresentingUpdatesToExistingQualifications = dto.qualifications
         .filterIsInstance<UpdateQualificationDto>()
         .filter { existingQualificationsReferences.contains(it.reference) }
       dtosRepresentingUpdatesToExistingQualifications.onEach { updateQualificationDto ->
-        val qualificationEntityToUpdate = qualifications().first { qualificationEntity -> qualificationEntity.reference == updateQualificationDto.reference }
+        val qualificationEntityToUpdate = qualifications.first { qualificationEntity -> qualificationEntity.reference == updateQualificationDto.reference }
 
         if (qualificationDataHasChanged(qualificationEntityToUpdate, updateQualificationDto)) {
           qualificationEntityMapper.updateEntityFromDomain(qualificationEntityToUpdate, updateQualificationDto)
@@ -116,14 +114,14 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
       }
 
       // Delete existing qualifications where there is not a corresponding qualification DTO
-      qualifications().removeIf { qualificationEntity ->
+      qualifications.removeIf { qualificationEntity ->
         !dtosRepresentingUpdatesToExistingQualifications.map { it.reference }.contains(qualificationEntity.reference)
       }
 
       // Add new QualificationEntity's
       val dtosRepresentingNewQualifications = dto.qualifications
         .filter { it is CreateQualificationDto || !existingQualificationsReferences.contains((it as UpdateQualificationDto).reference) }
-      qualifications().addAll(
+      qualifications.addAll(
         dtosRepresentingNewQualifications.map {
           qualificationEntityMapper.fromDomainToEntity(it).apply { parent = entity }
         },
@@ -132,7 +130,7 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
 
   private fun qualificationDataHasChanged(qualificationEntityToUpdate: QualificationEntity, updateQualificationDto: UpdateQualificationDto): Boolean =
     with(qualificationEntityToUpdate) {
-      !(subject == updateQualificationDto.subject && grade == updateQualificationDto.grade && toQualificationLevel(level!!) == updateQualificationDto.level)
+      !(subject == updateQualificationDto.subject && grade == updateQualificationDto.grade && toQualificationLevel(level) == updateQualificationDto.level)
     }
 }
 
@@ -159,12 +157,12 @@ class QualificationEntityMapper {
   fun fromEntityToDomain(persistedEntity: QualificationEntity): Qualification =
     with(persistedEntity) {
       Qualification(
-        reference = reference!!,
-        subject = subject!!,
-        level = toQualificationLevel(level!!),
-        grade = grade!!,
+        reference = reference,
+        subject = subject,
+        level = toQualificationLevel(level),
+        grade = grade,
         createdBy = createdBy!!,
-        createdAtPrison = createdAtPrison!!,
+        createdAtPrison = createdAtPrison,
         createdAt = createdAt!!,
         lastUpdatedBy = updatedBy!!,
         lastUpdatedAt = updatedAt!!,

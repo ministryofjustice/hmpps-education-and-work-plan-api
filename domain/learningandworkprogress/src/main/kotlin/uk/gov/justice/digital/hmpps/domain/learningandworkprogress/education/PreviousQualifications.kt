@@ -15,13 +15,11 @@ data class PreviousQualifications(
   val prisonNumber: String,
   val educationLevel: EducationLevel,
   val qualifications: List<Qualification>,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
+  val createdBy: String,
+  val createdAt: Instant,
   val createdAtPrison: String,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val lastUpdatedBy: String,
+  val lastUpdatedAt: Instant,
   val lastUpdatedAtPrison: String,
 )
 
