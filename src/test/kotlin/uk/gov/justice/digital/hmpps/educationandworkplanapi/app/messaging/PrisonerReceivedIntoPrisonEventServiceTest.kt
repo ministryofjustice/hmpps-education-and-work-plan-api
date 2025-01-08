@@ -67,7 +67,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(ciagKpiService).processPrisonerTransfer("A1234BC", "BXI")
     verify(reviewScheduleService).exemptAndReScheduleActiveReviewScheduleStatusDueToPrisonerTransfer("A1234BC", "BXI")
   }
 

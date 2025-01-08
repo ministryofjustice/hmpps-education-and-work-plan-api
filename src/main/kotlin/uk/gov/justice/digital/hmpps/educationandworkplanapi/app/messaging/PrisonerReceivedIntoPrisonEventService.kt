@@ -40,15 +40,18 @@ class PrisonerReceivedIntoPrisonEventService(
       prisonAdmittedTo = prisonId,
       eventDate = eventOccurredAt,
     )
+
+    /*
+    TODO - replace the above call to the CiagKpiService with the following logic / calls to the InductionScheduleService and ReviewScheduleService
+       - If prisoner has no Induction, Action Plan or Induction Schedule, then create the Induction Schedule
+       - If prisoner has an Induction Schedule that is complete, create or update their Review Schedule with status SCHEDULED, reason PRISONER_READMISSION and due date +10 days
+       - if prisoner has an Induction Schedule, and it is not complete, reschedule it with the same deadline date rules as if it were a new admission (even if it was exempt (exempt thru transfers handled below))
+     (check all of the above rules with Aliki)
+     */
   }
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerTransferEvent() {
     log.info { "Processing Prisoner Admission Event (due to transfer) for prisoner [$nomsNumber]" }
-
-    ciagKpiService?.processPrisonerTransfer(
-      prisonNumber = nomsNumber,
-      prisonTransferredTo = prisonId,
-    )
 
     try {
       reviewScheduleService.exemptAndReScheduleActiveReviewScheduleStatusDueToPrisonerTransfer(
@@ -58,5 +61,7 @@ class PrisonerReceivedIntoPrisonEventService(
     } catch (e: ReviewScheduleNotFoundException) {
       log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to exempt and re-schedule it" }
     }
+
+    // TODO - RR-1215 - call inductionScheduleService to exempt & reschedule Induction Schedule due to prisoner transfer
   }
 }

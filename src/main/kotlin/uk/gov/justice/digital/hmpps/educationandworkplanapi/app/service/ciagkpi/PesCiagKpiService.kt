@@ -6,8 +6,6 @@ import java.time.LocalDate
 
 /**
  * Implementation of the [CiagKpiService] with PES (from October '25) specific behaviours
- *
- * Enabled when the property `ciag-kpi-processing-rule` is set to `PES` via [CiagKpiServiceFactory]
  */
 class PesCiagKpiService : CiagKpiService() {
   override fun processPrisonerAdmission(prisonNumber: String, prisonAdmittedTo: String, eventDate: Instant) {

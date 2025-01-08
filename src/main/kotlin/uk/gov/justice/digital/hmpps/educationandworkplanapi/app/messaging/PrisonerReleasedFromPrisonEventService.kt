@@ -48,6 +48,8 @@ class PrisonerReleasedFromPrisonEventService(
     } catch (e: ReviewScheduleNotFoundException) {
       log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
     }
+
+    // TODO - RR-1215 - call inductionScheduleService to exempt Induction Schedule due to prisoner release
   }
 
   private fun PrisonerReleasedAdditionalInformation.processPrisonerReleaseEventDueToDeath() {
@@ -60,5 +62,7 @@ class PrisonerReleasedFromPrisonEventService(
     } catch (e: ReviewScheduleNotFoundException) {
       log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
     }
+
+    // TODO - RR-1215 - call inductionScheduleService to exempt Induction Schedule due to prisoner death
   }
 }
