@@ -10,10 +10,13 @@ fun aValidCreateInductionScheduleDto(
   deadlineDate: LocalDate = LocalDate.now().plusDays(20),
   scheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
   scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+  prisonId: String = "BXI",
 ): CreateInductionScheduleDto =
   CreateInductionScheduleDto(
     prisonNumber = prisonNumber,
     deadlineDate = deadlineDate,
     scheduleCalculationRule = scheduleCalculationRule,
     scheduleStatus = scheduleStatus,
+    prisonId = prisonId,
+
   )

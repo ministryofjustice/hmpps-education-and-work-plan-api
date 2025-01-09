@@ -533,6 +533,8 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
     deadlineDate: LocalDate = LocalDate.now().plusMonths(1),
+    createdAtPrison: String = "BXI",
+    updatedAtPrison: String = "BXI",
   ) {
     inductionScheduleRepository.save(
       InductionScheduleEntity(
@@ -541,6 +543,8 @@ abstract class IntegrationTestBase {
         reference = UUID.randomUUID(),
         scheduleStatus = status,
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        createdAtPrison = createdAtPrison,
+        updatedAtPrison = updatedAtPrison,
       ),
     )
   }
@@ -552,6 +556,8 @@ abstract class IntegrationTestBase {
     exemptionReason: String? = null,
     createdAt: Instant = Instant.now(),
     updatedAt: Instant = Instant.now(),
+    createdAtPrison: String = "BXI",
+    updatedAtPrison: String = "BXI",
   ) {
     inductionScheduleHistoryRepository.save(
       InductionScheduleHistoryEntity(
@@ -566,6 +572,8 @@ abstract class IntegrationTestBase {
         updatedBy = "auser_gen",
         createdAt = createdAt,
         updatedAt = updatedAt,
+        createdAtPrison = createdAtPrison,
+        updatedAtPrison = updatedAtPrison,
       ),
     )
   }

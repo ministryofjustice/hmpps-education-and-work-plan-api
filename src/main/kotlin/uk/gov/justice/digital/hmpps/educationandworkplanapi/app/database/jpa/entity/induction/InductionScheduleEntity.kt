@@ -45,6 +45,12 @@ data class InductionScheduleEntity(
 
   @Column
   var exemptionReason: String? = null,
+
+  @Column(updatable = false)
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
 ) {
   @Id
   @GeneratedValue

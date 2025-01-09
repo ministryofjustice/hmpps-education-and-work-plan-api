@@ -31,10 +31,12 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
    * plus 20 days.
    */
   override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate): CreateInductionScheduleDto =
+    // TODO remove this hardcoded BXI
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = admissionDate.plusDays(DAYS_AFTER_ADMISSION),
       scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
+      prisonId = "BXI",
     )
 }

@@ -29,10 +29,12 @@ class PesInductionScheduleDateCalculationService : InductionScheduleDateCalculat
    * deadline date correctly set (via a listener on the event sent from Curious)
    */
   override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate): CreateInductionScheduleDto =
+    // TODO remove this hardcoded BXI
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = LocalDate.now(),
       scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+      prisonId = "BXI",
     )
 }

@@ -33,6 +33,8 @@ class InductionScheduleEntityMapper(
         lastUpdatedByDisplayName = userService.getUserDetails(updatedBy!!).name,
         lastUpdatedAt = updatedAt,
         exemptionReason = exemptionReason,
+        lastUpdatedAtPrison = updatedAtPrison,
+        createdAtPrison = createdAtPrison,
       )
     }
 
@@ -52,6 +54,8 @@ class InductionScheduleEntityMapper(
         lastUpdatedAt = updatedAt,
         exemptionReason = exemptionReason,
         version = version,
+        lastUpdatedAtPrison = updatedAtPrison,
+        createdAtPrison = createdAtPrison,
       )
     }
 
@@ -63,6 +67,8 @@ class InductionScheduleEntityMapper(
         deadlineDate = deadlineDate,
         scheduleCalculationRule = toInductionScheduleCalculationRule(scheduleCalculationRule),
         scheduleStatus = toInductionScheduleStatus(scheduleStatus),
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       )
     }
 

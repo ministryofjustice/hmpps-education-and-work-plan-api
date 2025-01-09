@@ -19,6 +19,8 @@ fun aValidInductionScheduleHistory(
   lastUpdatedAt: Instant = Instant.now(),
   exemptionReason: String? = null,
   version: Int = 1,
+  createdAtPrison: String = "BXI",
+  updatedAtPrison: String = "BXI",
 ): InductionScheduleHistory =
   InductionScheduleHistory(
     reference = reference,
@@ -34,4 +36,6 @@ fun aValidInductionScheduleHistory(
     lastUpdatedAt = lastUpdatedAt,
     exemptionReason = exemptionReason,
     version = version,
+    createdAtPrison = createdAtPrison,
+    lastUpdatedAtPrison = updatedAtPrison,
   )
