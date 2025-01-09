@@ -42,13 +42,15 @@ class PrisonerReceivedIntoPrisonEventService(
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
+
     val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
     val prisonId = prisoner.prisonId ?: "N/A"
+    val prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC)
     try {
       // Attempt to create the prisoner's Induction Schedule
       inductionScheduleService.createInductionSchedule(
         prisonNumber = nomsNumber,
-        prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC),
+        prisonerAdmissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
       )
     } catch (e: InductionScheduleAlreadyExistsException) {
@@ -56,12 +58,12 @@ class PrisonerReceivedIntoPrisonEventService(
       when (e.inductionSchedule.scheduleStatus) {
         COMPLETED -> {
           // The Induction was completed so we need to reschedule their active Review Schedule if they have one, or create a new Review Schedule.
-          rescheduleOrCreatePrisonersReviewSchedule(nomsNumber, prisoner)
+          rescheduleOrCreatePrisonersReviewSchedule(prisoner)
         }
 
         else -> {
           // The Induction was not completed so need to reschedule it with a new deadline date.
-          // TODO - reschedule it
+          inductionScheduleService.reschedulePrisonersInductionSchedule(nomsNumber, prisonerAdmissionDate, prisonId)
         }
       }
     }
@@ -82,11 +84,11 @@ class PrisonerReceivedIntoPrisonEventService(
     // TODO - RR-1215 - call inductionScheduleService to exempt & reschedule Induction Schedule due to prisoner transfer
   }
 
-  private fun rescheduleOrCreatePrisonersReviewSchedule(prisonNumber: String, prisoner: Prisoner) {
-    try {
-      val reviewSchedule = reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber)
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner) {
+    val reviewSchedule = runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
+    if (reviewSchedule != null) {
       // TODO - reschedule it
-    } catch (e: ReviewScheduleNotFoundException) {
+    } else {
       // An active Review Schedule does not exist - create a new Review Schedule for the prisoner
       val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
         prisoner = prisoner,

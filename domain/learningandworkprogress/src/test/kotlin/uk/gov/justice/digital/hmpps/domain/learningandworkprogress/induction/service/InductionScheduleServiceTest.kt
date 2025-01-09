@@ -15,9 +15,14 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InvalidInductionScheduleStatusException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionScheduleHistory
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import java.time.Instant
@@ -172,7 +177,7 @@ class InductionScheduleServiceTest {
 
       val existingInductionSchedule = aValidInductionSchedule(
         prisonNumber = prisonNumber,
-        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+        scheduleStatus = SCHEDULED,
       )
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(existingInductionSchedule)
 
@@ -187,6 +192,104 @@ class InductionScheduleServiceTest {
       verifyNoMoreInteractions(inductionSchedulePersistenceAdapter)
       verifyNoInteractions(inductionScheduleDateCalculationService)
       verifyNoInteractions(inductionScheduleEventService)
+    }
+  }
+
+  @Nested
+  inner class ReschedulePrisonersInductionSchedule {
+    @Test
+    fun `should reschedule prisoners induction schedule`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val prisonerAdmissionDate = TODAY
+
+      val originalDueDate = TODAY.minusDays(5)
+      val inductionSchedule = aValidInductionSchedule(
+        prisonNumber = prisonNumber,
+        scheduleStatus = EXEMPT_PRISONER_FAILED_TO_ENGAGE,
+        deadlineDate = originalDueDate,
+      )
+      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
+
+      val expectedDueDate = prisonerAdmissionDate.plusDays(20)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any())).willReturn(
+        aValidCreateInductionScheduleDto(
+          prisonNumber = prisonNumber,
+          deadlineDate = expectedDueDate,
+        ),
+      )
+
+      val expectedInductionSchedule = inductionSchedule.copy(
+        scheduleStatus = SCHEDULED,
+        deadlineDate = expectedDueDate,
+      )
+      given(inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(any())).willReturn(expectedInductionSchedule)
+
+      val expectedUpdateInductionScheduleStatusDto = UpdateInductionScheduleStatusDto(
+        prisonNumber = prisonNumber,
+        reference = inductionSchedule.reference,
+        scheduleStatus = SCHEDULED,
+        exemptionReason = null,
+        latestDeadlineDate = expectedDueDate,
+      )
+      val expectedUpdatedInductionScheduleStatus = UpdatedInductionScheduleStatus(
+        reference = inductionSchedule.reference,
+        prisonNumber = prisonNumber,
+        oldStatus = EXEMPT_PRISONER_FAILED_TO_ENGAGE,
+        newStatus = SCHEDULED,
+        exemptionReason = null,
+        newDeadlineDate = expectedDueDate,
+        oldDeadlineDate = originalDueDate,
+        updatedAt = inductionSchedule.lastUpdatedAt!!,
+        updatedBy = inductionSchedule.lastUpdatedBy!!,
+      )
+
+      // When
+      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedInductionSchedule)
+      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate)
+      verify(inductionSchedulePersistenceAdapter).updateInductionScheduleStatus(expectedUpdateInductionScheduleStatusDto)
+      verify(inductionScheduleEventService).inductionScheduleStatusUpdated(expectedUpdatedInductionScheduleStatus)
+    }
+
+    @Test
+    fun `should not reschedule prisoners induction schedule given induction schedule is in a status not supported`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+
+      val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
+
+      // When
+      val exception = catchThrowableOfType(InvalidInductionScheduleStatusException::class.java) {
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY)
+      }
+
+      // Then
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      assertThat(exception.fromStatus).isEqualTo(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+      assertThat(exception.toStatus).isEqualTo(SCHEDULED)
+      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
+    }
+
+    @Test
+    fun `should not reschedule prisoners induction schedule given prisoner does not have an induction schedule`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+
+      given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
+
+      // When
+      val exception = catchThrowableOfType(InductionScheduleNotFoundException::class.java) {
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY)
+      }
+
+      // Then
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
     }
   }
 }

@@ -15,6 +15,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
@@ -119,6 +120,35 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
     verify(createInitialReviewScheduleMapper).fromPrisonerToDomain(prisoner, isTransfer = false, isReadmission = true)
     verify(reviewScheduleService).createInitialReviewSchedule(createReviewScheduleDto)
+  }
+
+  @Test
+  fun `should process event given reason is prisoner admission and prisoner already has an Induction Schedule that is not COMPLETED`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = "BXI",
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
+    given(inductionScheduleService.createInductionSchedule(any(), any())).willThrow(
+      InductionScheduleAlreadyExistsException(inductionSchedule),
+    )
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate)
+    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate)
   }
 
   @Test

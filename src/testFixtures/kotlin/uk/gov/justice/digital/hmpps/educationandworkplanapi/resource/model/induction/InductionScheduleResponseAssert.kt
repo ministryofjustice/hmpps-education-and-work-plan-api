@@ -159,4 +159,14 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     }
     return this
   }
+
+  fun hasDeadlineDate(expected: LocalDate): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (deadlineDate != expected) {
+        failWithMessage("Expected deadline date to be $expected, but was $deadlineDate")
+      }
+    }
+    return this
+  }
 }

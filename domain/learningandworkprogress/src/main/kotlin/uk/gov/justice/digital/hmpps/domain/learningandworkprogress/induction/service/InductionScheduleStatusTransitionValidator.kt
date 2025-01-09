@@ -41,12 +41,12 @@ class InductionScheduleStatusTransitionValidator {
       reason = "Cannot transition from COMPLETED to any other status.",
     ),
     ValidationRule(
-      condition = { current, new -> current.isExemptionOrExclusion() && new.isExemptionOrExclusion() },
-      reason = "Cannot transition from one exemption or exclusion status to another.",
+      condition = { current, _ -> current == InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS },
+      reason = "Cannot transition from PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS to any other status.",
     ),
     ValidationRule(
-      condition = { current, new -> new == InductionScheduleStatus.SCHEDULED && !current.isExemptionOrExclusion() },
-      reason = "Can only transition to SCHEDULED if the current status is an exemption or exclusion.",
+      condition = { current, new -> current.isExemptionOrExclusion() && new.isExemptionOrExclusion() },
+      reason = "Cannot transition from one exemption or exclusion status to another.",
     ),
     ValidationRule(
       condition = { _, new -> new in unsupportedNewStatuses },
@@ -60,6 +60,7 @@ class InductionScheduleStatusTransitionValidator {
       InductionScheduleStatus.EXEMPT_PRISONER_RELEASE,
       InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
       InductionScheduleStatus.COMPLETED,
+      InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     )
   }
 }

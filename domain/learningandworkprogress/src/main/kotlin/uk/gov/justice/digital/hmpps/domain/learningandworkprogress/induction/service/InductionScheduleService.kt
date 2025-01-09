@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import java.time.LocalDate
@@ -46,6 +47,33 @@ class InductionScheduleService(
       }
   }
 
+  /**
+   * Re-schedule the prisoner's Induction Schedule.
+   *
+   * Unless the Induction Schedule is already COMPLETED or PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS the
+   * status is set to SCHEDULED and a new deadline date is set.
+   * The new deadline date is set as it were a new Induction Schedule via the [InductionScheduleDateCalculationService]
+   *
+   * Throws [InductionScheduleNotFoundException] ff the prisoner does not have an [InductionSchedule].
+   */
+  fun reschedulePrisonersInductionSchedule(prisonNumber: String, prisonerAdmissionDate: LocalDate, prisonId: String): InductionSchedule {
+    val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+      ?: throw InductionScheduleNotFoundException(prisonNumber)
+
+    return with(inductionSchedule) {
+      // Validate the status transition
+      inductionScheduleStatusTransitionValidator.validate(prisonNumber, scheduleStatus, SCHEDULED)
+
+      // A rescheduled Induction Schedule must have its due date set as if it were a new Induction Schedule based on the prisoner's admission date
+      val newInductionDeadlineDate = inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(
+        prisonNumber = prisonNumber,
+        admissionDate = prisonerAdmissionDate,
+        prisonId = prisonId,
+      ).deadlineDate
+      rescheduleInductionSchedule(this, newInductionDeadlineDate, prisonId)
+    }
+  }
+
   fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =
     inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
@@ -63,86 +91,88 @@ class InductionScheduleService(
     newStatus: InductionScheduleStatus,
     exemptionReason: String?,
     prisonId: String,
-  ) {
+  ): InductionSchedule {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
 
     // Validate the status transition
     inductionScheduleStatusTransitionValidator.validate(prisonNumber, inductionSchedule.scheduleStatus, newStatus)
 
-    when {
+    return when {
       newStatus == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
         updateInductionScheduleFollowingSystemTechnicalIssue(inductionSchedule, exemptionReason, prisonNumber, prisonId)
       }
 
       newStatus.isExemptionOrExclusion() -> {
-        updateExemptStatus(inductionSchedule, newStatus, exemptionReason, prisonNumber, prisonId)
+        exemptInductionSchedule(inductionSchedule, newStatus, exemptionReason, prisonNumber, prisonId)
       }
 
       else -> {
-        updateScheduledStatus(inductionSchedule, prisonNumber, prisonId)
+        val adjustedInductionDueDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
+        rescheduleInductionSchedule(inductionSchedule, adjustedInductionDueDate, prisonId)
       }
     }
   }
 
-  private fun updateExemptStatus(
+  private fun exemptInductionSchedule(
     inductionSchedule: InductionSchedule,
     newStatus: InductionScheduleStatus,
     exemptionReason: String?,
-    prisonNumber: String,
     prisonId: String,
-  ) {
-    val updatedInductionSchedule = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
-      UpdateInductionScheduleStatusDto(
-        reference = inductionSchedule.reference,
-        scheduleStatus = newStatus,
-        exemptionReason = exemptionReason,
-        prisonNumber = prisonNumber,
-        updatedAtPrison = prisonId,
-      ),
-    )
-    performFollowOnEvents(
-      updatedInductionSchedule = updatedInductionSchedule,
-      oldStatus = inductionSchedule.scheduleStatus,
-      oldDeadlineDate = inductionSchedule.deadlineDate,
-    )
-  }
+  ): InductionSchedule =
+    with(inductionSchedule) {
+      inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
+        UpdateInductionScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = newStatus,
+          exemptionReason = exemptionReason,
+          prisonNumber = prisonNumber,
+          updatedAtPrison = prisonId,
+        ),
+      ).also {
+        performFollowOnEvents(
+          updatedInductionSchedule = it,
+          oldStatus = scheduleStatus,
+          oldDeadlineDate = deadlineDate,
+        )
+      }
+    }
 
-  private fun updateScheduledStatus(
+  private fun rescheduleInductionSchedule(
     inductionSchedule: InductionSchedule,
-    prisonNumber: String,
+    newInductionDueDate: LocalDate,
     prisonId: String,
-  ) {
-    val adjustedInductionDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
-    val updatedInductionSchedule = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
-      UpdateInductionScheduleStatusDto(
-        reference = inductionSchedule.reference,
-        scheduleStatus = InductionScheduleStatus.SCHEDULED,
-        latestDeadlineDate = adjustedInductionDate,
-        prisonNumber = prisonNumber,
-        updatedAtPrison = prisonId,
-      ),
-    )
-    performFollowOnEvents(
-      updatedInductionSchedule = updatedInductionSchedule,
-      oldStatus = inductionSchedule.scheduleStatus,
-      oldDeadlineDate = inductionSchedule.deadlineDate,
-    )
-  }
+  ): InductionSchedule =
+    with(inductionSchedule) {
+      inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
+        UpdateInductionScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = SCHEDULED,
+          latestDeadlineDate = newInductionDueDate,
+          prisonNumber = prisonNumber,
+          updatedAtPrison = prisonId,
+        ),
+      ).also {
+        performFollowOnEvents(
+          updatedInductionSchedule = it,
+          oldStatus = scheduleStatus,
+          oldDeadlineDate = deadlineDate,
+        )
+      }
+    }
 
   private fun updateInductionScheduleFollowingSystemTechnicalIssue(
     inductionSchedule: InductionSchedule,
     exemptionReason: String?,
-    prisonNumber: String,
     prisonId: String,
-  ) {
+  ): InductionSchedule {
     // Update the induction schedule status to EXEMPT_SYSTEM_TECHNICAL_ISSUE
     val updatedInductionScheduleFirst = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
         reference = inductionSchedule.reference,
         scheduleStatus = InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         exemptionReason = exemptionReason,
-        prisonNumber = prisonNumber,
+        prisonNumber = inductionSchedule.prisonNumber,
         updatedAtPrison = prisonId,
       ),
     )
@@ -154,20 +184,21 @@ class InductionScheduleService(
 
     // Then update the induction schedule to be SCHEDULED with an adjusted induction date
     val adjustedInductionDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(updatedInductionScheduleFirst)
-    val updatedInductionScheduleSecond = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
+    return inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
         reference = inductionSchedule.reference,
-        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+        scheduleStatus = SCHEDULED,
         latestDeadlineDate = adjustedInductionDate,
-        prisonNumber = prisonNumber,
+        prisonNumber = inductionSchedule.prisonNumber,
         updatedAtPrison = prisonId,
       ),
-    )
-    performFollowOnEvents(
-      updatedInductionSchedule = updatedInductionScheduleSecond,
-      oldStatus = inductionSchedule.scheduleStatus,
-      oldDeadlineDate = inductionSchedule.deadlineDate,
-    )
+    ).also {
+      performFollowOnEvents(
+        updatedInductionSchedule = it,
+        oldStatus = inductionSchedule.scheduleStatus,
+        oldDeadlineDate = inductionSchedule.deadlineDate,
+      )
+    }
   }
 
   private fun performFollowOnEvents(

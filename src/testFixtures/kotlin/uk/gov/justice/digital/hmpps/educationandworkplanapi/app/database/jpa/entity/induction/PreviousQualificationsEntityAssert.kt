@@ -86,16 +86,6 @@ class PreviousQualificationsEntityAssert(actual: PreviousQualificationsEntity?) 
     return this
   }
 
-  fun hasAReference(): PreviousQualificationsEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: PreviousQualificationsEntity): PreviousQualificationsEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
