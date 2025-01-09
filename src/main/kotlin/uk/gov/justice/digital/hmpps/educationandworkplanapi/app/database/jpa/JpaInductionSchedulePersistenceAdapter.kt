@@ -71,6 +71,7 @@ class JpaInductionSchedulePersistenceAdapter(
       scheduleStatus = inductionScheduleEntityMapper.toInductionScheduleStatus(updateInductionScheduleStatusDto.scheduleStatus)
       exemptionReason = updateInductionScheduleStatusDto.exemptionReason
       updateInductionScheduleStatusDto.latestDeadlineDate?.let { deadlineDate = it }
+      updatedAtPrison = updateInductionScheduleStatusDto.updatedAtPrison
     }
 
     val savedReviewScheduleEntity = inductionScheduleRepository.save(inductionScheduleEntity)

@@ -16,6 +16,7 @@ class PesInductionScheduleDateCalculationServiceTest {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     val admissionDate = LocalDate.now().minusDays(1)
+    val prisonId = "BXI"
 
     val expected = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,
@@ -25,7 +26,7 @@ class PesInductionScheduleDateCalculationServiceTest {
     )
 
     // When
-    val actual = service.determineCreateInductionScheduleDto(prisonNumber, admissionDate)
+    val actual = service.determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId)
 
     // Then
     assertThat(actual).isEqualTo(expected)

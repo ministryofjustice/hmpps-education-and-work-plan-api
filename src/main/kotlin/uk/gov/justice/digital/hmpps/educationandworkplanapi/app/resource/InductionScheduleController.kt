@@ -82,6 +82,7 @@ class InductionScheduleController(
       prisonNumber = prisonNumber,
       newStatus = toReviewScheduleStatus(updateInductionScheduleStatusRequest.status),
       exemptionReason = updateInductionScheduleStatusRequest.exemptionReason,
+      prisonId = updateInductionScheduleStatusRequest.prisonId,
     )
   }
 

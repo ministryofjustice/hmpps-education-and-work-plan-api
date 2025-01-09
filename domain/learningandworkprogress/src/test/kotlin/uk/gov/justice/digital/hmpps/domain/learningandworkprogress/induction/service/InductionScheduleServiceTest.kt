@@ -142,22 +142,23 @@ class InductionScheduleServiceTest {
       // Given
       val prisonNumber = randomValidPrisonNumber()
       val admissionDate = LocalDate.now()
+      val prisonId = "BXI"
 
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
 
       val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any())).willReturn(createInductionScheduleDto)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any())).willReturn(createInductionScheduleDto)
 
       val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
       given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
 
       // When
-      val actual = service.createInductionSchedule(prisonNumber, admissionDate)
+      val actual = service.createInductionSchedule(prisonNumber, admissionDate, prisonId)
 
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId)
       verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
       verify(inductionScheduleEventService).inductionScheduleCreated(actual)
     }
@@ -167,6 +168,7 @@ class InductionScheduleServiceTest {
       // Given
       val prisonNumber = randomValidPrisonNumber()
       val admissionDate = LocalDate.now()
+      val prisonId = "BXI"
 
       val existingInductionSchedule = aValidInductionSchedule(
         prisonNumber = prisonNumber,
@@ -177,8 +179,7 @@ class InductionScheduleServiceTest {
       // When
       val exception = catchThrowableOfType(
         InductionScheduleAlreadyExistsException::class.java,
-        { service.createInductionSchedule(prisonNumber, admissionDate) },
-      )
+      ) { service.createInductionSchedule(prisonNumber, admissionDate, prisonId) }
 
       // Then
       assertThat(exception.inductionSchedule).isEqualTo(existingInductionSchedule)
