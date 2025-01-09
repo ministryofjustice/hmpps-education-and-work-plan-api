@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationEventService
@@ -9,7 +8,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.CiagKpiService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
@@ -35,9 +33,6 @@ import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineServic
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PefCiagKpiService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ciagkpi.PesCiagKpiService
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -125,24 +120,4 @@ class DomainConfiguration {
     reviewScheduleEventService: ReviewScheduleEventService,
   ): ReviewScheduleService =
     ReviewScheduleService(reviewSchedulePersistenceAdapter, reviewScheduleEventService)
-
-  @Bean
-  fun ciagKpiService(
-    @Value("\${ciag-kpi-processing-rule}") ciagKpiProcessingRule: String?,
-    inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
-    inductionPersistenceAdapter: InductionPersistenceAdapter,
-    reviewScheduleAdapter: ReviewScheduleAdapter,
-    inductionScheduleEventService: InductionScheduleEventService,
-  ): CiagKpiService? =
-    when (ciagKpiProcessingRule) {
-      "PEF" -> PefCiagKpiService(
-        inductionSchedulePersistenceAdapter,
-        inductionPersistenceAdapter,
-        reviewScheduleAdapter,
-        inductionScheduleEventService,
-      )
-
-      "PES" -> PesCiagKpiService()
-      else -> null
-    }
 }

@@ -11,9 +11,12 @@ import java.time.LocalDate
 
 /**
  * Implementation of [InductionScheduleDateCalculationService] with implemented behaviours specific to the CIAG PES contracts.
+ *
+ * This bean is only enabled when the `ciag-kpi-processing-rule` property is set to `PES`; otherwise [PefInductionScheduleDateCalculationService]
+ * is used.
  */
 @Service
-@ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PES", matchIfMissing = false)
+@ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PES")
 class PesInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
 
   /**

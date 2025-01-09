@@ -40,6 +40,9 @@ class InductionScheduleService(
       admissionDate = prisonerAdmissionDate,
     )
     return inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
+      .also {
+        inductionScheduleEventService.inductionScheduleCreated(it)
+      }
   }
 
   fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =

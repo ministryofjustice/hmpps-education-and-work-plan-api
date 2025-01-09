@@ -37,9 +37,6 @@ class InductionServiceTest {
   @Mock
   private lateinit var inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter
 
-  @Mock
-  private lateinit var ciagKpiService: CiagKpiService
-
   companion object {
     private const val PRISON_NUMBER = "A1234AB"
   }

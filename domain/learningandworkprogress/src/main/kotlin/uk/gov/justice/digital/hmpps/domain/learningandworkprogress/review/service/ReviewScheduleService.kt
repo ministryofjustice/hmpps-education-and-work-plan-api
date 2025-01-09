@@ -92,15 +92,17 @@ class ReviewScheduleService(
       )
       // Persist the initial review schedule if a ReviewScheduleWindow is calculated
       reviewScheduleDateCalculationService.calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
-        ?.let {
+        ?.let { reviewScheduleWindow ->
           reviewSchedulePersistenceAdapter.createReviewSchedule(
             CreateReviewScheduleDto(
               prisonNumber = prisonNumber,
               prisonId = prisonId,
-              reviewScheduleWindow = it,
+              reviewScheduleWindow = reviewScheduleWindow,
               scheduleCalculationRule = reviewScheduleCalculationRule,
             ),
-          )
+          ).also {
+            reviewScheduleEventService.reviewScheduleCreated(it)
+          }
         }
     }
 
