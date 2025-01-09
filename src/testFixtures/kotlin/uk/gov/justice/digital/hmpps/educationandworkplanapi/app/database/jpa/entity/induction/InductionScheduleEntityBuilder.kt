@@ -16,6 +16,8 @@ fun aPersistedInductionScheduleEntity(
   createdAt: Instant = Instant.now(),
   updatedAt: Instant = Instant.now(),
   updatedBy: String = "auser_gen",
+  createdAtPrison: String = "BXI",
+  updatedAtPrison: String = "BXI",
 ): InductionScheduleEntity =
   InductionScheduleEntity(
     reference = reference,
@@ -23,6 +25,8 @@ fun aPersistedInductionScheduleEntity(
     deadlineDate = deadlineDate,
     scheduleCalculationRule = scheduleCalculationRule,
     scheduleStatus = scheduleStatus,
+    createdAtPrison = createdAtPrison,
+    updatedAtPrison = updatedAtPrison,
   ).apply {
     this.id = id
     this.createdAt = createdAt
@@ -37,6 +41,8 @@ fun anUnPersistedInductionScheduleEntity(
   deadlineDate: LocalDate = LocalDate.now().plusDays(30),
   scheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
   scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+  createdAtPrison: String = "BXI",
+  updatedAtPrison: String = "BXI",
 ): InductionScheduleEntity =
   InductionScheduleEntity(
     reference = reference,
@@ -44,4 +50,6 @@ fun anUnPersistedInductionScheduleEntity(
     deadlineDate = deadlineDate,
     scheduleCalculationRule = scheduleCalculationRule,
     scheduleStatus = scheduleStatus,
+    updatedAtPrison = updatedAtPrison,
+    createdAtPrison = createdAtPrison,
   )

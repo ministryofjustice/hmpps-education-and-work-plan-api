@@ -32,10 +32,12 @@ class InductionHistoryScheduleResourceMapper(
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
         updatedBy = lastUpdatedBy!!,
         updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
+        updatedAtPrison = lastUpdatedAtPrison,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
         inductionPerformedBy = if (isCompleted) induction?.let { userService.getUserDetails(it.lastUpdatedBy!!).name } else null,
         inductionPerformedAt = if (isCompleted) induction?.lastUpdatedAt?.atZone(ZoneId.systemDefault())?.toLocalDate() else null,
         version = version,
+        createdAtPrison = createdAtPrison,
       )
     }
   }

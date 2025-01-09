@@ -21,6 +21,8 @@ data class InductionScheduleHistory(
    * The name of the logged-in user who created the Induction.
    */
   val createdByDisplayName: String?,
+
+  val createdAtPrison: String,
   /**
    * The timestamp when this Induction was created.
    */
@@ -33,6 +35,8 @@ data class InductionScheduleHistory(
    * The name of the logged-in user who updated the Induction.
    */
   val lastUpdatedByDisplayName: String?,
+
+  val lastUpdatedAtPrison: String,
   /**
    * The timestamp when this Induction was updated.
    */

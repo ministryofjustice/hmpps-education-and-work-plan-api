@@ -57,4 +57,10 @@ data class InductionScheduleHistoryEntity(
 
   @Column
   var updatedAt: Instant? = null,
+
+  @Column(updatable = false)
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
 )

@@ -25,6 +25,8 @@ data class InductionSchedule(
    * The timestamp when this Induction was created.
    */
   val createdAt: Instant?,
+
+  val createdAtPrison: String,
   /**
    * The user ID of the person (logged-in user) who updated the Induction.
    */
@@ -37,6 +39,8 @@ data class InductionSchedule(
    * The timestamp when this Induction was updated.
    */
   val lastUpdatedAt: Instant?,
+
+  val lastUpdatedAtPrison: String,
 
   var exemptionReason: String?,
 )

@@ -9,4 +9,5 @@ data class CreateInductionScheduleDto(
   val deadlineDate: LocalDate,
   val scheduleCalculationRule: InductionScheduleCalculationRule,
   val scheduleStatus: InductionScheduleStatus,
+  val prisonId: String,
 )
