@@ -25,7 +25,7 @@ class InductionScheduleService(
    * A prisoner can only have 1 Induction Schedule. Throws [InductionScheduleAlreadyExistsException] if the prisoner
    * already has an Induction Schedule regardless of status (scheduled, completed, exempt etc.)
    */
-  fun createInductionSchedule(prisonNumber: String, prisonerAdmissionDate: LocalDate): InductionSchedule {
+  fun createInductionSchedule(prisonNumber: String, prisonerAdmissionDate: LocalDate, prisonId: String): InductionSchedule {
     // Check for an existing Induction Schedule
     val inductionSchedule = runCatching {
       getInductionScheduleForPrisoner(prisonNumber)
@@ -38,6 +38,7 @@ class InductionScheduleService(
     val createInductionScheduleDto = inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       admissionDate = prisonerAdmissionDate,
+      prisonId = prisonId,
     )
     return inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
       .also {
@@ -61,6 +62,7 @@ class InductionScheduleService(
     prisonNumber: String,
     newStatus: InductionScheduleStatus,
     exemptionReason: String?,
+    prisonId: String,
   ) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
@@ -70,15 +72,15 @@ class InductionScheduleService(
 
     when {
       newStatus == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
-        updateInductionScheduleFollowingSystemTechnicalIssue(inductionSchedule, exemptionReason, prisonNumber)
+        updateInductionScheduleFollowingSystemTechnicalIssue(inductionSchedule, exemptionReason, prisonNumber, prisonId)
       }
 
       newStatus.isExemptionOrExclusion() -> {
-        updateExemptStatus(inductionSchedule, newStatus, exemptionReason, prisonNumber)
+        updateExemptStatus(inductionSchedule, newStatus, exemptionReason, prisonNumber, prisonId)
       }
 
       else -> {
-        updateScheduledStatus(inductionSchedule, prisonNumber)
+        updateScheduledStatus(inductionSchedule, prisonNumber, prisonId)
       }
     }
   }
@@ -88,6 +90,7 @@ class InductionScheduleService(
     newStatus: InductionScheduleStatus,
     exemptionReason: String?,
     prisonNumber: String,
+    prisonId: String,
   ) {
     val updatedInductionSchedule = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
@@ -95,6 +98,7 @@ class InductionScheduleService(
         scheduleStatus = newStatus,
         exemptionReason = exemptionReason,
         prisonNumber = prisonNumber,
+        updatedAtPrison = prisonId,
       ),
     )
     performFollowOnEvents(
@@ -107,6 +111,7 @@ class InductionScheduleService(
   private fun updateScheduledStatus(
     inductionSchedule: InductionSchedule,
     prisonNumber: String,
+    prisonId: String,
   ) {
     val adjustedInductionDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
     val updatedInductionSchedule = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
@@ -115,6 +120,7 @@ class InductionScheduleService(
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
         latestDeadlineDate = adjustedInductionDate,
         prisonNumber = prisonNumber,
+        updatedAtPrison = prisonId,
       ),
     )
     performFollowOnEvents(
@@ -128,6 +134,7 @@ class InductionScheduleService(
     inductionSchedule: InductionSchedule,
     exemptionReason: String?,
     prisonNumber: String,
+    prisonId: String,
   ) {
     // Update the induction schedule status to EXEMPT_SYSTEM_TECHNICAL_ISSUE
     val updatedInductionScheduleFirst = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
@@ -136,6 +143,7 @@ class InductionScheduleService(
         scheduleStatus = InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         exemptionReason = exemptionReason,
         prisonNumber = prisonNumber,
+        updatedAtPrison = prisonId,
       ),
     )
     performFollowOnEvents(
@@ -152,6 +160,7 @@ class InductionScheduleService(
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
         latestDeadlineDate = adjustedInductionDate,
         prisonNumber = prisonNumber,
+        updatedAtPrison = prisonId,
       ),
     )
     performFollowOnEvents(

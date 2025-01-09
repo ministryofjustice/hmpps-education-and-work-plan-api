@@ -12,6 +12,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
@@ -55,22 +56,25 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "BXI"
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
       reason = ADMISSION,
-      prisonId = "BXI",
+      prisonId = prisonId,
     )
     val inboundEvent = anInboundEvent(
       additionalInformation = additionalInformation,
       eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
     )
 
+    val prisoner = aValidPrisoner(prisonNumber)
     // When
+    whenever(prisonerSearchApiService.getPrisoner(prisonNumber)).thenReturn(prisoner)
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
     verifyNoInteractions(reviewScheduleService)
   }
 
@@ -79,11 +83,12 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "BXI"
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
       reason = ADMISSION,
-      prisonId = "BXI",
+      prisonId = prisonId,
     )
     val inboundEvent = anInboundEvent(
       additionalInformation = additionalInformation,
@@ -91,7 +96,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
-    given(inductionScheduleService.createInductionSchedule(any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -100,7 +105,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val prisoner = aValidPrisoner(prisonNumber)
-    given(prisonerSearchApiService.getPrisoner(any())).willReturn(prisoner)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(prisoner)
 
     val createReviewScheduleDto = aValidCreateInitialReviewScheduleDto()
     given(createInitialReviewScheduleMapper.fromPrisonerToDomain(any(), any(), any())).willReturn(createReviewScheduleDto)
@@ -109,7 +114,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
     verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
     verify(createInitialReviewScheduleMapper).fromPrisonerToDomain(prisoner, isTransfer = false, isReadmission = true)

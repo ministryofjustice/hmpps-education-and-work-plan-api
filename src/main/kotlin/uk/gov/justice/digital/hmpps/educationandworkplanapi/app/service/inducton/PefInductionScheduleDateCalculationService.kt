@@ -30,13 +30,12 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
    * Under the PEF contract the prisoner's Induction is immediately scheduled with a deadline date of the prisoner's admission date
    * plus 20 days.
    */
-  override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate): CreateInductionScheduleDto =
-    // TODO remove this hardcoded BXI
+  override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String): CreateInductionScheduleDto =
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = admissionDate.plusDays(DAYS_AFTER_ADMISSION),
       scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
-      prisonId = "BXI",
+      prisonId = prisonId,
     )
 }

@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.RETURN_FROM_COURT
@@ -41,20 +42,23 @@ class PrisonerReceivedIntoPrisonEventService(
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
-
+    val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
+    val prisonId = prisoner.prisonId ?: "NA"
     try {
       // Attempt to create the prisoner's Induction Schedule
       inductionScheduleService.createInductionSchedule(
         prisonNumber = nomsNumber,
         prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC),
+        prisonId = prisonId,
       )
     } catch (e: InductionScheduleAlreadyExistsException) {
       // Prisoner already has an Induction Schedule
       when (e.inductionSchedule.scheduleStatus) {
         COMPLETED -> {
           // The Induction was completed so we need to reschedule their active Review Schedule if they have one, or create a new Review Schedule.
-          rescheduleOrCreatePrisonersReviewSchedule(nomsNumber)
+          rescheduleOrCreatePrisonersReviewSchedule(nomsNumber, prisoner)
         }
+
         else -> {
           // The Induction was not completed so need to reschedule it with a new deadline date.
           // TODO - reschedule it
@@ -78,13 +82,12 @@ class PrisonerReceivedIntoPrisonEventService(
     // TODO - RR-1215 - call inductionScheduleService to exempt & reschedule Induction Schedule due to prisoner transfer
   }
 
-  private fun rescheduleOrCreatePrisonersReviewSchedule(prisonNumber: String) {
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisonNumber: String, prisoner: Prisoner) {
     try {
       val reviewSchedule = reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber)
       // TODO - reschedule it
     } catch (e: ReviewScheduleNotFoundException) {
       // An active Review Schedule does not exist - create a new Review Schedule for the prisoner
-      val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
       val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
         prisoner = prisoner,
         // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)

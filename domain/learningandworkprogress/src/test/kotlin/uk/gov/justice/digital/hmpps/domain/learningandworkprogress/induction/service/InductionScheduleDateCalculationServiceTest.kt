@@ -21,6 +21,7 @@ class InductionScheduleDateCalculationServiceTest {
     override fun determineCreateInductionScheduleDto(
       prisonNumber: String,
       admissionDate: LocalDate,
+      prisonId: String,
     ): CreateInductionScheduleDto {
       TODO("Not implemented here")
     }

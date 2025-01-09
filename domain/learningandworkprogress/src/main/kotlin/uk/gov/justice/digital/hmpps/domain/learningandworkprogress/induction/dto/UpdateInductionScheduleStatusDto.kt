@@ -10,4 +10,5 @@ data class UpdateInductionScheduleStatusDto(
   val exemptionReason: String? = null,
   val latestDeadlineDate: LocalDate? = null,
   val prisonNumber: String,
+  val updatedAtPrison: String,
 )
