@@ -43,7 +43,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
     val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
-    val prisonId = prisoner.prisonId ?: "NA"
+    val prisonId = prisoner.prisonId ?: "N/A"
     try {
       // Attempt to create the prisoner's Induction Schedule
       inductionScheduleService.createInductionSchedule(
