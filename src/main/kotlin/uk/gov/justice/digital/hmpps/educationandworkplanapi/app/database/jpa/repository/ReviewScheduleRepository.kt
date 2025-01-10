@@ -12,7 +12,7 @@ interface ReviewScheduleRepository : JpaRepository<ReviewScheduleEntity, UUID> {
 
   fun getAllByPrisonNumber(prisonNumber: String): List<ReviewScheduleEntity>
 
-  @Query("select rse from ReviewScheduleEntity rse where rse.prisonNumber = :prisonNumber and rse.scheduleStatus != 'COMPLETED'")
+  @Query("select rse from ReviewScheduleEntity rse where rse.prisonNumber = :prisonNumber and rse.scheduleStatus != 'COMPLETED' and rse.scheduleStatus != 'EXEMPT_PRISONER_RELEASE' and rse.scheduleStatus != 'EXEMPT_PRISONER_DEATH' and rse.scheduleStatus != 'EXEMPT_UNKNOWN'")
   fun findActiveReviewSchedule(prisonNumber: String): ReviewScheduleEntity?
 
   fun findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber: String): ReviewScheduleEntity?

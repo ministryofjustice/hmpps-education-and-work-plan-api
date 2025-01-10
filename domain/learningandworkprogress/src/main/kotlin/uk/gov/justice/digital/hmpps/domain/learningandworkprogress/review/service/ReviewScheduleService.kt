@@ -27,7 +27,7 @@ class ReviewScheduleService(
 
   /**
    * Returns the active [ReviewSchedule] for the prisoner identified by their prison number, where "active" is defined
-   * as not having the status "COMPLETED".
+   * as not having the status "COMPLETED", "EXEMPT_PRISONER_RELEASE", "EXEMPT_PRISONER_DEATH", or "EXEMPT_UNKNOWN".
    * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
    */
   fun getActiveReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
@@ -137,7 +137,7 @@ class ReviewScheduleService(
    * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_RELEASE
    *
    * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
-   * A Review Schedule with the status COMPLETE is not considered 'active'
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH or EXEMPT_UNKNOWN is not considered 'active'
    */
   fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
     reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
@@ -158,7 +158,7 @@ class ReviewScheduleService(
    * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_DEATH
    *
    * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
-   * A Review Schedule with the status COMPLETE is not considered 'active'
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH or EXEMPT_UNKNOWN is not considered 'active'
    */
   fun exemptActiveReviewScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
     reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
@@ -176,20 +176,41 @@ class ReviewScheduleService(
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
   /**
+   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_UNKNOWN
+   *
+   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH or EXEMPT_UNKNOWN is not considered 'active'
+   */
+  fun exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber: String, prisonId: String) =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateExemptStatus(
+          prisonNumber = prisonNumber,
+          prisonId = prisonId,
+          reviewSchedule = this,
+          newStatus = ReviewScheduleStatus.EXEMPT_UNKNOWN,
+          exemptionReason = null,
+        ).also {
+          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_UNKNOWN" }
+        }
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
+  /**
    * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_TRANSFER, then immediately
    * re-scheduling it.
    * Applying both status changes in quick succession (EXEMPT_PRISONER_TRANSFER, immediately followed by SCHEDULED) allows
    * for the full history of state changes of the [ReviewSchedule] to be maintained.
    *
    * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
-   * A Review Schedule with the status COMPLETE is not considered 'active'
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE or EXEMPT_PRISONER_DEATH is not considered 'active'
    */
-  fun exemptAndReScheduleActiveReviewScheduleStatusDueToPrisonerTransfer(prisonNumber: String, prisonTransferredTo: String) =
+  fun exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(prisonNumber: String, prisonTransferredTo: String) =
     reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
       ?.run {
         updateReviewScheduleFollowingPrisonerTransfer(this, prisonTransferredTo)
           .also {
-            log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_TRANSFER, and then re-scheduled" }
+            log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_TRANSFER, and then re-scheduled with deadline date [${reviewScheduleWindow.dateTo}]" }
           }
       }
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
@@ -229,7 +250,7 @@ class ReviewScheduleService(
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
         prisonId = prisonId,
         latestReviewDate = adjustedReviewDate,
-        prisonNumber = prisonNumber,
+        prisonNumber = reviewSchedule.prisonNumber,
       ),
     )
     performFollowOnEvents(

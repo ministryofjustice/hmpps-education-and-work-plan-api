@@ -169,4 +169,14 @@ class ScheduledActionPlanReviewResponseAssert(actual: ScheduledActionPlanReviewR
     }
     return this
   }
+
+  fun isVersion(expected: Int): ScheduledActionPlanReviewResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (version != expected) {
+        failWithMessage("Expected version to be $expected, but was $version")
+      }
+    }
+    return this
+  }
 }
