@@ -100,11 +100,11 @@ class InductionScheduleService(
 
     return when {
       newStatus == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
-        updateInductionScheduleFollowingSystemTechnicalIssue(inductionSchedule, exemptionReason, prisonNumber, prisonId)
+        updateInductionScheduleFollowingSystemTechnicalIssue(inductionSchedule, exemptionReason, prisonId)
       }
 
       newStatus.isExemptionOrExclusion() -> {
-        exemptInductionSchedule(inductionSchedule, newStatus, exemptionReason, prisonNumber, prisonId)
+        exemptInductionSchedule(inductionSchedule, newStatus, exemptionReason, prisonId)
       }
 
       else -> {

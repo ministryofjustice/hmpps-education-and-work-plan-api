@@ -48,6 +48,7 @@ class InductionScheduleServiceTest {
 
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
+    private val PRISON_ID = "BXI"
     private val TODAY = LocalDate.now()
     private val NOW = Instant.now()
   }
@@ -212,7 +213,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
 
       val expectedDueDate = prisonerAdmissionDate.plusDays(20)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any())).willReturn(
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any())).willReturn(
         aValidCreateInductionScheduleDto(
           prisonNumber = prisonNumber,
           deadlineDate = expectedDueDate,
@@ -231,6 +232,7 @@ class InductionScheduleServiceTest {
         scheduleStatus = SCHEDULED,
         exemptionReason = null,
         latestDeadlineDate = expectedDueDate,
+        updatedAtPrison = PRISON_ID,
       )
       val expectedUpdatedInductionScheduleStatus = UpdatedInductionScheduleStatus(
         reference = inductionSchedule.reference,
@@ -245,12 +247,12 @@ class InductionScheduleServiceTest {
       )
 
       // When
-      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate)
+      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, PRISON_ID)
 
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate, PRISON_ID)
       verify(inductionSchedulePersistenceAdapter).updateInductionScheduleStatus(expectedUpdateInductionScheduleStatusDto)
       verify(inductionScheduleEventService).inductionScheduleStatusUpdated(expectedUpdatedInductionScheduleStatus)
     }
@@ -265,7 +267,7 @@ class InductionScheduleServiceTest {
 
       // When
       val exception = catchThrowableOfType(InvalidInductionScheduleStatusException::class.java) {
-        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY)
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID)
       }
 
       // Then
@@ -284,7 +286,7 @@ class InductionScheduleServiceTest {
 
       // When
       val exception = catchThrowableOfType(InductionScheduleNotFoundException::class.java) {
-        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY)
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID)
       }
 
       // Then

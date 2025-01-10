@@ -85,7 +85,8 @@ class PrisonerReceivedIntoPrisonEventService(
   }
 
   private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner) {
-    val reviewSchedule = runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
+    val reviewSchedule =
+      runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
     if (reviewSchedule != null) {
       // TODO - reschedule it
     } else {

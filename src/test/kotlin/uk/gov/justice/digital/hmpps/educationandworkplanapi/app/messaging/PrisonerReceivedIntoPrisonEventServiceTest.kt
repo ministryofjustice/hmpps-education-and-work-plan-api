@@ -127,6 +127,10 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "MDI"
+
+    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber, prisonId = prisonId)
+    given(prisonerSearchApiService.getPrisoner(any())).willReturn(prisoner)
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
@@ -139,7 +143,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
-    given(inductionScheduleService.createInductionSchedule(any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -147,8 +151,9 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate)
-    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(prisonerSearchApiService).getPrisoner(prisonNumber)
   }
 
   @Test
