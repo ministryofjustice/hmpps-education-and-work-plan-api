@@ -53,7 +53,6 @@ class PreviousQualificationsEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)

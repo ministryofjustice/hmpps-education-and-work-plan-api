@@ -50,6 +50,16 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     return this
   }
 
+  fun wasCreatedAtPrison(expected: String): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (createdAtPrison != expected) {
+        failWithMessage("Expected createdAtPrison to be $expected, but was $createdAtPrison")
+      }
+    }
+    return this
+  }
+
   fun wasUpdatedAt(expected: OffsetDateTime): InductionScheduleResponseAssert {
     isNotNull
     with(actual!!) {
@@ -65,6 +75,16 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     with(actual!!) {
       if (updatedAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
+      }
+    }
+    return this
+  }
+
+  fun wasUpdatedAtPrison(expected: String): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (updatedAtPrison != expected) {
+        failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
     }
     return this
@@ -155,6 +175,16 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     with(actual!!) {
       if (version != expected) {
         failWithMessage("Expected version to be $expected, but was $version")
+      }
+    }
+    return this
+  }
+
+  fun hasDeadlineDate(expected: LocalDate): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (deadlineDate != expected) {
+        failWithMessage("Expected deadline date to be $expected, but was $deadlineDate")
       }
     }
     return this
