@@ -101,6 +101,13 @@ class InductionEntity(
   @Column
   @LastModifiedByDisplayName
   var updatedByDisplayName: String? = null,
+
+  @Column(updatable = false)
+  val conductedBy: String?,
+
+  @Column(updatable = false)
+  val conductedByRole: String?,
+
 ) {
   fun updateLastUpdatedAt() {
     updatedAt = Instant.now()

@@ -27,7 +27,6 @@ class JpaInductionPersistenceAdapter(
 
   @Transactional
   override fun createInduction(createInductionDto: CreateInductionDto): Induction {
-    val prisonNumber = createInductionDto.prisonNumber
     val inductionEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
     val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto)
     return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity)
