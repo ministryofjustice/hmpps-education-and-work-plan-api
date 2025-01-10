@@ -22,6 +22,8 @@ fun aValidInductionEntity(
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
   updatedByDisplayName: String? = null,
+  conductedBy: String? = null,
+  conductedByRole: String? = null,
 ) = InductionEntity(
   id = id,
   reference = reference,
@@ -40,6 +42,9 @@ fun aValidInductionEntity(
   updatedAtPrison = updatedAtPrison,
   updatedBy = updatedBy,
   updatedByDisplayName = updatedByDisplayName,
+  conductedBy = conductedBy,
+  conductedByRole = conductedByRole,
+
 )
 
 fun aValidInductionEntityWithJpaFieldsPopulated(
@@ -60,6 +65,8 @@ fun aValidInductionEntityWithJpaFieldsPopulated(
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
   updatedByDisplayName: String? = "Barry Jones",
+  conductedBy: String? = "John Smith",
+  conductedByRole: String? = "Peer Mentor",
 ) = InductionEntity(
   id = id,
   reference = reference,
@@ -78,4 +85,6 @@ fun aValidInductionEntityWithJpaFieldsPopulated(
   updatedAtPrison = updatedAtPrison,
   updatedBy = updatedBy,
   updatedByDisplayName = updatedByDisplayName,
+  conductedBy = conductedBy,
+  conductedByRole = conductedByRole,
 )
