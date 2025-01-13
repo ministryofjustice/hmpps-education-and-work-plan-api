@@ -58,7 +58,7 @@ class PrisonerReceivedIntoPrisonEventService(
       when (e.inductionSchedule.scheduleStatus) {
         COMPLETED -> {
           // The Induction was completed so we need to reschedule their active Review Schedule if they have one, or create a new Review Schedule.
-          rescheduleOrCreatePrisonersReviewSchedule(prisoner)
+          rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
         }
 
         else -> {
@@ -73,7 +73,7 @@ class PrisonerReceivedIntoPrisonEventService(
     log.info { "Processing Prisoner Admission Event (due to transfer) for prisoner [$nomsNumber]" }
 
     try {
-      reviewScheduleService.exemptAndReScheduleActiveReviewScheduleStatusDueToPrisonerTransfer(
+      reviewScheduleService.exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(
         prisonNumber = nomsNumber,
         prisonTransferredTo = prisonId,
       )
@@ -84,20 +84,21 @@ class PrisonerReceivedIntoPrisonEventService(
     // TODO - RR-1215 - call inductionScheduleService to exempt & reschedule Induction Schedule due to prisoner transfer
   }
 
-  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner) {
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String) {
     val reviewSchedule =
       runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
     if (reviewSchedule != null) {
-      // TODO - reschedule it
-    } else {
-      // An active Review Schedule does not exist - create a new Review Schedule for the prisoner
-      val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
-        prisoner = prisoner,
-        // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)
-        isReadmission = true,
-        isTransfer = false,
-      )
-      reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
+      // An active Review Schedule exists - Exempt it for unknown reason, which will make it non-active
+      reviewScheduleService.exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber = prisoner.prisonerNumber, prisonId = prisonId)
     }
+
+    // Create a new Review Schedule for the prisoner
+    val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
+      prisoner = prisoner,
+      // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)
+      isReadmission = true,
+      isTransfer = false,
+    )
+    reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
   }
 }

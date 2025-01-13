@@ -51,6 +51,7 @@ enum class ReviewScheduleStatus(val isExclusion: Boolean = false, val isExemptio
   EXEMPT_PRISONER_TRANSFER(isExemption = true),
   EXEMPT_PRISONER_RELEASE(isExemption = true),
   EXEMPT_PRISONER_DEATH(isExemption = true),
+  EXEMPT_UNKNOWN,
   COMPLETED,
   ;
 

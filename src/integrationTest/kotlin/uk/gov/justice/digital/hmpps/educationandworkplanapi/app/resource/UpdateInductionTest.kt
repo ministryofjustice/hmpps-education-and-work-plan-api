@@ -368,6 +368,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       // different prison to the create request
       updatedAtPrison = "MDI",
     )
+
     // these fields should be created
     val expectedPreviousWorkExperiences = aValidPreviousWorkExperiencesResponse(
       createdBy = updateUsername,

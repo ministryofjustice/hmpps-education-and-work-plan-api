@@ -65,7 +65,7 @@ abstract class InductionEntityMapper {
     Induction(
       reference = inductionEntity.reference!!,
       prisonNumber = inductionEntity.prisonNumber!!,
-      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease),
+      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease!!),
       previousQualifications = previousQualificationsEntityMapper.fromEntityToDomain(previousQualificationsEntity),
       previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining),
       previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
@@ -148,6 +148,6 @@ abstract class InductionEntityMapper {
   }
 
   fun updateWorkOnRelease(entity: InductionEntity, dto: UpdateInductionDto): WorkOnReleaseEntity? =
-    workOnReleaseEntityMapper.updateExistingEntityFromDto(entity.workOnRelease!!, dto.workOnRelease)
+    workOnReleaseEntityMapper.updateExistingEntityFromDto(entity.workOnRelease!!, dto.workOnRelease!!)
       .let { entity.workOnRelease }
 }

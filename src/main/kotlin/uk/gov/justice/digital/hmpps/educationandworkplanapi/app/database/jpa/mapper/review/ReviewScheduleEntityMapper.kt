@@ -126,6 +126,7 @@ class ReviewScheduleEntityMapper {
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
       ReviewScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH
+      ReviewScheduleStatusEntity.EXEMPT_UNKNOWN -> ReviewScheduleStatusDomain.EXEMPT_UNKNOWN
     }
 
   fun toReviewScheduleStatus(reviewScheduleStatus: ReviewScheduleStatusDomain): ReviewScheduleStatusEntity =
@@ -145,5 +146,6 @@ class ReviewScheduleEntityMapper {
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_DEATH
+      ReviewScheduleStatusDomain.EXEMPT_UNKNOWN -> ReviewScheduleStatusEntity.EXEMPT_UNKNOWN
     }
 }

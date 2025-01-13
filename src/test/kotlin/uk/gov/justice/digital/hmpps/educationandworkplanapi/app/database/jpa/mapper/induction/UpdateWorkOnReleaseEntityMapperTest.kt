@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class UpdateWorkOnReleaseEntityMapperTest {
 
-  private val mapper = WorkOnReleaseEntityMapperImpl()
+  private val mapper = WorkOnReleaseEntityMapper()
 
   @Test
   fun `should update existing work on release values`() {
