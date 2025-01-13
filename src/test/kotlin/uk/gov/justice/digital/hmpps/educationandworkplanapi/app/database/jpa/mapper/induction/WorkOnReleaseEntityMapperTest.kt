@@ -54,11 +54,9 @@ class WorkOnReleaseEntityMapperTest {
       createdAt = workOnReleaseEntity.createdAt!!,
       createdAtPrison = workOnReleaseEntity.createdAtPrison!!,
       createdBy = workOnReleaseEntity.createdBy!!,
-      createdByDisplayName = workOnReleaseEntity.createdByDisplayName!!,
       lastUpdatedAt = workOnReleaseEntity.updatedAt!!,
       lastUpdatedAtPrison = workOnReleaseEntity.updatedAtPrison!!,
       lastUpdatedBy = workOnReleaseEntity.updatedBy!!,
-      lastUpdatedByDisplayName = workOnReleaseEntity.updatedByDisplayName!!,
     )
 
     // When

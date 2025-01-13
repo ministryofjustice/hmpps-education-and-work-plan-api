@@ -8,6 +8,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkOnReleaseEntity
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork as AffectAbilityToWorkEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork as HopingToWorkEntity
 
 @Component
 class WorkOnReleaseEntityMapper {
@@ -33,11 +35,9 @@ class WorkOnReleaseEntityMapper {
         toModel(affectAbilityToWork),
         affectAbilityToWorkOther,
         createdBy,
-        createdByDisplayName,
         createdAt,
         createdAtPrison!!,
         updatedBy,
-        updatedByDisplayName,
         updatedAt,
         updatedAtPrison!!,
       )
@@ -61,60 +61,59 @@ class WorkOnReleaseEntityMapper {
     entity.affectAbilityToWorkOther = dto.affectAbilityToWorkOther
   }
 
-  fun toEntity(list: List<AffectAbilityToWork>): MutableList<uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork> {
+  fun toEntity(list: List<AffectAbilityToWork>): MutableList<AffectAbilityToWorkEntity> {
     return list.mapTo(ArrayList(list.size)) { affectAbilityToWorkToAffectAbilityToWork(it) }
   }
 
-  fun toModel(list: List<uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork>?): List<AffectAbilityToWork> {
+  fun toModel(list: List<AffectAbilityToWorkEntity>?): List<AffectAbilityToWork> {
     return list?.map { toAffectAbilityToWork(it) } ?: emptyList()
   }
 
   fun toAffectAbilityToWork(affectAbilityToWork: uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork): AffectAbilityToWork {
     return when (affectAbilityToWork) {
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.LIMITED_BY_OFFENCE -> AffectAbilityToWork.LIMITED_BY_OFFENCE
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.CARING_RESPONSIBILITIES -> AffectAbilityToWork.CARING_RESPONSIBILITIES
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH -> AffectAbilityToWork.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.UNABLE_TO_WORK_DUE_TO_HEALTH -> AffectAbilityToWork.UNABLE_TO_WORK_DUE_TO_HEALTH
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.LACKS_CONFIDENCE_OR_MOTIVATION -> AffectAbilityToWork.LACKS_CONFIDENCE_OR_MOTIVATION
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.REFUSED_SUPPORT_WITH_NO_REASON -> AffectAbilityToWork.REFUSED_SUPPORT_WITH_NO_REASON
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.RETIRED -> AffectAbilityToWork.RETIRED
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NO_RIGHT_TO_WORK -> AffectAbilityToWork.NO_RIGHT_TO_WORK
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NOT_SURE -> AffectAbilityToWork.NOT_SURE
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.OTHER -> AffectAbilityToWork.OTHER
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NONE -> AffectAbilityToWork.NONE
+      AffectAbilityToWorkEntity.LIMITED_BY_OFFENCE -> AffectAbilityToWork.LIMITED_BY_OFFENCE
+      AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES -> AffectAbilityToWork.CARING_RESPONSIBILITIES
+      AffectAbilityToWorkEntity.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH -> AffectAbilityToWork.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH
+      AffectAbilityToWorkEntity.UNABLE_TO_WORK_DUE_TO_HEALTH -> AffectAbilityToWork.UNABLE_TO_WORK_DUE_TO_HEALTH
+      AffectAbilityToWorkEntity.LACKS_CONFIDENCE_OR_MOTIVATION -> AffectAbilityToWork.LACKS_CONFIDENCE_OR_MOTIVATION
+      AffectAbilityToWorkEntity.REFUSED_SUPPORT_WITH_NO_REASON -> AffectAbilityToWork.REFUSED_SUPPORT_WITH_NO_REASON
+      AffectAbilityToWorkEntity.RETIRED -> AffectAbilityToWork.RETIRED
+      AffectAbilityToWorkEntity.NO_RIGHT_TO_WORK -> AffectAbilityToWork.NO_RIGHT_TO_WORK
+      AffectAbilityToWorkEntity.NOT_SURE -> AffectAbilityToWork.NOT_SURE
+      AffectAbilityToWorkEntity.OTHER -> AffectAbilityToWork.OTHER
+      AffectAbilityToWorkEntity.NONE -> AffectAbilityToWork.NONE
     }
   }
 
-  fun toHopingToWork(hopingToWork: HopingToWork): uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork {
+  fun toHopingToWork(hopingToWork: HopingToWork): HopingToWorkEntity {
     return when (hopingToWork) {
-      HopingToWork.YES -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork.YES
-      HopingToWork.NO -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork.NO
-      HopingToWork.NOT_SURE -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork.NOT_SURE
-      else -> throw IllegalArgumentException("Unexpected enum constant: $hopingToWork")
+      HopingToWork.YES -> HopingToWorkEntity.YES
+      HopingToWork.NO -> HopingToWorkEntity.NO
+      HopingToWork.NOT_SURE -> HopingToWorkEntity.NOT_SURE
     }
   }
 
   fun affectAbilityToWorkToAffectAbilityToWork(affectAbilityToWork: AffectAbilityToWork): uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork {
     return when (affectAbilityToWork) {
-      AffectAbilityToWork.LIMITED_BY_OFFENCE -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.LIMITED_BY_OFFENCE
-      AffectAbilityToWork.CARING_RESPONSIBILITIES -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.CARING_RESPONSIBILITIES
-      AffectAbilityToWork.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH
-      AffectAbilityToWork.UNABLE_TO_WORK_DUE_TO_HEALTH -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.UNABLE_TO_WORK_DUE_TO_HEALTH
-      AffectAbilityToWork.LACKS_CONFIDENCE_OR_MOTIVATION -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.LACKS_CONFIDENCE_OR_MOTIVATION
-      AffectAbilityToWork.REFUSED_SUPPORT_WITH_NO_REASON -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.REFUSED_SUPPORT_WITH_NO_REASON
-      AffectAbilityToWork.RETIRED -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.RETIRED
-      AffectAbilityToWork.NO_RIGHT_TO_WORK -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NO_RIGHT_TO_WORK
-      AffectAbilityToWork.NOT_SURE -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NOT_SURE
-      AffectAbilityToWork.OTHER -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.OTHER
-      AffectAbilityToWork.NONE -> uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork.NONE
+      AffectAbilityToWork.LIMITED_BY_OFFENCE -> AffectAbilityToWorkEntity.LIMITED_BY_OFFENCE
+      AffectAbilityToWork.CARING_RESPONSIBILITIES -> AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES
+      AffectAbilityToWork.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH -> AffectAbilityToWorkEntity.NEEDS_WORK_ADJUSTMENTS_DUE_TO_HEALTH
+      AffectAbilityToWork.UNABLE_TO_WORK_DUE_TO_HEALTH -> AffectAbilityToWorkEntity.UNABLE_TO_WORK_DUE_TO_HEALTH
+      AffectAbilityToWork.LACKS_CONFIDENCE_OR_MOTIVATION -> AffectAbilityToWorkEntity.LACKS_CONFIDENCE_OR_MOTIVATION
+      AffectAbilityToWork.REFUSED_SUPPORT_WITH_NO_REASON -> AffectAbilityToWorkEntity.REFUSED_SUPPORT_WITH_NO_REASON
+      AffectAbilityToWork.RETIRED -> AffectAbilityToWorkEntity.RETIRED
+      AffectAbilityToWork.NO_RIGHT_TO_WORK -> AffectAbilityToWorkEntity.NO_RIGHT_TO_WORK
+      AffectAbilityToWork.NOT_SURE -> AffectAbilityToWorkEntity.NOT_SURE
+      AffectAbilityToWork.OTHER -> AffectAbilityToWorkEntity.OTHER
+      AffectAbilityToWork.NONE -> AffectAbilityToWorkEntity.NONE
     }
   }
 
-  fun toHopingToWork(hopingToWork: uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork): HopingToWork {
+  fun toHopingToWork(hopingToWork: HopingToWorkEntity): HopingToWork {
     return when (hopingToWork) {
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork.YES -> HopingToWork.YES
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork.NO -> HopingToWork.NO
-      uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork.NOT_SURE -> HopingToWork.NOT_SURE
+      HopingToWorkEntity.YES -> HopingToWork.YES
+      HopingToWorkEntity.NO -> HopingToWork.NO
+      HopingToWorkEntity.NOT_SURE -> HopingToWork.NOT_SURE
     }
   }
 }
