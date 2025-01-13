@@ -18,6 +18,9 @@ fun aValidCreateInductionDto(
   futureWorkInterests: CreateFutureWorkInterestsDto = aValidCreateFutureWorkInterestsDto(),
   prisonId: String = "BXI",
   conductedAt: LocalDate = LocalDate.now(),
+  conductedBy: String? = null,
+  conductedByRole: String? = null,
+  note: String = "example note",
 ) = CreateInductionDto(
   prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
@@ -29,6 +32,9 @@ fun aValidCreateInductionDto(
   futureWorkInterests = futureWorkInterests,
   prisonId = prisonId,
   conductedAt = conductedAt,
+  conductedByRole = conductedByRole,
+  conductedBy = conductedBy,
+  note = note,
 )
 
 fun aValidUpdateInductionDto(

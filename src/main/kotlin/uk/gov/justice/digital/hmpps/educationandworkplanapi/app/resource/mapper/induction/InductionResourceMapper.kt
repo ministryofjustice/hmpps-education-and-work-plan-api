@@ -53,7 +53,7 @@ class InductionResourceMapper(
         },
         prisonId = prisonId,
         conductedBy = conductedBy,
-        conductedByRole = conductedBy,
+        conductedByRole = conductedByRole,
         conductedAt = conductedAt,
         note = note,
       )
