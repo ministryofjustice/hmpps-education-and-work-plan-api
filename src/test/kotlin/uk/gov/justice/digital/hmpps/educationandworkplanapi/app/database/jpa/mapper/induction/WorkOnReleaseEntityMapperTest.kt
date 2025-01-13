@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class WorkOnReleaseEntityMapperTest {
 
-  private val mapper = WorkOnReleaseEntityMapperImpl()
+  private val mapper = WorkOnReleaseEntityMapper()
 
   @Test
   fun `should map from dto to entity`() {
