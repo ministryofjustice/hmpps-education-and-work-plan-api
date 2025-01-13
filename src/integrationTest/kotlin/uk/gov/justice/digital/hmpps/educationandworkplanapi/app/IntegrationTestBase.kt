@@ -38,6 +38,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
@@ -637,7 +638,7 @@ abstract class IntegrationTestBase {
     status: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
     exemptionReason: String? = null,
   ) {
-    val reviewScheduleEntity = reviewScheduleRepository.findActiveReviewSchedule(prisonNumber)
+    val reviewScheduleEntity = reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
     reviewScheduleEntity?.run {
       scheduleStatus = status
       reviewScheduleRepository.saveAndFlush(this)
@@ -648,7 +649,7 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     latestReviewDate: LocalDate,
   ) {
-    val reviewScheduleEntity = reviewScheduleRepository.findActiveReviewSchedule(prisonNumber)
+    val reviewScheduleEntity = reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
     reviewScheduleEntity?.run {
       this.latestReviewDate = latestReviewDate
       reviewScheduleRepository.saveAndFlush(this)

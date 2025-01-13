@@ -37,6 +37,7 @@ class ReviewScheduleDateCalculationService {
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
     private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
+    private const val RESCHEDULE_ADDITIONAL_DAYS = 10L
   }
 
   /**
@@ -121,9 +122,10 @@ class ReviewScheduleDateCalculationService {
 
   private fun getExtensionDays(status: ReviewScheduleStatus): Long =
     when {
+      status == ReviewScheduleStatus.EXEMPT_UNKNOWN -> RESCHEDULE_ADDITIONAL_DAYS
+      status == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
       status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
       status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-      status == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
       else -> 0 // Default case, if no condition matches
     }
 

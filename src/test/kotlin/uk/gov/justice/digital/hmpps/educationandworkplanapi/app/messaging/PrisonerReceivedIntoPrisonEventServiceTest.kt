@@ -19,6 +19,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
@@ -122,6 +124,52 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     verify(reviewScheduleService).createInitialReviewSchedule(createReviewScheduleDto)
   }
 
+  // Weird edge case scenario as we would expect a previously released/transferred prisoner who is being re-admitted to have had their Review Schedules exempted due to release or transfer via the prisoner.release listener
+  // This scenario is to cover the edge case that the Review Schedule did not get exempted for some reason when the prisoner was released, and was left "hanging"
+  // In this scenario the Review Schedule is marked as EXEMPT_UNKNOWN and then a new Review Schedule is created.
+  @Test
+  fun `should process event given reason is prisoner admission and prisoner already has an Induction Schedule that is COMPLETED and has an active Review Schedule`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "BXI"
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = prisonId,
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
+      InductionScheduleAlreadyExistsException(inductionSchedule),
+    )
+
+    val reviewSchedule = aValidReviewSchedule(prisonNumber = prisonNumber, scheduleStatus = ReviewScheduleStatus.SCHEDULED)
+    given(reviewScheduleService.getActiveReviewScheduleForPrisoner(any())).willReturn(reviewSchedule)
+
+    val prisoner = aValidPrisoner(prisonNumber)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(prisoner)
+
+    val createReviewScheduleDto = aValidCreateInitialReviewScheduleDto()
+    given(createInitialReviewScheduleMapper.fromPrisonerToDomain(any(), any(), any())).willReturn(createReviewScheduleDto)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
+    verify(prisonerSearchApiService).getPrisoner(prisonNumber)
+    verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber, prisonId)
+    verify(createInitialReviewScheduleMapper).fromPrisonerToDomain(prisoner, isTransfer = false, isReadmission = true)
+    verify(reviewScheduleService).createInitialReviewSchedule(createReviewScheduleDto)
+  }
+
   @Test
   fun `should process event given reason is prisoner admission and prisoner already has an Induction Schedule that is not COMPLETED`() {
     // Given
@@ -172,7 +220,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(reviewScheduleService).exemptAndReScheduleActiveReviewScheduleStatusDueToPrisonerTransfer(prisonNumber, "BXI")
+    verify(reviewScheduleService).exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(prisonNumber, "BXI")
   }
 
   @ParameterizedTest
