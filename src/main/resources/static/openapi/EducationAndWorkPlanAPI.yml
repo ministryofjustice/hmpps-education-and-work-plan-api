@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.4'
+  version: '1.20.5'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2572,6 +2572,29 @@ components:
           $ref: '#/components/schemas/CreatePersonalSkillsAndInterestsRequest'
         futureWorkInterests:
           $ref: '#/components/schemas/CreateFutureWorkInterestsRequest'
+        note:
+          type: string
+          description: The notes taken when conducting the prisoner's Induction.
+          example: Peter is excited to be part of the programme.
+        conductedAt:
+          type: string
+          format: date
+          description: An ISO-8601 date representing the date that this Induction was conducted on.
+          example: '2023-12-19'
+        conductedBy:
+          type: string
+          description: |
+            The name of the person who actually conducted the Induction session with the Prisoner. 
+
+            Only populated if the person who conducted the Induction was not the person who keyed it into the system.
+          example: 'Albert Mozzarella'
+        conductedByRole:
+          type: string
+          description: |
+            The role of the person who actually conducted the Induction session with the Prisoner.
+
+            Only populated if the person who conducted the Induction was not the person who keyed it into the system.
+          example: 'Peer mentor'
       required:
         - prisonId
         - workOnRelease

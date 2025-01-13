@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
+import java.time.LocalDate
 
 data class CreateInductionDto(
   val prisonNumber: String,
@@ -12,4 +13,8 @@ data class CreateInductionDto(
   val personalSkillsAndInterests: CreatePersonalSkillsAndInterestsDto?,
   val futureWorkInterests: CreateFutureWorkInterestsDto?,
   val prisonId: String,
+  val conductedAt: LocalDate?,
+  val conductedBy: String?,
+  val conductedByRole: String?,
+  val note: String?,
 )
