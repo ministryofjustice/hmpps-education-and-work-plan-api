@@ -2,13 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.given
-import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousTraining
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousTrainingEntity
@@ -17,13 +10,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.TrainingType as TrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.TrainingType as TrainingTypeEntity
 
-@ExtendWith(MockitoExtension::class)
 class PreviousTrainingEntityMapperTest {
-  @InjectMocks
-  private lateinit var mapper: PreviousTrainingEntityMapperImpl
 
-  @Mock
-  private lateinit var trainingTypeMapper: TrainingTypeMapper
+  private val mapper = PreviousTrainingEntityMapper()
 
   @Test
   fun `should map from dto to entity`() {
@@ -36,7 +25,6 @@ class PreviousTrainingEntityMapperTest {
       createdAtPrison = "BXI",
       updatedAtPrison = "BXI",
     )
-    given(trainingTypeMapper.fromDomainToEntity(any())).willReturn(mutableListOf(expectedTrainingTypeEntity))
 
     // When
     val actual = mapper.fromCreateDtoToEntity(createTrainingDto)
@@ -44,11 +32,9 @@ class PreviousTrainingEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
-    verify(trainingTypeMapper).fromDomainToEntity(createTrainingDto.trainingTypes)
   }
 
   @Test
@@ -56,25 +42,21 @@ class PreviousTrainingEntityMapperTest {
     // Given
     val previousTrainingEntity = aValidPreviousTrainingEntityWithJpaFieldsPopulated()
     val expectedPreviousTraining = aValidPreviousTraining(
-      reference = previousTrainingEntity.reference!!,
+      reference = previousTrainingEntity.reference,
       trainingTypes = mutableListOf(TrainingTypeDomain.OTHER),
       trainingTypeOther = "Kotlin course",
       createdAt = previousTrainingEntity.createdAt!!,
-      createdAtPrison = previousTrainingEntity.createdAtPrison!!,
+      createdAtPrison = previousTrainingEntity.createdAtPrison,
       createdBy = previousTrainingEntity.createdBy!!,
-      createdByDisplayName = previousTrainingEntity.createdByDisplayName!!,
       lastUpdatedAt = previousTrainingEntity.updatedAt!!,
-      lastUpdatedAtPrison = previousTrainingEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = previousTrainingEntity.updatedAtPrison,
       lastUpdatedBy = previousTrainingEntity.updatedBy!!,
-      lastUpdatedByDisplayName = previousTrainingEntity.updatedByDisplayName!!,
     )
-    given(trainingTypeMapper.fromEntityToDomain(any())).willReturn(mutableListOf(TrainingTypeDomain.OTHER))
 
     // When
     val actual = mapper.fromEntityToDomain(previousTrainingEntity)
 
     // Then
     assertThat(actual).isEqualTo(expectedPreviousTraining)
-    verify(trainingTypeMapper).fromEntityToDomain(previousTrainingEntity.trainingTypes!!)
   }
 }

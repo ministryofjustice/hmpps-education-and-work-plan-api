@@ -1,55 +1,90 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.MappingTarget
-import org.mapstruct.NullValueMappingStrategy
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousTraining
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousTrainingEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
+import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.TrainingType as TrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.TrainingType as TrainingTypeEntity
 
-@Mapper(
-  uses = [
-    TrainingTypeMapper::class,
-  ],
-  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-)
-interface PreviousTrainingEntityMapper {
+@Component
+class PreviousTrainingEntityMapper {
 
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromCreateDtoToEntity(dto: CreatePreviousTrainingDto): PreviousTrainingEntity
+  fun fromCreateDtoToEntity(dto: CreatePreviousTrainingDto): PreviousTrainingEntity =
+    with(dto) {
+      PreviousTrainingEntity(
+        reference = UUID.randomUUID(),
+        trainingTypes = trainingTypes.map { toTrainingType(it) },
+        trainingTypeOther = trainingTypeOther,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
+      )
+    }
 
-  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
-  @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
-  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
-  @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  fun fromEntityToDomain(persistedEntity: PreviousTrainingEntity?): PreviousTraining
+  fun fromEntityToDomain(persistedEntity: PreviousTrainingEntity): PreviousTraining =
+    with(persistedEntity) {
+      PreviousTraining(
+        reference = reference,
+        trainingTypes = trainingTypes.map { toTrainingType(it) },
+        trainingTypeOther = trainingTypeOther,
+        createdAt = createdAt!!,
+        createdBy = createdBy!!,
+        createdAtPrison = createdAtPrison,
+        lastUpdatedAt = updatedAt!!,
+        lastUpdatedBy = updatedBy!!,
+        lastUpdatedAtPrison = updatedAtPrison,
+      )
+    }
 
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @ExcludeReferenceField
-  @Mapping(target = "createdAtPrison", ignore = true)
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun updateExistingEntityFromDto(@MappingTarget entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto?)
+  fun updateExistingEntityFromDto(entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto?) =
+    dto?.also {
+      with(entity) {
+        trainingTypes = it.trainingTypes.map { toTrainingType(it) }
+        trainingTypeOther = it.trainingTypeOther
+        updatedAtPrison = it.prisonId
+      }
+    }
 
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  fun fromUpdateDtoToNewEntity(previousTraining: UpdatePreviousTrainingDto?): PreviousTrainingEntity?
-}
+  fun fromUpdateDtoToNewEntity(previousTraining: UpdatePreviousTrainingDto?): PreviousTrainingEntity? =
+    previousTraining?.let {
+      PreviousTrainingEntity(
+        reference = UUID.randomUUID(),
+        trainingTypes = it.trainingTypes.map { toTrainingType(it) },
+        trainingTypeOther = it.trainingTypeOther,
+        createdAtPrison = it.prisonId,
+        updatedAtPrison = it.prisonId,
+      )
+    }
 
-@Mapper
-interface TrainingTypeMapper {
-  fun fromDomainToEntity(domainEnumList: List<TrainingTypeDomain>): List<TrainingTypeEntity>
+  private fun toTrainingType(entity: TrainingTypeEntity): TrainingTypeDomain =
+    when (entity) {
+      TrainingTypeEntity.CSCS_CARD -> TrainingTypeDomain.CSCS_CARD
+      TrainingTypeEntity.FIRST_AID_CERTIFICATE -> TrainingTypeDomain.FIRST_AID_CERTIFICATE
+      TrainingTypeEntity.FOOD_HYGIENE_CERTIFICATE -> TrainingTypeDomain.FOOD_HYGIENE_CERTIFICATE
+      TrainingTypeEntity.FULL_UK_DRIVING_LICENCE -> TrainingTypeDomain.FULL_UK_DRIVING_LICENCE
+      TrainingTypeEntity.HEALTH_AND_SAFETY -> TrainingTypeDomain.HEALTH_AND_SAFETY
+      TrainingTypeEntity.HGV_LICENCE -> TrainingTypeDomain.HGV_LICENCE
+      TrainingTypeEntity.MACHINERY_TICKETS -> TrainingTypeDomain.MACHINERY_TICKETS
+      TrainingTypeEntity.MANUAL_HANDLING -> TrainingTypeDomain.MANUAL_HANDLING
+      TrainingTypeEntity.TRADE_COURSE -> TrainingTypeDomain.TRADE_COURSE
+      TrainingTypeEntity.OTHER -> TrainingTypeDomain.OTHER
+      TrainingTypeEntity.NONE -> TrainingTypeDomain.NONE
+    }
 
-  fun fromEntityToDomain(persistedEntities: List<TrainingTypeEntity>): List<TrainingTypeDomain>
+  private fun toTrainingType(entity: TrainingTypeDomain): TrainingTypeEntity =
+    when (entity) {
+      TrainingTypeDomain.CSCS_CARD -> TrainingTypeEntity.CSCS_CARD
+      TrainingTypeDomain.FIRST_AID_CERTIFICATE -> TrainingTypeEntity.FIRST_AID_CERTIFICATE
+      TrainingTypeDomain.FOOD_HYGIENE_CERTIFICATE -> TrainingTypeEntity.FOOD_HYGIENE_CERTIFICATE
+      TrainingTypeDomain.FULL_UK_DRIVING_LICENCE -> TrainingTypeEntity.FULL_UK_DRIVING_LICENCE
+      TrainingTypeDomain.HEALTH_AND_SAFETY -> TrainingTypeEntity.HEALTH_AND_SAFETY
+      TrainingTypeDomain.HGV_LICENCE -> TrainingTypeEntity.HGV_LICENCE
+      TrainingTypeDomain.MACHINERY_TICKETS -> TrainingTypeEntity.MACHINERY_TICKETS
+      TrainingTypeDomain.MANUAL_HANDLING -> TrainingTypeEntity.MANUAL_HANDLING
+      TrainingTypeDomain.TRADE_COURSE -> TrainingTypeEntity.TRADE_COURSE
+      TrainingTypeDomain.OTHER -> TrainingTypeEntity.OTHER
+      TrainingTypeDomain.NONE -> TrainingTypeEntity.NONE
+    }
 }
