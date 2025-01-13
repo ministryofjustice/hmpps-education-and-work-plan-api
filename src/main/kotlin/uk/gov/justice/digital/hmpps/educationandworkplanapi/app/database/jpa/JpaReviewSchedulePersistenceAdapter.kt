@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.Up
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleHistoryEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
@@ -55,7 +56,7 @@ class JpaReviewSchedulePersistenceAdapter(
   @Transactional(readOnly = true)
   override fun getActiveReviewSchedule(prisonNumber: String): ReviewSchedule? =
     try {
-      reviewScheduleRepository.findActiveReviewSchedule(prisonNumber)
+      reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber = prisonNumber, scheduleStatuses = STATUSES_FOR_ACTIVE_REVIEWS)
         ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
     } catch (e: NonUniqueResultException) {
       log.error { "Prisoner $prisonNumber has more than one active ReviewSchedule which is not supported. Please investigate the ReviewSchedule data for prisoner $prisonNumber" }
