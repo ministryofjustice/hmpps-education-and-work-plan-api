@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.UpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
+import java.time.LocalDate
 import java.util.UUID
 
 fun aValidCreateInductionDto(
@@ -16,6 +17,7 @@ fun aValidCreateInductionDto(
   personalSkillsAndInterests: CreatePersonalSkillsAndInterestsDto = aValidCreatePersonalSkillsAndInterestsDto(),
   futureWorkInterests: CreateFutureWorkInterestsDto = aValidCreateFutureWorkInterestsDto(),
   prisonId: String = "BXI",
+  conductedAt: LocalDate = LocalDate.now(),
 ) = CreateInductionDto(
   prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
@@ -26,6 +28,7 @@ fun aValidCreateInductionDto(
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
   prisonId = prisonId,
+  conductedAt = conductedAt,
 )
 
 fun aValidUpdateInductionDto(

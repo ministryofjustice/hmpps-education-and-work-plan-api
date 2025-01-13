@@ -14,7 +14,7 @@ data class CreateInductionDto(
   val futureWorkInterests: CreateFutureWorkInterestsDto?,
   val prisonId: String,
   val conductedAt: LocalDate?,
-  val conductedBy: String?,
-  val conductedByRole: String?,
-  val note: String?,
+  val conductedBy: String? = null,
+  val conductedByRole: String? = null,
+  val note: String? = null,
 )
