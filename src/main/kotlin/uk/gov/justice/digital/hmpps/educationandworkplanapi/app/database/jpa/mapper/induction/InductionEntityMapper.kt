@@ -67,7 +67,7 @@ abstract class InductionEntityMapper {
       prisonNumber = inductionEntity.prisonNumber!!,
       workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease!!),
       previousQualifications = previousQualificationsEntityMapper.fromEntityToDomain(previousQualificationsEntity),
-      previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining),
+      previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining!!),
       previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
       inPrisonInterests = inPrisonInterestsEntityMapper.fromEntityToDomain(inductionEntity.inPrisonInterests),
       personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromEntityToDomain(inductionEntity.personalSkillsAndInterests),
