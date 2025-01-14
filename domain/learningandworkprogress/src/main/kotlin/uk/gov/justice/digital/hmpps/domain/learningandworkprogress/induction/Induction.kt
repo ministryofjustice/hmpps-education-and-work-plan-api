@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -85,4 +86,19 @@ data class Induction(
    * The ID of the Prison that the Prisoner was at when this induction was updated.
    */
   val lastUpdatedAtPrison: String,
+
+  /**
+   * the person who conducted the induction if it were not the actual user
+   */
+  val conductedBy: String?,
+
+  /**
+   * the role of the person who conducted the induction if it were not the actual user
+   */
+  val conductedByRole: String?,
+
+  /**
+   * The date the induction was carried out
+   */
+  val completedDate: LocalDate?,
 )

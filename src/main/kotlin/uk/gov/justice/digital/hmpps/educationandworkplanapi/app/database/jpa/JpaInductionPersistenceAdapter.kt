@@ -10,10 +10,15 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -23,12 +28,30 @@ class JpaInductionPersistenceAdapter(
   private val inductionMapper: InductionEntityMapper,
   private val previousQualificationsRepository: PreviousQualificationsRepository,
   private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
+  private val noteRepository: NoteRepository,
 ) : InductionPersistenceAdapter {
 
   @Transactional
   override fun createInduction(createInductionDto: CreateInductionDto): Induction {
     val inductionEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
     val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto)
+
+    val noteEntity = createInductionDto.note?.let {
+      noteRepository.saveAndFlush(
+        NoteEntity(
+          reference = UUID.randomUUID(),
+          prisonNumber = createInductionDto.prisonNumber,
+          content = it,
+          noteType = NoteType.INDUCTION,
+          entityType = EntityType.INDUCTION,
+          entityReference = inductionEntity.reference!!,
+          createdAtPrison = inductionEntity.createdAtPrison ?: "N/A",
+          updatedAtPrison = inductionEntity.updatedAtPrison ?: "N/A",
+        ),
+      )
+    }
+
+    // TODO add the note to the returned Induction
     return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity)
   }
 

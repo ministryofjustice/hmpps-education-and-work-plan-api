@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 fun aValidInductionEntity(
@@ -24,6 +25,7 @@ fun aValidInductionEntity(
   updatedByDisplayName: String? = null,
   conductedBy: String? = null,
   conductedByRole: String? = null,
+  completedDate: LocalDate? = LocalDate.now(),
 ) = InductionEntity(
   id = id,
   reference = reference,
@@ -44,7 +46,7 @@ fun aValidInductionEntity(
   updatedByDisplayName = updatedByDisplayName,
   conductedBy = conductedBy,
   conductedByRole = conductedByRole,
-
+  completedDate = completedDate,
 )
 
 fun aValidInductionEntityWithJpaFieldsPopulated(
@@ -67,6 +69,7 @@ fun aValidInductionEntityWithJpaFieldsPopulated(
   updatedByDisplayName: String? = "Barry Jones",
   conductedBy: String? = "John Smith",
   conductedByRole: String? = "Peer Mentor",
+  completedDate: LocalDate? = LocalDate.now(),
 ) = InductionEntity(
   id = id,
   reference = reference,
@@ -87,4 +90,5 @@ fun aValidInductionEntityWithJpaFieldsPopulated(
   updatedByDisplayName = updatedByDisplayName,
   conductedBy = conductedBy,
   conductedByRole = conductedByRole,
+  completedDate = completedDate,
 )

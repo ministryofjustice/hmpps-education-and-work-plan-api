@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.Dis
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -107,6 +108,9 @@ class InductionEntity(
 
   @Column(updatable = false)
   val conductedByRole: String?,
+
+  @Column(updatable = false)
+  var completedDate: LocalDate?,
 
 ) {
   fun updateLastUpdatedAt() {

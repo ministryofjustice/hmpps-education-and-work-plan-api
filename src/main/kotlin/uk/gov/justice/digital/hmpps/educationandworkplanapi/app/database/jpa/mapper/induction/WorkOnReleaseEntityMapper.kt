@@ -93,7 +93,7 @@ class WorkOnReleaseEntityMapper {
     }
   }
 
-  fun affectAbilityToWorkToAffectAbilityToWork(affectAbilityToWork: AffectAbilityToWork): uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.AffectAbilityToWork {
+  fun affectAbilityToWorkToAffectAbilityToWork(affectAbilityToWork: AffectAbilityToWork): AffectAbilityToWorkEntity {
     return when (affectAbilityToWork) {
       AffectAbilityToWork.LIMITED_BY_OFFENCE -> AffectAbilityToWorkEntity.LIMITED_BY_OFFENCE
       AffectAbilityToWork.CARING_RESPONSIBILITIES -> AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES

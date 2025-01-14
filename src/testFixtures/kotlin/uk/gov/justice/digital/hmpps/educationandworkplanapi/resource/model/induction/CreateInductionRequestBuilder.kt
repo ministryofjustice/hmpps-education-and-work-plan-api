@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousTrainingRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePreviousWorkExperiencesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateWorkOnReleaseRequest
+import java.time.LocalDate
 
 fun aValidCreateInductionRequest(): CreateInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork()
 
@@ -62,6 +63,10 @@ fun aFullyPopulatedCreateInductionRequest(
   inPrisonInterests: CreateInPrisonInterestsRequest? = aValidCreateInPrisonInterestsRequest(),
   personalSkillsAndInterests: CreatePersonalSkillsAndInterestsRequest? = aValidCreatePersonalSkillsAndInterestsRequest(),
   futureWorkInterests: CreateFutureWorkInterestsRequest? = aValidCreateFutureWorkInterestsRequest(),
+  conductedAt: LocalDate = LocalDate.now(),
+  conductedByRole: String? = "Peer Mentor",
+  conductedBy: String? = "John Smith",
+  note: String? = "example note",
 ): CreateInductionRequest = CreateInductionRequest(
   prisonId = prisonId,
   workOnRelease = workOnRelease,
@@ -71,4 +76,9 @@ fun aFullyPopulatedCreateInductionRequest(
   inPrisonInterests = inPrisonInterests,
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
+  conductedAt = conductedAt,
+  conductedByRole = conductedByRole,
+  conductedBy = conductedBy,
+  note = note,
+
 )
