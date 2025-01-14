@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
 
 @Mapper(
   uses = [
@@ -30,6 +31,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
     PreviousTrainingEntityMapper::class,
     PreviousWorkExperiencesEntityMapper::class,
     WorkOnReleaseEntityMapper::class,
+    NoteMapper::class,
   ],
 )
 abstract class InductionEntityMapper {
@@ -59,9 +61,13 @@ abstract class InductionEntityMapper {
   @GenerateNewReference
   @Mapping(target = "createdAtPrison", source = "prisonId")
   @Mapping(target = "updatedAtPrison", source = "prisonId")
+  @Mapping(target = "completedDate", source = "conductedAt")
   abstract fun fromCreateDtoToEntity(dto: CreateInductionDto): InductionEntity
 
-  fun fromEntityToDomain(inductionEntity: InductionEntity, previousQualificationsEntity: PreviousQualificationsEntity?): Induction =
+  fun fromEntityToDomain(
+    inductionEntity: InductionEntity,
+    previousQualificationsEntity: PreviousQualificationsEntity?,
+  ): Induction =
     Induction(
       reference = inductionEntity.reference!!,
       prisonNumber = inductionEntity.prisonNumber!!,
@@ -80,6 +86,9 @@ abstract class InductionEntityMapper {
       lastUpdatedByDisplayName = inductionEntity.updatedByDisplayName,
       lastUpdatedAt = inductionEntity.updatedAt,
       lastUpdatedAtPrison = inductionEntity.updatedAtPrison!!,
+      conductedBy = inductionEntity.conductedBy,
+      conductedByRole = inductionEntity.conductedByRole,
+      completedDate = inductionEntity.completedDate,
     )
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")

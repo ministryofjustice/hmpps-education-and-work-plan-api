@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 fun aFullyPopulatedInduction(
@@ -23,6 +24,9 @@ fun aFullyPopulatedInduction(
   lastUpdatedByDisplayName: String? = "Barry Jones",
   lastUpdatedAt: Instant? = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
+  conductedBy: String? = "John Smith",
+  conductedByRole: String? = "Peer Mentor",
+  conductedAt: LocalDate? = LocalDate.now(),
 ) = Induction(
   reference = reference,
   prisonNumber = prisonNumber,
@@ -41,4 +45,7 @@ fun aFullyPopulatedInduction(
   lastUpdatedByDisplayName = lastUpdatedByDisplayName,
   lastUpdatedAt = lastUpdatedAt,
   lastUpdatedAtPrison = lastUpdatedAtPrison,
+  conductedBy = conductedBy,
+  completedDate = conductedAt,
+  conductedByRole = conductedByRole,
 )
