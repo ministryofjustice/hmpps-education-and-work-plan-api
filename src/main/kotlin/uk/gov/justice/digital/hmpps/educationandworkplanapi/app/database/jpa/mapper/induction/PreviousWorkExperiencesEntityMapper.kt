@@ -1,119 +1,171 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
-import org.mapstruct.AfterMapping
-import org.mapstruct.BeanMapping
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.MappingTarget
-import org.mapstruct.Named
-import org.mapstruct.NullValueMappingStrategy
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperience
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
+import java.util.UUID
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HasWorkedBefore as HasWorkedBeforeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperienceType as WorkExperienceTypeDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HasWorkedBefore as HasWorkedBeforeEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceType as WorkExperienceTypeEntity
 
-@Mapper(
-  uses = [
-    WorkExperienceEntityMapper::class,
-  ],
-  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-)
-abstract class PreviousWorkExperiencesEntityMapper {
+@Component
+class PreviousWorkExperiencesEntityMapper(
+  private val workExperienceEntityMapper: WorkExperienceEntityMapper,
+  private val entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>,
+) {
 
-  @Autowired
-  private lateinit var workExperienceEntityMapper: WorkExperienceEntityMapper
+  fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity? =
+    dto?.let {
+      PreviousWorkExperiencesEntity(
+        reference = UUID.randomUUID(),
+        hasWorkedBefore = toHasWorkedBefore(it.hasWorkedBefore),
+        hasWorkedBeforeNotRelevantReason = it.hasWorkedBeforeNotRelevantReason,
+        createdAtPrison = it.prisonId,
+        updatedAtPrison = it.prisonId,
+      ).apply {
+        addNewExperiences(it.experiences, this)
+      }
+    }
 
-  @Autowired
-  private lateinit var entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>
+  fun fromEntityToDomain(persistedEntity: PreviousWorkExperiencesEntity?): PreviousWorkExperiences? =
+    persistedEntity?.let {
+      PreviousWorkExperiences(
+        reference = it.reference,
+        hasWorkedBefore = toHasWorkedBefore(it.hasWorkedBefore),
+        hasWorkedBeforeNotRelevantReason = it.hasWorkedBeforeNotRelevantReason,
+        experiences = it.experiences.map { workExperienceEntityMapper.fromEntityToDomain(it) },
+        createdBy = it.createdBy!!,
+        createdAt = it.createdAt!!,
+        createdAtPrison = it.createdAtPrison,
+        lastUpdatedBy = it.updatedBy!!,
+        lastUpdatedAt = it.updatedAt!!,
+        lastUpdatedAtPrison = it.updatedAtPrison,
+      )
+    }
 
-  @BeanMapping(qualifiedByName = ["addNewExperiencesDuringCreate"])
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "experiences", ignore = true)
-  abstract fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity
+  fun updateExistingEntityFromDto(entity: PreviousWorkExperiencesEntity, dto: UpdatePreviousWorkExperiencesDto?) =
+    dto?.also {
+      with(entity) {
+        hasWorkedBefore = toHasWorkedBefore(dto.hasWorkedBefore)
+        hasWorkedBeforeNotRelevantReason = dto.hasWorkedBeforeNotRelevantReason
+        updatedAtPrison = dto.prisonId
 
-  @Named("addNewExperiencesDuringCreate")
-  @AfterMapping
-  fun addNewExperiencesDuringCreate(dto: CreatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
-    addNewExperiences(dto.experiences, entity)
-  }
+        val existingExperiences = experiences
+        val updatedExperiences = dto.experiences
+        entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
+        entityListManager.addNew(entity, existingExperiences, updatedExperiences, workExperienceEntityMapper)
+        entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
+      }
+    }
 
-  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
-  @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
-  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
-  @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  @Mapping(target = "experiences", source = "experiences")
-  abstract fun fromEntityToDomain(persistedEntity: PreviousWorkExperiencesEntity?): PreviousWorkExperiences
-
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @ExcludeReferenceField
-  @Mapping(target = "createdAtPrison", ignore = true)
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "experiences", expression = "java( updateWorkExperiences(entity, dto) )")
-  abstract fun updateExistingEntityFromDto(
-    @MappingTarget entity: PreviousWorkExperiencesEntity,
-    dto: UpdatePreviousWorkExperiencesDto?,
-  )
-
-  fun updateWorkExperiences(
-    entity: PreviousWorkExperiencesEntity,
-    dto: UpdatePreviousWorkExperiencesDto,
-  ): List<WorkExperienceEntity> {
-    val existingExperiences = entity.experiences!!
-    val updatedExperiences = dto.experiences
-
-    entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
-    entityListManager.addNew(entity, existingExperiences, updatedExperiences, workExperienceEntityMapper)
-    entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
-
-    return existingExperiences
-  }
-
-  @BeanMapping(qualifiedByName = ["addNewExperiencesDuringUpdate"])
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "experiences", ignore = true)
-  abstract fun fromUpdateDtoToNewEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity?
-
-  @Named("addNewExperiencesDuringUpdate")
-  @AfterMapping
-  fun addNewExperiencesDuringUpdate(dto: UpdatePreviousWorkExperiencesDto, @MappingTarget entity: PreviousWorkExperiencesEntity) {
-    addNewExperiences(dto.experiences, entity)
-  }
+  fun fromUpdateDtoToNewEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity? =
+    previousWorkExperiences?.let {
+      PreviousWorkExperiencesEntity(
+        reference = UUID.randomUUID(),
+        hasWorkedBefore = toHasWorkedBefore(it.hasWorkedBefore),
+        hasWorkedBeforeNotRelevantReason = it.hasWorkedBeforeNotRelevantReason,
+        createdAtPrison = it.prisonId,
+        updatedAtPrison = it.prisonId,
+      ).apply {
+        addNewExperiences(it.experiences, this)
+      }
+    }
 
   private fun addNewExperiences(experiences: List<WorkExperience>, entity: PreviousWorkExperiencesEntity) {
     experiences.forEach {
       entity.addChild(
         workExperienceEntityMapper.fromDomainToEntity(it),
-        entity.experiences(),
+        entity.experiences,
       )
     }
   }
+
+  private fun toHasWorkedBefore(hasWorkedBefore: HasWorkedBeforeEntity): HasWorkedBeforeDomain =
+    when (hasWorkedBefore) {
+      HasWorkedBeforeEntity.YES -> HasWorkedBeforeDomain.YES
+      HasWorkedBeforeEntity.NO -> HasWorkedBeforeDomain.NO
+      HasWorkedBeforeEntity.NOT_RELEVANT -> HasWorkedBeforeDomain.NOT_RELEVANT
+    }
+
+  private fun toHasWorkedBefore(hasWorkedBefore: HasWorkedBeforeDomain): HasWorkedBeforeEntity =
+    when (hasWorkedBefore) {
+      HasWorkedBeforeDomain.YES -> HasWorkedBeforeEntity.YES
+      HasWorkedBeforeDomain.NO -> HasWorkedBeforeEntity.NO
+      HasWorkedBeforeDomain.NOT_RELEVANT -> HasWorkedBeforeEntity.NOT_RELEVANT
+    }
 }
 
-@Mapper
-interface WorkExperienceEntityMapper : KeyAwareEntityMapper<WorkExperienceEntity, WorkExperience> {
-  @ExcludeJpaManagedFields
-  @GenerateNewReference
-  @ExcludeParentEntity
-  override fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity
+@Component
+class WorkExperienceEntityMapper : KeyAwareEntityMapper<WorkExperienceEntity, WorkExperience> {
+  override fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity =
+    with(domain) {
+      WorkExperienceEntity(
+        reference = UUID.randomUUID(),
+        experienceType = toExperienceType(experienceType),
+        experienceTypeOther = experienceTypeOther,
+        role = role,
+        details = details,
+      )
+    }
 
-  fun fromEntityToDomain(persistedEntity: WorkExperienceEntity): WorkExperience
+  fun fromEntityToDomain(persistedEntity: WorkExperienceEntity): WorkExperience =
+    with(persistedEntity) {
+      WorkExperience(
+        experienceType = toExperienceType(experienceType),
+        experienceTypeOther = experienceTypeOther,
+        role = role,
+        details = details,
+      )
+    }
 
-  @ExcludeJpaManagedFields
-  @ExcludeReferenceField
-  @ExcludeParentEntity
-  override fun updateEntityFromDomain(@MappingTarget entity: WorkExperienceEntity, domain: WorkExperience)
+  override fun updateEntityFromDomain(entity: WorkExperienceEntity, domain: WorkExperience) =
+    with(entity) {
+      experienceType = toExperienceType(domain.experienceType)
+      experienceTypeOther = domain.experienceTypeOther
+      role = domain.role
+      details = domain.details
+    }
+
+  private fun toExperienceType(experienceType: WorkExperienceTypeEntity): WorkExperienceTypeDomain =
+    when (experienceType) {
+      WorkExperienceTypeEntity.BEAUTY -> WorkExperienceTypeDomain.BEAUTY
+      WorkExperienceTypeEntity.OUTDOOR -> WorkExperienceTypeDomain.OUTDOOR
+      WorkExperienceTypeEntity.CONSTRUCTION -> WorkExperienceTypeDomain.CONSTRUCTION
+      WorkExperienceTypeEntity.DRIVING -> WorkExperienceTypeDomain.DRIVING
+      WorkExperienceTypeEntity.HOSPITALITY -> WorkExperienceTypeDomain.HOSPITALITY
+      WorkExperienceTypeEntity.TECHNICAL -> WorkExperienceTypeDomain.TECHNICAL
+      WorkExperienceTypeEntity.MANUFACTURING -> WorkExperienceTypeDomain.MANUFACTURING
+      WorkExperienceTypeEntity.OFFICE -> WorkExperienceTypeDomain.OFFICE
+      WorkExperienceTypeEntity.RETAIL -> WorkExperienceTypeDomain.RETAIL
+      WorkExperienceTypeEntity.SPORTS -> WorkExperienceTypeDomain.SPORTS
+      WorkExperienceTypeEntity.WAREHOUSING -> WorkExperienceTypeDomain.WAREHOUSING
+      WorkExperienceTypeEntity.WASTE_MANAGEMENT -> WorkExperienceTypeDomain.WASTE_MANAGEMENT
+      WorkExperienceTypeEntity.EDUCATION_TRAINING -> WorkExperienceTypeDomain.EDUCATION_TRAINING
+      WorkExperienceTypeEntity.CLEANING_AND_MAINTENANCE -> WorkExperienceTypeDomain.CLEANING_AND_MAINTENANCE
+      WorkExperienceTypeEntity.OTHER -> WorkExperienceTypeDomain.OTHER
+    }
+
+  private fun toExperienceType(experienceType: WorkExperienceTypeDomain): WorkExperienceTypeEntity =
+    when (experienceType) {
+      WorkExperienceTypeDomain.BEAUTY -> WorkExperienceTypeEntity.BEAUTY
+      WorkExperienceTypeDomain.OUTDOOR -> WorkExperienceTypeEntity.OUTDOOR
+      WorkExperienceTypeDomain.CONSTRUCTION -> WorkExperienceTypeEntity.CONSTRUCTION
+      WorkExperienceTypeDomain.DRIVING -> WorkExperienceTypeEntity.DRIVING
+      WorkExperienceTypeDomain.HOSPITALITY -> WorkExperienceTypeEntity.HOSPITALITY
+      WorkExperienceTypeDomain.TECHNICAL -> WorkExperienceTypeEntity.TECHNICAL
+      WorkExperienceTypeDomain.MANUFACTURING -> WorkExperienceTypeEntity.MANUFACTURING
+      WorkExperienceTypeDomain.OFFICE -> WorkExperienceTypeEntity.OFFICE
+      WorkExperienceTypeDomain.RETAIL -> WorkExperienceTypeEntity.RETAIL
+      WorkExperienceTypeDomain.SPORTS -> WorkExperienceTypeEntity.SPORTS
+      WorkExperienceTypeDomain.WAREHOUSING -> WorkExperienceTypeEntity.WAREHOUSING
+      WorkExperienceTypeDomain.WASTE_MANAGEMENT -> WorkExperienceTypeEntity.WASTE_MANAGEMENT
+      WorkExperienceTypeDomain.EDUCATION_TRAINING -> WorkExperienceTypeEntity.EDUCATION_TRAINING
+      WorkExperienceTypeDomain.CLEANING_AND_MAINTENANCE -> WorkExperienceTypeEntity.CLEANING_AND_MAINTENANCE
+      WorkExperienceTypeDomain.OTHER -> WorkExperienceTypeEntity.OTHER
+    }
 }

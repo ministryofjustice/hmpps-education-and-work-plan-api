@@ -97,16 +97,6 @@ class PreviousWorkExperiencesEntityAssert(actual: PreviousWorkExperiencesEntity?
     return this
   }
 
-  fun hasAReference(): PreviousWorkExperiencesEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: PreviousWorkExperiencesEntity): PreviousWorkExperiencesEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()

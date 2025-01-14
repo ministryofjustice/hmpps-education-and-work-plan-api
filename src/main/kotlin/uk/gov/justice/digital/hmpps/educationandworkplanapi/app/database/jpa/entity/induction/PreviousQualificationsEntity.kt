@@ -16,7 +16,6 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -119,8 +118,7 @@ data class QualificationEntity(
   val createdAtPrison: String,
 
   @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAtPrison: String,
 ) : KeyAwareChildEntity {
 
   @Id
