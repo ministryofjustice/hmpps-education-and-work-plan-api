@@ -58,7 +58,11 @@ class JpaInductionPersistenceAdapter(
   override fun getInduction(prisonNumber: String): Induction? =
     inductionRepository.findByPrisonNumber(prisonNumber)?.let {
       val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
-      inductionMapper.fromEntityToDomain(it, previousQualificationsEntity)
+      val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
+        entityReference = it.reference!!,
+        entityType = EntityType.INDUCTION,
+      ).firstOrNull()
+      inductionMapper.fromEntityToDomain(it, previousQualificationsEntity, noteEntity)
     }
 
   @Transactional
@@ -70,7 +74,11 @@ class JpaInductionPersistenceAdapter(
       inductionEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
       val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto)
-      inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity)
+      val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
+        entityReference = inductionEntity.reference!!,
+        entityType = EntityType.INDUCTION,
+      ).firstOrNull()
+      inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity, noteEntity)
     } else {
       null
     }

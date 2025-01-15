@@ -93,34 +93,6 @@ abstract class InductionEntityMapper {
       note = noteEntity?.let { NoteMapper.fromEntityToDomain(noteEntity) },
     )
 
-  fun fromEntityToDomain(
-    inductionEntity: InductionEntity,
-    previousQualificationsEntity: PreviousQualificationsEntity?,
-  ): Induction =
-    Induction(
-      reference = inductionEntity.reference!!,
-      prisonNumber = inductionEntity.prisonNumber!!,
-      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease!!),
-      previousQualifications = previousQualificationsEntityMapper.fromEntityToDomain(previousQualificationsEntity),
-      previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining!!),
-      previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
-      inPrisonInterests = inPrisonInterestsEntityMapper.fromEntityToDomain(inductionEntity.inPrisonInterests),
-      personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromEntityToDomain(inductionEntity.personalSkillsAndInterests),
-      futureWorkInterests = futureWorkInterestsEntityMapper.fromEntityToDomain(inductionEntity.futureWorkInterests),
-      createdBy = inductionEntity.createdBy,
-      createdByDisplayName = inductionEntity.createdByDisplayName,
-      createdAt = inductionEntity.createdAt,
-      createdAtPrison = inductionEntity.createdAtPrison!!,
-      lastUpdatedBy = inductionEntity.updatedBy,
-      lastUpdatedByDisplayName = inductionEntity.updatedByDisplayName,
-      lastUpdatedAt = inductionEntity.updatedAt,
-      lastUpdatedAtPrison = inductionEntity.updatedAtPrison!!,
-      conductedBy = inductionEntity.conductedBy,
-      conductedByRole = inductionEntity.conductedByRole,
-      completedDate = inductionEntity.completedDate,
-      note = null,
-    )
-
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
   @Mapping(target = "lastUpdatedAt", source = "updatedAt")
   abstract fun fromEntitySummaryToDomainSummary(inductionSummaryProjection: InductionSummaryProjection): InductionSummary

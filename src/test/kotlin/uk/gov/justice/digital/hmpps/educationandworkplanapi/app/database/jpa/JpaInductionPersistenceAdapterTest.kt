@@ -229,7 +229,7 @@ class JpaInductionPersistenceAdapterTest {
     given(previousQualificationsRepository.findByPrisonNumber(any())).willReturn(previousQualificationsEntity)
 
     val expected = aFullyPopulatedInduction(prisonNumber = prisonNumber)
-    given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expected)
+    given(inductionMapper.fromEntityToDomain(any(), any(), anyOrNull())).willReturn(expected)
 
     // When
     val actual = persistenceAdapter.getInduction(prisonNumber)
@@ -238,7 +238,7 @@ class JpaInductionPersistenceAdapterTest {
     assertThat(actual).isEqualTo(expected)
     verify(inductionRepository).findByPrisonNumber(prisonNumber)
     verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
-    verify(inductionMapper).fromEntityToDomain(inductionEntity, previousQualificationsEntity)
+    verify(inductionMapper).fromEntityToDomain(inductionEntity, previousQualificationsEntity, null)
   }
 
   @Test
@@ -297,7 +297,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), any(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -318,7 +318,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verify(previousQualificationsMapper).updateExistingEntityFromDto(previousQualificationsEntity, updateInductionDto.previousQualifications!!)
       verify(previousQualificationsRepository).saveAndFlush(previousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity, null)
     }
 
     @Test
@@ -360,7 +360,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), any(), anyOrNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -388,7 +388,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verify(previousQualificationsMapper).fromCreateDtoToEntity(expectedCreatePreviousQualificationsDto)
       verify(previousQualificationsRepository).saveAndFlush(newPreviousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity, null)
     }
 
     @Test
@@ -425,7 +425,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), isNull())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), isNull(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -446,7 +446,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, null)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, null, null)
     }
 
     @Test
@@ -484,7 +484,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), any(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -505,7 +505,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, previousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, previousQualificationsEntity, null)
     }
 
     @Test
