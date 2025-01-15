@@ -14,13 +14,11 @@ data class PreviousWorkExperiences(
   val hasWorkedBefore: HasWorkedBefore,
   val hasWorkedBeforeNotRelevantReason: String?,
   val experiences: List<WorkExperience>,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
+  val createdBy: String,
+  val createdAt: Instant,
   val createdAtPrison: String,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val lastUpdatedBy: String,
+  val lastUpdatedAt: Instant,
   val lastUpdatedAtPrison: String,
 )
 

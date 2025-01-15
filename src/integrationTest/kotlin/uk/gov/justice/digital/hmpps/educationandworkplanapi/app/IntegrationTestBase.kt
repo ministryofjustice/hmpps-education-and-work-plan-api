@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -74,6 +74,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Compl
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
@@ -81,6 +82,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -273,21 +275,50 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     createActionPlanRequest: CreateActionPlanRequest = aValidCreateActionPlanRequest(),
     username: String = "auser_gen",
-    displayName: String = "Albert User",
+    testSensitiveToGoalCreationOrder: Boolean = false,
+  ) {
+    if (!testSensitiveToGoalCreationOrder) {
+      // Create the action plan including all goals in one operation
+      webTestClient.post()
+        .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
+        .withBody(createActionPlanRequest)
+        .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private, username = username))
+        .contentType(APPLICATION_JSON)
+        .exchange()
+    } else {
+      // The test is sensitive to the order in which the goals are created.
+      val goalsToCreate = createActionPlanRequest.goals
+      // Create the action plan with the first goal
+      webTestClient.post()
+        .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
+        .withBody(createActionPlanRequest.copy(goals = listOf(goalsToCreate.first())))
+        .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private, username = username))
+        .contentType(APPLICATION_JSON)
+        .exchange()
+      // Then create the remaining goals one at a time in order
+      goalsToCreate.slice(1..<goalsToCreate.size).onEach { goalToCreate ->
+        createGoals(
+          prisonNumber = prisonNumber,
+          username = username,
+          createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(goalToCreate)),
+        )
+      }
+    }
+  }
+
+  fun createGoals(
+    prisonNumber: String,
+    createGoalsRequest: CreateGoalsRequest = aValidCreateGoalsRequest(),
+    username: String = "auser_gen",
   ) {
     webTestClient.post()
-      .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
-      .withBody(createActionPlanRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          ACTIONPLANS_RW,
-          privateKey = keyPair.private,
-          username = username,
-          displayName = displayName,
-        ),
-      )
-      .contentType(MediaType.APPLICATION_JSON)
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private, username = username))
+      .contentType(APPLICATION_JSON)
       .exchange()
+      .expectStatus()
+      .isCreated()
   }
 
   fun getTimeline(prisonNumber: String): TimelineResponse =
@@ -330,7 +361,7 @@ abstract class IntegrationTestBase {
           displayName = displayName,
         ),
       )
-      .contentType(MediaType.APPLICATION_JSON)
+      .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isCreated()
@@ -363,7 +394,7 @@ abstract class IntegrationTestBase {
           displayName = displayName,
         ),
       )
-      .contentType(MediaType.APPLICATION_JSON)
+      .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isNoContent
@@ -386,7 +417,7 @@ abstract class IntegrationTestBase {
           displayName = displayName,
         ),
       )
-      .contentType(MediaType.APPLICATION_JSON)
+      .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isNoContent
@@ -409,7 +440,7 @@ abstract class IntegrationTestBase {
           displayName = displayName,
         ),
       )
-      .contentType(MediaType.APPLICATION_JSON)
+      .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
       .isCreated()

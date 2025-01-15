@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -38,6 +37,7 @@ class GetGoalsTest : IntegrationTestBase() {
           aValidCreateGoalRequest(title = "Goal 5", notes = null),
         ),
       ),
+      testSensitiveToGoalCreationOrder = true,
     )
   }
 
@@ -90,13 +90,27 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).hasSize(5)
-    actual.goals.onEach {
-      assertThat(it).hasStatus(GoalStatus.ACTIVE)
-    }
-    val actualTitles = actual.goals.map { it.title }
-    assertThat(actualTitles).containsExactlyInAnyOrder("Goal 1", "Goal 2", "Goal 3", "Goal 4", "Goal 5")
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(5)
+      .allGoals {
+        it.hasStatus(GoalStatus.ACTIVE)
+      }
+      .goal(1) {
+        it.hasTitle("Goal 1")
+      }
+      .goal(2) {
+        it.hasTitle("Goal 2")
+      }
+      .goal(3) {
+        it.hasTitle("Goal 3")
+      }
+      .goal(4) {
+        it.hasTitle("Goal 4")
+      }
+      .goal(5) {
+        it.hasTitle("Goal 5")
+      }
   }
 
   @Test
@@ -134,27 +148,38 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).hasSize(5)
-    assertThat(actual.goals[0])
-      .hasTitle("Goal 1")
-      .hasNoNotes()
-    assertThat(actual.goals[1])
-      .hasTitle("Goal 2")
-      .hasGoalNote("Only goal 2 has a goal note")
-      .hasNoArchiveNote()
-      .hasCompletedNote("Goal 2 completion note")
-    assertThat(actual.goals[2])
-      .hasTitle("Goal 3")
-      .hasNoGoalNote()
-      .hasArchiveNote("Goal 3 archive note")
-      .hasNoCompletedNote()
-    assertThat(actual.goals[3])
-      .hasTitle("Goal 4")
-      .hasNoNotes()
-    assertThat(actual.goals[4])
-      .hasTitle("Goal 5")
-      .hasNoNotes()
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(5)
+      .goal(1) {
+        it.hasTitle("Goal 1")
+          .hasStatus(GoalStatus.ACTIVE)
+          .hasNoNotes()
+      }
+      .goal(2) {
+        it.hasTitle("Goal 2")
+          .hasStatus(GoalStatus.COMPLETED)
+          .hasGoalNote("Only goal 2 has a goal note")
+          .hasNoArchiveNote()
+          .hasCompletedNote("Goal 2 completion note")
+      }
+      .goal(3) {
+        it.hasTitle("Goal 3")
+          .hasStatus(GoalStatus.ARCHIVED)
+          .hasNoGoalNote()
+          .hasArchiveNote("Goal 3 archive note")
+          .hasNoCompletedNote()
+      }
+      .goal(4) {
+        it.hasTitle("Goal 4")
+          .hasStatus(GoalStatus.ACTIVE)
+          .hasNoNotes()
+      }
+      .goal(5) {
+        it.hasTitle("Goal 5")
+          .hasStatus(GoalStatus.ACTIVE)
+          .hasNoNotes()
+      }
   }
 
   @Test
@@ -190,10 +215,21 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).hasSize(3)
-    val actualTitles = actual.goals.map { it.title }
-    assertThat(actualTitles).containsExactlyInAnyOrder("Goal 1", "Goal 2", "Goal 5")
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(3)
+      .allGoals {
+        it.hasStatus(GoalStatus.ACTIVE)
+      }
+      .goal(1) {
+        it.hasTitle("Goal 1")
+      }
+      .goal(2) {
+        it.hasTitle("Goal 2")
+      }
+      .goal(3) {
+        it.hasTitle("Goal 5")
+      }
   }
 
   @Test
@@ -229,13 +265,18 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).hasSize(2)
-    assertThat(actual.goals[0]).hasTitle("Goal 2")
-    assertThat(actual.goals[1]).hasTitle("Goal 4")
-
-    val actualTitles = actual.goals.map { it.title }
-    assertThat(actualTitles).containsExactlyInAnyOrder("Goal 2", "Goal 4")
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(2)
+      .allGoals {
+        it.hasStatus(GoalStatus.ARCHIVED)
+      }
+      .goal(1) {
+        it.hasTitle("Goal 2")
+      }
+      .goal(2) {
+        it.hasTitle("Goal 4")
+      }
   }
 
   @Test
@@ -277,12 +318,21 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).hasSize(4)
-    assertThat(actual.goals[0]).hasTitle("Goal 1").hasStatus(GoalStatus.ACTIVE)
-    assertThat(actual.goals[1]).hasTitle("Goal 2").hasStatus(GoalStatus.ACTIVE)
-    assertThat(actual.goals[2]).hasTitle("Goal 4").hasStatus(GoalStatus.ARCHIVED)
-    assertThat(actual.goals[3]).hasTitle("Goal 5").hasStatus(GoalStatus.ARCHIVED)
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(4)
+      .goal(1) {
+        it.hasTitle("Goal 1").hasStatus(GoalStatus.ACTIVE)
+      }
+      .goal(2) {
+        it.hasTitle("Goal 2").hasStatus(GoalStatus.ACTIVE)
+      }
+      .goal(3) {
+        it.hasTitle("Goal 4").hasStatus(GoalStatus.ARCHIVED)
+      }
+      .goal(4) {
+        it.hasTitle("Goal 5").hasStatus(GoalStatus.ARCHIVED)
+      }
   }
 
   @Test
@@ -324,12 +374,21 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).hasSize(4)
-    assertThat(actual.goals[0]).hasTitle("Goal 1").hasStatus(GoalStatus.ACTIVE)
-    assertThat(actual.goals[1]).hasTitle("Goal 2").hasStatus(GoalStatus.ACTIVE)
-    assertThat(actual.goals[2]).hasTitle("Goal 4").hasStatus(GoalStatus.ARCHIVED)
-    assertThat(actual.goals[3]).hasTitle("Goal 5").hasStatus(GoalStatus.ARCHIVED)
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(4)
+      .goal(1) {
+        it.hasTitle("Goal 1").hasStatus(GoalStatus.ACTIVE)
+      }
+      .goal(2) {
+        it.hasTitle("Goal 2").hasStatus(GoalStatus.ACTIVE)
+      }
+      .goal(3) {
+        it.hasTitle("Goal 4").hasStatus(GoalStatus.ARCHIVED)
+      }
+      .goal(4) {
+        it.hasTitle("Goal 5").hasStatus(GoalStatus.ARCHIVED)
+      }
   }
 
   @Test
@@ -352,8 +411,9 @@ class GetGoalsTest : IntegrationTestBase() {
       .returnResult(GetGoalsResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
-    assertThat(actual.goals).isEmpty()
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfGoals(0)
   }
 
   @Test
