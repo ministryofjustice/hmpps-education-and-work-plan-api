@@ -11,26 +11,23 @@ fun aValidInPrisonInterestsEntity(
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
-  createdByDisplayName: String? = null,
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-  updatedByDisplayName: String? = null,
 ) =
   InPrisonInterestsEntity(
-    id = id,
     reference = reference,
     inPrisonWorkInterests = inPrisonWorkInterests,
     inPrisonTrainingInterests = inPrisonTrainingInterests,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
 
 fun aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -40,26 +37,23 @@ fun aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",
-  createdByDisplayName: String? = "Alex Smith",
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-  updatedByDisplayName: String? = "Barry Jones",
 ) =
   InPrisonInterestsEntity(
-    id = id,
     reference = reference,
     inPrisonWorkInterests = inPrisonWorkInterests,
     inPrisonTrainingInterests = inPrisonTrainingInterests,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
 
 fun aValidInPrisonWorkInterestEntity(
   reference: UUID = UUID.randomUUID(),
