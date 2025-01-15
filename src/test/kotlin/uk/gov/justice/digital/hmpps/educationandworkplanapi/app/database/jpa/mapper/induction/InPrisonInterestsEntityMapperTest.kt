@@ -64,7 +64,6 @@ class InPrisonInterestsEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)

@@ -9,9 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidFutureWorkInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkInterestEntity
@@ -21,10 +23,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class FutureWorkInterestsEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: FutureWorkInterestsEntityMapperImpl
+  private lateinit var mapper: FutureWorkInterestsEntityMapper
 
   @Mock
   private lateinit var workInterestEntityMapper: WorkInterestEntityMapper
+
+  @Mock
+  private lateinit var entityListManager: InductionEntityListManager<WorkInterestEntity, WorkInterest>
 
   @Test
   fun `should map from dto to entity`() {
@@ -44,7 +49,6 @@ class FutureWorkInterestsEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
@@ -57,16 +61,14 @@ class FutureWorkInterestsEntityMapperTest {
     val futureWorkInterestsEntity = aValidFutureWorkInterestsEntityWithJpaFieldsPopulated()
     val expectedWorkInterest = aValidWorkInterest()
     val expectedFutureWorkInterests = aValidFutureWorkInterests(
-      reference = futureWorkInterestsEntity.reference!!,
+      reference = futureWorkInterestsEntity.reference,
       interests = listOf(expectedWorkInterest),
       createdAt = futureWorkInterestsEntity.createdAt!!,
-      createdAtPrison = futureWorkInterestsEntity.createdAtPrison!!,
+      createdAtPrison = futureWorkInterestsEntity.createdAtPrison,
       createdBy = futureWorkInterestsEntity.createdBy!!,
-      createdByDisplayName = futureWorkInterestsEntity.createdByDisplayName!!,
       lastUpdatedAt = futureWorkInterestsEntity.updatedAt!!,
-      lastUpdatedAtPrison = futureWorkInterestsEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = futureWorkInterestsEntity.updatedAtPrison,
       lastUpdatedBy = futureWorkInterestsEntity.updatedBy!!,
-      lastUpdatedByDisplayName = futureWorkInterestsEntity.updatedByDisplayName!!,
     )
     given(workInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedWorkInterest)
 
@@ -75,6 +77,6 @@ class FutureWorkInterestsEntityMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedFutureWorkInterests)
-    verify(workInterestEntityMapper).fromEntityToDomain(futureWorkInterestsEntity.interests!![0])
+    verify(workInterestEntityMapper).fromEntityToDomain(futureWorkInterestsEntity.interests[0])
   }
 }

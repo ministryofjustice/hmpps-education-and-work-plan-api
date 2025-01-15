@@ -107,16 +107,6 @@ class FutureWorkInterestsEntityAssert(actual: FutureWorkInterestsEntity?) :
     return this
   }
 
-  fun hasAReference(): FutureWorkInterestsEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: FutureWorkInterestsEntity): FutureWorkInterestsEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
