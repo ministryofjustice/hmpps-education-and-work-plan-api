@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousTrainingEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkOnReleaseEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
@@ -31,7 +32,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.map
     PreviousTrainingEntityMapper::class,
     PreviousWorkExperiencesEntityMapper::class,
     WorkOnReleaseEntityMapper::class,
-    NoteMapper::class,
   ],
 )
 abstract class InductionEntityMapper {
@@ -67,6 +67,7 @@ abstract class InductionEntityMapper {
   fun fromEntityToDomain(
     inductionEntity: InductionEntity,
     previousQualificationsEntity: PreviousQualificationsEntity?,
+    noteEntity: NoteEntity? = null,
   ): Induction =
     Induction(
       reference = inductionEntity.reference!!,
@@ -89,6 +90,35 @@ abstract class InductionEntityMapper {
       conductedBy = inductionEntity.conductedBy,
       conductedByRole = inductionEntity.conductedByRole,
       completedDate = inductionEntity.completedDate,
+      note = noteEntity?.let { NoteMapper.fromEntityToDomain(noteEntity) },
+    )
+
+  fun fromEntityToDomain(
+    inductionEntity: InductionEntity,
+    previousQualificationsEntity: PreviousQualificationsEntity?,
+  ): Induction =
+    Induction(
+      reference = inductionEntity.reference!!,
+      prisonNumber = inductionEntity.prisonNumber!!,
+      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease!!),
+      previousQualifications = previousQualificationsEntityMapper.fromEntityToDomain(previousQualificationsEntity),
+      previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining!!),
+      previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
+      inPrisonInterests = inPrisonInterestsEntityMapper.fromEntityToDomain(inductionEntity.inPrisonInterests),
+      personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromEntityToDomain(inductionEntity.personalSkillsAndInterests),
+      futureWorkInterests = futureWorkInterestsEntityMapper.fromEntityToDomain(inductionEntity.futureWorkInterests),
+      createdBy = inductionEntity.createdBy,
+      createdByDisplayName = inductionEntity.createdByDisplayName,
+      createdAt = inductionEntity.createdAt,
+      createdAtPrison = inductionEntity.createdAtPrison!!,
+      lastUpdatedBy = inductionEntity.updatedBy,
+      lastUpdatedByDisplayName = inductionEntity.updatedByDisplayName,
+      lastUpdatedAt = inductionEntity.updatedAt,
+      lastUpdatedAtPrison = inductionEntity.updatedAtPrison!!,
+      conductedBy = inductionEntity.conductedBy,
+      conductedByRole = inductionEntity.conductedByRole,
+      completedDate = inductionEntity.completedDate,
+      note = null,
     )
 
   @Mapping(target = "lastUpdatedBy", source = "updatedBy")
@@ -129,11 +159,17 @@ abstract class InductionEntityMapper {
     }
   }
 
-  fun updatePersonalSkillsAndInterests(entity: InductionEntity, dto: UpdateInductionDto): PersonalSkillsAndInterestsEntity? {
+  fun updatePersonalSkillsAndInterests(
+    entity: InductionEntity,
+    dto: UpdateInductionDto,
+  ): PersonalSkillsAndInterestsEntity? {
     return if (entity.personalSkillsAndInterests == null) {
       skillsAndInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.personalSkillsAndInterests)
     } else {
-      skillsAndInterestsEntityMapper.updateExistingEntityFromDto(entity.personalSkillsAndInterests!!, dto.personalSkillsAndInterests)
+      skillsAndInterestsEntityMapper.updateExistingEntityFromDto(
+        entity.personalSkillsAndInterests!!,
+        dto.personalSkillsAndInterests,
+      )
         .let { entity.personalSkillsAndInterests }
     }
   }
@@ -151,7 +187,10 @@ abstract class InductionEntityMapper {
     return if (entity.previousWorkExperiences == null) {
       workExperiencesEntityMapper.fromUpdateDtoToNewEntity(dto.previousWorkExperiences)
     } else {
-      workExperiencesEntityMapper.updateExistingEntityFromDto(entity.previousWorkExperiences!!, dto.previousWorkExperiences)
+      workExperiencesEntityMapper.updateExistingEntityFromDto(
+        entity.previousWorkExperiences!!,
+        dto.previousWorkExperiences,
+      )
         .let { entity.previousWorkExperiences }
     }
   }

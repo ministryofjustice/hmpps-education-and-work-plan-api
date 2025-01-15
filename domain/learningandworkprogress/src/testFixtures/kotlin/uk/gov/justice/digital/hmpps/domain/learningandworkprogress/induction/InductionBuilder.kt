@@ -2,6 +2,10 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -27,6 +31,7 @@ fun aFullyPopulatedInduction(
   conductedBy: String? = "John Smith",
   conductedByRole: String? = "Peer Mentor",
   conductedAt: LocalDate? = LocalDate.now(),
+  note: NoteDto? = aValidNoteDto(prisonNumber, noteType = NoteType.INDUCTION, entityType = EntityType.INDUCTION),
 ) = Induction(
   reference = reference,
   prisonNumber = prisonNumber,
@@ -48,4 +53,5 @@ fun aFullyPopulatedInduction(
   conductedBy = conductedBy,
   completedDate = conductedAt,
   conductedByRole = conductedByRole,
+  note = note,
 )
