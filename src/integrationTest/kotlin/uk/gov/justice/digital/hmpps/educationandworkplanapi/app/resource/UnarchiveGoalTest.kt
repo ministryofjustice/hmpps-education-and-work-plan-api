@@ -333,7 +333,6 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     )
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = createActionPlanRequest,
     )

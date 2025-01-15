@@ -198,7 +198,6 @@ class UpdateGoalTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
         goals = listOf(
@@ -321,7 +320,6 @@ class UpdateGoalTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
         goals = listOf(
@@ -444,7 +442,6 @@ class UpdateGoalTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
         goals = listOf(
