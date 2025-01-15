@@ -12,27 +12,24 @@ fun aValidPreviousWorkExperiencesEntity(
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
-  createdByDisplayName: String? = null,
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-  updatedByDisplayName: String? = null,
 ) =
   PreviousWorkExperiencesEntity(
-    id = id,
     reference = reference,
     hasWorkedBefore = hasWorkedBefore,
     hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
     experiences = experiences,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
 
 fun aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -42,33 +39,30 @@ fun aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",
-  createdByDisplayName: String? = "Alex Smith",
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-  updatedByDisplayName: String? = "Barry Jones",
 ) =
   PreviousWorkExperiencesEntity(
-    id = id,
     reference = reference,
     hasWorkedBefore = hasWorkedBefore,
     experiences = experiences,
-    createdAt = createdAt,
     createdAtPrison = createdAtPrison,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    updatedAt = updatedAt,
     updatedAtPrison = updatedAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }
 
 fun aValidWorkExperienceEntity(
   reference: UUID = UUID.randomUUID(),
   experienceType: WorkExperienceType = WorkExperienceType.OTHER,
   experienceTypeOther: String? = "Warehouse work",
-  role: String? = "Chief Forklift Truck Driver",
-  details: String? = "Forward, pick stuff up, reverse etc",
+  role: String = "Chief Forklift Truck Driver",
+  details: String = "Forward, pick stuff up, reverse etc",
 ) =
   WorkExperienceEntity(
     reference = reference,

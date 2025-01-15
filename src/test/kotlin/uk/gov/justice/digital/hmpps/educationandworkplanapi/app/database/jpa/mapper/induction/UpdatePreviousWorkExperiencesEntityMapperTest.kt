@@ -1,31 +1,18 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperience
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkExperience
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousWorkExperiencesDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperienceType as WorkExperienceTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceType as WorkExperienceTypeEntity
 
 class UpdatePreviousWorkExperiencesEntityMapperTest {
 
-  private val mapper = PreviousWorkExperiencesEntityMapperImpl().also {
-    PreviousWorkExperiencesEntityMapper::class.java.getDeclaredField("workExperienceEntityMapper").apply {
-      isAccessible = true
-      set(it, WorkExperienceEntityMapperImpl())
-    }
-
-    PreviousWorkExperiencesEntityMapper::class.java.getDeclaredField("entityListManager").apply {
-      isAccessible = true
-      set(it, InductionEntityListManager<WorkExperienceEntity, WorkExperience>())
-    }
-  }
+  private val mapper = PreviousWorkExperiencesEntityMapper(WorkExperienceEntityMapper(), InductionEntityListManager())
 
   @Test
   fun `should update existing work experiences`() {
@@ -56,20 +43,18 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingPreviousWorkExperiencesEntity.deepCopy().apply {
-      id
-      reference = reference
+    val expectedEntity = existingPreviousWorkExperiencesEntity.copy(
       experiences = mutableListOf(
-        existingEntity.deepCopy().apply {
-          experienceType = WorkExperienceTypeEntity.OTHER
-          experienceTypeOther = "Building work"
-          role = "Bricklaying"
-          details = "Various types of bricklaying"
-        },
-      )
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+        existingEntity.copy(
+          experienceType = WorkExperienceTypeEntity.OTHER,
+          experienceTypeOther = "Building work",
+          role = "Bricklaying",
+          details = "Various types of bricklaying",
+        ),
+      ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
@@ -107,10 +92,7 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       ),
     )
 
-    val expectedEntity = existingPreviousWorkExperiencesEntity.deepCopy().apply {
-      id
-      reference = reference
-    }
+    val expectedEntity = existingPreviousWorkExperiencesEntity.copy()
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updatedExperiencesDto)
@@ -154,9 +136,7 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingPreviousWorkExperiencesEntity.deepCopy().apply {
-      id
-      reference = reference
+    val expectedEntity = existingPreviousWorkExperiencesEntity.copy(
       experiences = mutableListOf(
         aValidWorkExperienceEntity(
           experienceType = WorkExperienceTypeEntity.OTHER,
@@ -170,10 +150,10 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
           role = "Bricklaying",
           details = "Various types of bricklaying",
         ),
-      )
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+      ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updateExperiencesDto)
@@ -218,13 +198,11 @@ class UpdatePreviousWorkExperiencesEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingPreviousWorkExperiencesEntity.deepCopy().apply {
-      id
-      reference = reference
-      experiences = mutableListOf(firstWorkExperienceEntity)
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingPreviousWorkExperiencesEntity.copy(
+      experiences = mutableListOf(firstWorkExperienceEntity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousWorkExperiencesEntity, updatePreviousWorkExperiencesDto)

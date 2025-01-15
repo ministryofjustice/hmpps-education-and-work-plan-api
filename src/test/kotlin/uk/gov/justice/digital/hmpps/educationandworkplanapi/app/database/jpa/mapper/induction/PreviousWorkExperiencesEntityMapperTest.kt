@@ -9,9 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.WorkExperience
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousWorkExperiences
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkExperience
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkExperienceEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkExperienceEntity
@@ -20,10 +22,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 @ExtendWith(MockitoExtension::class)
 class PreviousWorkExperiencesEntityMapperTest {
   @InjectMocks
-  private lateinit var mapper: PreviousWorkExperiencesEntityMapperImpl
+  private lateinit var mapper: PreviousWorkExperiencesEntityMapper
 
   @Mock
   private lateinit var workExperienceEntityMapper: WorkExperienceEntityMapper
+
+  @Mock
+  private lateinit var entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>
 
   @Test
   fun `should map from dto to entity`() {
@@ -43,7 +48,6 @@ class PreviousWorkExperiencesEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
@@ -56,16 +60,14 @@ class PreviousWorkExperiencesEntityMapperTest {
     val workExperiencesEntity = aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated()
     val expectedWorkExperience = aValidWorkExperience()
     val expectedPreviousWorkExperiences = aValidPreviousWorkExperiences(
-      reference = workExperiencesEntity.reference!!,
+      reference = workExperiencesEntity.reference,
       experiences = mutableListOf(expectedWorkExperience),
       createdAt = workExperiencesEntity.createdAt!!,
-      createdAtPrison = workExperiencesEntity.createdAtPrison!!,
+      createdAtPrison = workExperiencesEntity.createdAtPrison,
       createdBy = workExperiencesEntity.createdBy!!,
-      createdByDisplayName = workExperiencesEntity.createdByDisplayName!!,
       lastUpdatedAt = workExperiencesEntity.updatedAt!!,
-      lastUpdatedAtPrison = workExperiencesEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = workExperiencesEntity.updatedAtPrison,
       lastUpdatedBy = workExperiencesEntity.updatedBy!!,
-      lastUpdatedByDisplayName = workExperiencesEntity.updatedByDisplayName!!,
     )
     given(workExperienceEntityMapper.fromEntityToDomain(any())).willReturn(expectedWorkExperience)
 
@@ -74,6 +76,6 @@ class PreviousWorkExperiencesEntityMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedPreviousWorkExperiences)
-    verify(workExperienceEntityMapper).fromEntityToDomain(workExperiencesEntity.experiences!![0])
+    verify(workExperienceEntityMapper).fromEntityToDomain(workExperiencesEntity.experiences[0])
   }
 }
