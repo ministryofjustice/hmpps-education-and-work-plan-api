@@ -9,10 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonTrainingInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonTrainingInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInPrisonInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonTrainingInterestEntity
@@ -23,13 +27,19 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class InPrisonInterestsEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: InPrisonInterestsEntityMapperImpl
+  private lateinit var mapper: InPrisonInterestsEntityMapper
 
   @Mock
   private lateinit var workInterestEntityMapper: InPrisonWorkInterestEntityMapper
 
   @Mock
   private lateinit var trainingInterestEntityMapper: InPrisonTrainingInterestEntityMapper
+
+  @Mock
+  private lateinit var workInterestEntityListManager: InductionEntityListManager<InPrisonWorkInterestEntity, InPrisonWorkInterest>
+
+  @Mock
+  private lateinit var trainingInterestEntityListManager: InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>
 
   @Test
   fun `should map from dto to entity`() {
@@ -69,17 +79,15 @@ class InPrisonInterestsEntityMapperTest {
     val expectedWorkInterest = aValidInPrisonWorkInterest()
     val expectedTrainingInterest = aValidInPrisonTrainingInterest()
     val expectedInPrisonInterests = aValidInPrisonInterests(
-      reference = inPrisonInterestsEntity.reference!!,
+      reference = inPrisonInterestsEntity.reference,
       inPrisonWorkInterests = mutableListOf(expectedWorkInterest),
       inPrisonTrainingInterests = mutableListOf(expectedTrainingInterest),
       createdAt = inPrisonInterestsEntity.createdAt!!,
-      createdAtPrison = inPrisonInterestsEntity.createdAtPrison!!,
+      createdAtPrison = inPrisonInterestsEntity.createdAtPrison,
       createdBy = inPrisonInterestsEntity.createdBy!!,
-      createdByDisplayName = inPrisonInterestsEntity.createdByDisplayName!!,
       lastUpdatedAt = inPrisonInterestsEntity.updatedAt!!,
-      lastUpdatedAtPrison = inPrisonInterestsEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = inPrisonInterestsEntity.updatedAtPrison,
       lastUpdatedBy = inPrisonInterestsEntity.updatedBy!!,
-      lastUpdatedByDisplayName = inPrisonInterestsEntity.updatedByDisplayName!!,
     )
 
     given(workInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedWorkInterest)
@@ -90,7 +98,7 @@ class InPrisonInterestsEntityMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedInPrisonInterests)
-    verify(workInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonWorkInterests!![0])
-    verify(trainingInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonTrainingInterests!![0])
+    verify(workInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonWorkInterests[0])
+    verify(trainingInterestEntityMapper).fromEntityToDomain(inPrisonInterestsEntity.inPrisonTrainingInterests[0])
   }
 }

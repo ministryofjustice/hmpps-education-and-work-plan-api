@@ -1,13 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
-import org.mapstruct.AfterMapping
-import org.mapstruct.BeanMapping
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.MappingTarget
-import org.mapstruct.Named
-import org.mapstruct.NullValueMappingStrategy
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonTrainingInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonWorkInterest
@@ -16,112 +9,83 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFields
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeParentEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
+import java.util.UUID
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonTrainingType as InPrisonTrainingTypeDomain
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonWorkType as InPrisonWorkTypeDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingType as InPrisonTrainingTypeEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkType as InPrisonWorkTypeEntity
 
-@Mapper(
-  uses = [
-    InPrisonWorkInterestEntityMapper::class,
-    InPrisonTrainingInterestEntityMapper::class,
-  ],
-  nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
-)
-abstract class InPrisonInterestsEntityMapper {
+@Component
+class InPrisonInterestsEntityMapper(
+  private val workInterestEntityMapper: InPrisonWorkInterestEntityMapper,
+  private val trainingInterestEntityMapper: InPrisonTrainingInterestEntityMapper,
+  private val workInterestEntityListManager: InductionEntityListManager<InPrisonWorkInterestEntity, InPrisonWorkInterest>,
+  private val trainingInterestEntityListManager: InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>,
+) {
 
-  @Autowired
-  private lateinit var workInterestEntityMapper: InPrisonWorkInterestEntityMapper
+  fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto?): InPrisonInterestsEntity? =
+    dto?.let {
+      InPrisonInterestsEntity(
+        reference = UUID.randomUUID(),
+        createdAtPrison = it.prisonId,
+        updatedAtPrison = it.prisonId,
+      ).apply {
+        addNewWorkInterests(it.inPrisonWorkInterests, this)
+        addNewTrainingInterests(it.inPrisonTrainingInterests, this)
+      }
+    }
 
-  @Autowired
-  private lateinit var trainingInterestEntityMapper: InPrisonTrainingInterestEntityMapper
+  fun fromEntityToDomain(persistedEntity: InPrisonInterestsEntity?): InPrisonInterests? =
+    persistedEntity?.let {
+      InPrisonInterests(
+        reference = it.reference,
+        inPrisonWorkInterests = it.inPrisonWorkInterests.map { workInterestEntityMapper.fromEntityToDomain(it) },
+        inPrisonTrainingInterests = it.inPrisonTrainingInterests.map { trainingInterestEntityMapper.fromEntityToDomain(it) },
+        createdBy = it.createdBy!!,
+        createdAt = it.createdAt!!,
+        createdAtPrison = it.createdAtPrison,
+        lastUpdatedBy = it.updatedBy!!,
+        lastUpdatedAt = it.updatedAt!!,
+        lastUpdatedAtPrison = it.updatedAtPrison,
+      )
+    }
 
-  @Autowired
-  private lateinit var workInterestEntityListManager: InductionEntityListManager<InPrisonWorkInterestEntity, InPrisonWorkInterest>
+  fun updateExistingEntityFromDto(entity: InPrisonInterestsEntity, dto: UpdateInPrisonInterestsDto?) =
+    dto?.also {
+      with(entity) {
+        updatedAtPrison = it.prisonId
 
-  @Autowired
-  private lateinit var trainingInterestEntityListManager: InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>
+        val existingWorkInterests = entity.inPrisonWorkInterests
+        val updatedWorkInterests = dto.inPrisonWorkInterests
+        workInterestEntityListManager.updateExisting(existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
+        workInterestEntityListManager.addNew(entity, existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
+        workInterestEntityListManager.deleteRemoved(existingWorkInterests, updatedWorkInterests)
 
-  @BeanMapping(qualifiedByName = ["addNewInterestsDuringCreate"])
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "inPrisonWorkInterests", ignore = true)
-  @Mapping(target = "inPrisonTrainingInterests", ignore = true)
-  abstract fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity
+        val existingTrainingInterests = entity.inPrisonTrainingInterests
+        val updatedTrainingInterests = dto.inPrisonTrainingInterests
+        trainingInterestEntityListManager.updateExisting(existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
+        trainingInterestEntityListManager.addNew(entity, existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
+        trainingInterestEntityListManager.deleteRemoved(existingTrainingInterests, updatedTrainingInterests)
+      }
+    }
 
-  @Named("addNewInterestsDuringCreate")
-  @AfterMapping
-  fun addNewInterestsDuringCreate(dto: CreateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
-    addNewWorkInterests(dto.inPrisonWorkInterests, entity)
-    addNewTrainingInterests(dto.inPrisonTrainingInterests, entity)
-  }
-
-  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
-  @Mapping(target = "lastUpdatedByDisplayName", source = "updatedByDisplayName")
-  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
-  @Mapping(target = "lastUpdatedAtPrison", source = "updatedAtPrison")
-  abstract fun fromEntityToDomain(persistedEntity: InPrisonInterestsEntity?): InPrisonInterests
-
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @ExcludeReferenceField
-  @Mapping(target = "createdAtPrison", ignore = true)
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "inPrisonWorkInterests", expression = "java( updateWorkInterests(entity, dto) )")
-  @Mapping(target = "inPrisonTrainingInterests", expression = "java( updateTrainingInterests(entity, dto) )")
-  abstract fun updateExistingEntityFromDto(@MappingTarget entity: InPrisonInterestsEntity, dto: UpdateInPrisonInterestsDto?)
-
-  fun updateWorkInterests(
-    entity: InPrisonInterestsEntity,
-    dto: UpdateInPrisonInterestsDto,
-  ): List<InPrisonWorkInterestEntity> {
-    val existingInterests = entity.inPrisonWorkInterests!!
-    val updatedInterests = dto.inPrisonWorkInterests
-
-    workInterestEntityListManager.updateExisting(existingInterests, updatedInterests, workInterestEntityMapper)
-    workInterestEntityListManager.addNew(entity, existingInterests, updatedInterests, workInterestEntityMapper)
-    workInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
-
-    return existingInterests
-  }
-
-  fun updateTrainingInterests(
-    entity: InPrisonInterestsEntity,
-    dto: UpdateInPrisonInterestsDto,
-  ): List<InPrisonTrainingInterestEntity> {
-    val existingInterests = entity.inPrisonTrainingInterests!!
-    val updatedInterests = dto.inPrisonTrainingInterests
-
-    trainingInterestEntityListManager.updateExisting(existingInterests, updatedInterests, trainingInterestEntityMapper)
-    trainingInterestEntityListManager.addNew(entity, existingInterests, updatedInterests, trainingInterestEntityMapper)
-    trainingInterestEntityListManager.deleteRemoved(existingInterests, updatedInterests)
-
-    return existingInterests
-  }
-
-  @BeanMapping(qualifiedByName = ["addNewInterestsDuringUpdate"])
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "inPrisonWorkInterests", ignore = true)
-  @Mapping(target = "inPrisonTrainingInterests", ignore = true)
-  abstract fun fromUpdateDtoToNewEntity(inPrisonInterests: UpdateInPrisonInterestsDto?): InPrisonInterestsEntity?
-
-  @Named("addNewInterestsDuringUpdate")
-  @AfterMapping
-  fun addNewInterestsDuringUpdate(dto: UpdateInPrisonInterestsDto, @MappingTarget entity: InPrisonInterestsEntity) {
-    addNewWorkInterests(dto.inPrisonWorkInterests, entity)
-    addNewTrainingInterests(dto.inPrisonTrainingInterests, entity)
-  }
+  fun fromUpdateDtoToNewEntity(inPrisonInterests: UpdateInPrisonInterestsDto?): InPrisonInterestsEntity? =
+    inPrisonInterests?.let {
+      InPrisonInterestsEntity(
+        reference = UUID.randomUUID(),
+        createdAtPrison = it.prisonId,
+        updatedAtPrison = it.prisonId,
+      ).apply {
+        addNewWorkInterests(it.inPrisonWorkInterests, this)
+        addNewTrainingInterests(it.inPrisonTrainingInterests, this)
+      }
+    }
 
   private fun addNewWorkInterests(workInterests: List<InPrisonWorkInterest>, entity: InPrisonInterestsEntity) {
     workInterests.forEach {
       entity.addChild(
         workInterestEntityMapper.fromDomainToEntity(it),
-        entity.inPrisonWorkInterests(),
+        entity.inPrisonWorkInterests,
       )
     }
   }
@@ -130,42 +94,126 @@ abstract class InPrisonInterestsEntityMapper {
     workInterests.forEach {
       entity.addChild(
         trainingInterestEntityMapper.fromDomainToEntity(it),
-        entity.inPrisonTrainingInterests(),
+        entity.inPrisonTrainingInterests,
       )
     }
   }
 }
 
-@Mapper
-interface InPrisonWorkInterestEntityMapper : KeyAwareEntityMapper<InPrisonWorkInterestEntity, InPrisonWorkInterest> {
-  @ExcludeJpaManagedFields
-  @GenerateNewReference
-  @ExcludeParentEntity
-  override fun fromDomainToEntity(domain: InPrisonWorkInterest): InPrisonWorkInterestEntity
+@Component
+class InPrisonWorkInterestEntityMapper : KeyAwareEntityMapper<InPrisonWorkInterestEntity, InPrisonWorkInterest> {
+  override fun fromDomainToEntity(domain: InPrisonWorkInterest): InPrisonWorkInterestEntity =
+    with(domain) {
+      InPrisonWorkInterestEntity(
+        reference = UUID.randomUUID(),
+        workType = toWorkType(workType),
+        workTypeOther = workTypeOther,
+      )
+    }
 
-  fun fromEntityToDomain(persistedEntity: InPrisonWorkInterestEntity): InPrisonWorkInterest
+  fun fromEntityToDomain(persistedEntity: InPrisonWorkInterestEntity): InPrisonWorkInterest =
+    with(persistedEntity) {
+      InPrisonWorkInterest(
+        workType = toWorkType(workType),
+        workTypeOther = workTypeOther,
+      )
+    }
 
-  @ExcludeJpaManagedFields
-  @ExcludeReferenceField
-  @ExcludeParentEntity
-  override fun updateEntityFromDomain(@MappingTarget entity: InPrisonWorkInterestEntity, domain: InPrisonWorkInterest)
+  override fun updateEntityFromDomain(entity: InPrisonWorkInterestEntity, domain: InPrisonWorkInterest) =
+    with(entity) {
+      workType = toWorkType(domain.workType)
+      workTypeOther = domain.workTypeOther
+    }
+
+  private fun toWorkType(workType: InPrisonWorkTypeEntity): InPrisonWorkTypeDomain =
+    when (workType) {
+      InPrisonWorkTypeEntity.CLEANING_AND_HYGIENE -> InPrisonWorkTypeDomain.CLEANING_AND_HYGIENE
+      InPrisonWorkTypeEntity.COMPUTERS_OR_DESK_BASED -> InPrisonWorkTypeDomain.COMPUTERS_OR_DESK_BASED
+      InPrisonWorkTypeEntity.GARDENING_AND_OUTDOORS -> InPrisonWorkTypeDomain.GARDENING_AND_OUTDOORS
+      InPrisonWorkTypeEntity.KITCHENS_AND_COOKING -> InPrisonWorkTypeDomain.KITCHENS_AND_COOKING
+      InPrisonWorkTypeEntity.MAINTENANCE -> InPrisonWorkTypeDomain.MAINTENANCE
+      InPrisonWorkTypeEntity.PRISON_LAUNDRY -> InPrisonWorkTypeDomain.PRISON_LAUNDRY
+      InPrisonWorkTypeEntity.PRISON_LIBRARY -> InPrisonWorkTypeDomain.PRISON_LIBRARY
+      InPrisonWorkTypeEntity.TEXTILES_AND_SEWING -> InPrisonWorkTypeDomain.TEXTILES_AND_SEWING
+      InPrisonWorkTypeEntity.WELDING_AND_METALWORK -> InPrisonWorkTypeDomain.WELDING_AND_METALWORK
+      InPrisonWorkTypeEntity.WOODWORK_AND_JOINERY -> InPrisonWorkTypeDomain.WOODWORK_AND_JOINERY
+      InPrisonWorkTypeEntity.OTHER -> InPrisonWorkTypeDomain.OTHER
+    }
+
+  private fun toWorkType(workType: InPrisonWorkTypeDomain): InPrisonWorkTypeEntity =
+    when (workType) {
+      InPrisonWorkTypeDomain.CLEANING_AND_HYGIENE -> InPrisonWorkTypeEntity.CLEANING_AND_HYGIENE
+      InPrisonWorkTypeDomain.COMPUTERS_OR_DESK_BASED -> InPrisonWorkTypeEntity.COMPUTERS_OR_DESK_BASED
+      InPrisonWorkTypeDomain.GARDENING_AND_OUTDOORS -> InPrisonWorkTypeEntity.GARDENING_AND_OUTDOORS
+      InPrisonWorkTypeDomain.KITCHENS_AND_COOKING -> InPrisonWorkTypeEntity.KITCHENS_AND_COOKING
+      InPrisonWorkTypeDomain.MAINTENANCE -> InPrisonWorkTypeEntity.MAINTENANCE
+      InPrisonWorkTypeDomain.PRISON_LAUNDRY -> InPrisonWorkTypeEntity.PRISON_LAUNDRY
+      InPrisonWorkTypeDomain.PRISON_LIBRARY -> InPrisonWorkTypeEntity.PRISON_LIBRARY
+      InPrisonWorkTypeDomain.TEXTILES_AND_SEWING -> InPrisonWorkTypeEntity.TEXTILES_AND_SEWING
+      InPrisonWorkTypeDomain.WELDING_AND_METALWORK -> InPrisonWorkTypeEntity.WELDING_AND_METALWORK
+      InPrisonWorkTypeDomain.WOODWORK_AND_JOINERY -> InPrisonWorkTypeEntity.WOODWORK_AND_JOINERY
+      InPrisonWorkTypeDomain.OTHER -> InPrisonWorkTypeEntity.OTHER
+    }
 }
 
-@Mapper
-interface InPrisonTrainingInterestEntityMapper :
+@Component
+class InPrisonTrainingInterestEntityMapper :
   KeyAwareEntityMapper<InPrisonTrainingInterestEntity, InPrisonTrainingInterest> {
-  @ExcludeJpaManagedFields
-  @GenerateNewReference
-  @ExcludeParentEntity
-  override fun fromDomainToEntity(domain: InPrisonTrainingInterest): InPrisonTrainingInterestEntity
 
-  fun fromEntityToDomain(persistedEntity: InPrisonTrainingInterestEntity): InPrisonTrainingInterest
+  override fun fromDomainToEntity(domain: InPrisonTrainingInterest): InPrisonTrainingInterestEntity =
+    with(domain) {
+      InPrisonTrainingInterestEntity(
+        reference = UUID.randomUUID(),
+        trainingType = toTrainingType(trainingType),
+        trainingTypeOther = trainingTypeOther,
+      )
+    }
 
-  @ExcludeJpaManagedFields
-  @ExcludeReferenceField
-  @ExcludeParentEntity
-  override fun updateEntityFromDomain(
-    @MappingTarget entity: InPrisonTrainingInterestEntity,
-    domain: InPrisonTrainingInterest,
-  )
+  fun fromEntityToDomain(persistedEntity: InPrisonTrainingInterestEntity): InPrisonTrainingInterest =
+    with(persistedEntity) {
+      InPrisonTrainingInterest(
+        trainingType = toTrainingType(trainingType),
+        trainingTypeOther = trainingTypeOther,
+      )
+    }
+
+  override fun updateEntityFromDomain(entity: InPrisonTrainingInterestEntity, domain: InPrisonTrainingInterest) =
+    with(entity) {
+      trainingType = toTrainingType(domain.trainingType)
+      trainingTypeOther = domain.trainingTypeOther
+    }
+
+  private fun toTrainingType(trainingType: InPrisonTrainingTypeEntity): InPrisonTrainingTypeDomain =
+    when (trainingType) {
+      InPrisonTrainingTypeEntity.BARBERING_AND_HAIRDRESSING -> InPrisonTrainingTypeDomain.BARBERING_AND_HAIRDRESSING
+      InPrisonTrainingTypeEntity.CATERING -> InPrisonTrainingTypeDomain.CATERING
+      InPrisonTrainingTypeEntity.COMMUNICATION_SKILLS -> InPrisonTrainingTypeDomain.COMMUNICATION_SKILLS
+      InPrisonTrainingTypeEntity.ENGLISH_LANGUAGE_SKILLS -> InPrisonTrainingTypeDomain.ENGLISH_LANGUAGE_SKILLS
+      InPrisonTrainingTypeEntity.FORKLIFT_DRIVING -> InPrisonTrainingTypeDomain.FORKLIFT_DRIVING
+      InPrisonTrainingTypeEntity.INTERVIEW_SKILLS -> InPrisonTrainingTypeDomain.INTERVIEW_SKILLS
+      InPrisonTrainingTypeEntity.MACHINERY_TICKETS -> InPrisonTrainingTypeDomain.MACHINERY_TICKETS
+      InPrisonTrainingTypeEntity.NUMERACY_SKILLS -> InPrisonTrainingTypeDomain.NUMERACY_SKILLS
+      InPrisonTrainingTypeEntity.RUNNING_A_BUSINESS -> InPrisonTrainingTypeDomain.RUNNING_A_BUSINESS
+      InPrisonTrainingTypeEntity.SOCIAL_AND_LIFE_SKILLS -> InPrisonTrainingTypeDomain.SOCIAL_AND_LIFE_SKILLS
+      InPrisonTrainingTypeEntity.WELDING_AND_METALWORK -> InPrisonTrainingTypeDomain.WELDING_AND_METALWORK
+      InPrisonTrainingTypeEntity.WOODWORK_AND_JOINERY -> InPrisonTrainingTypeDomain.WOODWORK_AND_JOINERY
+      InPrisonTrainingTypeEntity.OTHER -> InPrisonTrainingTypeDomain.OTHER
+    }
+
+  private fun toTrainingType(trainingType: InPrisonTrainingTypeDomain): InPrisonTrainingTypeEntity =
+    when (trainingType) {
+      InPrisonTrainingTypeDomain.BARBERING_AND_HAIRDRESSING -> InPrisonTrainingTypeEntity.BARBERING_AND_HAIRDRESSING
+      InPrisonTrainingTypeDomain.CATERING -> InPrisonTrainingTypeEntity.CATERING
+      InPrisonTrainingTypeDomain.COMMUNICATION_SKILLS -> InPrisonTrainingTypeEntity.COMMUNICATION_SKILLS
+      InPrisonTrainingTypeDomain.ENGLISH_LANGUAGE_SKILLS -> InPrisonTrainingTypeEntity.ENGLISH_LANGUAGE_SKILLS
+      InPrisonTrainingTypeDomain.FORKLIFT_DRIVING -> InPrisonTrainingTypeEntity.FORKLIFT_DRIVING
+      InPrisonTrainingTypeDomain.INTERVIEW_SKILLS -> InPrisonTrainingTypeEntity.INTERVIEW_SKILLS
+      InPrisonTrainingTypeDomain.MACHINERY_TICKETS -> InPrisonTrainingTypeEntity.MACHINERY_TICKETS
+      InPrisonTrainingTypeDomain.NUMERACY_SKILLS -> InPrisonTrainingTypeEntity.NUMERACY_SKILLS
+      InPrisonTrainingTypeDomain.RUNNING_A_BUSINESS -> InPrisonTrainingTypeEntity.RUNNING_A_BUSINESS
+      InPrisonTrainingTypeDomain.SOCIAL_AND_LIFE_SKILLS -> InPrisonTrainingTypeEntity.SOCIAL_AND_LIFE_SKILLS
+      InPrisonTrainingTypeDomain.WELDING_AND_METALWORK -> InPrisonTrainingTypeEntity.WELDING_AND_METALWORK
+      InPrisonTrainingTypeDomain.WOODWORK_AND_JOINERY -> InPrisonTrainingTypeEntity.WOODWORK_AND_JOINERY
+      InPrisonTrainingTypeDomain.OTHER -> InPrisonTrainingTypeEntity.OTHER
+    }
 }
