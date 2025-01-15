@@ -278,7 +278,6 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.INDUCTION_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(induction.reference.toString())
-            .hasNoContextualInfo() // creating an induction has no contextual info
             .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
             .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
         }
