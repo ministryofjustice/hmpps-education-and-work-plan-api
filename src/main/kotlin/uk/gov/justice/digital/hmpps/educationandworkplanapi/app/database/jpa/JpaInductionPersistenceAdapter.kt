@@ -52,7 +52,7 @@ class JpaInductionPersistenceAdapter(
     }
 
     // TODO add the note to the returned Induction
-    return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity)
+    return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity, noteEntity)
   }
 
   @Transactional(readOnly = true)

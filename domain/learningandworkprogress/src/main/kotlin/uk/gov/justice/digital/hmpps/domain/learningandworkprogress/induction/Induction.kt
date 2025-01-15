@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -101,4 +102,6 @@ data class Induction(
    * The date the induction was carried out
    */
   val completedDate: LocalDate?,
+
+  val note: NoteDto?,
 )
