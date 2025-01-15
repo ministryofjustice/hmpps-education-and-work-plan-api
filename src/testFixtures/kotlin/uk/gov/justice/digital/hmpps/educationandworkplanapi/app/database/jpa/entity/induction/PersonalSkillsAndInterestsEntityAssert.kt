@@ -97,16 +97,6 @@ class PersonalSkillsAndInterestsEntityAssert(actual: PersonalSkillsAndInterestsE
     return this
   }
 
-  fun hasAReference(): PersonalSkillsAndInterestsEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: PersonalSkillsAndInterestsEntity): PersonalSkillsAndInterestsEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
