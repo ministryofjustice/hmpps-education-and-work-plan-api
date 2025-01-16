@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -212,7 +212,9 @@ class GetTimelineTest : IntegrationTestBase() {
       ),
     )
 
-    createInduction(prisonNumber, aValidCreateInductionRequest())
+    val validInductionRequest = aFullyPopulatedCreateInductionRequest()
+
+    createInduction(prisonNumber, validInductionRequest)
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
@@ -278,7 +280,16 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.INDUCTION_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(induction.reference.toString())
-            .hasNoContextualInfo() // creating an induction has no contextual info
+            .hasContextualInfo(
+              mapOf(
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE" to validInductionRequest.conductedAt.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_AT" to induction.createdAt.toString(),
+                "COMPLETED_INDUCTION_NOTES" to validInductionRequest.note.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_BY" to "Albert User",
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY" to validInductionRequest.conductedBy.toString(),
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
+              ),
+            )
             .correlationIdIsNotEqualTo(actionPlanCreatedCorrelationId)
             .correlationIdIsNotEqualTo(goalUpdatedCorrelationId)
         }
