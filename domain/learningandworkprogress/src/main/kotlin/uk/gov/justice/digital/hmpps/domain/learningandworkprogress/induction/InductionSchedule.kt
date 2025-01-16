@@ -16,29 +16,21 @@ data class InductionSchedule(
   /**
    * The user ID of the person (logged-in user) who created the Induction.
    */
-  val createdBy: String?,
-  /**
-   * The name of the logged-in user who created the Induction.
-   */
-  val createdByDisplayName: String?,
+  val createdBy: String,
   /**
    * The timestamp when this Induction was created.
    */
-  val createdAt: Instant?,
+  val createdAt: Instant,
 
   val createdAtPrison: String,
   /**
    * The user ID of the person (logged-in user) who updated the Induction.
    */
-  val lastUpdatedBy: String?,
-  /**
-   * The name of the logged-in user who updated the Induction.
-   */
-  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedBy: String,
   /**
    * The timestamp when this Induction was updated.
    */
-  val lastUpdatedAt: Instant?,
+  val lastUpdatedAt: Instant,
 
   val lastUpdatedAtPrison: String,
 

@@ -19,16 +19,16 @@ class PreviousWorkExperiencesEntityMapper(
   private val entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>,
 ) {
 
-  fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity? =
-    dto?.let {
+  fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity =
+    with(dto) {
       PreviousWorkExperiencesEntity(
         reference = UUID.randomUUID(),
-        hasWorkedBefore = toHasWorkedBefore(it.hasWorkedBefore),
-        hasWorkedBeforeNotRelevantReason = it.hasWorkedBeforeNotRelevantReason,
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        hasWorkedBefore = toHasWorkedBefore(hasWorkedBefore),
+        hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewExperiences(it.experiences, this)
+        addNewExperiences(dto.experiences, this)
       }
     }
 
@@ -48,31 +48,29 @@ class PreviousWorkExperiencesEntityMapper(
       )
     }
 
-  fun updateExistingEntityFromDto(entity: PreviousWorkExperiencesEntity, dto: UpdatePreviousWorkExperiencesDto?) =
-    dto?.also {
-      with(entity) {
-        hasWorkedBefore = toHasWorkedBefore(dto.hasWorkedBefore)
-        hasWorkedBeforeNotRelevantReason = dto.hasWorkedBeforeNotRelevantReason
-        updatedAtPrison = dto.prisonId
+  fun updateExistingEntityFromDto(entity: PreviousWorkExperiencesEntity, dto: UpdatePreviousWorkExperiencesDto) =
+    with(entity) {
+      hasWorkedBefore = toHasWorkedBefore(dto.hasWorkedBefore)
+      hasWorkedBeforeNotRelevantReason = dto.hasWorkedBeforeNotRelevantReason
+      updatedAtPrison = dto.prisonId
 
-        val existingExperiences = experiences
-        val updatedExperiences = dto.experiences
-        entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
-        entityListManager.addNew(entity, existingExperiences, updatedExperiences, workExperienceEntityMapper)
-        entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
-      }
+      val existingExperiences = experiences
+      val updatedExperiences = dto.experiences
+      entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
+      entityListManager.addNew(entity, existingExperiences, updatedExperiences, workExperienceEntityMapper)
+      entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
     }
 
-  fun fromUpdateDtoToNewEntity(previousWorkExperiences: UpdatePreviousWorkExperiencesDto?): PreviousWorkExperiencesEntity? =
-    previousWorkExperiences?.let {
+  fun fromUpdateDtoToNewEntity(dto: UpdatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity =
+    with(dto) {
       PreviousWorkExperiencesEntity(
         reference = UUID.randomUUID(),
-        hasWorkedBefore = toHasWorkedBefore(it.hasWorkedBefore),
-        hasWorkedBeforeNotRelevantReason = it.hasWorkedBeforeNotRelevantReason,
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        hasWorkedBefore = toHasWorkedBefore(hasWorkedBefore),
+        hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewExperiences(it.experiences, this)
+        addNewExperiences(dto.experiences, this)
       }
     }
 

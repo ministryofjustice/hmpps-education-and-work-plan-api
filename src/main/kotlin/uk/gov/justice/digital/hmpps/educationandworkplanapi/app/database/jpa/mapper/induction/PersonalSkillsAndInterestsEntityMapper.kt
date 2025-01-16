@@ -22,15 +22,15 @@ class PersonalSkillsAndInterestsEntityMapper(
   private val personalSkillEntityListManager: InductionEntityListManager<PersonalSkillEntity, PersonalSkill>,
   private val personalInterestEntityListManager: InductionEntityListManager<PersonalInterestEntity, PersonalInterest>,
 ) {
-  fun fromCreateDtoToEntity(dto: CreatePersonalSkillsAndInterestsDto?): PersonalSkillsAndInterestsEntity? =
-    dto?.let {
+  fun fromCreateDtoToEntity(dto: CreatePersonalSkillsAndInterestsDto): PersonalSkillsAndInterestsEntity =
+    with(dto) {
       PersonalSkillsAndInterestsEntity(
         reference = UUID.randomUUID(),
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewSkills(it.skills, this)
-        addNewInterests(it.interests, this)
+        addNewSkills(dto.skills, this)
+        addNewInterests(dto.interests, this)
       }
     }
 
@@ -68,15 +68,15 @@ class PersonalSkillsAndInterestsEntityMapper(
       }
     }
 
-  fun fromUpdateDtoToNewEntity(personalSkillsAndInterests: UpdatePersonalSkillsAndInterestsDto?): PersonalSkillsAndInterestsEntity? =
-    personalSkillsAndInterests?.let {
+  fun fromUpdateDtoToNewEntity(dto: UpdatePersonalSkillsAndInterestsDto): PersonalSkillsAndInterestsEntity =
+    with(dto) {
       PersonalSkillsAndInterestsEntity(
         reference = UUID.randomUUID(),
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewSkills(it.skills, this)
-        addNewInterests(it.interests, this)
+        addNewSkills(dto.skills, this)
+        addNewInterests(dto.interests, this)
       }
     }
 

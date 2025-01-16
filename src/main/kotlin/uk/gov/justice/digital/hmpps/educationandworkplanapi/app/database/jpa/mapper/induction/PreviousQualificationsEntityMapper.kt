@@ -74,19 +74,19 @@ class PreviousQualificationsEntityMapper(private val qualificationEntityMapper: 
       )
     }
 
-  fun fromEntityToDomain(persistedEntity: PreviousQualificationsEntity?): PreviousQualifications? =
-    persistedEntity?.let {
+  fun fromEntityToDomain(persistedEntity: PreviousQualificationsEntity): PreviousQualifications =
+    with(persistedEntity) {
       PreviousQualifications(
-        reference = it.reference,
-        prisonNumber = it.prisonNumber,
-        educationLevel = toEducationLevel(it.educationLevel),
-        qualifications = it.qualifications.map { qualificationEntityMapper.fromEntityToDomain(it) },
-        createdBy = it.createdBy!!,
-        createdAt = it.createdAt!!,
-        createdAtPrison = it.createdAtPrison,
-        lastUpdatedBy = it.updatedBy!!,
-        lastUpdatedAt = it.updatedAt!!,
-        lastUpdatedAtPrison = it.updatedAtPrison,
+        reference = reference,
+        prisonNumber = prisonNumber,
+        educationLevel = toEducationLevel(educationLevel),
+        qualifications = qualifications.map { qualificationEntityMapper.fromEntityToDomain(it) },
+        createdBy = createdBy!!,
+        createdAt = createdAt!!,
+        createdAtPrison = createdAtPrison,
+        lastUpdatedBy = updatedBy!!,
+        lastUpdatedAt = updatedAt!!,
+        lastUpdatedAtPrison = updatedAtPrison,
       )
     }
 

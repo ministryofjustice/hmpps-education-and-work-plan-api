@@ -18,16 +18,13 @@ fun aValidInductionEntity(
   createdAt: Instant? = null,
   createdAtPrison: String = "BXI",
   createdBy: String? = null,
-  createdByDisplayName: String? = null,
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-  updatedByDisplayName: String? = null,
   conductedBy: String? = null,
   conductedByRole: String? = null,
   completedDate: LocalDate? = LocalDate.now(),
 ) = InductionEntity(
-  id = id,
   reference = reference,
   prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
@@ -36,18 +33,18 @@ fun aValidInductionEntity(
   inPrisonInterests = inPrisonInterests,
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
-  createdAt = createdAt,
   createdAtPrison = createdAtPrison,
-  createdBy = createdBy,
-  createdByDisplayName = createdByDisplayName,
-  updatedAt = updatedAt,
   updatedAtPrison = updatedAtPrison,
-  updatedBy = updatedBy,
-  updatedByDisplayName = updatedByDisplayName,
   conductedBy = conductedBy,
   conductedByRole = conductedByRole,
   completedDate = completedDate,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidInductionEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -62,16 +59,13 @@ fun aValidInductionEntityWithJpaFieldsPopulated(
   createdAt: Instant? = Instant.now(),
   createdAtPrison: String = "BXI",
   createdBy: String? = "asmith_gen",
-  createdByDisplayName: String? = "Alex Smith",
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-  updatedByDisplayName: String? = "Barry Jones",
   conductedBy: String? = "John Smith",
   conductedByRole: String? = "Peer Mentor",
   completedDate: LocalDate? = LocalDate.now(),
 ) = InductionEntity(
-  id = id,
   reference = reference,
   prisonNumber = prisonNumber,
   workOnRelease = workOnRelease,
@@ -80,15 +74,15 @@ fun aValidInductionEntityWithJpaFieldsPopulated(
   inPrisonInterests = inPrisonInterests,
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
-  createdAt = createdAt,
   createdAtPrison = createdAtPrison,
-  createdBy = createdBy,
-  createdByDisplayName = createdByDisplayName,
-  updatedAt = updatedAt,
   updatedAtPrison = updatedAtPrison,
-  updatedBy = updatedBy,
-  updatedByDisplayName = updatedByDisplayName,
   conductedBy = conductedBy,
   conductedByRole = conductedByRole,
   completedDate = completedDate,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

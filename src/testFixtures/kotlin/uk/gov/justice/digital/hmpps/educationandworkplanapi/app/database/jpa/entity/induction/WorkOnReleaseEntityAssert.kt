@@ -86,16 +86,6 @@ class WorkOnReleaseEntityAssert(actual: WorkOnReleaseEntity?) :
     return this
   }
 
-  fun hasAReference(): WorkOnReleaseEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: WorkOnReleaseEntity): WorkOnReleaseEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()

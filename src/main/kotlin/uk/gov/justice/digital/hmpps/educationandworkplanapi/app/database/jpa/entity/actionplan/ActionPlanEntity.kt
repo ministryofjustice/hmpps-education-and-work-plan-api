@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -25,42 +24,38 @@ import java.util.UUID
 @Table(name = "action_plan")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class ActionPlanEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
+data class ActionPlanEntity(
+  @Column(updatable = false)
+  val reference: UUID,
 
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @Column(updatable = false)
-  @field:NotNull
-  var prisonNumber: String? = null,
+  val prisonNumber: String,
 
   @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "action_plan_id", nullable = false)
   @OrderBy(value = "createdAt")
-  @field:NotNull
-  var goals: MutableList<GoalEntity>? = null,
+  val goals: MutableList<GoalEntity> = mutableListOf(),
+) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) {
+  var updatedBy: String? = null
 
   companion object {
 
@@ -80,13 +75,13 @@ class ActionPlanEntity(
    * Returns null if the Goal Entity cannot be found.
    */
   fun getGoalByReference(goalReference: UUID): GoalEntity? =
-    goals?.find { it.reference == goalReference }
+    goals.find { it.reference == goalReference }
 
   /**
    * Adds a [GoalEntity] to this [ActionPlanEntity]
    */
   fun addGoal(goalEntity: GoalEntity): ActionPlanEntity {
-    goals!!.add(goalEntity)
+    goals.add(goalEntity)
     return this
   }
 

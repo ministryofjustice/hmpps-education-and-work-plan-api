@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -29,33 +28,27 @@ import java.util.UUID
 @Entity
 @EntityListeners(value = [AuditingEntityListener::class])
 data class WorkOnReleaseEntity(
-
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
+  val reference: UUID,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var hopingToWork: HopingToWork? = null,
+  var hopingToWork: HopingToWork,
 
   @ElementCollection(targetClass = AffectAbilityToWork::class)
   @Enumerated(value = EnumType.STRING)
   @CollectionTable(name = "affecting_ability_to_work", joinColumns = [JoinColumn(name = "work_on_release_id")])
   @Column(name = "affect")
-  var affectAbilityToWork: MutableList<AffectAbilityToWork>? = null,
+  val affectAbilityToWork: MutableList<AffectAbilityToWork> = mutableListOf(),
 
   @Column(name = "affecting_work_other")
   var affectAbilityToWorkOther: String? = null,
 
   @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  val createdAtPrison: String,
 
   @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
-
+  var updatedAtPrison: String,
 ) {
 
   @Id
