@@ -36,20 +36,22 @@ class JpaInductionPersistenceAdapter(
     val inductionEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
     val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto)
 
-    val noteEntity = createInductionDto.note?.let {
-      noteRepository.saveAndFlush(
-        NoteEntity(
-          reference = UUID.randomUUID(),
-          prisonNumber = createInductionDto.prisonNumber,
-          content = it,
-          noteType = NoteType.INDUCTION,
-          entityType = EntityType.INDUCTION,
-          entityReference = inductionEntity.reference!!,
-          createdAtPrison = inductionEntity.createdAtPrison ?: "N/A",
-          updatedAtPrison = inductionEntity.updatedAtPrison ?: "N/A",
-        ),
-      )
-    }
+    val noteEntity = createInductionDto.note
+      ?.takeIf { it.isNotBlank() }
+      ?.let {
+        noteRepository.saveAndFlush(
+          NoteEntity(
+            reference = UUID.randomUUID(),
+            prisonNumber = createInductionDto.prisonNumber,
+            content = it,
+            noteType = NoteType.INDUCTION,
+            entityType = EntityType.INDUCTION,
+            entityReference = inductionEntity.reference!!,
+            createdAtPrison = inductionEntity.createdAtPrison ?: "N/A",
+            updatedAtPrison = inductionEntity.updatedAtPrison ?: "N/A",
+          ),
+        )
+      }
 
     return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity, noteEntity)
   }
