@@ -105,9 +105,16 @@ class TimelineEventResponseAssert(actual: TimelineEventResponse?) :
 
   private fun truncateToMilliseconds(value: String): String {
     return try {
-      OffsetDateTime.parse(value)
-        .truncatedTo(ChronoUnit.MILLIS)
-        .toString()
+      val dateTime = OffsetDateTime.parse(value)
+      val nanos = dateTime.nano
+      val roundedNanos = if (nanos % 1_000_000 >= 500_000) {
+        // Add 1 millisecond if the remaining nanoseconds are >= 500,000
+        dateTime.plusNanos(1_000_000L - nanos % 1_000_000)
+      } else {
+        // Otherwise, subtract the remaining nanoseconds
+        dateTime.minusNanos((nanos % 1_000_000).toLong())
+      }
+      roundedNanos.truncatedTo(ChronoUnit.MILLIS).toString()
     } catch (e: DateTimeParseException) {
       // If parsing fails, return the original string
       value
