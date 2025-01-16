@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
@@ -33,6 +34,7 @@ class TimelineEventFactoryTest {
     // Given
     val goal = aValidGoal()
     val actionPlan = aValidActionPlan(goals = listOf(goal))
+    val induction = aFullyPopulatedInduction()
 
     // When
     val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)

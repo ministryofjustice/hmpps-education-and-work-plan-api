@@ -10,6 +10,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
@@ -35,6 +36,7 @@ class AsyncActionPlanEventServiceTest {
     // Given
     val prisonNumber = aValidPrisonNumber()
     val actionPlan = aValidActionPlan()
+    val induction = aFullyPopulatedInduction()
     val createActionPlanEvents = listOf(
       aValidTimelineEvent(eventType = TimelineEventType.ACTION_PLAN_CREATED),
       aValidTimelineEvent(eventType = TimelineEventType.GOAL_CREATED),
