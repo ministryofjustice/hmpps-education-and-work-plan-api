@@ -39,14 +39,14 @@ class AsyncActionPlanEventServiceTest {
       aValidTimelineEvent(eventType = TimelineEventType.ACTION_PLAN_CREATED),
       aValidTimelineEvent(eventType = TimelineEventType.GOAL_CREATED),
     )
-    given(timelineEventFactory.actionPlanCreatedEvent(any())).willReturn(createActionPlanEvents)
+    given(timelineEventFactory.actionPlanCreatedEvent(any(), induction)).willReturn(createActionPlanEvents)
 
     // When
     actionPlanEventService.actionPlanCreated(actionPlan)
 
     // Then
     verify(telemetryService).trackGoalCreatedEvent(eq(actionPlan.goals[0]), any())
-    verify(timelineEventFactory).actionPlanCreatedEvent(actionPlan)
+    verify(timelineEventFactory).actionPlanCreatedEvent(actionPlan, induction)
     verify(timelineService).recordTimelineEvents(prisonNumber, createActionPlanEvents)
   }
 }

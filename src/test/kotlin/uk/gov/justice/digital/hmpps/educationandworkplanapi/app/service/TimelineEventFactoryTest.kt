@@ -35,7 +35,7 @@ class TimelineEventFactoryTest {
     val actionPlan = aValidActionPlan(goals = listOf(goal))
 
     // When
-    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
+    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
 
     // Then
     assertThat(actual).hasSize(2)
