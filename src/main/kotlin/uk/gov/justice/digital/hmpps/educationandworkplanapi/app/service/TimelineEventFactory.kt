@@ -48,9 +48,9 @@ import java.util.UUID
  * Responsible for identifying which [TimelineEvent]s have occurred, for example following an update to a [Goal].
  */
 @Component
-class TimelineEventFactory {
+class TimelineEventFactory(private val userService: ManageUserService) {
 
-  fun actionPlanCreatedEvent(actionPlan: ActionPlan, induction: Induction, inductionCompletedOnlineBy: String): List<TimelineEvent> {
+  fun actionPlanCreatedEvent(actionPlan: ActionPlan, induction: Induction): List<TimelineEvent> {
     val events = mutableListOf<TimelineEvent>()
 
     val correlationId = UUID.randomUUID()
@@ -59,7 +59,7 @@ class TimelineEventFactory {
         actionPlan.goals[0],
         actionPlan.reference,
         TimelineEventType.ACTION_PLAN_CREATED,
-        contextualInfo = getInductionContextInfo(induction, inductionCompletedOnlineBy),
+        contextualInfo = getInductionContextInfo(induction),
         correlationId = correlationId,
       ),
     )
@@ -69,7 +69,7 @@ class TimelineEventFactory {
     return events
   }
 
-  private fun getInductionContextInfo(induction: Induction, completedOnlineBy: String): Map<TimelineEventContext, String> =
+  private fun getInductionContextInfo(induction: Induction): Map<TimelineEventContext, String> =
     with(induction) {
       val noteContent = note?.content ?: ""
       val conductedByPerson = conductedBy ?: ""
@@ -77,7 +77,7 @@ class TimelineEventFactory {
 
       return mapOf(
         TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
-        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to completedOnlineBy,
+        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(induction.createdBy!!).name,
         TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
         TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
         *conductedBy

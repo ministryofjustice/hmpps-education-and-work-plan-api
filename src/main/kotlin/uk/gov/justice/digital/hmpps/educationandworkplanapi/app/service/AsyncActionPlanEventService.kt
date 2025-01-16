@@ -21,7 +21,6 @@ class AsyncActionPlanEventService(
   private val timelineEventFactory: TimelineEventFactory,
   private val timelineService: TimelineService,
   private val inductionService: InductionService,
-  private val userService: ManageUserService,
 ) : ActionPlanEventService {
   override fun actionPlanCreated(actionPlan: ActionPlan) {
     log.info { "ActionPlan created event for prisoner [${actionPlan.prisonNumber}]" }
@@ -31,9 +30,8 @@ class AsyncActionPlanEventService(
     }
 
     val induction = inductionService.getInductionForPrisoner(actionPlan.prisonNumber)
-    val inductionCompletedOnlineBy = userService.getUserDetails(induction.createdBy!!).name
 
-    val timelineEvents = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction, inductionCompletedOnlineBy)
+    val timelineEvents = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
     timelineService.recordTimelineEvents(actionPlan.prisonNumber, timelineEvents)
   }
 }
