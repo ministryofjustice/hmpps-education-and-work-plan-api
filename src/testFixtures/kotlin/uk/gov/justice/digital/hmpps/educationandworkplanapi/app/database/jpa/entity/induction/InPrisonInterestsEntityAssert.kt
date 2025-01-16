@@ -97,16 +97,6 @@ class InPrisonInterestsEntityAssert(actual: InPrisonInterestsEntity?) :
     return this
   }
 
-  fun hasAReference(): InPrisonInterestsEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: InPrisonInterestsEntity): InPrisonInterestsEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()
