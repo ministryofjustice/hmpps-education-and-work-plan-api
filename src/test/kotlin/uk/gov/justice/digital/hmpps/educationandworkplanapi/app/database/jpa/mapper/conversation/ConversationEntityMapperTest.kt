@@ -30,7 +30,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class ConversationEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: ConversationEntityMapperImpl
+  private lateinit var mapper: ConversationEntityMapper
 
   @Mock
   private lateinit var conversationNoteMapper: ConversationNoteEntityMapper
@@ -59,10 +59,8 @@ class ConversationEntityMapperTest {
       id = null,
       createdAt = null,
       createdBy = null,
-      createdByDisplayName = null,
       updatedAt = null,
       updatedBy = null,
-      updatedByDisplayName = null,
     )
     given(conversationNoteMapper.fromCreateDtoToEntity(any())).willReturn(expectedConversationNoteEntity)
 
@@ -84,7 +82,6 @@ class ConversationEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFields("reference")
       .isEqualTo(expected)
@@ -104,10 +101,8 @@ class ConversationEntityMapperTest {
       updatedAtPrison = "MDI",
       createdAt = createdAt,
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       updatedAt = updatedAt,
       updatedBy = "bjones_gen",
-      updatedByDisplayName = "Barry Jones",
     )
     val entity = aValidConversationEntity(
       prisonNumber = prisonNumber,
@@ -120,21 +115,19 @@ class ConversationEntityMapperTest {
     )
 
     val expectedConversationNote = aValidConversationNote(
-      reference = entity.note!!.reference!!,
+      reference = entity.note.reference,
       content = "Chris engaged well during our meeting and has made some good progress",
       createdAtPrison = "BXI",
       lastUpdatedAtPrison = "MDI",
-      createdAt = entity.note!!.createdAt,
+      createdAt = entity.note.createdAt!!,
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
-      lastUpdatedAt = entity.note!!.updatedAt,
+      lastUpdatedAt = entity.note.updatedAt!!,
       lastUpdatedBy = "bjones_gen",
-      lastUpdatedByDisplayName = "Barry Jones",
     )
     given(conversationNoteMapper.fromEntityToDomain(any())).willReturn(expectedConversationNote)
 
     val expected = aValidConversation(
-      reference = entity.reference!!,
+      reference = entity.reference,
       type = DomainType.REVIEW,
       note = expectedConversationNote,
     )

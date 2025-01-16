@@ -16,13 +16,14 @@ fun aValidConversationEntity(
   updatedBy: String? = "bjones_gen",
 ): ConversationEntity =
   ConversationEntity(
-    id = id,
     reference = reference,
     prisonNumber = prisonNumber,
     note = conversationNote,
     type = type,
-    createdAt = createdAt,
-    createdBy = createdBy,
-    updatedAt = updatedAt,
-    updatedBy = updatedBy,
-  )
+  ).apply {
+    this.id = id
+    this.createdAt = createdAt
+    this.createdBy = createdBy
+    this.updatedAt = updatedAt
+    this.updatedBy = updatedBy
+  }

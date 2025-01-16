@@ -13,8 +13,8 @@ class ConversationNoteEntityAssert(actual: ConversationNoteEntity?) : AbstractOb
   fun hasJpaManagedFieldsPopulated(): ConversationNoteEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id == null || createdAt == null || createdBy == null || createdByDisplayName == null || updatedAt == null || updatedBy == null || updatedByDisplayName == null) {
-        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, createdByDisplayName = $createdByDisplayName, updatedAt = $updatedAt, updatedBy = $updatedBy, updatedByDisplayName = $updatedByDisplayName")
+      if (id == null || createdAt == null || createdBy == null || updatedAt == null || updatedBy == null) {
+        failWithMessage("Expected entity to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
       }
     }
     return this
@@ -23,8 +23,8 @@ class ConversationNoteEntityAssert(actual: ConversationNoteEntity?) : AbstractOb
   fun doesNotHaveJpaManagedFieldsPopulated(): ConversationNoteEntityAssert {
     isNotNull
     with(actual!!) {
-      if (id != null || createdAt != null || createdBy != null || createdByDisplayName != null || updatedAt != null || updatedBy != null || updatedByDisplayName != null) {
-        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, createdByDisplayName = $createdByDisplayName, updatedAt = $updatedAt, updatedBy = $updatedBy, updatedByDisplayName = $updatedByDisplayName")
+      if (id != null || createdAt != null || createdBy != null || updatedAt != null || updatedBy != null) {
+        failWithMessage("Expected entity not to have the JPA managed fields populated, but was [id = $id, createdAt = $createdAt, createdBy = $createdBy, updatedAt = $updatedAt, updatedBy = $updatedBy")
       }
     }
     return this
@@ -65,16 +65,6 @@ class ConversationNoteEntityAssert(actual: ConversationNoteEntity?) : AbstractOb
     return this
   }
 
-  fun hasCreatedByDisplayName(expected: String): ConversationNoteEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (createdByDisplayName != expected) {
-        failWithMessage("Expected createdByDisplayName to be $expected, but was $createdByDisplayName")
-      }
-    }
-    return this
-  }
-
   fun wasCreatedAt(expected: Instant): ConversationNoteEntityAssert {
     isNotNull
     with(actual!!) {
@@ -100,16 +90,6 @@ class ConversationNoteEntityAssert(actual: ConversationNoteEntity?) : AbstractOb
     with(actual!!) {
       if (updatedBy != expected) {
         failWithMessage("Expected updatedBy to be $expected, but was $updatedBy")
-      }
-    }
-    return this
-  }
-
-  fun hasUpdatedByDisplayName(expected: String): ConversationNoteEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (updatedByDisplayName != expected) {
-        failWithMessage("Expected updatedByDisplayName to be $expected, but was $updatedByDisplayName")
       }
     }
     return this
@@ -150,16 +130,6 @@ class ConversationNoteEntityAssert(actual: ConversationNoteEntity?) : AbstractOb
     with(actual!!) {
       if (reference != expected) {
         failWithMessage("Expected reference to be $expected, but was $reference")
-      }
-    }
-    return this
-  }
-
-  fun hasAReference(): ConversationNoteEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
     return this

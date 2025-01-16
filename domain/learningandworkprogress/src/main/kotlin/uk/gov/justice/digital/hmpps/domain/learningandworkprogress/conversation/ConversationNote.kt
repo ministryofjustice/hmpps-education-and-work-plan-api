@@ -9,12 +9,10 @@ import java.util.UUID
 data class ConversationNote(
   val reference: UUID,
   val content: String,
-  val createdBy: String?,
-  val createdByDisplayName: String?,
-  val createdAt: Instant?,
+  val createdBy: String,
+  val createdAt: Instant,
   val createdAtPrison: String,
-  val lastUpdatedBy: String?,
-  val lastUpdatedByDisplayName: String?,
-  val lastUpdatedAt: Instant?,
+  val lastUpdatedBy: String,
+  val lastUpdatedAt: Instant,
   val lastUpdatedAtPrison: String,
 )
