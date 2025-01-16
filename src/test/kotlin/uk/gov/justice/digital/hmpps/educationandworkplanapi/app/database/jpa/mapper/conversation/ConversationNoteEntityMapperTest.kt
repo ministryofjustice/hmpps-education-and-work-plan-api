@@ -11,7 +11,7 @@ import java.util.UUID
 
 class ConversationNoteEntityMapperTest {
 
-  private val mapper = ConversationNoteEntityMapperImpl()
+  private val mapper = ConversationNoteEntityMapper()
 
   @Test
   fun `should map from create DTO to entity`() {
@@ -29,10 +29,8 @@ class ConversationNoteEntityMapperTest {
       id = null,
       createdAt = null,
       createdBy = null,
-      createdByDisplayName = null,
       updatedAt = null,
       updatedBy = null,
-      updatedByDisplayName = null,
     )
 
     // When
@@ -41,7 +39,6 @@ class ConversationNoteEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFields("reference")
       .isEqualTo(expected)
@@ -61,23 +58,19 @@ class ConversationNoteEntityMapperTest {
       updatedAtPrison = "MDI",
       createdAt = createdAt,
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       updatedAt = updatedAt,
       updatedBy = "bjones_gen",
-      updatedByDisplayName = "Barry Jones",
     )
 
     val expected = aValidConversationNote(
-      reference = entity.reference!!,
+      reference = entity.reference,
       content = "Chris engaged well during our meeting and has made some good progress",
       createdAtPrison = "BXI",
       lastUpdatedAtPrison = "MDI",
       createdAt = createdAt,
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       lastUpdatedAt = updatedAt,
       lastUpdatedBy = "bjones_gen",
-      lastUpdatedByDisplayName = "Barry Jones",
     )
 
     // When

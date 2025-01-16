@@ -12,7 +12,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -20,53 +19,48 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
 import java.time.Instant
 import java.util.UUID
 
 @Table(name = "conversation")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class ConversationEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+@EntityListeners(value = [AuditingEntityListener::class])
+data class ConversationEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
+  val reference: UUID,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "conversation_note_id")
-  @field:NotNull
-  var note: ConversationNoteEntity?,
+  val note: ConversationNoteEntity,
 
   @Column(updatable = false)
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var type: ConversationType? = null,
+  val type: ConversationType,
 
   @Column(updatable = false)
-  @field:NotNull
-  var prisonNumber: String? = null,
+  val prisonNumber: String,
+) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) {
+  var updatedBy: String? = null
+
   fun updateLastUpdatedAt() {
     updatedAt = Instant.now()
   }

@@ -151,14 +151,4 @@ class ConversationEntityAssert(actual: ConversationEntity?) : AbstractObjectAsse
     }
     return this
   }
-
-  fun hasAReference(): ConversationEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
 }

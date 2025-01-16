@@ -52,11 +52,9 @@ internal class ConversationResourceMapperTest {
       note = aValidConversationNote(
         content = noteContent,
         createdBy = createUsername,
-        createdByDisplayName = createDisplayName,
         createdAt = Instant.now(),
         createdAtPrison = createPrison,
         lastUpdatedBy = updateUsername,
-        lastUpdatedByDisplayName = updateDisplayName,
         lastUpdatedAt = Instant.now(),
         lastUpdatedAtPrison = updatePrison,
       ),
