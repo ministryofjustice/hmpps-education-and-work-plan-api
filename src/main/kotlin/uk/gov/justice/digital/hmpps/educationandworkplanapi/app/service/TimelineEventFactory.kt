@@ -49,7 +49,7 @@ import java.util.UUID
 @Component
 class TimelineEventFactory {
 
-  fun actionPlanCreatedEvent(actionPlan: ActionPlan): List<TimelineEvent> {
+  fun actionPlanCreatedEvent(actionPlan: ActionPlan, inductionTimelineEvent: TimelineEvent): List<TimelineEvent> {
     val events = mutableListOf<TimelineEvent>()
     val correlationId = UUID.randomUUID()
     events.add(
@@ -61,6 +61,7 @@ class TimelineEventFactory {
         correlationId = correlationId,
       ),
     )
+    events.add(inductionTimelineEvent)
     actionPlan.goals.forEach {
       events.add(goalCreatedTimelineEvent(it, correlationId))
     }
