@@ -65,28 +65,12 @@ class AsyncInductionEventService(
 
   private fun buildInductionUpdatedEvent(induction: Induction): TimelineEvent =
     with(induction) {
-      val noteContent = note?.content ?: ""
-      val conductedByPerson = conductedBy ?: ""
-      val conductedByRolePerson = conductedByRole ?: ""
       TimelineEvent.newTimelineEvent(
         sourceReference = reference.toString(),
         eventType = TimelineEventType.INDUCTION_UPDATED,
         prisonId = lastUpdatedAtPrison,
         actionedBy = induction.lastUpdatedBy!!,
         timestamp = induction.lastUpdatedAt!!,
-        contextualInfo = mapOf(
-          TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
-          TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(createdBy!!).name,
-          TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
-          TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
-          *conductedBy
-            ?.let {
-              arrayOf(
-                TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to conductedByPerson,
-                TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to conductedByRolePerson,
-              )
-            } ?: arrayOf(),
-        ),
       )
     }
 }

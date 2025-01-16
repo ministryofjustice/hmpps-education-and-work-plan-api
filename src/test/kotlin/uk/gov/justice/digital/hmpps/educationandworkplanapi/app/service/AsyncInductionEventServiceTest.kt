@@ -84,9 +84,6 @@ class AsyncInductionEventServiceTest {
   @Test
   fun `should handle induction updated`() {
     // Given
-    given(userService.getUserDetails(any())).willReturn(
-      UserDetailsDto("asmith_gen", true, "Alex Smith"),
-    )
     val prisonNumber = aValidPrisonNumber()
     val induction = aFullyPopulatedInduction(prisonNumber = prisonNumber)
     val expectedTimelineEvent =
@@ -97,14 +94,7 @@ class AsyncInductionEventServiceTest {
           prisonId = lastUpdatedAtPrison,
           actionedBy = induction.lastUpdatedBy!!,
           timestamp = induction.lastUpdatedAt!!,
-          contextualInfo = mapOf(
-            TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to induction.createdAt.toString(),
-            TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to "Alex Smith",
-            TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to induction.completedDate.toString(),
-            TimelineEventContext.COMPLETED_INDUCTION_NOTES to induction.note!!.content,
-            TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to "John Smith",
-            TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to "Peer Mentor",
-          ),
+          contextualInfo = emptyMap(),
         )
       }
 

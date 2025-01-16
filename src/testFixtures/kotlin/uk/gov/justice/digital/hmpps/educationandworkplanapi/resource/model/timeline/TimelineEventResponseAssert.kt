@@ -3,6 +3,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.time
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
+import java.time.OffsetDateTime
+import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 fun assertThat(actual: TimelineEventResponse?) = TimelineEventResponseAssert(actual)
@@ -86,20 +89,35 @@ class TimelineEventResponseAssert(actual: TimelineEventResponse?) :
     return this
   }
 
+  // sometimes dates are returned with nanoseconds and sometimes not so we have to do some truncation here in order to
+  // get the dates to match.
   fun hasContextualInfo(expected: Map<String, String>): TimelineEventResponseAssert {
     isNotNull
     with(actual!!) {
-      if (contextualInfo != expected) {
-        failWithMessage("Expected contextualInfo to be $expected, but was $contextualInfo")
+      val truncatedContextualInfo = contextualInfo.mapValues { truncateToMilliseconds(it.value) }
+      val truncatedExpected = expected.mapValues { truncateToMilliseconds(it.value) }
+      if (truncatedContextualInfo != truncatedExpected) {
+        failWithMessage("Expected contextualInfo to be $truncatedExpected, but was $truncatedContextualInfo")
       }
     }
     return this
   }
 
+  private fun truncateToMilliseconds(value: String): String {
+    return try {
+      OffsetDateTime.parse(value)
+        .truncatedTo(ChronoUnit.MILLIS)
+        .toString()
+    } catch (e: DateTimeParseException) {
+      // If parsing fails, return the original string
+      value
+    }
+  }
+
   fun hasNoContextualInfo(): TimelineEventResponseAssert {
     isNotNull
     with(actual!!) {
-      if (contextualInfo!!.isNotEmpty()) {
+      if (contextualInfo.isNotEmpty()) {
         failWithMessage("Expected contextualInfo to be an empty map, but was $contextualInfo")
       }
     }
