@@ -6,24 +6,20 @@ import java.util.UUID
 fun aValidFutureWorkInterests(
   reference: UUID = UUID.randomUUID(),
   interests: List<WorkInterest> = listOf(aValidWorkInterest()),
-  createdBy: String? = "asmith_gen",
-  createdByDisplayName: String? = "Alex Smith",
-  createdAt: Instant? = Instant.now(),
+  createdBy: String = "asmith_gen",
+  createdAt: Instant = Instant.now(),
   createdAtPrison: String = "BXI",
-  lastUpdatedBy: String? = "bjones_gen",
-  lastUpdatedByDisplayName: String? = "Barry Jones",
-  lastUpdatedAt: Instant? = Instant.now(),
+  lastUpdatedBy: String = "bjones_gen",
+  lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
 ) =
   FutureWorkInterests(
     reference = reference,
     interests = interests,
     createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
     createdAt = createdAt,
     createdAtPrison = createdAtPrison,
     lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedByDisplayName = lastUpdatedByDisplayName,
     lastUpdatedAt = lastUpdatedAt,
     lastUpdatedAtPrison = lastUpdatedAtPrison,
   )
