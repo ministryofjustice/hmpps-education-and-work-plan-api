@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule as InductionScheduleCalculationRuleDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus as InductionScheduleStatusDomain
@@ -14,9 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus as InductionScheduleStatusEntity
 
 @Component
-class InductionScheduleEntityMapper(
-  private val userService: ManageUserService,
-) {
+class InductionScheduleEntityMapper {
 
   fun fromEntityToDomain(entity: InductionScheduleEntity): InductionSchedule =
     with(entity) {
@@ -26,12 +23,10 @@ class InductionScheduleEntityMapper(
         deadlineDate = deadlineDate,
         scheduleCalculationRule = toInductionScheduleCalculationRule(scheduleCalculationRule),
         scheduleStatus = toInductionScheduleStatus(scheduleStatus),
-        createdBy = createdBy,
-        createdByDisplayName = userService.getUserDetails(createdBy!!).name,
-        createdAt = createdAt,
-        lastUpdatedBy = updatedBy,
-        lastUpdatedByDisplayName = userService.getUserDetails(updatedBy!!).name,
-        lastUpdatedAt = updatedAt,
+        createdBy = createdBy!!,
+        createdAt = createdAt!!,
+        lastUpdatedBy = updatedBy!!,
+        lastUpdatedAt = updatedAt!!,
         exemptionReason = exemptionReason,
         lastUpdatedAtPrison = updatedAtPrison,
         createdAtPrison = createdAtPrison,
@@ -46,12 +41,10 @@ class InductionScheduleEntityMapper(
         deadlineDate = deadlineDate,
         scheduleCalculationRule = toInductionScheduleCalculationRule(scheduleCalculationRule),
         scheduleStatus = toInductionScheduleStatus(scheduleStatus),
-        createdBy = createdBy,
-        createdByDisplayName = userService.getUserDetails(createdBy!!).name,
-        createdAt = createdAt,
-        lastUpdatedBy = updatedBy,
-        lastUpdatedByDisplayName = userService.getUserDetails(updatedBy!!).name,
-        lastUpdatedAt = updatedAt,
+        createdBy = createdBy!!,
+        createdAt = createdAt!!,
+        lastUpdatedBy = updatedBy!!,
+        lastUpdatedAt = updatedAt!!,
         exemptionReason = exemptionReason,
         version = version,
         lastUpdatedAtPrison = updatedAtPrison,

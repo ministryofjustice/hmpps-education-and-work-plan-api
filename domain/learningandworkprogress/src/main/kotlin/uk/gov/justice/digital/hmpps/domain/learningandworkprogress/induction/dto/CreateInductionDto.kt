@@ -7,7 +7,7 @@ data class CreateInductionDto(
   val prisonNumber: String,
   val workOnRelease: CreateWorkOnReleaseDto,
   val previousQualifications: CreatePreviousQualificationsDto?,
-  val previousTraining: CreatePreviousTrainingDto?,
+  val previousTraining: CreatePreviousTrainingDto,
   val previousWorkExperiences: CreatePreviousWorkExperiencesDto?,
   val inPrisonInterests: CreateInPrisonInterestsDto?,
   val personalSkillsAndInterests: CreatePersonalSkillsAndInterestsDto?,

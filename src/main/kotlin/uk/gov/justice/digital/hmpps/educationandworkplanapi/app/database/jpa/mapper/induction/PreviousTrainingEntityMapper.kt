@@ -38,24 +38,11 @@ class PreviousTrainingEntityMapper {
       )
     }
 
-  fun updateExistingEntityFromDto(entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto?) =
-    dto?.also {
-      with(entity) {
-        trainingTypes = it.trainingTypes.map { toTrainingType(it) }
-        trainingTypeOther = it.trainingTypeOther
-        updatedAtPrison = it.prisonId
-      }
-    }
-
-  fun fromUpdateDtoToNewEntity(previousTraining: UpdatePreviousTrainingDto?): PreviousTrainingEntity? =
-    previousTraining?.let {
-      PreviousTrainingEntity(
-        reference = UUID.randomUUID(),
-        trainingTypes = it.trainingTypes.map { toTrainingType(it) },
-        trainingTypeOther = it.trainingTypeOther,
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
-      )
+  fun updateExistingEntityFromDto(entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto) =
+    with(entity) {
+      trainingTypes = dto.trainingTypes.map { toTrainingType(it) }
+      trainingTypeOther = dto.trainingTypeOther
+      updatedAtPrison = dto.prisonId
     }
 
   private fun toTrainingType(entity: TrainingTypeEntity): TrainingTypeDomain =

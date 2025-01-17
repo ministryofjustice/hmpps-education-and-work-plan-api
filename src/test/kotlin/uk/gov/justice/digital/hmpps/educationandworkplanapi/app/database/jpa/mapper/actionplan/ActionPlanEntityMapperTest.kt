@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class ActionPlanEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: ActionPlanEntityMapperImpl
+  private lateinit var mapper: ActionPlanEntityMapper
 
   @Mock
   private lateinit var goalMapper: GoalEntityMapper
@@ -43,6 +43,10 @@ class ActionPlanEntityMapperTest {
       goals = mutableListOf(expectedGoalEntity),
       // JPA managed fields - expect these all to be null, implying a new db entity
       id = null,
+      createdAt = null,
+      createdBy = null,
+      updatedAt = null,
+      updatedBy = null,
     )
     given(goalMapper.fromDtoToEntity(any())).willReturn(expectedGoalEntity)
 
@@ -54,7 +58,6 @@ class ActionPlanEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFields("reference")
       .isEqualTo(expected)

@@ -60,10 +60,6 @@ data class Induction(
    */
   val createdBy: String?,
   /**
-   * The name of the logged-in user who created the Induction.
-   */
-  val createdByDisplayName: String?,
-  /**
    * The timestamp when this Induction was created.
    */
   val createdAt: Instant?,
@@ -75,10 +71,6 @@ data class Induction(
    * The user ID of the person (logged-in user) who updated the Induction.
    */
   val lastUpdatedBy: String?,
-  /**
-   * The name of the logged-in user who updated the Induction.
-   */
-  val lastUpdatedByDisplayName: String?,
   /**
    * The timestamp when this Induction was updated.
    */

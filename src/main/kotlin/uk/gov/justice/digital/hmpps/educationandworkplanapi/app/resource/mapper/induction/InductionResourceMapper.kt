@@ -36,9 +36,10 @@ class InductionResourceMapper(
             prisonId = prisonId,
           )
         },
-        previousTraining = previousTraining?.let {
-          previousTrainingMapper.toCreatePreviousTrainingDto(request = it, prisonId = prisonId)
-        },
+        previousTraining = previousTrainingMapper.toCreatePreviousTrainingDto(
+          request = previousTraining!!,
+          prisonId = prisonId,
+        ),
         previousWorkExperiences = previousWorkExperiences?.let {
           workExperiencesMapper.toCreatePreviousWorkExperiencesDto(request = it, prisonId = prisonId)
         },

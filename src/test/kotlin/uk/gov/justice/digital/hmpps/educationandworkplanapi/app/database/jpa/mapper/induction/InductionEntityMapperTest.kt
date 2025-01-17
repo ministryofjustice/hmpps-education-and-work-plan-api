@@ -38,14 +38,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType.INDUCTION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.aValidNoteEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class InductionEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: InductionEntityMapperImpl
+  private lateinit var mapper: InductionEntityMapper
 
   @Mock
   private lateinit var futureWorkInterestsEntityMapper: FutureWorkInterestsEntityMapper
@@ -111,14 +110,13 @@ class InductionEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
     verify(futureWorkInterestsEntityMapper).fromCreateDtoToEntity(createInductionDto.futureWorkInterests!!)
     verify(inPrisonInterestsEntityMapper).fromCreateDtoToEntity(createInductionDto.inPrisonInterests!!)
     verify(personalSkillsAndInterestsEntityMapper).fromCreateDtoToEntity(createInductionDto.personalSkillsAndInterests!!)
-    verify(previousTrainingEntityMapper).fromCreateDtoToEntity(createInductionDto.previousTraining!!)
+    verify(previousTrainingEntityMapper).fromCreateDtoToEntity(createInductionDto.previousTraining)
     verify(previousWorkExperiencesEntityMapper).fromCreateDtoToEntity(createInductionDto.previousWorkExperiences!!)
     verify(workOnReleaseEntityMapper).fromCreateDtoToEntity(createInductionDto.workOnRelease)
   }
@@ -132,13 +130,13 @@ class InductionEntityMapperTest {
       aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
 
     val noteDTO = aValidNoteDto(
-      entityReference = inductionEntity.reference!!,
+      entityReference = inductionEntity.reference,
       noteType = NoteType.INDUCTION,
       entityType = uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType.INDUCTION,
     )
 
     val expectedInduction = aFullyPopulatedInduction(
-      reference = inductionEntity.reference!!,
+      reference = inductionEntity.reference,
       prisonNumber = prisonNumber,
       workOnRelease = aValidWorkOnRelease(),
       previousQualifications = aValidPreviousQualifications(),
@@ -148,13 +146,11 @@ class InductionEntityMapperTest {
       personalSkillsAndInterests = aValidPersonalSkillsAndInterests(),
       futureWorkInterests = aValidFutureWorkInterests(),
       createdAt = inductionEntity.createdAt!!,
-      createdAtPrison = inductionEntity.createdAtPrison!!,
+      createdAtPrison = inductionEntity.createdAtPrison,
       createdBy = inductionEntity.createdBy!!,
-      createdByDisplayName = inductionEntity.createdByDisplayName!!,
       lastUpdatedAt = inductionEntity.updatedAt!!,
-      lastUpdatedAtPrison = inductionEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = inductionEntity.updatedAtPrison,
       lastUpdatedBy = inductionEntity.updatedBy!!,
-      lastUpdatedByDisplayName = inductionEntity.updatedByDisplayName!!,
       note = noteDTO,
     )
 
@@ -170,7 +166,7 @@ class InductionEntityMapperTest {
       updatedAt = noteDTO.lastUpdatedAt!!,
       updatedBy = noteDTO.lastUpdatedBy!!,
       updatedAtPrison = noteDTO.lastUpdatedAtPrison,
-      entityReference = inductionEntity.reference!!,
+      entityReference = inductionEntity.reference,
     )
 
     given(futureWorkInterestsEntityMapper.fromEntityToDomain(any())).willReturn(expectedInduction.futureWorkInterests)
@@ -189,9 +185,9 @@ class InductionEntityMapperTest {
     verify(futureWorkInterestsEntityMapper).fromEntityToDomain(inductionEntity.futureWorkInterests!!)
     verify(inPrisonInterestsEntityMapper).fromEntityToDomain(inductionEntity.inPrisonInterests!!)
     verify(personalSkillsAndInterestsEntityMapper).fromEntityToDomain(inductionEntity.personalSkillsAndInterests!!)
-    verify(previousTrainingEntityMapper).fromEntityToDomain(inductionEntity.previousTraining!!)
+    verify(previousTrainingEntityMapper).fromEntityToDomain(inductionEntity.previousTraining)
     verify(previousWorkExperiencesEntityMapper).fromEntityToDomain(inductionEntity.previousWorkExperiences!!)
-    verify(workOnReleaseEntityMapper).fromEntityToDomain(inductionEntity.workOnRelease!!)
+    verify(workOnReleaseEntityMapper).fromEntityToDomain(inductionEntity.workOnRelease)
     verify(previousQualificationsEntityMapper).fromEntityToDomain(previousQualificationsEntity)
   }
 
@@ -209,12 +205,10 @@ class InductionEntityMapperTest {
       prisonNumber = prisonNumber,
       prisonId = "MDI",
     )
-    val expectedInductionEntity = existingInductionEntity.deepCopy().apply {
-      id
-      reference = inductionReference
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedInductionEntity = existingInductionEntity.copy(
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateEntityFromDto(existingInductionEntity, updateInductionDto)
@@ -223,27 +217,27 @@ class InductionEntityMapperTest {
     assertThat(existingInductionEntity).isEqualToComparingAllFields(expectedInductionEntity)
     verify(futureWorkInterestsEntityMapper).updateExistingEntityFromDto(
       existingInductionEntity.futureWorkInterests!!,
-      updateInductionDto.futureWorkInterests,
+      updateInductionDto.futureWorkInterests!!,
     )
     verify(inPrisonInterestsEntityMapper).updateExistingEntityFromDto(
       existingInductionEntity.inPrisonInterests!!,
-      updateInductionDto.inPrisonInterests,
+      updateInductionDto.inPrisonInterests!!,
     )
     verify(personalSkillsAndInterestsEntityMapper).updateExistingEntityFromDto(
       existingInductionEntity.personalSkillsAndInterests!!,
-      updateInductionDto.personalSkillsAndInterests,
+      updateInductionDto.personalSkillsAndInterests!!,
     )
     verify(previousTrainingEntityMapper).updateExistingEntityFromDto(
-      existingInductionEntity.previousTraining!!,
-      updateInductionDto.previousTraining,
+      existingInductionEntity.previousTraining,
+      updateInductionDto.previousTraining!!,
     )
     verify(previousWorkExperiencesEntityMapper).updateExistingEntityFromDto(
       existingInductionEntity.previousWorkExperiences!!,
-      updateInductionDto.previousWorkExperiences,
+      updateInductionDto.previousWorkExperiences!!,
     )
     verify(workOnReleaseEntityMapper).updateExistingEntityFromDto(
-      existingInductionEntity.workOnRelease!!,
-      updateInductionDto.workOnRelease,
+      existingInductionEntity.workOnRelease,
+      updateInductionDto.workOnRelease!!,
     )
   }
 

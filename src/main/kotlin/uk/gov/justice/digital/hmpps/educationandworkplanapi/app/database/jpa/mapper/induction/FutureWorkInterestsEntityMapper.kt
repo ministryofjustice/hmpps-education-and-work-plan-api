@@ -16,14 +16,14 @@ class FutureWorkInterestsEntityMapper(
   private val workInterestEntityMapper: WorkInterestEntityMapper,
   private val entityListManager: InductionEntityListManager<WorkInterestEntity, WorkInterest>,
 ) {
-  fun fromCreateDtoToEntity(dto: CreateFutureWorkInterestsDto?): FutureWorkInterestsEntity? =
-    dto?.let {
+  fun fromCreateDtoToEntity(dto: CreateFutureWorkInterestsDto): FutureWorkInterestsEntity =
+    with(dto) {
       FutureWorkInterestsEntity(
         reference = UUID.randomUUID(),
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewInterests(it.interests, this)
+        addNewInterests(dto.interests, this)
       }
     }
 
@@ -41,27 +41,25 @@ class FutureWorkInterestsEntityMapper(
       )
     }
 
-  fun updateExistingEntityFromDto(entity: FutureWorkInterestsEntity, dto: UpdateFutureWorkInterestsDto?) =
-    dto?.also {
-      with(entity) {
-        updatedAtPrison = it.prisonId
+  fun updateExistingEntityFromDto(entity: FutureWorkInterestsEntity, dto: UpdateFutureWorkInterestsDto) =
+    with(entity) {
+      updatedAtPrison = dto.prisonId
 
-        val existingInterests = entity.interests
-        val updatedInterests = dto.interests
-        entityListManager.updateExisting(existingInterests, updatedInterests, workInterestEntityMapper)
-        entityListManager.addNew(entity, existingInterests, updatedInterests, workInterestEntityMapper)
-        entityListManager.deleteRemoved(existingInterests, updatedInterests)
-      }
+      val existingInterests = entity.interests
+      val updatedInterests = dto.interests
+      entityListManager.updateExisting(existingInterests, updatedInterests, workInterestEntityMapper)
+      entityListManager.addNew(entity, existingInterests, updatedInterests, workInterestEntityMapper)
+      entityListManager.deleteRemoved(existingInterests, updatedInterests)
     }
 
-  fun fromUpdateDtoToNewEntity(dto: UpdateFutureWorkInterestsDto?): FutureWorkInterestsEntity? =
-    dto?.let {
+  fun fromUpdateDtoToNewEntity(dto: UpdateFutureWorkInterestsDto): FutureWorkInterestsEntity =
+    with(dto) {
       FutureWorkInterestsEntity(
         reference = UUID.randomUUID(),
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewInterests(it.interests, this)
+        addNewInterests(dto.interests, this)
       }
     }
 

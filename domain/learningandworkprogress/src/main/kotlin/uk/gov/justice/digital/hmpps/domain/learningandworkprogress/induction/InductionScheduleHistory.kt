@@ -13,34 +13,26 @@ data class InductionScheduleHistory(
   val deadlineDate: LocalDate,
   val scheduleCalculationRule: InductionScheduleCalculationRule,
   val scheduleStatus: InductionScheduleStatus,
+  var exemptionReason: String?,
   /**
    * The user ID of the person (logged-in user) who created the Induction.
    */
-  val createdBy: String?,
-  /**
-   * The name of the logged-in user who created the Induction.
-   */
-  val createdByDisplayName: String?,
+  val createdBy: String,
 
   val createdAtPrison: String,
   /**
    * The timestamp when this Induction was created.
    */
-  val createdAt: Instant?,
+  val createdAt: Instant,
   /**
    * The user ID of the person (logged-in user) who updated the Induction.
    */
-  val lastUpdatedBy: String?,
-  /**
-   * The name of the logged-in user who updated the Induction.
-   */
-  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedBy: String,
 
   val lastUpdatedAtPrison: String,
   /**
    * The timestamp when this Induction was updated.
    */
-  val lastUpdatedAt: Instant?,
-  var exemptionReason: String?,
+  val lastUpdatedAt: Instant,
   val version: Int,
 )

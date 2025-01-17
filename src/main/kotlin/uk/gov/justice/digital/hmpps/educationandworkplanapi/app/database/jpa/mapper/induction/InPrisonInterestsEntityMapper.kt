@@ -23,15 +23,15 @@ class InPrisonInterestsEntityMapper(
   private val trainingInterestEntityListManager: InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>,
 ) {
 
-  fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto?): InPrisonInterestsEntity? =
-    dto?.let {
+  fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity =
+    with(dto) {
       InPrisonInterestsEntity(
         reference = UUID.randomUUID(),
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewWorkInterests(it.inPrisonWorkInterests, this)
-        addNewTrainingInterests(it.inPrisonTrainingInterests, this)
+        addNewWorkInterests(dto.inPrisonWorkInterests, this)
+        addNewTrainingInterests(dto.inPrisonTrainingInterests, this)
       }
     }
 
@@ -50,34 +50,32 @@ class InPrisonInterestsEntityMapper(
       )
     }
 
-  fun updateExistingEntityFromDto(entity: InPrisonInterestsEntity, dto: UpdateInPrisonInterestsDto?) =
-    dto?.also {
-      with(entity) {
-        updatedAtPrison = it.prisonId
+  fun updateExistingEntityFromDto(entity: InPrisonInterestsEntity, dto: UpdateInPrisonInterestsDto) =
+    with(entity) {
+      updatedAtPrison = dto.prisonId
 
-        val existingWorkInterests = entity.inPrisonWorkInterests
-        val updatedWorkInterests = dto.inPrisonWorkInterests
-        workInterestEntityListManager.updateExisting(existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
-        workInterestEntityListManager.addNew(entity, existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
-        workInterestEntityListManager.deleteRemoved(existingWorkInterests, updatedWorkInterests)
+      val existingWorkInterests = entity.inPrisonWorkInterests
+      val updatedWorkInterests = dto.inPrisonWorkInterests
+      workInterestEntityListManager.updateExisting(existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
+      workInterestEntityListManager.addNew(entity, existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
+      workInterestEntityListManager.deleteRemoved(existingWorkInterests, updatedWorkInterests)
 
-        val existingTrainingInterests = entity.inPrisonTrainingInterests
-        val updatedTrainingInterests = dto.inPrisonTrainingInterests
-        trainingInterestEntityListManager.updateExisting(existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
-        trainingInterestEntityListManager.addNew(entity, existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
-        trainingInterestEntityListManager.deleteRemoved(existingTrainingInterests, updatedTrainingInterests)
-      }
+      val existingTrainingInterests = entity.inPrisonTrainingInterests
+      val updatedTrainingInterests = dto.inPrisonTrainingInterests
+      trainingInterestEntityListManager.updateExisting(existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
+      trainingInterestEntityListManager.addNew(entity, existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
+      trainingInterestEntityListManager.deleteRemoved(existingTrainingInterests, updatedTrainingInterests)
     }
 
-  fun fromUpdateDtoToNewEntity(inPrisonInterests: UpdateInPrisonInterestsDto?): InPrisonInterestsEntity? =
-    inPrisonInterests?.let {
+  fun fromUpdateDtoToNewEntity(dto: UpdateInPrisonInterestsDto): InPrisonInterestsEntity =
+    with(dto) {
       InPrisonInterestsEntity(
         reference = UUID.randomUUID(),
-        createdAtPrison = it.prisonId,
-        updatedAtPrison = it.prisonId,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
       ).apply {
-        addNewWorkInterests(it.inPrisonWorkInterests, this)
-        addNewTrainingInterests(it.inPrisonTrainingInterests, this)
+        addNewWorkInterests(dto.inPrisonWorkInterests, this)
+        addNewTrainingInterests(dto.inPrisonTrainingInterests, this)
       }
     }
 
