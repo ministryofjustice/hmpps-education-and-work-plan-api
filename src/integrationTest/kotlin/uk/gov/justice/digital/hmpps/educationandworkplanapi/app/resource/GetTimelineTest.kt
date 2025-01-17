@@ -147,8 +147,6 @@ class GetTimelineTest : IntegrationTestBase() {
 
       // Then
       val actual = response.responseBody.blockFirst()!!
-      println("&&& Event count = " + actual.events.size)
-      println("&&& events  = " + actual.events)
       val actionPlanCreatedCorrelationId = actual.events[4].correlationId
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
@@ -210,6 +208,7 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline with multiple events in order`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
+    createInduction(prisonNumber, aFullyPopulatedCreateInductionRequest())
 
     val prisonerFromApi = aValidPrisoner(prisonerNumber = prisonNumber)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
@@ -236,7 +235,6 @@ class GetTimelineTest : IntegrationTestBase() {
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
-    createInduction(prisonNumber, aFullyPopulatedCreateInductionRequest())
     createActionPlan(prisonNumber, createActionPlanRequest)
 
     createGoal(prisonNumber, aValidCreateGoalRequest(title = "Learn French"))
@@ -282,7 +280,6 @@ class GetTimelineTest : IntegrationTestBase() {
       val actual = response.responseBody.blockFirst()!!
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
-
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
         .hasNumberOfEvents(9)
@@ -317,7 +314,16 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(actionPlanReference.toString())
-            .hasNoContextualInfo() // creating an action plan has no contextual info
+            .hasContextualInfo(
+              mapOf(
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE" to validInductionRequest.conductedAt.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_AT" to induction.createdAt.toString(),
+                "COMPLETED_INDUCTION_NOTES" to validInductionRequest.note.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_BY" to "Albert User",
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY" to validInductionRequest.conductedBy.toString(),
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
+              ),
+            )
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .anyOfEventNumber(3, 4) {
