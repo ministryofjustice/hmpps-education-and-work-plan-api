@@ -4,7 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
+import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
@@ -17,6 +20,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newT
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -29,6 +33,9 @@ class TimelineEventFactoryTest {
   @InjectMocks
   private lateinit var timelineEventFactory: TimelineEventFactory
 
+  @Mock
+  private lateinit var userService: ManageUserService
+
   @Test
   fun `should create action plan created event`() {
     // Given
@@ -36,6 +43,10 @@ class TimelineEventFactoryTest {
     val actionPlan = aValidActionPlan(goals = listOf(goal))
     val induction = aFullyPopulatedInduction()
 
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+      UserDetailsDto("bjones_gen", true, "Barry Jones"),
+    )
     // When
     val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
 
