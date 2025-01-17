@@ -101,6 +101,8 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline for prisoner`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
+    val validInductionRequest = aFullyPopulatedCreateInductionRequest()
+    createInduction(prisonNumber, validInductionRequest)
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
@@ -126,6 +128,7 @@ class GetTimelineTest : IntegrationTestBase() {
 
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]
+    val induction = getInduction(prisonNumber)
 
     // When
     await.untilAsserted {
@@ -144,10 +147,10 @@ class GetTimelineTest : IntegrationTestBase() {
 
       // Then
       val actual = response.responseBody.blockFirst()!!
-      val actionPlanCreatedCorrelationId = actual.events[3].correlationId
+      val actionPlanCreatedCorrelationId = actual.events[4].correlationId
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(4)
+        .hasNumberOfEvents(5)
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
@@ -164,18 +167,32 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasNoActionedByDisplayName()
             .hasContextualInfo(mapOf("PRISON_TRANSFERRED_FROM" to "MDI"))
         }
-        // Events 3 and 4 were all created as part of the same Action Plan created event so will all have the same timestamp
+        .event(3) {
+          it.hasEventType(TimelineEventType.INDUCTION_CREATED)
+            .hasPrisonId("BXI")
+            .wasActionedBy("auser_gen")
+        }
+        // Events 4 and 5 were all created as part of the same Action Plan created event so will all have the same timestamp
         // so we cannot guarantee their order
-        .anyOfEventNumber(3, 4) {
+        .anyOfEventNumber(4, 5) {
           it.hasSourceReference(actionPlan.reference.toString())
             .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
             .wasActionedBy("auser_gen")
             .hasActionedByDisplayName("Albert User")
-            .hasNoContextualInfo()
+            .hasContextualInfo(
+              mapOf(
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE" to validInductionRequest.conductedAt.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_AT" to induction.createdAt.toString(),
+                "COMPLETED_INDUCTION_NOTES" to validInductionRequest.note.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_BY" to "Albert User",
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY" to validInductionRequest.conductedBy.toString(),
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
+              ),
+            )
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
-        .anyOfEventNumber(3, 4) {
+        .anyOfEventNumber(4, 5) {
           it.hasSourceReference(goal.goalReference.toString())
             .hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
@@ -191,6 +208,7 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline with multiple events in order`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
+    createInduction(prisonNumber, aFullyPopulatedCreateInductionRequest())
 
     val prisonerFromApi = aValidPrisoner(prisonerNumber = prisonNumber)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
@@ -213,8 +231,6 @@ class GetTimelineTest : IntegrationTestBase() {
     )
 
     val validInductionRequest = aFullyPopulatedCreateInductionRequest()
-
-    createInduction(prisonNumber, validInductionRequest)
 
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
@@ -264,7 +280,6 @@ class GetTimelineTest : IntegrationTestBase() {
       val actual = response.responseBody.blockFirst()!!
       val actionPlanCreatedCorrelationId = actual.events[2].correlationId
       val goalUpdatedCorrelationId = actual.events[6].correlationId
-
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
         .hasNumberOfEvents(9)
@@ -299,7 +314,16 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(actionPlanReference.toString())
-            .hasNoContextualInfo() // creating an action plan has no contextual info
+            .hasContextualInfo(
+              mapOf(
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE" to validInductionRequest.conductedAt.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_AT" to induction.createdAt.toString(),
+                "COMPLETED_INDUCTION_NOTES" to validInductionRequest.note.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_BY" to "Albert User",
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY" to validInductionRequest.conductedBy.toString(),
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
+              ),
+            )
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .anyOfEventNumber(3, 4) {

@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.util.UUID
@@ -90,7 +91,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(5) {
+        .event(6) {
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -137,7 +138,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(5) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
+        .event(6) { // the 6th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -272,6 +273,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     .exchange()
 
   private fun createAnActionPlanAndGetTheGoalReference(prisonNumber: String): UUID {
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(
         aValidCreateGoalRequest(

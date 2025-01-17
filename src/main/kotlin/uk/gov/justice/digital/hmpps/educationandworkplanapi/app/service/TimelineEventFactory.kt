@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
@@ -47,17 +48,18 @@ import java.util.UUID
  * Responsible for identifying which [TimelineEvent]s have occurred, for example following an update to a [Goal].
  */
 @Component
-class TimelineEventFactory {
+class TimelineEventFactory(private val userService: ManageUserService) {
 
-  fun actionPlanCreatedEvent(actionPlan: ActionPlan): List<TimelineEvent> {
+  fun actionPlanCreatedEvent(actionPlan: ActionPlan, induction: Induction): List<TimelineEvent> {
     val events = mutableListOf<TimelineEvent>()
+
     val correlationId = UUID.randomUUID()
     events.add(
       buildTimelineEvent(
         actionPlan.goals[0],
         actionPlan.reference,
         TimelineEventType.ACTION_PLAN_CREATED,
-        contextualInfo = emptyMap(),
+        contextualInfo = getInductionContextInfo(induction),
         correlationId = correlationId,
       ),
     )
@@ -66,6 +68,27 @@ class TimelineEventFactory {
     }
     return events
   }
+
+  private fun getInductionContextInfo(induction: Induction): Map<TimelineEventContext, String> =
+    with(induction) {
+      val noteContent = note?.content ?: ""
+      val conductedByPerson = conductedBy ?: ""
+      val conductedByRolePerson = conductedByRole ?: ""
+
+      return mapOf(
+        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
+        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(induction.createdBy!!).name,
+        TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
+        TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
+        *conductedBy
+          ?.let {
+            arrayOf(
+              TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to conductedByPerson,
+              TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to conductedByRolePerson,
+            )
+          } ?: arrayOf(),
+      )
+    }
 
   fun goalCreatedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
     buildTimelineEvent(

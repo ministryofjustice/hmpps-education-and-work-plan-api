@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -196,6 +197,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
       prisonNumber = prisonNumber,
@@ -283,7 +285,7 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        .event(5) { // the 5th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -318,6 +320,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal and delete goal note`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
       prisonNumber = prisonNumber,
@@ -405,7 +408,7 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        .event(5) { // the 5th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -440,6 +443,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal given the goal fields are unchanged and the only change is to add a step`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
       prisonNumber = prisonNumber,
@@ -528,7 +532,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+      .event(5) { // the 5th Timeline event will be the GOAL_UPDATED event
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .wasActionedBy("buser_gen")
           .hasActionedByDisplayName("Bernie User")
