@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.util.UUID
@@ -102,7 +103,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(4) { // the 4th Timeline event will be the GOAL_UNARCHIVED event
+        .event(6) { // the 6th Timeline event will be the GOAL_UNARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_UNARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -162,7 +163,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(4) { // the 4th Timeline event will be the GOAL_UNARCHIVED event
+        .event(6) { // the 6th Timeline event will be the GOAL_UNARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_UNARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -316,6 +317,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     .isNoContent()
 
   private fun createAnActionPlanAndGetTheGoalReference(prisonNumber: String): UUID {
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(
         aValidCreateGoalRequest(

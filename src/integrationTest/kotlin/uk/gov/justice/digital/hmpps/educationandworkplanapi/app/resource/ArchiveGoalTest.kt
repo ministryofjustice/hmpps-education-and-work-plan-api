@@ -68,7 +68,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and archive a goal and record the reason and other text `() {
     // given
-    createInduction(prisonNumber, aValidCreateInductionRequest())
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val archiveGoalRequest = aValidArchiveGoalRequest(
@@ -120,7 +119,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and archive a goal and record the reason and other text and create an archive note`() {
     // given
-    createInduction(prisonNumber, aValidCreateInductionRequest())
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val noteText = "no longer relevant"
@@ -149,7 +147,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
-      println("timeline : ${timeline}")
       assertThat(timeline)
         .hasNumberOfEvents(4)
         .event(4) { // the 4th Timeline event will be the GOAL_ARCHIVED event
@@ -306,6 +303,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     .exchange()
 
   private fun createAnActionPlanAndGetTheGoalReference(prisonNumber: String): UUID {
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(
         aValidCreateGoalRequest(
