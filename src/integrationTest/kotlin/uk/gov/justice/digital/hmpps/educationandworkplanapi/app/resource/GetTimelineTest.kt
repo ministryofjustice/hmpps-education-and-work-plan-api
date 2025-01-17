@@ -28,7 +28,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -102,7 +101,8 @@ class GetTimelineTest : IntegrationTestBase() {
   fun `should get timeline for prisoner`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
-    createInduction(prisonNumber, aValidCreateInductionRequest())
+    val validInductionRequest = aFullyPopulatedCreateInductionRequest()
+    createInduction(prisonNumber, validInductionRequest)
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
       prisonNumber,
       aValidPrisonerInPrisonSummary(
@@ -128,6 +128,7 @@ class GetTimelineTest : IntegrationTestBase() {
 
     val actionPlan = getActionPlan(prisonNumber)
     val goal = actionPlan.goals[0]
+    val induction = getInduction(prisonNumber)
 
     // When
     await.untilAsserted {
@@ -181,7 +182,16 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasPrisonId("BXI")
             .wasActionedBy("auser_gen")
             .hasActionedByDisplayName("Albert User")
-            .hasNoContextualInfo()
+            .hasContextualInfo(
+              mapOf(
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE" to validInductionRequest.conductedAt.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_AT" to induction.createdAt.toString(),
+                "COMPLETED_INDUCTION_NOTES" to validInductionRequest.note.toString(),
+                "COMPLETED_INDUCTION_ENTERED_ONLINE_BY" to "Albert User",
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY" to validInductionRequest.conductedBy.toString(),
+                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
+              ),
+            )
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .anyOfEventNumber(4, 5) {
