@@ -20,21 +20,33 @@ class InductionScheduleResourceMapper(
 ) {
   fun toInductionResponse(inductionSchedule: InductionSchedule, induction: Induction?): InductionScheduleResponse {
     with(inductionSchedule) {
+      val (inductionPerformedBy, inductionPerformedByRole) = induction?.let {
+        it.conductedBy?.let { conductedBy ->
+          conductedBy to it.conductedByRole
+        } ?: (userService.getUserDetails(it.lastUpdatedBy!!).name to null)
+      } ?: (null to null)
+
+      val inductionPerformedAt = induction?.createdAt
+        ?.atZone(ZoneId.systemDefault())
+        ?.toLocalDate()
+
       return InductionScheduleResponse(
         reference = reference,
         prisonNumber = prisonNumber,
         deadlineDate = deadlineDate,
         scheduleCalculationRule = toInductionScheduleCalculationRule(scheduleCalculationRule),
         scheduleStatus = toInductionScheduleStatus(scheduleStatus),
-        createdBy = createdBy!!,
-        createdByDisplayName = userService.getUserDetails(createdBy!!).name,
+        createdBy = createdBy,
+        createdByDisplayName = userService.getUserDetails(createdBy).name,
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
-        updatedBy = lastUpdatedBy!!,
+        updatedBy = lastUpdatedBy,
         createdAtPrison = createdAtPrison,
-        updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
+        updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
-        inductionPerformedBy = induction?.let { userService.getUserDetails(it.lastUpdatedBy!!).name },
-        inductionPerformedAt = induction?.lastUpdatedAt?.atZone(ZoneId.systemDefault())?.toLocalDate(),
+        inductionPerformedBy = inductionPerformedBy,
+        inductionPerformedAt = inductionPerformedAt,
+        inductionPerformedByRole = inductionPerformedByRole,
+        inductionPerformedAtPrison = induction?.createdAtPrison,
         updatedAtPrison = lastUpdatedAtPrison,
       )
     }

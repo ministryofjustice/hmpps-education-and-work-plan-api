@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.5'
+  version: '1.20.6'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -1801,11 +1801,19 @@ components:
           type: string
           description: The name of the person who completed the review.
           example: 'John smith'
+        inductionPerformedByRole:
+          type: string
+          description: The role of the person who completed the review.
+          example: 'Peer Mentor'
         inductionPerformedAt:
           type: string
           format: date
           description: the date when this resource was updated.
           example: '2023-06-19'
+        inductionPerformedAtPrison:
+          type: string
+          description: The prison that the induction was performed at.
+          example: 'BCI'
         exemptionReason:
           type: string
           description: |
