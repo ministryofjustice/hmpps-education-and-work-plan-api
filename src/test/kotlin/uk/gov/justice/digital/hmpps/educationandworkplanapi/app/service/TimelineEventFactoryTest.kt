@@ -8,6 +8,8 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
@@ -18,9 +20,17 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_NOTES
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
+import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -37,16 +47,20 @@ class TimelineEventFactoryTest {
   private lateinit var userService: ManageUserService
 
   @Test
-  fun `should create action plan created event`() {
+  fun `should create action plan created event given induction contains conductedAt meaning it was created by the new Induction UI journey`() {
     // Given
     val goal = aValidGoal()
     val actionPlan = aValidActionPlan(goals = listOf(goal))
-    val induction = aFullyPopulatedInduction()
+    val inductionCreatedDate = Instant.now()
+    val induction = aFullyPopulatedInduction(
+      createdAt = inductionCreatedDate,
+      conductedAt = LocalDate.parse("2025-01-20"),
+    )
 
     given(userService.getUserDetails(any())).willReturn(
       UserDetailsDto("asmith_gen", true, "Alex Smith"),
-      UserDetailsDto("bjones_gen", true, "Barry Jones"),
     )
+
     // When
     val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
 
@@ -58,6 +72,16 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
+      .hasContextualInfo(
+        mapOf(
+          COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to "2025-01-20",
+          COMPLETED_INDUCTION_ENTERED_ONLINE_BY to "Alex Smith",
+          COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to "John Smith",
+          COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to "Peer Mentor",
+          COMPLETED_INDUCTION_NOTES to "Note content",
+          COMPLETED_INDUCTION_ENTERED_ONLINE_AT to inductionCreatedDate.toString(),
+        ),
+      )
 
     val goalCreatedEvent = actual[1]
     assertThat(goalCreatedEvent)
@@ -67,6 +91,42 @@ class TimelineEventFactoryTest {
       .wasActionedBy(goal.lastUpdatedBy!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
       .hasCorrelationId(actionPlanCreatedEvent.correlationId)
+
+    verify(userService).getUserDetails("asmith_gen")
+  }
+
+  @Test
+  fun `should create action plan created event given induction does not contain conductedAt meaning it was created by the original Induction UI journey`() {
+    // Given
+    val goal = aValidGoal()
+    val actionPlan = aValidActionPlan(goals = listOf(goal))
+    val induction = aFullyPopulatedInduction(
+      conductedAt = null,
+    )
+
+    // When
+    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
+
+    // Then
+    assertThat(actual).hasSize(2)
+    val actionPlanCreatedEvent = actual[0]
+    assertThat(actionPlanCreatedEvent)
+      .hasSourceReference(actionPlan.reference.toString())
+      .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .hasEmptyContextualInfo()
+
+    val goalCreatedEvent = actual[1]
+    assertThat(goalCreatedEvent)
+      .hasSourceReference(goal.reference.toString())
+      .hasEventType(TimelineEventType.GOAL_CREATED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
+      .hasCorrelationId(actionPlanCreatedEvent.correlationId)
+
+    verifyNoInteractions(userService)
   }
 
   @Test

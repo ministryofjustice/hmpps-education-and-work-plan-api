@@ -29,7 +29,7 @@ fun aFullyPopulatedInduction(
   conductedBy: String? = "John Smith",
   conductedByRole: String? = "Peer Mentor",
   conductedAt: LocalDate? = LocalDate.now(),
-  note: NoteDto? = aValidNoteDto(prisonNumber, noteType = NoteType.INDUCTION, entityType = EntityType.INDUCTION),
+  note: NoteDto? = aValidNoteDto(noteType = NoteType.INDUCTION, entityType = EntityType.INDUCTION),
 ) = Induction(
   reference = reference,
   prisonNumber = prisonNumber,
