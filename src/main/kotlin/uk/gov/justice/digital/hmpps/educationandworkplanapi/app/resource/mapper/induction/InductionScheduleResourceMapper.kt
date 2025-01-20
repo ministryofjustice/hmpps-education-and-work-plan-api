@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
+import java.time.LocalDate
 import java.time.ZoneId
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus as InductionScheduleStatusResponse
@@ -20,15 +21,20 @@ class InductionScheduleResourceMapper(
 ) {
   fun toInductionResponse(inductionSchedule: InductionSchedule, induction: Induction?): InductionScheduleResponse {
     with(inductionSchedule) {
-      val (inductionPerformedBy, inductionPerformedByRole) = induction?.let {
-        it.conductedBy?.let { conductedBy ->
-          conductedBy to it.conductedByRole
-        } ?: (userService.getUserDetails(it.lastUpdatedBy!!).name to null)
-      } ?: (null to null)
+      var inductionPerformedBy: String? = null
+      var inductionPerformedByRole: String? = null
+      var inductionPerformedAt: LocalDate? = null
+      var inductionPerformedAtPrison: String? = null
 
-      val inductionPerformedAt = induction?.createdAt
-        ?.atZone(ZoneId.systemDefault())
-        ?.toLocalDate()
+      // Only set inductionPerformed* fields if the status is COMPLETED
+      if (scheduleStatus == InductionScheduleStatus.COMPLETED && induction != null) {
+        inductionPerformedBy = induction.conductedBy ?: userService.getUserDetails(induction.lastUpdatedBy!!).name
+        inductionPerformedByRole = induction.conductedByRole
+        inductionPerformedAt = induction.createdAt
+          ?.atZone(ZoneId.systemDefault())
+          ?.toLocalDate()
+        inductionPerformedAtPrison = induction.createdAtPrison
+      }
 
       return InductionScheduleResponse(
         reference = reference,
@@ -46,7 +52,7 @@ class InductionScheduleResourceMapper(
         inductionPerformedBy = inductionPerformedBy,
         inductionPerformedAt = inductionPerformedAt,
         inductionPerformedByRole = inductionPerformedByRole,
-        inductionPerformedAtPrison = induction?.createdAtPrison,
+        inductionPerformedAtPrison = inductionPerformedAtPrison,
         updatedAtPrison = lastUpdatedAtPrison,
       )
     }
