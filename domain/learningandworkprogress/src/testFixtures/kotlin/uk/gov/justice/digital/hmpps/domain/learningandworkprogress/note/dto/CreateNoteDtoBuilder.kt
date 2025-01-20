@@ -29,10 +29,10 @@ fun aValidNoteDto(
   entityReference: UUID = UUID.randomUUID(),
   entityType: EntityType = EntityType.GOAL,
   noteType: NoteType = NoteType.GOAL,
-  createdBy: String = "created_username",
+  createdBy: String = "asmith_gen",
   createdAt: Instant = Instant.now(),
   createdAtPrison: String = "BXI",
-  lastUpdatedBy: String = "updated_username",
+  lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "MDI",
 ): NoteDto =
@@ -48,5 +48,4 @@ fun aValidNoteDto(
     lastUpdatedAt = lastUpdatedAt,
     createdBy = createdBy,
     lastUpdatedBy = lastUpdatedBy,
-
   )

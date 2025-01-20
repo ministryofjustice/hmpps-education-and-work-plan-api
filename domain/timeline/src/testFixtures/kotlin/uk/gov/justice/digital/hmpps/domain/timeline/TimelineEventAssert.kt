@@ -60,6 +60,16 @@ class TimelineEventAssert(actual: TimelineEvent?) :
     return this
   }
 
+  fun hasEmptyContextualInfo(): TimelineEventAssert {
+    isNotNull
+    with(actual!!) {
+      if (contextualInfo.isNotEmpty()) {
+        failWithMessage("Expected contextualInfo to be empty, but was $contextualInfo")
+      }
+    }
+    return this
+  }
+
   fun hasCorrelationId(expected: UUID): TimelineEventAssert {
     isNotNull
     with(actual!!) {
