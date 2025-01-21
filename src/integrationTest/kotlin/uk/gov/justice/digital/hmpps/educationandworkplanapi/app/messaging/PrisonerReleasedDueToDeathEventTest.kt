@@ -2,16 +2,20 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RELEASED_FROM_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus as InductionScheduleStatusEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 
 @Isolated
@@ -122,5 +126,67 @@ class PrisonerReleasedDueToDeathEventTest : IntegrationTestBase() {
     } matches { it == 0 }
 
     assertThat(runCatching { getActionPlanReviews(prisonNumber) }.getOrNull()).isNull()
+  }
+
+  @Test
+  fun `should update Induction Schedule given deceased prisoner had an active Induction Schedule`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInductionSchedule(prisonNumber)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RELEASED_FROM_PRISON,
+      additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        nomisMovementReasonCode = "DEC",
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatus.EXEMPT_PRISONER_DEATH)
+    }
+  }
+
+  @Test
+  fun `should not update Induction Schedule given deceased prisoner had a completed Induction Schedule`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInductionSchedule(prisonNumber, status = InductionScheduleStatusEntity.COMPLETED)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RELEASED_FROM_PRISON,
+      additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        nomisMovementReasonCode = "DEC",
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatus.COMPLETED)
+    }
   }
 }

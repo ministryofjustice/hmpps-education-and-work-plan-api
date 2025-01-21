@@ -26,7 +26,11 @@ class InductionScheduleService(
    * A prisoner can only have 1 Induction Schedule. Throws [InductionScheduleAlreadyExistsException] if the prisoner
    * already has an Induction Schedule regardless of status (scheduled, completed, exempt etc.)
    */
-  fun createInductionSchedule(prisonNumber: String, prisonerAdmissionDate: LocalDate, prisonId: String): InductionSchedule {
+  fun createInductionSchedule(
+    prisonNumber: String,
+    prisonerAdmissionDate: LocalDate,
+    prisonId: String,
+  ): InductionSchedule {
     // Check for an existing Induction Schedule
     val inductionSchedule = runCatching {
       getInductionScheduleForPrisoner(prisonNumber)
@@ -56,7 +60,11 @@ class InductionScheduleService(
    *
    * Throws [InductionScheduleNotFoundException] ff the prisoner does not have an [InductionSchedule].
    */
-  fun reschedulePrisonersInductionSchedule(prisonNumber: String, prisonerAdmissionDate: LocalDate, prisonId: String): InductionSchedule {
+  fun reschedulePrisonersInductionSchedule(
+    prisonNumber: String,
+    prisonerAdmissionDate: LocalDate,
+    prisonId: String,
+  ): InductionSchedule {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
 
@@ -108,7 +116,8 @@ class InductionScheduleService(
       }
 
       else -> {
-        val adjustedInductionDueDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
+        val adjustedInductionDueDate =
+          inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
         rescheduleInductionSchedule(inductionSchedule, adjustedInductionDueDate, prisonId)
       }
     }
@@ -183,7 +192,8 @@ class InductionScheduleService(
     )
 
     // Then update the induction schedule to be SCHEDULED with an adjusted induction date
-    val adjustedInductionDate = inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(updatedInductionScheduleFirst)
+    val adjustedInductionDate =
+      inductionScheduleDateCalculationService.calculateAdjustedInductionDueDate(updatedInductionScheduleFirst)
     return inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
         reference = inductionSchedule.reference,
@@ -215,9 +225,36 @@ class InductionScheduleService(
         exemptionReason = updatedInductionSchedule.exemptionReason,
         newDeadlineDate = updatedInductionSchedule.deadlineDate,
         oldDeadlineDate = oldDeadlineDate,
-        updatedAt = updatedInductionSchedule.lastUpdatedAt!!,
-        updatedBy = updatedInductionSchedule.lastUpdatedBy!!,
+        updatedAt = updatedInductionSchedule.lastUpdatedAt,
+        updatedBy = updatedInductionSchedule.lastUpdatedBy,
       ),
     )
+  }
+
+  /**
+   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_DEATH
+   *
+   */
+  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) {
+    val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
+      ?: throw InductionScheduleNotFoundException(prisonNumber)
+
+    with(inductionSchedule) {
+      inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
+        UpdateInductionScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
+          exemptionReason = exemptionReason,
+          prisonNumber = prisonNumber,
+          updatedAtPrison = prisonId,
+        ),
+      ).also {
+        performFollowOnEvents(
+          updatedInductionSchedule = it,
+          oldStatus = scheduleStatus,
+          oldDeadlineDate = deadlineDate,
+        )
+      }
+    }
   }
 }

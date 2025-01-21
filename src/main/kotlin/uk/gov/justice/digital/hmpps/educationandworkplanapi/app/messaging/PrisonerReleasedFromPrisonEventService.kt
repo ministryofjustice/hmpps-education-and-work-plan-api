@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
@@ -17,6 +19,7 @@ private val log = KotlinLogging.logger {}
 @Service
 class PrisonerReleasedFromPrisonEventService(
   private val reviewScheduleService: ReviewScheduleService,
+  private val inductionScheduleService: InductionScheduleService,
 ) {
   fun process(
     inboundEvent: InboundEvent,
@@ -63,6 +66,13 @@ class PrisonerReleasedFromPrisonEventService(
       log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
     }
 
-    // TODO - RR-1215 - call inductionScheduleService to exempt Induction Schedule due to prisoner death
+    try {
+      inductionScheduleService.exemptActiveInductionScheduleStatusDueToPrisonerDeath(
+        prisonNumber = nomsNumber,
+        prisonId = prisonId,
+      )
+    } catch (e: InductionScheduleNotFoundException) {
+      log.debug { "Prisoner [$nomsNumber] does not have an Induction Schedule; no need to set it as exempt" }
+    }
   }
 }

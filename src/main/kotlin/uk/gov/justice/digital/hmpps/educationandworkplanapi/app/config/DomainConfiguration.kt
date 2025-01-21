@@ -79,9 +79,8 @@ class DomainConfiguration {
   fun inductionDomainService(
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     inductionEventService: InductionEventService,
-    inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   ): InductionService =
-    InductionService(inductionPersistenceAdapter, inductionEventService, inductionSchedulePersistenceAdapter)
+    InductionService(inductionPersistenceAdapter, inductionEventService)
 
   @Bean
   fun inductionScheduleDomainService(

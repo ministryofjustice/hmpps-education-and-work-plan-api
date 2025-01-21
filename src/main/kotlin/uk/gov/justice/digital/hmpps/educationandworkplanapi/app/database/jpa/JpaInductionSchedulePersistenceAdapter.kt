@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionScheduleEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
@@ -34,6 +35,10 @@ class JpaInductionSchedulePersistenceAdapter(
     inductionScheduleRepository.findByPrisonNumber(prisonNumber)?.let {
       inductionScheduleEntityMapper.fromEntityToDomain(it)
     }
+
+  override fun getActiveInductionSchedule(prisonNumber: String): InductionSchedule? =
+    inductionScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber = prisonNumber, scheduleStatuses = InductionScheduleStatus.ACTIVE_STATUSES)
+      ?.let { inductionScheduleEntityMapper.fromEntityToDomain(it) }
 
   @Transactional
   override fun updateSchedule(
