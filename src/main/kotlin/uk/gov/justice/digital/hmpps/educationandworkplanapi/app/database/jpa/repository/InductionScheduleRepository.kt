@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.re
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import java.util.UUID
 
 @Repository
@@ -10,4 +11,6 @@ interface InductionScheduleRepository : JpaRepository<InductionScheduleEntity, U
   fun findByReference(reference: UUID): InductionScheduleEntity?
 
   fun findByPrisonNumber(prisonNumber: String): InductionScheduleEntity?
+
+  fun findByPrisonNumberAndScheduleStatusIn(prisonNumber: String, scheduleStatuses: List<InductionScheduleStatus>): InductionScheduleEntity?
 }

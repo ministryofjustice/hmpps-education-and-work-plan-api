@@ -12,6 +12,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
@@ -26,6 +27,9 @@ class PrisonerReleasedFromPrisonEventServiceTest {
 
   @Mock
   private lateinit var reviewScheduleService: ReviewScheduleService
+
+  @Mock
+  private lateinit var inductionScheduleService: InductionScheduleService
 
   private val objectMapper = ObjectMapper()
 
@@ -65,6 +69,11 @@ class PrisonerReleasedFromPrisonEventServiceTest {
 
     // Then
     verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToPrisonerDeath(
+      prisonNumber = "A1234BC",
+      prisonId = "BXI",
+    )
+
+    verify(inductionScheduleService).exemptActiveInductionScheduleStatusDueToPrisonerDeath(
       prisonNumber = "A1234BC",
       prisonId = "BXI",
     )
