@@ -22,7 +22,6 @@ private val log = KotlinLogging.logger {}
 class InductionService(
   private val persistenceAdapter: InductionPersistenceAdapter,
   private val inductionEventService: InductionEventService,
-  private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
 ) {
 
   /**
