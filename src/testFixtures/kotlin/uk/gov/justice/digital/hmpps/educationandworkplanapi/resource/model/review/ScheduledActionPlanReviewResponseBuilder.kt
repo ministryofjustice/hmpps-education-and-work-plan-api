@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review
 
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ScheduledActionPlanReviewResponse
@@ -8,6 +9,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 fun aValidScheduledActionPlanReviewResponse(
+  prisonNumber: String = aValidPrisonNumber(),
   reference: UUID = UUID.randomUUID(),
   reviewDateFrom: LocalDate = LocalDate.now().minusMonths(1),
   reviewDateTo: LocalDate = LocalDate.now().plusMonths(1),
@@ -23,6 +25,7 @@ fun aValidScheduledActionPlanReviewResponse(
   updatedAtPrison: String = "BXI",
 ): ScheduledActionPlanReviewResponse =
   ScheduledActionPlanReviewResponse(
+    prisonNumber = prisonNumber,
     reference = reference,
     reviewDateFrom = reviewDateFrom,
     reviewDateTo = reviewDateTo,

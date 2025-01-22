@@ -16,9 +16,10 @@ class ScheduledActionPlanReviewResponseMapper(
   private val userService: ManageUserService,
 ) {
 
-  fun fromDomainToModel(reviewSchedule: ReviewSchedule): ScheduledActionPlanReviewResponse =
+  fun fromDomainToModel(reviewSchedule: ReviewSchedule, prisonNumber: String): ScheduledActionPlanReviewResponse =
     with(reviewSchedule) {
       ScheduledActionPlanReviewResponse(
+        prisonNumber = prisonNumber,
         reference = reference,
         reviewDateFrom = reviewScheduleWindow.dateFrom,
         reviewDateTo = reviewScheduleWindow.dateTo,

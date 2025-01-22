@@ -10,6 +10,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
@@ -31,6 +32,7 @@ class ScheduledActionPlanReviewResponseMapperTest {
   @Test
   fun `should map from domain to model`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val reference = aValidReference()
     val reviewSchedule = aValidReviewSchedule(
       reference = reference,
@@ -52,10 +54,11 @@ class ScheduledActionPlanReviewResponseMapperTest {
       reference = reference,
       createdAt = reviewSchedule.createdAt.atOffset(ZoneOffset.UTC),
       updatedAt = reviewSchedule.lastUpdatedAt.atOffset(ZoneOffset.UTC),
+      prisonNumber = prisonNumber,
     )
 
     // When
-    val actual = mapper.fromDomainToModel(reviewSchedule)
+    val actual = mapper.fromDomainToModel(reviewSchedule, prisonNumber)
 
     // Then
     assertThat(actual).isEqualTo(expected)

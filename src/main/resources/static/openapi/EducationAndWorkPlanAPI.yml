@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.6'
+  version: '1.20.7'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3146,6 +3146,10 @@ components:
         when they complete a prisoner's Induction or their previous Review. IE. completing an Induction will create
         the prisoner's first Review Schedule. Completing their Review will create their next Review Schedule.
       properties:
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
         reference:
           type: string
           format: uuid
@@ -3189,6 +3193,7 @@ components:
         - reviewDateTo
         - status
         - calculationRule
+        - prisonNumber
 
     ### Update Induction Schedule Status ###
     UpdateInductionScheduleStatusRequest:

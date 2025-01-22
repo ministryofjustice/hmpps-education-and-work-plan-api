@@ -16,9 +16,10 @@ class ReviewScheduleHistoryResponseMapper(
   private val userService: ManageUserService,
 ) {
 
-  fun fromDomainToModel(reviewSchedule: ReviewScheduleHistory): ScheduledActionPlanReviewResponse =
+  fun fromDomainToModel(reviewSchedule: ReviewScheduleHistory, prisonNumber: String): ScheduledActionPlanReviewResponse =
     with(reviewSchedule) {
       ScheduledActionPlanReviewResponse(
+        prisonNumber = prisonNumber,
         reference = reference,
         reviewDateFrom = reviewSchedule.earliestReviewDate,
         reviewDateTo = reviewSchedule.latestReviewDate,

@@ -51,7 +51,7 @@ class ReviewController(
     val latestReviewSchedule = reviewScheduleService.getLatestReviewScheduleForPrisoner(prisonNumber)
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
     return ActionPlanReviewsResponse(
-      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(latestReviewSchedule),
+      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(latestReviewSchedule, prisonNumber),
       completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
     )
   }
@@ -82,7 +82,7 @@ class ReviewController(
 
     return CreateActionPlanReviewResponse(
       wasLastReviewBeforeRelease = completedReview.wasLastReviewBeforeRelease,
-      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(completedReview.latestReviewSchedule),
+      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(completedReview.latestReviewSchedule, prisonNumber),
     )
   }
 
@@ -110,7 +110,7 @@ class ReviewController(
   ): ActionPlanReviewSchedulesResponse {
     val reviewSchedules = reviewScheduleService.getReviewSchedulesForPrisoner(prisonNumber)
     return ActionPlanReviewSchedulesResponse(
-      reviewSchedules = reviewSchedules.map { reviewScheduleHistoryResponseMapper.fromDomainToModel(it) },
+      reviewSchedules = reviewSchedules.map { reviewScheduleHistoryResponseMapper.fromDomainToModel(it, prisonNumber) },
     )
   }
 
