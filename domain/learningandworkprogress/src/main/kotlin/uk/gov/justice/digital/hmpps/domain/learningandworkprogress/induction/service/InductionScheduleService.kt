@@ -232,29 +232,53 @@ class InductionScheduleService(
   }
 
   /**
-   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_DEATH
-   *
+   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_DEATH.
    */
   fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) {
+    exemptActiveInductionScheduleStatus(
+      prisonNumber = prisonNumber,
+      prisonId = prisonId,
+      newStatus = InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
+    )
+  }
+
+  /**
+   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_RELEASE.
+   */
+  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) {
+    exemptActiveInductionScheduleStatus(
+      prisonNumber = prisonNumber,
+      prisonId = prisonId,
+      newStatus = InductionScheduleStatus.EXEMPT_PRISONER_RELEASE,
+    )
+  }
+
+  /**
+   * Shared logic for updating the Induction Schedule status with the given status.
+   */
+  private fun exemptActiveInductionScheduleStatus(
+    prisonNumber: String,
+    prisonId: String,
+    newStatus: InductionScheduleStatus,
+  ) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
 
-    with(inductionSchedule) {
-      inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
-        UpdateInductionScheduleStatusDto(
-          reference = reference,
-          scheduleStatus = InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
-          exemptionReason = exemptionReason,
-          prisonNumber = prisonNumber,
-          updatedAtPrison = prisonId,
-        ),
-      ).also {
-        performFollowOnEvents(
-          updatedInductionSchedule = it,
-          oldStatus = scheduleStatus,
-          oldDeadlineDate = deadlineDate,
-        )
-      }
+    val oldStatus = inductionSchedule.scheduleStatus
+    inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
+      UpdateInductionScheduleStatusDto(
+        reference = inductionSchedule.reference,
+        scheduleStatus = newStatus,
+        exemptionReason = inductionSchedule.exemptionReason,
+        prisonNumber = prisonNumber,
+        updatedAtPrison = prisonId,
+      ),
+    ).also {
+      performFollowOnEvents(
+        updatedInductionSchedule = it,
+        oldStatus = oldStatus,
+        oldDeadlineDate = inductionSchedule.deadlineDate,
+      )
     }
   }
 }
