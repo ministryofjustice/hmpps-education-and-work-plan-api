@@ -7,9 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RELEASED_FROM_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
@@ -122,5 +125,94 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
     } matches { it == 0 }
 
     assertThat(runCatching { getActionPlanReviews(prisonNumber) }.getOrNull()).isNull()
+  }
+
+  @Test
+  fun `should update Induction Schedule given released prisoner has an active Induction Schedule`() {
+    // Given
+    // an induction schedule exists
+    val prisonNumber = aValidPrisonNumber()
+    createInductionSchedule(prisonNumber)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RELEASED_FROM_PRISON,
+      additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        nomisMovementReasonCode = "CR",
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await.untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
+    }
+  }
+
+  @Test
+  fun `should not update Induction Schedule given released prisoner does not have an active Induction Schedule`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+    createInductionSchedule(prisonNumber, status = COMPLETED)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RELEASED_FROM_PRISON,
+      additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        nomisMovementReasonCode = "CR",
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await.untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatus.COMPLETED)
+    }
+  }
+
+  @Test
+  fun `should not create or update Induction Schedule given released prisoner does not have an Induction Schedule at all`() {
+    // Given
+    val prisonNumber = aValidPrisonNumber()
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RELEASED_FROM_PRISON,
+      additionalInformation = aValidPrisonerReleasedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        nomisMovementReasonCode = "CR",
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    assertThat(runCatching { getInductionSchedule(prisonNumber) }.getOrNull()).isNull()
   }
 }
