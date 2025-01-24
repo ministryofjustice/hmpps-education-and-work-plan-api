@@ -65,14 +65,14 @@ class ScheduleEtlController(
     // Get filtered prisoners step-by-step
     val prisonersWithoutReviewSchedules = filterPrisonersWithoutReviewSchedules(allPrisoners)
     val prisonersWithoutInductionSchedule = filterPrisonersWithoutInductionSchedule(allPrisoners)
-    val prisonersWithInductions = filterPrisonersWithInductions(prisonersWithoutReviewSchedules)
-    val eligibleInductionSchedulePrisoners =
-      filterPrisonersWithoutInductionsOrInductionSchedules(prisonersWithoutInductionSchedule)
-    val eligibleReviewSchedulePrisoners = filterPrisonersWithActionPlans(prisonersWithInductions)
+    val prisonersWithInductionsAndNoReviewSchedule = filterPrisonersWithInductions(prisonersWithoutReviewSchedules)
+
+    val eligibleInductionSchedulePrisoners = filterPrisonersWithNoInduction(prisonersWithoutInductionSchedule)
+    val eligibleReviewSchedulePrisoners = filterPrisonersWithActionPlans(prisonersWithInductionsAndNoReviewSchedule)
 
     val totalPrisonersWithInductionSchedule = totalPrisonersInPrison - prisonersWithoutInductionSchedule.size
     val totalPrisonersWithReviewSchedule = totalPrisonersInPrison - prisonersWithoutReviewSchedules.size
-    val totalPrisonersWithInduction = prisonersWithInductions.size
+    val totalPrisonersWithInduction = prisonersWithInductionsAndNoReviewSchedule.size
     val totalPrisonersWithActionPlan = eligibleReviewSchedulePrisoners.size
 
     // Create schedules for eligible prisoners
@@ -141,12 +141,11 @@ class ScheduleEtlController(
     }
   }
 
-  private fun filterPrisonersWithoutInductionsOrInductionSchedules(prisoners: List<Prisoner>): List<Prisoner> {
-    val prisonersWithoutInductionSchedule = prisoners.map { it.prisonerNumber }
-    val prisonersWithInductionSchedules =
-      inductionScheduleRepository.findByPrisonNumberIn(prisonersWithoutInductionSchedule).map { it.prisonNumber }
-        .toSet()
-    return prisoners.filter { it.prisonerNumber !in prisonersWithInductionSchedules }
+  private fun filterPrisonersWithNoInduction(prisoners: List<Prisoner>): List<Prisoner> {
+    val prisonNumbers = prisoners.map { it.prisonerNumber }
+    val prisonersWithInductions =
+      inductionRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
+    return prisoners.filter { it.prisonerNumber !in prisonersWithInductions }
   }
 
   private fun filterPrisonersWithoutReviewSchedules(prisoners: List<Prisoner>): List<Prisoner> {
