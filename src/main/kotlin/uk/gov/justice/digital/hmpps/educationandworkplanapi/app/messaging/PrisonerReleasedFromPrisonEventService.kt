@@ -16,6 +16,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 
 private val log = KotlinLogging.logger {}
 
+private const val REVIEW_SCHEDULE = "Review Schedule"
+private const val INDUCTION_SCHEDULE = "Induction Schedule"
+
 @Service
 class PrisonerReleasedFromPrisonEventService(
   private val reviewScheduleService: ReviewScheduleService,
@@ -43,36 +46,36 @@ class PrisonerReleasedFromPrisonEventService(
 
   private fun PrisonerReleasedAdditionalInformation.processPrisonerReleaseEvent() {
     log.info { "Processing Prisoner Released From Prison Event for prisoner [$nomsNumber]" }
-    try {
-      reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerRelease(
-        prisonNumber = nomsNumber,
-        prisonId = prisonId,
-      )
-    } catch (e: ReviewScheduleNotFoundException) {
-      log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
-    }
-
-    // TODO - RR-1215 - call inductionScheduleService to exempt Induction Schedule due to prisoner release
+    handle(
+      REVIEW_SCHEDULE,
+    ) { reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerRelease(nomsNumber, prisonId) }
+    handle(
+      INDUCTION_SCHEDULE,
+    ) { inductionScheduleService.exemptActiveInductionScheduleStatusDueToPrisonerRelease(nomsNumber, prisonId) }
   }
 
   private fun PrisonerReleasedAdditionalInformation.processPrisonerReleaseEventDueToDeath() {
     log.info { "Processing Prisoner Released From Prison Event (due to death) for prisoner [$nomsNumber]" }
-    try {
-      reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerDeath(
-        prisonNumber = nomsNumber,
-        prisonId = prisonId,
-      )
-    } catch (e: ReviewScheduleNotFoundException) {
-      log.debug { "Prisoner [$nomsNumber] does not have an active Review Schedule; no need to set it as exempt" }
-    }
+    handle(
+      REVIEW_SCHEDULE,
+    ) { reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerDeath(nomsNumber, prisonId) }
+    handle(
+      INDUCTION_SCHEDULE,
+    ) { inductionScheduleService.exemptActiveInductionScheduleStatusDueToPrisonerDeath(nomsNumber, prisonId) }
+  }
 
+  private fun handle(
+    scheduleType: String,
+    action: () -> Unit,
+  ) {
     try {
-      inductionScheduleService.exemptActiveInductionScheduleStatusDueToPrisonerDeath(
-        prisonNumber = nomsNumber,
-        prisonId = prisonId,
-      )
-    } catch (e: InductionScheduleNotFoundException) {
-      log.debug { "Prisoner [$nomsNumber] does not have an Induction Schedule; no need to set it as exempt" }
+      action()
+    } catch (e: Exception) {
+      if (e is ReviewScheduleNotFoundException || e is InductionScheduleNotFoundException) {
+        log.debug { "Prisoner does not have an active $scheduleType; no need to set it as exempt" }
+      } else {
+        throw e // Re-throw unexpected exceptions
+      }
     }
   }
 }
