@@ -68,14 +68,14 @@ class InductionScheduleEntityMapperTest {
     val createInductionScheduleDto = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = deadlineDate,
-      scheduleCalculationRule = InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_ON_REMAND,
+      scheduleCalculationRule = InductionScheduleCalculationRuleDomain.EXISTING_PRISONER,
       scheduleStatus = InductionScheduleStatusDomain.SCHEDULED,
     )
 
     val expectedInductionScheduleEntity = anUnPersistedInductionScheduleEntity(
       prisonNumber = prisonNumber,
       deadlineDate = deadlineDate,
-      scheduleCalculationRule = InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_ON_REMAND,
+      scheduleCalculationRule = InductionScheduleCalculationRuleEntity.EXISTING_PRISONER,
       scheduleStatus = InductionScheduleStatusEntity.SCHEDULED,
     )
 

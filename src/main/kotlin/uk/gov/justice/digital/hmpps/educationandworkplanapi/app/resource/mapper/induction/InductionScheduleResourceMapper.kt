@@ -61,12 +61,7 @@ class InductionScheduleResourceMapper(
   fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRule): InductionScheduleCalculationRuleResponse =
     when (inductionScheduleCalculationRule) {
       InductionScheduleCalculationRule.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION
-      InductionScheduleCalculationRule.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE
-      InductionScheduleCalculationRule.EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE
-      InductionScheduleCalculationRule.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE
-      InductionScheduleCalculationRule.EXISTING_PRISONER_INDETERMINATE_SENTENCE -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_INDETERMINATE_SENTENCE
-      InductionScheduleCalculationRule.EXISTING_PRISONER_ON_REMAND -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_ON_REMAND
-      InductionScheduleCalculationRule.EXISTING_PRISONER_UN_SENTENCED -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER_UN_SENTENCED
+      InductionScheduleCalculationRule.EXISTING_PRISONER -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER
     }
 
   fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =

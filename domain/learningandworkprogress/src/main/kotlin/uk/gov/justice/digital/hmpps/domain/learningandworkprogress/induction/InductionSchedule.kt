@@ -39,12 +39,7 @@ data class InductionSchedule(
 
 enum class InductionScheduleCalculationRule(val existingPrisonerWhenScheduleCreated: Boolean) {
   NEW_PRISON_ADMISSION(false),
-  EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE(true),
-  EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE(true),
-  EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE(true),
-  EXISTING_PRISONER_INDETERMINATE_SENTENCE(true),
-  EXISTING_PRISONER_ON_REMAND(true),
-  EXISTING_PRISONER_UN_SENTENCED(true),
+  EXISTING_PRISONER(true),
 }
 
 enum class InductionScheduleStatus(val isExclusion: Boolean = false, val isExemption: Boolean = false) {
