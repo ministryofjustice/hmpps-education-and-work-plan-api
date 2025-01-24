@@ -65,14 +65,14 @@ class ScheduleEtlController(
     // Get filtered prisoners step-by-step
     val prisonersWithoutReviewSchedules = filterPrisonersWithoutReviewSchedules(allPrisoners)
     val prisonersWithoutInductionSchedule = filterPrisonersWithoutInductionSchedule(allPrisoners)
-    val prisonersWithInductionsAndNoReviewSchedule = filterPrisonersWithInductions(prisonersWithoutReviewSchedules)
+    val prisonersWithInductions = filterPrisonersWithInductions(allPrisoners)
+    val prisonersWithInductionsAndNoReviewSchedule = filterPrisonersWithInductionButNoReviewSchedule(prisonersWithInductions, prisonersWithoutReviewSchedules)
 
-    val eligibleInductionSchedulePrisoners = filterPrisonersWithNoInduction(prisonersWithoutInductionSchedule)
+    val eligibleInductionSchedulePrisoners = filterPrisonersWithNoInduction(prisonersWithoutInductionSchedule, prisonersWithInductions)
     val eligibleReviewSchedulePrisoners = filterPrisonersWithActionPlans(prisonersWithInductionsAndNoReviewSchedule)
 
     val totalPrisonersWithInductionSchedule = totalPrisonersInPrison - prisonersWithoutInductionSchedule.size
     val totalPrisonersWithReviewSchedule = totalPrisonersInPrison - prisonersWithoutReviewSchedules.size
-    val totalPrisonersWithInduction = prisonersWithInductionsAndNoReviewSchedule.size
     val totalPrisonersWithActionPlan = eligibleReviewSchedulePrisoners.size
 
     // Create schedules for eligible prisoners
@@ -91,12 +91,12 @@ class ScheduleEtlController(
       totalPrisonersInPrison = totalPrisonersInPrison,
       totalPrisonersWithReviewSchedule = totalPrisonersWithReviewSchedule,
       totalPrisonersWithInductionSchedule = totalPrisonersWithInductionSchedule,
-      totalPrisonersWithInduction = totalPrisonersWithInduction,
+      totalPrisonersWithInduction = prisonersWithInductions.size,
       totalPrisonersWithActionPlan = totalPrisonersWithActionPlan,
       prisonersWithCreatedReviewSchedules = createdReviewSchedules,
       prisonersWithoutReviewSchedules = failedReviewSchedules,
-      prisonersWithCreatedInductionSchedule = listOf(),
-      prisonersWithoutInductionSchedule = listOf(),
+      prisonersWithCreatedInductionSchedule = createdInductionSchedules,
+      prisonersWithoutInductionSchedule = failedInductionSchedules,
     )
 
     // Handle dry run
@@ -141,11 +141,9 @@ class ScheduleEtlController(
     }
   }
 
-  private fun filterPrisonersWithNoInduction(prisoners: List<Prisoner>): List<Prisoner> {
-    val prisonNumbers = prisoners.map { it.prisonerNumber }
-    val prisonersWithInductions =
-      inductionRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
-    return prisoners.filter { it.prisonerNumber !in prisonersWithInductions }
+  private fun filterPrisonersWithNoInduction(prisoners: List<Prisoner>, prisonersWithInductions: List<Prisoner>): List<Prisoner> {
+    val prisonerNumbersWithInductions = prisonersWithInductions.map { it.prisonerNumber }.toSet()
+    return prisoners.filter { it.prisonerNumber !in prisonerNumbersWithInductions }
   }
 
   private fun filterPrisonersWithoutReviewSchedules(prisoners: List<Prisoner>): List<Prisoner> {
@@ -167,6 +165,11 @@ class ScheduleEtlController(
     val prisonersWithInductions =
       inductionRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
     return prisoners.filter { it.prisonerNumber in prisonersWithInductions }
+  }
+
+  private fun filterPrisonersWithInductionButNoReviewSchedule(prisonersWithInduction: List<Prisoner>, prisonersWithoutReviewSchedules: List<Prisoner>): List<Prisoner> {
+    val prisonNumbersWithNoReviewSchedule = prisonersWithoutReviewSchedules.map { it.prisonerNumber }
+    return prisonersWithInduction.filter { it.prisonerNumber in prisonNumbersWithNoReviewSchedule }
   }
 
   private fun filterPrisonersWithActionPlans(prisoners: List<Prisoner>): List<Prisoner> {
