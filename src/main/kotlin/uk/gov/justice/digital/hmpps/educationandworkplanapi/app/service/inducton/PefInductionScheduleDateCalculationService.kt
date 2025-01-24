@@ -30,12 +30,45 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
    * Under the PEF contract the prisoner's Induction is immediately scheduled with a deadline date of the prisoner's admission date
    * plus 20 days.
    */
-  override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String): CreateInductionScheduleDto =
-    CreateInductionScheduleDto(
-      prisonNumber = prisonNumber,
-      deadlineDate = admissionDate.plusDays(DAYS_AFTER_ADMISSION),
-      scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
-      scheduleStatus = InductionScheduleStatus.SCHEDULED,
-      prisonId = prisonId,
-    )
+  override fun determineCreateInductionScheduleDto(
+    prisonNumber: String,
+    admissionDate: LocalDate,
+    prisonId: String,
+    newAdmission: Boolean,
+  ): CreateInductionScheduleDto {
+    return if (newAdmission) {
+      CreateInductionScheduleDto(
+        prisonNumber = prisonNumber,
+        deadlineDate = admissionDate.plusDays(DAYS_AFTER_ADMISSION),
+        scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
+      )
+    } else {
+      CreateInductionScheduleDto(
+        prisonNumber = prisonNumber,
+        deadlineDate = getDeadlineDate(),
+        scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
+        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
+      )
+    }
+  }
+
+  // This will return the grater of today's date plus six months or 1/04/2025 plus six months
+  // This should only be used by the ETL process, which will take place before 31/03/2025.
+  fun getDeadlineDate(): LocalDate {
+    val todayPlus6Months = LocalDate.now().plusMonths(6)
+
+    // Hardcoded date: 1st April 2025
+    val aprilFirst2025 = LocalDate.of(2025, 4, 1)
+    val aprilFirstPlus6Months = aprilFirst2025.plusMonths(6)
+
+    // Return the later of the two dates
+    return if (todayPlus6Months.isAfter(aprilFirstPlus6Months)) {
+      todayPlus6Months
+    } else {
+      aprilFirstPlus6Months
+    }
+  }
 }
