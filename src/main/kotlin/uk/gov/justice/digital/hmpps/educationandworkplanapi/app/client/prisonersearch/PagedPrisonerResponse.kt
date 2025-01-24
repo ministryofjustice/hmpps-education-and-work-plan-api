@@ -10,7 +10,7 @@ data class PagedPrisonerResponse(
 
 data class Prisoner(
   val prisonerNumber: String,
-  val legalStatus: LegalStatus,
+  val legalStatus: LegalStatus = LegalStatus.OTHER,
   val releaseDate: LocalDate?,
   val prisonId: String?,
   @field:JsonProperty(value = "indeterminateSentence", defaultValue = "false")
