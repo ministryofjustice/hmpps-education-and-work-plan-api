@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -31,7 +31,6 @@ import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class ReviewScheduleServiceTest {
-  @InjectMocks
   private lateinit var reviewScheduleService: ReviewScheduleService
 
   @Mock
@@ -40,10 +39,21 @@ class ReviewScheduleServiceTest {
   @Mock
   private lateinit var reviewScheduleEventService: ReviewScheduleEventService
 
+  private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
+
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
     private val TODAY = LocalDate.now()
     private val NOW = Instant.now()
+  }
+
+  @BeforeEach
+  fun setupService() {
+    reviewScheduleService = ReviewScheduleService(
+      reviewSchedulePersistenceAdapter = reviewSchedulePersistenceAdapter,
+      reviewScheduleEventService = reviewScheduleEventService,
+      reviewScheduleDateCalculationService = reviewScheduleDateCalculationService,
+    )
   }
 
   @Nested

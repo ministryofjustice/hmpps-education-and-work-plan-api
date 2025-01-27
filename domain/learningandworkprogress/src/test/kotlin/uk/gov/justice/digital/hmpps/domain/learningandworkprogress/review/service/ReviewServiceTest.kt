@@ -30,6 +30,9 @@ class ReviewServiceTest {
   @Mock
   private lateinit var reviewScheduleService: ReviewScheduleService
 
+  @Mock
+  private lateinit var reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService
+
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
   }

@@ -65,23 +65,22 @@ data class ReviewScheduleWindow(
   val dateTo: LocalDate,
 ) {
   companion object {
-    fun fromTodayToTenDays(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(this, plusDays(10))
-    }
-    fun fromOneToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(1), plusMonths(3))
-    }
-    fun fromOneMonthToSpecificDate(dateTo: LocalDate): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(1), dateTo)
-    }
-    fun fromTwoToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(2), plusMonths(3))
-    }
-    fun fromFourToSixMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(4), plusMonths(6))
-    }
-    fun fromTenToTwelveMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(10), plusMonths(12))
-    }
+    fun fromTodayToTenDays(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate, baseDate.plusDays(10))
+
+    fun fromOneToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(1), baseDate.plusMonths(3))
+
+    fun fromOneMonthToSpecificDate(baseDate: LocalDate, dateTo: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(1), dateTo)
+
+    fun fromTwoToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(2), baseDate.plusMonths(3))
+
+    fun fromFourToSixMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(4), baseDate.plusMonths(6))
+
+    fun fromTenToTwelveMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(10), baseDate.plusMonths(12))
   }
 }

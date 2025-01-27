@@ -2,13 +2,13 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -30,7 +30,6 @@ import java.util.stream.Stream
 
 @ExtendWith(MockitoExtension::class)
 class ReviewScheduleServiceCreateInitialReviewScheduleTest {
-  @InjectMocks
   private lateinit var service: ReviewScheduleService
 
   @Mock
@@ -38,6 +37,17 @@ class ReviewScheduleServiceCreateInitialReviewScheduleTest {
 
   @Mock
   private lateinit var reviewEventService: ReviewScheduleEventService
+
+  private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
+
+  @BeforeEach
+  fun setupService() {
+    service = ReviewScheduleService(
+      reviewSchedulePersistenceAdapter = reviewSchedulePersistenceAdapter,
+      reviewScheduleEventService = reviewEventService,
+      reviewScheduleDateCalculationService = reviewScheduleDateCalculationService,
+    )
+  }
 
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("prisonersInitialReview_testCases")
