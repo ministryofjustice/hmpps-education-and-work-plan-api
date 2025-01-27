@@ -242,8 +242,9 @@ class InductionScheduleServiceTest {
         exemptionReason = null,
         newDeadlineDate = expectedDueDate,
         oldDeadlineDate = originalDueDate,
-        updatedAt = inductionSchedule.lastUpdatedAt!!,
-        updatedBy = inductionSchedule.lastUpdatedBy!!,
+        updatedAt = inductionSchedule.lastUpdatedAt,
+        updatedBy = inductionSchedule.lastUpdatedBy,
+        updatedAtPrison = inductionSchedule.lastUpdatedAtPrison,
       )
 
       // When

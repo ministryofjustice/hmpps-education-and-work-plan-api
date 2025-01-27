@@ -252,6 +252,7 @@ class InductionScheduleService(
       UpdatedInductionScheduleStatus(
         reference = updatedInductionSchedule.reference,
         prisonNumber = updatedInductionSchedule.prisonNumber,
+        updatedAtPrison = updatedInductionSchedule.lastUpdatedAtPrison,
         oldStatus = oldStatus,
         newStatus = updatedInductionSchedule.scheduleStatus,
         exemptionReason = updatedInductionSchedule.exemptionReason,
