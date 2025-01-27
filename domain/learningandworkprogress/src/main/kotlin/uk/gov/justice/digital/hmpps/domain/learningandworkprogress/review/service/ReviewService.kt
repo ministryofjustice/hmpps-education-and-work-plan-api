@@ -27,9 +27,8 @@ class ReviewService(
   private val reviewPersistenceAdapter: ReviewPersistenceAdapter,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   private val reviewScheduleService: ReviewScheduleService,
+  private val reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
 ) {
-
-  private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
 
   /**
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is

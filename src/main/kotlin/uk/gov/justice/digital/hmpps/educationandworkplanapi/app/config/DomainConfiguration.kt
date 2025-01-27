@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationEventService
@@ -18,6 +19,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleDateCalculationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
@@ -33,6 +35,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineServic
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
+import java.time.LocalDate
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -88,7 +91,11 @@ class DomainConfiguration {
     inductionScheduleEventService: InductionScheduleEventService,
     inductionScheduleDateCalculationService: InductionScheduleDateCalculationService,
   ): InductionScheduleService =
-    InductionScheduleService(inductionSchedulePersistenceAdapter, inductionScheduleEventService, inductionScheduleDateCalculationService)
+    InductionScheduleService(
+      inductionSchedulePersistenceAdapter,
+      inductionScheduleEventService,
+      inductionScheduleDateCalculationService,
+    )
 
   @Bean
   fun conversationDomainService(
@@ -110,13 +117,30 @@ class DomainConfiguration {
     reviewPersistenceAdapter: ReviewPersistenceAdapter,
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
     reviewScheduleService: ReviewScheduleService,
+    reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
   ): ReviewService =
-    ReviewService(reviewEventService, reviewPersistenceAdapter, reviewSchedulePersistenceAdapter, reviewScheduleService)
+    ReviewService(
+      reviewEventService,
+      reviewPersistenceAdapter,
+      reviewSchedulePersistenceAdapter,
+      reviewScheduleService,
+      reviewScheduleDateCalculationService,
+    )
 
   @Bean
   fun reviewScheduleDomainService(
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
     reviewScheduleEventService: ReviewScheduleEventService,
+    reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
   ): ReviewScheduleService =
-    ReviewScheduleService(reviewSchedulePersistenceAdapter, reviewScheduleEventService)
+    ReviewScheduleService(
+      reviewSchedulePersistenceAdapter,
+      reviewScheduleEventService,
+      reviewScheduleDateCalculationService,
+    )
+
+  @Bean
+  fun reviewScheduleDateCalculationService(
+    @Value("\${EDUCATION_CONTRACTS_START_DATE:}") scheduleDateNotBefore: LocalDate? = null,
+  ) = ReviewScheduleDateCalculationService(scheduleDateNotBefore)
 }
