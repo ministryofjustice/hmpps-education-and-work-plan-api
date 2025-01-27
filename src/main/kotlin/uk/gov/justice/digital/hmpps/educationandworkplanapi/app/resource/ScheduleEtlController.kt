@@ -93,6 +93,8 @@ class ScheduleEtlController(
       totalPrisonersWithInductionSchedule = totalPrisonersWithInductionSchedule,
       totalPrisonersWithInduction = prisonersWithInductions.size,
       totalPrisonersWithActionPlan = totalPrisonersWithActionPlan,
+      eligibleInductionSchedulePrisoners = eligibleInductionSchedulePrisoners.size,
+      eligibleReviewSchedulePrisoners = eligibleReviewSchedulePrisoners.size,
       prisonersWithCreatedReviewSchedules = createdReviewSchedules,
       prisonersWithoutReviewSchedules = failedReviewSchedules,
       prisonersWithCreatedInductionSchedule = createdInductionSchedules,
@@ -245,6 +247,8 @@ data class SchedulesEtlResponse(
   val prisonersWithoutReviewSchedules: List<String>,
   val prisonersWithCreatedInductionSchedule: List<String>,
   val prisonersWithoutInductionSchedule: List<String>,
+  val eligibleInductionSchedulePrisoners: Int,
+  val eligibleReviewSchedulePrisoners: Int,
 ) {
   val summary: String
     get() =
@@ -264,10 +268,15 @@ data class SchedulesEtlResponse(
           Prisoners requiring Schedules
           -------------------------------------
           Total of $totalPrisonersInPrison prisoners in $prisonId.
-          Of those, $totalPrisonersWithInductionSchedule already have an Induction Schedule, leaving ${totalPrisonersInPrison - totalPrisonersWithInductionSchedule} candidate prisoners.
+          Of those, $totalPrisonersWithInductionSchedule already have an Induction Schedule, 
+          leaving ${totalPrisonersInPrison - totalPrisonersWithInductionSchedule} candidates for induction schedules.
+          Of those, $totalPrisonersWithInduction have an Induction, 
+          leaving $eligibleInductionSchedulePrisoners eligible for induction schedule creation.
+          
+          Total of $totalPrisonersInPrison prisoners in $prisonId.
           Of those, $totalPrisonersWithReviewSchedule already have a Review Schedule, leaving ${totalPrisonersInPrison - totalPrisonersWithReviewSchedule} candidate prisoners.
           Of those, $totalPrisonersWithInduction have an Induction, and $totalPrisonersWithActionPlan have an Induction and an Action Plan.
-          The $totalPrisonersWithActionPlan prisoners with both an Induction and an Action Plan are the candidate prisoners.
+          leaving $eligibleReviewSchedulePrisoners eligible for review schedule creation.
           
           Created Review Schedules
           ------------------------          
