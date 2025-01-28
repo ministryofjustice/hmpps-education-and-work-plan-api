@@ -7,8 +7,8 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementEvents
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonMovementType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.AuthAwareTokenConverter.Companion.SYSTEM_USER
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerApiTimelineService.Companion.SYSTEM_USER
 import java.util.UUID
 
 @Component

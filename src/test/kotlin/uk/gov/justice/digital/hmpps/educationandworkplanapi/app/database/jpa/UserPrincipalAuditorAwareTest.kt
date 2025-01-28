@@ -6,16 +6,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import java.security.Principal
 import java.util.Optional
 
 class UserPrincipalAuditorAwareTest {
 
   companion object {
-    private const val USERNAME = "auser_gen"
     private val ROLES = emptyList<GrantedAuthority>()
 
-    private val PRINCIPAL = Principal { USERNAME }
+    private val PRINCIPAL = "auser_gen"
     private val AUTHENTICATION = TestingAuthenticationToken(PRINCIPAL, null, ROLES)
   }
 
