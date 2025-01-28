@@ -117,7 +117,6 @@ class GetConversationTest : IntegrationTestBase() {
           CONVERSATIONS_RO,
           privateKey = keyPair.private,
           username = createUsername,
-          displayName = createDisplayName,
         ),
       )
       .contentType(MediaType.APPLICATION_JSON)
