@@ -16,10 +16,6 @@ class PrisonerApiTimelineService(
   private val prisonMovementEventsMapper: PrisonMovementEventsMapper,
 ) : PrisonTimelineService {
 
-  companion object {
-    const val SYSTEM_USER = "system"
-  }
-
   override fun getPrisonTimelineEvents(prisonNumber: String): List<TimelineEvent> {
     return try {
       val prisonMovementEvents = prisonApiClient.getPrisonMovementEvents(prisonNumber)
