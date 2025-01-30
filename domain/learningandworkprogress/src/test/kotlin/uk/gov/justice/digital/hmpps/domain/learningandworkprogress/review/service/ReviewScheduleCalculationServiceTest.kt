@@ -114,6 +114,7 @@ class ReviewScheduleCalculationServiceTest {
         "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
       ],
     )
     fun `should calculate adjusted review due date given an exemption status that is classed as an exemption and the review due date is earlier than the calculated date`(

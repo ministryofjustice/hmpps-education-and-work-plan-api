@@ -76,6 +76,13 @@ class ReviewScheduleStatusTransitionValidatorTest {
       ),
       TransitionTestCase(
         prisonNumber = PRISON_NUMBER,
+        currentStatus = ReviewScheduleStatus.EXEMPT_PRISONER_MERGE,
+        newStatus = COMPLETED,
+        reason = "Cannot transition to restricted statuses using this route.",
+        isValid = false,
+      ),
+      TransitionTestCase(
+        prisonNumber = PRISON_NUMBER,
         currentStatus = SCHEDULED,
         newStatus = EXEMPT_PRISON_STAFF_REDEPLOYMENT,
         isValid = true,
