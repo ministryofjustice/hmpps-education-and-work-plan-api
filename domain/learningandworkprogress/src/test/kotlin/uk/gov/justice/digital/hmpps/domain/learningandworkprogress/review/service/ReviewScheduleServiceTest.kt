@@ -10,18 +10,27 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.given
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewScheduleHistory
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import java.time.Instant
 import java.time.LocalDate
@@ -39,7 +48,8 @@ class ReviewScheduleServiceTest {
   @Mock
   private lateinit var reviewScheduleEventService: ReviewScheduleEventService
 
-  private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
+  @Mock
+  private lateinit var reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService
 
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
@@ -300,12 +310,17 @@ class ReviewScheduleServiceTest {
       )
 
       val expectedNewReviewScheduleDeadlineDate = TODAY.plusDays(5)
+      given(reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(any()))
+        .willReturn(expectedNewReviewScheduleDeadlineDate)
 
       val secondUpdatedReviewSchedule = firstUpdatedReviewSchedule.copy(
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
         reviewScheduleWindow = firstUpdatedReviewSchedule.reviewScheduleWindow.copy(dateTo = expectedNewReviewScheduleDeadlineDate),
       )
-      given(reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(any())).willReturn(firstUpdatedReviewSchedule, secondUpdatedReviewSchedule)
+      given(reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(any())).willReturn(
+        firstUpdatedReviewSchedule,
+        secondUpdatedReviewSchedule,
+      )
 
       // When
       reviewScheduleService.exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(prisonNumber, newPrisonId)
@@ -314,7 +329,10 @@ class ReviewScheduleServiceTest {
       verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(prisonNumber)
 
       val updateReviewScheduleStatusDtoCaptor = argumentCaptor<UpdateReviewScheduleStatusDto>()
-      verify(reviewSchedulePersistenceAdapter, times(2)).updateReviewScheduleStatus(updateReviewScheduleStatusDtoCaptor.capture())
+      verify(
+        reviewSchedulePersistenceAdapter,
+        times(2),
+      ).updateReviewScheduleStatus(updateReviewScheduleStatusDtoCaptor.capture())
       // First call to the persistence adapter should be to mark the Review Schedule as Exempt due to Prisoner Transfer
       var updateReviewScheduleStatusDto = updateReviewScheduleStatusDtoCaptor.firstValue
       assertThat(updateReviewScheduleStatusDto.reference).isEqualTo(activeReviewSchedule.reference)
@@ -330,7 +348,10 @@ class ReviewScheduleServiceTest {
       assertThat(updateReviewScheduleStatusDto.latestReviewDate).isEqualTo(expectedNewReviewScheduleDeadlineDate)
 
       val updateReviewScheduleStatusCaptor = argumentCaptor<UpdatedReviewScheduleStatus>()
-      verify(reviewScheduleEventService, times(2)).reviewScheduleStatusUpdated(updateReviewScheduleStatusCaptor.capture())
+      verify(
+        reviewScheduleEventService,
+        times(2),
+      ).reviewScheduleStatusUpdated(updateReviewScheduleStatusCaptor.capture())
       // First call to the event service should be because of the Exemption of the Review Schedule due to Prisoner Transfer
       var updateReviewScheduleStatus = updateReviewScheduleStatusCaptor.firstValue
       assertThat(updateReviewScheduleStatus.reference).isEqualTo(firstUpdatedReviewSchedule.reference)
@@ -346,6 +367,8 @@ class ReviewScheduleServiceTest {
       assertThat(updateReviewScheduleStatus.oldStatus).isEqualTo(ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
       assertThat(updateReviewScheduleStatus.newStatus).isEqualTo(ReviewScheduleStatus.SCHEDULED)
       assertThat(updateReviewScheduleStatus.newReviewDate).isEqualTo(expectedNewReviewScheduleDeadlineDate)
+
+      verify(reviewScheduleDateCalculationService).calculateAdjustedReviewDueDate(firstUpdatedReviewSchedule)
     }
 
     @Test
@@ -476,6 +499,193 @@ class ReviewScheduleServiceTest {
       assertThat(exception).hasMessage("Review Schedule not found for prisoner [$PRISON_NUMBER]")
       assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
       verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+    }
+  }
+
+  @Nested
+  inner class CreateInitialReviewSchedule {
+    @Test
+    fun `should create initial review schedule`() {
+      // Given
+      val releaseDate = TODAY.plusMonths(12)
+      val createInitialReviewScheduleDto = aValidCreateInitialReviewScheduleDto(
+        prisonNumber = PRISON_NUMBER,
+        prisonerReleaseDate = releaseDate,
+        prisonerSentenceType = SentenceType.SENTENCED,
+        prisonerHasIndeterminateFlag = false,
+        prisonerHasRecallFlag = false,
+        isReadmission = false,
+        isTransfer = false,
+      )
+
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
+
+      given(
+        reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
+          any(),
+          any(),
+          anyOrNull(),
+          any(),
+          any(),
+        ),
+      )
+        .willReturn(ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE)
+
+      val expectedReviewScheduleWindow = ReviewScheduleWindow.fromTwoToThreeMonths(TODAY)
+      given(reviewScheduleDateCalculationService.calculateReviewWindow(any(), any()))
+        .willReturn(expectedReviewScheduleWindow)
+
+      val expectedReviewSchedule = aValidReviewSchedule(
+        prisonNumber = PRISON_NUMBER,
+        earliestReviewDate = expectedReviewScheduleWindow.dateFrom,
+        latestReviewDate = expectedReviewScheduleWindow.dateTo,
+        scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
+      )
+      given(reviewSchedulePersistenceAdapter.createReviewSchedule(any())).willReturn(expectedReviewSchedule)
+
+      // When
+      val actual = reviewScheduleService.createInitialReviewSchedule(createInitialReviewScheduleDto)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewSchedule)
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+      verify(reviewScheduleDateCalculationService).determineReviewScheduleCalculationRule(
+        PRISON_NUMBER,
+        SentenceType.SENTENCED,
+        releaseDate,
+        false,
+        false,
+      )
+      verify(reviewScheduleDateCalculationService).calculateReviewWindow(
+        ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
+        releaseDate,
+      )
+
+      val createReviewScheduleCaptor = argumentCaptor<CreateReviewScheduleDto>()
+      verify(reviewSchedulePersistenceAdapter).createReviewSchedule(createReviewScheduleCaptor.capture())
+      with(createReviewScheduleCaptor.firstValue) {
+        assertThat(prisonNumber).isEqualTo(PRISON_NUMBER)
+        assertThat(scheduleCalculationRule).isEqualTo(ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE)
+        assertThat(reviewScheduleWindow).isEqualTo(expectedReviewScheduleWindow)
+      }
+
+      verify(reviewScheduleEventService).reviewScheduleCreated(expectedReviewSchedule)
+    }
+
+    @Test
+    fun `should not create initial review schedule given a ReviewScheduleWindow is not calculated based on the ReviewScheduleCalculationRule`() {
+      // Given
+      val releaseDate = TODAY.plusWeeks(1)
+      val createInitialReviewScheduleDto = aValidCreateInitialReviewScheduleDto(
+        prisonNumber = PRISON_NUMBER,
+        prisonerReleaseDate = releaseDate,
+        prisonerSentenceType = SentenceType.SENTENCED,
+        prisonerHasIndeterminateFlag = false,
+        prisonerHasRecallFlag = false,
+        isReadmission = false,
+        isTransfer = false,
+      )
+
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
+
+      given(
+        reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
+          any(),
+          any(),
+          anyOrNull(),
+          any(),
+          any(),
+        ),
+      )
+        .willReturn(ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE)
+
+      given(reviewScheduleDateCalculationService.calculateReviewWindow(any(), any())).willReturn(null)
+
+      // When
+      val actual = reviewScheduleService.createInitialReviewSchedule(createInitialReviewScheduleDto)
+
+      // Then
+      assertThat(actual).isNull()
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+      verify(reviewScheduleDateCalculationService).determineReviewScheduleCalculationRule(
+        PRISON_NUMBER,
+        SentenceType.SENTENCED,
+        releaseDate,
+        false,
+        false,
+      )
+      verify(reviewScheduleDateCalculationService).calculateReviewWindow(
+        ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE,
+        releaseDate,
+      )
+      verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
+      verifyNoInteractions(reviewScheduleEventService)
+    }
+
+    @Test
+    fun `should not create initial review schedule given prisoner already has an active review schedule`() {
+      // Given
+      val createInitialReviewScheduleDto = aValidCreateInitialReviewScheduleDto(
+        prisonNumber = PRISON_NUMBER,
+        prisonerReleaseDate = TODAY.plusYears(1),
+        prisonerSentenceType = SentenceType.SENTENCED,
+      )
+
+      val reviewSchedule = aValidReviewSchedule(prisonNumber = PRISON_NUMBER)
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(reviewSchedule)
+
+      // When
+      val exception = catchThrowableOfType(ActiveReviewScheduleAlreadyExistsException::class.java) {
+        reviewScheduleService.createInitialReviewSchedule(createInitialReviewScheduleDto)
+      }
+
+      // Then
+      assertThat(exception.prisonNumber).isEqualTo(PRISON_NUMBER)
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(PRISON_NUMBER)
+      verifyNoMoreInteractions(reviewSchedulePersistenceAdapter)
+      verifyNoInteractions(reviewScheduleEventService)
+    }
+
+    @Test
+    fun `should not create initial review given reviewScheduleDateCalculationService throws ReviewScheduleNoReleaseDateForSentenceTypeException`() {
+      // Given
+      val createInitialReviewScheduleDto = aValidCreateInitialReviewScheduleDto(
+        prisonNumber = PRISON_NUMBER,
+        prisonerReleaseDate = null,
+        prisonerSentenceType = SentenceType.SENTENCED,
+        prisonerHasIndeterminateFlag = false,
+        prisonerHasRecallFlag = false,
+      )
+
+      given(
+        reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
+          any(),
+          any(),
+          anyOrNull(),
+          any(),
+          any(),
+        ),
+      )
+        .willThrow(ReviewScheduleNoReleaseDateForSentenceTypeException(PRISON_NUMBER, SentenceType.SENTENCED))
+
+      // When
+      val exception = catchThrowableOfType(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java) {
+        reviewScheduleService.createInitialReviewSchedule(createInitialReviewScheduleDto)
+      }
+
+      // Then
+      assertThat(exception)
+        .isInstanceOf(ReviewScheduleNoReleaseDateForSentenceTypeException::class.java)
+        .extracting("prisonNumber", "sentenceType")
+        .containsExactly(PRISON_NUMBER, SentenceType.SENTENCED)
+      verifyNoInteractions(reviewScheduleEventService)
+      verify(reviewScheduleDateCalculationService).determineReviewScheduleCalculationRule(
+        PRISON_NUMBER,
+        SentenceType.SENTENCED,
+        null,
+        false,
+        false,
+      )
     }
   }
 }
