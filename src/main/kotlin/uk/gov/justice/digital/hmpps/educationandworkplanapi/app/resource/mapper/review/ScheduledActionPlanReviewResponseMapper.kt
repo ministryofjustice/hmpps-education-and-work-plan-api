@@ -53,6 +53,7 @@ class ScheduledActionPlanReviewResponseMapper(
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatusApi.EXEMPT_PRISONER_TRANSFER
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatusApi.EXEMPT_PRISONER_RELEASE
       ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusApi.EXEMPT_PRISONER_DEATH
+      ReviewScheduleStatusDomain.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatusApi.EXEMPT_PRISONER_MERGE
       ReviewScheduleStatusDomain.EXEMPT_UNKNOWN -> ReviewScheduleStatusApi.EXEMPT_UNKNOWN
     }
 

@@ -96,6 +96,7 @@ class InductionScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
         "EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS",
         "EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE",
       ],
@@ -128,6 +129,7 @@ class InductionScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
       ],
     )
     fun `should calculate adjusted induction due date given an exemption status that is classed as an exemption and the induction due date is earlier than the calculated date`(
