@@ -75,4 +75,19 @@ sealed class AdditionalInformation {
       NOT_UNDER_PRISON_CARE,
     }
   }
+
+  /**
+   * Additional Information for Prisoner Merged (prison-offender-events.prisoner.merged) HMPPS Domain Event
+   */
+  data class PrisonerMergedAdditionalInformation(
+    val nomsNumber: String,
+    val reason: Reason,
+    val removedNomsNumber: String,
+
+  ) : AdditionalInformation() {
+
+    enum class Reason {
+      MERGE,
+    }
+  }
 }

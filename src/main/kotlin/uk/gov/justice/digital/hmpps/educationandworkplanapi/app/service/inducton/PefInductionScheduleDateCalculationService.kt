@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducton
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -18,7 +19,9 @@ import java.time.LocalDate
 @Service
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
-class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
+class PefInductionScheduleDateCalculationService(
+  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val scheduleDateNotBefore: LocalDate? = null,
+) : InductionScheduleDateCalculationService(scheduleDateNotBefore) {
 
   companion object {
     private const val DAYS_AFTER_ADMISSION = 20L
@@ -30,12 +33,35 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
    * Under the PEF contract the prisoner's Induction is immediately scheduled with a deadline date of the prisoner's admission date
    * plus 20 days.
    */
-  override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String): CreateInductionScheduleDto =
-    CreateInductionScheduleDto(
-      prisonNumber = prisonNumber,
-      deadlineDate = admissionDate.plusDays(DAYS_AFTER_ADMISSION),
-      scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
-      scheduleStatus = InductionScheduleStatus.SCHEDULED,
-      prisonId = prisonId,
-    )
+  override fun determineCreateInductionScheduleDto(
+    prisonNumber: String,
+    admissionDate: LocalDate,
+    prisonId: String,
+    newAdmission: Boolean,
+  ): CreateInductionScheduleDto {
+    return if (newAdmission) {
+      CreateInductionScheduleDto(
+        prisonNumber = prisonNumber,
+        deadlineDate = latestOf(admissionDate, scheduleDateNotBefore).plusDays(DAYS_AFTER_ADMISSION),
+        scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
+      )
+    } else {
+      CreateInductionScheduleDto(
+        prisonNumber = prisonNumber,
+        deadlineDate = baseScheduleDate().plusMonths(6),
+        scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
+        scheduleStatus = InductionScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
+      )
+    }
+  }
+
+  private fun latestOf(admissionDate: LocalDate, scheduleDateNotBefore: LocalDate?): LocalDate =
+    if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(admissionDate)) {
+      scheduleDateNotBefore
+    } else {
+      admissionDate
+    }
 }

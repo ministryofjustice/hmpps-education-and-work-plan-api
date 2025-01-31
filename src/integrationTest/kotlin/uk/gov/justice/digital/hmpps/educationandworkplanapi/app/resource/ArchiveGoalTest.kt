@@ -295,7 +295,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
       aValidTokenWithAuthority(
         GOALS_RW,
         username = "buser_gen",
-        displayName = "Bernie User",
         privateKey = keyPair.private,
       ),
     )

@@ -99,7 +99,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -145,7 +145,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -191,7 +191,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 

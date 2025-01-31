@@ -156,7 +156,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val updateDisplayName = "Bernie User"
     createInduction(
       username = createUsername,
-      displayName = createDisplayName,
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
     )
@@ -255,7 +254,6 @@ class UpdateInductionTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
           username = updateUsername,
-          displayName = updateDisplayName,
           privateKey = keyPair.private,
         ),
       )
@@ -319,7 +317,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val updateDisplayName = "Bernie User"
     createInduction(
       username = createUsername,
-      displayName = createDisplayName,
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(),
     )
@@ -404,7 +401,6 @@ class UpdateInductionTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
           username = updateUsername,
-          displayName = updateDisplayName,
           privateKey = keyPair.private,
         ),
       )

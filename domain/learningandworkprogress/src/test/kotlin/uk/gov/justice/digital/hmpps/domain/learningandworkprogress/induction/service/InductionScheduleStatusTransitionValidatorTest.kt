@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_DEATH
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_MERGE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
@@ -72,6 +73,20 @@ class InductionScheduleStatusTransitionValidatorTest {
       TransitionTestCase(
         prisonNumber = PRISON_NUMBER,
         currentStatus = EXEMPT_PRISONER_DEATH,
+        newStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+        reason = "Cannot transition to restricted statuses using this route.",
+        isValid = false,
+      ),
+      TransitionTestCase(
+        prisonNumber = PRISON_NUMBER,
+        currentStatus = EXEMPT_PRISONER_MERGE,
+        newStatus = COMPLETED,
+        reason = "Cannot transition to restricted statuses using this route.",
+        isValid = false,
+      ),
+      TransitionTestCase(
+        prisonNumber = PRISON_NUMBER,
+        currentStatus = EXEMPT_PRISONER_MERGE,
         newStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
         reason = "Cannot transition to restricted statuses using this route.",
         isValid = false,

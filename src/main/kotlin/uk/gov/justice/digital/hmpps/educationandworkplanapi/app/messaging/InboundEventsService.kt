@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RELEASED_FROM_PRISON
 
@@ -34,6 +35,9 @@ class InboundEventsService(
         PRISONER_RELEASED_FROM_PRISON -> {
           val additionalInformation = eventAdditionalInformation<PrisonerReleasedAdditionalInformation>(inboundEvent)
           prisonerReleasedFromPrisonEventService.process(inboundEvent, additionalInformation)
+        }
+        PRISONER_MERGED -> {
+          // TODO process prisoner merged message
         }
       }
     }

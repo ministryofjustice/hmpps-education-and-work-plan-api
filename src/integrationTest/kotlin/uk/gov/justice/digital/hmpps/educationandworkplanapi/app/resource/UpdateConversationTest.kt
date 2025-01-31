@@ -154,17 +154,14 @@ class UpdateConversationTest : IntegrationTestBase() {
     )
 
     val creatorUsername = "auser_gen"
-    val creatorName = "Albert User"
 
     val editorUsername = "bruser_gen"
-    val editorName = "Bernie User"
 
     // When
     createConversation(
       prisonNumber,
       createReviewConversationRequest,
       creatorUsername,
-      creatorName,
     )
 
     val createdConversation = conversationRepository.findAllByPrisonNumber(prisonNumber).first()
@@ -176,7 +173,6 @@ class UpdateConversationTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           CONVERSATIONS_RW,
           username = editorUsername,
-          displayName = editorName,
           privateKey = keyPair.private,
         ),
       )

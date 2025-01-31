@@ -348,7 +348,6 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     createInductionRequest: CreateInductionRequest,
     username: String = "auser_gen",
-    displayName: String = "Albert User",
   ) {
     webTestClient.post()
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
@@ -358,7 +357,6 @@ abstract class IntegrationTestBase {
           INDUCTIONS_RW,
           privateKey = keyPair.private,
           username = username,
-          displayName = displayName,
         ),
       )
       .contentType(APPLICATION_JSON)
@@ -381,7 +379,6 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     archiveGoalRequest: ArchiveGoalRequest,
     username: String = "auser_gen",
-    displayName: String = "Albert User",
   ) {
     webTestClient.put()
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/archive", prisonNumber, archiveGoalRequest.goalReference)
@@ -391,7 +388,6 @@ abstract class IntegrationTestBase {
           GOALS_RW,
           privateKey = keyPair.private,
           username = username,
-          displayName = displayName,
         ),
       )
       .contentType(APPLICATION_JSON)
@@ -404,7 +400,6 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     completeGoalRequest: CompleteGoalRequest,
     username: String = "auser_gen",
-    displayName: String = "Albert User",
   ) {
     webTestClient.put()
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/complete", prisonNumber, completeGoalRequest.goalReference)
@@ -414,7 +409,6 @@ abstract class IntegrationTestBase {
           GOALS_RW,
           privateKey = keyPair.private,
           username = username,
-          displayName = displayName,
         ),
       )
       .contentType(APPLICATION_JSON)
@@ -427,7 +421,6 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     createConversationRequest: CreateConversationRequest = aValidCreateConversationRequest(),
     username: String = "auser_gen",
-    displayName: String = "Albert User",
   ) {
     webTestClient.post()
       .uri("/conversations/{prisonNumber}", prisonNumber)
@@ -437,7 +430,6 @@ abstract class IntegrationTestBase {
           CONVERSATIONS_RW,
           privateKey = keyPair.private,
           username = username,
-          displayName = displayName,
         ),
       )
       .contentType(APPLICATION_JSON)
@@ -465,7 +457,6 @@ abstract class IntegrationTestBase {
     prisonNumber: String,
     createEducationRequest: CreateEducationRequest = aValidCreateEducationRequest(),
     username: String = "auser_gen",
-    displayName: String = "Albert User",
   ) {
     webTestClient.post()
       .uri(EDUCATION_URI_TEMPLATE, prisonNumber)

@@ -68,23 +68,13 @@ class InductionScheduleEntityMapper {
   fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleEntity): InductionScheduleCalculationRuleDomain =
     when (inductionScheduleCalculationRule) {
       InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION
-      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE
-      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE
-      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE
-      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_INDETERMINATE_SENTENCE -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_INDETERMINATE_SENTENCE
-      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_ON_REMAND -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_ON_REMAND
-      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_UN_SENTENCED -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_UN_SENTENCED
+      InductionScheduleCalculationRuleEntity.EXISTING_PRISONER -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER
     }
 
   fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleDomain): InductionScheduleCalculationRuleEntity =
     when (inductionScheduleCalculationRule) {
       InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION
-      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE
-      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE
-      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE
-      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_INDETERMINATE_SENTENCE -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_INDETERMINATE_SENTENCE
-      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_ON_REMAND -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_ON_REMAND
-      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER_UN_SENTENCED -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER_UN_SENTENCED
+      InductionScheduleCalculationRuleDomain.EXISTING_PRISONER -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER
     }
 
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusEntity): InductionScheduleStatusDomain =
@@ -104,6 +94,7 @@ class InductionScheduleEntityMapper {
       InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
       InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
       InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH
+      InductionScheduleStatusEntity.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_MERGE
       InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
       InductionScheduleStatusEntity.COMPLETED -> InductionScheduleStatusDomain.COMPLETED
@@ -126,6 +117,7 @@ class InductionScheduleEntityMapper {
       InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
       InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
       InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH
+      InductionScheduleStatusDomain.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_MERGE
       InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
       InductionScheduleStatusDomain.COMPLETED -> InductionScheduleStatusEntity.COMPLETED

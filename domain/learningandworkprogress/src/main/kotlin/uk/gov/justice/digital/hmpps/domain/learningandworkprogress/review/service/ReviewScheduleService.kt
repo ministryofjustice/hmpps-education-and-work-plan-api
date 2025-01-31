@@ -19,9 +19,8 @@ private val log = KotlinLogging.logger {}
 class ReviewScheduleService(
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   private val reviewScheduleEventService: ReviewScheduleEventService,
+  private val reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
 ) {
-
-  private val reviewScheduleDateCalculationService = ReviewScheduleDateCalculationService()
 
   private val reviewScheduleStatusTransitionValidator = ReviewScheduleStatusTransitionValidator()
 

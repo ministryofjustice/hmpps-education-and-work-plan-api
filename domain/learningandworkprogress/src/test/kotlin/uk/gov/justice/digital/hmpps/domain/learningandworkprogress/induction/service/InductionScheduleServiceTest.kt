@@ -153,7 +153,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
 
       val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any())).willReturn(createInductionScheduleDto)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any())).willReturn(createInductionScheduleDto)
 
       val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
       given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
@@ -164,7 +164,7 @@ class InductionScheduleServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId, true)
       verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
       verify(inductionScheduleEventService).inductionScheduleCreated(actual)
     }
@@ -213,7 +213,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
 
       val expectedDueDate = prisonerAdmissionDate.plusDays(20)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any())).willReturn(
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any())).willReturn(
         aValidCreateInductionScheduleDto(
           prisonNumber = prisonNumber,
           deadlineDate = expectedDueDate,
@@ -242,8 +242,9 @@ class InductionScheduleServiceTest {
         exemptionReason = null,
         newDeadlineDate = expectedDueDate,
         oldDeadlineDate = originalDueDate,
-        updatedAt = inductionSchedule.lastUpdatedAt!!,
-        updatedBy = inductionSchedule.lastUpdatedBy!!,
+        updatedAt = inductionSchedule.lastUpdatedAt,
+        updatedBy = inductionSchedule.lastUpdatedBy,
+        updatedAtPrison = inductionSchedule.lastUpdatedAtPrison,
       )
 
       // When
@@ -252,7 +253,7 @@ class InductionScheduleServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate, PRISON_ID)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate, PRISON_ID, true)
       verify(inductionSchedulePersistenceAdapter).updateInductionScheduleStatus(expectedUpdateInductionScheduleStatusDto)
       verify(inductionScheduleEventService).inductionScheduleStatusUpdated(expectedUpdatedInductionScheduleStatus)
     }

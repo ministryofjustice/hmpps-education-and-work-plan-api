@@ -57,9 +57,10 @@ class JpaInductionSchedulePersistenceAdapter(
     )
 
     // Save the updated schedule and return the mapped domain object.
-    val inductionSchedule = inductionScheduleRepository.saveAndFlush(updatedSchedule)
-    saveInductionScheduleHistory(inductionSchedule)
-    return inductionScheduleEntityMapper.fromEntityToDomain(inductionSchedule)
+    return inductionScheduleRepository.saveAndFlush(updatedSchedule).let {
+      saveInductionScheduleHistory(it)
+      inductionScheduleEntityMapper.fromEntityToDomain(it)
+    }
   }
 
   override fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory> {
@@ -79,9 +80,10 @@ class JpaInductionSchedulePersistenceAdapter(
       updatedAtPrison = updateInductionScheduleStatusDto.updatedAtPrison
     }
 
-    val savedReviewScheduleEntity = inductionScheduleRepository.save(inductionScheduleEntity)
-    saveInductionScheduleHistory(savedReviewScheduleEntity)
-    return inductionScheduleEntityMapper.fromEntityToDomain(savedReviewScheduleEntity)
+    return inductionScheduleRepository.saveAndFlush(inductionScheduleEntity).let {
+      saveInductionScheduleHistory(it)
+      inductionScheduleEntityMapper.fromEntityToDomain(it)
+    }
   }
 
   private fun saveInductionScheduleHistory(inductionScheduleEntity: InductionScheduleEntity) {
@@ -91,12 +93,12 @@ class JpaInductionSchedulePersistenceAdapter(
           ?.plus(1) ?: 1,
         reference = reference,
         prisonNumber = prisonNumber,
-        updatedAt = updatedAt,
+        updatedAt = updatedAt!!,
         updatedAtPrison = updatedAtPrison,
-        createdAt = createdAt,
+        createdAt = createdAt!!,
         createdAtPrison = createdAtPrison,
-        updatedBy = updatedBy,
-        createdBy = createdBy,
+        updatedBy = updatedBy!!,
+        createdBy = createdBy!!,
         scheduleStatus = scheduleStatus,
         exemptionReason = exemptionReason,
         scheduleCalculationRule = scheduleCalculationRule,
