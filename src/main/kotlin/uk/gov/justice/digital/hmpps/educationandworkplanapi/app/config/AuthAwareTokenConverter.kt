@@ -12,7 +12,7 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
   private val jwtGrantedAuthoritiesConverter: Converter<Jwt, Collection<GrantedAuthority>> = JwtGrantedAuthoritiesConverter()
 
   companion object {
-    const val SYSTEM: String = "system"
+    const val SYSTEM_USER: String = "system"
   }
 
   override fun convert(jwt: Jwt): AbstractAuthenticationToken {
@@ -28,7 +28,7 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
     return if (claims.containsKey("user_name")) {
       claims["user_name"] as String
     } else {
-      SYSTEM
+      SYSTEM_USER
     }
   }
 

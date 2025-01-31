@@ -289,7 +289,6 @@ class UnarchiveGoalTest : IntegrationTestBase() {
       aValidTokenWithAuthority(
         GOALS_RW,
         username = "buser_gen",
-        displayName = "Bernie User",
         privateKey = keyPair.private,
       ),
     )
@@ -307,7 +306,6 @@ class UnarchiveGoalTest : IntegrationTestBase() {
       aValidTokenWithAuthority(
         GOALS_RW,
         username = "buser_gen",
-        displayName = "Bernie User",
         privateKey = keyPair.private,
       ),
     )

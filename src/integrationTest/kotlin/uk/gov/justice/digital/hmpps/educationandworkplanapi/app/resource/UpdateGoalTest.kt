@@ -251,7 +251,6 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           GOALS_RW,
           username = "buser_gen",
-          displayName = "Bernie User",
           privateKey = keyPair.private,
         ),
       )
@@ -374,7 +373,6 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           GOALS_RW,
           username = "buser_gen",
-          displayName = "Bernie User",
           privateKey = keyPair.private,
         ),
       )
@@ -408,7 +406,7 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(5) { // the 5th Timeline event will be the GOAL_UPDATED event
+        .anyOfEventNumber(5, 6) { // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -495,7 +493,6 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           GOALS_RW,
           username = "buser_gen",
-          displayName = "Bernie User",
           privateKey = keyPair.private,
         ),
       )
@@ -538,7 +535,11 @@ class UpdateGoalTest : IntegrationTestBase() {
           .hasActionedByDisplayName("Bernie User")
       }
 
-    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[0].goalReference, EntityType.GOAL, NoteType.GOAL)
+    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+      actual.goals[0].goalReference,
+      EntityType.GOAL,
+      NoteType.GOAL,
+    )
     assertThat(notes.size).isGreaterThan(0)
     assertThat(notes[0].content).isEqualTo("Updated goal text")
 

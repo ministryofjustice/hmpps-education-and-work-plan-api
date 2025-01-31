@@ -103,6 +103,7 @@ class InductionScheduleController(
       InductionScheduleStatusModel.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER
       InductionScheduleStatusModel.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
       InductionScheduleStatusModel.EXEMPT_PRISONER_DEATH -> InductionScheduleStatus.EXEMPT_PRISONER_DEATH
+      InductionScheduleStatusModel.EXEMPT_PRISONER_MERGE -> InductionScheduleStatus.EXEMPT_PRISONER_MERGE
       InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
       InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
       InductionScheduleStatusModel.COMPLETED -> InductionScheduleStatus.COMPLETED

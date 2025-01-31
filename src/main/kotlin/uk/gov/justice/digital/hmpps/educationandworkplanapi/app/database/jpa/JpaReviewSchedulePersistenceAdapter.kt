@@ -34,11 +34,13 @@ class JpaReviewSchedulePersistenceAdapter(
       if (getActiveReviewSchedule(prisonNumber) != null) {
         throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
       }
-      val persistedEntity = reviewScheduleRepository.saveAndFlush(
+
+      reviewScheduleRepository.saveAndFlush(
         reviewScheduleEntityMapper.fromDomainToEntity(this),
-      )
-      saveReviewScheduleHistory(persistedEntity)
-      reviewScheduleEntityMapper.fromEntityToDomain(persistedEntity)
+      ).let {
+        saveReviewScheduleHistory(it)
+        reviewScheduleEntityMapper.fromEntityToDomain(it)
+      }
     }
 
   @Transactional
@@ -47,9 +49,10 @@ class JpaReviewSchedulePersistenceAdapter(
 
     return reviewScheduleEntity?.let {
       reviewScheduleEntityMapper.updateExistingEntityFromDto(it, updateReviewScheduleDto)
-      val saved = reviewScheduleRepository.saveAndFlush(it)
-      saveReviewScheduleHistory(saved)
-      reviewScheduleEntityMapper.fromEntityToDomain(saved)
+      reviewScheduleRepository.saveAndFlush(it).let { saved ->
+        saveReviewScheduleHistory(saved)
+        reviewScheduleEntityMapper.fromEntityToDomain(saved)
+      }
     }
   }
 
@@ -80,9 +83,10 @@ class JpaReviewSchedulePersistenceAdapter(
       updatedAtPrison = updateReviewScheduleStatusDto.prisonId
     }
 
-    val savedReviewScheduleEntity = reviewScheduleRepository.save(reviewScheduleEntity)
-    saveReviewScheduleHistory(savedReviewScheduleEntity)
-    return reviewScheduleEntityMapper.fromEntityToDomain(savedReviewScheduleEntity)
+    return reviewScheduleRepository.saveAndFlush(reviewScheduleEntity).let {
+      saveReviewScheduleHistory(it)
+      reviewScheduleEntityMapper.fromEntityToDomain(it)
+    }
   }
 
   private fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
@@ -94,10 +98,10 @@ class JpaReviewSchedulePersistenceAdapter(
         prisonNumber = prisonNumber,
         createdAtPrison = createdAtPrison,
         updatedAtPrison = updatedAtPrison,
-        updatedAt = updatedAt,
-        createdAt = createdAt,
-        updatedBy = updatedBy,
-        createdBy = createdBy,
+        updatedAt = updatedAt!!,
+        createdAt = createdAt!!,
+        updatedBy = updatedBy!!,
+        createdBy = createdBy!!,
         scheduleStatus = scheduleStatus,
         exemptionReason = exemptionReason,
         earliestReviewDate = earliestReviewDate,

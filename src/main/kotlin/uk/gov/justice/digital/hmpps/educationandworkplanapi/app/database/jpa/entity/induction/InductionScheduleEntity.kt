@@ -65,11 +65,11 @@ data class InductionScheduleEntity(
   @CreationTimestamp
   var createdAt: Instant? = null
 
-  @Column(updatable = false)
+  @Column
   @LastModifiedBy
   var updatedBy: String? = null
 
-  @Column(updatable = false)
+  @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null
 
@@ -105,6 +105,7 @@ enum class InductionScheduleStatus(val active: Boolean) {
   EXEMPT_PRISONER_TRANSFER(true),
   EXEMPT_PRISONER_RELEASE(false),
   EXEMPT_PRISONER_DEATH(false),
+  EXEMPT_PRISONER_MERGE(false),
   EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE(true),
   EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(true),
   COMPLETED(false),

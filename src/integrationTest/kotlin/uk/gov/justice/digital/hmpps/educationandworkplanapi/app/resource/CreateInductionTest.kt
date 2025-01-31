@@ -144,7 +144,6 @@ class CreateInductionTest : IntegrationTestBase() {
     val prisonNumber = anotherValidPrisonNumber()
     val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
     val dpsUsername = "auser_gen"
-    val displayName = "Albert User"
 
     // When
     webTestClient.post()
@@ -154,7 +153,6 @@ class CreateInductionTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
           username = dpsUsername,
-          displayName = displayName,
           privateKey = keyPair.private,
         ),
       )
@@ -192,7 +190,6 @@ class CreateInductionTest : IntegrationTestBase() {
     val prisonNumber = aValidPrisonNumber()
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork()
     val dpsUsername = "auser_gen"
-    val displayName = "Albert User"
 
     // When
     webTestClient.post()
@@ -202,7 +199,6 @@ class CreateInductionTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
           username = dpsUsername,
-          displayName = displayName,
           privateKey = keyPair.private,
         ),
       )

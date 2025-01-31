@@ -31,7 +31,9 @@ private val log = KotlinLogging.logger {}
  * This class is deliberately final so that it cannot be subclassed, ensuring that the business rules stay within the
  * domain.
  */
-class ReviewScheduleDateCalculationService {
+class ReviewScheduleDateCalculationService(
+  private val scheduleDateNotBefore: LocalDate? = null,
+) {
   companion object {
     private val SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE = listOf(INDETERMINATE_SENTENCE, CONVICTED_UNSENTENCED, REMAND)
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
@@ -78,20 +80,20 @@ class ReviewScheduleDateCalculationService {
   ): ReviewScheduleWindow? =
     when (reviewScheduleCalculationRule) {
       BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
-      PRISONER_READMISSION, PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays()
+      PRISONER_READMISSION, PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays(baseScheduleDate())
       BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> {
         // If the prisoner has between 3 months and 3 months 7 days left to serve their Review Schedule Window would be between 1 and 3 months
         // as they would fall into the "between 3 and 6 months left to serve" rule. This would mean their deadline date would be within the last
         // week before release.
         // Prisoners and CIAGs need a clear 7 days between their final review deadline and release (their last week in prison is busy), so
         // we need to set the deadline date to be the prisoner's release date minus 7 days
-        ReviewScheduleWindow.fromOneMonthToSpecificDate(releaseDate!!.minusDays(7))
+        ReviewScheduleWindow.fromOneMonthToSpecificDate(baseScheduleDate(), releaseDate!!.minusDays(7))
       }
 
-      BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths()
-      BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths()
-      BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths()
-      MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths()
+      BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths(baseScheduleDate())
+      BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths(baseScheduleDate())
+      BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths(baseScheduleDate())
+      MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths(baseScheduleDate())
     }.also {
       when {
         it == null -> log.debug { "Returning no ReviewScheduleWindow because ReviewScheduleCalculationRule is $reviewScheduleCalculationRule" }
@@ -176,5 +178,17 @@ class ReviewScheduleDateCalculationService {
     fun isBetween6And12Months(): Boolean = months >= 6 && !isExactMonths(6) && (months < 12 || isExactMonths(12))
     fun isBetween12And60Months(): Boolean = months >= 12 && !isExactMonths(12) && (months < 60 || isExactMonths(60))
     fun isMoreThan60Months(): Boolean = months >= 60 && !isExactMonths(60)
+  }
+
+  /**
+   * Returns the base date from which all Induction Schedule dates are calculated
+   */
+  private fun baseScheduleDate(): LocalDate {
+    val today = LocalDate.now()
+    return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
+      scheduleDateNotBefore
+    } else {
+      today
+    }
   }
 }

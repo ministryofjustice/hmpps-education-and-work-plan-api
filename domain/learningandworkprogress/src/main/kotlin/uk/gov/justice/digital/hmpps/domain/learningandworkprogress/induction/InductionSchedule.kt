@@ -58,6 +58,7 @@ enum class InductionScheduleStatus(val isExclusion: Boolean = false, val isExemp
   EXEMPT_PRISONER_TRANSFER(isExemption = true),
   EXEMPT_PRISONER_RELEASE(isExemption = true),
   EXEMPT_PRISONER_DEATH(isExemption = true),
+  EXEMPT_PRISONER_MERGE(isExemption = true),
   EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(isExemption = true),
   EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE(isExemption = true),
   COMPLETED,

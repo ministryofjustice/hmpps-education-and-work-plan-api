@@ -12,7 +12,9 @@ import java.time.LocalDate
  * domain.
  * The only exception to this are the abstract methods which are intended to be implemented by subclasses.
  */
-abstract class InductionScheduleDateCalculationService {
+abstract class InductionScheduleDateCalculationService(
+  private val scheduleDateNotBefore: LocalDate? = null,
+) {
   companion object {
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
@@ -29,8 +31,8 @@ abstract class InductionScheduleDateCalculationService {
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate =
     with(inductionSchedule) {
       val additionalDays = getExtensionDays(scheduleStatus)
-      val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
-      maxOf(todayPlusAdditionalDays, deadlineDate)
+      val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
+      maxOf(baseDatePlusAdditionalDays, deadlineDate)
     }
 
   private fun getExtensionDays(status: InductionScheduleStatus): Long =
@@ -40,4 +42,16 @@ abstract class InductionScheduleDateCalculationService {
       status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
       else -> 0 // Default case, if no condition matches
     }
+
+  /**
+   * Returns the base date from which all Induction Schedule dates are calculated
+   */
+  protected fun baseScheduleDate(): LocalDate {
+    val today = LocalDate.now()
+    return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
+      scheduleDateNotBefore
+    } else {
+      today
+    }
+  }
 }

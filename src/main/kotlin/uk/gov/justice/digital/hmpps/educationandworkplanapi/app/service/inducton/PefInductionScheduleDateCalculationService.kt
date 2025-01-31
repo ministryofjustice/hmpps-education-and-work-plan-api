@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducton
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -18,7 +19,9 @@ import java.time.LocalDate
 @Service
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
-class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
+class PefInductionScheduleDateCalculationService(
+  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val scheduleDateNotBefore: LocalDate? = null,
+) : InductionScheduleDateCalculationService(scheduleDateNotBefore) {
 
   companion object {
     private const val DAYS_AFTER_ADMISSION = 20L
@@ -39,7 +42,7 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
     return if (newAdmission) {
       CreateInductionScheduleDto(
         prisonNumber = prisonNumber,
-        deadlineDate = admissionDate.plusDays(DAYS_AFTER_ADMISSION),
+        deadlineDate = latestOf(admissionDate, scheduleDateNotBefore).plusDays(DAYS_AFTER_ADMISSION),
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
         prisonId = prisonId,
@@ -47,7 +50,7 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
     } else {
       CreateInductionScheduleDto(
         prisonNumber = prisonNumber,
-        deadlineDate = getDeadlineDate(),
+        deadlineDate = baseScheduleDate().plusMonths(6),
         scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
         prisonId = prisonId,
@@ -55,20 +58,10 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
     }
   }
 
-  // This will return the grater of today's date plus six months or 1/04/2025 plus six months
-  // This should only be used by the ETL process, which will take place before 31/03/2025.
-  fun getDeadlineDate(): LocalDate {
-    val todayPlus6Months = LocalDate.now().plusMonths(6)
-
-    // Hardcoded date: 1st April 2025
-    val aprilFirst2025 = LocalDate.of(2025, 4, 1)
-    val aprilFirstPlus6Months = aprilFirst2025.plusMonths(6)
-
-    // Return the later of the two dates
-    return if (todayPlus6Months.isAfter(aprilFirstPlus6Months)) {
-      todayPlus6Months
+  private fun latestOf(admissionDate: LocalDate, scheduleDateNotBefore: LocalDate?): LocalDate =
+    if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(admissionDate)) {
+      scheduleDateNotBefore
     } else {
-      aprilFirstPlus6Months
+      admissionDate
     }
-  }
 }

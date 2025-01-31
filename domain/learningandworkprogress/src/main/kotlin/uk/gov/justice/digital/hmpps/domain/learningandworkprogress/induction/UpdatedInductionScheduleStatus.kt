@@ -12,6 +12,7 @@ data class UpdatedInductionScheduleStatus(
   val prisonNumber: String,
   val updatedBy: String,
   val updatedAt: Instant,
+  val updatedAtPrison: String,
   val oldStatus: InductionScheduleStatus,
   val newStatus: InductionScheduleStatus,
   val exemptionReason: String?,

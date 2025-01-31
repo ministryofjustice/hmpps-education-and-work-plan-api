@@ -174,7 +174,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           ACTIONPLANS_RW,
           username = dpsUsername,
-          displayName = displayName,
           privateKey = keyPair.private,
         ),
       )

@@ -41,3 +41,14 @@ fun aValidPrisonerReleasedAdditionalInformation(
     nomisMovementReasonCode = nomisMovementReasonCode,
     currentPrisonStatus = currentPrisonStatus,
   )
+
+fun aValidPrisonerMergedAdditionalInformation(
+  prisonNumber: String = aValidPrisonNumber(),
+  removedNomsNumber: String,
+  reason: AdditionalInformation.PrisonerMergedAdditionalInformation.Reason = AdditionalInformation.PrisonerMergedAdditionalInformation.Reason.MERGE,
+): AdditionalInformation.PrisonerMergedAdditionalInformation =
+  AdditionalInformation.PrisonerMergedAdditionalInformation(
+    nomsNumber = prisonNumber,
+    reason = reason,
+    removedNomsNumber = removedNomsNumber,
+  )

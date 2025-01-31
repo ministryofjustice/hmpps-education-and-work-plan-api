@@ -293,7 +293,7 @@ class TimelineEventFactory(private val userService: ManageUserService) {
         eventType = INDUCTION_SCHEDULE_STATUS_UPDATED,
         actionedBy = updatedBy,
         timestamp = updatedAt,
-        prisonId = "N/A",
+        prisonId = updatedAtPrison,
         contextualInfo = mapOf(
           INDUCTION_SCHEDULE_STATUS_OLD to oldStatus.name,
           INDUCTION_SCHEDULE_STATUS_NEW to newStatus.name,

@@ -59,6 +59,7 @@ class InductionScheduleStatusTransitionValidator {
       InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER,
       InductionScheduleStatus.EXEMPT_PRISONER_RELEASE,
       InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
+      InductionScheduleStatus.EXEMPT_PRISONER_MERGE,
       InductionScheduleStatus.COMPLETED,
       InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     )

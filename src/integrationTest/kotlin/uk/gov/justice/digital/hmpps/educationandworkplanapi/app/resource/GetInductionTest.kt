@@ -76,7 +76,6 @@ class GetInductionTest : IntegrationTestBase() {
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(),
       username = "asmith_gen",
-      displayName = "Alex Smith",
     )
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork()
     val expectedPreviousQualifications =
@@ -127,7 +126,6 @@ class GetInductionTest : IntegrationTestBase() {
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
       username = "asmith_gen",
-      displayName = "Alex Smith",
     )
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerLookingToWork()
     val expectedPreviousQualifications = aValidPreviousQualificationsResponse()

@@ -13,19 +13,17 @@ import java.time.LocalDate
 import java.util.UUID
 
 /**
- * Represents the schedule for when a prisoner's Induction must be completed by.
+ * Represents an immutable history record of the schedule for when a prisoner's Induction must be completed by.
  */
 @Table(name = "induction_schedule_history")
 @Entity
 data class InductionScheduleHistoryEntity(
 
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
   @Column(updatable = false)
   val reference: UUID,
+
+  @Column(updatable = false)
+  val version: Int,
 
   @Column(updatable = false)
   val prisonNumber: String,
@@ -34,33 +32,36 @@ data class InductionScheduleHistoryEntity(
   @Enumerated(value = EnumType.STRING)
   val scheduleCalculationRule: InductionScheduleCalculationRule,
 
-  @Column(updatable = true)
-  var deadlineDate: LocalDate,
+  @Column(updatable = false)
+  val deadlineDate: LocalDate,
 
-  @Column(updatable = true)
+  @Column(updatable = false)
   @Enumerated(value = EnumType.STRING)
-  var scheduleStatus: InductionScheduleStatus,
-
-  val version: Int,
-
-  @Column
-  var exemptionReason: String?,
+  val scheduleStatus: InductionScheduleStatus,
 
   @Column(updatable = false)
-  var createdBy: String? = null,
+  val exemptionReason: String?,
 
   @Column(updatable = false)
-  var createdAt: Instant? = null,
+  val createdBy: String,
 
-  @Column
-  var updatedBy: String? = null,
+  @Column(updatable = false)
+  val createdAt: Instant,
 
-  @Column
-  var updatedAt: Instant? = null,
+  @Column(updatable = false)
+  val updatedBy: String,
+
+  @Column(updatable = false)
+  val updatedAt: Instant,
 
   @Column(updatable = false)
   val createdAtPrison: String,
 
-  @Column
-  var updatedAtPrison: String,
-)
+  @Column(updatable = false)
+  val updatedAtPrison: String,
+) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+}
