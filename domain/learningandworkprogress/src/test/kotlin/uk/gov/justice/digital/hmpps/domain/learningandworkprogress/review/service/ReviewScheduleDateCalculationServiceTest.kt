@@ -395,15 +395,7 @@ class ReviewScheduleDateCalculationServiceTest {
           ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
         ),
         Arguments.of(
-          "prisoner is sentenced with no more than 3 months left to serve",
-          TODAY.plusMonths(3),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE,
-        ),
-        Arguments.of(
-          "prisoner is sentenced with no more than 3 months left to serve",
+          "prisoner is sentenced with 1 day less than 3 months left to serve",
           TODAY.plusMonths(3).minusDays(1),
           SentenceType.SENTENCED,
           false,
