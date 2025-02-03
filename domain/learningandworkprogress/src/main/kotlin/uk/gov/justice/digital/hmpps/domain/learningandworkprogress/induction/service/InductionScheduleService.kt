@@ -217,7 +217,7 @@ class InductionScheduleService(
     )
   }
 
-  private fun updateInductionSchedule(
+  fun updateInductionSchedule(
     inductionSchedule: InductionSchedule,
     newStatus: InductionScheduleStatus,
     exemptionReason: String? = null,

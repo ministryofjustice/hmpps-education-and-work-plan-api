@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPl
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
@@ -38,7 +38,7 @@ class ActionPlanController(
   private val actionPlanMapper: ActionPlanResourceMapper,
   private val noteService: NoteService,
   private val noteResourceMapper: NoteResourceMapper,
-  private val reviewScheduleAdapter: ReviewScheduleAdapter,
+  private val scheduleAdapter: ScheduleAdapter,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -54,7 +54,7 @@ class ActionPlanController(
     actionPlanService.createActionPlan(actionPlanMapper.fromModelToDto(prisonNumber, request))
 
     try {
-      reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
+      scheduleAdapter.completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber)
     } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
       log.warn { "Action Plan created, but could not create initial Review Schedule: ${e.message}" }
     }
