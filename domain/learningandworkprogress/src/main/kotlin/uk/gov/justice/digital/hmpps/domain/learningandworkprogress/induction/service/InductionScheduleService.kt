@@ -190,32 +190,31 @@ class InductionScheduleService(
   }
 
   /**
-   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_DEATH.
+   * Updates the prisoner's Induction Schedule by setting its status to the provided exemption status.
    */
-  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) {
+  private fun exemptActiveInductionSchedule(
+    prisonNumber: String,
+    prisonId: String,
+    status: InductionScheduleStatus,
+  ) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
 
     updateInductionSchedule(
       inductionSchedule = inductionSchedule,
-      newStatus = InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
+      newStatus = status,
       prisonId = prisonId,
     )
   }
 
-  /**
-   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_RELEASE.
-   */
-  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) {
-    val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
-      ?: throw InductionScheduleNotFoundException(prisonNumber)
+  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
+    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_DEATH)
 
-    updateInductionSchedule(
-      inductionSchedule = inductionSchedule,
-      newStatus = InductionScheduleStatus.EXEMPT_PRISONER_RELEASE,
-      prisonId = prisonId,
-    )
-  }
+  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
+    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
+
+  fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String, prisonId: String) =
+    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
 
   fun updateInductionSchedule(
     inductionSchedule: InductionSchedule,

@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerMergedAdditionalInformation
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerMergedAdditionalInformation.Reason
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
 
@@ -45,9 +47,9 @@ fun aValidPrisonerReleasedAdditionalInformation(
 fun aValidPrisonerMergedAdditionalInformation(
   prisonNumber: String = aValidPrisonNumber(),
   removedNomsNumber: String,
-  reason: AdditionalInformation.PrisonerMergedAdditionalInformation.Reason = AdditionalInformation.PrisonerMergedAdditionalInformation.Reason.MERGE,
-): AdditionalInformation.PrisonerMergedAdditionalInformation =
-  AdditionalInformation.PrisonerMergedAdditionalInformation(
+  reason: Reason = Reason.MERGE,
+): PrisonerMergedAdditionalInformation =
+  PrisonerMergedAdditionalInformation(
     nomsNumber = prisonNumber,
     reason = reason,
     removedNomsNumber = removedNomsNumber,
