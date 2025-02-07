@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerMergedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
@@ -21,6 +22,7 @@ class InboundEventsService(
   private val mapper: ObjectMapper,
   private val prisonerReceivedIntoPrisonEventService: PrisonerReceivedIntoPrisonEventService,
   private val prisonerReleasedFromPrisonEventService: PrisonerReleasedFromPrisonEventService,
+  private val prisonerMergedEventService: PrisonerMergedEventService,
 ) {
 
   fun process(inboundEvent: InboundEvent) =
@@ -37,7 +39,8 @@ class InboundEventsService(
           prisonerReleasedFromPrisonEventService.process(inboundEvent, additionalInformation)
         }
         PRISONER_MERGED -> {
-          // TODO process prisoner merged message
+          val additionalInformation = eventAdditionalInformation<PrisonerMergedAdditionalInformation>(inboundEvent)
+          prisonerMergedEventService.process(inboundEvent, additionalInformation)
         }
       }
     }
