@@ -25,10 +25,10 @@ class PrisonerMergedEventService(
       log.info { "Processing Prisoner Merged event removed noms number [$removedNomsNumber]" }
       handle(
         REVIEW_SCHEDULE,
-      ) { reviewScheduleService.exemptActiveReviewScheduleStatusDueToMerge(removedNomsNumber, "N/A") }
+      ) { reviewScheduleService.exemptActiveReviewScheduleStatusDueToMerge(removedNomsNumber) }
       handle(
         INDUCTION_SCHEDULE,
-      ) { inductionScheduleService.exemptActiveInductionScheduleStatusDueToMerge(removedNomsNumber, "N/A") }
+      ) { inductionScheduleService.exemptActiveInductionScheduleStatusDueToMerge(removedNomsNumber) }
     }
 
   private fun handle(

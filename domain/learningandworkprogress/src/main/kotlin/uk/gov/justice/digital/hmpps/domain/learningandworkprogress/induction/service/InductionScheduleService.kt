@@ -194,7 +194,7 @@ class InductionScheduleService(
    */
   private fun exemptActiveInductionSchedule(
     prisonNumber: String,
-    prisonId: String,
+    prisonId: String = "N/A",
     status: InductionScheduleStatus,
   ) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
@@ -213,8 +213,8 @@ class InductionScheduleService(
   fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
     exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
 
-  fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String, prisonId: String) =
-    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
+  fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String) =
+    exemptActiveInductionSchedule(prisonNumber = prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
 
   fun updateInductionSchedule(
     inductionSchedule: InductionSchedule,
