@@ -140,7 +140,7 @@ class ReviewScheduleService(
    */
   private fun exemptActiveReviewSchedule(
     prisonNumber: String,
-    prisonId: String,
+    prisonId: String = "N/A",
     status: ReviewScheduleStatus,
   ) {
     reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
@@ -161,8 +161,8 @@ class ReviewScheduleService(
   fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
     exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE)
 
-  fun exemptActiveReviewScheduleStatusDueToMerge(prisonNumber: String, prisonId: String) =
-    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_MERGE)
+  fun exemptActiveReviewScheduleStatusDueToMerge(prisonNumber: String) =
+    exemptActiveReviewSchedule(prisonNumber = prisonNumber, status = ReviewScheduleStatus.EXEMPT_PRISONER_MERGE)
 
   fun exemptActiveReviewScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
     exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_DEATH)

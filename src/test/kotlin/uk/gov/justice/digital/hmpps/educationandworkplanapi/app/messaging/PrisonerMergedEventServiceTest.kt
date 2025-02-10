@@ -45,7 +45,6 @@ class PrisonerMergedEventServiceTest {
     // Then
     verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToMerge(
       prisonNumber = removedNomsNumber,
-      prisonId = "N/A",
     )
   }
 
