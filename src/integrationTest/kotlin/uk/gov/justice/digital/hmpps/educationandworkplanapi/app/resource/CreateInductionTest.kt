@@ -14,8 +14,11 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
@@ -400,5 +403,61 @@ class CreateInductionTest : IntegrationTestBase() {
       .isNotFound
 
     assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+  }
+
+  @Test
+  fun `should create an induction for a prisoner looking for work and complete the existing induction schedule`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
+    val dpsUsername = "auser_gen"
+    // action plan and induction schedule exist
+    createActionPlan(prisonNumber)
+    createInductionSchedule(
+      prisonNumber = prisonNumber,
+      status = SCHEDULED,
+      createdAtPrison = "BXI",
+    )
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          username = dpsUsername,
+          privateKey = keyPair.private,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction)
+      .wasCreatedBy(dpsUsername)
+      .wasUpdatedBy(dpsUsername)
+      .wasCreatedAtPrison(createRequest.prisonId)
+      .wasUpdatedAtPrison(createRequest.prisonId)
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("INDUCTION_CREATED"),
+        capture(eventPropertiesCaptor),
+        isNull(),
+      )
+      val createInductionEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonId", createRequest.prisonId)
+        .containsEntry("userId", dpsUsername)
+        .containsKey("reference")
+    }
+
+    val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
+    assertThat(inductionSchedule!!.scheduleStatus).isEqualTo(COMPLETED)
   }
 }

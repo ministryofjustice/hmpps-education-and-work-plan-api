@@ -9,6 +9,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -77,7 +78,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
     verifyNoInteractions(reviewScheduleService)
   }
 
@@ -99,7 +100,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -117,7 +118,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
     verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
     verify(createInitialReviewScheduleMapper).fromPrisonerToDomain(prisoner, isTransfer = false, isReadmission = true)
@@ -145,7 +146,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -162,7 +163,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
     verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
     verify(reviewScheduleService).exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber, prisonId)
@@ -191,7 +192,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     )
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -199,8 +200,8 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
-    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
+    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
   }
 

@@ -31,6 +31,7 @@ class InductionScheduleService(
     prisonerAdmissionDate: LocalDate,
     prisonId: String,
     newAdmission: Boolean = true,
+    releaseDate: LocalDate? = null,
   ): InductionSchedule {
     // Check for an existing Induction Schedule
     val inductionSchedule = runCatching {
@@ -46,6 +47,7 @@ class InductionScheduleService(
       admissionDate = prisonerAdmissionDate,
       prisonId = prisonId,
       newAdmission = newAdmission,
+      releaseDate = releaseDate,
     )
     return inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
       .also {
@@ -66,6 +68,7 @@ class InductionScheduleService(
     prisonNumber: String,
     prisonerAdmissionDate: LocalDate,
     prisonId: String,
+    releaseDate: LocalDate?,
   ): InductionSchedule {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
@@ -79,6 +82,7 @@ class InductionScheduleService(
         prisonNumber = prisonNumber,
         admissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
+        releaseDate = releaseDate,
       ).deadlineDate
 
       updateInductionSchedule(
@@ -190,34 +194,33 @@ class InductionScheduleService(
   }
 
   /**
-   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_DEATH.
+   * Updates the prisoner's Induction Schedule by setting its status to the provided exemption status.
    */
-  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) {
+  private fun exemptActiveInductionSchedule(
+    prisonNumber: String,
+    prisonId: String = "N/A",
+    status: InductionScheduleStatus,
+  ) {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
 
     updateInductionSchedule(
       inductionSchedule = inductionSchedule,
-      newStatus = InductionScheduleStatus.EXEMPT_PRISONER_DEATH,
+      newStatus = status,
       prisonId = prisonId,
     )
   }
 
-  /**
-   * Updates the prisoner's Induction Schedule by setting its status to EXEMPT_PRISONER_RELEASE.
-   */
-  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) {
-    val inductionSchedule = inductionSchedulePersistenceAdapter.getActiveInductionSchedule(prisonNumber)
-      ?: throw InductionScheduleNotFoundException(prisonNumber)
+  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
+    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_DEATH)
 
-    updateInductionSchedule(
-      inductionSchedule = inductionSchedule,
-      newStatus = InductionScheduleStatus.EXEMPT_PRISONER_RELEASE,
-      prisonId = prisonId,
-    )
-  }
+  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
+    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
 
-  private fun updateInductionSchedule(
+  fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String) =
+    exemptActiveInductionSchedule(prisonNumber = prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
+
+  fun updateInductionSchedule(
     inductionSchedule: InductionSchedule,
     newStatus: InductionScheduleStatus,
     exemptionReason: String? = null,

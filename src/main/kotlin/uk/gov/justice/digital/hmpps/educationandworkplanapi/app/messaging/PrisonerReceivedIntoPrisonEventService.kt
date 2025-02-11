@@ -56,6 +56,7 @@ class PrisonerReceivedIntoPrisonEventService(
         prisonNumber = nomsNumber,
         prisonerAdmissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
+        releaseDate = prisoner.releaseDate,
       )
     } catch (e: InductionScheduleAlreadyExistsException) {
       // Prisoner already has an Induction Schedule
@@ -67,7 +68,12 @@ class PrisonerReceivedIntoPrisonEventService(
 
         else -> {
           // The Induction was not completed so need to reschedule it with a new deadline date.
-          inductionScheduleService.reschedulePrisonersInductionSchedule(nomsNumber, prisonerAdmissionDate, prisonId)
+          inductionScheduleService.reschedulePrisonersInductionSchedule(
+            nomsNumber,
+            prisonerAdmissionDate = prisonerAdmissionDate,
+            prisonId = prisonId,
+            releaseDate = prisoner.releaseDate,
+          )
         }
       }
     }

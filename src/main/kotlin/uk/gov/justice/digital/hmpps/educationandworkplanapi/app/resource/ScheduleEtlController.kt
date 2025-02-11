@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import io.swagger.v3.oas.annotations.Hidden
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -35,6 +36,7 @@ private val log = KotlinLogging.logger {}
 @Hidden
 @RestController
 class ScheduleEtlController(
+  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val goLiveDate: LocalDate? = null,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val inductionRepository: InductionRepository,
   private val actionPlanRepository: ActionPlanRepository,
@@ -66,9 +68,11 @@ class ScheduleEtlController(
     val prisonersWithoutReviewSchedules = filterPrisonersWithoutReviewSchedules(allPrisoners)
     val prisonersWithoutInductionSchedule = filterPrisonersWithoutInductionSchedule(allPrisoners)
     val prisonersWithInductions = filterPrisonersWithInductions(allPrisoners)
-    val prisonersWithInductionsAndNoReviewSchedule = filterPrisonersWithInductionButNoReviewSchedule(prisonersWithInductions, prisonersWithoutReviewSchedules)
+    val prisonersWithInductionsAndNoReviewSchedule =
+      filterPrisonersWithInductionButNoReviewSchedule(prisonersWithInductions, prisonersWithoutReviewSchedules)
 
-    val eligibleInductionSchedulePrisoners = filterPrisonersWithNoInduction(prisonersWithoutInductionSchedule, prisonersWithInductions)
+    val eligibleInductionSchedulePrisoners =
+      filterPrisonersWithNoInduction(prisonersWithoutInductionSchedule, prisonersWithInductions)
     val eligibleReviewSchedulePrisoners = filterPrisonersWithActionPlans(prisonersWithInductionsAndNoReviewSchedule)
 
     val totalPrisonersWithInductionSchedule = totalPrisonersInPrison - prisonersWithoutInductionSchedule.size
@@ -133,17 +137,38 @@ class ScheduleEtlController(
     failedInductionSchedules: MutableList<String>,
   ) {
     eligibleInductionSchedulePrisoners.forEach { prisoner ->
-      val prisonNumber = prisoner.prisonerNumber
-      try {
-        createInductionSchedule(prisoner)
-        createdInductionSchedules.add(prisonNumber)
-      } catch (e: Exception) {
-        handleInductionScheduleCreationError(prisonNumber, e, failedInductionSchedules)
+      if (prisoner.releaseDate != null &&
+        prisoner.releaseDate.isBefore(goLiveDate().plusDays(7))
+      ) {
+        log.info { "Induction for prisoner ${prisoner.prisonerNumber} skipped due to release within 7 days of go-live." }
+      } else {
+        val prisonNumber = prisoner.prisonerNumber
+        try {
+          createInductionSchedule(prisoner)
+          createdInductionSchedules.add(prisonNumber)
+        } catch (e: Exception) {
+          handleInductionScheduleCreationError(prisonNumber, e, failedInductionSchedules)
+        }
       }
     }
   }
 
-  private fun filterPrisonersWithNoInduction(prisoners: List<Prisoner>, prisonersWithInductions: List<Prisoner>): List<Prisoner> {
+  /**
+   * Returns go live date - this is configured in the specific values yaml or default to today.
+   */
+  protected fun goLiveDate(): LocalDate {
+    val today = LocalDate.now()
+    return if (goLiveDate != null && goLiveDate.isAfter(today)) {
+      goLiveDate
+    } else {
+      today
+    }
+  }
+
+  private fun filterPrisonersWithNoInduction(
+    prisoners: List<Prisoner>,
+    prisonersWithInductions: List<Prisoner>,
+  ): List<Prisoner> {
     val prisonerNumbersWithInductions = prisonersWithInductions.map { it.prisonerNumber }.toSet()
     return prisoners.filter { it.prisonerNumber !in prisonerNumbersWithInductions }
   }
@@ -169,7 +194,10 @@ class ScheduleEtlController(
     return prisoners.filter { it.prisonerNumber in prisonersWithInductions }
   }
 
-  private fun filterPrisonersWithInductionButNoReviewSchedule(prisonersWithInduction: List<Prisoner>, prisonersWithoutReviewSchedules: List<Prisoner>): List<Prisoner> {
+  private fun filterPrisonersWithInductionButNoReviewSchedule(
+    prisonersWithInduction: List<Prisoner>,
+    prisonersWithoutReviewSchedules: List<Prisoner>,
+  ): List<Prisoner> {
     val prisonNumbersWithNoReviewSchedule = prisonersWithoutReviewSchedules.map { it.prisonerNumber }
     return prisonersWithInduction.filter { it.prisonerNumber in prisonNumbersWithNoReviewSchedule }
   }
@@ -197,6 +225,7 @@ class ScheduleEtlController(
       prisonerAdmissionDate = LocalDate.now(),
       prisonId = prisoner.prisonId ?: "N/A",
       newAdmission = false,
+      releaseDate = prisoner.releaseDate,
     )
   }
 

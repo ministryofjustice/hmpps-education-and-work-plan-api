@@ -133,67 +133,42 @@ class ReviewScheduleService(
   }
 
   /**
-   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_RELEASE
+   * Updates the prisoner's active Review Schedule by setting its status to the provided exemption status.
    *
    * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
-   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH or EXEMPT_UNKNOWN is not considered 'active'
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH, or EXEMPT_UNKNOWN is not considered 'active.'
    */
+  private fun exemptActiveReviewSchedule(
+    prisonNumber: String,
+    prisonId: String = "N/A",
+    status: ReviewScheduleStatus,
+  ) {
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateExemptStatus(
+          prisonNumber = prisonNumber,
+          prisonId = prisonId,
+          reviewSchedule = this,
+          newStatus = status,
+          exemptionReason = null,
+        ).also {
+          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: $status" }
+        }
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+  }
+
   fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
-    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
-      ?.run {
-        updateExemptStatus(
-          prisonNumber = prisonNumber,
-          prisonId = prisonId,
-          reviewSchedule = this,
-          newStatus = ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE,
-          exemptionReason = null,
-        ).also {
-          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_RELEASE" }
-        }
-      }
-      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE)
 
-  /**
-   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_DEATH
-   *
-   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
-   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH or EXEMPT_UNKNOWN is not considered 'active'
-   */
+  fun exemptActiveReviewScheduleStatusDueToMerge(prisonNumber: String) =
+    exemptActiveReviewSchedule(prisonNumber = prisonNumber, status = ReviewScheduleStatus.EXEMPT_PRISONER_MERGE)
+
   fun exemptActiveReviewScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
-    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
-      ?.run {
-        updateExemptStatus(
-          prisonNumber = prisonNumber,
-          prisonId = prisonId,
-          reviewSchedule = this,
-          newStatus = ReviewScheduleStatus.EXEMPT_PRISONER_DEATH,
-          exemptionReason = null,
-        ).also {
-          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_DEATH" }
-        }
-      }
-      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_DEATH)
 
-  /**
-   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_UNKNOWN
-   *
-   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
-   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH or EXEMPT_UNKNOWN is not considered 'active'
-   */
   fun exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber: String, prisonId: String) =
-    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
-      ?.run {
-        updateExemptStatus(
-          prisonNumber = prisonNumber,
-          prisonId = prisonId,
-          reviewSchedule = this,
-          newStatus = ReviewScheduleStatus.EXEMPT_UNKNOWN,
-          exemptionReason = null,
-        ).also {
-          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_UNKNOWN" }
-        }
-      }
-      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_UNKNOWN)
 
   /**
    * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_TRANSFER, then immediately

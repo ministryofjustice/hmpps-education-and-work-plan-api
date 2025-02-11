@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewScheduleAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
@@ -33,7 +33,7 @@ private val log = KotlinLogging.logger {}
 class InductionController(
   private val inductionService: InductionService,
   private val inductionMapper: InductionResourceMapper,
-  private val reviewScheduleAdapter: ReviewScheduleAdapter,
+  private val scheduleAdapter: ScheduleAdapter,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -49,7 +49,7 @@ class InductionController(
     inductionService.createInduction(inductionMapper.toCreateInductionDto(prisonNumber, request))
 
     try {
-      reviewScheduleAdapter.createInitialReviewScheduleIfInductionAndActionPlanExists(prisonNumber)
+      scheduleAdapter.completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber)
     } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
       log.warn { "Induction created, but could not create initial Review Schedule: ${e.message}" }
     }

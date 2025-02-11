@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Senten
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.INDETERMINATE_SENTENCE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.REMAND
 import java.time.LocalDate
-import java.time.Period
 
 private val log = KotlinLogging.logger {}
 
@@ -132,7 +131,7 @@ class ReviewScheduleDateCalculationService(
     }
 
   private fun reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate: LocalDate): ReviewScheduleCalculationRule {
-    val timeLeftToServe = MonthsAndDaysLeftToServe.until(releaseDate)
+    val timeLeftToServe = from(baseScheduleDate()).until(releaseDate)
 
     return when {
       timeLeftToServe.isNoMoreThan3Months() -> BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
@@ -152,32 +151,6 @@ class ReviewScheduleDateCalculationService(
       sentenceType !in SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE && releaseDate == null ->
         throw ReviewScheduleNoReleaseDateForSentenceTypeException(prisonNumber, sentenceType)
     }
-  }
-
-  private data class MonthsAndDaysLeftToServe(
-    val months: Long,
-    val days: Int,
-  ) {
-    companion object {
-      fun until(releaseDate: LocalDate): MonthsAndDaysLeftToServe {
-        val today = LocalDate.now()
-        val timeLeftToServe = Period.between(today, releaseDate)
-        val monthsLeft = timeLeftToServe.toTotalMonths()
-        val remainderDays = timeLeftToServe.minusMonths(monthsLeft).days
-        return MonthsAndDaysLeftToServe(monthsLeft, remainderDays)
-      }
-    }
-
-    private fun isExactMonths(value: Long) = months == value && days == 0
-
-    fun isNoMoreThan3Months(): Boolean = months < 3 || isExactMonths(3)
-    fun isBetween3MonthsAnd3Months7Days(): Boolean = months == 3L && days in 1..7
-    fun isBetween3Months8DaysAnd6Months(): Boolean =
-      ((months == 3L && days >= 8) || months >= 4) && (months < 6 || isExactMonths(6))
-
-    fun isBetween6And12Months(): Boolean = months >= 6 && !isExactMonths(6) && (months < 12 || isExactMonths(12))
-    fun isBetween12And60Months(): Boolean = months >= 12 && !isExactMonths(12) && (months < 60 || isExactMonths(60))
-    fun isMoreThan60Months(): Boolean = months >= 60 && !isExactMonths(60)
   }
 
   /**
