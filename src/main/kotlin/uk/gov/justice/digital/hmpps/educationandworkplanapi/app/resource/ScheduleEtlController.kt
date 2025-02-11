@@ -36,7 +36,7 @@ private val log = KotlinLogging.logger {}
 @Hidden
 @RestController
 class ScheduleEtlController(
-  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val scheduleDateNotBefore: LocalDate? = null,
+  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val goLiveDate: LocalDate? = null,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val inductionRepository: InductionRepository,
   private val actionPlanRepository: ActionPlanRepository,
@@ -154,12 +154,12 @@ class ScheduleEtlController(
   }
 
   /**
-   * Returns go live date - this is configured in the specific values yaml
+   * Returns go live date - this is configured in the specific values yaml or default to today.
    */
   protected fun goLiveDate(): LocalDate {
     val today = LocalDate.now()
-    return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
-      scheduleDateNotBefore
+    return if (goLiveDate != null && goLiveDate.isAfter(today)) {
+      goLiveDate
     } else {
       today
     }
