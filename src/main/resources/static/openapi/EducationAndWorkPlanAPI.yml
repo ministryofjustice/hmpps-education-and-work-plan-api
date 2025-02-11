@@ -807,7 +807,7 @@ paths:
   # Information about sessions (ie induction and review sessions)
   # -------------------------------------------------------------------------------
 
-  '/session/{prisonId}':
+  '/session/{prisonId}/summary':
     get:
       summary: Get summary of reviews and inductions sessions for a prison
       tags:
