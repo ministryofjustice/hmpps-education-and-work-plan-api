@@ -23,6 +23,7 @@ class InductionScheduleDateCalculationServiceTest {
       admissionDate: LocalDate,
       prisonId: String,
       newAdmission: Boolean,
+      releaseDate: LocalDate?,
     ): CreateInductionScheduleDto {
       TODO("Not implemented here")
     }
