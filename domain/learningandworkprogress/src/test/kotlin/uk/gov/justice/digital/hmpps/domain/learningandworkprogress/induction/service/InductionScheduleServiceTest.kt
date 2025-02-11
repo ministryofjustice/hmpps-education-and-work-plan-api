@@ -9,6 +9,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -153,7 +154,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
 
       val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any())).willReturn(createInductionScheduleDto)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull())).willReturn(createInductionScheduleDto)
 
       val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
       given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
@@ -164,7 +165,7 @@ class InductionScheduleServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId, true)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId, true, null)
       verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
       verify(inductionScheduleEventService).inductionScheduleCreated(actual)
     }
@@ -213,7 +214,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
 
       val expectedDueDate = prisonerAdmissionDate.plusDays(20)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any())).willReturn(
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull())).willReturn(
         aValidCreateInductionScheduleDto(
           prisonNumber = prisonNumber,
           deadlineDate = expectedDueDate,
@@ -248,7 +249,7 @@ class InductionScheduleServiceTest {
       )
 
       // When
-      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, PRISON_ID)
+      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, PRISON_ID, null)
 
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
@@ -268,7 +269,7 @@ class InductionScheduleServiceTest {
 
       // When
       val exception = catchThrowableOfType(InvalidInductionScheduleStatusException::class.java) {
-        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID)
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID, null)
       }
 
       // Then
@@ -287,7 +288,7 @@ class InductionScheduleServiceTest {
 
       // When
       val exception = catchThrowableOfType(InductionScheduleNotFoundException::class.java) {
-        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID)
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID, null)
       }
 
       // Then

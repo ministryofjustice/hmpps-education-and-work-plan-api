@@ -38,6 +38,7 @@ class PefInductionScheduleDateCalculationService(
     admissionDate: LocalDate,
     prisonId: String,
     newAdmission: Boolean,
+    releaseDate: LocalDate?,
   ): CreateInductionScheduleDto {
     return if (newAdmission) {
       CreateInductionScheduleDto(
@@ -50,11 +51,21 @@ class PefInductionScheduleDateCalculationService(
     } else {
       CreateInductionScheduleDto(
         prisonNumber = prisonNumber,
-        deadlineDate = baseScheduleDate().plusMonths(6),
+        deadlineDate = calculateDeadlineDate(releaseDate),
         scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
         scheduleStatus = InductionScheduleStatus.SCHEDULED,
         prisonId = prisonId,
       )
+    }
+  }
+
+  private fun calculateDeadlineDate(releaseDate: LocalDate?): LocalDate {
+    val sixMonthsAfterBase = baseScheduleDate().plusMonths(6)
+
+    return when {
+      releaseDate == null -> sixMonthsAfterBase
+      releaseDate.isBefore(sixMonthsAfterBase) -> releaseDate.minusDays(7)
+      else -> sixMonthsAfterBase
     }
   }
 
