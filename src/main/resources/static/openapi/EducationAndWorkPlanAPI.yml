@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.6'
+  version: '1.21.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -803,6 +803,55 @@ paths:
         '401':
           description: The client does not have authorisation to make this request
 
+  #
+  # Information about sessions (ie induction and review sessions)
+  # -------------------------------------------------------------------------------
+
+  '/session/{prisonId}':
+    get:
+      summary: Get summary of reviews and inductions sessions for a prison
+      tags:
+        - Session reporting
+      description: Returns counts of overdue, due, and exempt reviews and inductions for a given prison.
+      parameters:
+        - name: prisonId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the prison
+      responses:
+        '200':
+          description: Summary data for the specified prison
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overdueReviews:
+                    type: integer
+                    example: 0
+                    description: Number of overdue reviews
+                  overdueInductions:
+                    type: integer
+                    example: 0
+                    description: Number of overdue inductions
+                  dueReviews:
+                    type: integer
+                    example: 1
+                    description: Number of due reviews
+                  dueInductions:
+                    type: integer
+                    example: 0
+                    description: Number of due inductions
+                  exemptReviews:
+                    type: integer
+                    example: 0
+                    description: Number of exempt reviews
+                  exemptInductions:
+                    type: integer
+                    example: 0
+                    description: Number of exempt inductions
 #
 # --------------------------------------------------------------------------------
 #
