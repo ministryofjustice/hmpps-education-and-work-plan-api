@@ -137,7 +137,9 @@ class ScheduleEtlController(
     failedInductionSchedules: MutableList<String>,
   ) {
     eligibleInductionSchedulePrisoners.forEach { prisoner ->
-      if (prisoner.releaseDate?.isBefore(scheduleDateNotBefore?.plusDays(7)) == true) {
+      if (prisoner.releaseDate != null &&
+        prisoner.releaseDate.isBefore(goLiveDate().plusDays(7))
+      ) {
         log.info { "Induction for prisoner ${prisoner.prisonerNumber} skipped due to release within 7 days of go-live." }
       } else {
         val prisonNumber = prisoner.prisonerNumber
@@ -148,6 +150,18 @@ class ScheduleEtlController(
           handleInductionScheduleCreationError(prisonNumber, e, failedInductionSchedules)
         }
       }
+    }
+  }
+
+  /**
+   * Returns go live date - this is configured in the specific values yaml
+   */
+  protected fun goLiveDate(): LocalDate {
+    val today = LocalDate.now()
+    return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
+      scheduleDateNotBefore
+    } else {
+      today
     }
   }
 
