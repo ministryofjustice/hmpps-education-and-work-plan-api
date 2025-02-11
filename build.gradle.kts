@@ -12,7 +12,7 @@ plugins {
   kotlin("kapt") version "2.0.21"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "4.1.5"
+  id("name.remal.integration-tests") version "5.0.0"
 
   `java-test-fixtures`
 }
