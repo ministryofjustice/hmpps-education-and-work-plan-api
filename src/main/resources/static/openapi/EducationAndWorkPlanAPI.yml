@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.20.6'
+  version: '1.21.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -802,6 +802,29 @@ paths:
           $ref: '#/components/responses/400ErrorResponse'
         '401':
           description: The client does not have authorisation to make this request
+
+  #
+  # Information about sessions (ie induction and review sessions)
+  # -------------------------------------------------------------------------------
+
+  '/session/{prisonId}/summary':
+    get:
+      summary: Get summary of reviews and inductions sessions for a prison
+      tags:
+        - Session reporting
+      description: Returns counts of overdue, due, and exempt reviews and inductions for a given prison.
+      parameters:
+        - name: prisonId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[A-Z]{3}$"
+            example: 'BXI'
+          description: The ID of the prison
+      responses:
+        '200':
+          $ref: '#/components/responses/SessionSummary'
 
 #
 # --------------------------------------------------------------------------------
@@ -3041,6 +3064,36 @@ components:
       required:
         - inductionSchedules
 
+    SessionSummaryResponse:
+      title: SessionSummaryResponse
+      description: Summary data for the specified prison
+      type: object
+      properties:
+        overdueReviews:
+          type: integer
+          example: 0
+          description: Number of overdue reviews
+        overdueInductions:
+          type: integer
+          example: 0
+          description: Number of overdue inductions
+        dueReviews:
+          type: integer
+          example: 1
+          description: Number of due reviews
+        dueInductions:
+          type: integer
+          example: 0
+          description: Number of due inductions
+        exemptReviews:
+          type: integer
+          example: 0
+          description: Number of exempt reviews
+        exemptInductions:
+          type: integer
+          example: 0
+          description: Number of exempt inductions
+
     CompletedActionPlanReviewResponse:
       title: CompletedActionPlanReviewResponse
       type: object
@@ -3601,6 +3654,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InductionSchedulesResponse'
+
+    SessionSummary:
+      description: Response body containing a session summary response.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SessionSummaryResponse'
 
   #
   # Request Body Definitions
