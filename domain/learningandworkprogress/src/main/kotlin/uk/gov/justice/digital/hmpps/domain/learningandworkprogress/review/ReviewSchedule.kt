@@ -63,6 +63,10 @@ enum class ReviewScheduleStatus(
   fun isExemptionOrExclusion(): Boolean {
     return isExemption || isExclusion
   }
+
+  fun includeExceptionOnSummary(): Boolean {
+    return (isExemption || isExclusion) && includeExemptionOnSummary
+  }
 }
 
 data class ReviewScheduleWindow(

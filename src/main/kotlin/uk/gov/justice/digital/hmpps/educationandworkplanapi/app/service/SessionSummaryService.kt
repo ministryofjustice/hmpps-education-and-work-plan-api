@@ -43,12 +43,11 @@ class SessionSummaryService(
       inductionSchedule?.let {
         if (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) {
           when {
-            inductionSchedule.scheduleStatus.isExemptionOrExclusion() && inductionSchedule.scheduleStatus.includeExemptionOnSummary -> exemptInductions.add(prisoner)
-            inductionSchedule.scheduleStatus.isExemptionOrExclusion() && !inductionSchedule.scheduleStatus.includeExemptionOnSummary -> {
-              // do nothing with these exemptions
-            }
-            inductionSchedule.deadlineDate < today -> overdueInductions.add(prisoner)
-            else -> dueInductions.add(prisoner)
+            inductionSchedule.scheduleStatus.includeExceptionOnSummary() -> exemptInductions.add(prisoner)
+            inductionSchedule.scheduleStatus == InductionScheduleStatus.SCHEDULED &&
+              inductionSchedule.deadlineDate < today -> overdueInductions.add(prisoner)
+            inductionSchedule.scheduleStatus == InductionScheduleStatus.SCHEDULED &&
+              inductionSchedule.deadlineDate > today -> dueInductions.add(prisoner)
           }
         }
       }
@@ -56,12 +55,11 @@ class SessionSummaryService(
       reviewSchedule?.let {
         if (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED) {
           when {
-            reviewSchedule.scheduleStatus.isExemptionOrExclusion() && reviewSchedule.scheduleStatus.includeExemptionOnSummary -> exemptReviews.add(prisoner)
-            reviewSchedule.scheduleStatus.isExemptionOrExclusion() && !reviewSchedule.scheduleStatus.includeExemptionOnSummary -> {
-              // do nothing with these exemptions
-            }
-            reviewSchedule.reviewScheduleWindow.dateTo < today -> overdueReviews.add(prisoner)
-            else -> dueReviews.add(prisoner)
+            reviewSchedule.scheduleStatus.includeExceptionOnSummary() -> exemptReviews.add(prisoner)
+            reviewSchedule.scheduleStatus == ReviewScheduleStatus.SCHEDULED &&
+              reviewSchedule.reviewScheduleWindow.dateTo < today -> overdueReviews.add(prisoner)
+            reviewSchedule.scheduleStatus == ReviewScheduleStatus.SCHEDULED &&
+              reviewSchedule.reviewScheduleWindow.dateTo > today -> dueReviews.add(prisoner)
           }
         }
       }
