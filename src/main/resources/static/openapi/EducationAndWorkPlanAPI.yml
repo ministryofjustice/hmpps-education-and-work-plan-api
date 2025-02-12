@@ -838,8 +838,7 @@ paths:
           required: false
           description: Filter session summaries by status. Valid values are DUE, OVERDUE, or ON_HOLD.
           schema:
-            type: string
-            enum: [ DUE, OVERDUE, ON_HOLD ]
+              $ref: '#/components/schemas/SessionStatusType'
       responses:
         '200':
           $ref: '#/components/responses/Session'
@@ -2130,6 +2129,15 @@ components:
         - reference
         - content
         - type
+
+    SessionStatusType:
+      title: Session type
+      description: Enum of the different session status types.
+      type: string
+      enum:
+        - ON_HOLD
+        - DUE
+        - OVERDUE
 
     NoteType:
       title: NoteType
