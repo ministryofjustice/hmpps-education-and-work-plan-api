@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSummaryResponse
 import java.time.LocalDate
 
@@ -23,45 +22,35 @@ class SessionSummaryService(
     val today = LocalDate.now()
     val prisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
 
-    val dueReviews = mutableListOf<Prisoner>()
-    val overdueReviews = mutableListOf<Prisoner>()
-    val exemptReviews = mutableListOf<Prisoner>()
-    val dueInductions = mutableListOf<Prisoner>()
-    val overdueInductions = mutableListOf<Prisoner>()
-    val exemptInductions = mutableListOf<Prisoner>()
+    val dueReviews = mutableListOf<String>()
+    val overdueReviews = mutableListOf<String>()
+    val exemptReviews = mutableListOf<String>()
+    val dueInductions = mutableListOf<String>()
+    val overdueInductions = mutableListOf<String>()
+    val exemptInductions = mutableListOf<String>()
 
-    prisoners.forEach { prisoner ->
-      val inductionSchedule =
-        runCatching { inductionScheduleService.getInductionScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
-      val reviewSchedule =
-        runCatching { reviewScheduleService.getLatestReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
+    val prisonerNumbers = prisoners.map { it.prisonerNumber }
 
-      if (inductionSchedule != null && (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) && reviewSchedule != null && (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED)) {
-        log.warn("Prisoner ${prisoner.prisonerNumber} has both an incomplete induction schedule and review schedule.")
+    val inductionSchedules = inductionScheduleService.getInCompleteInductionSchedules(prisonerNumbers)
+    val reviewSchedules = reviewScheduleService.getInCompleteReviewSchedules(prisonerNumbers)
+
+    inductionSchedules.forEach { schedule ->
+      when {
+        schedule.scheduleStatus.includeExceptionOnSummary() -> exemptInductions.add(schedule.prisonNumber)
+        schedule.scheduleStatus == InductionScheduleStatus.SCHEDULED &&
+          schedule.deadlineDate < today -> overdueInductions.add(schedule.prisonNumber)
+        schedule.scheduleStatus == InductionScheduleStatus.SCHEDULED &&
+          schedule.deadlineDate > today -> dueInductions.add(schedule.prisonNumber)
       }
+    }
 
-      inductionSchedule?.let {
-        if (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) {
-          when {
-            inductionSchedule.scheduleStatus.includeExceptionOnSummary() -> exemptInductions.add(prisoner)
-            inductionSchedule.scheduleStatus == InductionScheduleStatus.SCHEDULED &&
-              inductionSchedule.deadlineDate < today -> overdueInductions.add(prisoner)
-            inductionSchedule.scheduleStatus == InductionScheduleStatus.SCHEDULED &&
-              inductionSchedule.deadlineDate > today -> dueInductions.add(prisoner)
-          }
-        }
-      }
-
-      reviewSchedule?.let {
-        if (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED) {
-          when {
-            reviewSchedule.scheduleStatus.includeExceptionOnSummary() -> exemptReviews.add(prisoner)
-            reviewSchedule.scheduleStatus == ReviewScheduleStatus.SCHEDULED &&
-              reviewSchedule.reviewScheduleWindow.dateTo < today -> overdueReviews.add(prisoner)
-            reviewSchedule.scheduleStatus == ReviewScheduleStatus.SCHEDULED &&
-              reviewSchedule.reviewScheduleWindow.dateTo > today -> dueReviews.add(prisoner)
-          }
-        }
+    reviewSchedules.forEach { schedule ->
+      when {
+        schedule.scheduleStatus.includeExceptionOnSummary() -> exemptReviews.add(schedule.prisonNumber)
+        schedule.scheduleStatus == ReviewScheduleStatus.SCHEDULED &&
+          schedule.reviewScheduleWindow.dateTo < today -> overdueReviews.add(schedule.prisonNumber)
+        schedule.scheduleStatus == ReviewScheduleStatus.SCHEDULED &&
+          schedule.reviewScheduleWindow.dateTo > today -> dueReviews.add(schedule.prisonNumber)
       }
     }
 

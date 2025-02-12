@@ -25,7 +25,11 @@ class JpaInductionSchedulePersistenceAdapter(
 ) : InductionSchedulePersistenceAdapter {
   @Transactional
   override fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule =
-    inductionScheduleRepository.saveAndFlush(inductionScheduleEntityMapper.fromCreateDtoToEntity(createInductionScheduleDto)).let {
+    inductionScheduleRepository.saveAndFlush(
+      inductionScheduleEntityMapper.fromCreateDtoToEntity(
+        createInductionScheduleDto,
+      ),
+    ).let {
       saveInductionScheduleHistory(it)
       inductionScheduleEntityMapper.fromEntityToDomain(it)
     }
@@ -37,8 +41,16 @@ class JpaInductionSchedulePersistenceAdapter(
     }
 
   override fun getActiveInductionSchedule(prisonNumber: String): InductionSchedule? =
-    inductionScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber = prisonNumber, scheduleStatuses = InductionScheduleStatus.ACTIVE_STATUSES)
+    inductionScheduleRepository.findByPrisonNumberAndScheduleStatusIn(
+      prisonNumber = prisonNumber,
+      scheduleStatuses = InductionScheduleStatus.ACTIVE_STATUSES,
+    )
       ?.let { inductionScheduleEntityMapper.fromEntityToDomain(it) }
+
+  override fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> {
+    return inductionScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
+      .map { inductionScheduleEntityMapper.fromEntityToDomain(it) }
+  }
 
   @Transactional
   override fun updateSchedule(
@@ -69,12 +81,14 @@ class JpaInductionSchedulePersistenceAdapter(
   }
 
   override fun updateInductionScheduleStatus(updateInductionScheduleStatusDto: UpdateInductionScheduleStatusDto): InductionSchedule {
-    val inductionScheduleEntity = inductionScheduleRepository.findByPrisonNumber(updateInductionScheduleStatusDto.prisonNumber)
-      ?: throw InductionScheduleNotFoundException(updateInductionScheduleStatusDto.prisonNumber)
+    val inductionScheduleEntity =
+      inductionScheduleRepository.findByPrisonNumber(updateInductionScheduleStatusDto.prisonNumber)
+        ?: throw InductionScheduleNotFoundException(updateInductionScheduleStatusDto.prisonNumber)
 
     // Update the schedule status and optionally the latest review date
     inductionScheduleEntity.apply {
-      scheduleStatus = inductionScheduleEntityMapper.toInductionScheduleStatus(updateInductionScheduleStatusDto.scheduleStatus)
+      scheduleStatus =
+        inductionScheduleEntityMapper.toInductionScheduleStatus(updateInductionScheduleStatusDto.scheduleStatus)
       exemptionReason = updateInductionScheduleStatusDto.exemptionReason
       updateInductionScheduleStatusDto.latestDeadlineDate?.let { deadlineDate = it }
       updatedAtPrison = updateInductionScheduleStatusDto.updatedAtPrison
