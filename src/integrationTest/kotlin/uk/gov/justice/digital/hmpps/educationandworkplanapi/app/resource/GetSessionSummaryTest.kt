@@ -83,7 +83,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
 
   @Test
   fun `should return 1 count in each section`() {
-    // Given a prisoner exists in each state: STEVO
+    // Given
     setUpData()
 
     wiremockService.stubPrisonersInAPrisonSearchApi(
