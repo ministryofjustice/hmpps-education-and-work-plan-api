@@ -266,4 +266,8 @@ class InductionScheduleService(
       ),
     )
   }
+
+  fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> {
+    return inductionSchedulePersistenceAdapter.getInCompleteInductionSchedules(prisonerNumbers)
+  }
 }

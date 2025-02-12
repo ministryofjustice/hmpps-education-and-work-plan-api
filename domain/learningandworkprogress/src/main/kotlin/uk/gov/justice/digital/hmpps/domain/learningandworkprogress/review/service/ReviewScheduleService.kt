@@ -337,4 +337,8 @@ class ReviewScheduleService(
       ),
     )
   }
+
+  fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
+    return reviewSchedulePersistenceAdapter.getInCompleteReviewSchedules(prisonerNumbers)
+  }
 }

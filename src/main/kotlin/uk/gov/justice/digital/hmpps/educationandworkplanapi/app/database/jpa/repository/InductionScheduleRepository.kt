@@ -12,7 +12,15 @@ interface InductionScheduleRepository : JpaRepository<InductionScheduleEntity, U
 
   fun findByPrisonNumber(prisonNumber: String): InductionScheduleEntity?
 
-  fun findByPrisonNumberAndScheduleStatusIn(prisonNumber: String, scheduleStatuses: List<InductionScheduleStatus>): InductionScheduleEntity?
+  fun findByPrisonNumberAndScheduleStatusIn(
+    prisonNumber: String,
+    scheduleStatuses: List<InductionScheduleStatus>,
+  ): InductionScheduleEntity?
 
   fun findByPrisonNumberIn(prisonNumbers: List<String>): List<InductionScheduleEntity>
+
+  fun findAllByPrisonNumberInAndScheduleStatusNot(
+    prisonNumbers: List<String>,
+    status: InductionScheduleStatus = InductionScheduleStatus.COMPLETED,
+  ): List<InductionScheduleEntity>
 }

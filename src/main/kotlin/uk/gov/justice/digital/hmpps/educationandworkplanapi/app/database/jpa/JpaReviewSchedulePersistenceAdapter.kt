@@ -89,6 +89,11 @@ class JpaReviewSchedulePersistenceAdapter(
     }
   }
 
+  override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
+    return reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
+      .map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+  }
+
   private fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
     with(reviewScheduleEntity) {
       val historyEntry = ReviewScheduleHistoryEntity(
