@@ -40,3 +40,5 @@ const val HAS_VIEW_TIMELINE = """hasAnyAuthority("$EDITOR", "$VIEWER", "$TIMELIN
 
 const val HAS_VIEW_REVIEWS = """hasAnyAuthority("$EDITOR", "$VIEWER", "$REVIEWS_RO", "$REVIEWS_RW")"""
 const val HAS_EDIT_REVIEWS = """hasAnyAuthority("$EDITOR", "$REVIEWS_RW")"""
+
+const val HAS_EDIT_SESSIONS = """hasAnyAuthority("$EDITOR", "$INDUCTIONS_RW", "$REVIEWS_RW")"""

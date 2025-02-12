@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PagedPrisonerResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
 
@@ -54,6 +55,18 @@ class WiremockService(private val wireMockServer: WireMockServer) {
             .withStatus(200)
             .withHeader("Content-Type", "application/json")
             .withBody(objectMapper.writeValueAsString(response)),
+        ),
+    )
+  }
+
+  fun stubPrisonersInAPrisonSearchApi(prisonId: String, response: List<Prisoner>) {
+    wireMockServer.stubFor(
+      get(urlPathMatching("/prisoner-search/prison/$prisonId"))
+        .willReturn(
+          responseDefinition()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(PagedPrisonerResponse(last = true, content = response))),
         ),
     )
   }
