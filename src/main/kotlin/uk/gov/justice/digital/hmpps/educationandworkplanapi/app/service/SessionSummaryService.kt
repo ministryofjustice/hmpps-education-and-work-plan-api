@@ -32,20 +32,22 @@ class SessionSummaryService(
 
     prisoners.forEach { prisoner ->
       val inductionSchedule =
-        safelyGet { inductionScheduleService.getInductionScheduleForPrisoner(prisoner.prisonerNumber) }
+        runCatching { inductionScheduleService.getInductionScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
       val reviewSchedule =
-        safelyGet { reviewScheduleService.getLatestReviewScheduleForPrisoner(prisoner.prisonerNumber) }
+        runCatching { reviewScheduleService.getLatestReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
 
-      if (inductionSchedule != null && (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) &&
-        reviewSchedule != null && (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED)
-      ) {
+      if (inductionSchedule != null && (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) && reviewSchedule != null && (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED)) {
         log.warn("Prisoner ${prisoner.prisonerNumber} has both an incomplete induction schedule and review schedule.")
       }
 
       inductionSchedule?.let {
         if (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) {
           when {
-            inductionSchedule.scheduleStatus.isExemptionOrExclusion() -> exemptInductions.add(prisoner)
+            inductionSchedule.scheduleStatus.isExclusion -> exemptInductions.add(prisoner)
+            inductionSchedule.scheduleStatus.isExemption -> {
+              // do nothing with exemptions
+            }
+
             inductionSchedule.deadlineDate < today -> overdueInductions.add(prisoner)
             else -> dueInductions.add(prisoner)
           }
@@ -55,7 +57,11 @@ class SessionSummaryService(
       reviewSchedule?.let {
         if (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED) {
           when {
-            reviewSchedule.scheduleStatus.isExemptionOrExclusion() -> exemptReviews.add(prisoner)
+            reviewSchedule.scheduleStatus.isExclusion -> exemptReviews.add(prisoner)
+            reviewSchedule.scheduleStatus.isExemption -> {
+              // do nothing with exemptions
+            }
+
             reviewSchedule.reviewScheduleWindow.dateTo < today -> overdueReviews.add(prisoner)
             else -> dueReviews.add(prisoner)
           }
@@ -71,11 +77,5 @@ class SessionSummaryService(
       overdueInductions = overdueInductions.size,
       exemptInductions = exemptInductions.size,
     )
-  }
-
-  private inline fun <T> safelyGet(action: () -> T): T? = try {
-    action()
-  } catch (e: Exception) {
-    null
   }
 }

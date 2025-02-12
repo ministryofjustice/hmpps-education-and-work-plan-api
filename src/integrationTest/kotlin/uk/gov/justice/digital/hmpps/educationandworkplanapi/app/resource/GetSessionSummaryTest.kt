@@ -68,7 +68,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -92,7 +92,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -117,7 +117,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -142,7 +142,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -167,7 +167,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -192,7 +192,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -217,7 +217,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -242,7 +242,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     )
 
     // When
-    val response = getSectionSummary()
+    val response = getSessionSummary()
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -256,7 +256,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.exemptInductions).isEqualTo(1)
   }
 
-  private fun getSectionSummary(): FluxExchangeResult<SessionSummaryResponse> {
+  private fun getSessionSummary(): FluxExchangeResult<SessionSummaryResponse> {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, PRISON_ID)
       .bearerToken(
