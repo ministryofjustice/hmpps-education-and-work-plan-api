@@ -36,23 +36,27 @@ enum class ReviewScheduleCalculationRule {
   PRISONER_UN_SENTENCED,
 }
 
-enum class ReviewScheduleStatus(val isExclusion: Boolean = false, val isExemption: Boolean = false) {
+enum class ReviewScheduleStatus(
+  val isExclusion: Boolean = false,
+  val isExemption: Boolean = false,
+  val includeExemptionOnSummary: Boolean = false,
+) {
   SCHEDULED,
-  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(isExclusion = true),
-  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(isExclusion = true),
-  EXEMPT_PRISONER_FAILED_TO_ENGAGE(isExemption = true),
-  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(isExemption = true),
-  EXEMPT_PRISONER_SAFETY_ISSUES(isExclusion = true),
-  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(isExclusion = true),
-  EXEMPT_PRISON_STAFF_REDEPLOYMENT(isExemption = true),
-  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(isExemption = true),
-  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(isExclusion = true),
-  EXEMPT_SYSTEM_TECHNICAL_ISSUE, // system down
+  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_FAILED_TO_ENGAGE(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_SAFETY_ISSUES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_STAFF_REDEPLOYMENT(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_SYSTEM_TECHNICAL_ISSUE(includeExemptionOnSummary = true), // system down
   EXEMPT_PRISONER_TRANSFER(isExemption = true),
   EXEMPT_PRISONER_RELEASE(isExemption = true),
   EXEMPT_PRISONER_DEATH(isExemption = true),
   EXEMPT_PRISONER_MERGE(isExemption = true),
-  EXEMPT_UNKNOWN,
+  EXEMPT_UNKNOWN(includeExemptionOnSummary = true),
   COMPLETED,
   ;
 

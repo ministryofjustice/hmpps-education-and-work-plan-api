@@ -43,11 +43,10 @@ class SessionSummaryService(
       inductionSchedule?.let {
         if (inductionSchedule.scheduleStatus != InductionScheduleStatus.COMPLETED) {
           when {
-            inductionSchedule.scheduleStatus.isExclusion -> exemptInductions.add(prisoner)
-            inductionSchedule.scheduleStatus.isExemption -> {
-              // do nothing with exemptions
+            inductionSchedule.scheduleStatus.includeExemptionOnSummary -> exemptInductions.add(prisoner)
+            !inductionSchedule.scheduleStatus.includeExemptionOnSummary -> {
+              // do nothing with these exemptions
             }
-
             inductionSchedule.deadlineDate < today -> overdueInductions.add(prisoner)
             else -> dueInductions.add(prisoner)
           }
@@ -57,11 +56,10 @@ class SessionSummaryService(
       reviewSchedule?.let {
         if (reviewSchedule.scheduleStatus != ReviewScheduleStatus.COMPLETED) {
           when {
-            reviewSchedule.scheduleStatus.isExclusion -> exemptReviews.add(prisoner)
-            reviewSchedule.scheduleStatus.isExemption -> {
-              // do nothing with exemptions
+            reviewSchedule.scheduleStatus.includeExemptionOnSummary -> exemptReviews.add(prisoner)
+            !reviewSchedule.scheduleStatus.includeExemptionOnSummary -> {
+              // do nothing with these exemptions
             }
-
             reviewSchedule.reviewScheduleWindow.dateTo < today -> overdueReviews.add(prisoner)
             else -> dueReviews.add(prisoner)
           }
