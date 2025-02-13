@@ -559,6 +559,7 @@ abstract class IntegrationTestBase {
     deadlineDate: LocalDate = LocalDate.now().plusMonths(1),
     createdAtPrison: String = "BXI",
     updatedAtPrison: String = "BXI",
+    exemptionReason: String? = null,
   ) {
     inductionScheduleRepository.save(
       InductionScheduleEntity(
@@ -569,6 +570,7 @@ abstract class IntegrationTestBase {
         scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
         createdAtPrison = createdAtPrison,
         updatedAtPrison = updatedAtPrison,
+        exemptionReason = exemptionReason,
       ),
     )
   }
