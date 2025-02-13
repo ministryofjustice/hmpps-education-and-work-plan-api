@@ -287,18 +287,21 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     createReviewScheduleRecord(
       prisoner4.prisonerNumber,
       latestDate = LocalDate.now().plusDays(1),
+      earliestDate = LocalDate.now().minusDays(10),
       status = ReviewScheduleStatus.SCHEDULED,
     )
     // overdue review
     createReviewScheduleRecord(
       prisoner5.prisonerNumber,
       latestDate = LocalDate.now().minusDays(1),
+      earliestDate = LocalDate.now().minusDays(10),
       status = ReviewScheduleStatus.SCHEDULED,
     )
     // exempt review
     createReviewScheduleRecord(
       prisoner6.prisonerNumber,
       latestDate = LocalDate.now().plusDays(1),
+      earliestDate = LocalDate.now().minusDays(10),
       status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
     )
   }
