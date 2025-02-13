@@ -826,6 +826,25 @@ paths:
         '200':
           $ref: '#/components/responses/SessionSummary'
 
+  '/session/summary':
+    post:
+      summary: Retrieve a list of session summary details for a given list of prison numbers
+      tags:
+        - Session reporting
+      description: Returns details of overdue, due, and exempt reviews and inductions for a given list of prison numbers.
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filter session summaries by status. Valid values are DUE, OVERDUE, or ON_HOLD.
+          schema:
+              $ref: '#/components/schemas/SessionStatusType'
+      responses:
+        '200':
+          $ref: '#/components/responses/Session'
+      requestBody:
+        $ref: '#/components/requestBodies/GetSessionSummaries'
+
 #
 # --------------------------------------------------------------------------------
 #
@@ -2111,6 +2130,15 @@ components:
         - content
         - type
 
+    SessionStatusType:
+      title: Session type
+      description: Enum of the different session status types.
+      type: string
+      enum:
+        - ON_HOLD
+        - DUE
+        - OVERDUE
+
     NoteType:
       title: NoteType
       description: Enum describing the various note types.
@@ -2581,6 +2609,21 @@ components:
             example: "A1234BC"
       required:
         - offenderIds
+
+    PrisonerIdsRequest:
+      title: PrisonerIdsRequest
+      type: object
+      description: A request object to provide a list of prison numbers.
+      properties:
+        prisonNumbers:
+          type: array
+          description: A List of prison numbers.
+          items:
+            type: string
+            pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
+            example: "A1234BC"
+      required:
+        - prisonNumbers
 
     CreateInductionRequest:
       title: CreateInductionRequest
@@ -3063,6 +3106,56 @@ components:
             $ref: '#/components/schemas/InductionScheduleResponse'
       required:
         - inductionSchedules
+
+    SessionResponses:
+      title: SessionResponse
+      description: A list of session responses.
+      type: object
+      properties:
+        sessions:
+          type: array
+          description: A List containing zero or more SessionResponse.
+          items:
+            $ref: '#/components/schemas/SessionResponse'
+      required:
+        - sessions
+
+    SessionResponse:
+      title: SessionResponse
+      description: Session response data
+      type: object
+      properties:
+        sessionType:
+          type: string
+          enum:
+            - REVIEW
+            - INDUCTION
+        prisonNumber:
+          type: string
+          description: The ID of the prisoner
+          example: 'A1234BC'
+        exemptionReason:
+          type: string
+          description: if applicable this will be the reason for the exemption
+          example: 'could not attend due to illness'
+        exemptionDate:
+          type: string
+          format: date
+          description: if applicable this will be the date of the exemption
+        deadlineDate:
+          type: string
+          format: date
+          description: The deadline for the induction to be completed
+        reference:
+          type: string
+          format: uuid
+          description: The unique reference of this session
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+      required:
+        - reference
+        - deadlineDate
+        - sessionType
+        - prisonNumber
 
     SessionSummaryResponse:
       title: SessionSummaryResponse
@@ -3672,6 +3765,23 @@ components:
           schema:
             $ref: '#/components/schemas/SessionSummaryResponse'
 
+    Session:
+      description: Response body containing a session response.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SessionResponses'
+
   #
   # Request Body Definitions
   # --------------------------------------------------------------------------------
@@ -3724,6 +3834,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GetCiagInductionSummariesRequest'
+
+    GetSessionSummaries:
+      description: Request body to retrieve a list of Session summaries for one or more Prisoners.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PrisonerIdsRequest'
     CreateInduction:
       description: Request body to create a Prisoner's Induction.
       content:
