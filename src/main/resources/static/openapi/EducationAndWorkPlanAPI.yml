@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.21.0'
+  version: '1.21.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -835,7 +835,7 @@ paths:
       parameters:
         - name: status
           in: query
-          required: false
+          required: true
           description: Filter session summaries by status. Valid values are DUE, OVERDUE, or ON_HOLD.
           schema:
               $ref: '#/components/schemas/SessionStatusType'
