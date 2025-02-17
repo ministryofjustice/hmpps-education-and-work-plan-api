@@ -3,9 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationEventService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationPersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.service.ConversationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
@@ -96,13 +93,6 @@ class DomainConfiguration {
       inductionScheduleEventService,
       inductionScheduleDateCalculationService,
     )
-
-  @Bean
-  fun conversationDomainService(
-    conversationPersistenceAdapter: ConversationPersistenceAdapter,
-    conversationEventService: ConversationEventService,
-  ): ConversationService =
-    ConversationService(conversationPersistenceAdapter, conversationEventService)
 
   @Bean
   fun educationDomainService(

@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
@@ -11,8 +10,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
@@ -110,20 +107,6 @@ class TelemetryService(
     )
   }
 
-  fun trackConversationCreated(conversation: Conversation) {
-    sendTelemetryEventForConversation(
-      conversation = conversation,
-      telemetryEventType = CONVERSATION_CREATED,
-    )
-  }
-
-  fun trackConversationUpdated(conversation: Conversation) {
-    sendTelemetryEventForConversation(
-      conversation = conversation,
-      telemetryEventType = CONVERSATION_UPDATED,
-    )
-  }
-
   /**
    * Sends all goal update telemetry tracking events based on the differences between the previousGoal and the
    * updatedGoal.
@@ -174,9 +157,6 @@ class TelemetryService(
 
   private fun sendTelemetryEventForInduction(induction: Induction, telemetryEventType: InductionTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction))
-
-  private fun sendTelemetryEventForConversation(conversation: Conversation, telemetryEventType: ConversationTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(conversation))
 
   private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) =
     telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
