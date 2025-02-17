@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import java.time.LocalDate
@@ -45,7 +46,39 @@ class ScheduleEtlController(
   private val inductionScheduleService: InductionScheduleService,
   private val reviewScheduleService: ReviewScheduleService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
+  private val eventPublisher: EventPublisher,
 ) {
+
+  @PostMapping("/action-plans/schedules/etl/messages")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @Transactional
+  fun generateMessages(
+    @RequestParam(name = "dryRun", required = false, defaultValue = "false") dryRun: Boolean,
+  ): MessagesEtlResponse {
+    val inductionPrisonNumbers = inductionScheduleRepository.findAll().map { it.prisonNumber }
+    val reviewPrisonNumbers = reviewScheduleRepository.findAll().map { it.prisonNumber }
+
+    if (!dryRun) {
+      inductionPrisonNumbers.forEach(eventPublisher::createAndPublishInductionEvent)
+      reviewPrisonNumbers.forEach(eventPublisher::createAndPublishReviewScheduleEvent)
+    }
+
+    return MessagesEtlResponse(
+      dryRun = dryRun,
+      inductionSchedulePrisonerIds = inductionPrisonNumbers,
+      reviewSchedulePrisonerIds = reviewPrisonNumbers,
+    ).also {
+      log.info(
+        """
+            ETL Published messages:
+            Dry run: ${it.dryRun}
+            Number of induction messages: ${it.numberOfInductionScheduleMessages}
+            Number of review messages: ${it.numberOfReviewScheduleMessages}
+        """.trimIndent(),
+      )
+    }
+  }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -262,6 +295,17 @@ class ScheduleEtlController(
     log.info("Dry run rollback triggered. Response: ${e.schedulesEtlResponse.summary}")
     return ResponseEntity.ok(e.schedulesEtlResponse)
   }
+}
+
+data class MessagesEtlResponse(
+  val dryRun: Boolean,
+  val reviewSchedulePrisonerIds: List<String> = listOf(),
+  val inductionSchedulePrisonerIds: List<String> = listOf(),
+) {
+  val numberOfReviewScheduleMessages: Int
+    get() = reviewSchedulePrisonerIds.size
+  val numberOfInductionScheduleMessages: Int
+    get() = inductionSchedulePrisonerIds.size
 }
 
 data class SchedulesEtlResponse(
