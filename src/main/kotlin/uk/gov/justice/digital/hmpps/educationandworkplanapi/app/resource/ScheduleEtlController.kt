@@ -49,7 +49,7 @@ class ScheduleEtlController(
   private val eventPublisher: EventPublisher,
 ) {
 
-  @PostMapping("/action-plans/schedules/etl/messages")
+  @PostMapping("/action-plans/schedules/etl-messages")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_REVIEWS)
   @Transactional
