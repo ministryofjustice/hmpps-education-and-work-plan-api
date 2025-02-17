@@ -57,7 +57,7 @@ class ScheduleEtlController(
     @RequestParam(name = "dryRun", required = false, defaultValue = "false") dryRun: Boolean,
   ): MessagesEtlResponse {
     val inductionPrisonNumbers = inductionScheduleRepository.findAll().map { it.prisonNumber }
-    val reviewPrisonNumbers = reviewScheduleRepository.findAll().map { it.prisonNumber }
+    val reviewPrisonNumbers = reviewScheduleRepository.findAll().map { it.prisonNumber }.toSet().toList()
 
     if (!dryRun) {
       inductionPrisonNumbers.forEach(eventPublisher::createAndPublishInductionEvent)
