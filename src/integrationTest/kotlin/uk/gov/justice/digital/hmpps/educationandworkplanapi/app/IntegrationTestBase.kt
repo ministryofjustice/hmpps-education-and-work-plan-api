@@ -40,7 +40,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ConversationRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
@@ -54,7 +53,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventP
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsMessage
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.CONVERSATIONS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.EDUCATION_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.EDUCATION_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GOALS_RW
@@ -72,7 +70,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
@@ -83,7 +80,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.conversation.aValidCreateConversationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import uk.gov.justice.hmpps.sqs.HmppsQueue
@@ -161,9 +157,6 @@ abstract class IntegrationTestBase {
   lateinit var previousQualificationsRepository: PreviousQualificationsRepository
 
   @Autowired
-  lateinit var conversationRepository: ConversationRepository
-
-  @Autowired
   lateinit var reviewRepository: ReviewRepository
 
   @Autowired
@@ -220,7 +213,6 @@ abstract class IntegrationTestBase {
     timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
     inductionRepository.deleteAll()
     previousQualificationsRepository.deleteAll()
-    conversationRepository.deleteAll()
     reviewRepository.deleteAll()
     reviewScheduleRepository.deleteAll()
     reviewScheduleHistoryRepository.deleteAll()
@@ -415,27 +407,6 @@ abstract class IntegrationTestBase {
       .exchange()
       .expectStatus()
       .isNoContent
-  }
-
-  fun createConversation(
-    prisonNumber: String,
-    createConversationRequest: CreateConversationRequest = aValidCreateConversationRequest(),
-    username: String = "auser_gen",
-  ) {
-    webTestClient.post()
-      .uri("/conversations/{prisonNumber}", prisonNumber)
-      .withBody(createConversationRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          CONVERSATIONS_RW,
-          privateKey = keyPair.private,
-          username = username,
-        ),
-      )
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated()
   }
 
   fun getEducation(prisonNumber: String): EducationResponse =
