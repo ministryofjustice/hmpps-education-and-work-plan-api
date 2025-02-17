@@ -75,8 +75,8 @@ class SessionSummaryService(
         prisonNumber = it.prisonNumber,
         deadlineDate = it.reviewScheduleWindow.dateTo,
         reference = it.reference,
-        exemptionReason = it.exemptionReason,
-        exemptionDate = if (!it.exemptionReason.isNullOrBlank()) convertInstantToLocalDate(it.createdAt) else null,
+        exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
+        exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
       )
     } + inductions.map {
       SessionResponse(
@@ -84,8 +84,8 @@ class SessionSummaryService(
         prisonNumber = it.prisonNumber,
         deadlineDate = it.deadlineDate,
         reference = it.reference,
-        exemptionReason = it.exemptionReason,
-        exemptionDate = if (!it.exemptionReason.isNullOrBlank()) convertInstantToLocalDate(it.createdAt) else null,
+        exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
+        exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
       )
     }
   }
