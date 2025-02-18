@@ -19,7 +19,6 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val mapstructVersion = "1.6.3"
 val postgresqlVersion = "42.7.4"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.7.0"
@@ -40,12 +39,6 @@ allOpen {
     "javax.persistence.MappedSuperclass",
     "javax.persistence.Embeddable",
   )
-}
-
-kapt {
-  arguments {
-    arg("mapstruct.defaultComponentModel", "spring")
-  }
 }
 
 jacoco {
@@ -71,9 +64,6 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:$hmppsSqsVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion")
-
-  implementation("org.mapstruct:mapstruct:$mapstructVersion")
-  kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
 
   implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 

@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan
 
-import org.mapstruct.Mapper
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
@@ -8,16 +8,28 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 
-@Mapper(
-  uses = [
-    GoalResourceMapper::class,
-  ],
-)
-interface ActionPlanResourceMapper {
+@Component
+class ActionPlanResourceMapper(private val goalResourceMapper: GoalResourceMapper) {
 
-  fun fromModelToDto(prisonNumber: String, request: CreateActionPlanRequest): CreateActionPlanDto
+  fun fromModelToDto(prisonNumber: String, request: CreateActionPlanRequest) =
+    with(request) {
+      CreateActionPlanDto(
+        prisonNumber = prisonNumber,
+        goals = goals.map {
+          goalResourceMapper.fromModelToDto(it)
+        },
+      )
+    }
 
-  fun fromDomainToModel(actionPlan: ActionPlan): ActionPlanResponse
+  fun fromDomainToModel(actionPlan: ActionPlan) =
+    with(actionPlan) {
+      ActionPlanResponse(
+        reference = reference,
+        prisonNumber = prisonNumber,
+        goals = goals.map { goalResourceMapper.fromDomainToModel(it) },
+      )
+    }
 
-  fun fromDomainToModel(actionPlanSummaries: List<ActionPlanSummary>): List<ActionPlanSummaryResponse>
+  fun fromDomainToModel(actionPlanSummaries: List<ActionPlanSummary>) =
+    actionPlanSummaries.map { ActionPlanSummaryResponse(it.reference, it.prisonNumber) }
 }
