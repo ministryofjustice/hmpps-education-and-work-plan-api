@@ -5,14 +5,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 
 fun aValidCreateGoalsRequest(
   goals: List<CreateGoalRequest> = listOf(aValidCreateGoalRequest()),
-): CreateGoalsRequest =
-  CreateGoalsRequest(
-    goals = goals,
-  )
+): CreateGoalsRequest = CreateGoalsRequest(
+  goals = goals,
+)
 
 fun anotherValidCreateGoalsRequest(
   goals: List<CreateGoalRequest> = listOf(anotherValidCreateGoalRequest()),
-): CreateGoalsRequest =
-  CreateGoalsRequest(
-    goals = goals,
-  )
+): CreateGoalsRequest = CreateGoalsRequest(
+  goals = goals,
+)

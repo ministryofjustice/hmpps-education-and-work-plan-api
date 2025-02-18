@@ -13,19 +13,18 @@ fun aValidFutureWorkInterestsEntity(
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-) =
-  FutureWorkInterestsEntity(
-    reference = reference,
-    interests = interests,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+) = FutureWorkInterestsEntity(
+  reference = reference,
+  interests = interests,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -37,29 +36,27 @@ fun aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-) =
-  FutureWorkInterestsEntity(
-    reference = reference,
-    interests = interests,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+) = FutureWorkInterestsEntity(
+  reference = reference,
+  interests = interests,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidWorkInterestEntity(
   reference: UUID = UUID.randomUUID(),
   workType: WorkInterestType = WorkInterestType.OTHER,
   workTypeOther: String? = "Any job I can get",
   role: String? = "Any role",
-) =
-  WorkInterestEntity(
-    reference = reference,
-    workType = workType,
-    workTypeOther = workTypeOther,
-    role = role,
-  )
+) = WorkInterestEntity(
+  reference = reference,
+  workType = workType,
+  workTypeOther = workTypeOther,
+  role = role,
+)

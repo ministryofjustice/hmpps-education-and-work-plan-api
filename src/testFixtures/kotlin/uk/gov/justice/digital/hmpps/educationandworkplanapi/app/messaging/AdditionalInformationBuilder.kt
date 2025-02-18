@@ -14,16 +14,15 @@ fun aValidPrisonerReceivedAdditionalInformation(
   currentLocation: PrisonerReceivedAdditionalInformation.Location = PrisonerReceivedAdditionalInformation.Location.IN_PRISON,
   currentPrisonStatus: PrisonerReceivedAdditionalInformation.PrisonStatus = PrisonerReceivedAdditionalInformation.PrisonStatus.UNDER_PRISON_CARE,
   nomisMovementReasonCode: String = "N",
-): PrisonerReceivedAdditionalInformation =
-  PrisonerReceivedAdditionalInformation(
-    nomsNumber = prisonNumber,
-    reason = reason,
-    details = details,
-    currentLocation = currentLocation,
-    prisonId = prisonId,
-    nomisMovementReasonCode = nomisMovementReasonCode,
-    currentPrisonStatus = currentPrisonStatus,
-  )
+): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
+  nomsNumber = prisonNumber,
+  reason = reason,
+  details = details,
+  currentLocation = currentLocation,
+  prisonId = prisonId,
+  nomisMovementReasonCode = nomisMovementReasonCode,
+  currentPrisonStatus = currentPrisonStatus,
+)
 
 fun aValidPrisonerReleasedAdditionalInformation(
   prisonNumber: String = aValidPrisonNumber(),
@@ -33,24 +32,22 @@ fun aValidPrisonerReleasedAdditionalInformation(
   currentLocation: PrisonerReleasedAdditionalInformation.Location = PrisonerReleasedAdditionalInformation.Location.OUTSIDE_PRISON,
   currentPrisonStatus: PrisonerReleasedAdditionalInformation.PrisonStatus = PrisonerReleasedAdditionalInformation.PrisonStatus.NOT_UNDER_PRISON_CARE,
   nomisMovementReasonCode: String = "CR",
-): PrisonerReleasedAdditionalInformation =
-  PrisonerReleasedAdditionalInformation(
-    nomsNumber = prisonNumber,
-    reason = reason,
-    details = details,
-    currentLocation = currentLocation,
-    prisonId = prisonId,
-    nomisMovementReasonCode = nomisMovementReasonCode,
-    currentPrisonStatus = currentPrisonStatus,
-  )
+): PrisonerReleasedAdditionalInformation = PrisonerReleasedAdditionalInformation(
+  nomsNumber = prisonNumber,
+  reason = reason,
+  details = details,
+  currentLocation = currentLocation,
+  prisonId = prisonId,
+  nomisMovementReasonCode = nomisMovementReasonCode,
+  currentPrisonStatus = currentPrisonStatus,
+)
 
 fun aValidPrisonerMergedAdditionalInformation(
   prisonNumber: String = aValidPrisonNumber(),
   removedNomsNumber: String,
   reason: Reason = Reason.MERGE,
-): PrisonerMergedAdditionalInformation =
-  PrisonerMergedAdditionalInformation(
-    nomsNumber = prisonNumber,
-    reason = reason,
-    removedNomsNumber = removedNomsNumber,
-  )
+): PrisonerMergedAdditionalInformation = PrisonerMergedAdditionalInformation(
+  nomsNumber = prisonNumber,
+  reason = reason,
+  removedNomsNumber = removedNomsNumber,
+)

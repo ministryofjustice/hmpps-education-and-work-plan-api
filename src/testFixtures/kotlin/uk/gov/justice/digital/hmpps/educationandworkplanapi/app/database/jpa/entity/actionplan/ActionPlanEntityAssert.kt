@@ -10,8 +10,7 @@ fun assertThat(actual: ActionPlanEntity?) = ActionPlanEntityAssert(actual)
 /**
  * AssertJ custom assertion for [ActionPlanEntity]
  */
-class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
-  AbstractObjectAssert<ActionPlanEntityAssert, ActionPlanEntity?>(actual, ActionPlanEntityAssert::class.java) {
+class ActionPlanEntityAssert(actual: ActionPlanEntity?) : AbstractObjectAssert<ActionPlanEntityAssert, ActionPlanEntity?>(actual, ActionPlanEntityAssert::class.java) {
 
   fun hasJpaManagedFieldsPopulated(): ActionPlanEntityAssert {
     isNotNull

@@ -9,9 +9,8 @@ fun aValidUpdatePersonalSkillsAndInterestsRequest(
   reference: UUID? = UUID.randomUUID(),
   skills: List<PersonalSkill> = listOf(aValidPersonalSkill()),
   interests: List<PersonalInterest> = listOf(aValidPersonalInterest()),
-): UpdatePersonalSkillsAndInterestsRequest =
-  UpdatePersonalSkillsAndInterestsRequest(
-    reference = reference,
-    skills = skills,
-    interests = interests,
-  )
+): UpdatePersonalSkillsAndInterestsRequest = UpdatePersonalSkillsAndInterestsRequest(
+  reference = reference,
+  skills = skills,
+  interests = interests,
+)

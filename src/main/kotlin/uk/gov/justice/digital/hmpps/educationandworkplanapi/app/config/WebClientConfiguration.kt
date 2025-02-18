@@ -21,24 +21,21 @@ class WebClientConfiguration {
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     @Value("\${apis.prison-api.url}") prisonApiUri: String,
-  ): WebClient =
-    builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonApiUri)
+  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonApiUri)
 
   @Bean(name = ["manageUsersApiWebClient"])
   fun manageUsersApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     @Value("\${apis.manage-users-api.url}") manageUsersApiUri: String,
-  ): WebClient =
-    builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri)
+  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri)
 
   @Bean(name = ["prisonerSearchApiWebClient"])
   fun prisonerSearchApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     @Value("\${apis.prisoner-search-api.url}") prisonerSearchApiUri: String,
-  ): WebClient =
-    builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search-api", url = prisonerSearchApiUri)
+  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search-api", url = prisonerSearchApiUri)
 
   @Bean
   fun authorizedClientManager(

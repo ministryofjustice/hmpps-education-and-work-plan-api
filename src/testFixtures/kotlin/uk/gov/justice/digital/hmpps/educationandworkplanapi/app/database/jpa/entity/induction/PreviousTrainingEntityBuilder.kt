@@ -14,20 +14,19 @@ fun aValidPreviousTrainingEntity(
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-) =
-  PreviousTrainingEntity(
-    reference = reference,
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+) = PreviousTrainingEntity(
+  reference = reference,
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidPreviousTrainingEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -40,17 +39,16 @@ fun aValidPreviousTrainingEntityWithJpaFieldsPopulated(
   updatedAt: Instant = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String = "bjones_gen",
-) =
-  PreviousTrainingEntity(
-    reference = reference,
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+) = PreviousTrainingEntity(
+  reference = reference,
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

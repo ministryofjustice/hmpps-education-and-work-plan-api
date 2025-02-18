@@ -13,42 +13,39 @@ import java.util.UUID
 @Component
 class ReviewEntityMapper {
 
-  fun fromEntityToDomain(reviewEntity: ReviewEntity, reviewNoteEntity: NoteEntity): CompletedReview =
-    with(reviewEntity) {
-      CompletedReview(
-        reference = reference,
-        prisonNumber = prisonNumber,
-        deadlineDate = deadlineDate,
-        completedDate = completedDate,
-        note = NoteMapper.fromEntityToDomain(reviewNoteEntity),
-        createdBy = createdBy!!,
-        createdAt = createdAt!!,
-        createdAtPrison = createdAtPrison,
-        conductedBy = toReviewConductedBy(this),
-        reviewScheduleReference = reviewScheduleReference,
-        updatedBy = updatedBy!!,
-        updatedAt = updatedAt!!,
-        updatedAtPrison = updatedAtPrison,
-        preRelease = preRelease,
-      )
-    }
+  fun fromEntityToDomain(reviewEntity: ReviewEntity, reviewNoteEntity: NoteEntity): CompletedReview = with(reviewEntity) {
+    CompletedReview(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      deadlineDate = deadlineDate,
+      completedDate = completedDate,
+      note = NoteMapper.fromEntityToDomain(reviewNoteEntity),
+      createdBy = createdBy!!,
+      createdAt = createdAt!!,
+      createdAtPrison = createdAtPrison,
+      conductedBy = toReviewConductedBy(this),
+      reviewScheduleReference = reviewScheduleReference,
+      updatedBy = updatedBy!!,
+      updatedAt = updatedAt!!,
+      updatedAtPrison = updatedAtPrison,
+      preRelease = preRelease,
+    )
+  }
 
-  fun fromDomainToEntity(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): ReviewEntity =
-    with(createCompletedReviewDto) {
-      ReviewEntity(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        deadlineDate = reviewSchedule.reviewScheduleWindow.dateTo,
-        reviewScheduleReference = reviewSchedule.reference,
-        completedDate = conductedAt,
-        createdAtPrison = prisonId,
-        updatedAtPrison = prisonId,
-        conductedBy = conductedBy,
-        conductedByRole = conductedByRole,
-      )
-    }
+  fun fromDomainToEntity(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): ReviewEntity = with(createCompletedReviewDto) {
+    ReviewEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      deadlineDate = reviewSchedule.reviewScheduleWindow.dateTo,
+      reviewScheduleReference = reviewSchedule.reference,
+      completedDate = conductedAt,
+      createdAtPrison = prisonId,
+      updatedAtPrison = prisonId,
+      conductedBy = conductedBy,
+      conductedByRole = conductedByRole,
+    )
+  }
 
-  private fun toReviewConductedBy(reviewEntity: ReviewEntity): ReviewConductedBy? =
-    reviewEntity.takeIf { reviewEntity.conductedBy != null && reviewEntity.conductedByRole != null }
-      ?.let { ReviewConductedBy(name = it.conductedBy!!, role = it.conductedByRole!!) }
+  private fun toReviewConductedBy(reviewEntity: ReviewEntity): ReviewConductedBy? = reviewEntity.takeIf { reviewEntity.conductedBy != null && reviewEntity.conductedByRole != null }
+    ?.let { ReviewConductedBy(name = it.conductedBy!!, role = it.conductedByRole!!) }
 }

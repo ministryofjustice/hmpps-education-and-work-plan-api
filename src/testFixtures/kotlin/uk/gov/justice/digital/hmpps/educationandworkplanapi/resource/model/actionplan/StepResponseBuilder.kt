@@ -9,23 +9,21 @@ fun aValidStepResponse(
   title: String = "Book communication skills course",
   status: StepStatus = StepStatus.NOT_STARTED,
   sequenceNumber: Int = 1,
-): StepResponse =
-  StepResponse(
-    stepReference = reference,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-  )
+): StepResponse = StepResponse(
+  stepReference = reference,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+)
 
 fun anotherValidStepResponse(
   reference: UUID = UUID.randomUUID(),
   title: String = "Complete communication skills course",
   status: StepStatus = StepStatus.NOT_STARTED,
   sequenceNumber: Int = 2,
-): StepResponse =
-  StepResponse(
-    stepReference = reference,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-  )
+): StepResponse = StepResponse(
+  stepReference = reference,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+)

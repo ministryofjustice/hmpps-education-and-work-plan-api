@@ -19,11 +19,10 @@ fun aValidPrisonMovementEvents(
       anotherValidReleasePrisonMovementEvent(),
     ),
   ),
-): PrisonMovementEvents =
-  PrisonMovementEvents(
-    prisonNumber = prisonNumber,
-    prisonBookings = prisonBookings,
-  )
+): PrisonMovementEvents = PrisonMovementEvents(
+  prisonNumber = prisonNumber,
+  prisonBookings = prisonBookings,
+)
 
 fun anotherValidPrisonMovementEvents(
   prisonNumber: String = aValidPrisonNumber(),
@@ -33,11 +32,10 @@ fun anotherValidPrisonMovementEvents(
       anotherValidReleasePrisonMovementEvent(),
     ),
   ),
-): PrisonMovementEvents =
-  PrisonMovementEvents(
-    prisonNumber = prisonNumber,
-    prisonBookings = prisonBookings,
-  )
+): PrisonMovementEvents = PrisonMovementEvents(
+  prisonNumber = prisonNumber,
+  prisonBookings = prisonBookings,
+)
 
 fun aValidAdmissionPrisonMovementEvent(
   date: LocalDate = LocalDate.now().minusMonths(6),

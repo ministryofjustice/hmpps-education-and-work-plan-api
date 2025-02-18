@@ -17,17 +17,16 @@ fun aValidNoteResponse(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): NoteResponse =
-  NoteResponse(
-    reference = reference,
-    content = content,
-    type = type,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): NoteResponse = NoteResponse(
+  reference = reference,
+  content = content,
+  type = type,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)

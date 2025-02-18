@@ -19,18 +19,17 @@ fun aValidPreviousWorkExperiencesResponse(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): PreviousWorkExperiencesResponse =
-  PreviousWorkExperiencesResponse(
-    reference = reference,
-    hasWorkedBefore = hasWorkedBefore,
-    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
-    experiences = experiences,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): PreviousWorkExperiencesResponse = PreviousWorkExperiencesResponse(
+  reference = reference,
+  hasWorkedBefore = hasWorkedBefore,
+  hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+  experiences = experiences,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)

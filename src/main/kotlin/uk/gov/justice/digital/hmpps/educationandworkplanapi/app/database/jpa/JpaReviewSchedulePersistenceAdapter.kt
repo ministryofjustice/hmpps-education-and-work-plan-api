@@ -29,19 +29,18 @@ class JpaReviewSchedulePersistenceAdapter(
 ) : ReviewSchedulePersistenceAdapter {
 
   @Transactional
-  override fun createReviewSchedule(createReviewScheduleDto: CreateReviewScheduleDto): ReviewSchedule =
-    with(createReviewScheduleDto) {
-      if (getActiveReviewSchedule(prisonNumber) != null) {
-        throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
-      }
-
-      reviewScheduleRepository.saveAndFlush(
-        reviewScheduleEntityMapper.fromDomainToEntity(this),
-      ).let {
-        saveReviewScheduleHistory(it)
-        reviewScheduleEntityMapper.fromEntityToDomain(it)
-      }
+  override fun createReviewSchedule(createReviewScheduleDto: CreateReviewScheduleDto): ReviewSchedule = with(createReviewScheduleDto) {
+    if (getActiveReviewSchedule(prisonNumber) != null) {
+      throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
     }
+
+    reviewScheduleRepository.saveAndFlush(
+      reviewScheduleEntityMapper.fromDomainToEntity(this),
+    ).let {
+      saveReviewScheduleHistory(it)
+      reviewScheduleEntityMapper.fromEntityToDomain(it)
+    }
+  }
 
   @Transactional
   override fun updateReviewSchedule(updateReviewScheduleDto: UpdateReviewScheduleDto): ReviewSchedule? {
@@ -57,19 +56,17 @@ class JpaReviewSchedulePersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
-  override fun getActiveReviewSchedule(prisonNumber: String): ReviewSchedule? =
-    try {
-      reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber = prisonNumber, scheduleStatuses = STATUSES_FOR_ACTIVE_REVIEWS)
-        ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
-    } catch (e: NonUniqueResultException) {
-      log.error { "Prisoner $prisonNumber has more than one active ReviewSchedule which is not supported. Please investigate the ReviewSchedule data for prisoner $prisonNumber" }
-      throw IllegalStateException("A prisoner cannot have more than one active ReviewSchedule. Please investigate the ReviewSchedule data for prisoner $prisonNumber")
-    }
+  override fun getActiveReviewSchedule(prisonNumber: String): ReviewSchedule? = try {
+    reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber = prisonNumber, scheduleStatuses = STATUSES_FOR_ACTIVE_REVIEWS)
+      ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+  } catch (e: NonUniqueResultException) {
+    log.error { "Prisoner $prisonNumber has more than one active ReviewSchedule which is not supported. Please investigate the ReviewSchedule data for prisoner $prisonNumber" }
+    throw IllegalStateException("A prisoner cannot have more than one active ReviewSchedule. Please investigate the ReviewSchedule data for prisoner $prisonNumber")
+  }
 
   @Transactional(readOnly = true)
-  override fun getLatestReviewSchedule(prisonNumber: String): ReviewSchedule? =
-    reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
-      ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+  override fun getLatestReviewSchedule(prisonNumber: String): ReviewSchedule? = reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
+    ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
 
   override fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule {
     val reviewScheduleEntity = reviewScheduleRepository.findByReference(updateReviewScheduleStatusDto.reference)
@@ -89,10 +86,8 @@ class JpaReviewSchedulePersistenceAdapter(
     }
   }
 
-  override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
-    return reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
-      .map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
-  }
+  override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> = reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
+    .map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
 
   private fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
     with(reviewScheduleEntity) {
@@ -117,8 +112,6 @@ class JpaReviewSchedulePersistenceAdapter(
     }
   }
 
-  override fun getReviewScheduleHistory(prisonNumber: String): List<ReviewScheduleHistory> {
-    return reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
-      .map { reviewScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
-  }
+  override fun getReviewScheduleHistory(prisonNumber: String): List<ReviewScheduleHistory> = reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
+    .map { reviewScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
 }

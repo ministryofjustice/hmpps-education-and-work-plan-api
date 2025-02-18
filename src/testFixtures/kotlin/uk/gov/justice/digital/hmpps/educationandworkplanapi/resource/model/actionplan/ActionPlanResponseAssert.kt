@@ -9,8 +9,7 @@ fun assertThat(actual: ActionPlanResponse?) = ActionPlanResponseAssert(actual)
 /**
  * AssertJ custom assertion for [ActionPlanResponse]
  */
-class ActionPlanResponseAssert(actual: ActionPlanResponse?) :
-  AbstractObjectAssert<ActionPlanResponseAssert, ActionPlanResponse?>(actual, ActionPlanResponseAssert::class.java) {
+class ActionPlanResponseAssert(actual: ActionPlanResponse?) : AbstractObjectAssert<ActionPlanResponseAssert, ActionPlanResponse?>(actual, ActionPlanResponseAssert::class.java) {
 
   fun isForPrisonNumber(expected: String): ActionPlanResponseAssert {
     isNotNull

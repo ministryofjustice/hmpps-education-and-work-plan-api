@@ -5,7 +5,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 
 fun aValidCreateActionPlanRequest(
   goals: List<CreateGoalRequest> = listOf(aValidCreateGoalRequest()),
-): CreateActionPlanRequest =
-  CreateActionPlanRequest(
-    goals = goals,
-  )
+): CreateActionPlanRequest = CreateActionPlanRequest(
+  goals = goals,
+)

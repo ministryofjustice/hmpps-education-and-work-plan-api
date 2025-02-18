@@ -7,5 +7,4 @@ import java.util.UUID
 fun aValidUpdateFutureWorkInterestsRequest(
   reference: UUID? = UUID.randomUUID(),
   interests: List<FutureWorkInterest> = listOf(aValidFutureWorkInterest()),
-): UpdateFutureWorkInterestsRequest =
-  UpdateFutureWorkInterestsRequest(reference = reference, interests = interests)
+): UpdateFutureWorkInterestsRequest = UpdateFutureWorkInterestsRequest(reference = reference, interests = interests)

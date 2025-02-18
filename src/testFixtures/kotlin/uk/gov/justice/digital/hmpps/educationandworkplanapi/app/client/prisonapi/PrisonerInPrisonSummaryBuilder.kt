@@ -104,8 +104,7 @@ fun aValidPrisonerInPrisonSummary(
     aValidPrisonPeriod(),
     anotherValidPrisonPeriod(),
   ),
-): PrisonerInPrisonSummary =
-  PrisonerInPrisonSummary(prisonerNumber, prisonPeriod)
+): PrisonerInPrisonSummary = PrisonerInPrisonSummary(prisonerNumber, prisonPeriod)
 
 fun aValidPrisonPeriod(
   entryDate: LocalDateTime = LocalDateTime.now().minusMonths(6),
@@ -249,5 +248,4 @@ fun anotherValidTransferDetail(
   toPrisonId = toPrisonId,
 )
 
-private fun LocalDateTime?.asIsoDateTimeString() =
-  this?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+private fun LocalDateTime?.asIsoDateTimeString() = this?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)

@@ -6,12 +6,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 @Component
 class TimelineEntityMapper(private val timelineEventEntityMapper: TimelineEventEntityMapper) {
-  fun fromEntityToDomain(persisted: TimelineEntity): Timeline =
-    with(persisted) {
-      Timeline(
-        reference = reference,
-        prisonNumber = prisonNumber,
-        events = events.map { timelineEventEntityMapper.fromEntityToDomain(it) },
-      )
-    }
+  fun fromEntityToDomain(persisted: TimelineEntity): Timeline = with(persisted) {
+    Timeline(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      events = events.map { timelineEventEntityMapper.fromEntityToDomain(it) },
+    )
+  }
 }

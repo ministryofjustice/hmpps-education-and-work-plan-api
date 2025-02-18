@@ -15,23 +15,22 @@ private val logger = KotlinLogging.logger {}
 class WiremockConfiguration {
 
   @Bean
-  fun wireMockServer(@Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean): WireMockServer =
-    WireMockServer(options().port(9093).usingFilesUnderClasspath("simulations")).apply {
-      if (logWiremockRequests) {
-        addMockServiceRequestListener { request: Request, _: Response ->
-          val formattedHeaders = request.headers.all().joinToString("\n") {
-            "${it.key()}: ${it.values().joinToString(", ")}"
-          }
-          val logMessage = StringBuilder()
-            .appendLine("Request sent to wiremock:")
-            .appendLine("${request.method} ${request.absoluteUrl}")
-            .appendLine(formattedHeaders)
-            .appendLine()
-            .appendLine(request.bodyAsString)
-          logger.info { logMessage }
+  fun wireMockServer(@Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean): WireMockServer = WireMockServer(options().port(9093).usingFilesUnderClasspath("simulations")).apply {
+    if (logWiremockRequests) {
+      addMockServiceRequestListener { request: Request, _: Response ->
+        val formattedHeaders = request.headers.all().joinToString("\n") {
+          "${it.key()}: ${it.values().joinToString(", ")}"
         }
+        val logMessage = StringBuilder()
+          .appendLine("Request sent to wiremock:")
+          .appendLine("${request.method} ${request.absoluteUrl}")
+          .appendLine(formattedHeaders)
+          .appendLine()
+          .appendLine(request.bodyAsString)
+        logger.info { logMessage }
       }
-
-      start()
     }
+
+    start()
+  }
 }

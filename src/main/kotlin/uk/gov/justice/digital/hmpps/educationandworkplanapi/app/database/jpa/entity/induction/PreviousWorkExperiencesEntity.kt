@@ -92,9 +92,7 @@ data class PreviousWorkExperiencesEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference)"
 }
 
 @Table(name = "work_experience")
@@ -166,9 +164,7 @@ data class WorkExperienceEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, experienceType = $experienceType, experienceTypeOther = $experienceTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, experienceType = $experienceType, experienceTypeOther = $experienceTypeOther)"
 }
 
 enum class WorkExperienceType {

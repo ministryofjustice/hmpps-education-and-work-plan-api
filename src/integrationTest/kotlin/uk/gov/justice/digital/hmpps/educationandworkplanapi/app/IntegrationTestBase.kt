@@ -252,16 +252,14 @@ abstract class IntegrationTestBase {
     ).get()
   }
 
-  final inline fun <reified T> createCaptor(): ArgumentCaptor<T> =
-    ArgumentCaptor.forClass(T::class.java)
+  final inline fun <reified T> createCaptor(): ArgumentCaptor<T> = ArgumentCaptor.forClass(T::class.java)
 
-  fun getActionPlan(prisonNumber: String): ActionPlanResponse =
-    webTestClient.get()
-      .uri(GET_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
-      .exchange()
-      .returnResult(ActionPlanResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getActionPlan(prisonNumber: String): ActionPlanResponse = webTestClient.get()
+    .uri(GET_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
+    .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
+    .exchange()
+    .returnResult(ActionPlanResponse::class.java)
+    .responseBody.blockFirst()!!
 
   fun createActionPlan(
     prisonNumber: String,
@@ -313,28 +311,26 @@ abstract class IntegrationTestBase {
       .isCreated()
   }
 
-  fun getTimeline(prisonNumber: String): TimelineResponse =
-    run {
-      wiremockService.stubGetPrisonTimelineFromPrisonApi(
-        prisonNumber,
-        aValidPrisonerInPrisonSummary(prisonerNumber = prisonNumber, prisonPeriod = emptyList()),
-      )
-      webTestClient.get()
-        .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
-        .bearerToken(aValidTokenWithAuthority(TIMELINE_RO, privateKey = keyPair.private))
-        .exchange()
-        .returnResult(TimelineResponse::class.java)
-        .responseBody.blockFirst()!!
-    }
+  fun getTimeline(prisonNumber: String): TimelineResponse = run {
+    wiremockService.stubGetPrisonTimelineFromPrisonApi(
+      prisonNumber,
+      aValidPrisonerInPrisonSummary(prisonerNumber = prisonNumber, prisonPeriod = emptyList()),
+    )
+    webTestClient.get()
+      .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidTokenWithAuthority(TIMELINE_RO, privateKey = keyPair.private))
+      .exchange()
+      .returnResult(TimelineResponse::class.java)
+      .responseBody.blockFirst()!!
+  }
 
-  fun createPrisonerAPIStub(prisonNumber: String, prisoner: Prisoner): Prisoner =
-    run {
-      wiremockService.stubGetPrisonerFromPrisonerSearchApi(
-        prisonNumber,
-        prisoner,
-      )
-      return prisoner
-    }
+  fun createPrisonerAPIStub(prisonNumber: String, prisoner: Prisoner): Prisoner = run {
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+      prisonNumber,
+      prisoner,
+    )
+    return prisoner
+  }
 
   fun createInduction(
     prisonNumber: String,
@@ -357,15 +353,14 @@ abstract class IntegrationTestBase {
       .isCreated()
   }
 
-  fun getInduction(prisonNumber: String): InductionResponse =
-    webTestClient.get()
-      .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(InductionResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getInduction(prisonNumber: String): InductionResponse = webTestClient.get()
+    .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
+    .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
+    .exchange()
+    .expectStatus()
+    .isOk
+    .returnResult(InductionResponse::class.java)
+    .responseBody.blockFirst()!!
 
   fun archiveGoal(
     prisonNumber: String,
@@ -409,20 +404,19 @@ abstract class IntegrationTestBase {
       .isNoContent
   }
 
-  fun getEducation(prisonNumber: String): EducationResponse =
-    webTestClient.get()
-      .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RO,
-          privateKey = keyPair.private,
-        ),
-      )
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(EducationResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getEducation(prisonNumber: String): EducationResponse = webTestClient.get()
+    .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
+    .bearerToken(
+      aValidTokenWithAuthority(
+        EDUCATION_RO,
+        privateKey = keyPair.private,
+      ),
+    )
+    .exchange()
+    .expectStatus()
+    .isOk
+    .returnResult(EducationResponse::class.java)
+    .responseBody.blockFirst()!!
 
   fun createEducation(
     prisonNumber: String,
@@ -444,54 +438,49 @@ abstract class IntegrationTestBase {
       .isCreated
   }
 
-  fun getActionPlanReviews(prisonNumber: String): ActionPlanReviewsResponse =
-    webTestClient.get()
-      .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
-      .exchange()
-      .returnResult(ActionPlanReviewsResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getActionPlanReviews(prisonNumber: String): ActionPlanReviewsResponse = webTestClient.get()
+    .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
+    .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+    .exchange()
+    .returnResult(ActionPlanReviewsResponse::class.java)
+    .responseBody.blockFirst()!!
 
-  fun getReviewSchedules(prisonNumber: String): ActionPlanReviewSchedulesResponse =
-    webTestClient.get()
-      .uri(GET_REVIEW_SCHEDULES_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
-      .exchange()
-      .returnResult(ActionPlanReviewSchedulesResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getReviewSchedules(prisonNumber: String): ActionPlanReviewSchedulesResponse = webTestClient.get()
+    .uri(GET_REVIEW_SCHEDULES_URI_TEMPLATE, prisonNumber)
+    .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+    .exchange()
+    .returnResult(ActionPlanReviewSchedulesResponse::class.java)
+    .responseBody.blockFirst()!!
 
-  fun getInductionSchedule(prisonNumber: String): InductionScheduleResponse =
-    webTestClient.get()
-      .uri(GET_INDUCTION_SCHEDULE_URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(InductionScheduleResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getInductionSchedule(prisonNumber: String): InductionScheduleResponse = webTestClient.get()
+    .uri(GET_INDUCTION_SCHEDULE_URI_TEMPLATE, prisonNumber)
+    .bearerToken(
+      aValidTokenWithAuthority(
+        INDUCTIONS_RO,
+        privateKey = keyPair.private,
+      ),
+    )
+    .exchange()
+    .expectStatus()
+    .isOk
+    .returnResult(InductionScheduleResponse::class.java)
+    .responseBody.blockFirst()!!
 
-  fun getInductionScheduleHistory(prisonNumber: String): InductionSchedulesResponse =
-    webTestClient.get()
-      .uri(GET_INDUCTION_SCHEDULE_HISTORY_URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(InductionSchedulesResponse::class.java)
-      .responseBody.blockFirst()!!
+  fun getInductionScheduleHistory(prisonNumber: String): InductionSchedulesResponse = webTestClient.get()
+    .uri(GET_INDUCTION_SCHEDULE_HISTORY_URI_TEMPLATE, prisonNumber)
+    .bearerToken(
+      aValidTokenWithAuthority(
+        INDUCTIONS_RO,
+        privateKey = keyPair.private,
+      ),
+    )
+    .exchange()
+    .expectStatus()
+    .isOk
+    .returnResult(InductionSchedulesResponse::class.java)
+    .responseBody.blockFirst()!!
 
-  internal fun HmppsQueue.receiveEvent(queueType: QueueType): HmppsDomainEvent =
-    receiveEventsOnQueue(queueType).single()
+  internal fun HmppsQueue.receiveEvent(queueType: QueueType): HmppsDomainEvent = receiveEventsOnQueue(queueType).single()
 
   internal fun HmppsQueue.receiveEventsOnQueue(queueType: QueueType, maxMessages: Int = 10): List<HmppsDomainEvent> {
     val messageCount = when (queueType) {

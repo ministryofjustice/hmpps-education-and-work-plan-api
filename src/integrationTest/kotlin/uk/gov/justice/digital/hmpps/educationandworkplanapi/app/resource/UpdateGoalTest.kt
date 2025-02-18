@@ -284,7 +284,8 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(5) { // the 5th Timeline event will be the GOAL_UPDATED event
+        .event(5) {
+          // the 5th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -406,7 +407,8 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .anyOfEventNumber(5, 6) { // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
+        .anyOfEventNumber(5, 6) {
+          // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -529,7 +531,8 @@ class UpdateGoalTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(5) { // the 5th Timeline event will be the GOAL_UPDATED event
+      .event(5) {
+        // the 5th Timeline event will be the GOAL_UPDATED event
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .wasActionedBy("buser_gen")
           .hasActionedByDisplayName("Bernie User")

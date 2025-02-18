@@ -34,27 +34,26 @@ class AsyncReviewEventService(
     telemetryService.trackReviewCompleted(completedReview = completedReview)
   }
 
-  private fun buildReviewCompletedEvent(completedReview: CompletedReview): TimelineEvent =
-    with(completedReview) {
-      TimelineEvent.newTimelineEvent(
-        sourceReference = reference.toString(),
-        eventType = TimelineEventType.ACTION_PLAN_REVIEW_COMPLETED,
-        prisonId = createdAtPrison,
-        actionedBy = createdBy,
-        timestamp = createdAt,
-        contextualInfo = mapOf(
-          COMPLETED_REVIEW_ENTERED_ONLINE_AT to createdAt.toString(),
-          COMPLETED_REVIEW_ENTERED_ONLINE_BY to userService.getUserDetails(createdBy).name,
-          COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
-          COMPLETED_REVIEW_NOTES to note.content,
-          *conductedBy
-            ?.let {
-              arrayOf(
-                COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY to it.name,
-                COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE to it.role,
-              )
-            } ?: arrayOf(),
-        ),
-      )
-    }
+  private fun buildReviewCompletedEvent(completedReview: CompletedReview): TimelineEvent = with(completedReview) {
+    TimelineEvent.newTimelineEvent(
+      sourceReference = reference.toString(),
+      eventType = TimelineEventType.ACTION_PLAN_REVIEW_COMPLETED,
+      prisonId = createdAtPrison,
+      actionedBy = createdBy,
+      timestamp = createdAt,
+      contextualInfo = mapOf(
+        COMPLETED_REVIEW_ENTERED_ONLINE_AT to createdAt.toString(),
+        COMPLETED_REVIEW_ENTERED_ONLINE_BY to userService.getUserDetails(createdBy).name,
+        COMPLETED_REVIEW_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
+        COMPLETED_REVIEW_NOTES to note.content,
+        *conductedBy
+          ?.let {
+            arrayOf(
+              COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY to it.name,
+              COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY_ROLE to it.role,
+            )
+          } ?: arrayOf(),
+      ),
+    )
+  }
 }

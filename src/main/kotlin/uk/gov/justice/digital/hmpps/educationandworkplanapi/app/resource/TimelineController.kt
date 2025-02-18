@@ -26,8 +26,7 @@ class TimelineController(
   @GetMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_TIMELINE)
-  fun getTimeline(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): TimelineResponse =
-    with(timelineService.getTimelineForPrisoner(prisonNumber)) {
-      timelineMapper.fromDomainToModel(this)
-    }
+  fun getTimeline(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): TimelineResponse = with(timelineService.getTimelineForPrisoner(prisonNumber)) {
+    timelineMapper.fromDomainToModel(this)
+  }
 }

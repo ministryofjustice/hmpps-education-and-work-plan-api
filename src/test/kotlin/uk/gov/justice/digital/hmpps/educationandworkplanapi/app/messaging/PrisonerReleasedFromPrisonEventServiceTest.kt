@@ -144,14 +144,13 @@ class PrisonerReleasedFromPrisonEventServiceTest {
     verifyNoInteractions(reviewScheduleService)
   }
 
-  private fun anInboundEvent(additionalInformation: PrisonerReleasedAdditionalInformation): InboundEvent =
-    InboundEvent(
-      eventType = EventType.PRISONER_RELEASED_FROM_PRISON,
-      personReference = PersonReference(listOf(Identifier(type = "noms", value = "A1234BC"))),
-      occurredAt = Instant.now(),
-      publishedAt = Instant.now(),
-      description = "Prisoner released from prison event",
-      version = "1.0",
-      additionalInformation = objectMapper.writeValueAsString(additionalInformation),
-    )
+  private fun anInboundEvent(additionalInformation: PrisonerReleasedAdditionalInformation): InboundEvent = InboundEvent(
+    eventType = EventType.PRISONER_RELEASED_FROM_PRISON,
+    personReference = PersonReference(listOf(Identifier(type = "noms", value = "A1234BC"))),
+    occurredAt = Instant.now(),
+    publishedAt = Instant.now(),
+    description = "Prisoner released from prison event",
+    version = "1.0",
+    additionalInformation = objectMapper.writeValueAsString(additionalInformation),
+  )
 }

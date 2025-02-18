@@ -85,9 +85,7 @@ data class InPrisonInterestsEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference)"
 }
 
 @Table(name = "in_prison_work_interest")
@@ -153,9 +151,7 @@ data class InPrisonWorkInterestEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
 }
 
 @Table(name = "in_prison_training_interest")
@@ -214,9 +210,7 @@ data class InPrisonTrainingInterestEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, trainingType = $trainingType, trainingTypeOther = $trainingTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, trainingType = $trainingType, trainingTypeOther = $trainingTypeOther)"
 }
 
 enum class InPrisonWorkType {

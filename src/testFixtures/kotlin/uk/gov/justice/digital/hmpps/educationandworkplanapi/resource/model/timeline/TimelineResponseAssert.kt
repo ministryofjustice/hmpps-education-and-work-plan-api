@@ -9,8 +9,7 @@ fun assertThat(actual: TimelineResponse?) = TimelineResponseAssert(actual)
 /**
  * AssertJ custom assertion for [TimelineResponse]
  */
-class TimelineResponseAssert(actual: TimelineResponse?) :
-  AbstractObjectAssert<TimelineResponseAssert, TimelineResponse?>(actual, TimelineResponseAssert::class.java) {
+class TimelineResponseAssert(actual: TimelineResponse?) : AbstractObjectAssert<TimelineResponseAssert, TimelineResponse?>(actual, TimelineResponseAssert::class.java) {
 
   fun isForPrisonNumber(expected: String): TimelineResponseAssert {
     isNotNull
