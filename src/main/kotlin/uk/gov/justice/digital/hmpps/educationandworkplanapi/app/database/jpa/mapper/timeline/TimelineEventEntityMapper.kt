@@ -62,8 +62,6 @@ class TimelineEventEntityMapper {
       TimelineEventTypeEntity.ACTION_PLAN_REVIEW_COMPLETED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_COMPLETED
       TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
       TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_CREATED -> TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
-      TimelineEventTypeEntity.CONVERSATION_CREATED -> TimelineEventTypeDomain.CONVERSATION_CREATED
-      TimelineEventTypeEntity.CONVERSATION_UPDATED -> TimelineEventTypeDomain.CONVERSATION_UPDATED
       TimelineEventTypeEntity.PRISON_ADMISSION -> TimelineEventTypeDomain.PRISON_ADMISSION
       TimelineEventTypeEntity.PRISON_RELEASE -> TimelineEventTypeDomain.PRISON_RELEASE
       TimelineEventTypeEntity.PRISON_TRANSFER -> TimelineEventTypeDomain.PRISON_TRANSFER
@@ -86,8 +84,6 @@ class TimelineEventEntityMapper {
       TimelineEventTypeDomain.STEP_STARTED -> TimelineEventTypeEntity.STEP_STARTED
       TimelineEventTypeDomain.STEP_COMPLETED -> TimelineEventTypeEntity.STEP_COMPLETED
       TimelineEventTypeDomain.ACTION_PLAN_REVIEW_COMPLETED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_COMPLETED
-      TimelineEventTypeDomain.CONVERSATION_CREATED -> TimelineEventTypeEntity.CONVERSATION_CREATED
-      TimelineEventTypeDomain.CONVERSATION_UPDATED -> TimelineEventTypeEntity.CONVERSATION_UPDATED
       TimelineEventTypeDomain.PRISON_ADMISSION -> TimelineEventTypeEntity.PRISON_ADMISSION
       TimelineEventTypeDomain.PRISON_RELEASE -> TimelineEventTypeEntity.PRISON_RELEASE
       TimelineEventTypeDomain.PRISON_TRANSFER -> TimelineEventTypeEntity.PRISON_TRANSFER
@@ -100,7 +96,6 @@ class TimelineEventEntityMapper {
     when (eventType) {
       TimelineEventContextEntity.GOAL_TITLE -> TimelineEventContextDomain.GOAL_TITLE
       TimelineEventContextEntity.STEP_TITLE -> TimelineEventContextDomain.STEP_TITLE
-      TimelineEventContextEntity.CONVERSATION_TYPE -> TimelineEventContextDomain.CONVERSATION_TYPE
       TimelineEventContextEntity.GOAL_ARCHIVED_REASON -> TimelineEventContextDomain.GOAL_ARCHIVED_REASON
       TimelineEventContextEntity.GOAL_ARCHIVED_REASON_OTHER -> TimelineEventContextDomain.GOAL_ARCHIVED_REASON_OTHER
       TimelineEventContextEntity.PRISON_TRANSFERRED_FROM -> TimelineEventContextDomain.PRISON_TRANSFERRED_FROM
@@ -134,7 +129,6 @@ class TimelineEventEntityMapper {
     when (eventType) {
       TimelineEventContextDomain.GOAL_TITLE -> TimelineEventContextEntity.GOAL_TITLE
       TimelineEventContextDomain.STEP_TITLE -> TimelineEventContextEntity.STEP_TITLE
-      TimelineEventContextDomain.CONVERSATION_TYPE -> TimelineEventContextEntity.CONVERSATION_TYPE
       TimelineEventContextDomain.GOAL_ARCHIVED_REASON -> TimelineEventContextEntity.GOAL_ARCHIVED_REASON
       TimelineEventContextDomain.GOAL_ARCHIVED_REASON_OTHER -> TimelineEventContextEntity.GOAL_ARCHIVED_REASON_OTHER
       TimelineEventContextDomain.PRISON_TRANSFERRED_FROM -> TimelineEventContextEntity.PRISON_TRANSFERRED_FROM

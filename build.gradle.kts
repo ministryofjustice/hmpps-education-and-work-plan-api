@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
@@ -9,7 +8,6 @@ plugins {
   id("org.openapi.generator") version "7.10.0"
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
-  kotlin("kapt") version "2.0.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "5.0.0"
@@ -19,7 +17,6 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val mapstructVersion = "1.6.3"
 val postgresqlVersion = "42.7.4"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.7.0"
@@ -40,12 +37,6 @@ allOpen {
     "javax.persistence.MappedSuperclass",
     "javax.persistence.Embeddable",
   )
-}
-
-kapt {
-  arguments {
-    arg("mapstruct.defaultComponentModel", "spring")
-  }
 }
 
 jacoco {
@@ -71,9 +62,6 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:$hmppsSqsVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion")
-
-  implementation("org.mapstruct:mapstruct:$mapstructVersion")
-  kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
 
   implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
@@ -234,10 +222,6 @@ tasks {
   }
   withType<KtLintFormatTask> {
     // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
-    mustRunAfter("buildEducationAndWorkPlanModel")
-    mustRunAfter("buildPrisonApiModel")
-  }
-  withType<KaptGenerateStubsTask> {
     mustRunAfter("buildEducationAndWorkPlanModel")
     mustRunAfter("buildPrisonApiModel")
   }

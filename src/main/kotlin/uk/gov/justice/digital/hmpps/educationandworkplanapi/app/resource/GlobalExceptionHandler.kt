@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.PrisonerConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
@@ -175,8 +173,6 @@ class GlobalExceptionHandler(
       GoalNotFoundException::class,
       TimelineNotFoundException::class,
       InductionNotFoundException::class,
-      ConversationNotFoundException::class,
-      PrisonerConversationNotFoundException::class,
       EducationNotFoundException::class,
       PrisonerHasNoGoalsException::class,
       ReviewScheduleNotFoundException::class,

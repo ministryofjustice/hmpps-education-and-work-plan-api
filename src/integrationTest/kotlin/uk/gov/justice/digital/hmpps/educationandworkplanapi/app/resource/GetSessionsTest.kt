@@ -146,10 +146,10 @@ class GetSessionsTest : IntegrationTestBase() {
     assertThat(actual!!.sessions.size).isEqualTo(2)
     assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
     assertThat(actual.sessions[0].sessionType).isEqualTo(SessionResponse.SessionType.REVIEW)
-    assertThat(actual.sessions[0].exemptionReason).isEqualTo("This guy messes around")
+    assertThat(actual.sessions[0].exemptionReason).isEqualTo(EXEMPT_PRISONER_SAFETY_ISSUES.name)
     assertThat(actual.sessions[1].prisonNumber).isEqualTo(prisoner3.prisonerNumber)
     assertThat(actual.sessions[1].sessionType).isEqualTo(SessionResponse.SessionType.INDUCTION)
-    assertThat(actual.sessions[1].exemptionReason).isEqualTo("Has a drugs problem")
+    assertThat(actual.sessions[1].exemptionReason).isEqualTo(EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY.name)
   }
 
   private fun getSessionSummary(status: SessionStatusType, prisonerIdsRequest: PrisonerIdsRequest): FluxExchangeResult<SessionResponses> {

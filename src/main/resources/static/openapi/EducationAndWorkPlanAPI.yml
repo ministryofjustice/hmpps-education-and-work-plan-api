@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.21.0'
+  version: '1.21.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -668,117 +668,6 @@ paths:
       operationId: get-prisoner-induction-schedule
 
   #
-  # Conversations
-  # --------------------------------------------------------------------------------
-  '/conversations/{prisonNumber}':
-    parameters:
-      - $ref: "#/components/parameters/prisonNumberPathParameter"
-    post:
-      summary: Creates a Learning Work and Progress Conversation for a Prisoner.
-      description: |
-        Creates a Learning Work and Progress Conversation for a Prisoner.
-        A Prisoner can have many Conversations. Sending the same request will result in a new Conversation being
-        saved for the Prisoner.
-        
-        **Role Requirements:**
-        Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
-      tags:
-        - Conversations
-      responses:
-        '201':
-          description: The Conversation was created successfully.
-        '400':
-          $ref: '#/components/responses/400ErrorResponse'
-      operationId: create-prisoner-conversation
-      requestBody:
-        $ref: '#/components/requestBodies/CreateConversation'
-    get:
-      summary: Returns a page of Learning Work and Progress Conversations for a Prisoner.
-      description: |
-        Returns a page of Learning Work and Progress Conversations for a Prisoner.
-        
-        **Role Requirements:**
-        Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RO` (Read-Only)
-          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
-      tags:
-        - Conversations
-      parameters:
-        - name: page
-          description: The page of the results set to return
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          example: 0
-          in: query
-        - name: pageSize
-          description: The page of the results set to return
-          schema:
-            type: integer
-            minimum: 1
-            default: 20
-          example: 20
-          in: query
-      responses:
-        '200':
-          $ref: '#/components/responses/Conversations'
-        '404':
-          $ref: '#/components/responses/404ErrorResponse'
-      operationId: get-prisoner-conversations
-
-  '/conversations/{prisonNumber}/{conversationReference}':
-    parameters:
-      - $ref: "#/components/parameters/prisonNumberPathParameter"
-      - name: conversationReference
-        description: The conversation's unique reference
-        schema:
-          type: string
-          format: uuid
-        example: 'c88a6c48-97e2-4c04-93b5-98619966447b'
-        in: path
-        required: true
-    get:
-      summary: Returns a Learning Work and Progress Conversation for a Prisoner.
-      description: |
-        Returns a prisoner's Learning Work and Progress Conversation.
-        
-        **Role Requirements:**
-        Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RO` (Read-Only)
-          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
-      tags:
-        - Conversations
-      responses:
-        '200':
-          $ref: '#/components/responses/Conversation'
-        '404':
-          $ref: '#/components/responses/404ErrorResponse'
-      operationId: get-prisoner-conversation
-
-    put:
-      summary: Updates a Learning Work and Progress Conversation for a Prisoner.
-      description: |
-        Updates a prisoner's Learning Work and Progress Conversation.
-        
-        **Role Requirements:**
-        Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__CONVERSATIONS__RW` (Read-Write)
-      tags:
-        - Conversations
-      responses:
-        '204':
-          description: The Conversation was updated successfully.
-        '400':
-          $ref: '#/components/responses/400ErrorResponse'
-        '404':
-          $ref: '#/components/responses/404ErrorResponse'
-      operationId: update-prisoner-conversation
-      requestBody:
-        $ref: '#/components/requestBodies/UpdateConversation'
-
-  #
   # Subject access request
   # --------------------------------------------------------------------------------
   '/subject-access-request':
@@ -835,7 +724,7 @@ paths:
       parameters:
         - name: status
           in: query
-          required: false
+          required: true
           description: Filter session summaries by status. Valid values are DUE, OVERDUE, or ON_HOLD.
           schema:
               $ref: '#/components/schemas/SessionStatusType'
@@ -1790,31 +1679,6 @@ components:
         - updatedAt
         - updatedAtPrison
 
-    ConversationResponse:
-      title: ConversationResponse
-      type: object
-      description: Represents a Conversation with a prisoner within the context of their Learning and Work Progress.
-      allOf:
-        - $ref: '#/components/schemas/AuditedResource'
-      properties:
-        reference:
-          type: string
-          format: uuid
-          description: A unique reference for this ConversationResponse.
-          example: 814ade0a-a3b2-46a3-862f-79211ba13f7b
-        prisonNumber:
-          type: string
-          description: The ID of the prisoner
-          example: 'A1234BC'
-        note:
-          type: string
-          description: A note for this conversation
-          example: Pay close attention to Peter's behaviour.
-      required:
-        - reference
-        - prisonNumber
-        - note
-
     InductionScheduleResponse:
       title: InductionScheduleResponse
       type: object
@@ -1872,34 +1736,6 @@ components:
         - deadlineDate
         - scheduleCalculationRule
         - scheduleStatus
-
-    ConversationsResponse:
-      title: ConversationsResponse
-      type: object
-      description: Represents a pageable list of Conversations with a prisoner within the context of their Learning and Work Progress.
-      properties:
-        totalElements:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        pageNumber:
-          type: integer
-          format: int32
-        pageSize:
-          type: integer
-          format: int32
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationResponse'
-      required:
-        - totalElements
-        - totalPages
-        - pageNumber
-        - pageSize
-        - content
 
     EducationResponse:
       title: EducationResponse
@@ -2203,8 +2039,6 @@ components:
         - ACTION_PLAN_REVIEW_COMPLETED
         - ACTION_PLAN_REVIEW_SCHEDULE_CREATED
         - ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
-        - CONVERSATION_CREATED
-        - CONVERSATION_UPDATED
         - PRISON_ADMISSION
         - PRISON_RELEASE
         - PRISON_TRANSFER
@@ -2890,50 +2724,6 @@ components:
           format: uuid
           description: A unique reference for a FutureWorkInterests resource (if it already exists).
           example: c88a6c48-97e2-4c04-93b5-98619966447b
-
-    ### Conversations ###
-    ConversationType:
-      title: ConversationType
-      description: The categories of Conversation that a Prisoner may have recorded against their Learning and Work Progress.
-      type: string
-      enum:
-        - INDUCTION
-        - GENERAL
-        - REVIEW
-
-    CreateConversationRequest:
-      title: CreateConversationRequest
-      description: A request to create a Prisoner Conversation.
-      type: object
-      properties:
-        prisonId:
-          $ref: '#/components/schemas/PrisonId'
-        type:
-          $ref: '#/components/schemas/ConversationType'
-        note:
-          type: string
-          description: A note for this conversation
-          example: Pay close attention to Peter's behaviour.
-      required:
-        - prisonId
-        - type
-        - note
-
-    UpdateConversationRequest:
-      title: UpdateConversationRequest
-      description: A request to update a Prisoner Conversation.
-      type: object
-      properties:
-        prisonId:
-          $ref: '#/components/schemas/PrisonId'
-        note:
-          type: string
-          description: A note for this conversation
-          example: Pay close attention to Peter's behaviour.
-      required:
-        - prisonId
-        - type
-        - note
 
     ### SAR endpoint ###
     SubjectAccessRequestContent:
@@ -3621,39 +3411,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InductionScheduleResponse'
-    Conversation:
-      description: Response body containing a Prisoner's Learning and Work Progress conversation.
-      headers:
-        Access-Control-Allow-Origin:
-          schema:
-            type: string
-        Access-Control-Allow-Methods:
-          schema:
-            type: string
-        Access-Control-Allow-Headers:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ConversationResponse'
-
-    Conversations:
-      description: Response body containing a Pageable list of Prisoner's Learning and Work Progress conversations.
-      headers:
-        Access-Control-Allow-Origin:
-          schema:
-            type: string
-        Access-Control-Allow-Methods:
-          schema:
-            type: string
-        Access-Control-Allow-Headers:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ConversationsResponse'
 
     SarContentFound:
       description: Request successfully processed - content found
@@ -3853,18 +3610,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateInductionRequest'
-    CreateConversation:
-      description: Request body to create a Prisoner Conversation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CreateConversationRequest'
-    UpdateConversation:
-      description: Request body to update a Prisoner Conversation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UpdateConversationRequest'
     CreateEducation:
       description: Request body to create an individual's education record.
       content:
