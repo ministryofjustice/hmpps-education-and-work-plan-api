@@ -25,7 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 @ExtendWith(MockitoExtension::class)
 internal class ActionPlanResourceMapperTest {
   @InjectMocks
-  private lateinit var mapper: ActionPlanResourceMapperImpl
+  private lateinit var mapper: ActionPlanResourceMapper
 
   @Mock
   private lateinit var goalMapper: GoalResourceMapper

@@ -19,7 +19,6 @@ import java.time.LocalDate
  * instances rather than mocks.
  * This is because the method under test ([GoalEntityMapper.updateEntityFromDto]) mutates the steps collection using
  * the [GoalEntityListManager] and [StepEntityMapper].
- * It is set with reflection as there is no setter or constructor injection on the mapstruct generated class.
  */
 class GoalEntityMapperUpdateEntityFromDtoTest {
 
