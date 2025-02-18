@@ -10,14 +10,13 @@ fun aValidCreateGoalRequest(
   steps: List<CreateStepRequest> = listOf(aValidCreateStepRequest(), anotherValidCreateStepRequest()),
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
   prisonId: String = "BXI",
-): CreateGoalRequest =
-  CreateGoalRequest(
-    title = title,
-    targetCompletionDate = targetCompletionDate,
-    steps = steps,
-    notes = notes,
-    prisonId = prisonId,
-  )
+): CreateGoalRequest = CreateGoalRequest(
+  title = title,
+  targetCompletionDate = targetCompletionDate,
+  steps = steps,
+  notes = notes,
+  prisonId = prisonId,
+)
 
 fun anotherValidCreateGoalRequest(
   title: String = "Learn bricklaying",
@@ -25,11 +24,10 @@ fun anotherValidCreateGoalRequest(
   steps: List<CreateStepRequest> = listOf(aValidCreateStepRequest("Attend in house bricklaying course")),
   notes: String? = "",
   prisonId: String = "BXI",
-): CreateGoalRequest =
-  CreateGoalRequest(
-    title = title,
-    targetCompletionDate = targetCompletionDate,
-    steps = steps,
-    notes = notes,
-    prisonId = prisonId,
-  )
+): CreateGoalRequest = CreateGoalRequest(
+  title = title,
+  targetCompletionDate = targetCompletionDate,
+  steps = steps,
+  notes = notes,
+  prisonId = prisonId,
+)

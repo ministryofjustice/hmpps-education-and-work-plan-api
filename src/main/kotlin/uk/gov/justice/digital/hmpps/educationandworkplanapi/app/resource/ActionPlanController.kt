@@ -88,8 +88,7 @@ class ActionPlanController(
     @Valid
     @RequestBody
     request: GetActionPlanSummariesRequest,
-  ): ActionPlanSummaryListResponse =
-    with(actionPlanService.getActionPlanSummaries(request.prisonNumbers)) {
-      ActionPlanSummaryListResponse(actionPlanMapper.fromDomainToModel(this))
-    }
+  ): ActionPlanSummaryListResponse = with(actionPlanService.getActionPlanSummaries(request.prisonNumbers)) {
+    ActionPlanSummaryListResponse(actionPlanMapper.fromDomainToModel(this))
+  }
 }

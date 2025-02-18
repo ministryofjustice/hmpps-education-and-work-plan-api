@@ -12,11 +12,10 @@ fun aValidCreatePreviousQualificationsRequest(
     aValidAchievedQualification(),
     anotherValidAchievedQualification(),
   ),
-): CreatePreviousQualificationsRequest =
-  CreatePreviousQualificationsRequest(
-    educationLevel = educationLevel,
-    qualifications = qualifications,
-  )
+): CreatePreviousQualificationsRequest = CreatePreviousQualificationsRequest(
+  educationLevel = educationLevel,
+  qualifications = qualifications,
+)
 
 fun aValidAchievedQualification(
   reference: UUID? = null,

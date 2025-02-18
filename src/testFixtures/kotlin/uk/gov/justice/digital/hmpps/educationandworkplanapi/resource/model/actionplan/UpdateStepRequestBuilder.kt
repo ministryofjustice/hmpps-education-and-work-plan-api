@@ -9,10 +9,9 @@ fun aValidUpdateStepRequest(
   title: String = "Book French course",
   status: StepStatus = StepStatus.ACTIVE,
   sequenceNumber: Int = 1,
-): UpdateStepRequest =
-  UpdateStepRequest(
-    stepReference = stepReference,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-  )
+): UpdateStepRequest = UpdateStepRequest(
+  stepReference = stepReference,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+)

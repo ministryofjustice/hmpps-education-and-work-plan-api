@@ -12,32 +12,29 @@ import java.util.UUID
 class ActionPlanEntityMapper(
   private val goalEntityMapper: GoalEntityMapper,
 ) {
-  fun fromDtoToEntity(createActionPlanDto: CreateActionPlanDto): ActionPlanEntity =
-    with(createActionPlanDto) {
-      ActionPlanEntity(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-      ).apply {
-        goals.addAll(
-          createActionPlanDto.goals.map { goalEntityMapper.fromDtoToEntity(it) },
-        )
-      }
-    }
-
-  fun fromEntityToDomain(actionPlanEntity: ActionPlanEntity): ActionPlan =
-    with(actionPlanEntity) {
-      ActionPlan(
-        reference = reference,
-        prisonNumber = prisonNumber,
-        goals = goals.map { goalEntityMapper.fromEntityToDomain(it) },
+  fun fromDtoToEntity(createActionPlanDto: CreateActionPlanDto): ActionPlanEntity = with(createActionPlanDto) {
+    ActionPlanEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+    ).apply {
+      goals.addAll(
+        createActionPlanDto.goals.map { goalEntityMapper.fromDtoToEntity(it) },
       )
     }
+  }
 
-  fun fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections: List<ActionPlanSummaryProjection>): List<ActionPlanSummary> =
-    actionPlanSummaryProjections.map {
-      ActionPlanSummary(
-        reference = it.reference,
-        prisonNumber = it.prisonNumber,
-      )
-    }
+  fun fromEntityToDomain(actionPlanEntity: ActionPlanEntity): ActionPlan = with(actionPlanEntity) {
+    ActionPlan(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      goals = goals.map { goalEntityMapper.fromEntityToDomain(it) },
+    )
+  }
+
+  fun fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections: List<ActionPlanSummaryProjection>): List<ActionPlanSummary> = actionPlanSummaryProjections.map {
+    ActionPlanSummary(
+      reference = it.reference,
+      prisonNumber = it.prisonNumber,
+    )
+  }
 }

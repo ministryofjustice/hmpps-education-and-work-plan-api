@@ -25,9 +25,7 @@ class GoalNoteService(
     }
   }
 
-  override fun getNotes(entityReference: UUID): String? {
-    return noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL).firstOrNull()?.content
-  }
+  override fun getNotes(entityReference: UUID): String? = noteService.getNotes(entityReference, EntityType.GOAL, NoteType.GOAL).firstOrNull()?.content
 
   override fun deleteNote(entityReference: UUID) {
     noteService.deleteNote(entityReference, EntityType.GOAL, NoteType.GOAL)
@@ -48,14 +46,12 @@ class GoalNoteService(
   }
 }
 
-fun Goal.mapToNotesDTO(prisonNumber: String): CreateNoteDto {
-  return CreateNoteDto(
-    prisonNumber = prisonNumber,
-    content = notes!!,
-    noteType = NoteType.GOAL,
-    entityType = EntityType.GOAL,
-    entityReference = reference,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
-}
+fun Goal.mapToNotesDTO(prisonNumber: String): CreateNoteDto = CreateNoteDto(
+  prisonNumber = prisonNumber,
+  content = notes!!,
+  noteType = NoteType.GOAL,
+  entityType = EntityType.GOAL,
+  entityReference = reference,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)

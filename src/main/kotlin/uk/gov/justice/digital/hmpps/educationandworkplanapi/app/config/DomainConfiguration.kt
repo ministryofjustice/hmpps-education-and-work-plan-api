@@ -46,60 +46,53 @@ class DomainConfiguration {
     goalEventService: GoalEventService,
     actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
     goalNotesService: GoalNotesService,
-  ): GoalService =
-    GoalService(
-      goalPersistenceAdapter,
-      goalEventService,
-      actionPlanPersistenceAdapter,
-      goalNotesService,
-    )
+  ): GoalService = GoalService(
+    goalPersistenceAdapter,
+    goalEventService,
+    actionPlanPersistenceAdapter,
+    goalNotesService,
+  )
 
   @Bean
   fun actionPlanDomainService(
     actionPlanPersistenceAdapter: ActionPlanPersistenceAdapter,
     actionPlanEventService: ActionPlanEventService,
     goalNotesService: GoalNotesService,
-  ): ActionPlanService =
-    ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService, goalNotesService)
+  ): ActionPlanService = ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService, goalNotesService)
 
   @Bean
   fun noteService(
     notePersistenceAdapter: JpaNotePersistenceAdapter,
-  ): NoteService =
-    NoteService(notePersistenceAdapter)
+  ): NoteService = NoteService(notePersistenceAdapter)
 
   @Bean
   fun timelineDomainService(
     timelinePersistenceAdapter: TimelinePersistenceAdapter,
     prisonTimelineService: PrisonTimelineService,
-  ): TimelineService =
-    TimelineService(timelinePersistenceAdapter, prisonTimelineService)
+  ): TimelineService = TimelineService(timelinePersistenceAdapter, prisonTimelineService)
 
   @Bean
   fun inductionDomainService(
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     inductionEventService: InductionEventService,
-  ): InductionService =
-    InductionService(inductionPersistenceAdapter, inductionEventService)
+  ): InductionService = InductionService(inductionPersistenceAdapter, inductionEventService)
 
   @Bean
   fun inductionScheduleDomainService(
     inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
     inductionScheduleEventService: InductionScheduleEventService,
     inductionScheduleDateCalculationService: InductionScheduleDateCalculationService,
-  ): InductionScheduleService =
-    InductionScheduleService(
-      inductionSchedulePersistenceAdapter,
-      inductionScheduleEventService,
-      inductionScheduleDateCalculationService,
-    )
+  ): InductionScheduleService = InductionScheduleService(
+    inductionSchedulePersistenceAdapter,
+    inductionScheduleEventService,
+    inductionScheduleDateCalculationService,
+  )
 
   @Bean
   fun educationDomainService(
     educationPersistenceAdapter: EducationPersistenceAdapter,
     educationEventService: EducationEventService,
-  ): EducationService =
-    EducationService(educationPersistenceAdapter, educationEventService)
+  ): EducationService = EducationService(educationPersistenceAdapter, educationEventService)
 
   @Bean
   fun reviewDomainService(
@@ -108,26 +101,24 @@ class DomainConfiguration {
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
     reviewScheduleService: ReviewScheduleService,
     reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
-  ): ReviewService =
-    ReviewService(
-      reviewEventService,
-      reviewPersistenceAdapter,
-      reviewSchedulePersistenceAdapter,
-      reviewScheduleService,
-      reviewScheduleDateCalculationService,
-    )
+  ): ReviewService = ReviewService(
+    reviewEventService,
+    reviewPersistenceAdapter,
+    reviewSchedulePersistenceAdapter,
+    reviewScheduleService,
+    reviewScheduleDateCalculationService,
+  )
 
   @Bean
   fun reviewScheduleDomainService(
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
     reviewScheduleEventService: ReviewScheduleEventService,
     reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
-  ): ReviewScheduleService =
-    ReviewScheduleService(
-      reviewSchedulePersistenceAdapter,
-      reviewScheduleEventService,
-      reviewScheduleDateCalculationService,
-    )
+  ): ReviewScheduleService = ReviewScheduleService(
+    reviewSchedulePersistenceAdapter,
+    reviewScheduleEventService,
+    reviewScheduleDateCalculationService,
+  )
 
   @Bean
   fun reviewScheduleDateCalculationService(

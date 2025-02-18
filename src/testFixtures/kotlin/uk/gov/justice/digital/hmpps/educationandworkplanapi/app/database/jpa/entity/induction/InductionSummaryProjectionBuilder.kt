@@ -11,13 +11,12 @@ fun aValidInductionSummaryProjection(
   createdAt: Instant = Instant.now(),
   updatedBy: String = "bjones_gen",
   updatedAt: Instant = Instant.now(),
-): InductionSummaryProjection =
-  InductionSummaryProjection(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    workOnRelease = workOnRelease,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    updatedBy = updatedBy,
-    updatedAt = updatedAt,
-  )
+): InductionSummaryProjection = InductionSummaryProjection(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  workOnRelease = workOnRelease,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  updatedBy = updatedBy,
+  updatedAt = updatedAt,
+)

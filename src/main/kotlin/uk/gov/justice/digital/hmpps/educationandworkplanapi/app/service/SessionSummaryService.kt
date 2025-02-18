@@ -68,31 +68,27 @@ class SessionSummaryService(
   fun mapSessions(
     reviews: List<ReviewSchedule>,
     inductions: List<InductionSchedule>,
-  ): List<SessionResponse> {
-    return reviews.map {
-      SessionResponse(
-        sessionType = SessionResponse.SessionType.REVIEW,
-        prisonNumber = it.prisonNumber,
-        deadlineDate = it.reviewScheduleWindow.dateTo,
-        reference = it.reference,
-        exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
-        exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
-      )
-    } + inductions.map {
-      SessionResponse(
-        sessionType = SessionResponse.SessionType.INDUCTION,
-        prisonNumber = it.prisonNumber,
-        deadlineDate = it.deadlineDate,
-        reference = it.reference,
-        exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
-        exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
-      )
-    }
+  ): List<SessionResponse> = reviews.map {
+    SessionResponse(
+      sessionType = SessionResponse.SessionType.REVIEW,
+      prisonNumber = it.prisonNumber,
+      deadlineDate = it.reviewScheduleWindow.dateTo,
+      reference = it.reference,
+      exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
+      exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
+    )
+  } + inductions.map {
+    SessionResponse(
+      sessionType = SessionResponse.SessionType.INDUCTION,
+      prisonNumber = it.prisonNumber,
+      deadlineDate = it.deadlineDate,
+      reference = it.reference,
+      exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
+      exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
+    )
   }
 
-  fun convertInstantToLocalDate(instant: Instant, zoneId: ZoneId = ZoneId.systemDefault()): LocalDate {
-    return instant.atZone(zoneId).toLocalDate()
-  }
+  fun convertInstantToLocalDate(instant: Instant, zoneId: ZoneId = ZoneId.systemDefault()): LocalDate = instant.atZone(zoneId).toLocalDate()
 
   /**
    * Work out which schedules are due, overdue and on_hold (exempt)

@@ -10,8 +10,7 @@ fun assertThat(actual: TimelineEntity?) = TimelineEntityAssert(actual)
 /**
  * AssertJ custom assertion for [TimelineEntity]
  */
-class TimelineEntityAssert(actual: TimelineEntity?) :
-  AbstractObjectAssert<TimelineEntityAssert, TimelineEntity?>(actual, TimelineEntityAssert::class.java) {
+class TimelineEntityAssert(actual: TimelineEntity?) : AbstractObjectAssert<TimelineEntityAssert, TimelineEntity?>(actual, TimelineEntityAssert::class.java) {
 
   fun hasJpaManagedFieldsPopulated(): TimelineEntityAssert {
     isNotNull

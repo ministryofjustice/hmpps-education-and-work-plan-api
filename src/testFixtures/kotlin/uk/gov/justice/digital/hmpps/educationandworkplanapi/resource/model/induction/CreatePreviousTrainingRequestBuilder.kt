@@ -6,8 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Train
 fun aValidCreatePreviousTrainingRequest(
   trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
   trainingTypeOther: String? = "Certified Kotlin Developer",
-): CreatePreviousTrainingRequest =
-  CreatePreviousTrainingRequest(
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-  )
+): CreatePreviousTrainingRequest = CreatePreviousTrainingRequest(
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+)

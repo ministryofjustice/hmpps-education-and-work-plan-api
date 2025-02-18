@@ -23,27 +23,25 @@ class AsyncReviewScheduleEventService(
   private val eventPublisher: EventPublisher,
 ) : ReviewScheduleEventService {
 
-  override fun reviewScheduleCreated(reviewSchedule: ReviewSchedule) =
-    with(reviewSchedule) {
-      log.debug { "Review Schedule created event for prisoner [$prisonNumber]" }
+  override fun reviewScheduleCreated(reviewSchedule: ReviewSchedule) = with(reviewSchedule) {
+    log.debug { "Review Schedule created event for prisoner [$prisonNumber]" }
 
-      timelineService.recordTimelineEvent(
-        prisonNumber,
-        timelineEventFactory.reviewScheduleCreatedTimelineEvent(this),
-      )
-      telemetryService.trackReviewScheduleCreated(this)
-      eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
-    }
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.reviewScheduleCreatedTimelineEvent(this),
+    )
+    telemetryService.trackReviewScheduleCreated(this)
+    eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
+  }
 
-  override fun reviewScheduleStatusUpdated(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus) =
-    with(updatedReviewScheduleStatus) {
-      log.debug { "Review schedule status updated event for prisoner [$prisonNumber]" }
+  override fun reviewScheduleStatusUpdated(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus) = with(updatedReviewScheduleStatus) {
+    log.debug { "Review schedule status updated event for prisoner [$prisonNumber]" }
 
-      timelineService.recordTimelineEvent(
-        prisonNumber,
-        timelineEventFactory.reviewScheduleStatusUpdatedTimelineEvent(this),
-      )
-      telemetryService.trackReviewScheduleStatusUpdated(this)
-      eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
-    }
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.reviewScheduleStatusUpdatedTimelineEvent(this),
+    )
+    telemetryService.trackReviewScheduleStatusUpdated(this)
+    eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
+  }
 }

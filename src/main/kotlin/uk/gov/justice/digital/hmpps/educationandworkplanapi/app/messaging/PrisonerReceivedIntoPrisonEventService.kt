@@ -32,17 +32,16 @@ class PrisonerReceivedIntoPrisonEventService(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
 ) {
-  fun process(inboundEvent: InboundEvent, additionalInformation: PrisonerReceivedAdditionalInformation) =
-    with(additionalInformation) {
-      when (reason) {
-        ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt)
+  fun process(inboundEvent: InboundEvent, additionalInformation: PrisonerReceivedAdditionalInformation) = with(additionalInformation) {
+    when (reason) {
+      ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt)
 
-        TRANSFERRED -> processPrisonerTransferEvent()
+      TRANSFERRED -> processPrisonerTransferEvent()
 
-        TEMPORARY_ABSENCE_RETURN, RETURN_FROM_COURT ->
-          log.debug { "Ignoring Processing Prisoner Received Into Prison Event with reason ${additionalInformation.reason}" }
-      }
+      TEMPORARY_ABSENCE_RETURN, RETURN_FROM_COURT ->
+        log.debug { "Ignoring Processing Prisoner Received Into Prison Event with reason ${additionalInformation.reason}" }
     }
+  }
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }

@@ -8,9 +8,8 @@ fun aValidActionPlanResponse(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "A1234BC",
   goals: List<GoalResponse> = listOf(aValidGoalResponse(), anotherValidGoalResponse()),
-): ActionPlanResponse =
-  ActionPlanResponse(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    goals = goals,
-  )
+): ActionPlanResponse = ActionPlanResponse(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  goals = goals,
+)

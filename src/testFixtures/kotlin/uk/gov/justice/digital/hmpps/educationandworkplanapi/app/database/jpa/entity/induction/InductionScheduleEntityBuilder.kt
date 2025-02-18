@@ -18,22 +18,21 @@ fun aPersistedInductionScheduleEntity(
   updatedBy: String = "auser_gen",
   createdAtPrison: String = "BXI",
   updatedAtPrison: String = "BXI",
-): InductionScheduleEntity =
-  InductionScheduleEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    deadlineDate = deadlineDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+): InductionScheduleEntity = InductionScheduleEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  deadlineDate = deadlineDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun anUnPersistedInductionScheduleEntity(
   reference: UUID = UUID.randomUUID(),
@@ -43,13 +42,12 @@ fun anUnPersistedInductionScheduleEntity(
   scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
   createdAtPrison: String = "BXI",
   updatedAtPrison: String = "BXI",
-): InductionScheduleEntity =
-  InductionScheduleEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    deadlineDate = deadlineDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    updatedAtPrison = updatedAtPrison,
-    createdAtPrison = createdAtPrison,
-  )
+): InductionScheduleEntity = InductionScheduleEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  deadlineDate = deadlineDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  updatedAtPrison = updatedAtPrison,
+  createdAtPrison = createdAtPrison,
+)

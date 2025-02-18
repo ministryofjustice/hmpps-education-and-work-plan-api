@@ -242,14 +242,13 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   private fun anInboundEvent(
     additionalInformation: PrisonerReceivedAdditionalInformation,
     eventOccurredAt: Instant = Instant.now(),
-  ): InboundEvent =
-    InboundEvent(
-      eventType = EventType.PRISONER_RECEIVED_INTO_PRISON,
-      personReference = PersonReference(listOf(Identifier(type = "noms", value = "A1234BC"))),
-      occurredAt = eventOccurredAt,
-      publishedAt = Instant.now(),
-      description = "Prisoner received into prison event",
-      version = "1.0",
-      additionalInformation = objectMapper.writeValueAsString(additionalInformation),
-    )
+  ): InboundEvent = InboundEvent(
+    eventType = EventType.PRISONER_RECEIVED_INTO_PRISON,
+    personReference = PersonReference(listOf(Identifier(type = "noms", value = "A1234BC"))),
+    occurredAt = eventOccurredAt,
+    publishedAt = Instant.now(),
+    description = "Prisoner received into prison event",
+    version = "1.0",
+    additionalInformation = objectMapper.writeValueAsString(additionalInformation),
+  )
 }

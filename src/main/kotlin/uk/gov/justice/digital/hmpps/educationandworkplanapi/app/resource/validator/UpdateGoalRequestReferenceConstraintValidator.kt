@@ -15,8 +15,7 @@ import kotlin.reflect.KClass
  * in the `UpdateGoalRequest` matches the `goalReference` in the REST request URI path.
  */
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
-class UpdateGoalRequestReferenceConstraintValidator :
-  ConstraintValidator<GoalReferenceMatchesReferenceInUpdateGoalRequest, Array<Any>> {
+class UpdateGoalRequestReferenceConstraintValidator : ConstraintValidator<GoalReferenceMatchesReferenceInUpdateGoalRequest, Array<Any>> {
 
   override fun isValid(
     methodArguments: Array<Any>,

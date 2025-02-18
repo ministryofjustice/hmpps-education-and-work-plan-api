@@ -152,12 +152,9 @@ class TelemetryService(
     )
   }
 
-  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: GoalTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
+  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: GoalTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
 
-  private fun sendTelemetryEventForInduction(induction: Induction, telemetryEventType: InductionTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction))
+  private fun sendTelemetryEventForInduction(induction: Induction, telemetryEventType: InductionTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction))
 
-  private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
+  private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
 }

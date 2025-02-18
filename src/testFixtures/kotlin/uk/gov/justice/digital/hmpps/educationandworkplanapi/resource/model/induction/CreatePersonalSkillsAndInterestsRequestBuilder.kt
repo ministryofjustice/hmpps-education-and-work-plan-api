@@ -9,11 +9,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Perso
 fun aValidCreatePersonalSkillsAndInterestsRequest(
   skills: List<PersonalSkill> = listOf(aValidPersonalSkill()),
   interests: List<PersonalInterest> = listOf(aValidPersonalInterest()),
-): CreatePersonalSkillsAndInterestsRequest =
-  CreatePersonalSkillsAndInterestsRequest(
-    skills = skills,
-    interests = interests,
-  )
+): CreatePersonalSkillsAndInterestsRequest = CreatePersonalSkillsAndInterestsRequest(
+  skills = skills,
+  interests = interests,
+)
 
 fun aValidPersonalSkill(
   skillType: PersonalSkillType = PersonalSkillType.OTHER,

@@ -276,23 +276,21 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     responseLastWeek.expectStatus().isNoContent
   }
 
-  private fun WebTestClient.sarRequest(prisonNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec {
-    return webTestClient.get()
-      .uri { uriBuilder: UriBuilder ->
-        uriBuilder
-          .path(URI_TEMPLATE)
-          .queryParam("prn", prisonNumber)
-          .queryParam("fromDate", fromDate)
-          .queryParam("toDate", toDate)
-          .build()
-      }
-      .bearerToken(
-        buildAccessToken(
-          roles = listOf("ROLE_SAR_DATA_ACCESS"),
-          privateKey = keyPair.private,
-        ),
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-  }
+  private fun WebTestClient.sarRequest(prisonNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec = webTestClient.get()
+    .uri { uriBuilder: UriBuilder ->
+      uriBuilder
+        .path(URI_TEMPLATE)
+        .queryParam("prn", prisonNumber)
+        .queryParam("fromDate", fromDate)
+        .queryParam("toDate", toDate)
+        .build()
+    }
+    .bearerToken(
+      buildAccessToken(
+        roles = listOf("ROLE_SAR_DATA_ACCESS"),
+        privateKey = keyPair.private,
+      ),
+    )
+    .contentType(MediaType.APPLICATION_JSON)
+    .exchange()
 }

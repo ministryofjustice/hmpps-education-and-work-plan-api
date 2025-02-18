@@ -23,27 +23,25 @@ class AsyncInductionScheduleEventService(
   private val eventPublisher: EventPublisher,
 ) : InductionScheduleEventService {
 
-  override fun inductionScheduleCreated(inductionSchedule: InductionSchedule) =
-    with(inductionSchedule) {
-      log.debug { "Induction schedule created event for prisoner [$prisonNumber]" }
+  override fun inductionScheduleCreated(inductionSchedule: InductionSchedule) = with(inductionSchedule) {
+    log.debug { "Induction schedule created event for prisoner [$prisonNumber]" }
 
-      timelineService.recordTimelineEvent(
-        prisonNumber,
-        timelineEventFactory.inductionScheduleCreatedTimelineEvent(this),
-      )
-      telemetryService.trackInductionScheduleCreated(this)
-      eventPublisher.createAndPublishInductionEvent(prisonNumber)
-    }
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.inductionScheduleCreatedTimelineEvent(this),
+    )
+    telemetryService.trackInductionScheduleCreated(this)
+    eventPublisher.createAndPublishInductionEvent(prisonNumber)
+  }
 
-  override fun inductionScheduleStatusUpdated(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus) =
-    with(updatedInductionScheduleStatus) {
-      log.debug { "Induction schedule status updated event for prisoner [$prisonNumber]" }
+  override fun inductionScheduleStatusUpdated(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus) = with(updatedInductionScheduleStatus) {
+    log.debug { "Induction schedule status updated event for prisoner [$prisonNumber]" }
 
-      timelineService.recordTimelineEvent(
-        prisonNumber,
-        timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
-      )
-      telemetryService.trackInductionScheduleStatusUpdated(this)
-      eventPublisher.createAndPublishInductionEvent(prisonNumber)
-    }
+    timelineService.recordTimelineEvent(
+      prisonNumber,
+      timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
+    )
+    telemetryService.trackInductionScheduleStatusUpdated(this)
+    eventPublisher.createAndPublishInductionEvent(prisonNumber)
+  }
 }

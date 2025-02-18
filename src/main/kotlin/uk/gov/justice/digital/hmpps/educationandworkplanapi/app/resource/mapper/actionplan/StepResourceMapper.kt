@@ -12,44 +12,37 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus as Do
 
 @Component
 class StepResourceMapper {
-  fun fromModelToDto(createStepRequest: CreateStepRequest) =
-    with(createStepRequest) {
-      CreateStepDto(title = title, sequenceNumber = sequenceNumber)
-    }
-
-  fun fromModelToDto(updateStepRequest: UpdateStepRequest) =
-    with(updateStepRequest) {
-      UpdateStepDto(
-        title = title,
-        sequenceNumber = sequenceNumber,
-        reference = stepReference,
-        status = toStepStatus(status),
-      )
-    }
-
-  fun fromDomainToModel(stepDomain: Step) =
-    with(stepDomain) {
-      StepResponse(
-        title = title,
-        sequenceNumber = sequenceNumber,
-        stepReference = reference,
-        status = toStepStatus(status),
-      )
-    }
-
-  protected fun toStepStatus(stepStatus: StepStatus): DomainStepStatus {
-    return when (stepStatus) {
-      StepStatus.NOT_STARTED -> DomainStepStatus.NOT_STARTED
-      StepStatus.ACTIVE -> DomainStepStatus.ACTIVE
-      StepStatus.COMPLETE -> DomainStepStatus.COMPLETE
-    }
+  fun fromModelToDto(createStepRequest: CreateStepRequest) = with(createStepRequest) {
+    CreateStepDto(title = title, sequenceNumber = sequenceNumber)
   }
 
-  protected fun toStepStatus(stepStatus: DomainStepStatus): StepStatus {
-    return when (stepStatus) {
-      DomainStepStatus.NOT_STARTED -> StepStatus.NOT_STARTED
-      DomainStepStatus.ACTIVE -> StepStatus.ACTIVE
-      DomainStepStatus.COMPLETE -> StepStatus.COMPLETE
-    }
+  fun fromModelToDto(updateStepRequest: UpdateStepRequest) = with(updateStepRequest) {
+    UpdateStepDto(
+      title = title,
+      sequenceNumber = sequenceNumber,
+      reference = stepReference,
+      status = toStepStatus(status),
+    )
+  }
+
+  fun fromDomainToModel(stepDomain: Step) = with(stepDomain) {
+    StepResponse(
+      title = title,
+      sequenceNumber = sequenceNumber,
+      stepReference = reference,
+      status = toStepStatus(status),
+    )
+  }
+
+  protected fun toStepStatus(stepStatus: StepStatus): DomainStepStatus = when (stepStatus) {
+    StepStatus.NOT_STARTED -> DomainStepStatus.NOT_STARTED
+    StepStatus.ACTIVE -> DomainStepStatus.ACTIVE
+    StepStatus.COMPLETE -> DomainStepStatus.COMPLETE
+  }
+
+  protected fun toStepStatus(stepStatus: DomainStepStatus): StepStatus = when (stepStatus) {
+    DomainStepStatus.NOT_STARTED -> StepStatus.NOT_STARTED
+    DomainStepStatus.ACTIVE -> StepStatus.ACTIVE
+    DomainStepStatus.COMPLETE -> StepStatus.COMPLETE
   }
 }

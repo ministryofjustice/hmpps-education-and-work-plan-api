@@ -22,36 +22,34 @@ class JpaReviewPersistenceAdapter(
 ) : ReviewPersistenceAdapter {
 
   @Transactional(readOnly = true)
-  override fun getCompletedReviews(prisonNumber: String): List<CompletedReview> =
-    reviewRepository.getAllByPrisonNumber(prisonNumber).map {
-      val reviewNoteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
-        entityReference = it.reference,
-        entityType = EntityType.REVIEW,
-      ).first()
-      reviewEntityMapper.fromEntityToDomain(it, reviewNoteEntity)
-    }
+  override fun getCompletedReviews(prisonNumber: String): List<CompletedReview> = reviewRepository.getAllByPrisonNumber(prisonNumber).map {
+    val reviewNoteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
+      entityReference = it.reference,
+      entityType = EntityType.REVIEW,
+    ).first()
+    reviewEntityMapper.fromEntityToDomain(it, reviewNoteEntity)
+  }
 
   @Transactional
-  override fun createCompletedReview(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): CompletedReview =
-    with(createCompletedReviewDto) {
-      val completedReviewEntity = reviewRepository.saveAndFlush(
-        reviewEntityMapper.fromDomainToEntity(this, reviewSchedule),
-      )
-      val noteEntity = noteRepository.saveAndFlush(
-        NoteEntity(
-          reference = UUID.randomUUID(),
-          prisonNumber = prisonNumber,
-          content = note,
-          noteType = NoteType.REVIEW,
-          entityType = EntityType.REVIEW,
-          entityReference = completedReviewEntity.reference,
-          createdAtPrison = prisonId,
-          updatedAtPrison = prisonId,
-        ),
-      )
+  override fun createCompletedReview(createCompletedReviewDto: CreateCompletedReviewDto, reviewSchedule: ReviewSchedule): CompletedReview = with(createCompletedReviewDto) {
+    val completedReviewEntity = reviewRepository.saveAndFlush(
+      reviewEntityMapper.fromDomainToEntity(this, reviewSchedule),
+    )
+    val noteEntity = noteRepository.saveAndFlush(
+      NoteEntity(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        content = note,
+        noteType = NoteType.REVIEW,
+        entityType = EntityType.REVIEW,
+        entityReference = completedReviewEntity.reference,
+        createdAtPrison = prisonId,
+        updatedAtPrison = prisonId,
+      ),
+    )
 
-      reviewEntityMapper.fromEntityToDomain(completedReviewEntity, noteEntity)
-    }
+    reviewEntityMapper.fromEntityToDomain(completedReviewEntity, noteEntity)
+  }
 
   @Transactional
   override fun markCompletedReviewAsThePrisonersPreReleaseReview(reference: UUID) {

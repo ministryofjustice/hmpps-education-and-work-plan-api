@@ -12,9 +12,8 @@ fun aValidUpdatePreviousQualificationsRequest(
     aValidAchievedQualification(),
     anotherValidAchievedQualification(),
   ),
-): UpdatePreviousQualificationsRequest =
-  UpdatePreviousQualificationsRequest(
-    reference = reference,
-    educationLevel = educationLevel,
-    qualifications = qualifications,
-  )
+): UpdatePreviousQualificationsRequest = UpdatePreviousQualificationsRequest(
+  reference = reference,
+  educationLevel = educationLevel,
+  qualifications = qualifications,
+)

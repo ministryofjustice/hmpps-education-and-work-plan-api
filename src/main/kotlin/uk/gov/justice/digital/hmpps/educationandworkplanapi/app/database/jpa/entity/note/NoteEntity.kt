@@ -79,9 +79,7 @@ data class NoteEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference)"
 }
 
 enum class EntityType {

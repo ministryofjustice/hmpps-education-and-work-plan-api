@@ -20,21 +20,20 @@ fun aValidReviewEntity(
   updatedAt: Instant = Instant.now(),
   updatedBy: String = "bjones_gen",
   updatedAtPrison: String = "BXI",
-): ReviewEntity =
-  ReviewEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    deadlineDate = deadlineDate,
-    completedDate = completedDate,
-    reviewScheduleReference = reviewScheduleReference,
-    conductedBy = conductedBy,
-    conductedByRole = conductedByRole,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+): ReviewEntity = ReviewEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  deadlineDate = deadlineDate,
+  completedDate = completedDate,
+  reviewScheduleReference = reviewScheduleReference,
+  conductedBy = conductedBy,
+  conductedByRole = conductedByRole,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

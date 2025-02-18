@@ -7,19 +7,17 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class ManageUsersApiClient(@Qualifier("manageUsersApiWebClient") private val manageUsersApiClient: WebClient) {
-  fun getUserDetails(username: String): UserDetailsDto {
-    return try {
-      manageUsersApiClient
-        .get()
-        .uri("/users/{username}", username)
-        .retrieve()
-        .bodyToMono(UserDetailsDto::class.java)
-        .block()!!
-    } catch (e: WebClientResponseException.NotFound) {
-      UserDetailsDto(username, false, "$username not found")
-    } catch (e: Exception) {
-      throw ManageUsersApiException("Error retrieving user details for user $username", e)
-    }
+  fun getUserDetails(username: String): UserDetailsDto = try {
+    manageUsersApiClient
+      .get()
+      .uri("/users/{username}", username)
+      .retrieve()
+      .bodyToMono(UserDetailsDto::class.java)
+      .block()!!
+  } catch (e: WebClientResponseException.NotFound) {
+    UserDetailsDto(username, false, "$username not found")
+  } catch (e: Exception) {
+    throw ManageUsersApiException("Error retrieving user details for user $username", e)
   }
 }
 

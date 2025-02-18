@@ -6,7 +6,6 @@ import java.util.*
 
 fun aValidUnarchiveGoalRequest(
   goalReference: UUID = aValidReference(),
-): UnarchiveGoalRequest =
-  UnarchiveGoalRequest(
-    goalReference = goalReference,
-  )
+): UnarchiveGoalRequest = UnarchiveGoalRequest(
+  goalReference = goalReference,
+)

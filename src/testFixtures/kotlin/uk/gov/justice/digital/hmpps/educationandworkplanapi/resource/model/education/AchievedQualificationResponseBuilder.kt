@@ -16,19 +16,18 @@ fun aValidAchievedQualificationResponse(
   updatedBy: String = "asmith_gen",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): AchievedQualificationResponse =
-  AchievedQualificationResponse(
-    reference = reference,
-    subject = subject,
-    level = level,
-    grade = grade,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): AchievedQualificationResponse = AchievedQualificationResponse(
+  reference = reference,
+  subject = subject,
+  level = level,
+  grade = grade,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)
 
 fun anotherValidAchievedQualificationResponse(
   reference: UUID = UUID.randomUUID(),
@@ -39,14 +38,13 @@ fun anotherValidAchievedQualificationResponse(
   createdAt: OffsetDateTime = OffsetDateTime.now(),
   updatedBy: String = "asmith_gen",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
-): AchievedQualificationResponse =
-  aValidAchievedQualificationResponse(
-    reference = reference,
-    subject = subject,
-    level = level,
-    grade = grade,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    updatedBy = updatedBy,
-    updatedAt = updatedAt,
-  )
+): AchievedQualificationResponse = aValidAchievedQualificationResponse(
+  reference = reference,
+  subject = subject,
+  level = level,
+  grade = grade,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  updatedBy = updatedBy,
+  updatedAt = updatedAt,
+)

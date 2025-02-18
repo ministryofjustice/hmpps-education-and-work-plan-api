@@ -25,26 +25,24 @@ class InboundEventsService(
   private val prisonerMergedEventService: PrisonerMergedEventService,
 ) {
 
-  fun process(inboundEvent: InboundEvent) =
-    with(inboundEvent) {
-      log.info { "Processing inbound event $eventType" }
+  fun process(inboundEvent: InboundEvent) = with(inboundEvent) {
+    log.info { "Processing inbound event $eventType" }
 
-      when (eventType) {
-        PRISONER_RECEIVED_INTO_PRISON -> {
-          val additionalInformation = eventAdditionalInformation<PrisonerReceivedAdditionalInformation>(inboundEvent)
-          prisonerReceivedIntoPrisonEventService.process(inboundEvent, additionalInformation)
-        }
-        PRISONER_RELEASED_FROM_PRISON -> {
-          val additionalInformation = eventAdditionalInformation<PrisonerReleasedAdditionalInformation>(inboundEvent)
-          prisonerReleasedFromPrisonEventService.process(inboundEvent, additionalInformation)
-        }
-        PRISONER_MERGED -> {
-          val additionalInformation = eventAdditionalInformation<PrisonerMergedAdditionalInformation>(inboundEvent)
-          prisonerMergedEventService.process(inboundEvent, additionalInformation)
-        }
+    when (eventType) {
+      PRISONER_RECEIVED_INTO_PRISON -> {
+        val additionalInformation = eventAdditionalInformation<PrisonerReceivedAdditionalInformation>(inboundEvent)
+        prisonerReceivedIntoPrisonEventService.process(inboundEvent, additionalInformation)
+      }
+      PRISONER_RELEASED_FROM_PRISON -> {
+        val additionalInformation = eventAdditionalInformation<PrisonerReleasedAdditionalInformation>(inboundEvent)
+        prisonerReleasedFromPrisonEventService.process(inboundEvent, additionalInformation)
+      }
+      PRISONER_MERGED -> {
+        val additionalInformation = eventAdditionalInformation<PrisonerMergedAdditionalInformation>(inboundEvent)
+        prisonerMergedEventService.process(inboundEvent, additionalInformation)
       }
     }
+  }
 
-  private inline fun <reified T : AdditionalInformation> eventAdditionalInformation(inboundEvent: InboundEvent): T =
-    this.mapper.readValue(inboundEvent.additionalInformation, T::class.java)
+  private inline fun <reified T : AdditionalInformation> eventAdditionalInformation(inboundEvent: InboundEvent): T = this.mapper.readValue(inboundEvent.additionalInformation, T::class.java)
 }

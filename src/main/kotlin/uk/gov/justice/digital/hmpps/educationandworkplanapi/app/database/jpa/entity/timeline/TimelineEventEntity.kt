@@ -84,9 +84,7 @@ data class TimelineEventEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, sourceReference = $sourceReference, eventType = $eventType)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, sourceReference = $sourceReference, eventType = $eventType)"
 }
 
 enum class TimelineEventType {

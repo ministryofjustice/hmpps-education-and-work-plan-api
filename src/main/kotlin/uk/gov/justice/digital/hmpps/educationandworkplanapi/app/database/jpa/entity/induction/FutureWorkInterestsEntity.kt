@@ -82,9 +82,7 @@ data class FutureWorkInterestsEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference)"
 }
 
 @Table(name = "work_interest")
@@ -152,9 +150,7 @@ data class WorkInterestEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
 }
 
 enum class WorkInterestType {

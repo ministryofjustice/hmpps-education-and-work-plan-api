@@ -28,44 +28,42 @@ class GoalEntityMapper(
    * `archiveReason` and `archiveReasonOther` are not mapped as they have no corresponding fields in the source `CreateGoalDto` instance
    * because it is not possible to create a new goal that is already in an archived state.
    */
-  fun fromDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity =
-    with(createGoalDto) {
-      GoalEntity(
-        reference = UUID.randomUUID(),
-        createdAtPrison = createGoalDto.prisonId,
-        updatedAtPrison = createGoalDto.prisonId,
-        title = createGoalDto.title,
-        targetCompletionDate = createGoalDto.targetCompletionDate,
-        status = toGoalStatus(createGoalDto.status),
-        notes = createGoalDto.notes,
-        steps = mutableListOf(),
-      ).also {
-        addNewStepsToEntity(steps, it)
-      }
+  fun fromDtoToEntity(createGoalDto: CreateGoalDto): GoalEntity = with(createGoalDto) {
+    GoalEntity(
+      reference = UUID.randomUUID(),
+      createdAtPrison = createGoalDto.prisonId,
+      updatedAtPrison = createGoalDto.prisonId,
+      title = createGoalDto.title,
+      targetCompletionDate = createGoalDto.targetCompletionDate,
+      status = toGoalStatus(createGoalDto.status),
+      notes = createGoalDto.notes,
+      steps = mutableListOf(),
+    ).also {
+      addNewStepsToEntity(steps, it)
     }
+  }
 
   /**
    * Maps the supplied [GoalEntity] into the domain [Goal].
    */
-  fun fromEntityToDomain(goalEntity: GoalEntity): Goal =
-    with(goalEntity) {
-      Goal(
-        reference = reference,
-        title = title,
-        targetCompletionDate = targetCompletionDate,
-        status = toGoalStatus(status),
-        notes = notes,
-        createdBy = createdBy,
-        createdAt = createdAt,
-        createdAtPrison = createdAtPrison,
-        lastUpdatedBy = updatedBy,
-        lastUpdatedAt = updatedAt,
-        lastUpdatedAtPrison = updatedAtPrison,
-        archiveReason = archiveReason?.let { archiveReasonFromDomainToEntity(it) },
-        archiveReasonOther = archiveReasonOther,
-        steps = steps.map { stepEntityMapper.fromEntityToDomain(it) },
-      )
-    }
+  fun fromEntityToDomain(goalEntity: GoalEntity): Goal = with(goalEntity) {
+    Goal(
+      reference = reference,
+      title = title,
+      targetCompletionDate = targetCompletionDate,
+      status = toGoalStatus(status),
+      notes = notes,
+      createdBy = createdBy,
+      createdAt = createdAt,
+      createdAtPrison = createdAtPrison,
+      lastUpdatedBy = updatedBy,
+      lastUpdatedAt = updatedAt,
+      lastUpdatedAtPrison = updatedAtPrison,
+      archiveReason = archiveReason?.let { archiveReasonFromDomainToEntity(it) },
+      archiveReasonOther = archiveReasonOther,
+      steps = steps.map { stepEntityMapper.fromEntityToDomain(it) },
+    )
+  }
 
   /**
    * Updates the supplied [GoalEntity] with fields from the supplied [UpdateGoalDto]. The updated [GoalEntity] can then be
@@ -74,30 +72,27 @@ class GoalEntityMapper(
    * `status`, `archiveReason` and `archiveReasonOther` are not mapped as they have no corresponding fields in the source `UpdateGoalDto` instance
    * because it is not possible to either update a goal's status or update an archived goal via the Update Goal operation.
    */
-  fun updateEntityFromDto(goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto) =
-    with(goalEntity) {
-      updatedAtPrison = updatedGoalDto.prisonId
-      title = updatedGoalDto.title
-      targetCompletionDate = updatedGoalDto.targetCompletionDate
-      notes = updatedGoalDto.notes
-      steps = updateSteps(this, updatedGoalDto)
-    }
+  fun updateEntityFromDto(goalEntity: GoalEntity, updatedGoalDto: UpdateGoalDto) = with(goalEntity) {
+    updatedAtPrison = updatedGoalDto.prisonId
+    title = updatedGoalDto.title
+    targetCompletionDate = updatedGoalDto.targetCompletionDate
+    notes = updatedGoalDto.notes
+    steps = updateSteps(this, updatedGoalDto)
+  }
 
-  fun archiveReasonFromDomainToEntity(reason: ReasonToArchiveGoal): ReasonToArchiveGoalEntity =
-    when (reason) {
-      ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
-      ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
-      ReasonToArchiveGoal.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoalEntity.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
-      ReasonToArchiveGoal.OTHER -> ReasonToArchiveGoalEntity.OTHER
-    }
+  fun archiveReasonFromDomainToEntity(reason: ReasonToArchiveGoal): ReasonToArchiveGoalEntity = when (reason) {
+    ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
+    ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
+    ReasonToArchiveGoal.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoalEntity.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
+    ReasonToArchiveGoal.OTHER -> ReasonToArchiveGoalEntity.OTHER
+  }
 
-  fun archiveReasonFromDomainToEntity(reason: ReasonToArchiveGoalEntity): ReasonToArchiveGoal =
-    when (reason) {
-      ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
-      ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
-      ReasonToArchiveGoalEntity.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoal.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
-      ReasonToArchiveGoalEntity.OTHER -> ReasonToArchiveGoal.OTHER
-    }
+  fun archiveReasonFromDomainToEntity(reason: ReasonToArchiveGoalEntity): ReasonToArchiveGoal = when (reason) {
+    ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
+    ReasonToArchiveGoalEntity.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoal.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
+    ReasonToArchiveGoalEntity.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoal.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
+    ReasonToArchiveGoalEntity.OTHER -> ReasonToArchiveGoal.OTHER
+  }
 
   private fun updateSteps(entity: GoalEntity, dto: UpdateGoalDto): MutableList<StepEntity> {
     val existingSteps = entity.steps
@@ -121,17 +116,15 @@ class GoalEntityMapper(
     }
   }
 
-  private fun toGoalStatus(goalStatus: GoalStatusDomain): GoalStatusEntity =
-    when (goalStatus) {
-      GoalStatusDomain.ACTIVE -> GoalStatusEntity.ACTIVE
-      GoalStatusDomain.ARCHIVED -> GoalStatusEntity.ARCHIVED
-      GoalStatusDomain.COMPLETED -> GoalStatusEntity.COMPLETED
-    }
+  private fun toGoalStatus(goalStatus: GoalStatusDomain): GoalStatusEntity = when (goalStatus) {
+    GoalStatusDomain.ACTIVE -> GoalStatusEntity.ACTIVE
+    GoalStatusDomain.ARCHIVED -> GoalStatusEntity.ARCHIVED
+    GoalStatusDomain.COMPLETED -> GoalStatusEntity.COMPLETED
+  }
 
-  private fun toGoalStatus(goalStatus: GoalStatusEntity): GoalStatusDomain =
-    when (goalStatus) {
-      GoalStatusEntity.ACTIVE -> GoalStatusDomain.ACTIVE
-      GoalStatusEntity.ARCHIVED -> GoalStatusDomain.ARCHIVED
-      GoalStatusEntity.COMPLETED -> GoalStatusDomain.COMPLETED
-    }
+  private fun toGoalStatus(goalStatus: GoalStatusEntity): GoalStatusDomain = when (goalStatus) {
+    GoalStatusEntity.ACTIVE -> GoalStatusDomain.ACTIVE
+    GoalStatusEntity.ARCHIVED -> GoalStatusDomain.ARCHIVED
+    GoalStatusEntity.COMPLETED -> GoalStatusDomain.COMPLETED
+  }
 }

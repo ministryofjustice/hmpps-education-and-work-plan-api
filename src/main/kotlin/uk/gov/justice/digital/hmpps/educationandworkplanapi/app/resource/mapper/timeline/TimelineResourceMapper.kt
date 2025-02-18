@@ -8,12 +8,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Timel
 class TimelineResourceMapper(
   private val timelineEventResourceMapper: TimelineEventResourceMapper,
 ) {
-  fun fromDomainToModel(timeline: Timeline): TimelineResponse =
-    with(timeline) {
-      TimelineResponse(
-        reference = reference,
-        prisonNumber = prisonNumber,
-        events = events.map { timelineEventResourceMapper.fromDomainToModel(it) },
-      )
-    }
+  fun fromDomainToModel(timeline: Timeline): TimelineResponse = with(timeline) {
+    TimelineResponse(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      events = events.map { timelineEventResourceMapper.fromDomainToModel(it) },
+    )
+  }
 }

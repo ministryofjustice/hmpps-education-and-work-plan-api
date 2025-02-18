@@ -9,9 +9,8 @@ fun aValidUpdateInPrisonInterestsRequest(
   reference: UUID? = UUID.randomUUID(),
   inPrisonWorkInterests: List<InPrisonWorkInterest> = listOf(aValidInPrisonWorkInterest()),
   inPrisonTrainingInterests: List<InPrisonTrainingInterest> = listOf(aValidInPrisonTrainingInterest()),
-): UpdateInPrisonInterestsRequest =
-  UpdateInPrisonInterestsRequest(
-    reference = reference,
-    inPrisonWorkInterests = inPrisonWorkInterests,
-    inPrisonTrainingInterests = inPrisonTrainingInterests,
-  )
+): UpdateInPrisonInterestsRequest = UpdateInPrisonInterestsRequest(
+  reference = reference,
+  inPrisonWorkInterests = inPrisonWorkInterests,
+  inPrisonTrainingInterests = inPrisonTrainingInterests,
+)

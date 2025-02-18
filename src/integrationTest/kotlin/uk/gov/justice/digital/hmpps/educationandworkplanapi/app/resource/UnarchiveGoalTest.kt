@@ -103,7 +103,8 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) { // the 6th Timeline event will be the GOAL_UNARCHIVED event
+        .event(6) {
+          // the 6th Timeline event will be the GOAL_UNARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_UNARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -163,7 +164,8 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) { // the 6th Timeline event will be the GOAL_UNARCHIVED event
+        .event(6) {
+          // the 6th Timeline event will be the GOAL_UNARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_UNARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")

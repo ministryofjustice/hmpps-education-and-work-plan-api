@@ -36,35 +36,29 @@ class ApiRequestErrorAttributes(
       .including(Include.MESSAGE, Include.BINDING_ERRORS)
   }
 
-  fun getErrorResponse(request: WebRequest): ErrorResponse =
-    getErrorAttributes(request, errorAttributeOptions).let {
-      ErrorResponse(
-        status = it.getStatus(),
-        errorCode = it.getError(),
-        userMessage = it.getMessage(),
-        developerMessage = it.getErrors().toString(),
-      )
-    }
+  fun getErrorResponse(request: WebRequest): ErrorResponse = getErrorAttributes(request, errorAttributeOptions).let {
+    ErrorResponse(
+      status = it.getStatus(),
+      errorCode = it.getError(),
+      userMessage = it.getMessage(),
+      developerMessage = it.getErrors().toString(),
+    )
+  }
 
-  private fun Map<String, Any>.getTimeStamp(): OffsetDateTime =
-    (this[TIMESTAMP] as Date).toInstant().atOffset(ZoneOffset.UTC)
+  private fun Map<String, Any>.getTimeStamp(): OffsetDateTime = (this[TIMESTAMP] as Date).toInstant().atOffset(ZoneOffset.UTC)
 
-  private fun Map<String, Any>.getStatus(): Int =
-    this[STATUS] as Int
+  private fun Map<String, Any>.getStatus(): Int = this[STATUS] as Int
 
-  private fun Map<String, Any>.getError(): String =
-    this[ERROR].toString()
+  private fun Map<String, Any>.getError(): String = this[ERROR].toString()
 
-  private fun Map<String, Any>.getMessage(): String =
-    this[MESSAGE].toString()
+  private fun Map<String, Any>.getMessage(): String = this[MESSAGE].toString()
 
-  private fun Map<String, Any>.getErrors(): List<String>? =
-    (this[ERRORS] as List<*>?)
-      ?.map { it as FieldError }
-      ?.map {
-        with(it) {
-          val message = messageSource.getMessage(this, Locale.getDefault())
-          "Error on field '$field': rejected value [$rejectedValue], $message"
-        }
+  private fun Map<String, Any>.getErrors(): List<String>? = (this[ERRORS] as List<*>?)
+    ?.map { it as FieldError }
+    ?.map {
+      with(it) {
+        val message = messageSource.getMessage(this, Locale.getDefault())
+        "Error on field '$field': rejected value [$rejectedValue], $message"
       }
+    }
 }

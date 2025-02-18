@@ -20,21 +20,20 @@ fun aValidGoalEntity(
   updatedBy: String? = "bjones_gen",
   archiveReason: ReasonToArchiveGoal? = null,
   archiveReasonOther: String? = null,
-): GoalEntity =
-  GoalEntity(
-    reference = reference,
-    title = title,
-    targetCompletionDate = targetCompletionDate,
-    status = status,
-    steps = steps.toMutableList(),
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-    archiveReason = archiveReason,
-    archiveReasonOther = archiveReasonOther,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+): GoalEntity = GoalEntity(
+  reference = reference,
+  title = title,
+  targetCompletionDate = targetCompletionDate,
+  status = status,
+  steps = steps.toMutableList(),
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+  archiveReason = archiveReason,
+  archiveReasonOther = archiveReasonOther,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

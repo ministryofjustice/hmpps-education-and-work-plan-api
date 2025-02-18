@@ -9,11 +9,10 @@ fun aValidCreateActionPlanReviewRequest(
   conductedAt: LocalDate = LocalDate.now(),
   conductedBy: String? = "Barnie Jones",
   conductedByRole: String? = "Peer mentor",
-): CreateActionPlanReviewRequest =
-  CreateActionPlanReviewRequest(
-    prisonId = prisonId,
-    note = note,
-    conductedBy = conductedBy,
-    conductedByRole = conductedByRole,
-    conductedAt = conductedAt,
-  )
+): CreateActionPlanReviewRequest = CreateActionPlanReviewRequest(
+  prisonId = prisonId,
+  note = note,
+  conductedBy = conductedBy,
+  conductedByRole = conductedByRole,
+  conductedAt = conductedAt,
+)

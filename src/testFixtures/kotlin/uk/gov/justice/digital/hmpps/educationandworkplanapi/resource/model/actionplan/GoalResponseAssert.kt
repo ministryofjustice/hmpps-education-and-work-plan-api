@@ -16,8 +16,7 @@ fun assertThat(actual: GoalResponse?) = GoalResponseAssert(actual)
 /**
  * AssertJ custom assertion for a single [GoalResponse]
  */
-class GoalResponseAssert(actual: GoalResponse?) :
-  AbstractObjectAssert<GoalResponseAssert, GoalResponse?>(actual, GoalResponseAssert::class.java) {
+class GoalResponseAssert(actual: GoalResponse?) : AbstractObjectAssert<GoalResponseAssert, GoalResponse?>(actual, GoalResponseAssert::class.java) {
 
   fun wasCreatedBy(expected: String): GoalResponseAssert {
     isNotNull
@@ -193,17 +192,11 @@ class GoalResponseAssert(actual: GoalResponse?) :
     return this
   }
 
-  fun hasCompletedNote(expected: String): GoalResponseAssert {
-    return hasNoteOfType(NoteType.GOAL_COMPLETION, expected, "completion")
-  }
+  fun hasCompletedNote(expected: String): GoalResponseAssert = hasNoteOfType(NoteType.GOAL_COMPLETION, expected, "completion")
 
-  fun hasArchiveNote(expected: String): GoalResponseAssert {
-    return hasNoteOfType(NoteType.GOAL_ARCHIVAL, expected, "archive")
-  }
+  fun hasArchiveNote(expected: String): GoalResponseAssert = hasNoteOfType(NoteType.GOAL_ARCHIVAL, expected, "archive")
 
-  fun hasGoalNote(expected: String): GoalResponseAssert {
-    return hasNoteOfType(NoteType.GOAL, expected, "goal")
-  }
+  fun hasGoalNote(expected: String): GoalResponseAssert = hasNoteOfType(NoteType.GOAL, expected, "goal")
 
   private fun hasNoteOfType(noteType: NoteType, expected: String, noteLabel: String): GoalResponseAssert {
     isNotNull

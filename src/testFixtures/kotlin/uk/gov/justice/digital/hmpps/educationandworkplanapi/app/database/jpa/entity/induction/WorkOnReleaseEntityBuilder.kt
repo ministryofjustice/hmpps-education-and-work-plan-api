@@ -15,21 +15,20 @@ fun aValidWorkOnReleaseEntity(
   updatedAt: Instant? = null,
   updatedAtPrison: String = "BXI",
   updatedBy: String? = null,
-) =
-  WorkOnReleaseEntity(
-    reference = reference,
-    hopingToWork = hopingToWork,
-    affectAbilityToWork = affectAbilityToWork,
-    affectAbilityToWorkOther = affectAbilityToWorkOther,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+) = WorkOnReleaseEntity(
+  reference = reference,
+  hopingToWork = hopingToWork,
+  affectAbilityToWork = affectAbilityToWork,
+  affectAbilityToWorkOther = affectAbilityToWorkOther,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidWorkOnReleaseEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
@@ -43,18 +42,17 @@ fun aValidWorkOnReleaseEntityWithJpaFieldsPopulated(
   updatedAt: Instant? = Instant.now(),
   updatedAtPrison: String = "BXI",
   updatedBy: String? = "bjones_gen",
-) =
-  WorkOnReleaseEntity(
-    reference = reference,
-    hopingToWork = hopingToWork,
-    affectAbilityToWork = affectAbilityToWork,
-    affectAbilityToWorkOther = affectAbilityToWorkOther,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+) = WorkOnReleaseEntity(
+  reference = reference,
+  hopingToWork = hopingToWork,
+  affectAbilityToWork = affectAbilityToWork,
+  affectAbilityToWorkOther = affectAbilityToWorkOther,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
