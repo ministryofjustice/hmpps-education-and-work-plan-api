@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
@@ -9,7 +8,6 @@ plugins {
   id("org.openapi.generator") version "7.10.0"
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
-  kotlin("kapt") version "2.0.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "5.0.0"
@@ -224,10 +222,6 @@ tasks {
   }
   withType<KtLintFormatTask> {
     // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
-    mustRunAfter("buildEducationAndWorkPlanModel")
-    mustRunAfter("buildPrisonApiModel")
-  }
-  withType<KaptGenerateStubsTask> {
     mustRunAfter("buildEducationAndWorkPlanModel")
     mustRunAfter("buildPrisonApiModel")
   }
