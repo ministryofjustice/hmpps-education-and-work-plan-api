@@ -12,52 +12,59 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
+/**
+ * Represents an immutable history record of the schedule for when a prisoner's Review must be completed by.
+ */
 @Table(name = "review_schedule_history")
 @Entity
 data class ReviewScheduleHistoryEntity(
-
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
-  val version: Int,
 
   @Column(updatable = false)
   val reference: UUID,
 
   @Column(updatable = false)
+  val version: Int,
+
+  @Column(updatable = false)
   val prisonNumber: String,
 
-  @Column
-  var earliestReviewDate: LocalDate,
+  @Column(updatable = false)
+  val earliestReviewDate: LocalDate,
 
-  @Column
-  var latestReviewDate: LocalDate,
+  @Column(updatable = false)
+  val latestReviewDate: LocalDate,
 
-  @Column
+  @Column(updatable = false)
   @Enumerated(value = EnumType.STRING)
-  var scheduleCalculationRule: ReviewScheduleCalculationRule,
+  val scheduleCalculationRule: ReviewScheduleCalculationRule,
 
-  @Column
+  @Column(updatable = false)
   @Enumerated(value = EnumType.STRING)
-  var scheduleStatus: ReviewScheduleStatus,
+  val scheduleStatus: ReviewScheduleStatus,
+
+  @Column(updatable = false)
+  val exemptionReason: String?,
 
   @Column(updatable = false)
   val createdAtPrison: String,
 
-  @Column
-  var updatedAtPrison: String,
+  @Column(updatable = false)
+  val updatedAtPrison: String,
 
   @Column(updatable = false)
-  var createdBy: String? = null,
+  val createdBy: String,
 
   @Column(updatable = false)
-  var createdAt: Instant? = null,
+  val createdAt: Instant,
 
-  @Column
-  var updatedBy: String? = null,
+  @Column(updatable = false)
+  val updatedBy: String,
 
-  @Column
-  var updatedAt: Instant? = null,
-)
+  @Column(updatable = false)
+  val updatedAt: Instant,
+) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+}

@@ -1,18 +1,13 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonTrainingInterest
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonTrainingInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonWorkInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInPrisonInterestsDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonTrainingInterestEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonTrainingInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonWorkInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonTrainingType as InPrisonTrainingTypeDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InPrisonWorkType as InPrisonWorkTypeDomain
@@ -21,27 +16,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class UpdateInPrisonInterestsEntityMapperTest {
 
-  private val mapper = InPrisonInterestsEntityMapperImpl().also {
-    InPrisonInterestsEntityMapper::class.java.getDeclaredField("workInterestEntityMapper").apply {
-      isAccessible = true
-      set(it, InPrisonWorkInterestEntityMapperImpl())
-    }
-
-    InPrisonInterestsEntityMapper::class.java.getDeclaredField("trainingInterestEntityMapper").apply {
-      isAccessible = true
-      set(it, InPrisonTrainingInterestEntityMapperImpl())
-    }
-
-    InPrisonInterestsEntityMapper::class.java.getDeclaredField("workInterestEntityListManager").apply {
-      isAccessible = true
-      set(it, InductionEntityListManager<InPrisonWorkInterestEntity, InPrisonWorkInterest>())
-    }
-
-    InPrisonInterestsEntityMapper::class.java.getDeclaredField("trainingInterestEntityListManager").apply {
-      isAccessible = true
-      set(it, InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>())
-    }
-  }
+  private val mapper = InPrisonInterestsEntityMapper(
+    InPrisonWorkInterestEntityMapper(),
+    InPrisonTrainingInterestEntityMapper(),
+    InductionEntityListManager(),
+    InductionEntityListManager(),
+  )
 
   @Test
   fun `should update existing interests`() {
@@ -81,24 +61,22 @@ class UpdateInPrisonInterestsEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingInPrisonInterestsEntity.deepCopy().apply {
-      id
-      reference = reference
+    val expectedEntity = existingInPrisonInterestsEntity.copy(
       inPrisonWorkInterests = mutableListOf(
-        existingWorkInterestEntity.deepCopy().apply {
-          workType = InPrisonWorkTypeEntity.OTHER
-          workTypeOther = "The most popular work"
-        },
-      )
+        existingWorkInterestEntity.copy(
+          workType = InPrisonWorkTypeEntity.OTHER,
+          workTypeOther = "The most popular work",
+        ),
+      ),
       inPrisonTrainingInterests = mutableListOf(
-        existingTrainingInterestEntity.deepCopy().apply {
-          trainingType = InPrisonTrainingTypeEntity.OTHER
-          trainingTypeOther = "The most popular training"
-        },
-      )
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+        existingTrainingInterestEntity.copy(
+          trainingType = InPrisonTrainingTypeEntity.OTHER,
+          trainingTypeOther = "The most popular training",
+        ),
+      ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
@@ -152,9 +130,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingInPrisonInterestsEntity.deepCopy().apply {
-      id
-      reference = reference
+    val expectedEntity = existingInPrisonInterestsEntity.copy(
       inPrisonWorkInterests = mutableListOf(
         aValidInPrisonWorkInterestEntity(
           workType = InPrisonWorkTypeEntity.OTHER,
@@ -164,7 +140,7 @@ class UpdateInPrisonInterestsEntityMapperTest {
           workType = InPrisonWorkTypeEntity.COMPUTERS_OR_DESK_BASED,
           workTypeOther = null,
         ),
-      )
+      ),
       inPrisonTrainingInterests = mutableListOf(
         aValidInPrisonTrainingInterestEntity(
           trainingType = InPrisonTrainingTypeEntity.OTHER,
@@ -174,10 +150,10 @@ class UpdateInPrisonInterestsEntityMapperTest {
           trainingType = InPrisonTrainingTypeEntity.NUMERACY_SKILLS,
           trainingTypeOther = null,
         ),
-      )
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+      ),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)
@@ -231,14 +207,12 @@ class UpdateInPrisonInterestsEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingInPrisonInterestsEntity.deepCopy().apply {
-      id
-      reference = reference
-      inPrisonWorkInterests = mutableListOf(firstWorkInterestEntity)
-      inPrisonTrainingInterests = mutableListOf(firstTrainingInterestEntity)
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingInPrisonInterestsEntity.copy(
+      inPrisonWorkInterests = mutableListOf(firstWorkInterestEntity),
+      inPrisonTrainingInterests = mutableListOf(firstTrainingInterestEntity),
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingInPrisonInterestsEntity, updatedInterestsDto)

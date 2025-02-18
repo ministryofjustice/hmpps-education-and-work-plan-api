@@ -8,23 +8,22 @@ fun aValidTimelineEventEntity(
   reference: UUID = UUID.randomUUID(),
   sourceReference: String = UUID.randomUUID().toString(),
   eventType: TimelineEventType = TimelineEventType.GOAL_CREATED,
-  contextualInfo: Map<TimelineEventContext, String>? = null,
+  contextualInfo: Map<TimelineEventContext, String> = emptyMap(),
   prisonId: String = "BXI",
   actionedBy: String = "asmith_gen",
-  actionedByDisplayName: String? = "Alex Smith",
   timestamp: Instant = Instant.now(),
   createdAt: Instant = Instant.now(),
   correlationId: UUID = UUID.randomUUID(),
 ) = TimelineEventEntity(
-  id = id,
   reference = reference,
   sourceReference = sourceReference,
   eventType = eventType,
   contextualInfo = contextualInfo,
   prisonId = prisonId,
   actionedBy = actionedBy,
-  actionedByDisplayName = actionedByDisplayName,
   timestamp = timestamp,
-  createdAt = createdAt,
   correlationId = correlationId,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+}

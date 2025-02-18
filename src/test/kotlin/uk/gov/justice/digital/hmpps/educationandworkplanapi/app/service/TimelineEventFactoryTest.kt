@@ -4,7 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
+import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.given
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
@@ -14,8 +20,17 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_INDUCTION_NOTES
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
+import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
@@ -28,14 +43,26 @@ class TimelineEventFactoryTest {
   @InjectMocks
   private lateinit var timelineEventFactory: TimelineEventFactory
 
+  @Mock
+  private lateinit var userService: ManageUserService
+
   @Test
-  fun `should create action plan created event`() {
+  fun `should create action plan created event given induction contains conductedAt meaning it was created by the new Induction UI journey`() {
     // Given
     val goal = aValidGoal()
     val actionPlan = aValidActionPlan(goals = listOf(goal))
+    val inductionCreatedDate = Instant.now()
+    val induction = aFullyPopulatedInduction(
+      createdAt = inductionCreatedDate,
+      conductedAt = LocalDate.parse("2025-01-20"),
+    )
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+    )
 
     // When
-    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan)
+    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
 
     // Then
     assertThat(actual).hasSize(2)
@@ -45,8 +72,16 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
-      .hasNoContextualInfo()
+      .hasContextualInfo(
+        mapOf(
+          COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to "2025-01-20",
+          COMPLETED_INDUCTION_ENTERED_ONLINE_BY to "Alex Smith",
+          COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to "John Smith",
+          COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to "Peer Mentor",
+          COMPLETED_INDUCTION_NOTES to "Note content",
+          COMPLETED_INDUCTION_ENTERED_ONLINE_AT to inductionCreatedDate.toString(),
+        ),
+      )
 
     val goalCreatedEvent = actual[1]
     assertThat(goalCreatedEvent)
@@ -54,9 +89,44 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
       .hasCorrelationId(actionPlanCreatedEvent.correlationId)
+
+    verify(userService).getUserDetails("asmith_gen")
+  }
+
+  @Test
+  fun `should create action plan created event given induction does not contain conductedAt meaning it was created by the original Induction UI journey`() {
+    // Given
+    val goal = aValidGoal()
+    val actionPlan = aValidActionPlan(goals = listOf(goal))
+    val induction = aFullyPopulatedInduction(
+      conductedAt = null,
+    )
+
+    // When
+    val actual = timelineEventFactory.actionPlanCreatedEvent(actionPlan, induction)
+
+    // Then
+    assertThat(actual).hasSize(2)
+    val actionPlanCreatedEvent = actual[0]
+    assertThat(actionPlanCreatedEvent)
+      .hasSourceReference(actionPlan.reference.toString())
+      .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .hasEmptyContextualInfo()
+
+    val goalCreatedEvent = actual[1]
+    assertThat(goalCreatedEvent)
+      .hasSourceReference(goal.reference.toString())
+      .hasEventType(TimelineEventType.GOAL_CREATED)
+      .hasPrisonId(goal.createdAtPrison)
+      .wasActionedBy(goal.lastUpdatedBy!!)
+      .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
+      .hasCorrelationId(actionPlanCreatedEvent.correlationId)
+
+    verifyNoInteractions(userService)
   }
 
   @Test
@@ -73,7 +143,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_CREATED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
   }
 
@@ -89,7 +158,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
       ),
     )
@@ -128,7 +196,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
       ),
       newTimelineEvent(
@@ -136,7 +203,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
     )
@@ -173,7 +239,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
       ),
       newTimelineEvent(
@@ -181,7 +246,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_STARTED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book course"),
       ),
     )
@@ -234,7 +298,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.GOAL_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to "Learn Spanish"),
       ),
       newTimelineEvent(
@@ -242,7 +305,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_COMPLETED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
       newTimelineEvent(
@@ -250,7 +312,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_UPDATED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
       ),
       newTimelineEvent(
@@ -258,7 +319,6 @@ class TimelineEventFactoryTest {
         eventType = TimelineEventType.STEP_STARTED,
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
-        actionedByDisplayName = updatedGoal.lastUpdatedByDisplayName!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Complete course"),
       ),
     )
@@ -292,7 +352,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_ARCHIVED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(
         mapOf(
           TimelineEventContext.GOAL_TITLE to goal.title,
@@ -319,7 +378,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_ARCHIVED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(
         mapOf(
           TimelineEventContext.GOAL_TITLE to goal.title,
@@ -343,7 +401,6 @@ class TimelineEventFactoryTest {
       .hasEventType(TimelineEventType.GOAL_UNARCHIVED)
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
-      .wasActionedByDisplayName(goal.lastUpdatedByDisplayName!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
   }
 }

@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUs
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedUpdateInductionRequest
+import java.time.LocalDate
 import java.time.ZoneOffset
 
 @ExtendWith(MockitoExtension::class)
@@ -89,6 +90,10 @@ class InductionResourceMapperTest {
       personalSkillsAndInterests = skillsAndInterests,
       futureWorkInterests = workInterests,
       prisonId = prisonId,
+      conductedAt = LocalDate.now(),
+      conductedBy = "John Smith",
+      conductedByRole = "Peer Mentor",
+      note = "example note",
     )
 
     given(workOnReleaseMapper.toCreateWorkOnReleaseDto(any(), any())).willReturn(workOnRelease)

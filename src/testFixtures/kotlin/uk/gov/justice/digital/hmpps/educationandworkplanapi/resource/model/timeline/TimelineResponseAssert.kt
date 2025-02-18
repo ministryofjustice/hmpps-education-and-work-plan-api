@@ -9,8 +9,7 @@ fun assertThat(actual: TimelineResponse?) = TimelineResponseAssert(actual)
 /**
  * AssertJ custom assertion for [TimelineResponse]
  */
-class TimelineResponseAssert(actual: TimelineResponse?) :
-  AbstractObjectAssert<TimelineResponseAssert, TimelineResponse?>(actual, TimelineResponseAssert::class.java) {
+class TimelineResponseAssert(actual: TimelineResponse?) : AbstractObjectAssert<TimelineResponseAssert, TimelineResponse?>(actual, TimelineResponseAssert::class.java) {
 
   fun isForPrisonNumber(expected: String): TimelineResponseAssert {
     isNotNull
@@ -45,6 +44,33 @@ class TimelineResponseAssert(actual: TimelineResponse?) :
     with(actual!!) {
       val event = events[eventNumber - 1]
       consumer.accept(assertThat(event))
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [TimelineEventResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [TimelineEventResponseAssert].
+   * Returns this [TimelineResponseAssert] to allow further chained assertions on the parent [TimelineResponse]
+   *
+   * The `eventNumber` parameter is not zero indexed to make for better readability in tests. IE. the first event
+   * should be referenced as `.event(1) { .... }`
+   */
+  fun anyOfEventNumber(vararg eventNumbers: Int, consumer: Consumer<TimelineEventResponseAssert>): TimelineResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val events = events.filterIndexed { index, _ -> eventNumbers.contains(index + 1) }
+      val assertionPassed = events.any {
+        try {
+          consumer.accept(assertThat(it))
+          true
+        } catch (e: AssertionError) {
+          false
+        }
+      }
+      if (!assertionPassed) {
+        failWithMessage("Expected timeline event to be not present")
+      }
     }
     return this
   }

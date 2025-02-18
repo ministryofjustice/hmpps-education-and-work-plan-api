@@ -19,7 +19,7 @@ import java.util.UUID
 class TimelineEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: TimelineEntityMapperImpl
+  private lateinit var mapper: TimelineEntityMapper
 
   @Mock
   private lateinit var eventMapper: TimelineEventEntityMapper

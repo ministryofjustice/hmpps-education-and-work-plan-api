@@ -43,7 +43,7 @@ class ActionPlanService(
 
   /**
    * Retrieves a Prisoner's [ActionPlan] based on their prison number.
-   * Returns a new [ActionPlan] if the [ActionPlan] cannot be found.
+   * Throws [ActionPlanNotFoundException] if the [ActionPlan] cannot be found.
    */
   fun getActionPlan(prisonNumber: String): ActionPlan {
     log.debug { "Retrieving Action Plan for prisoner [$prisonNumber]" }

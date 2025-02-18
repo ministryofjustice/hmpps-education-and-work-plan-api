@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.INTERNALLY_MANAGED_FIELDS
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import java.time.Instant
 import java.util.UUID
 
@@ -86,21 +87,11 @@ class PersonalSkillsAndInterestsEntityAssert(actual: PersonalSkillsAndInterestsE
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: Instant): PersonalSkillsAndInterestsEntityAssert {
+  fun wasUpdatedAtOrAfter(dateTime: Instant): PersonalSkillsAndInterestsEntityAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt!!.isAfter(dateTime)) {
+      if (updatedAt!!.isBeforeRounded(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
-      }
-    }
-    return this
-  }
-
-  fun hasAReference(): PersonalSkillsAndInterestsEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
     return this

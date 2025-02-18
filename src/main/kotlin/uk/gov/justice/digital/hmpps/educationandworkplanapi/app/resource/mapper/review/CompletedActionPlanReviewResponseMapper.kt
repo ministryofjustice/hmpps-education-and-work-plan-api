@@ -14,19 +14,24 @@ class CompletedActionPlanReviewResponseMapper(
   private val noteResourceMapper: NoteResourceMapper,
 ) {
 
-  fun fromDomainToModel(completedReview: CompletedReview): CompletedActionPlanReviewResponse =
-    with(completedReview) {
-      CompletedActionPlanReviewResponse(
-        reference = reference,
-        completedDate = completedDate,
-        deadlineDate = deadlineDate,
-        note = noteResourceMapper.fromDomainToModel(note),
-        conductedBy = conductedBy?.name,
-        conductedByRole = conductedBy?.role,
-        createdBy = createdBy,
-        createdByDisplayName = userService.getUserDetails(createdBy).name,
-        createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
-        createdAtPrison = createdAtPrison,
-      )
-    }
+  fun fromDomainToModel(completedReview: CompletedReview): CompletedActionPlanReviewResponse = with(completedReview) {
+    CompletedActionPlanReviewResponse(
+      reference = reference,
+      completedDate = completedDate,
+      deadlineDate = deadlineDate,
+      note = noteResourceMapper.fromDomainToModel(note),
+      conductedBy = conductedBy?.name,
+      conductedByRole = conductedBy?.role,
+      createdBy = createdBy,
+      createdByDisplayName = userService.getUserDetails(createdBy).name,
+      createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
+      createdAtPrison = createdAtPrison,
+      updatedBy = updatedBy,
+      updatedByDisplayName = userService.getUserDetails(updatedBy).name,
+      updatedAt = instantMapper.toOffsetDateTime(updatedAt)!!,
+      updatedAtPrison = updatedAtPrison,
+      reviewScheduleReference = reviewScheduleReference,
+      preRelease = preRelease,
+    )
+  }
 }

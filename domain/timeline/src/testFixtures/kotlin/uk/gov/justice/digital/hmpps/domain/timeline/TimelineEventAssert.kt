@@ -21,16 +21,6 @@ class TimelineEventAssert(actual: TimelineEvent?) :
     return this
   }
 
-  fun wasActionedByDisplayName(expected: String): TimelineEventAssert {
-    isNotNull
-    with(actual!!) {
-      if (actionedByDisplayName != expected) {
-        failWithMessage("Expected actionedByDisplayName to be $expected, but was $actionedByDisplayName")
-      }
-    }
-    return this
-  }
-
   fun hasPrisonId(expected: String): TimelineEventAssert {
     isNotNull
     with(actual!!) {
@@ -70,11 +60,11 @@ class TimelineEventAssert(actual: TimelineEvent?) :
     return this
   }
 
-  fun hasNoContextualInfo(): TimelineEventAssert {
+  fun hasEmptyContextualInfo(): TimelineEventAssert {
     isNotNull
     with(actual!!) {
-      if (contextualInfo != null) {
-        failWithMessage("Expected contextualInfo to be null, but was $contextualInfo")
+      if (contextualInfo.isNotEmpty()) {
+        failWithMessage("Expected contextualInfo to be empty, but was $contextualInfo")
       }
     }
     return this

@@ -13,6 +13,8 @@ fun aValidCreateCompletedReviewDto(
   conductedByRole: String? = "Peer mentor",
   prisonerReleaseDate: LocalDate? = LocalDate.now().plusYears(1),
   prisonerSentenceType: SentenceType = SentenceType.SENTENCED,
+  prisonerHasIndeterminateFlag: Boolean = false,
+  prisonerHasRecallFlag: Boolean = false,
 ): CreateCompletedReviewDto =
   CreateCompletedReviewDto(
     prisonNumber = prisonNumber,
@@ -23,4 +25,6 @@ fun aValidCreateCompletedReviewDto(
     conductedByRole = conductedByRole,
     prisonerReleaseDate = prisonerReleaseDate,
     prisonerSentenceType = prisonerSentenceType,
+    prisonerHasIndeterminateFlag = prisonerHasIndeterminateFlag,
+    prisonerHasRecallFlag = prisonerHasRecallFlag,
   )

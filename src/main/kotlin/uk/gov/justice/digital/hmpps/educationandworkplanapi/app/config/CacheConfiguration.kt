@@ -22,8 +22,7 @@ class CacheConfiguration {
   }
 
   @Bean
-  fun cacheManager(): CacheManager =
-    ConcurrentMapCacheManager(USER_DETAILS)
+  fun cacheManager(): CacheManager = ConcurrentMapCacheManager(USER_DETAILS)
 
   @CacheEvict(value = [USER_DETAILS])
   @Scheduled(fixedDelay = TTL_HOURS_USER_DETAILS, timeUnit = HOURS)

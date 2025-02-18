@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteDto
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -58,10 +60,6 @@ data class Induction(
    */
   val createdBy: String?,
   /**
-   * The name of the logged-in user who created the Induction.
-   */
-  val createdByDisplayName: String?,
-  /**
    * The timestamp when this Induction was created.
    */
   val createdAt: Instant?,
@@ -74,10 +72,6 @@ data class Induction(
    */
   val lastUpdatedBy: String?,
   /**
-   * The name of the logged-in user who updated the Induction.
-   */
-  val lastUpdatedByDisplayName: String?,
-  /**
    * The timestamp when this Induction was updated.
    */
   val lastUpdatedAt: Instant?,
@@ -85,4 +79,21 @@ data class Induction(
    * The ID of the Prison that the Prisoner was at when this induction was updated.
    */
   val lastUpdatedAtPrison: String,
+
+  /**
+   * the person who conducted the induction if it were not the actual user
+   */
+  val conductedBy: String?,
+
+  /**
+   * the role of the person who conducted the induction if it were not the actual user
+   */
+  val conductedByRole: String?,
+
+  /**
+   * The date the induction was carried out
+   */
+  val completedDate: LocalDate?,
+
+  val note: NoteDto?,
 )

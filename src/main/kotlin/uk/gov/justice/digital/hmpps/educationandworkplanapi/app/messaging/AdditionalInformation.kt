@@ -52,6 +52,9 @@ sealed class AdditionalInformation {
     val prisonId: String,
     val nomisMovementReasonCode: String,
   ) : AdditionalInformation() {
+
+    val releaseTriggeredByPrisonerDeath: Boolean = nomisMovementReasonCode == "DEC"
+
     enum class Reason {
       TEMPORARY_ABSENCE_RELEASE,
       RELEASED_TO_HOSPITAL,
@@ -70,6 +73,21 @@ sealed class AdditionalInformation {
     enum class PrisonStatus {
       UNDER_PRISON_CARE,
       NOT_UNDER_PRISON_CARE,
+    }
+  }
+
+  /**
+   * Additional Information for Prisoner Merged (prison-offender-events.prisoner.merged) HMPPS Domain Event
+   */
+  data class PrisonerMergedAdditionalInformation(
+    val nomsNumber: String,
+    val reason: Reason,
+    val removedNomsNumber: String,
+
+  ) : AdditionalInformation() {
+
+    enum class Reason {
+      MERGE,
     }
   }
 }

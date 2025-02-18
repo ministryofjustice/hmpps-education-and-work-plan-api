@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValid
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidUpdateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
@@ -54,7 +55,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       val activeReviewScheduleEntity = aValidReviewScheduleEntity(
         scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
       )
-      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(activeReviewScheduleEntity)
+      given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willReturn(activeReviewScheduleEntity)
 
       val activeReviewSchedule = aValidReviewSchedule(
         scheduleStatus = ReviewScheduleStatusDomain.SCHEDULED,
@@ -66,7 +67,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
       // Then
       assertThat(actual).isEqualTo(activeReviewSchedule)
-      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verify(reviewScheduleRepository).findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
       verify(reviewScheduleEntityMapper).fromEntityToDomain(activeReviewScheduleEntity)
     }
 
@@ -75,14 +76,14 @@ class JpaReviewSchedulePersistenceAdapterTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
 
-      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(null)
+      given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willReturn(null)
 
       // When
       val actual = persistenceAdapter.getActiveReviewSchedule(prisonNumber)
 
       // Then
       assertThat(actual).isNull()
-      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verify(reviewScheduleRepository).findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
       verifyNoInteractions(reviewScheduleEntityMapper)
     }
 
@@ -91,7 +92,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       // Given
       val prisonNumber = aValidPrisonNumber()
 
-      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willThrow(NonUniqueResultException())
+      given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willThrow(NonUniqueResultException())
 
       // When
       val exception = assertThrows(IllegalStateException::class.java) {
@@ -100,7 +101,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
       // Then
       assertThat(exception).hasMessage("A prisoner cannot have more than one active ReviewSchedule. Please investigate the ReviewSchedule data for prisoner A1234BC")
-      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verify(reviewScheduleRepository).findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
       verifyNoInteractions(reviewScheduleEntityMapper)
     }
   }
@@ -158,7 +159,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
         prisonNumber = prisonNumber,
       )
 
-      given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(null)
+      given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willReturn(null)
 
       val reviewScheduleEntity = aValidReviewScheduleEntity(
         prisonNumber = prisonNumber,
@@ -175,7 +176,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       // Then
       assertThat(actual).isEqualTo(expectedReviewSchedule)
       verify(reviewScheduleHistoryRepository).findMaxVersionByReviewScheduleReference(reviewScheduleEntity.reference)
-      verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+      verify(reviewScheduleRepository).findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
       verify(reviewScheduleEntityMapper).fromDomainToEntity(createReviewScheduleDto)
       verify(reviewScheduleRepository).saveAndFlush(reviewScheduleEntity)
       verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
@@ -196,7 +197,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       prisonNumber = prisonNumber,
       scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
     )
-    given(reviewScheduleRepository.findActiveReviewSchedule(any())).willReturn(reviewScheduleEntity)
+    given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willReturn(reviewScheduleEntity)
 
     val reviewSchedule = aValidReviewSchedule()
     given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(reviewSchedule)
@@ -208,7 +209,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
 
     // Then
     assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-    verify(reviewScheduleRepository).findActiveReviewSchedule(prisonNumber)
+    verify(reviewScheduleRepository).findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
     verify(reviewScheduleEntityMapper).fromEntityToDomain(reviewScheduleEntity)
     verifyNoMoreInteractions(reviewScheduleRepository)
     verifyNoInteractions(reviewScheduleHistoryRepository)

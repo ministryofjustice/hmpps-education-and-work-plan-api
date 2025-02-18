@@ -13,6 +13,7 @@ data class ReviewSchedule(
   val reviewScheduleWindow: ReviewScheduleWindow,
   val scheduleCalculationRule: ReviewScheduleCalculationRule,
   val scheduleStatus: ReviewScheduleStatus,
+  val exemptionReason: String?,
   val createdBy: String,
   val createdAt: Instant,
   val createdAtPrison: String,
@@ -35,26 +36,36 @@ enum class ReviewScheduleCalculationRule {
   PRISONER_UN_SENTENCED,
 }
 
-enum class ReviewScheduleStatus(val inScope: Boolean, val isExclusion: Boolean = false, val isExemption: Boolean = false) {
-  SCHEDULED(true),
-  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(false, isExclusion = true),
-  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(false, isExclusion = true),
-  EXEMPT_PRISONER_FAILED_TO_ENGAGE(false, isExemption = true),
-  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(false, isExemption = true),
-  EXEMPT_PRISONER_SAFETY_ISSUES(false, isExclusion = true),
-  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(false, isExclusion = true),
-  EXEMPT_PRISON_STAFF_REDEPLOYMENT(false, isExemption = true),
-  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(false, isExemption = true),
-  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(false, isExclusion = true),
-  EXEMPT_SYSTEM_TECHNICAL_ISSUE(false), // system down
-  EXEMPT_PRISONER_TRANSFER(false, isExemption = true),
-  EXEMPT_PRISONER_RELEASE(false, isExemption = true),
-  EXEMPT_PRISONER_DEATH(false, isExemption = true),
-  COMPLETED(false),
+enum class ReviewScheduleStatus(
+  val isExclusion: Boolean = false,
+  val isExemption: Boolean = false,
+  val includeExemptionOnSummary: Boolean = false,
+) {
+  SCHEDULED,
+  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_FAILED_TO_ENGAGE(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_SAFETY_ISSUES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_STAFF_REDEPLOYMENT(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_SYSTEM_TECHNICAL_ISSUE(includeExemptionOnSummary = true), // system down
+  EXEMPT_PRISONER_TRANSFER(isExemption = true),
+  EXEMPT_PRISONER_RELEASE(isExemption = true),
+  EXEMPT_PRISONER_DEATH(isExemption = true),
+  EXEMPT_PRISONER_MERGE(isExemption = true),
+  EXEMPT_UNKNOWN(includeExemptionOnSummary = true),
+  COMPLETED,
   ;
 
   fun isExemptionOrExclusion(): Boolean {
     return isExemption || isExclusion
+  }
+
+  fun includeExceptionOnSummary(): Boolean {
+    return (isExemption || isExclusion) && includeExemptionOnSummary
   }
 }
 
@@ -63,23 +74,22 @@ data class ReviewScheduleWindow(
   val dateTo: LocalDate,
 ) {
   companion object {
-    fun fromTodayToTenDays(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(this, plusDays(10))
-    }
-    fun fromOneToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(1), plusMonths(3))
-    }
-    fun fromOneToThreeMonthsMinusDays(daysToSubtract: Int): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(1), plusMonths(3).minusDays(daysToSubtract.toLong()))
-    }
-    fun fromTwoToThreeMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(2), plusMonths(3))
-    }
-    fun fromFourToSixMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(4), plusMonths(6))
-    }
-    fun fromTenToTwelveMonths(): ReviewScheduleWindow = with(LocalDate.now()) {
-      ReviewScheduleWindow(plusMonths(10), plusMonths(12))
-    }
+    fun fromTodayToTenDays(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate, baseDate.plusDays(10))
+
+    fun fromOneToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(1), baseDate.plusMonths(3))
+
+    fun fromOneMonthToSpecificDate(baseDate: LocalDate, dateTo: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(1), dateTo)
+
+    fun fromTwoToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(2), baseDate.plusMonths(3))
+
+    fun fromFourToSixMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(4), baseDate.plusMonths(6))
+
+    fun fromTenToTwelveMonths(baseDate: LocalDate): ReviewScheduleWindow =
+      ReviewScheduleWindow(baseDate.plusMonths(10), baseDate.plusMonths(12))
   }
 }

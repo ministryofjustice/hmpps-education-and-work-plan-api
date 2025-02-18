@@ -10,8 +10,7 @@ fun assertThat(actual: ActionPlanEntity?) = ActionPlanEntityAssert(actual)
 /**
  * AssertJ custom assertion for [ActionPlanEntity]
  */
-class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
-  AbstractObjectAssert<ActionPlanEntityAssert, ActionPlanEntity?>(actual, ActionPlanEntityAssert::class.java) {
+class ActionPlanEntityAssert(actual: ActionPlanEntity?) : AbstractObjectAssert<ActionPlanEntityAssert, ActionPlanEntity?>(actual, ActionPlanEntityAssert::class.java) {
 
   fun hasJpaManagedFieldsPopulated(): ActionPlanEntityAssert {
     isNotNull
@@ -96,7 +95,7 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
   fun hasNoGoalsSet(): ActionPlanEntityAssert {
     isNotNull
     with(actual!!) {
-      if (goals!!.isNotEmpty()) {
+      if (goals.isNotEmpty()) {
         failWithMessage("Expected ActionPlan to be have no goals set, but has $goals")
       }
     }
@@ -106,7 +105,7 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
   fun hasNumberOfGoals(numberOfGoals: Int): ActionPlanEntityAssert {
     isNotNull
     with(actual!!) {
-      if (goals!!.size != numberOfGoals) {
+      if (goals.size != numberOfGoals) {
         failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals!!.size}")
       }
     }
@@ -121,7 +120,7 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
   fun goal(goalNumber: Int, consumer: Consumer<GoalEntityAssert>): ActionPlanEntityAssert {
     isNotNull
     with(actual!!) {
-      val goal = goals!![goalNumber]
+      val goal = goals[goalNumber]
       consumer.accept(assertThat(goal))
     }
     return this
@@ -136,18 +135,8 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) :
   fun allGoals(consumer: Consumer<GoalEntityAssert>): ActionPlanEntityAssert {
     isNotNull
     with(actual!!) {
-      goals!!.onEach {
+      goals.onEach {
         consumer.accept(assertThat(it))
-      }
-    }
-    return this
-  }
-
-  fun hasAReference(): ActionPlanEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
     return this

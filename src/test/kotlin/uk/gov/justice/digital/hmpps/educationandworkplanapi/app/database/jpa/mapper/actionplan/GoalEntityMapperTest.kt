@@ -29,7 +29,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class GoalEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: GoalEntityMapperImpl
+  private lateinit var mapper: GoalEntityMapper
 
   @Mock
   private lateinit var stepMapper: StepEntityMapper
@@ -65,10 +65,8 @@ class GoalEntityMapperTest {
       id = null,
       createdAt = null,
       createdBy = null,
-      createdByDisplayName = null,
       updatedAt = null,
       updatedBy = null,
-      updatedByDisplayName = null,
     )
 
     // When
@@ -77,7 +75,6 @@ class GoalEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFields("reference", "notes")
       .isEqualTo(expected)
@@ -103,17 +100,15 @@ class GoalEntityMapperTest {
       updatedAtPrison = "MDI",
       createdAt = createdAt,
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       updatedAt = updatedAt,
       updatedBy = "bjones_gen",
-      updatedByDisplayName = "Barry Jones",
     )
 
     val domainStep = aValidStep()
     given(stepMapper.fromEntityToDomain(any())).willReturn(domainStep)
 
     val expected = aValidGoal(
-      reference = entityGoal.reference!!,
+      reference = entityGoal.reference,
       title = "Improve communication skills",
       targetCompletionDate = targetCompletionDate,
       status = DomainStatus.ACTIVE,
@@ -121,11 +116,9 @@ class GoalEntityMapperTest {
       createdAt = createdAt,
       createdAtPrison = "BXI",
       createdBy = "asmith_gen",
-      createdByDisplayName = "Alex Smith",
       lastUpdatedAt = updatedAt,
       lastUpdatedAtPrison = "MDI",
       lastUpdatedBy = "bjones_gen",
-      lastUpdatedByDisplayName = "Barry Jones",
     )
 
     // When

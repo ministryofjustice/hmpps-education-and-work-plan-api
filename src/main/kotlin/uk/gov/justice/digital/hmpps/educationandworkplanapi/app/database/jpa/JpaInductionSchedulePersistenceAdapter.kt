@@ -4,29 +4,48 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionScheduleEntityMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import java.time.LocalDate
 
 @Component
 class JpaInductionSchedulePersistenceAdapter(
   private val inductionScheduleRepository: InductionScheduleRepository,
+  private val inductionScheduleHistoryRepository: InductionScheduleHistoryRepository,
   private val inductionScheduleEntityMapper: InductionScheduleEntityMapper,
 ) : InductionSchedulePersistenceAdapter {
   @Transactional
-  override fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule =
-    inductionScheduleRepository.saveAndFlush(inductionScheduleEntityMapper.fromCreateDtoToEntity(createInductionScheduleDto)).let {
-      inductionScheduleEntityMapper.fromEntityToDomain(it)
-    }
+  override fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule = inductionScheduleRepository.saveAndFlush(
+    inductionScheduleEntityMapper.fromCreateDtoToEntity(
+      createInductionScheduleDto,
+    ),
+  ).let {
+    saveInductionScheduleHistory(it)
+    inductionScheduleEntityMapper.fromEntityToDomain(it)
+  }
 
   @Transactional(readOnly = true)
-  override fun getInductionSchedule(prisonNumber: String): InductionSchedule? =
-    inductionScheduleRepository.findByPrisonNumber(prisonNumber)?.let {
-      inductionScheduleEntityMapper.fromEntityToDomain(it)
-    }
+  override fun getInductionSchedule(prisonNumber: String): InductionSchedule? = inductionScheduleRepository.findByPrisonNumber(prisonNumber)?.let {
+    inductionScheduleEntityMapper.fromEntityToDomain(it)
+  }
+
+  override fun getActiveInductionSchedule(prisonNumber: String): InductionSchedule? = inductionScheduleRepository.findByPrisonNumberAndScheduleStatusIn(
+    prisonNumber = prisonNumber,
+    scheduleStatuses = InductionScheduleStatus.ACTIVE_STATUSES,
+  )
+    ?.let { inductionScheduleEntityMapper.fromEntityToDomain(it) }
+
+  override fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> = inductionScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
+    .map { inductionScheduleEntityMapper.fromEntityToDomain(it) }
 
   @Transactional
   override fun updateSchedule(
@@ -45,7 +64,54 @@ class JpaInductionSchedulePersistenceAdapter(
     )
 
     // Save the updated schedule and return the mapped domain object.
-    inductionScheduleRepository.saveAndFlush(updatedSchedule)
-    return inductionScheduleEntityMapper.fromEntityToDomain(updatedSchedule)
+    return inductionScheduleRepository.saveAndFlush(updatedSchedule).let {
+      saveInductionScheduleHistory(it)
+      inductionScheduleEntityMapper.fromEntityToDomain(it)
+    }
+  }
+
+  override fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory> = inductionScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
+    .map { inductionScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
+
+  override fun updateInductionScheduleStatus(updateInductionScheduleStatusDto: UpdateInductionScheduleStatusDto): InductionSchedule {
+    val inductionScheduleEntity =
+      inductionScheduleRepository.findByPrisonNumber(updateInductionScheduleStatusDto.prisonNumber)
+        ?: throw InductionScheduleNotFoundException(updateInductionScheduleStatusDto.prisonNumber)
+
+    // Update the schedule status and optionally the latest review date
+    inductionScheduleEntity.apply {
+      scheduleStatus =
+        inductionScheduleEntityMapper.toInductionScheduleStatus(updateInductionScheduleStatusDto.scheduleStatus)
+      exemptionReason = updateInductionScheduleStatusDto.exemptionReason
+      updateInductionScheduleStatusDto.latestDeadlineDate?.let { deadlineDate = it }
+      updatedAtPrison = updateInductionScheduleStatusDto.updatedAtPrison
+    }
+
+    return inductionScheduleRepository.saveAndFlush(inductionScheduleEntity).let {
+      saveInductionScheduleHistory(it)
+      inductionScheduleEntityMapper.fromEntityToDomain(it)
+    }
+  }
+
+  private fun saveInductionScheduleHistory(inductionScheduleEntity: InductionScheduleEntity) {
+    with(inductionScheduleEntity) {
+      val historyEntry = InductionScheduleHistoryEntity(
+        version = inductionScheduleHistoryRepository.findMaxVersionByInductionScheduleReference(reference)
+          ?.plus(1) ?: 1,
+        reference = reference,
+        prisonNumber = prisonNumber,
+        updatedAt = updatedAt!!,
+        updatedAtPrison = updatedAtPrison,
+        createdAt = createdAt!!,
+        createdAtPrison = createdAtPrison,
+        updatedBy = updatedBy!!,
+        createdBy = createdBy!!,
+        scheduleStatus = scheduleStatus,
+        exemptionReason = exemptionReason,
+        scheduleCalculationRule = scheduleCalculationRule,
+        deadlineDate = deadlineDate,
+      )
+      inductionScheduleHistoryRepository.save(historyEntry)
+    }
   }
 }

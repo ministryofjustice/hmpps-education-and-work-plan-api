@@ -18,17 +18,16 @@ fun aValidInPrisonInterestsResponse(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): InPrisonInterestsResponse =
-  InPrisonInterestsResponse(
-    reference = reference,
-    inPrisonWorkInterests = inPrisonWorkInterests,
-    inPrisonTrainingInterests = inPrisonTrainingInterests,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): InPrisonInterestsResponse = InPrisonInterestsResponse(
+  reference = reference,
+  inPrisonWorkInterests = inPrisonWorkInterests,
+  inPrisonTrainingInterests = inPrisonTrainingInterests,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)

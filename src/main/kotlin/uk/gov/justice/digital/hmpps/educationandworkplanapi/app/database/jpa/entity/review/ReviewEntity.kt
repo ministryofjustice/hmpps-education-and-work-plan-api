@@ -47,6 +47,10 @@ data class ReviewEntity(
 
   @Column(updatable = false)
   val updatedAtPrison: String,
+
+  // we will only know this once the review is done hence it is updatable and var
+  @Column
+  var preRelease: Boolean = false,
 ) {
   @Id
   @GeneratedValue

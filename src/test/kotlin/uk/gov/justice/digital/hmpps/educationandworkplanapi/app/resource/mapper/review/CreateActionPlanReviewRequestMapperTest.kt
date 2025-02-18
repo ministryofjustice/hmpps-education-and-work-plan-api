@@ -17,17 +17,21 @@ class CreateActionPlanReviewRequestMapperTest {
     val prisonNumber = aValidPrisonNumber()
     val prisonerReleaseDate = LocalDate.now().plusYears(5)
     val prisonerSentenceType = SentenceType.SENTENCED
+    val isIndeterminate = true
+    val isRecall = true
 
     val expected = aValidCreateCompletedReviewDto(
       prisonNumber = prisonNumber,
       prisonerReleaseDate = prisonerReleaseDate,
       prisonerSentenceType = prisonerSentenceType,
+      prisonerHasIndeterminateFlag = isIndeterminate,
+      prisonerHasRecallFlag = isRecall,
     )
 
     val createActionPlanReviewRequest = aValidCreateActionPlanReviewRequest()
 
     // When
-    val actual = mapper.fromModelToDomain(prisonNumber, prisonerReleaseDate, prisonerSentenceType, createActionPlanReviewRequest)
+    val actual = mapper.fromModelToDomain(prisonNumber, prisonerReleaseDate, prisonerSentenceType, isIndeterminate, isRecall, createActionPlanReviewRequest)
 
     // Then
     assertThat(actual).isEqualTo(expected)

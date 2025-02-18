@@ -25,7 +25,7 @@ data class TimelineEvent(
   /**
    * A map of useful contextual information about the event.
    */
-  val contextualInfo: Map<TimelineEventContext, String>?,
+  val contextualInfo: Map<TimelineEventContext, String>,
   /**
    * The ID of the Prison where the Prisoner is based at the time of the event.
    */
@@ -34,10 +34,6 @@ data class TimelineEvent(
    * The username of the person who caused this event. Set to 'system' if the event was not actioned by a DPS user.
    */
   val actionedBy: String,
-  /**
-   * The name of the person who caused this event (if applicable).
-   */
-  val actionedByDisplayName: String? = null,
   /**
    * The date and time when the event occurred.
    */
@@ -52,10 +48,9 @@ data class TimelineEvent(
     fun newTimelineEvent(
       sourceReference: String,
       eventType: TimelineEventType,
-      contextualInfo: Map<TimelineEventContext, String>? = null,
+      contextualInfo: Map<TimelineEventContext, String> = emptyMap(),
       prisonId: String,
       actionedBy: String,
-      actionedByDisplayName: String? = null,
       timestamp: Instant = Instant.now(),
       correlationId: UUID = UUID.randomUUID(),
     ) = TimelineEvent(
@@ -65,7 +60,6 @@ data class TimelineEvent(
       contextualInfo = contextualInfo,
       prisonId = prisonId,
       actionedBy = actionedBy,
-      actionedByDisplayName = actionedByDisplayName,
       timestamp = timestamp,
       correlationId = correlationId,
     )
@@ -81,6 +75,7 @@ enum class TimelineEventType {
   INDUCTION_UPDATED,
   INDUCTION_SCHEDULE_CREATED,
   INDUCTION_SCHEDULE_UPDATED,
+  INDUCTION_SCHEDULE_STATUS_UPDATED,
 
   // Action Plan/Goal/Step events
   ACTION_PLAN_CREATED,
@@ -97,10 +92,7 @@ enum class TimelineEventType {
   // Action Plan Review events
   ACTION_PLAN_REVIEW_COMPLETED,
   ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED,
-
-  // Conversation/Notes events
-  CONVERSATION_CREATED,
-  CONVERSATION_UPDATED,
+  ACTION_PLAN_REVIEW_SCHEDULE_CREATED,
 
   // Prison movement events
   PRISON_ADMISSION,
@@ -113,10 +105,15 @@ enum class TimelineEventContext {
   STEP_TITLE,
   GOAL_ARCHIVED_REASON,
   GOAL_ARCHIVED_REASON_OTHER,
-  CONVERSATION_TYPE,
   PRISON_TRANSFERRED_FROM,
   INDUCTION_SCHEDULE_STATUS,
   INDUCTION_SCHEDULE_DEADLINE_DATE,
+  COMPLETED_INDUCTION_ENTERED_ONLINE_AT,
+  COMPLETED_INDUCTION_ENTERED_ONLINE_BY,
+  COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE,
+  COMPLETED_INDUCTION_NOTES,
+  COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY,
+  COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE,
   COMPLETED_REVIEW_ENTERED_ONLINE_AT,
   COMPLETED_REVIEW_ENTERED_ONLINE_BY,
   COMPLETED_REVIEW_NOTES,
@@ -127,4 +124,10 @@ enum class TimelineEventContext {
   REVIEW_SCHEDULE_STATUS_NEW,
   REVIEW_SCHEDULE_DEADLINE_OLD,
   REVIEW_SCHEDULE_DEADLINE_NEW,
+  REVIEW_SCHEDULE_EXEMPTION_REASON,
+  INDUCTION_SCHEDULE_STATUS_OLD,
+  INDUCTION_SCHEDULE_STATUS_NEW,
+  INDUCTION_SCHEDULE_DEADLINE_OLD,
+  INDUCTION_SCHEDULE_DEADLINE_NEW,
+  INDUCTION_SCHEDULE_EXEMPTION_REASON,
 }

@@ -70,7 +70,6 @@ class AsyncReviewEventServiceTest {
       eventType = TimelineEventType.ACTION_PLAN_REVIEW_COMPLETED,
       prisonId = completedReview.createdAtPrison,
       actionedBy = completedReview.createdBy,
-      actionedByDisplayName = null,
       timestamp = completedReview.createdAt,
       contextualInfo = mapOf(
         COMPLETED_REVIEW_ENTERED_ONLINE_AT to completedReview.createdAt.toString(),
@@ -112,7 +111,6 @@ class AsyncReviewEventServiceTest {
       eventType = TimelineEventType.ACTION_PLAN_REVIEW_COMPLETED,
       prisonId = completedReview.createdAtPrison,
       actionedBy = completedReview.createdBy,
-      actionedByDisplayName = null,
       timestamp = completedReview.createdAt,
       contextualInfo = mapOf(
         COMPLETED_REVIEW_ENTERED_ONLINE_AT to completedReview.createdAt.toString(),

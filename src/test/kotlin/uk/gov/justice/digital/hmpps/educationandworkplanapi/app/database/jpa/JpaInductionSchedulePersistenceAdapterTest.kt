@@ -15,9 +15,11 @@ import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aPersistedInductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.anUnPersistedInductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionScheduleEntityMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 
 @ExtendWith(MockitoExtension::class)
@@ -28,6 +30,9 @@ class JpaInductionSchedulePersistenceAdapterTest {
 
   @Mock
   private lateinit var inductionScheduleRepository: InductionScheduleRepository
+
+  @Mock
+  private lateinit var inductionScheduleHistoryRepository: InductionScheduleHistoryRepository
 
   @Mock
   private lateinit var inductionScheduleEntityMapper: InductionScheduleEntityMapper
@@ -96,6 +101,7 @@ class JpaInductionSchedulePersistenceAdapterTest {
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionScheduleEntityMapper).fromCreateDtoToEntity(createInductionScheduleDto)
       verify(inductionScheduleRepository).saveAndFlush(newInductionScheduleEntity)
+      verify(inductionScheduleHistoryRepository).save(any<InductionScheduleHistoryEntity>())
       verify(inductionScheduleEntityMapper).fromEntityToDomain(persistedInductionScheduleEntity)
     }
   }

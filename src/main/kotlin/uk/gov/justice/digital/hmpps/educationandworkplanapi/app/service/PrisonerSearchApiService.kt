@@ -33,9 +33,8 @@ class PrisonerSearchApiService(
       }
   }
 
-  fun getPrisoner(prisonNumber: String): Prisoner =
-    prisonerSearchApiClient.getPrisoner(prisonNumber)
-      .also {
-        log.debug { "Retrieved prisoner [$prisonNumber] from Prisoner Search API" }
-      }
+  fun getPrisoner(prisonNumber: String): Prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
+    .also {
+      log.debug { "Retrieved prisoner [$prisonNumber] from Prisoner Search API" }
+    }
 }

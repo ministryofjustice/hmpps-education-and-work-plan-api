@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 
 private val log = KotlinLogging.logger {}
@@ -34,7 +34,8 @@ class ReviewScheduleEtlController(
   private val inductionRepository: InductionRepository,
   private val actionPlanRepository: ActionPlanRepository,
   private val reviewScheduleRepository: ReviewScheduleRepository,
-  private val reviewService: ReviewService,
+  private val reviewScheduleService: ReviewScheduleService,
+  private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
 ) {
 
   @PostMapping
@@ -52,7 +53,6 @@ class ReviewScheduleEtlController(
     val totalPrisonersWithReviewSchedule: Int
     val totalPrisonersWithInduction: Int
     val totalPrisonersWithActionPlan: Int
-    val totalSentencedPrisonersWithNoReleaseDate: Int
     val prisonersWithCreatedReviewSchedules = mutableListOf<String>()
     val prisonersWithoutReviewSchedules = mutableListOf<String>()
 
@@ -85,42 +85,30 @@ class ReviewScheduleEtlController(
           .also { totalPrisonersWithActionPlan = it.size }
         prisoners.filter { prisonersWithAnActionPlan.contains(it.prisonerNumber) }
       }
-      // Filter out prisoners who are SENTENCED but have no release date. This should only be a problem in dev
-      .let { prisoners ->
-        val sentencedPrisonersWithNoReleaseDate = prisoners
-          .filter { prisoner -> prisoner.legalStatus == LegalStatus.SENTENCED && prisoner.releaseDate == null }
-          .toSet()
-          .also { totalSentencedPrisonersWithNoReleaseDate = it.size }
-        prisoners.subtract(sentencedPrisonersWithNoReleaseDate)
-      }
       // Create the Review Schedule for each prisoner who requires one
       .forEach { prisoner ->
-        with(prisoner) {
-          log.debug { "Creating Review Schedule for $prisonerNumber" }
+        val prisonNumber = prisoner.prisonerNumber
+        // When retrospectively creating a ReviewSchedule (as we are here) we won't be able to tell if the prisoner entered their current prison because of a readmission or transfer
+        val createInitialReviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
+          prisoner = prisoner,
+          isReadmission = false,
+          isTransfer = false,
+        )
 
-          try {
-            reviewService.createInitialReviewSchedule(
-              CreateInitialReviewScheduleDto(
-                prisonNumber = prisonerNumber,
-                prisonerReleaseDate = releaseDate,
-                prisonerSentenceType = toSentenceType(legalStatus),
-                prisonId = this.prisonId ?: "N/A",
-                // When retrospectively creating a ReviewSchedule (as we are here) we won't be able to tell if the prisoner entered their current prison because of a readmission or transfer
-                isReadmission = false,
-                isTransfer = false,
-              ),
-            )
-              ?.run { prisonersWithCreatedReviewSchedules.add(prisonerNumber) }
-              ?: run { prisonersWithoutReviewSchedules.add(prisonerNumber) }
-          } catch (e: Exception) {
-            when (e) {
-              is NullPointerException -> log.error { "NPE creating Review Schedule for $prisonerNumber, likely a problem with missing releaseDate. $e" }
-              is UnsupportedOperationException, is RuntimeException -> { /* ignore, these are expected exceptions given the prisoner data in certain circumstances (SentenceType, releaseDate) */ }
+        log.debug { "Creating Review Schedule for $prisonNumber" }
 
-              else -> log.error { "Failed to create Review Schedule for $prisonerNumber. $e" }
-            }
-            prisonersWithoutReviewSchedules.add(prisonerNumber)
+        try {
+          reviewScheduleService.createInitialReviewSchedule(createInitialReviewScheduleDto)
+            ?.run { prisonersWithCreatedReviewSchedules.add(prisonNumber) }
+            ?: run { prisonersWithoutReviewSchedules.add(prisonNumber) }
+        } catch (e: Exception) {
+          when (e) {
+            is NullPointerException -> log.error { "NPE creating Review Schedule for $prisonNumber, likely a problem with missing releaseDate. $e" }
+            is ReviewScheduleNoReleaseDateForSentenceTypeException, is ActiveReviewScheduleAlreadyExistsException -> { /* ignore, these are expected exceptions given the prisoner data in certain circumstances (SentenceType, releaseDate) */ }
+
+            else -> log.error { "Failed to create Review Schedule for $prisonNumber. $e" }
           }
+          prisonersWithoutReviewSchedules.add(prisonNumber)
         }
       }
 
@@ -131,7 +119,6 @@ class ReviewScheduleEtlController(
       totalPrisonersWithReviewSchedule = totalPrisonersWithReviewSchedule,
       totalPrisonersWithInduction = totalPrisonersWithInduction,
       totalPrisonersWithActionPlan = totalPrisonersWithActionPlan,
-      totalSentencedPrisonersWithNoReleaseDate = totalSentencedPrisonersWithNoReleaseDate,
       prisonersWithCreatedReviewSchedules = prisonersWithCreatedReviewSchedules.toList(),
       prisonersWithoutReviewSchedules = prisonersWithoutReviewSchedules.toList(),
     )
@@ -144,26 +131,10 @@ class ReviewScheduleEtlController(
     }
   }
 
-  private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
-    when (legalStatus) {
-      LegalStatus.RECALL -> SentenceType.RECALL
-      LegalStatus.DEAD -> SentenceType.DEAD
-      LegalStatus.INDETERMINATE_SENTENCE -> SentenceType.INDETERMINATE_SENTENCE
-      LegalStatus.SENTENCED -> SentenceType.SENTENCED
-      LegalStatus.CONVICTED_UNSENTENCED -> SentenceType.CONVICTED_UNSENTENCED
-      LegalStatus.CIVIL_PRISONER -> SentenceType.CIVIL_PRISONER
-      LegalStatus.IMMIGRATION_DETAINEE -> SentenceType.IMMIGRATION_DETAINEE
-      LegalStatus.REMAND -> SentenceType.REMAND
-      LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
-      LegalStatus.OTHER -> SentenceType.OTHER
-    }
-
   @ExceptionHandler(value = [ReviewSchedulesEtlRollbackException::class])
-  fun handleReviewSchedulesEtlRollbackException(e: ReviewSchedulesEtlRollbackException): ResponseEntity<Any> {
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(e.reviewSchedulesEtlResponse)
-  }
+  fun handleReviewSchedulesEtlRollbackException(e: ReviewSchedulesEtlRollbackException): ResponseEntity<Any> = ResponseEntity
+    .status(HttpStatus.OK)
+    .body(e.reviewSchedulesEtlResponse)
 }
 
 data class ReviewSchedulesEtlResponse(
@@ -173,7 +144,6 @@ data class ReviewSchedulesEtlResponse(
   val totalPrisonersWithReviewSchedule: Int,
   val totalPrisonersWithInduction: Int,
   val totalPrisonersWithActionPlan: Int,
-  val totalSentencedPrisonersWithNoReleaseDate: Int,
   val prisonersWithCreatedReviewSchedules: List<String>,
   val prisonersWithoutReviewSchedules: List<String>,
 ) {
@@ -198,7 +168,6 @@ data class ReviewSchedulesEtlResponse(
           Of those, $totalPrisonersWithReviewSchedule already have a Review Schedule, leaving ${totalPrisonersInPrison - totalPrisonersWithReviewSchedule} candidate prisoners.
           Of those, $totalPrisonersWithInduction have an Induction, and $totalPrisonersWithActionPlan have an Induction and an Action Plan.
           The $totalPrisonersWithActionPlan prisoners with both an Induction and an Action Plan are the candidate prisoners.
-          Of those, $totalSentencedPrisonersWithNoReleaseDate are SENTENCED but have no release date, leaving ${totalPrisonersWithActionPlan - totalSentencedPrisonersWithNoReleaseDate} prisoners as the candidate prisoners for having a Review Schedule created.
           
           Created Review Schedules
           ------------------------          

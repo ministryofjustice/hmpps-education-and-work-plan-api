@@ -14,7 +14,6 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -30,49 +29,45 @@ import java.util.UUID
 @Table(name = "step")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class StepEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+data class StepEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "goal_id")
-  var parent: GoalEntity? = null,
+  val reference: UUID,
 
   @Column
-  @field:NotNull
-  var title: String? = null,
+  var title: String,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var status: StepStatus? = null,
+  var status: StepStatus,
 
   @Column
-  @field:NotNull
-  var sequenceNumber: Int? = null,
+  var sequenceNumber: Int,
+
+) : KeyAwareChildEntity {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) : KeyAwareChildEntity {
+  var updatedBy: String? = null
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "goal_id")
+  var parent: GoalEntity? = null
 
   @PrePersist
   @PreUpdate
@@ -85,7 +80,7 @@ class StepEntity(
     this.parent = parent as GoalEntity
   }
 
-  override fun key(): String = reference!!.toString()
+  override fun key(): String = reference.toString()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -97,9 +92,7 @@ class StepEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
 }
 
 enum class StepStatus {

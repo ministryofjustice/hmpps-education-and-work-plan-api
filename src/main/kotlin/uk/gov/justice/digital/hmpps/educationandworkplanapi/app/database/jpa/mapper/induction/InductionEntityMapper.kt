@@ -1,153 +1,161 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction
 
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.MappingTarget
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateFutureWorkInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInPrisonInterestsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.FutureWorkInterestsEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InPrisonInterestsEntity
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousTrainingDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousWorkExperiencesDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionSummaryProjection
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillsAndInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousTrainingEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousWorkExperiencesEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.WorkOnReleaseEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeJpaManagedFieldsIncludingDisplayNameFields
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.ExcludeReferenceField
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.GenerateNewReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
+import java.util.UUID
 
-@Mapper(
-  uses = [
-    FutureWorkInterestsEntityMapper::class,
-    InPrisonInterestsEntityMapper::class,
-    PersonalSkillsAndInterestsEntityMapper::class,
-    PreviousQualificationsEntityMapper::class,
-    PreviousTrainingEntityMapper::class,
-    PreviousWorkExperiencesEntityMapper::class,
-    WorkOnReleaseEntityMapper::class,
-  ],
-)
-abstract class InductionEntityMapper {
-
-  @Autowired
-  private lateinit var futureWorkInterestsEntityMapper: FutureWorkInterestsEntityMapper
-
-  @Autowired
-  private lateinit var inPrisonInterestsEntityMapper: InPrisonInterestsEntityMapper
-
-  @Autowired
-  private lateinit var skillsAndInterestsEntityMapper: PersonalSkillsAndInterestsEntityMapper
-
-  @Autowired
-  private lateinit var previousQualificationsEntityMapper: PreviousQualificationsEntityMapper
-
-  @Autowired
-  private lateinit var previousTrainingEntityMapper: PreviousTrainingEntityMapper
-
-  @Autowired
-  private lateinit var workExperiencesEntityMapper: PreviousWorkExperiencesEntityMapper
-
-  @Autowired
-  private lateinit var workOnReleaseEntityMapper: WorkOnReleaseEntityMapper
-
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @GenerateNewReference
-  @Mapping(target = "createdAtPrison", source = "prisonId")
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  abstract fun fromCreateDtoToEntity(dto: CreateInductionDto): InductionEntity
-
-  fun fromEntityToDomain(inductionEntity: InductionEntity, previousQualificationsEntity: PreviousQualificationsEntity?): Induction =
-    Induction(
-      reference = inductionEntity.reference!!,
-      prisonNumber = inductionEntity.prisonNumber!!,
-      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease),
-      previousQualifications = previousQualificationsEntityMapper.fromEntityToDomain(previousQualificationsEntity),
-      previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining),
-      previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
-      inPrisonInterests = inPrisonInterestsEntityMapper.fromEntityToDomain(inductionEntity.inPrisonInterests),
-      personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromEntityToDomain(inductionEntity.personalSkillsAndInterests),
-      futureWorkInterests = futureWorkInterestsEntityMapper.fromEntityToDomain(inductionEntity.futureWorkInterests),
-      createdBy = inductionEntity.createdBy,
-      createdByDisplayName = inductionEntity.createdByDisplayName,
-      createdAt = inductionEntity.createdAt,
-      createdAtPrison = inductionEntity.createdAtPrison!!,
-      lastUpdatedBy = inductionEntity.updatedBy,
-      lastUpdatedByDisplayName = inductionEntity.updatedByDisplayName,
-      lastUpdatedAt = inductionEntity.updatedAt,
-      lastUpdatedAtPrison = inductionEntity.updatedAtPrison!!,
+@Component
+class InductionEntityMapper(
+  private val personalSkillsAndInterestsEntityMapper: PersonalSkillsAndInterestsEntityMapper,
+  private val previousWorkExperiencesEntityMapper: PreviousWorkExperiencesEntityMapper,
+  private val futureWorkInterestsEntityMapper: FutureWorkInterestsEntityMapper,
+  private val inPrisonInterestsEntityMapper: InPrisonInterestsEntityMapper,
+  private val skillsAndInterestsEntityMapper: PersonalSkillsAndInterestsEntityMapper,
+  private val previousQualificationsEntityMapper: PreviousQualificationsEntityMapper,
+  private val previousTrainingEntityMapper: PreviousTrainingEntityMapper,
+  private val workExperiencesEntityMapper: PreviousWorkExperiencesEntityMapper,
+  private val workOnReleaseEntityMapper: WorkOnReleaseEntityMapper,
+) {
+  fun fromCreateDtoToEntity(dto: CreateInductionDto): InductionEntity = with(dto) {
+    InductionEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      workOnRelease = workOnReleaseEntityMapper.fromCreateDtoToEntity(workOnRelease),
+      previousTraining = previousTrainingEntityMapper.fromCreateDtoToEntity(previousTraining),
+      previousWorkExperiences = previousWorkExperiences?.let {
+        previousWorkExperiencesEntityMapper.fromCreateDtoToEntity(it)
+      },
+      inPrisonInterests = inPrisonInterests?.let { inPrisonInterestsEntityMapper.fromCreateDtoToEntity(it) },
+      personalSkillsAndInterests = personalSkillsAndInterests?.let {
+        personalSkillsAndInterestsEntityMapper.fromCreateDtoToEntity(it)
+      },
+      futureWorkInterests = futureWorkInterests?.let { futureWorkInterestsEntityMapper.fromCreateDtoToEntity(it) },
+      conductedBy = conductedBy,
+      conductedByRole = conductedByRole,
+      completedDate = conductedAt,
+      createdAtPrison = prisonId,
+      updatedAtPrison = prisonId,
     )
-
-  @Mapping(target = "lastUpdatedBy", source = "updatedBy")
-  @Mapping(target = "lastUpdatedAt", source = "updatedAt")
-  abstract fun fromEntitySummaryToDomainSummary(inductionSummaryProjection: InductionSummaryProjection): InductionSummary
-
-  abstract fun fromEntitySummariesToDomainSummaries(inductionSummaryProjections: List<InductionSummaryProjection>): List<InductionSummary>
-
-  @ExcludeJpaManagedFieldsIncludingDisplayNameFields
-  @ExcludeReferenceField
-  @Mapping(target = "createdAtPrison", ignore = true)
-  @Mapping(target = "updatedAtPrison", source = "prisonId")
-  @Mapping(target = "futureWorkInterests", expression = "java( updateFutureWorkInterests(entity, dto) )")
-  @Mapping(target = "inPrisonInterests", expression = "java( updateInPrisonInterests(entity, dto) )")
-  @Mapping(target = "personalSkillsAndInterests", expression = "java( updatePersonalSkillsAndInterests(entity, dto) )")
-  @Mapping(target = "previousTraining", expression = "java( updatePreviousTraining(entity, dto) )")
-  @Mapping(target = "previousWorkExperiences", expression = "java( updatePreviousWorkExperiences(entity, dto) )")
-  @Mapping(target = "workOnRelease", expression = "java( updateWorkOnRelease(entity, dto) )")
-  abstract fun updateEntityFromDto(@MappingTarget entity: InductionEntity, dto: UpdateInductionDto)
-
-  fun updateFutureWorkInterests(entity: InductionEntity, dto: UpdateInductionDto): FutureWorkInterestsEntity? {
-    return if (entity.futureWorkInterests == null) {
-      // if the Induction previously didn't have FutureWorkInterests (e.g. because the prisoner didn't want to work), then create a new FutureWorkInterests
-      futureWorkInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.futureWorkInterests)
-    } else {
-      // else update the existing FutureWorkInterests
-      futureWorkInterestsEntityMapper.updateExistingEntityFromDto(entity.futureWorkInterests!!, dto.futureWorkInterests)
-        .let { entity.futureWorkInterests }
-    }
   }
 
-  fun updateInPrisonInterests(entity: InductionEntity, dto: UpdateInductionDto): InPrisonInterestsEntity? {
-    return if (entity.inPrisonInterests == null) {
-      inPrisonInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.inPrisonInterests)
-    } else {
-      inPrisonInterestsEntityMapper.updateExistingEntityFromDto(entity.inPrisonInterests!!, dto.inPrisonInterests)
-        .let { entity.inPrisonInterests }
-    }
+  fun fromEntityToDomain(
+    inductionEntity: InductionEntity,
+    previousQualificationsEntity: PreviousQualificationsEntity?,
+    noteEntity: NoteEntity? = null,
+  ): Induction = Induction(
+    reference = inductionEntity.reference,
+    prisonNumber = inductionEntity.prisonNumber,
+    workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(inductionEntity.workOnRelease),
+    previousQualifications = previousQualificationsEntity?.let {
+      previousQualificationsEntityMapper.fromEntityToDomain(it)
+    },
+    previousTraining = previousTrainingEntityMapper.fromEntityToDomain(inductionEntity.previousTraining),
+    previousWorkExperiences = workExperiencesEntityMapper.fromEntityToDomain(inductionEntity.previousWorkExperiences),
+    inPrisonInterests = inPrisonInterestsEntityMapper.fromEntityToDomain(inductionEntity.inPrisonInterests),
+    personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromEntityToDomain(inductionEntity.personalSkillsAndInterests),
+    futureWorkInterests = futureWorkInterestsEntityMapper.fromEntityToDomain(inductionEntity.futureWorkInterests),
+    createdBy = inductionEntity.createdBy,
+    createdAt = inductionEntity.createdAt,
+    createdAtPrison = inductionEntity.createdAtPrison,
+    lastUpdatedBy = inductionEntity.updatedBy,
+    lastUpdatedAt = inductionEntity.updatedAt,
+    lastUpdatedAtPrison = inductionEntity.updatedAtPrison,
+    conductedBy = inductionEntity.conductedBy,
+    conductedByRole = inductionEntity.conductedByRole,
+    completedDate = inductionEntity.completedDate,
+    note = noteEntity?.let { NoteMapper.fromEntityToDomain(it) },
+  )
+
+  fun fromEntitySummariesToDomainSummaries(inductionSummaryProjections: List<InductionSummaryProjection>): List<InductionSummary> = inductionSummaryProjections.map {
+    InductionSummary(
+      reference = it.reference,
+      prisonNumber = it.prisonNumber,
+      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(it.workOnRelease),
+      createdBy = it.createdBy,
+      createdAt = it.createdAt,
+      lastUpdatedBy = it.updatedBy,
+      lastUpdatedAt = it.updatedAt,
+    )
   }
 
-  fun updatePersonalSkillsAndInterests(entity: InductionEntity, dto: UpdateInductionDto): PersonalSkillsAndInterestsEntity? {
-    return if (entity.personalSkillsAndInterests == null) {
-      skillsAndInterestsEntityMapper.fromUpdateDtoToNewEntity(dto.personalSkillsAndInterests)
-    } else {
-      skillsAndInterestsEntityMapper.updateExistingEntityFromDto(entity.personalSkillsAndInterests!!, dto.personalSkillsAndInterests)
-        .let { entity.personalSkillsAndInterests }
-    }
+  fun updateEntityFromDto(entity: InductionEntity, dto: UpdateInductionDto) = with(entity) {
+    updatedAtPrison = dto.prisonId
+
+    updateWorkOnRelease(this, dto.workOnRelease)
+    updatePreviousTraining(this, dto.previousTraining)
+    updateFutureWorkInterests(this, dto.futureWorkInterests)
+    updateInPrisonInterests(this, dto.inPrisonInterests)
+    updatePersonalSkillsAndInterests(this, dto.personalSkillsAndInterests)
+    updatePreviousWorkExperiences(this, dto.previousWorkExperiences)
   }
 
-  fun updatePreviousTraining(entity: InductionEntity, dto: UpdateInductionDto): PreviousTrainingEntity? {
-    return if (entity.previousTraining == null) {
-      previousTrainingEntityMapper.fromUpdateDtoToNewEntity(dto.previousTraining)
-    } else {
-      previousTrainingEntityMapper.updateExistingEntityFromDto(entity.previousTraining!!, dto.previousTraining)
-        .let { entity.previousTraining }
-    }
+  private fun updateFutureWorkInterests(entity: InductionEntity, dto: UpdateFutureWorkInterestsDto?) = dto?.also {
+    entity.futureWorkInterests
+      ?.also { existingWorkInterests ->
+        // update the existing FutureWorkInterests
+        futureWorkInterestsEntityMapper.updateExistingEntityFromDto(existingWorkInterests, it)
+      }
+      ?: run {
+        // if the Induction previously didn't have FutureWorkInterests (e.g. because the prisoner originally didn't want to work), then create a new FutureWorkInterests
+        entity.futureWorkInterests = futureWorkInterestsEntityMapper.fromUpdateDtoToNewEntity(it)
+      }
   }
 
-  fun updatePreviousWorkExperiences(entity: InductionEntity, dto: UpdateInductionDto): PreviousWorkExperiencesEntity? {
-    return if (entity.previousWorkExperiences == null) {
-      workExperiencesEntityMapper.fromUpdateDtoToNewEntity(dto.previousWorkExperiences)
-    } else {
-      workExperiencesEntityMapper.updateExistingEntityFromDto(entity.previousWorkExperiences!!, dto.previousWorkExperiences)
-        .let { entity.previousWorkExperiences }
-    }
+  private fun updateInPrisonInterests(entity: InductionEntity, dto: UpdateInPrisonInterestsDto?) = dto?.also {
+    entity.inPrisonInterests
+      ?.also { existingInPrisonInterests ->
+        // update the existing InPrisonInterests
+        inPrisonInterestsEntityMapper.updateExistingEntityFromDto(existingInPrisonInterests, it)
+      }
+      ?: run {
+        // if the Induction previously didn't have InPrisonInterests, then create a new InPrisonInterests
+        entity.inPrisonInterests = inPrisonInterestsEntityMapper.fromUpdateDtoToNewEntity(it)
+      }
   }
 
-  fun updateWorkOnRelease(entity: InductionEntity, dto: UpdateInductionDto): WorkOnReleaseEntity? =
-    workOnReleaseEntityMapper.updateExistingEntityFromDto(entity.workOnRelease!!, dto.workOnRelease)
-      .let { entity.workOnRelease }
+  private fun updatePersonalSkillsAndInterests(entity: InductionEntity, dto: UpdatePersonalSkillsAndInterestsDto?) = dto?.also {
+    entity.personalSkillsAndInterests
+      ?.also { existingPersonalSkillsAndInterests ->
+        // Update the existing Personal Skills And Interests
+        skillsAndInterestsEntityMapper.updateExistingEntityFromDto(existingPersonalSkillsAndInterests, it)
+      }
+      ?: run {
+        // If the Induction previously didn't have Personal Skills And Interests, then create a new PersonalSkillsAndInterests
+        entity.personalSkillsAndInterests = skillsAndInterestsEntityMapper.fromUpdateDtoToNewEntity(it)
+      }
+  }
+
+  private fun updatePreviousTraining(entity: InductionEntity, dto: UpdatePreviousTrainingDto?) = dto?.also {
+    previousTrainingEntityMapper.updateExistingEntityFromDto(entity.previousTraining, it)
+  }
+
+  private fun updatePreviousWorkExperiences(entity: InductionEntity, dto: UpdatePreviousWorkExperiencesDto?) = dto?.also {
+    entity.previousWorkExperiences
+      ?.also { existingPreviousWorkExperiences ->
+        // Update the existing PreviousWorkExperiences
+        previousWorkExperiencesEntityMapper.updateExistingEntityFromDto(existingPreviousWorkExperiences, it)
+      }
+      ?: run {
+        // If the Induction previously didn't have PreviousWorkExperiences, then create a PreviousWorkExperiences
+        entity.previousWorkExperiences = previousWorkExperiencesEntityMapper.fromUpdateDtoToNewEntity(it)
+      }
+  }
+
+  private fun updateWorkOnRelease(entity: InductionEntity, dto: UpdateWorkOnReleaseDto?) = dto?.also {
+    workOnReleaseEntityMapper.updateExistingEntityFromDto(entity.workOnRelease, it)
+  }
 }

@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class WorkOnReleaseEntityMapperTest {
 
-  private val mapper = WorkOnReleaseEntityMapperImpl()
+  private val mapper = WorkOnReleaseEntityMapper()
 
   @Test
   fun `should map from dto to entity`() {
@@ -36,7 +36,6 @@ class WorkOnReleaseEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
@@ -54,11 +53,9 @@ class WorkOnReleaseEntityMapperTest {
       createdAt = workOnReleaseEntity.createdAt!!,
       createdAtPrison = workOnReleaseEntity.createdAtPrison!!,
       createdBy = workOnReleaseEntity.createdBy!!,
-      createdByDisplayName = workOnReleaseEntity.createdByDisplayName!!,
       lastUpdatedAt = workOnReleaseEntity.updatedAt!!,
       lastUpdatedAtPrison = workOnReleaseEntity.updatedAtPrison!!,
       lastUpdatedBy = workOnReleaseEntity.updatedBy!!,
-      lastUpdatedByDisplayName = workOnReleaseEntity.updatedByDisplayName!!,
     )
 
     // When

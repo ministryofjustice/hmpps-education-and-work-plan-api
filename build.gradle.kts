@@ -1,11 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.2"
   id("org.openapi.generator") version "7.10.0"
   kotlin("plugin.spring") version "2.1.0"
   kotlin("plugin.jpa") version "2.1.0"
@@ -19,7 +18,6 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val mapstructVersion = "1.6.3"
 val postgresqlVersion = "42.7.4"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.7.0"
@@ -27,7 +25,7 @@ val hmppsSqsVersion = "5.2.0"
 val awaitilityVersion = "4.2.2"
 val wiremockVersion = "3.10.0"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "9.47"
+val nimbusJwtVersion = "10.0.1"
 val testContainersVersion = "1.20.4"
 val awsSdkVersion = "1.12.779"
 val buildDirectory: Directory = layout.buildDirectory.get()
@@ -40,12 +38,6 @@ allOpen {
     "javax.persistence.MappedSuperclass",
     "javax.persistence.Embeddable",
   )
-}
-
-kapt {
-  arguments {
-    arg("mapstruct.defaultComponentModel", "spring")
-  }
 }
 
 jacoco {
@@ -71,9 +63,6 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:$hmppsSqsVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion")
-
-  implementation("org.mapstruct:mapstruct:$mapstructVersion")
-  kapt("org.mapstruct:mapstruct-processor:$mapstructVersion")
 
   implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
@@ -234,10 +223,6 @@ tasks {
   }
   withType<KtLintFormatTask> {
     // Under gradle 8 we must declare the dependency here, even if we're not going to be linting the model
-    mustRunAfter("buildEducationAndWorkPlanModel")
-    mustRunAfter("buildPrisonApiModel")
-  }
-  withType<KaptGenerateStubsTask> {
     mustRunAfter("buildEducationAndWorkPlanModel")
     mustRunAfter("buildPrisonApiModel")
   }

@@ -1,0 +1,41 @@
+{
+  "prisonerNumber": "Z9999ZZ",
+  "bookingId": "1202234",
+  "bookNumber": "39343A",
+  "firstName": "JOHN",
+  "lastName": "BARRY",
+  "dateOfBirth": "1970-01-01",
+  "gender": "Male",
+  "youthOffender": false,
+  "status": "ACTIVE IN",
+  "lastMovementTypeCode": "ADM",
+  "lastMovementReasonCode": "27",
+  "inOutStatus": "IN",
+  "prisonId": "BXI",
+  "lastPrisonId": "BXI",
+  "prisonName": "Brixton (HMP)",
+  "cellLocation": "A-2-015",
+  "aliases": [],
+  "alerts": [],
+  "legalStatus": "SENTENCED",
+  "imprisonmentStatus": "RECEP_HOS",
+  "imprisonmentStatusDescription": "Awaiting hospital transfer (reception)",
+  "recall": false,
+  "indeterminateSentence": false,
+  "receptionDate": "2022-05-09",
+  "locationDescription": "Brixton (HMP)",
+  "restrictedPatient": false,
+  "currentIncentive": {
+    "level": {
+      "code": "STD",
+      "description": "Standard"
+    },
+    "dateTime": "2022-05-09T11:42:29",
+    "nextReviewDate": "2023-05-09"
+  },
+  "addresses": [],
+  "emailAddresses": [],
+  "phoneNumbers": [],
+  "identifiers": [],
+  "allConvictedOffences": []
+}

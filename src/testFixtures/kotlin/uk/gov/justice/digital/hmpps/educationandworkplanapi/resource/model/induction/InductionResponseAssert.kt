@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -37,10 +38,10 @@ class InductionResponseAssert(actual: InductionResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): InductionResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -57,10 +58,10 @@ class InductionResponseAssert(actual: InductionResponse?) :
     return this
   }
 
-  fun wasUpdatedAfter(dateTime: OffsetDateTime): InductionResponseAssert {
+  fun wasUpdatedAtOrAfter(dateTime: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!updatedAt.isAfter(dateTime)) {
+      if (updatedAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected updatedAt to be after $dateTime, but was $updatedAt")
       }
     }

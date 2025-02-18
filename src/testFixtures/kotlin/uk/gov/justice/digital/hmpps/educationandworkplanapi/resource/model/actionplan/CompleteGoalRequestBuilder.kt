@@ -7,8 +7,7 @@ import java.util.*
 fun aValidCompleteGoalRequest(
   goalReference: UUID = aValidReference(),
   note: String? = null,
-): CompleteGoalRequest =
-  CompleteGoalRequest(
-    goalReference = goalReference,
-    note = note,
-  )
+): CompleteGoalRequest = CompleteGoalRequest(
+  goalReference = goalReference,
+  note = note,
+)

@@ -9,12 +9,11 @@ fun aValidCreatePreviousWorkExperiencesRequest(
   hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   hasWorkedBeforeNotRelevantReason: String? = null,
   experiences: List<PreviousWorkExperience>? = listOf(aValidPreviousWorkExperience()),
-): CreatePreviousWorkExperiencesRequest =
-  CreatePreviousWorkExperiencesRequest(
-    hasWorkedBefore = hasWorkedBefore,
-    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
-    experiences = experiences,
-  )
+): CreatePreviousWorkExperiencesRequest = CreatePreviousWorkExperiencesRequest(
+  hasWorkedBefore = hasWorkedBefore,
+  hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+  experiences = experiences,
+)
 
 fun aValidPreviousWorkExperience(
   experienceType: WorkType = WorkType.OTHER,

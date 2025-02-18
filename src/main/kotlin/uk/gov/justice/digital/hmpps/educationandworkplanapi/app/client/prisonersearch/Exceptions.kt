@@ -5,5 +5,4 @@ class PrisonerSearchApiException(message: String, throwable: Throwable) : Runtim
 /**
  * Thrown when a specific prisoner is not returned by Prisoner Search API
  */
-class PrisonerNotFoundException(prisonNumber: String) :
-  RuntimeException("Prisoner [$prisonNumber] not returned by Prisoner Search API")
+class PrisonerNotFoundException(prisonNumber: String) : RuntimeException("Prisoner [$prisonNumber] not returned by Prisoner Search API")

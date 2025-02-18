@@ -15,12 +15,12 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.given
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.thirdValue
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.aValidConversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
@@ -281,8 +281,8 @@ class TelemetryServiceTest {
       // Then
       verify(telemetryEventTypeResolver).resolveUpdateEventTypes(previousGoal, updatedGoal)
 
-      verify(telemetryClient).trackEvent(eq("goal-updated"), capture(eventPropertiesCaptor), eq(null))
-      verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), capture(eventPropertiesCaptor), eq(null))
+      verify(telemetryClient).trackEvent(eq("goal-updated"), capture(eventPropertiesCaptor), isNull())
+      verify(telemetryClient, times(2)).trackEvent(eq("step-removed"), capture(eventPropertiesCaptor), isNull())
       verifyNoMoreInteractions(telemetryClient)
 
       val propertiesForGoalUpdatedEvent = eventPropertiesCaptor.firstValue
@@ -328,47 +328,6 @@ class TelemetryServiceTest {
 
       // Then
       verify(telemetryClient).trackEvent("INDUCTION_UPDATED", expectedEventProperties)
-    }
-  }
-
-  @Nested
-  inner class TrackConversationEvents {
-    @Test
-    fun `should track conversation created event`() {
-      // Given
-      val conversation = aValidConversation()
-      val expectedEventProperties = mapOf(
-        "reference" to conversation.reference.toString(),
-        "prisonNumber" to conversation.prisonNumber,
-        "conversationType" to conversation.type.toString(),
-        "prisonId" to conversation.note.createdAtPrison,
-        "userId" to conversation.note.createdBy!!,
-      )
-
-      // When
-      telemetryService.trackConversationCreated(conversation)
-
-      // Then
-      verify(telemetryClient).trackEvent("CONVERSATION_CREATED", expectedEventProperties)
-    }
-
-    @Test
-    fun `should track conversation updated event`() {
-      // Given
-      val conversation = aValidConversation()
-      val expectedEventProperties = mapOf(
-        "reference" to conversation.reference.toString(),
-        "prisonNumber" to conversation.prisonNumber,
-        "conversationType" to conversation.type.toString(),
-        "prisonId" to conversation.note.lastUpdatedAtPrison,
-        "userId" to conversation.note.lastUpdatedBy!!,
-      )
-
-      // When
-      telemetryService.trackConversationUpdated(conversation)
-
-      // Then
-      verify(telemetryClient).trackEvent("CONVERSATION_UPDATED", expectedEventProperties)
     }
   }
 

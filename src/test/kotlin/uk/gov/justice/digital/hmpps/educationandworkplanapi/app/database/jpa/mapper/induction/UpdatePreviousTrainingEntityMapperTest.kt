@@ -4,19 +4,13 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousTrainingEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.TrainingType as TrainingTypeDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.TrainingType as TrainingTypeEntity
 
 class UpdatePreviousTrainingEntityMapperTest {
 
-  private val mapper = PreviousTrainingEntityMapperImpl().also {
-    PreviousTrainingEntityMapperImpl::class.java.getDeclaredField("trainingTypeMapper").apply {
-      isAccessible = true
-      set(it, TrainingTypeMapperImpl())
-    }
-  }
+  private val mapper = PreviousTrainingEntityMapper()
 
   @Test
   fun `should update existing training`() {
@@ -35,14 +29,12 @@ class UpdatePreviousTrainingEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingPreviousTrainingEntity.deepCopy().apply {
-      id
-      reference = reference
-      trainingTypes = mutableListOf(TrainingTypeEntity.FIRST_AID_CERTIFICATE)
-      trainingTypeOther = null
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingPreviousTrainingEntity.copy(
+      trainingTypes = mutableListOf(TrainingTypeEntity.FIRST_AID_CERTIFICATE),
+      trainingTypeOther = null,
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
@@ -67,14 +59,12 @@ class UpdatePreviousTrainingEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingPreviousTrainingEntity.deepCopy().apply {
-      id
-      reference = reference
-      trainingTypes = mutableListOf(TrainingTypeEntity.OTHER, TrainingTypeEntity.FIRST_AID_CERTIFICATE)
-      trainingTypeOther = "Kotlin course"
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingPreviousTrainingEntity.copy(
+      trainingTypes = mutableListOf(TrainingTypeEntity.OTHER, TrainingTypeEntity.FIRST_AID_CERTIFICATE),
+      trainingTypeOther = "Kotlin course",
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)
@@ -99,14 +89,12 @@ class UpdatePreviousTrainingEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingPreviousTrainingEntity.deepCopy().apply {
-      id
-      reference = reference
-      trainingTypes = mutableListOf(TrainingTypeEntity.FIRST_AID_CERTIFICATE)
-      trainingTypeOther = null
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingPreviousTrainingEntity.copy(
+      trainingTypes = mutableListOf(TrainingTypeEntity.FIRST_AID_CERTIFICATE),
+      trainingTypeOther = null,
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingPreviousTrainingEntity, updatedTrainingDto)

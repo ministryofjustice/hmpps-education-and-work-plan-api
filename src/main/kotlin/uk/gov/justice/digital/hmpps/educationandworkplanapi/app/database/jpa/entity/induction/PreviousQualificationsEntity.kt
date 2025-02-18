@@ -16,7 +16,6 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -24,9 +23,6 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
@@ -39,68 +35,48 @@ import java.util.UUID
  */
 @Table(name = "previous_qualifications")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class PreviousQualificationsEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
+@EntityListeners(value = [AuditingEntityListener::class])
+data class PreviousQualificationsEntity(
+  @Column(updatable = false)
+  val reference: UUID,
 
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @Column(updatable = false)
-  @field:NotNull
-  var prisonNumber: String? = null,
+  val prisonNumber: String,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var educationLevel: EducationLevel? = null,
+  var educationLevel: EducationLevel,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var qualifications: MutableList<QualificationEntity>? = null,
+  val qualifications: MutableList<QualificationEntity> = mutableListOf(),
+
+  @Column(updatable = false)
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
+) : ParentEntity {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
-
-  @Column
-  @CreatedByDisplayName
-  var createdByDisplayName: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-
-  @Column
-  @LastModifiedByDisplayName
-  var updatedByDisplayName: String? = null,
-) : ParentEntity {
-
-  fun qualifications(): MutableList<QualificationEntity> {
-    if (qualifications == null) {
-      qualifications = mutableListOf()
-    }
-    return qualifications!!
-  }
+  var updatedBy: String? = null
 
   override fun childEntityUpdated() {
     this.updatedAt = Instant.now()
@@ -116,61 +92,57 @@ class PreviousQualificationsEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, educationLevel = $educationLevel)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, educationLevel = $educationLevel)"
 }
 
 @Table(name = "qualification")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class QualificationEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
+data class QualificationEntity(
+  @Column(updatable = false)
+  val reference: UUID,
 
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "prev_qualifications_id")
-  var parent: PreviousQualificationsEntity? = null,
-
-  @field:NotNull
-  var subject: String? = null,
+  @Column
+  var subject: String,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  var level: QualificationLevel? = null,
+  var level: QualificationLevel,
 
   @Column
-  var grade: String? = null,
+  var grade: String,
+
+  @Column(updatable = false)
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
+) : KeyAwareChildEntity {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "prev_qualifications_id")
+  var parent: PreviousQualificationsEntity? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) : KeyAwareChildEntity {
+  var updatedBy: String? = null
 
   @PrePersist
   @PreUpdate
@@ -183,7 +155,7 @@ class QualificationEntity(
     this.parent = parent as PreviousQualificationsEntity
   }
 
-  override fun key(): String = "${subject?.trim()},$level".uppercase()
+  override fun key(): String = "${subject.trim()},$level".uppercase()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -195,9 +167,7 @@ class QualificationEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, subject = $subject, level = $level, grade = $grade)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, subject = $subject, level = $level, grade = $grade)"
 }
 
 enum class EducationLevel {

@@ -14,15 +14,15 @@ fun aValidStepEntity(
   createdBy: String? = "a.user.id",
   updatedAt: Instant? = Instant.now(),
   updatedBy: String? = "another.user.id",
-): StepEntity =
-  StepEntity(
-    id = id,
-    reference = reference,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-    createdAt = createdAt,
-    createdBy = createdBy,
-    updatedAt = updatedAt,
-    updatedBy = updatedBy,
-  )
+): StepEntity = StepEntity(
+  reference = reference,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

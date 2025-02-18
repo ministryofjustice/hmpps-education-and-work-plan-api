@@ -1,30 +1,115 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service
 
 import mu.KotlinLogging
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateInitialReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.effectiveSentenceType
 import java.time.LocalDate
-
-private const val EXEMPTION_ADDITIONAL_DAYS = 5L
-private const val EXCLUSION_ADDITIONAL_DAYS = 10L
-private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
 
 private val log = KotlinLogging.logger {}
 
 class ReviewScheduleService(
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   private val reviewScheduleEventService: ReviewScheduleEventService,
+  private val reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
 ) {
 
   private val reviewScheduleStatusTransitionValidator = ReviewScheduleStatusTransitionValidator()
+
+  /**
+   * Returns the active [ReviewSchedule] for the prisoner identified by their prison number, where "active" is defined
+   * as not having the status "COMPLETED", "EXEMPT_PRISONER_RELEASE", "EXEMPT_PRISONER_DEATH", or "EXEMPT_UNKNOWN".
+   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
+   */
+  fun getActiveReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
+      prisonNumber,
+    )
+
+  /**
+   * Returns the latest [ReviewSchedule] for the prisoner identified by their prison number. The latest (most recently
+   * updated) [ReviewSchedule] is returned irrespective of status.
+   * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
+   */
+  fun getLatestReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
+    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
+      prisonNumber,
+    )
+
+  /**
+   * Returns a list of [ReviewSchedule] for the prisoner identified by their prison number.
+   */
+  fun getReviewSchedulesForPrisoner(prisonNumber: String): List<ReviewScheduleHistory> {
+    val responses = reviewSchedulePersistenceAdapter
+      .getReviewScheduleHistory(prisonNumber)
+
+    return responses.sortedWith(
+      compareByDescending<ReviewScheduleHistory> { it.lastUpdatedAt }
+        .thenByDescending { it.version },
+    )
+  }
+
+  /**
+   * Creates and returns the prisoner's initial [ReviewSchedule].
+   * Returns null if the prisoner has less than 3 months to serve, in which case no Review is necessary and one is not
+   * scheduled for them.
+   *
+   * To create a new [ReviewSchedule] the prisoner is required to have a release date for most sentence types. The
+   * exception to this are sentence types REMAND, CONVICTED_UNSENTENCED and INDETERMINATE_SENTENCE. All other sentence
+   * types require a release date. Throws a [ReviewScheduleNoReleaseDateForSentenceTypeException] if this condition
+   * is not satisfied.
+   */
+  fun createInitialReviewSchedule(createInitialReviewScheduleDto: CreateInitialReviewScheduleDto): ReviewSchedule? =
+    with(createInitialReviewScheduleDto) {
+      val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
+
+      // Check for an existing active review schedule
+      val existingReviewSchedule = runCatching {
+        getActiveReviewScheduleForPrisoner(prisonNumber)
+      }.getOrNull()
+
+      if (existingReviewSchedule != null) {
+        throw ActiveReviewScheduleAlreadyExistsException(prisonNumber)
+      }
+
+      // Calculate the review schedule window and rule
+      val releaseDate = prisonerReleaseDate
+      val reviewScheduleCalculationRule = reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
+        prisonNumber = prisonNumber,
+        sentenceType = sentenceType,
+        releaseDate = releaseDate,
+        isReAdmission = isReadmission,
+        isTransfer = isTransfer,
+      )
+      // Persist the initial review schedule if a ReviewScheduleWindow is calculated
+      reviewScheduleDateCalculationService.calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
+        ?.let { reviewScheduleWindow ->
+          reviewSchedulePersistenceAdapter.createReviewSchedule(
+            CreateReviewScheduleDto(
+              prisonNumber = prisonNumber,
+              prisonId = prisonId,
+              reviewScheduleWindow = reviewScheduleWindow,
+              scheduleCalculationRule = reviewScheduleCalculationRule,
+            ),
+          ).also {
+            reviewScheduleEventService.reviewScheduleCreated(it)
+          }
+        }
+    }
 
   fun updateLatestReviewScheduleStatus(
     prisonNumber: String,
     prisonId: String,
     newStatus: ReviewScheduleStatus,
+    exemptionReason: String?,
   ) {
     val reviewSchedule = reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber)
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
@@ -34,30 +119,89 @@ class ReviewScheduleService(
 
     when {
       newStatus == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> {
-        updateReviewScheduleFollowingSystemTechnicalIssue(reviewSchedule, prisonId, prisonNumber)
+        updateReviewScheduleFollowingSystemTechnicalIssue(reviewSchedule, exemptionReason, prisonId, prisonNumber)
       }
 
       newStatus.isExemptionOrExclusion() -> {
-        updateExemptStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
+        updateExemptStatus(reviewSchedule, newStatus, exemptionReason, prisonId, prisonNumber)
       }
 
       else -> {
-        updateScheduledStatus(reviewSchedule, newStatus, prisonId, prisonNumber)
+        updateScheduledStatus(reviewSchedule, prisonId, prisonNumber)
       }
     }
   }
 
+  /**
+   * Updates the prisoner's active Review Schedule by setting its status to the provided exemption status.
+   *
+   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_DEATH, or EXEMPT_UNKNOWN is not considered 'active.'
+   */
+  private fun exemptActiveReviewSchedule(
+    prisonNumber: String,
+    prisonId: String = "N/A",
+    status: ReviewScheduleStatus,
+  ) {
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateExemptStatus(
+          prisonNumber = prisonNumber,
+          prisonId = prisonId,
+          reviewSchedule = this,
+          newStatus = status,
+          exemptionReason = null,
+        ).also {
+          log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: $status" }
+        }
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+  }
+
+  fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
+    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE)
+
+  fun exemptActiveReviewScheduleStatusDueToMerge(prisonNumber: String) =
+    exemptActiveReviewSchedule(prisonNumber = prisonNumber, status = ReviewScheduleStatus.EXEMPT_PRISONER_MERGE)
+
+  fun exemptActiveReviewScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
+    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_DEATH)
+
+  fun exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber: String, prisonId: String) =
+    exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_UNKNOWN)
+
+  /**
+   * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_TRANSFER, then immediately
+   * re-scheduling it.
+   * Applying both status changes in quick succession (EXEMPT_PRISONER_TRANSFER, immediately followed by SCHEDULED) allows
+   * for the full history of state changes of the [ReviewSchedule] to be maintained.
+   *
+   * The prisoner's active Review Schedule is the one with the status SCHEDULED or one of the EXEMPT_ statuses.
+   * A Review Schedule with the status COMPLETE, EXEMPT_PRISONER_RELEASE or EXEMPT_PRISONER_DEATH is not considered 'active'
+   */
+  fun exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(prisonNumber: String, prisonTransferredTo: String) =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateReviewScheduleFollowingPrisonerTransfer(this, prisonTransferredTo)
+          .also {
+            log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_PRISONER_TRANSFER, and then re-scheduled with deadline date [${reviewScheduleWindow.dateTo}]" }
+          }
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
   private fun updateExemptStatus(
     reviewSchedule: ReviewSchedule,
     newStatus: ReviewScheduleStatus,
+    exemptionReason: String?,
     prisonId: String,
     prisonNumber: String,
   ) {
     val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        newStatus,
-        prisonId,
+        reference = reviewSchedule.reference,
+        scheduleStatus = newStatus,
+        exemptionReason = exemptionReason,
+        prisonId = prisonId,
         prisonNumber = prisonNumber,
       ),
     )
@@ -70,18 +214,17 @@ class ReviewScheduleService(
 
   private fun updateScheduledStatus(
     reviewSchedule: ReviewSchedule,
-    newStatus: ReviewScheduleStatus,
     prisonId: String,
     prisonNumber: String,
   ) {
-    val newReviewDate = calculateNewReviewDate(reviewSchedule)
+    val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
     val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        ReviewScheduleStatus.SCHEDULED,
-        prisonId,
-        latestReviewDate = newReviewDate,
-        prisonNumber = prisonNumber,
+        reference = reviewSchedule.reference,
+        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
+        latestReviewDate = adjustedReviewDate,
+        prisonNumber = reviewSchedule.prisonNumber,
       ),
     )
     performFollowOnEvents(
@@ -93,15 +236,17 @@ class ReviewScheduleService(
 
   private fun updateReviewScheduleFollowingSystemTechnicalIssue(
     reviewSchedule: ReviewSchedule,
+    exemptionReason: String?,
     prisonId: String,
     prisonNumber: String,
   ) {
     // Update the review schedule status to EXEMPT_SYSTEM_TECHNICAL_ISSUE
     val updatedReviewScheduleFirst = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
-        prisonId,
+        reference = reviewSchedule.reference,
+        scheduleStatus = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
+        exemptionReason = exemptionReason,
+        prisonId = prisonId,
         prisonNumber = prisonNumber,
       ),
     )
@@ -111,14 +256,14 @@ class ReviewScheduleService(
       oldReviewDate = reviewSchedule.reviewScheduleWindow.dateTo,
     )
 
-    // Then update the review schedule to be SCHEDULED with a new review date
-    val newReviewDate = calculateNewReviewDate(reviewSchedule, SYSTEM_OUTAGE_ADDITIONAL_DAYS)
+    // Then update the review schedule to be SCHEDULED with an adjusted review date
+    val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
     val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
-        reviewSchedule.reference,
-        ReviewScheduleStatus.SCHEDULED,
-        prisonId,
-        latestReviewDate = newReviewDate,
+        reference = reviewSchedule.reference,
+        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+        prisonId = prisonId,
+        latestReviewDate = adjustedReviewDate,
         prisonNumber = prisonNumber,
       ),
     )
@@ -129,19 +274,46 @@ class ReviewScheduleService(
     )
   }
 
-  private fun calculateNewReviewDate(
+  private fun updateReviewScheduleFollowingPrisonerTransfer(
     reviewSchedule: ReviewSchedule,
-    additionalDays: Long = getExtensionDays(reviewSchedule.scheduleStatus),
-  ): LocalDate? {
-    return reviewSchedule.reviewScheduleWindow.dateTo.takeIf { it <= LocalDate.now() }
-      ?.let { LocalDate.now().plusDays(additionalDays) }
-  }
+    prisonTransferredTo: String,
+  ) {
+    with(reviewSchedule) {
+      // The prison that the prisoner transferred from is not in the event details. We need it when updating the Review Schedule
+      // with the EXEMPT_PRISONER_TRANSFER status to maintain the audit history fields. The best we can do is to use the `lastUpdatedAtPrison`
+      // field from the current ReviewSchedule record before any changes are made.
+      val prisonTransferredFrom = lastUpdatedAtPrison
+      // Update the review schedule status to EXEMPT_PRISONER_TRANSFER
+      val updatedReviewScheduleFirst = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+          prisonId = prisonTransferredFrom,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      performFollowOnEvents(
+        updatedReviewSchedule = updatedReviewScheduleFirst,
+        oldStatus = scheduleStatus,
+        oldReviewDate = reviewScheduleWindow.dateTo,
+      )
 
-  private fun getExtensionDays(status: ReviewScheduleStatus): Long {
-    return when {
-      status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
-      status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-      else -> 0 // Default case, if no condition matches
+      // Then update the review schedule to be SCHEDULED with an adjusted review date
+      val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
+      val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+          prisonId = prisonTransferredTo,
+          latestReviewDate = adjustedReviewDate,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      performFollowOnEvents(
+        updatedReviewSchedule = updatedReviewScheduleSecond,
+        oldStatus = updatedReviewScheduleFirst.scheduleStatus,
+        oldReviewDate = updatedReviewScheduleFirst.reviewScheduleWindow.dateTo,
+      )
     }
   }
 
@@ -157,11 +329,16 @@ class ReviewScheduleService(
         updatedAtPrison = updatedReviewSchedule.lastUpdatedAtPrison,
         oldStatus = oldStatus,
         newStatus = updatedReviewSchedule.scheduleStatus,
+        exemptionReason = updatedReviewSchedule.exemptionReason,
         oldReviewDate = oldReviewDate,
         newReviewDate = updatedReviewSchedule.reviewScheduleWindow.dateTo,
         updatedAt = updatedReviewSchedule.lastUpdatedAt,
         updatedBy = updatedReviewSchedule.lastUpdatedBy,
       ),
     )
+  }
+
+  fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
+    return reviewSchedulePersistenceAdapter.getInCompleteReviewSchedules(prisonerNumbers)
   }
 }

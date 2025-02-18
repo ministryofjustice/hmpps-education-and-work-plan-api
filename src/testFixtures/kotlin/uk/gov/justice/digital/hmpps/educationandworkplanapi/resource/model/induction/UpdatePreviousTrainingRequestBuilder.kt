@@ -8,9 +8,8 @@ fun aValidUpdatePreviousTrainingRequest(
   reference: UUID? = UUID.randomUUID(),
   trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
   trainingTypeOther: String? = "Certified Kotlin Developer",
-): UpdatePreviousTrainingRequest =
-  UpdatePreviousTrainingRequest(
-    reference = reference,
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-  )
+): UpdatePreviousTrainingRequest = UpdatePreviousTrainingRequest(
+  reference = reference,
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+)

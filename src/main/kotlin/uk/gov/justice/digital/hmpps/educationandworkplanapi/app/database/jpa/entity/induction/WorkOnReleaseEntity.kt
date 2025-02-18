@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -19,9 +18,6 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
 import java.util.UUID
 
@@ -30,63 +26,52 @@ import java.util.UUID
  */
 @Table(name = "work_on_release")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class WorkOnReleaseEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+@EntityListeners(value = [AuditingEntityListener::class])
+data class WorkOnReleaseEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
+  val reference: UUID,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var hopingToWork: HopingToWork? = null,
+  var hopingToWork: HopingToWork,
 
   @ElementCollection(targetClass = AffectAbilityToWork::class)
   @Enumerated(value = EnumType.STRING)
   @CollectionTable(name = "affecting_ability_to_work", joinColumns = [JoinColumn(name = "work_on_release_id")])
   @Column(name = "affect")
-  var affectAbilityToWork: MutableList<AffectAbilityToWork>? = null,
+  val affectAbilityToWork: MutableList<AffectAbilityToWork> = mutableListOf(),
 
   @Column(name = "affecting_work_other")
   var affectAbilityToWorkOther: String? = null,
 
-  @Column(updatable = false)
-  @CreationTimestamp
-  var createdAt: Instant? = null,
+  @Column
+  val createdAtPrison: String,
 
   @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  var updatedAtPrison: String,
+) {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @Column(updatable = false)
+  @CreationTimestamp
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
-
-  @Column
-  @CreatedByDisplayName
-  var createdByDisplayName: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
+  var updatedBy: String? = null
 
-  @Column
-  @LastModifiedByDisplayName
-  var updatedByDisplayName: String? = null,
-) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -97,9 +82,7 @@ class WorkOnReleaseEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, hopingToWork = $hopingToWork)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, hopingToWork = $hopingToWork)"
 }
 
 enum class HopingToWork {

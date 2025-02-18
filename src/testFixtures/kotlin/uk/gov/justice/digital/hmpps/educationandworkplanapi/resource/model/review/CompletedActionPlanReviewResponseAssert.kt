@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompletedActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.NoteResponseAssert
@@ -41,10 +42,10 @@ class CompletedActionPlanReviewResponseAssert(actual: CompletedActionPlanReviewR
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): CompletedActionPlanReviewResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): CompletedActionPlanReviewResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }
@@ -140,6 +141,16 @@ class CompletedActionPlanReviewResponseAssert(actual: CompletedActionPlanReviewR
     isNotNull
     with(actual!!) {
       consumer.accept(assertThat(note))
+    }
+    return this
+  }
+
+  fun wasPreRelease(): CompletedActionPlanReviewResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (!preRelease) {
+        failWithMessage("Expected review to be pre release but was not")
+      }
     }
     return this
   }

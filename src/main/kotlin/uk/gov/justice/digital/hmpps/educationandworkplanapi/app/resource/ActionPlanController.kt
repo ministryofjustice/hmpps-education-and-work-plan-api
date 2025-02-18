@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
+import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -16,14 +17,18 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetActionPlanSummariesRequest
+
+private val log = KotlinLogging.logger {}
 
 @RestController
 @Validated
@@ -33,6 +38,7 @@ class ActionPlanController(
   private val actionPlanMapper: ActionPlanResourceMapper,
   private val noteService: NoteService,
   private val noteResourceMapper: NoteResourceMapper,
+  private val scheduleAdapter: ScheduleAdapter,
 ) {
 
   @PostMapping("/{prisonNumber}")
@@ -46,6 +52,12 @@ class ActionPlanController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     actionPlanService.createActionPlan(actionPlanMapper.fromModelToDto(prisonNumber, request))
+
+    try {
+      scheduleAdapter.completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber)
+    } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
+      log.warn { "Action Plan created, but could not create initial Review Schedule: ${e.message}" }
+    }
   }
 
   @GetMapping("/{prisonNumber}")
@@ -76,8 +88,7 @@ class ActionPlanController(
     @Valid
     @RequestBody
     request: GetActionPlanSummariesRequest,
-  ): ActionPlanSummaryListResponse =
-    with(actionPlanService.getActionPlanSummaries(request.prisonNumbers)) {
-      ActionPlanSummaryListResponse(actionPlanMapper.fromDomainToModel(this))
-    }
+  ): ActionPlanSummaryListResponse = with(actionPlanService.getActionPlanSummaries(request.prisonNumbers)) {
+    ActionPlanSummaryListResponse(actionPlanMapper.fromDomainToModel(this))
+  }
 }

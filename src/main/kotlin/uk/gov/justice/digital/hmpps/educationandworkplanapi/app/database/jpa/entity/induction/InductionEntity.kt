@@ -10,7 +10,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -18,10 +17,8 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -30,29 +27,21 @@ import java.util.UUID
  */
 @Table(name = "induction")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class InductionEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
+@EntityListeners(value = [AuditingEntityListener::class])
+data class InductionEntity(
+  @Column(updatable = false)
+  val reference: UUID,
 
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @Column(updatable = false)
-  @field:NotNull
-  var prisonNumber: String? = null,
+  val prisonNumber: String,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "work_on_release_id")
-  @field:NotNull
-  var workOnRelease: WorkOnReleaseEntity? = null,
+  val workOnRelease: WorkOnReleaseEntity,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "previous_training_id")
-  var previousTraining: PreviousTrainingEntity? = null,
+  val previousTraining: PreviousTrainingEntity,
 
   @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "work_experiences_id")
@@ -71,37 +60,41 @@ class InductionEntity(
   var futureWorkInterests: FutureWorkInterestsEntity? = null,
 
   @Column(updatable = false)
-  @CreationTimestamp
-  var createdAt: Instant? = null,
+  val conductedBy: String? = null,
+
+  @Column(updatable = false)
+  val conductedByRole: String? = null,
+
+  @Column(updatable = false)
+  var completedDate: LocalDate? = null,
 
   @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
+) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @Column(updatable = false)
+  @CreationTimestamp
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
-
-  @Column
-  @CreatedByDisplayName
-  var createdByDisplayName: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
+  var updatedBy: String? = null
 
-  @Column
-  @LastModifiedByDisplayName
-  var updatedByDisplayName: String? = null,
-) {
   fun updateLastUpdatedAt() {
     updatedAt = Instant.now()
   }
@@ -116,7 +109,5 @@ class InductionEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, prisonNumber = $prisonNumber)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, prisonNumber = $prisonNumber)"
 }

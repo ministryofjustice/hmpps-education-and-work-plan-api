@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -156,7 +156,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val updateDisplayName = "Bernie User"
     createInduction(
       username = createUsername,
-      displayName = createDisplayName,
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
     )
@@ -255,7 +254,6 @@ class UpdateInductionTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
           username = updateUsername,
-          displayName = updateDisplayName,
           privateKey = keyPair.private,
         ),
       )
@@ -268,7 +266,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .wasCreatedAt(persistedInduction.createdAt)
-      .wasUpdatedAfter(persistedInduction.updatedAt)
+      .wasUpdatedAtOrAfter(persistedInduction.updatedAt)
       .wasCreatedBy(createUsername)
       .wasCreatedByDisplayName(createDisplayName)
       .wasUpdatedBy(updateUsername)
@@ -288,18 +286,19 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(2) { // the 2nd Timeline event will be the INDUCTION_UPDATED event
+      .event(2) {
+        // the 2nd Timeline event will be the INDUCTION_UPDATED event
         it.hasEventType(TimelineEventType.INDUCTION_UPDATED)
           .wasActionedBy(updateUsername)
           .hasActionedByDisplayName(updateDisplayName)
       }
 
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val updateInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(updateInductionEventProperties)
@@ -319,7 +318,6 @@ class UpdateInductionTest : IntegrationTestBase() {
     val updateDisplayName = "Bernie User"
     createInduction(
       username = createUsername,
-      displayName = createDisplayName,
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(),
     )
@@ -368,6 +366,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       // different prison to the create request
       updatedAtPrison = "MDI",
     )
+
     // these fields should be created
     val expectedPreviousWorkExperiences = aValidPreviousWorkExperiencesResponse(
       createdBy = updateUsername,
@@ -403,7 +402,6 @@ class UpdateInductionTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
           username = updateUsername,
-          displayName = updateDisplayName,
           privateKey = keyPair.private,
         ),
       )
@@ -416,7 +414,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     assertThat(updatedInduction)
       .hasReference(persistedInduction.reference)
       .wasCreatedAt(persistedInduction.createdAt)
-      .wasUpdatedAfter(persistedInduction.updatedAt)
+      .wasUpdatedAtOrAfter(persistedInduction.updatedAt)
       .wasCreatedBy(createUsername)
       .wasCreatedByDisplayName(createDisplayName)
       .wasUpdatedBy(updateUsername)
@@ -438,18 +436,19 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(2) { // the 2nd Timeline event will be the INDUCTION_UPDATED event
+      .event(2) {
+        // the 2nd Timeline event will be the INDUCTION_UPDATED event
         it.hasEventType(TimelineEventType.INDUCTION_UPDATED)
           .wasActionedBy(updateUsername)
           .hasActionedByDisplayName(updateDisplayName)
       }
 
     await.untilAsserted {
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_UPDATED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       val updateInductionEventProperties = eventPropertiesCaptor.firstValue
       assertThat(updateInductionEventProperties)

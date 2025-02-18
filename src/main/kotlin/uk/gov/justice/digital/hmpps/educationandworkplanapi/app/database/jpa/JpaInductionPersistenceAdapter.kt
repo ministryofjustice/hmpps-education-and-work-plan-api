@@ -10,10 +10,15 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -23,22 +28,43 @@ class JpaInductionPersistenceAdapter(
   private val inductionMapper: InductionEntityMapper,
   private val previousQualificationsRepository: PreviousQualificationsRepository,
   private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
+  private val noteRepository: NoteRepository,
 ) : InductionPersistenceAdapter {
 
   @Transactional
   override fun createInduction(createInductionDto: CreateInductionDto): Induction {
-    val prisonNumber = createInductionDto.prisonNumber
     val inductionEntity = inductionRepository.saveAndFlush(inductionMapper.fromCreateDtoToEntity(createInductionDto))
     val previousQualificationsEntity = createOrUpdatePreviousQualifications(createInductionDto)
-    return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity)
+
+    val noteEntity = createInductionDto.note
+      ?.takeIf { it.isNotBlank() }
+      ?.let {
+        noteRepository.saveAndFlush(
+          NoteEntity(
+            reference = UUID.randomUUID(),
+            prisonNumber = createInductionDto.prisonNumber,
+            content = it,
+            noteType = NoteType.INDUCTION,
+            entityType = EntityType.INDUCTION,
+            entityReference = inductionEntity.reference!!,
+            createdAtPrison = inductionEntity.createdAtPrison ?: "N/A",
+            updatedAtPrison = inductionEntity.updatedAtPrison ?: "N/A",
+          ),
+        )
+      }
+
+    return inductionMapper.fromEntityToDomain(inductionEntity, previousQualificationsEntity, noteEntity)
   }
 
   @Transactional(readOnly = true)
-  override fun getInduction(prisonNumber: String): Induction? =
-    inductionRepository.findByPrisonNumber(prisonNumber)?.let {
-      val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
-      inductionMapper.fromEntityToDomain(it, previousQualificationsEntity)
-    }
+  override fun getInduction(prisonNumber: String): Induction? = inductionRepository.findByPrisonNumber(prisonNumber)?.let {
+    val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
+    val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
+      entityReference = it.reference!!,
+      entityType = EntityType.INDUCTION,
+    ).firstOrNull()
+    inductionMapper.fromEntityToDomain(it, previousQualificationsEntity, noteEntity)
+  }
 
   @Transactional
   override fun updateInduction(updateInductionDto: UpdateInductionDto): Induction? {
@@ -49,17 +75,20 @@ class JpaInductionPersistenceAdapter(
       inductionEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
       val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto)
-      inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity)
+      val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
+        entityReference = inductionEntity.reference!!,
+        entityType = EntityType.INDUCTION,
+      ).firstOrNull()
+      inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity, noteEntity)
     } else {
       null
     }
   }
 
   @Transactional(readOnly = true)
-  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> =
-    inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
-      inductionMapper.fromEntitySummariesToDomainSummaries(it)
-    }
+  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> = inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
+    inductionMapper.fromEntitySummariesToDomainSummaries(it)
+  }
 
   private fun createOrUpdatePreviousQualifications(updateInductionDto: UpdateInductionDto): PreviousQualificationsEntity? {
     val prisonNumber = updateInductionDto.prisonNumber
@@ -76,7 +105,7 @@ class JpaInductionPersistenceAdapter(
       if (updateInductionDto.previousQualifications!!.qualifications.isEmpty()) {
         log.info {
           """
-            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications().size}] qualifications recorded, but the Update Induction request contains a PreviousQualifications object containing 0 qualifications. 
+            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications.size}] qualifications recorded, but the Update Induction request contains a PreviousQualifications object containing 0 qualifications. 
             The user has explicitly removed all previously recorded qualifications as part of updating the prisoner's Induction.
           """.trimIndent()
         }
@@ -113,7 +142,7 @@ class JpaInductionPersistenceAdapter(
       previousQualificationsEntity?.also {
         log.info {
           """
-            Prisoner [$prisonNumber] has [${it.qualifications().size}] qualifications recorded pre-induction, but the Create Induction request does not contain a PreviousQualifications object. 
+            Prisoner [$prisonNumber] has [${it.qualifications.size}] qualifications recorded pre-induction, but the Create Induction request does not contain a PreviousQualifications object. 
             Removing the prisoner's PreviousQualificationsEntity from the database.
           """.trimIndent()
         }
@@ -128,7 +157,7 @@ class JpaInductionPersistenceAdapter(
       if (createInductionDto.previousQualifications!!.qualifications.isEmpty()) {
         log.info {
           """
-            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications().size}] qualifications recorded pre-induction, but the Create Induction request contains a PreviousQualifications object containing 0 qualifications. 
+            Prisoner [$prisonNumber] has [${previousQualificationsEntity.qualifications.size}] qualifications recorded pre-induction, but the Create Induction request contains a PreviousQualifications object containing 0 qualifications. 
             The user has explicitly removed all previously recorded qualifications as part of creating the prisoner's Induction.
           """.trimIndent()
         }

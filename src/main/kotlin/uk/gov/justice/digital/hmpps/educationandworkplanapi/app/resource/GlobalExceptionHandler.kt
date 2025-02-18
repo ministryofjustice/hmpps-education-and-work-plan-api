@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.ConversationNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.PrisonerConversationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InvalidInductionScheduleStatusException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.InvalidReviewScheduleStatusException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
@@ -102,16 +102,14 @@ class GlobalExceptionHandler(
   protected fun handleNoArchiveReasonException(
     e: RuntimeException,
     request: WebRequest,
-  ): ResponseEntity<Any> {
-    return ResponseEntity
-      .status(BAD_REQUEST)
-      .body(
-        ErrorResponse(
-          status = BAD_REQUEST.value(),
-          userMessage = e.message,
-        ),
-      )
-  }
+  ): ResponseEntity<Any> = ResponseEntity
+    .status(BAD_REQUEST)
+    .body(
+      ErrorResponse(
+        status = BAD_REQUEST.value(),
+        userMessage = e.message,
+      ),
+    )
 
   /**
    * Exception handler to return a 403 Forbidden ErrorResponse for a prohibited action (e.g. a business rule violation).
@@ -145,6 +143,8 @@ class GlobalExceptionHandler(
       EducationAlreadyExistsException::class,
       InvalidGoalStateException::class,
       InvalidReviewScheduleStatusException::class,
+      InvalidInductionScheduleStatusException::class,
+      ReviewScheduleNoReleaseDateForSentenceTypeException::class,
     ],
   )
   protected fun handleExceptionReturnConflictErrorResponse(
@@ -171,8 +171,6 @@ class GlobalExceptionHandler(
       GoalNotFoundException::class,
       TimelineNotFoundException::class,
       InductionNotFoundException::class,
-      ConversationNotFoundException::class,
-      PrisonerConversationNotFoundException::class,
       EducationNotFoundException::class,
       PrisonerHasNoGoalsException::class,
       ReviewScheduleNotFoundException::class,
@@ -238,9 +236,7 @@ class GlobalExceptionHandler(
     headers: HttpHeaders,
     status: HttpStatusCode,
     request: WebRequest,
-  ): ResponseEntity<Any>? {
-    return populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
-  }
+  ): ResponseEntity<Any>? = populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
 
   /**
    * Overrides the HttpMessageNotReadableException exception handler to return a 400 Bad Request ErrorResponse
@@ -250,9 +246,7 @@ class GlobalExceptionHandler(
     headers: HttpHeaders,
     status: HttpStatusCode,
     request: WebRequest,
-  ): ResponseEntity<Any>? {
-    return populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
-  }
+  ): ResponseEntity<Any>? = populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
 
   @ExceptionHandler(Exception::class)
   fun unexpectedExceptionHandler(e: Exception, request: WebRequest): ResponseEntity<Any>? {

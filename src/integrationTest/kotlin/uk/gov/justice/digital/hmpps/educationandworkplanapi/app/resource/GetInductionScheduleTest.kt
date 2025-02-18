@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETE
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
@@ -108,8 +108,8 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("system")
       .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
@@ -125,7 +125,7 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     val randomPrisonNumber = randomValidPrisonNumber()
     createInductionSchedule(
       prisonNumber = randomPrisonNumber,
-      status = COMPLETE,
+      status = COMPLETED,
     )
     createInduction(randomPrisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
 
@@ -146,14 +146,14 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("system")
       .wasCreatedByDisplayName("system")
       .wasUpdatedBy("system")
       .wasUpdatedByDisplayName("system")
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .wasStatus(InductionScheduleStatus.COMPLETE)
+      .wasStatus(InductionScheduleStatus.COMPLETED)
       .wasInductionPerformedBy("Albert User")
       .wasInductionPerformedAt(LocalDate.now())
   }

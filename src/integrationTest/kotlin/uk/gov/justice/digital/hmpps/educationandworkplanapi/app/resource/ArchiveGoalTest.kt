@@ -3,16 +3,17 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -29,6 +30,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.util.UUID
@@ -39,7 +41,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/archive"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
+  private val prisonNumber = randomValidPrisonNumber()
 
   @Test
   fun `should return unauthorized given no bearer token`() {
@@ -93,18 +95,20 @@ class ArchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(3) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
+        .hasNumberOfEvents(4)
+        .event(4) {
+          // the 4th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("goal-archived"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
@@ -145,18 +149,20 @@ class ArchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(3) { // the 3rd Timeline event will be the GOAL_ARCHIVED event
+        .hasNumberOfEvents(4)
+        .event(4) {
+          // the 4th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("goal-archived"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
@@ -291,7 +297,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
       aValidTokenWithAuthority(
         GOALS_RW,
         username = "buser_gen",
-        displayName = "Bernie User",
         privateKey = keyPair.private,
       ),
     )
@@ -299,6 +304,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     .exchange()
 
   private fun createAnActionPlanAndGetTheGoalReference(prisonNumber: String): UUID {
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(
         aValidCreateGoalRequest(
@@ -316,7 +322,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
     )
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = createActionPlanRequest,
     )

@@ -146,7 +146,6 @@ class UpdateEductionTest : IntegrationTestBase() {
         ),
       ),
       username = "auser_gen",
-      displayName = "Albert User",
     )
 
     val prisonerEducationRecord = getEducation(prisonNumber)
@@ -196,7 +195,6 @@ class UpdateEductionTest : IntegrationTestBase() {
           EDUCATION_RW,
           privateKey = keyPair.private,
           username = "buser_gen",
-          displayName = "Bernie User",
         ),
       )
       .contentType(APPLICATION_JSON)
@@ -270,7 +268,6 @@ class UpdateEductionTest : IntegrationTestBase() {
         ),
       ),
       username = "auser_gen",
-      displayName = "Albert User",
     )
 
     val prisonerEducationRecord = getEducation(prisonNumber)

@@ -10,8 +10,7 @@ fun assertThat(actual: StepEntity?) = StepEntityAssert(actual)
 /**
  * AssertJ custom assertion for [StepEntity]
  */
-class StepEntityAssert(actual: StepEntity?) :
-  AbstractObjectAssert<StepEntityAssert, StepEntity?>(actual, StepEntityAssert::class.java) {
+class StepEntityAssert(actual: StepEntity?) : AbstractObjectAssert<StepEntityAssert, StepEntity?>(actual, StepEntityAssert::class.java) {
 
   fun hasJpaManagedFieldsPopulated(): StepEntityAssert {
     isNotNull
@@ -121,16 +120,6 @@ class StepEntityAssert(actual: StepEntity?) :
     with(actual!!) {
       if (reference != expected) {
         failWithMessage("Expected reference to be $expected, but was $reference")
-      }
-    }
-    return this
-  }
-
-  fun hasAReference(): StepEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
       }
     }
     return this

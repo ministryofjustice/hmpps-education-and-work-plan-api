@@ -1,0 +1,45 @@
+{
+  "mappings": [
+    {
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPath": "/prisoner/X9999XX"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prisoner-X9999XX-sentenced-but-with-indeterminate-flag-set.json"
+      }
+    },
+    {
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPath": "/prisoner/Z9999ZZ"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prisoner-Z9999ZZ-sentenced-without-release-date.json"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/prisoner/.*"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prisoner-A1234BC.json"
+      }
+    }
+  ]
+}

@@ -3,20 +3,21 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -126,12 +127,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
   @Test
   fun `should fail to create review given prisoner does not have a review schedule`() {
     // Given
-    val prisonerFromApi = Prisoner(
-      prisonerNumber = prisonNumber,
-      legalStatus = LegalStatus.SENTENCED,
-      releaseDate = LocalDate.now().plusYears(1),
-      prisonId = "BXI",
-    )
+    val prisonerFromApi = aValidPrisoner(prisonerNumber = prisonNumber)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
     // When
@@ -157,15 +153,14 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     // Given
     val earliestCreationTime = OffsetDateTime.now()
 
-    val prisonerFromApi = Prisoner(
+    val prisonerFromApi = aValidPrisoner(
       prisonerNumber = prisonNumber,
       legalStatus = LegalStatus.SENTENCED,
       releaseDate = LocalDate.now().plusYears(1),
-      prisonId = "BXI",
     )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
 
-    createReviewScheduleRecord(prisonNumber)
+    val reviewSchedule = createReviewScheduleRecord(prisonNumber)
 
     // When
     val response = webTestClient.post()
@@ -190,11 +185,11 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     assertThat(actual)
       .wasNotLastReviewBeforeRelease()
       .latestReviewSchedule {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
-          .wasUpdatedAfter(earliestCreationTime)
+          .wasUpdatedAtOrAfter(earliestCreationTime)
           .wasUpdatedBy("auser_gen")
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
@@ -208,11 +203,11 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     val reviews = getActionPlanReviews(prisonNumber)
     assertThat(reviews)
       .latestReviewSchedule {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
-          .wasUpdatedAfter(earliestCreationTime)
+          .wasUpdatedAtOrAfter(earliestCreationTime)
           .wasUpdatedBy("auser_gen")
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
@@ -224,7 +219,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       }
       .hasNumberOfCompletedReviews(1)
       .completedReview(1) {
-        it.wasCreatedAfter(earliestCreationTime)
+        it.wasCreatedAtOrAfter(earliestCreationTime)
           .wasCreatedBy("auser_gen")
           .wasCreatedByDisplayName("Albert User")
           .wasCreatedAtPrison("MDI")
@@ -233,7 +228,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           .wasConductedBy("Barnie Jones")
           .wasConductedByRole("Peer mentor")
           .note {
-            it.wasCreatedAfter(earliestCreationTime)
+            it.wasCreatedAtOrAfter(earliestCreationTime)
               .wasCreatedBy("auser_gen")
               .wasCreatedByDisplayName("Albert User")
               .wasCreatedAtPrison("MDI")
@@ -241,6 +236,9 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
               .hasContent("A great review today; prisoner is making good progress towards his goals")
           }
       }
+
+    // Test that the completed review has the correct review schedule reference
+    assertThat(reviews.completedReviews[0].reviewScheduleReference).isEqualTo(reviewSchedule.reference)
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
@@ -251,17 +249,75 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
             .hasActionedByDisplayName("Albert User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("REVIEW_COMPLETED"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val reviewCompleteEventProperties = eventPropertiesCaptor.firstValue
       assertThat(reviewCompleteEventProperties)
         .containsEntry("reference", reviews.completedReviews.first().reference.toString())
     }
+  }
+
+  @Test
+  fun `should create a pre release review`() {
+    // Given
+    val earliestCreationTime = OffsetDateTime.now()
+    val prisonerNumber = randomValidPrisonNumber()
+
+    val prisonerFromApi = aValidPrisoner(
+      prisonerNumber = prisonerNumber,
+      legalStatus = LegalStatus.SENTENCED,
+      releaseDate = LocalDate.now().plusMonths(1),
+    )
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
+    val reviewSchedule = createReviewScheduleRecord(prisonNumber)
+
+    // When
+    val response = webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidCreateActionPlanReviewRequest(
+          prisonId = "MDI",
+          conductedBy = "Barnie Jones",
+          conductedByRole = "Peer mentor",
+          note = "A great review today; prisoner is making good progress towards his goals",
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated
+      .returnResult(CreateActionPlanReviewResponse::class.java)
+
+    // Then
+    val reviews = getActionPlanReviews(prisonNumber)
+    assertThat(reviews)
+      .hasNumberOfCompletedReviews(1)
+      .completedReview(1) {
+        it.wasPreRelease()
+        it.wasCreatedAtOrAfter(earliestCreationTime)
+          .wasCreatedBy("auser_gen")
+          .wasCreatedByDisplayName("Albert User")
+          .wasCreatedAtPrison("MDI")
+          .wasCompletedOn(LocalDate.now())
+          .hadDeadlineDateOf(LocalDate.now().plusMonths(1))
+          .wasConductedBy("Barnie Jones")
+          .wasConductedByRole("Peer mentor")
+          .note {
+            it.wasCreatedAtOrAfter(earliestCreationTime)
+              .wasCreatedBy("auser_gen")
+              .wasCreatedByDisplayName("Albert User")
+              .wasCreatedAtPrison("MDI")
+              .hasType(NoteType.REVIEW)
+              .hasContent("A great review today; prisoner is making good progress towards his goals")
+          }
+      }
   }
 }

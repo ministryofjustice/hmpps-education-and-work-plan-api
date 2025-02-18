@@ -24,9 +24,7 @@ class NotInPastValidator : ConstraintValidator<NotInPast, LocalDate> {
     this.constraintAnnotation = constraintAnnotation
   }
 
-  override fun isValid(date: LocalDate?, context: ConstraintValidatorContext): Boolean {
-    return date?.isNotInThePast() ?: true
-  }
+  override fun isValid(date: LocalDate?, context: ConstraintValidatorContext): Boolean = date?.isNotInThePast() ?: true
 
   private fun LocalDate.isNotInThePast() = !this.isBefore(LocalDate.now())
 }

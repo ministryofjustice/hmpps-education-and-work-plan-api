@@ -9,10 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalInterest
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.PersonalSkill
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalInterest
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalSkill
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreatePersonalSkillsAndInterestsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalInterestEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PersonalSkillEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalInterestEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalSkillEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalSkillsAndInterestsEntity
@@ -23,13 +27,19 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class PersonalSkillsAndInterestsEntityMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: PersonalSkillsAndInterestsEntityMapperImpl
+  private lateinit var mapper: PersonalSkillsAndInterestsEntityMapper
 
   @Mock
   private lateinit var personalSkillEntityMapper: PersonalSkillEntityMapper
 
   @Mock
   private lateinit var personalInterestEntityMapper: PersonalInterestEntityMapper
+
+  @Mock
+  private lateinit var personalSkillEntityListManager: InductionEntityListManager<PersonalSkillEntity, PersonalSkill>
+
+  @Mock
+  private lateinit var personalInterestEntityListManager: InductionEntityListManager<PersonalInterestEntity, PersonalInterest>
 
   @Test
   fun `should map from dto to entity`() {
@@ -52,7 +62,6 @@ class PersonalSkillsAndInterestsEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFieldsMatchingRegexes(".*reference")
       .isEqualTo(expected)
@@ -67,17 +76,15 @@ class PersonalSkillsAndInterestsEntityMapperTest {
     val expectedSkill = aValidPersonalSkill()
     val expectedInterest = aValidPersonalInterest()
     val expectedSkillsAndInterests = aValidPersonalSkillsAndInterests(
-      reference = personalSkillsAndInterestsEntity.reference!!,
+      reference = personalSkillsAndInterestsEntity.reference,
       skills = mutableListOf(expectedSkill),
       interests = mutableListOf(expectedInterest),
       createdAt = personalSkillsAndInterestsEntity.createdAt!!,
-      createdAtPrison = personalSkillsAndInterestsEntity.createdAtPrison!!,
+      createdAtPrison = personalSkillsAndInterestsEntity.createdAtPrison,
       createdBy = personalSkillsAndInterestsEntity.createdBy!!,
-      createdByDisplayName = personalSkillsAndInterestsEntity.createdByDisplayName!!,
       lastUpdatedAt = personalSkillsAndInterestsEntity.updatedAt!!,
-      lastUpdatedAtPrison = personalSkillsAndInterestsEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = personalSkillsAndInterestsEntity.updatedAtPrison,
       lastUpdatedBy = personalSkillsAndInterestsEntity.updatedBy!!,
-      lastUpdatedByDisplayName = personalSkillsAndInterestsEntity.updatedByDisplayName!!,
     )
     given(personalSkillEntityMapper.fromEntityToDomain(any())).willReturn(expectedSkill)
     given(personalInterestEntityMapper.fromEntityToDomain(any())).willReturn(expectedInterest)
@@ -87,7 +94,7 @@ class PersonalSkillsAndInterestsEntityMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedSkillsAndInterests)
-    verify(personalSkillEntityMapper).fromEntityToDomain(personalSkillsAndInterestsEntity.skills!![0])
-    verify(personalInterestEntityMapper).fromEntityToDomain(personalSkillsAndInterestsEntity.interests!![0])
+    verify(personalSkillEntityMapper).fromEntityToDomain(personalSkillsAndInterestsEntity.skills[0])
+    verify(personalInterestEntityMapper).fromEntityToDomain(personalSkillsAndInterestsEntity.interests[0])
   }
 }

@@ -112,21 +112,20 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
   }
 
   // TODO - replace with a relevant service call once we have that developed
-  private fun createReviewScheduleRecords(prisonNumber: String): ReviewScheduleEntity {
-    return (1..3).map {
-      val reviewScheduleEntity = ReviewScheduleEntity(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        earliestReviewDate = LocalDate.now().minusMonths(1),
-        latestReviewDate = LocalDate.now().plusMonths(1),
-        scheduleCalculationRule = ReviewScheduleCalculationRule.PRISONER_TRANSFER,
-        scheduleStatus = if (it == 3) ReviewScheduleStatus.SCHEDULED else ReviewScheduleStatus.COMPLETED,
-        createdAtPrison = "BXI",
-        updatedAtPrison = "BXI",
-      )
-      reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
-    }.last()
-  }
+  private fun createReviewScheduleRecords(prisonNumber: String): ReviewScheduleEntity = (1..3).map {
+    val reviewScheduleEntity = ReviewScheduleEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      earliestReviewDate = LocalDate.now().minusMonths(1),
+      latestReviewDate = LocalDate.now().plusMonths(1),
+      scheduleCalculationRule = ReviewScheduleCalculationRule.PRISONER_TRANSFER,
+      scheduleStatus = if (it == 3) ReviewScheduleStatus.SCHEDULED else ReviewScheduleStatus.COMPLETED,
+      exemptionReason = null,
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
+    )
+    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+  }.last()
 
   // TODO - replace with a relevant service call once we have that developed
   private fun createCompletedReviewRecord(prisonNumber: String, reviewScheduleReference: UUID): ReviewEntity {

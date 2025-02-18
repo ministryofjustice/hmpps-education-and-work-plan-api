@@ -18,20 +18,19 @@ fun aValidNoteEntity(
   updatedAt: Instant = Instant.now(),
   updatedBy: String = "bjones_gen",
   updatedAtPrison: String = "BXI",
-): NoteEntity =
-  NoteEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    content = content,
-    entityReference = entityReference,
-    entityType = entityType,
-    noteType = noteType,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+): NoteEntity = NoteEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  content = content,
+  entityReference = entityReference,
+  entityType = entityType,
+  noteType = noteType,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

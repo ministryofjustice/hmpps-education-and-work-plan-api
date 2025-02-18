@@ -8,14 +8,18 @@ import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 
 @ExtendWith(MockitoExtension::class)
 class AsyncInductionEventServiceTest {
@@ -33,12 +37,20 @@ class AsyncInductionEventServiceTest {
   @Mock
   private lateinit var telemetryService: TelemetryService
 
+  @Mock
+  private lateinit var userService: ManageUserService
+
   @Captor
   private lateinit var timelineEventCaptor: ArgumentCaptor<TimelineEvent>
 
   @Test
   fun `should handle induction created`() {
     // Given
+
+    given(userService.getUserDetails(any())).willReturn(
+      UserDetailsDto("asmith_gen", true, "Alex Smith"),
+    )
+
     val prisonNumber = aValidPrisonNumber()
     val induction = aFullyPopulatedInduction(prisonNumber = prisonNumber)
     val expectedTimelineEvent =
@@ -48,9 +60,15 @@ class AsyncInductionEventServiceTest {
           eventType = TimelineEventType.INDUCTION_CREATED,
           prisonId = createdAtPrison,
           actionedBy = induction.createdBy!!,
-          actionedByDisplayName = induction.createdByDisplayName,
           timestamp = induction.createdAt!!,
-          contextualInfo = null,
+          contextualInfo = mapOf(
+            TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to induction.createdAt.toString(),
+            TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to "Alex Smith",
+            TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to induction.completedDate.toString(),
+            TimelineEventContext.COMPLETED_INDUCTION_NOTES to induction.note!!.content,
+            TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to "John Smith",
+            TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to "Peer Mentor",
+          ),
         )
       }
 
@@ -75,9 +93,8 @@ class AsyncInductionEventServiceTest {
           eventType = TimelineEventType.INDUCTION_UPDATED,
           prisonId = lastUpdatedAtPrison,
           actionedBy = induction.lastUpdatedBy!!,
-          actionedByDisplayName = induction.lastUpdatedByDisplayName,
           timestamp = induction.lastUpdatedAt!!,
-          contextualInfo = null,
+          contextualInfo = emptyMap(),
         )
       }
 

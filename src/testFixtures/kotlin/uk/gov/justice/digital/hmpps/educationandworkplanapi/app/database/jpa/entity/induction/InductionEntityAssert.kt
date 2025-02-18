@@ -116,16 +116,6 @@ class InductionEntityAssert(actual: InductionEntity?) :
     return this
   }
 
-  fun hasAReference(): InductionEntityAssert {
-    isNotNull
-    with(actual!!) {
-      if (reference == null) {
-        failWithMessage("Expected reference to be populated, but was $reference")
-      }
-    }
-    return this
-  }
-
   fun isEqualToComparingAllFields(expected: InductionEntity): InductionEntityAssert {
     assertThat(actual)
       .usingRecursiveComparison()

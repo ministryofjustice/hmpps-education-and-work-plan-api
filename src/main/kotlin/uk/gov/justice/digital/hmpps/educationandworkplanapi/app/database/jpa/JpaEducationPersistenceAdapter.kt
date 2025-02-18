@@ -18,10 +18,9 @@ class JpaEducationPersistenceAdapter(
   private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
 ) : EducationPersistenceAdapter {
   @Transactional(readOnly = true)
-  override fun getPreviousQualifications(prisonNumber: String): PreviousQualifications? =
-    previousQualificationsRepository.findByPrisonNumber(prisonNumber)?.let {
-      previousQualificationsMapper.fromEntityToDomain(it)
-    }
+  override fun getPreviousQualifications(prisonNumber: String): PreviousQualifications? = previousQualificationsRepository.findByPrisonNumber(prisonNumber)?.let {
+    previousQualificationsMapper.fromEntityToDomain(it)
+  }
 
   @Transactional
   override fun createPreviousQualifications(createPreviousQualificationsDto: CreatePreviousQualificationsDto): PreviousQualifications {

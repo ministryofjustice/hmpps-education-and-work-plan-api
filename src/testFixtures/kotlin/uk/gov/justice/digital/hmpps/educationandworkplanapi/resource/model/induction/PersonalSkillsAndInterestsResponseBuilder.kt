@@ -18,17 +18,16 @@ fun aValidPersonalSkillsAndInterestsResponse(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): PersonalSkillsAndInterestsResponse =
-  PersonalSkillsAndInterestsResponse(
-    reference = reference,
-    skills = skills,
-    interests = interests,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): PersonalSkillsAndInterestsResponse = PersonalSkillsAndInterestsResponse(
+  reference = reference,
+  skills = skills,
+  interests = interests,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)

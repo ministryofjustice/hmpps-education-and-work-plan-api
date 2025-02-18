@@ -6,8 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkO
 import java.time.OffsetDateTime
 import java.util.UUID
 
-fun aValidWorkOnReleaseResponse(): WorkOnReleaseResponse =
-  aValidWorkOnReleaseResponseForPrisonerNotLookingToWork()
+fun aValidWorkOnReleaseResponse(): WorkOnReleaseResponse = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork()
 
 fun aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
   reference: UUID = UUID.randomUUID(),
@@ -22,21 +21,20 @@ fun aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): WorkOnReleaseResponse =
-  WorkOnReleaseResponse(
-    reference = reference,
-    hopingToWork = hopingToWork,
-    affectAbilityToWork = affectAbilityToWork,
-    affectAbilityToWorkOther = affectAbilityToWorkOther,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): WorkOnReleaseResponse = WorkOnReleaseResponse(
+  reference = reference,
+  hopingToWork = hopingToWork,
+  affectAbilityToWork = affectAbilityToWork,
+  affectAbilityToWorkOther = affectAbilityToWorkOther,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)
 
 fun aValidWorkOnReleaseResponseForPrisonerLookingToWork(
   reference: UUID = UUID.randomUUID(),
@@ -51,18 +49,17 @@ fun aValidWorkOnReleaseResponseForPrisonerLookingToWork(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): WorkOnReleaseResponse =
-  WorkOnReleaseResponse(
-    reference = reference,
-    hopingToWork = hopingToWork,
-    affectAbilityToWork = affectAbilityToWork,
-    affectAbilityToWorkOther = affectAbilityToWorkOther,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): WorkOnReleaseResponse = WorkOnReleaseResponse(
+  reference = reference,
+  hopingToWork = hopingToWork,
+  affectAbilityToWork = affectAbilityToWork,
+  affectAbilityToWorkOther = affectAbilityToWorkOther,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)

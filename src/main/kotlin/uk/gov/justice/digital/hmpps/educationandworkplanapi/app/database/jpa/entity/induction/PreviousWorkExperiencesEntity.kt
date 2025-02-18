@@ -16,7 +16,6 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -24,9 +23,6 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
@@ -40,66 +36,47 @@ import java.util.UUID
  */
 @Table(name = "previous_work_experiences")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class PreviousWorkExperiencesEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+@EntityListeners(value = [AuditingEntityListener::class])
+data class PreviousWorkExperiencesEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
+  val reference: UUID,
 
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var hasWorkedBefore: HasWorkedBefore? = null,
+  var hasWorkedBefore: HasWorkedBefore,
 
   @Column
   var hasWorkedBeforeNotRelevantReason: String? = null,
 
   @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var experiences: MutableList<WorkExperienceEntity>? = null,
+  val experiences: MutableList<WorkExperienceEntity> = mutableListOf(),
+
+  @Column
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
+) : ParentEntity {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
-
-  @Column
-  @CreatedByDisplayName
-  var createdByDisplayName: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-
-  @Column
-  @LastModifiedByDisplayName
-  var updatedByDisplayName: String? = null,
-) : ParentEntity {
-
-  fun experiences(): MutableList<WorkExperienceEntity> {
-    if (experiences == null) {
-      experiences = mutableListOf()
-    }
-    return experiences!!
-  }
+  var updatedBy: String? = null
 
   override fun childEntityUpdated() {
     updatedAt = Instant.now()
@@ -115,32 +92,19 @@ class PreviousWorkExperiencesEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference)"
 }
 
 @Table(name = "work_experience")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class WorkExperienceEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+data class WorkExperienceEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "work_experiences_id")
-  var parent: PreviousWorkExperiencesEntity? = null,
+  val reference: UUID,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var experienceType: WorkExperienceType? = null,
+  var experienceType: WorkExperienceType,
 
   @Column
   var experienceTypeOther: String? = null,
@@ -150,23 +114,32 @@ class WorkExperienceEntity(
 
   @Column
   var details: String? = null,
+) : KeyAwareChildEntity {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "work_experiences_id")
+  var parent: PreviousWorkExperiencesEntity? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) : KeyAwareChildEntity {
+  var updatedBy: String? = null
 
   @PrePersist
   @PreUpdate
@@ -191,9 +164,7 @@ class WorkExperienceEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, experienceType = $experienceType, experienceTypeOther = $experienceTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, experienceType = $experienceType, experienceTypeOther = $experienceTypeOther)"
 }
 
 enum class WorkExperienceType {

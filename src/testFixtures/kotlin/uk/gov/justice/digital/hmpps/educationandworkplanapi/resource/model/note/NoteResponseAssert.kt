@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note
 
 import org.assertj.core.api.AbstractObjectAssert
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
 import java.time.OffsetDateTime
@@ -37,10 +38,10 @@ class NoteResponseAssert(actual: NoteResponse?) :
     return this
   }
 
-  fun wasCreatedAfter(dateTime: OffsetDateTime): NoteResponseAssert {
+  fun wasCreatedAtOrAfter(dateTime: OffsetDateTime): NoteResponseAssert {
     isNotNull
     with(actual!!) {
-      if (!createdAt.isAfter(dateTime)) {
+      if (createdAt.isBeforeRounded(dateTime)) {
         failWithMessage("Expected createdAt to be after $dateTime, but was $createdAt")
       }
     }

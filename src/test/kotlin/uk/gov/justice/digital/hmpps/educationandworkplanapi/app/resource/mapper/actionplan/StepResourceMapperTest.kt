@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.StepS
 internal class StepResourceMapperTest {
 
   @InjectMocks
-  private lateinit var mapper: StepResourceMapperImpl
+  private lateinit var mapper: StepResourceMapper
 
   @Test
   fun `should map from CreateStepRequest model to DTO`() {

@@ -13,18 +13,21 @@ class CreateActionPlanReviewRequestMapper {
     prisonNumber: String,
     releaseDate: LocalDate?,
     sentenceType: SentenceType,
+    isIndeterminateSentence: Boolean,
+    isRecall: Boolean,
     request: CreateActionPlanReviewRequest,
-  ): CreateCompletedReviewDto =
-    with(request) {
-      CreateCompletedReviewDto(
-        prisonNumber = prisonNumber,
-        prisonId = prisonId,
-        note = note,
-        conductedAt = conductedAt,
-        conductedBy = conductedBy,
-        conductedByRole = conductedByRole,
-        prisonerReleaseDate = releaseDate,
-        prisonerSentenceType = sentenceType,
-      )
-    }
+  ): CreateCompletedReviewDto = with(request) {
+    CreateCompletedReviewDto(
+      prisonNumber = prisonNumber,
+      prisonId = prisonId,
+      note = note,
+      conductedAt = conductedAt,
+      conductedBy = conductedBy,
+      conductedByRole = conductedByRole,
+      prisonerReleaseDate = releaseDate,
+      prisonerSentenceType = sentenceType,
+      prisonerHasIndeterminateFlag = isIndeterminateSentence,
+      prisonerHasRecallFlag = isRecall,
+    )
+  }
 }

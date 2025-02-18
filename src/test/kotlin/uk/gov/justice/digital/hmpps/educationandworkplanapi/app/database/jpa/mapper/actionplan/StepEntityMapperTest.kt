@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class StepEntityMapperTest {
 
-  private val mapper = StepEntityMapperImpl()
+  private val mapper = StepEntityMapper()
 
   @Test
   fun `should map from CreateStepDto to entity`() {
@@ -44,7 +44,6 @@ class StepEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison()
       .ignoringFields("reference")
       .isEqualTo(expected)
@@ -79,7 +78,6 @@ class StepEntityMapperTest {
     // Then
     assertThat(actual)
       .doesNotHaveJpaManagedFieldsPopulated()
-      .hasAReference()
       .usingRecursiveComparison().isEqualTo(expected)
   }
 
@@ -95,7 +93,7 @@ class StepEntityMapperTest {
     )
 
     val expected = aValidStep(
-      reference = entityStep.reference!!,
+      reference = entityStep.reference,
       title = "Book communication skills course",
       status = DomainStatus.ACTIVE,
       sequenceNumber = 1,

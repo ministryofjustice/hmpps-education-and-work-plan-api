@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Revie
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 
 class UpdateActionPlanReviewStatusHistoryTest : IntegrationTestBase() {
   companion object {
@@ -24,7 +25,7 @@ class UpdateActionPlanReviewStatusHistoryTest : IntegrationTestBase() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
-      status = ReviewScheduleStatus.SCHEDULED.name,
+      status = ReviewScheduleStatusEntity.SCHEDULED,
       earliestDate = LocalDate.now().minusDays(5),
       latestDate = LocalDate.now(),
     )

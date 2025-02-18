@@ -1,0 +1,190 @@
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
+
+import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Isolated
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
+import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
+import java.time.LocalDate
+
+@Isolated
+class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
+
+  companion object {
+    private const val ORIGINAL_PRISON = "BXI"
+    private const val PRISON_TRANSFERRING_TO = "MDI"
+  }
+
+  @Test
+  fun `should update Review Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has an active Review Schedule with review date later than adjusted date`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
+    val prisonNumber = randomValidPrisonNumber()
+    val prisoner = aValidPrisoner(prisonNumber)
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
+
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+    createActionPlan(prisonNumber)
+
+    val expectedLatestReviewDate = LocalDate.now().plusDays(10)
+    // Set the latest review date to be later than the adjusted date that a transfer might set
+    updateReviewScheduleRecordLatestReviewDate(prisonNumber, expectedLatestReviewDate)
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = PRISON_TRANSFERRING_TO,
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val reviewSchedules = getReviewSchedules(prisonNumber)
+    assertThat(reviewSchedules)
+      // Expect 3 schedules - 1 is the initial scheduled, 2 is exemption due to transfer, 3 is the re-scheduled
+      .hasNumberOfReviewSchedules(3)
+      .reviewScheduleAtVersion(2) {
+        // Review Schedule version 2 is the exempted schedule due to transfer
+        it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
+          .wasUpdatedAtPrison(ORIGINAL_PRISON)
+      }
+      .reviewScheduleAtVersion(3) {
+        // Review Schedule version 3 is the re-scheduled review schedule
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+          .wasUpdatedAtPrison(PRISON_TRANSFERRING_TO)
+          .hasReviewDateTo(expectedLatestReviewDate)
+      }
+
+    // test that outbound events are also created (there would have been 3 in total, but we cleared the queue after the first one in the given block above). The 2 new ones are the ones we are really interested in though)
+    val reviewScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.REVIEW)
+    assertThat(reviewScheduleEvents).hasSize(2)
+    assertThat(reviewScheduleEvents).allSatisfy {
+      assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+      assertThat(it.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+    }
+  }
+
+  @Test
+  fun `should update Review Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has an active Review Schedule with review date earlier than adjusted date`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
+    val prisonNumber = randomValidPrisonNumber()
+    val prisoner = aValidPrisoner(prisonNumber)
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
+
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+    createActionPlan(prisonNumber)
+
+    val expectedLatestReviewDate = LocalDate.now().plusDays(5)
+    // Set the latest review date to be earlier than the adjusted date that a transfer will set
+    updateReviewScheduleRecordLatestReviewDate(prisonNumber, LocalDate.now().plusDays(4))
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = PRISON_TRANSFERRING_TO,
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val reviewSchedules = getReviewSchedules(prisonNumber)
+    assertThat(reviewSchedules)
+      // Expect 3 schedules - 1 is the initial scheduled, 2 is exemption due to transfer, 3 is the re-scheduled
+      .hasNumberOfReviewSchedules(3)
+      .reviewScheduleAtVersion(2) {
+        // Review Schedule version 2 is the exempted schedule due to transfer
+        it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
+          .wasUpdatedAtPrison(ORIGINAL_PRISON)
+      }
+      .reviewScheduleAtVersion(3) {
+        // Review Schedule version 3 is the re-scheduled review schedule
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+          .wasUpdatedAtPrison(PRISON_TRANSFERRING_TO)
+          .hasReviewDateTo(expectedLatestReviewDate)
+      }
+
+    // test that outbound events are also created (there would have been 3 in total, but we cleared the queue after the first one in the given block above). The 2 new ones are the ones we are really interested in though)
+    val reviewScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.REVIEW)
+    assertThat(reviewScheduleEvents).hasSize(2)
+    assertThat(reviewScheduleEvents).allSatisfy {
+      assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+      assertThat(it.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+    }
+  }
+
+  @Test
+  fun `should not update Review Schedule and not send outbound message given 'prisoner received' (transfer) event for prisoner that does not have a Review Schedule at all`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = PRISON_TRANSFERRING_TO,
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
+
+    // test that no outbound events were created
+    assertThat(reviewScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+  }
+}

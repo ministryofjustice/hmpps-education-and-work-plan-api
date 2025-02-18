@@ -25,29 +25,40 @@ class InductionResourceMapper(
 
   fun toCreateInductionDto(prisonNumber: String, request: CreateInductionRequest): CreateInductionDto {
     val prisonId = request.prisonId
-    return CreateInductionDto(
-      prisonNumber = prisonNumber,
-      workOnRelease = workOnReleaseMapper.toCreateWorkOnReleaseDto(request.workOnRelease, prisonId),
-      previousQualifications = request.previousQualifications?.let {
-        qualificationsMapper.toCreatePreviousQualificationsDto(request = it, prisonNumber = prisonNumber, prisonId = prisonId)
-      },
-      previousTraining = request.previousTraining?.let {
-        previousTrainingMapper.toCreatePreviousTrainingDto(request = it, prisonId = prisonId)
-      },
-      previousWorkExperiences = request.previousWorkExperiences?.let {
-        workExperiencesMapper.toCreatePreviousWorkExperiencesDto(request = it, prisonId = prisonId)
-      },
-      inPrisonInterests = request.inPrisonInterests?.let {
-        inPrisonInterestsMapper.toCreateInPrisonInterestsDto(request = it, prisonId = prisonId)
-      },
-      personalSkillsAndInterests = request.personalSkillsAndInterests?.let {
-        skillsAndInterestsMapper.toCreatePersonalSkillsAndInterestsDto(request = it, prisonId = prisonId)
-      },
-      futureWorkInterests = request.futureWorkInterests?.let {
-        workInterestsMapper.toCreateFutureWorkInterestsDto(request = it, prisonId = prisonId)
-      },
-      prisonId = prisonId,
-    )
+    with(request) {
+      return CreateInductionDto(
+        prisonNumber = prisonNumber,
+        workOnRelease = workOnReleaseMapper.toCreateWorkOnReleaseDto(workOnRelease, prisonId),
+        previousQualifications = previousQualifications?.let {
+          qualificationsMapper.toCreatePreviousQualificationsDto(
+            request = it,
+            prisonNumber = prisonNumber,
+            prisonId = prisonId,
+          )
+        },
+        previousTraining = previousTrainingMapper.toCreatePreviousTrainingDto(
+          request = previousTraining!!,
+          prisonId = prisonId,
+        ),
+        previousWorkExperiences = previousWorkExperiences?.let {
+          workExperiencesMapper.toCreatePreviousWorkExperiencesDto(request = it, prisonId = prisonId)
+        },
+        inPrisonInterests = inPrisonInterests?.let {
+          inPrisonInterestsMapper.toCreateInPrisonInterestsDto(request = it, prisonId = prisonId)
+        },
+        personalSkillsAndInterests = personalSkillsAndInterests?.let {
+          skillsAndInterestsMapper.toCreatePersonalSkillsAndInterestsDto(request = it, prisonId = prisonId)
+        },
+        futureWorkInterests = futureWorkInterests?.let {
+          workInterestsMapper.toCreateFutureWorkInterestsDto(request = it, prisonId = prisonId)
+        },
+        prisonId = prisonId,
+        conductedBy = conductedBy,
+        conductedByRole = conductedByRole,
+        conductedAt = conductedAt,
+        note = note,
+      )
+    }
   }
 
   fun toInductionResponse(induction: Induction): InductionResponse {

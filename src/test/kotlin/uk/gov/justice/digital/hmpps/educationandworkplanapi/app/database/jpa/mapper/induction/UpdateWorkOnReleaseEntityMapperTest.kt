@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.deepCopy
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.AffectAbilityToWork as AffectAbilityToWorkDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
@@ -13,7 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 
 class UpdateWorkOnReleaseEntityMapperTest {
 
-  private val mapper = WorkOnReleaseEntityMapperImpl()
+  private val mapper = WorkOnReleaseEntityMapper()
 
   @Test
   fun `should update existing work on release values`() {
@@ -34,15 +33,13 @@ class UpdateWorkOnReleaseEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingWorkOnReleaseEntity.deepCopy().apply {
-      id
-      reference = reference
-      hopingToWork = HopingToWorkEntity.NOT_SURE
-      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES)
-      affectAbilityToWorkOther = null
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingWorkOnReleaseEntity.copy(
+      hopingToWork = HopingToWorkEntity.NOT_SURE,
+      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES),
+      affectAbilityToWorkOther = null,
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
@@ -70,15 +67,13 @@ class UpdateWorkOnReleaseEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingWorkOnReleaseEntity.deepCopy().apply {
-      id
-      reference = reference
-      hopingToWork = HopingToWorkEntity.NOT_SURE
-      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.OTHER, AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES)
-      affectAbilityToWorkOther = "Lacking confidence"
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingWorkOnReleaseEntity.copy(
+      hopingToWork = HopingToWorkEntity.NOT_SURE,
+      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.OTHER, AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES),
+      affectAbilityToWorkOther = "Lacking confidence",
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)
@@ -106,15 +101,13 @@ class UpdateWorkOnReleaseEntityMapperTest {
       prisonId = "MDI",
     )
 
-    val expectedEntity = existingWorkOnReleaseEntity.deepCopy().apply {
-      id
-      reference = reference
-      hopingToWork = HopingToWorkEntity.NOT_SURE
-      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES)
-      affectAbilityToWorkOther = null
-      createdAtPrison = "BXI"
-      updatedAtPrison = "MDI"
-    }
+    val expectedEntity = existingWorkOnReleaseEntity.copy(
+      hopingToWork = HopingToWorkEntity.NOT_SURE,
+      affectAbilityToWork = mutableListOf(AffectAbilityToWorkEntity.CARING_RESPONSIBILITIES),
+      affectAbilityToWorkOther = null,
+      createdAtPrison = "BXI",
+      updatedAtPrison = "MDI",
+    )
 
     // When
     mapper.updateExistingEntityFromDto(existingWorkOnReleaseEntity, updatedWorkOnReleaseDto)

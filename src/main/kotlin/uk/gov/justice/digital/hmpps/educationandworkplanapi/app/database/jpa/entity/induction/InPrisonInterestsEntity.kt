@@ -16,7 +16,6 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -24,9 +23,6 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.CreatedByDisplayName
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.DisplayNameAuditingEntityListener.LastModifiedByDisplayName
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
@@ -37,69 +33,43 @@ import java.util.UUID
  */
 @Table(name = "in_prison_interests")
 @Entity
-@EntityListeners(value = [AuditingEntityListener::class, DisplayNameAuditingEntityListener::class])
-class InPrisonInterestsEntity(
+@EntityListeners(value = [AuditingEntityListener::class])
+data class InPrisonInterestsEntity(
+  @Column(updatable = false)
+  val reference: UUID,
+
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+  val inPrisonWorkInterests: MutableList<InPrisonWorkInterestEntity> = mutableListOf(),
+
+  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+  val inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestEntity> = mutableListOf(),
+
+  @Column
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
+) : ParentEntity {
   @Id
   @GeneratedValue
   @UuidGenerator
-  var id: UUID? = null,
-
-  @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var inPrisonWorkInterests: MutableList<InPrisonWorkInterestEntity>? = null,
-
-  @OneToMany(mappedBy = "parent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  var inPrisonTrainingInterests: MutableList<InPrisonTrainingInterestEntity>? = null,
+  var id: UUID? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var createdAtPrison: String? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
-
-  @Column
-  @CreatedByDisplayName
-  var createdByDisplayName: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
-
-  @Column
-  @field:NotNull
-  var updatedAtPrison: String? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-
-  @Column
-  @LastModifiedByDisplayName
-  var updatedByDisplayName: String? = null,
-) : ParentEntity {
-
-  fun inPrisonWorkInterests(): MutableList<InPrisonWorkInterestEntity> {
-    if (inPrisonWorkInterests == null) {
-      inPrisonWorkInterests = mutableListOf()
-    }
-    return inPrisonWorkInterests!!
-  }
-
-  fun inPrisonTrainingInterests(): MutableList<InPrisonTrainingInterestEntity> {
-    if (inPrisonTrainingInterests == null) {
-      inPrisonTrainingInterests = mutableListOf()
-    }
-    return inPrisonTrainingInterests!!
-  }
+  var updatedBy: String? = null
 
   override fun childEntityUpdated() {
     this.updatedAt = Instant.now()
@@ -115,52 +85,48 @@ class InPrisonInterestsEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference)"
 }
 
 @Table(name = "in_prison_work_interest")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class InPrisonWorkInterestEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+data class InPrisonWorkInterestEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "interests_id")
-  var parent: InPrisonInterestsEntity? = null,
+  val reference: UUID,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var workType: InPrisonWorkType? = null,
+  var workType: InPrisonWorkType,
 
   @Column
   var workTypeOther: String? = null,
+) : KeyAwareChildEntity {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "interests_id")
+  var parent: InPrisonInterestsEntity? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) : KeyAwareChildEntity {
+  var updatedBy: String? = null
 
   @PrePersist
   @PreUpdate
@@ -185,52 +151,48 @@ class InPrisonWorkInterestEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, workType = $workType, workTypeOther = $workTypeOther)"
 }
 
 @Table(name = "in_prison_training_interest")
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class InPrisonTrainingInterestEntity(
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  var id: UUID? = null,
-
+data class InPrisonTrainingInterestEntity(
   @Column(updatable = false)
-  @field:NotNull
-  var reference: UUID? = null,
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "interests_id")
-  var parent: InPrisonInterestsEntity? = null,
+  val reference: UUID,
 
   @Column
   @Enumerated(value = EnumType.STRING)
-  @field:NotNull
-  var trainingType: InPrisonTrainingType? = null,
+  var trainingType: InPrisonTrainingType,
 
   @Column
   var trainingTypeOther: String? = null,
+) : KeyAwareChildEntity {
+
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "interests_id")
+  var parent: InPrisonInterestsEntity? = null
 
   @Column(updatable = false)
   @CreationTimestamp
-  var createdAt: Instant? = null,
+  var createdAt: Instant? = null
 
   @Column(updatable = false)
   @CreatedBy
-  var createdBy: String? = null,
+  var createdBy: String? = null
 
   @Column
   @UpdateTimestamp
-  var updatedAt: Instant? = null,
+  var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
-  var updatedBy: String? = null,
-) : KeyAwareChildEntity {
+  var updatedBy: String? = null
 
   override fun associateWithParent(parent: ParentEntity) {
     this.parent = parent as InPrisonInterestsEntity
@@ -248,9 +210,7 @@ class InPrisonTrainingInterestEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, trainingType = $trainingType, trainingTypeOther = $trainingTypeOther)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, trainingType = $trainingType, trainingTypeOther = $trainingTypeOther)"
 }
 
 enum class InPrisonWorkType {

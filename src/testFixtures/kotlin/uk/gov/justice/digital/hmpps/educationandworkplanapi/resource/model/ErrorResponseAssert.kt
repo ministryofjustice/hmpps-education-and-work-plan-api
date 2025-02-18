@@ -4,8 +4,7 @@ import org.assertj.core.api.AbstractAssert
 
 fun assertThat(actual: ErrorResponse?) = ErrorResponseAssert(actual)
 
-class ErrorResponseAssert(actual: ErrorResponse?) :
-  AbstractAssert<ErrorResponseAssert, ErrorResponse?>(actual, ErrorResponseAssert::class.java) {
+class ErrorResponseAssert(actual: ErrorResponse?) : AbstractAssert<ErrorResponseAssert, ErrorResponse?>(actual, ErrorResponseAssert::class.java) {
 
   fun hasStatus(expected: Int): ErrorResponseAssert {
     isNotNull

@@ -2,15 +2,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import com.microsoft.applicationinsights.TelemetryClient
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.conversation.Conversation
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ConversationTelemetryEventType.CONVERSATION_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
@@ -108,20 +107,6 @@ class TelemetryService(
     )
   }
 
-  fun trackConversationCreated(conversation: Conversation) {
-    sendTelemetryEventForConversation(
-      conversation = conversation,
-      telemetryEventType = CONVERSATION_CREATED,
-    )
-  }
-
-  fun trackConversationUpdated(conversation: Conversation) {
-    sendTelemetryEventForConversation(
-      conversation = conversation,
-      telemetryEventType = CONVERSATION_UPDATED,
-    )
-  }
-
   /**
    * Sends all goal update telemetry tracking events based on the differences between the previousGoal and the
    * updatedGoal.
@@ -140,34 +125,36 @@ class TelemetryService(
   }
 
   fun trackReviewCompleted(completedReview: CompletedReview) {
-    sendTelemetryEventForCompletedReview(
-      completedReview = completedReview,
-      telemetryEventType = CompletedReviewTelemetryEventType.REVIEW_COMPLETED,
+    telemetryClient.trackEvent(
+      CompletedReviewTelemetryEventType.REVIEW_COMPLETED.value,
+      CompletedReviewTelemetryEventType.REVIEW_COMPLETED.customDimensions(completedReview),
     )
   }
 
   fun trackReviewScheduleStatusUpdated(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus) {
-    sendTelemetryEventForUpdatedReviewScheduleStatus(
-      updatedReviewScheduleStatus = updatedReviewScheduleStatus,
-      telemetryEventType = UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED,
+    telemetryClient.trackEvent(
+      UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED.value,
+      UpdatedReviewScheduleStatusTelemetryEventType.REVIEW_SCHEDULE_STATUS_UPDATED.customDimensions(updatedReviewScheduleStatus),
     )
   }
 
-  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: GoalTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
+  fun trackReviewScheduleCreated(reviewSchedule: ReviewSchedule) {
+    telemetryClient.trackEvent(
+      ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED.value,
+      ReviewScheduleCreatedTelemetryEventType.REVIEW_SCHEDULE_CREATED.customDimensions(reviewSchedule),
+    )
+  }
 
-  private fun sendTelemetryEventForInduction(induction: Induction, telemetryEventType: InductionTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction))
+  fun trackInductionScheduleStatusUpdated(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus) {
+    telemetryClient.trackEvent(
+      UpdatedInductionScheduleStatusTelemetryEventType.INDUCTION_SCHEDULE_STATUS_UPDATED.value,
+      UpdatedInductionScheduleStatusTelemetryEventType.INDUCTION_SCHEDULE_STATUS_UPDATED.customDimensions(updatedInductionScheduleStatus),
+    )
+  }
 
-  private fun sendTelemetryEventForConversation(conversation: Conversation, telemetryEventType: ConversationTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(conversation))
+  private fun sendTelemetryEventForGoal(goal: Goal, correlationId: UUID, telemetryEventType: GoalTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(goal, correlationId))
 
-  private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
+  private fun sendTelemetryEventForInduction(induction: Induction, telemetryEventType: InductionTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction))
 
-  private fun sendTelemetryEventForCompletedReview(completedReview: CompletedReview, telemetryEventType: CompletedReviewTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(completedReview))
-
-  private fun sendTelemetryEventForUpdatedReviewScheduleStatus(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus, telemetryEventType: UpdatedReviewScheduleStatusTelemetryEventType) =
-    telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(updatedReviewScheduleStatus))
+  private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
 }

@@ -13,13 +13,12 @@ fun aValidCiagInductionSummaryResponse(
   createdDateTime: OffsetDateTime = OffsetDateTime.now(),
   modifiedBy: String = "asmith_gen",
   modifiedDateTime: OffsetDateTime = OffsetDateTime.now(),
-): CiagInductionSummaryResponse =
-  CiagInductionSummaryResponse(
-    offenderId = offenderId,
-    desireToWork = desireToWork,
-    hopingToGetWork = hopingToGetWork,
-    createdBy = createdBy,
-    createdDateTime = createdDateTime,
-    modifiedBy = modifiedBy,
-    modifiedDateTime = modifiedDateTime,
-  )
+): CiagInductionSummaryResponse = CiagInductionSummaryResponse(
+  offenderId = offenderId,
+  desireToWork = desireToWork,
+  hopingToGetWork = hopingToGetWork,
+  createdBy = createdBy,
+  createdDateTime = createdDateTime,
+  modifiedBy = modifiedBy,
+  modifiedDateTime = modifiedDateTime,
+)

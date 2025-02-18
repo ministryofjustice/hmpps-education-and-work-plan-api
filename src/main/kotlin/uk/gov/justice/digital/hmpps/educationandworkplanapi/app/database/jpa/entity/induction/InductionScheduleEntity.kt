@@ -42,6 +42,15 @@ data class InductionScheduleEntity(
   @Column(updatable = true)
   @Enumerated(value = EnumType.STRING)
   var scheduleStatus: InductionScheduleStatus,
+
+  @Column
+  var exemptionReason: String? = null,
+
+  @Column(updatable = false)
+  val createdAtPrison: String,
+
+  @Column
+  var updatedAtPrison: String,
 ) {
   @Id
   @GeneratedValue
@@ -56,11 +65,11 @@ data class InductionScheduleEntity(
   @CreationTimestamp
   var createdAt: Instant? = null
 
-  @Column(updatable = false)
+  @Column
   @LastModifiedBy
   var updatedBy: String? = null
 
-  @Column(updatable = false)
+  @Column
   @UpdateTimestamp
   var updatedAt: Instant? = null
 
@@ -77,28 +86,32 @@ data class InductionScheduleEntity(
 
 enum class InductionScheduleCalculationRule {
   NEW_PRISON_ADMISSION,
-  EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE,
-  EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE,
-  EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE,
-  EXISTING_PRISONER_INDETERMINATE_SENTENCE,
-  EXISTING_PRISONER_ON_REMAND,
-  EXISTING_PRISONER_UN_SENTENCED,
+  EXISTING_PRISONER,
 }
 
-enum class InductionScheduleStatus {
-  SCHEDULED,
-  COMPLETE,
-  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
-  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES,
-  EXEMPT_PRISONER_FAILED_TO_ENGAGE,
-  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED,
-  EXEMPT_PRISONER_SAFETY_ISSUES,
-  EXEMPT_PRISON_REGIME_CIRCUMSTANCES,
-  EXEMPT_PRISON_STAFF_REDEPLOYMENT,
-  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE,
-  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF,
-  EXEMPT_SYSTEM_TECHNICAL_ISSUE,
-  EXEMPT_PRISONER_TRANSFER,
-  EXEMPT_PRISONER_RELEASE,
-  EXEMPT_PRISONER_DEATH,
+enum class InductionScheduleStatus(val active: Boolean) {
+  PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS(true),
+  SCHEDULED(true),
+  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(true),
+  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(true),
+  EXEMPT_PRISONER_FAILED_TO_ENGAGE(true),
+  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(true),
+  EXEMPT_PRISONER_SAFETY_ISSUES(true),
+  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(true),
+  EXEMPT_PRISON_STAFF_REDEPLOYMENT(true),
+  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(true),
+  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(true),
+  EXEMPT_SYSTEM_TECHNICAL_ISSUE(true),
+  EXEMPT_PRISONER_TRANSFER(true),
+  EXEMPT_PRISONER_RELEASE(false),
+  EXEMPT_PRISONER_DEATH(false),
+  EXEMPT_PRISONER_MERGE(false),
+  EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE(true),
+  EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(true),
+  COMPLETED(false),
+  ;
+
+  companion object {
+    val ACTIVE_STATUSES = InductionScheduleStatus.entries.filter { it.active }
+  }
 }

@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
@@ -196,9 +197,9 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
         goals = listOf(
@@ -250,7 +251,6 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           GOALS_RW,
           username = "buser_gen",
-          displayName = "Bernie User",
           privateKey = keyPair.private,
         ),
       )
@@ -284,23 +284,24 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        .event(5) {
+          // the 5th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("goal-updated"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       verify(telemetryClient).trackEvent(
         eq("step-removed"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalUpdatedEventProperties = eventPropertiesCaptor.firstValue
@@ -319,9 +320,9 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal and delete goal note`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
         goals = listOf(
@@ -373,7 +374,6 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           GOALS_RW,
           username = "buser_gen",
-          displayName = "Bernie User",
           privateKey = keyPair.private,
         ),
       )
@@ -407,23 +407,24 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+        .anyOfEventNumber(5, 6) {
+          // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
         }
 
-      val eventPropertiesCaptor = ArgumentCaptor.forClass(Map::class.java as Class<Map<String, String>>)
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
 
       verify(telemetryClient).trackEvent(
         eq("goal-updated"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
       verify(telemetryClient).trackEvent(
         eq("step-removed"),
         capture(eventPropertiesCaptor),
-        eq(null),
+        isNull(),
       )
 
       val goalUpdatedEventProperties = eventPropertiesCaptor.firstValue
@@ -442,9 +443,9 @@ class UpdateGoalTest : IntegrationTestBase() {
   fun `should update goal given the goal fields are unchanged and the only change is to add a step`() {
     // Given
     val prisonNumber = aValidPrisonNumber()
+    createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
-      displayName = "Albert User",
       prisonNumber = prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
         goals = listOf(
@@ -494,7 +495,6 @@ class UpdateGoalTest : IntegrationTestBase() {
         aValidTokenWithAuthority(
           GOALS_RW,
           username = "buser_gen",
-          displayName = "Bernie User",
           privateKey = keyPair.private,
         ),
       )
@@ -531,13 +531,18 @@ class UpdateGoalTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(3) { // the 3rd Timeline event will be the GOAL_UPDATED event
+      .event(5) {
+        // the 5th Timeline event will be the GOAL_UPDATED event
         it.hasEventType(TimelineEventType.GOAL_UPDATED)
           .wasActionedBy("buser_gen")
           .hasActionedByDisplayName("Bernie User")
       }
 
-    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[0].goalReference, EntityType.GOAL, NoteType.GOAL)
+    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+      actual.goals[0].goalReference,
+      EntityType.GOAL,
+      NoteType.GOAL,
+    )
     assertThat(notes.size).isGreaterThan(0)
     assertThat(notes[0].content).isEqualTo("Updated goal text")
 

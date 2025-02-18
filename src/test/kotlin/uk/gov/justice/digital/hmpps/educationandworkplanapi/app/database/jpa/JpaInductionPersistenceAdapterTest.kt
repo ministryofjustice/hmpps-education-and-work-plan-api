@@ -8,8 +8,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.given
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -24,6 +25,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aVa
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
@@ -32,9 +34,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.aValidNoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
@@ -56,6 +61,9 @@ class JpaInductionPersistenceAdapterTest {
 
   @Mock
   private lateinit var previousQualificationsMapper: PreviousQualificationsEntityMapper
+
+  @Mock
+  private lateinit var noteRepository: NoteRepository
 
   @Nested
   inner class CreateInduction {
@@ -80,11 +88,15 @@ class JpaInductionPersistenceAdapterTest {
       given(inductionMapper.fromCreateDtoToEntity(any())).willReturn(inductionEntity)
       given(inductionRepository.saveAndFlush(any<InductionEntity>())).willReturn(inductionEntity)
 
+      val noteEntity = aValidNoteEntity()
+      given(noteRepository.saveAndFlush(any<NoteEntity>())).willReturn(noteEntity)
+
       val expected = aFullyPopulatedInduction(
         prisonNumber = prisonNumber,
         previousQualifications = aValidPreviousQualifications(),
+        note = aValidNoteDto(),
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expected)
+      given(inductionMapper.fromEntityToDomain(any(), any(), any())).willReturn(expected)
 
       // When
       val actual = persistenceAdapter.createInduction(createInductionDto)
@@ -96,7 +108,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verify(previousQualificationsMapper).fromCreateDtoToEntity(createInductionDto.previousQualifications!!)
       verify(previousQualificationsRepository).saveAndFlush(newPreviousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(inductionEntity, newPreviousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(inductionEntity, newPreviousQualificationsEntity, noteEntity)
     }
 
     @Test
@@ -122,7 +134,7 @@ class JpaInductionPersistenceAdapterTest {
         prisonNumber = prisonNumber,
         previousQualifications = aValidPreviousQualifications(),
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expected)
+      given(inductionMapper.fromEntityToDomain(any(), any(), anyOrNull())).willReturn(expected)
 
       // When
       val actual = persistenceAdapter.createInduction(createInductionDto)
@@ -134,7 +146,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verify(previousQualificationsMapper).updateExistingEntityFromDto(previousQualificationsEntity, createInductionDto.previousQualifications!!)
       verify(previousQualificationsRepository).saveAndFlush(previousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(inductionEntity, previousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(inductionEntity, previousQualificationsEntity, null)
     }
 
     @Test
@@ -156,7 +168,7 @@ class JpaInductionPersistenceAdapterTest {
         prisonNumber = prisonNumber,
         previousQualifications = null,
       )
-      given(inductionMapper.fromEntityToDomain(any(), eq(null))).willReturn(expected)
+      given(inductionMapper.fromEntityToDomain(any(), isNull(), isNull())).willReturn(expected)
 
       // When
       val actual = persistenceAdapter.createInduction(createInductionDto)
@@ -168,7 +180,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
-      verify(inductionMapper).fromEntityToDomain(inductionEntity, null)
+      verify(inductionMapper).fromEntityToDomain(inductionEntity, null, null)
     }
 
     @Test
@@ -191,7 +203,7 @@ class JpaInductionPersistenceAdapterTest {
         prisonNumber = prisonNumber,
         previousQualifications = null,
       )
-      given(inductionMapper.fromEntityToDomain(any(), eq(null))).willReturn(expected)
+      given(inductionMapper.fromEntityToDomain(any(), isNull(), isNull())).willReturn(expected)
 
       // When
       val actual = persistenceAdapter.createInduction(createInductionDto)
@@ -203,7 +215,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
       verify(previousQualificationsRepository).delete(previousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(inductionEntity, null)
+      verify(inductionMapper).fromEntityToDomain(inductionEntity, null, null)
     }
   }
 
@@ -217,7 +229,7 @@ class JpaInductionPersistenceAdapterTest {
     given(previousQualificationsRepository.findByPrisonNumber(any())).willReturn(previousQualificationsEntity)
 
     val expected = aFullyPopulatedInduction(prisonNumber = prisonNumber)
-    given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expected)
+    given(inductionMapper.fromEntityToDomain(any(), any(), anyOrNull())).willReturn(expected)
 
     // When
     val actual = persistenceAdapter.getInduction(prisonNumber)
@@ -226,7 +238,7 @@ class JpaInductionPersistenceAdapterTest {
     assertThat(actual).isEqualTo(expected)
     verify(inductionRepository).findByPrisonNumber(prisonNumber)
     verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
-    verify(inductionMapper).fromEntityToDomain(inductionEntity, previousQualificationsEntity)
+    verify(inductionMapper).fromEntityToDomain(inductionEntity, previousQualificationsEntity, null)
   }
 
   @Test
@@ -285,7 +297,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), any(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -306,7 +318,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verify(previousQualificationsMapper).updateExistingEntityFromDto(previousQualificationsEntity, updateInductionDto.previousQualifications!!)
       verify(previousQualificationsRepository).saveAndFlush(previousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity, null)
     }
 
     @Test
@@ -348,7 +360,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), any(), anyOrNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -376,7 +388,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verify(previousQualificationsMapper).fromCreateDtoToEntity(expectedCreatePreviousQualificationsDto)
       verify(previousQualificationsRepository).saveAndFlush(newPreviousQualificationsEntity)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity, null)
     }
 
     @Test
@@ -413,7 +425,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), eq(null))).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), isNull(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -434,7 +446,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, null)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, null, null)
     }
 
     @Test
@@ -472,7 +484,7 @@ class JpaInductionPersistenceAdapterTest {
         createdBy = "USER1",
         lastUpdatedBy = "USER2",
       )
-      given(inductionMapper.fromEntityToDomain(any(), any())).willReturn(expectedDomainInduction)
+      given(inductionMapper.fromEntityToDomain(any(), any(), isNull())).willReturn(expectedDomainInduction)
 
       val updateInductionDto = aValidUpdateInductionDto(
         prisonNumber = prisonNumber,
@@ -493,7 +505,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
-      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, previousQualificationsEntity)
+      verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, previousQualificationsEntity, null)
     }
 
     @Test

@@ -16,53 +16,63 @@ data class InductionSchedule(
   /**
    * The user ID of the person (logged-in user) who created the Induction.
    */
-  val createdBy: String?,
-  /**
-   * The name of the logged-in user who created the Induction.
-   */
-  val createdByDisplayName: String?,
+  val createdBy: String,
   /**
    * The timestamp when this Induction was created.
    */
-  val createdAt: Instant?,
+  val createdAt: Instant,
+
+  val createdAtPrison: String,
   /**
    * The user ID of the person (logged-in user) who updated the Induction.
    */
-  val lastUpdatedBy: String?,
-  /**
-   * The name of the logged-in user who updated the Induction.
-   */
-  val lastUpdatedByDisplayName: String?,
+  val lastUpdatedBy: String,
   /**
    * The timestamp when this Induction was updated.
    */
-  val lastUpdatedAt: Instant?,
+  val lastUpdatedAt: Instant,
+
+  val lastUpdatedAtPrison: String,
+
+  var exemptionReason: String?,
 )
 
 enum class InductionScheduleCalculationRule(val existingPrisonerWhenScheduleCreated: Boolean) {
   NEW_PRISON_ADMISSION(false),
-  EXISTING_PRISONER_LESS_THAN_6_MONTHS_TO_SERVE(true),
-  EXISTING_PRISONER_BETWEEN_6_AND_12_MONTHS_TO_SERVE(true),
-  EXISTING_PRISONER_BETWEEN_12_AND_60_MONTHS_TO_SERVE(true),
-  EXISTING_PRISONER_INDETERMINATE_SENTENCE(true),
-  EXISTING_PRISONER_ON_REMAND(true),
-  EXISTING_PRISONER_UN_SENTENCED(true),
+  EXISTING_PRISONER(true),
 }
 
-enum class InductionScheduleStatus(val inScope: Boolean) {
-  SCHEDULED(true),
-  COMPLETE(true),
-  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(false),
-  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(false),
-  EXEMPT_PRISONER_FAILED_TO_ENGAGE(false),
-  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(false),
-  EXEMPT_PRISONER_SAFETY_ISSUES(false),
-  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(false),
-  EXEMPT_PRISON_STAFF_REDEPLOYMENT(false),
-  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(false),
-  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(false),
-  EXEMPT_SYSTEM_TECHNICAL_ISSUE(false),
-  EXEMPT_PRISONER_TRANSFER(false),
-  EXEMPT_PRISONER_RELEASE(false),
-  EXEMPT_PRISONER_DEATH(false),
+enum class InductionScheduleStatus(
+  val isExclusion: Boolean = false,
+  val isExemption: Boolean = false,
+  val includeExemptionOnSummary: Boolean = false,
+) {
+  PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS(includeExemptionOnSummary = true),
+  SCHEDULED,
+  EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_OTHER_HEALTH_ISSUES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_FAILED_TO_ENGAGE(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISONER_SAFETY_ISSUES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_REGIME_CIRCUMSTANCES(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_STAFF_REDEPLOYMENT(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(isExclusion = true, includeExemptionOnSummary = true),
+  EXEMPT_SYSTEM_TECHNICAL_ISSUE(includeExemptionOnSummary = true), // system down
+  EXEMPT_PRISONER_TRANSFER(isExemption = true),
+  EXEMPT_PRISONER_RELEASE(isExemption = true),
+  EXEMPT_PRISONER_DEATH(isExemption = true),
+  EXEMPT_PRISONER_MERGE(isExemption = true),
+  EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(isExemption = true, includeExemptionOnSummary = true),
+  EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE(isExemption = true, includeExemptionOnSummary = true),
+  COMPLETED,
+  ;
+
+  fun isExemptionOrExclusion(): Boolean {
+    return isExemption || isExclusion
+  }
+
+  fun includeExceptionOnSummary(): Boolean {
+    return (isExemption || isExclusion) && includeExemptionOnSummary
+  }
 }

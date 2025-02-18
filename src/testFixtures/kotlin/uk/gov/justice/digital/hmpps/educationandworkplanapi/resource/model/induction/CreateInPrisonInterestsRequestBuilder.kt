@@ -9,26 +9,23 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPri
 fun aValidCreateInPrisonInterestsRequest(
   inPrisonWorkInterests: List<InPrisonWorkInterest> = listOf(aValidInPrisonWorkInterest()),
   inPrisonTrainingInterests: List<InPrisonTrainingInterest> = listOf(aValidInPrisonTrainingInterest()),
-): CreateInPrisonInterestsRequest =
-  CreateInPrisonInterestsRequest(
-    inPrisonWorkInterests = inPrisonWorkInterests,
-    inPrisonTrainingInterests = inPrisonTrainingInterests,
-  )
+): CreateInPrisonInterestsRequest = CreateInPrisonInterestsRequest(
+  inPrisonWorkInterests = inPrisonWorkInterests,
+  inPrisonTrainingInterests = inPrisonTrainingInterests,
+)
 
 fun aValidInPrisonWorkInterest(
   workType: InPrisonWorkType = InPrisonWorkType.OTHER,
   workTypeOther: String? = "Any in-prison work",
-): InPrisonWorkInterest =
-  InPrisonWorkInterest(
-    workType = workType,
-    workTypeOther = workTypeOther,
-  )
+): InPrisonWorkInterest = InPrisonWorkInterest(
+  workType = workType,
+  workTypeOther = workTypeOther,
+)
 
 fun aValidInPrisonTrainingInterest(
   trainingType: InPrisonTrainingType = InPrisonTrainingType.OTHER,
   trainingTypeOther: String? = "Any in-prison training",
-): InPrisonTrainingInterest =
-  InPrisonTrainingInterest(
-    trainingType = trainingType,
-    trainingTypeOther = trainingTypeOther,
-  )
+): InPrisonTrainingInterest = InPrisonTrainingInterest(
+  trainingType = trainingType,
+  trainingTypeOther = trainingTypeOther,
+)

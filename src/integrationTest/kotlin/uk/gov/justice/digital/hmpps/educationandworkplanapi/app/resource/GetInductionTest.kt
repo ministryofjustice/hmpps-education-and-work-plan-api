@@ -76,7 +76,6 @@ class GetInductionTest : IntegrationTestBase() {
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(),
       username = "asmith_gen",
-      displayName = "Alex Smith",
     )
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork()
     val expectedPreviousQualifications =
@@ -101,8 +100,8 @@ class GetInductionTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("asmith_gen")
       .wasCreatedByDisplayName("Alex Smith")
       .wasUpdatedBy("asmith_gen")
@@ -127,7 +126,6 @@ class GetInductionTest : IntegrationTestBase() {
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerLookingToWork(),
       username = "asmith_gen",
-      displayName = "Alex Smith",
     )
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerLookingToWork()
     val expectedPreviousQualifications = aValidPreviousQualificationsResponse()
@@ -153,8 +151,8 @@ class GetInductionTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
-      .wasCreatedAfter(initialDateTime)
-      .wasUpdatedAfter(initialDateTime)
+      .wasCreatedAtOrAfter(initialDateTime)
+      .wasUpdatedAtOrAfter(initialDateTime)
       .wasCreatedBy("asmith_gen")
       .wasCreatedByDisplayName("Alex Smith")
       .wasUpdatedBy("asmith_gen")

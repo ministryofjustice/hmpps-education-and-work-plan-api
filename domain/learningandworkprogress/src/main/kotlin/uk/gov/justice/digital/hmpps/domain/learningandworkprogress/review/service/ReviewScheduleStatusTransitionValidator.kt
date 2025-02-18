@@ -5,8 +5,10 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Invali
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_MERGE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_UNKNOWN
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.SCHEDULED
 
 private val log = KotlinLogging.logger {}
@@ -64,6 +66,8 @@ class ReviewScheduleStatusTransitionValidator {
       EXEMPT_PRISONER_TRANSFER,
       EXEMPT_PRISONER_RELEASE,
       EXEMPT_PRISONER_DEATH,
+      EXEMPT_PRISONER_MERGE,
+      EXEMPT_UNKNOWN,
       COMPLETED,
     )
   }

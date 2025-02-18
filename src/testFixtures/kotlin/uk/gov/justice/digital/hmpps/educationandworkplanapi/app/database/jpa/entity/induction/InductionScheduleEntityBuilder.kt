@@ -16,20 +16,23 @@ fun aPersistedInductionScheduleEntity(
   createdAt: Instant = Instant.now(),
   updatedAt: Instant = Instant.now(),
   updatedBy: String = "auser_gen",
-): InductionScheduleEntity =
-  InductionScheduleEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    deadlineDate = deadlineDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+  createdAtPrison: String = "BXI",
+  updatedAtPrison: String = "BXI",
+): InductionScheduleEntity = InductionScheduleEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  deadlineDate = deadlineDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun anUnPersistedInductionScheduleEntity(
   reference: UUID = UUID.randomUUID(),
@@ -37,11 +40,14 @@ fun anUnPersistedInductionScheduleEntity(
   deadlineDate: LocalDate = LocalDate.now().plusDays(30),
   scheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
   scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
-): InductionScheduleEntity =
-  InductionScheduleEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    deadlineDate = deadlineDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-  )
+  createdAtPrison: String = "BXI",
+  updatedAtPrison: String = "BXI",
+): InductionScheduleEntity = InductionScheduleEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  deadlineDate = deadlineDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  updatedAtPrison = updatedAtPrison,
+  createdAtPrison = createdAtPrison,
+)
