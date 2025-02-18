@@ -286,7 +286,8 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(2) { // the 2nd Timeline event will be the INDUCTION_UPDATED event
+      .event(2) {
+        // the 2nd Timeline event will be the INDUCTION_UPDATED event
         it.hasEventType(TimelineEventType.INDUCTION_UPDATED)
           .wasActionedBy(updateUsername)
           .hasActionedByDisplayName(updateDisplayName)
@@ -435,7 +436,8 @@ class UpdateInductionTest : IntegrationTestBase() {
 
     val timeline = getTimeline(prisonNumber)
     assertThat(timeline)
-      .event(2) { // the 2nd Timeline event will be the INDUCTION_UPDATED event
+      .event(2) {
+        // the 2nd Timeline event will be the INDUCTION_UPDATED event
         it.hasEventType(TimelineEventType.INDUCTION_UPDATED)
           .wasActionedBy(updateUsername)
           .hasActionedByDisplayName(updateDisplayName)

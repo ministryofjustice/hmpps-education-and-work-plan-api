@@ -8,9 +8,8 @@ fun aValidTimelineResponse(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "",
   events: List<TimelineEventResponse> = listOf(aValidTimelineEventResponse()),
-): TimelineResponse =
-  TimelineResponse(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    events = events,
-  )
+): TimelineResponse = TimelineResponse(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  events = events,
+)

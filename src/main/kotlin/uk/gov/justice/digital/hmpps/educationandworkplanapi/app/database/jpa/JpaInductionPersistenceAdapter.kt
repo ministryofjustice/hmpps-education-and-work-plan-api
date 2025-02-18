@@ -57,15 +57,14 @@ class JpaInductionPersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
-  override fun getInduction(prisonNumber: String): Induction? =
-    inductionRepository.findByPrisonNumber(prisonNumber)?.let {
-      val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
-      val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
-        entityReference = it.reference!!,
-        entityType = EntityType.INDUCTION,
-      ).firstOrNull()
-      inductionMapper.fromEntityToDomain(it, previousQualificationsEntity, noteEntity)
-    }
+  override fun getInduction(prisonNumber: String): Induction? = inductionRepository.findByPrisonNumber(prisonNumber)?.let {
+    val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
+    val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
+      entityReference = it.reference!!,
+      entityType = EntityType.INDUCTION,
+    ).firstOrNull()
+    inductionMapper.fromEntityToDomain(it, previousQualificationsEntity, noteEntity)
+  }
 
   @Transactional
   override fun updateInduction(updateInductionDto: UpdateInductionDto): Induction? {
@@ -87,10 +86,9 @@ class JpaInductionPersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
-  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> =
-    inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
-      inductionMapper.fromEntitySummariesToDomainSummaries(it)
-    }
+  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> = inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
+    inductionMapper.fromEntitySummariesToDomainSummaries(it)
+  }
 
   private fun createOrUpdatePreviousQualifications(updateInductionDto: UpdateInductionDto): PreviousQualificationsEntity? {
     val prisonNumber = updateInductionDto.prisonNumber

@@ -39,24 +39,22 @@ class PefInductionScheduleDateCalculationService(
     prisonId: String,
     newAdmission: Boolean,
     releaseDate: LocalDate?,
-  ): CreateInductionScheduleDto {
-    return if (newAdmission) {
-      CreateInductionScheduleDto(
-        prisonNumber = prisonNumber,
-        deadlineDate = latestOf(admissionDate, scheduleDateNotBefore).plusDays(DAYS_AFTER_ADMISSION),
-        scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
-        scheduleStatus = InductionScheduleStatus.SCHEDULED,
-        prisonId = prisonId,
-      )
-    } else {
-      CreateInductionScheduleDto(
-        prisonNumber = prisonNumber,
-        deadlineDate = calculateDeadlineDate(releaseDate),
-        scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
-        scheduleStatus = InductionScheduleStatus.SCHEDULED,
-        prisonId = prisonId,
-      )
-    }
+  ): CreateInductionScheduleDto = if (newAdmission) {
+    CreateInductionScheduleDto(
+      prisonNumber = prisonNumber,
+      deadlineDate = latestOf(admissionDate, scheduleDateNotBefore).plusDays(DAYS_AFTER_ADMISSION),
+      scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+      scheduleStatus = InductionScheduleStatus.SCHEDULED,
+      prisonId = prisonId,
+    )
+  } else {
+    CreateInductionScheduleDto(
+      prisonNumber = prisonNumber,
+      deadlineDate = calculateDeadlineDate(releaseDate),
+      scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
+      scheduleStatus = InductionScheduleStatus.SCHEDULED,
+      prisonId = prisonId,
+    )
   }
 
   private fun calculateDeadlineDate(releaseDate: LocalDate?): LocalDate {
@@ -69,10 +67,9 @@ class PefInductionScheduleDateCalculationService(
     }
   }
 
-  private fun latestOf(admissionDate: LocalDate, scheduleDateNotBefore: LocalDate?): LocalDate =
-    if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(admissionDate)) {
-      scheduleDateNotBefore
-    } else {
-      admissionDate
-    }
+  private fun latestOf(admissionDate: LocalDate, scheduleDateNotBefore: LocalDate?): LocalDate = if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(admissionDate)) {
+    scheduleDateNotBefore
+  } else {
+    admissionDate
+  }
 }

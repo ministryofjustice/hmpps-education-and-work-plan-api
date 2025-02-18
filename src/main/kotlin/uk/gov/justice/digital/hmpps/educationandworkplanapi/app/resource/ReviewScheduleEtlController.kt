@@ -132,11 +132,9 @@ class ReviewScheduleEtlController(
   }
 
   @ExceptionHandler(value = [ReviewSchedulesEtlRollbackException::class])
-  fun handleReviewSchedulesEtlRollbackException(e: ReviewSchedulesEtlRollbackException): ResponseEntity<Any> {
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(e.reviewSchedulesEtlResponse)
-  }
+  fun handleReviewSchedulesEtlRollbackException(e: ReviewSchedulesEtlRollbackException): ResponseEntity<Any> = ResponseEntity
+    .status(HttpStatus.OK)
+    .body(e.reviewSchedulesEtlResponse)
 }
 
 data class ReviewSchedulesEtlResponse(

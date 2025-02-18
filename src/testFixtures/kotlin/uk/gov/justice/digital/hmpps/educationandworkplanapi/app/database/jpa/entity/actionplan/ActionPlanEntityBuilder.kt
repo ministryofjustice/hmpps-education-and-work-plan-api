@@ -12,15 +12,14 @@ fun aValidActionPlanEntity(
   createdBy: String? = "asmith_gen",
   updatedAt: Instant? = Instant.now(),
   updatedBy: String? = "bjones_gen",
-): ActionPlanEntity =
-  ActionPlanEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    goals = goals.toMutableList(),
-  ).apply {
-    this.id = id
-    this.createdAt = createdAt
-    this.createdBy = createdBy
-    this.updatedAt = updatedAt
-    this.updatedBy = updatedBy
-  }
+): ActionPlanEntity = ActionPlanEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  goals = goals.toMutableList(),
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}

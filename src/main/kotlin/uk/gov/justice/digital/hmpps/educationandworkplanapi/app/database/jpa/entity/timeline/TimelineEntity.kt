@@ -50,12 +50,11 @@ data class TimelineEntity(
      * Returns new un-persisted [TimelineEntity] for the specified prisoner with an empty collection of
      * [TimelineEventEntity]s.
      */
-    fun newTimelineForPrisoner(prisonNumber: String): TimelineEntity =
-      TimelineEntity(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        events = mutableListOf(),
-      )
+    fun newTimelineForPrisoner(prisonNumber: String): TimelineEntity = TimelineEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      events = mutableListOf(),
+    )
   }
 
   fun addEvent(timelineEvent: TimelineEventEntity): TimelineEntity {
@@ -73,7 +72,5 @@ data class TimelineEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, prisonNumber = $prisonNumber)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, prisonNumber = $prisonNumber)"
 }

@@ -12,10 +12,9 @@ class ManageUserService(
   private val manageUsersApiClient: ManageUsersApiClient,
 ) {
   @Cacheable(USER_DETAILS)
-  fun getUserDetails(username: String): UserDetailsDto =
-    if (username == SYSTEM_USER) {
-      UserDetailsDto(username, true, username)
-    } else {
-      manageUsersApiClient.getUserDetails(username)
-    }
+  fun getUserDetails(username: String): UserDetailsDto = if (username == SYSTEM_USER) {
+    UserDetailsDto(username, true, username)
+  } else {
+    manageUsersApiClient.getUserDetails(username)
+  }
 }

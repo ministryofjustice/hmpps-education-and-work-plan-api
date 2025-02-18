@@ -102,16 +102,14 @@ class GlobalExceptionHandler(
   protected fun handleNoArchiveReasonException(
     e: RuntimeException,
     request: WebRequest,
-  ): ResponseEntity<Any> {
-    return ResponseEntity
-      .status(BAD_REQUEST)
-      .body(
-        ErrorResponse(
-          status = BAD_REQUEST.value(),
-          userMessage = e.message,
-        ),
-      )
-  }
+  ): ResponseEntity<Any> = ResponseEntity
+    .status(BAD_REQUEST)
+    .body(
+      ErrorResponse(
+        status = BAD_REQUEST.value(),
+        userMessage = e.message,
+      ),
+    )
 
   /**
    * Exception handler to return a 403 Forbidden ErrorResponse for a prohibited action (e.g. a business rule violation).
@@ -238,9 +236,7 @@ class GlobalExceptionHandler(
     headers: HttpHeaders,
     status: HttpStatusCode,
     request: WebRequest,
-  ): ResponseEntity<Any>? {
-    return populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
-  }
+  ): ResponseEntity<Any>? = populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
 
   /**
    * Overrides the HttpMessageNotReadableException exception handler to return a 400 Bad Request ErrorResponse
@@ -250,9 +246,7 @@ class GlobalExceptionHandler(
     headers: HttpHeaders,
     status: HttpStatusCode,
     request: WebRequest,
-  ): ResponseEntity<Any>? {
-    return populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
-  }
+  ): ResponseEntity<Any>? = populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
 
   @ExceptionHandler(Exception::class)
   fun unexpectedExceptionHandler(e: Exception, request: WebRequest): ResponseEntity<Any>? {

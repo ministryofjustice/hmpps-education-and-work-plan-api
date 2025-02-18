@@ -39,37 +39,32 @@ class PrisonApiMapper {
     return admissionsAndReleases
   }
 
-  private fun buildTransfers(transfers: List<TransferDetail>): List<PrisonMovementEvent> =
-    transfers.map {
-      PrisonMovementEvent(
-        date = it.dateInToPrison.toLocalDate(),
-        movementType = PrisonMovementType.TRANSFER,
-        fromPrisonId = it.fromPrisonId,
-        toPrisonId = it.toPrisonId,
-      )
-    } ?: emptyList()
-
-  private fun toPrisonAdmissionEvent(movement: SignificantMovement): PrisonMovementEvent =
+  private fun buildTransfers(transfers: List<TransferDetail>): List<PrisonMovementEvent> = transfers.map {
     PrisonMovementEvent(
-      date = movement.dateInToPrison.toLocalDate(),
-      movementType = PrisonMovementType.ADMISSION,
-      fromPrisonId = null,
-      toPrisonId = movement.admittedIntoPrisonId,
+      date = it.dateInToPrison.toLocalDate(),
+      movementType = PrisonMovementType.TRANSFER,
+      fromPrisonId = it.fromPrisonId,
+      toPrisonId = it.toPrisonId,
     )
+  } ?: emptyList()
 
-  private fun toPrisonReleaseEvent(movement: SignificantMovement): PrisonMovementEvent =
-    PrisonMovementEvent(
-      date = movement.dateOutOfPrison.toLocalDate(),
-      movementType = PrisonMovementType.RELEASE,
-      fromPrisonId = movement.releaseFromPrisonId,
-      toPrisonId = null,
-    )
+  private fun toPrisonAdmissionEvent(movement: SignificantMovement): PrisonMovementEvent = PrisonMovementEvent(
+    date = movement.dateInToPrison.toLocalDate(),
+    movementType = PrisonMovementType.ADMISSION,
+    fromPrisonId = null,
+    toPrisonId = movement.admittedIntoPrisonId,
+  )
 
-  private fun isAdmissionIntoPrison(it: SignificantMovement) =
-    it.inwardType == SignificantMovement.InwardType.ADM
+  private fun toPrisonReleaseEvent(movement: SignificantMovement): PrisonMovementEvent = PrisonMovementEvent(
+    date = movement.dateOutOfPrison.toLocalDate(),
+    movementType = PrisonMovementType.RELEASE,
+    fromPrisonId = movement.releaseFromPrisonId,
+    toPrisonId = null,
+  )
 
-  private fun isReleaseFromPrison(it: SignificantMovement) =
-    it.outwardType == SignificantMovement.OutwardType.REL
+  private fun isAdmissionIntoPrison(it: SignificantMovement) = it.inwardType == SignificantMovement.InwardType.ADM
+
+  private fun isReleaseFromPrison(it: SignificantMovement) = it.outwardType == SignificantMovement.OutwardType.REL
 
   private fun String?.toLocalDate() = LocalDate.parse(this, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 }

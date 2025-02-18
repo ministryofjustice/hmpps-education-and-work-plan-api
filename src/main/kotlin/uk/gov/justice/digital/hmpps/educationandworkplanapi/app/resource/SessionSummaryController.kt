@@ -22,16 +22,12 @@ class SessionSummaryController(private val sessionSummaryService: SessionSummary
 
   @GetMapping("/{prisonId}/summary")
   @PreAuthorize(HAS_EDIT_SESSIONS)
-  fun getSessionSummary(@PathVariable @Pattern(regexp = PRISON_ID_FORMAT) prisonId: String): SessionSummaryResponse {
-    return sessionSummaryService.getSessionSummaries(prisonId)
-  }
+  fun getSessionSummary(@PathVariable @Pattern(regexp = PRISON_ID_FORMAT) prisonId: String): SessionSummaryResponse = sessionSummaryService.getSessionSummaries(prisonId)
 
   @PostMapping("/summary")
   @PreAuthorize(HAS_EDIT_SESSIONS)
   fun getSessionSummaries(
     @RequestParam(required = true) status: SessionStatusType,
     @RequestBody requestIds: PrisonerIdsRequest,
-  ): SessionResponses {
-    return sessionSummaryService.getSessions(status, requestIds)
-  }
+  ): SessionResponses = sessionSummaryService.getSessions(status, requestIds)
 }

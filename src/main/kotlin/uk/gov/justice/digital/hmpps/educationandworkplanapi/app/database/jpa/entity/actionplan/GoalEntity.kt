@@ -94,9 +94,7 @@ data class GoalEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, title = $title)"
 }
 
 enum class GoalStatus {

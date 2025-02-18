@@ -27,134 +27,121 @@ class EducationResourceMapper(
   private val userService: ManageUserService,
 ) {
 
-  fun toEducationResponse(previousQualifications: PreviousQualifications): EducationResponse =
-    EducationResponse(
-      reference = previousQualifications.reference,
-      createdAt = instantMapper.toOffsetDateTime(previousQualifications.createdAt)!!,
-      createdAtPrison = previousQualifications.createdAtPrison,
-      createdBy = previousQualifications.createdBy!!,
-      createdByDisplayName = userService.getUserDetails(previousQualifications.createdBy!!).name,
-      updatedAt = instantMapper.toOffsetDateTime(previousQualifications.lastUpdatedAt)!!,
-      updatedAtPrison = previousQualifications.lastUpdatedAtPrison,
-      updatedBy = previousQualifications.lastUpdatedBy!!,
-      updatedByDisplayName = userService.getUserDetails(previousQualifications.lastUpdatedBy!!).name,
-      educationLevel = toEducationLevel(previousQualifications.educationLevel),
-      qualifications = toAchievedQualificationResponses(previousQualifications.qualifications),
+  fun toEducationResponse(previousQualifications: PreviousQualifications): EducationResponse = EducationResponse(
+    reference = previousQualifications.reference,
+    createdAt = instantMapper.toOffsetDateTime(previousQualifications.createdAt)!!,
+    createdAtPrison = previousQualifications.createdAtPrison,
+    createdBy = previousQualifications.createdBy!!,
+    createdByDisplayName = userService.getUserDetails(previousQualifications.createdBy!!).name,
+    updatedAt = instantMapper.toOffsetDateTime(previousQualifications.lastUpdatedAt)!!,
+    updatedAtPrison = previousQualifications.lastUpdatedAtPrison,
+    updatedBy = previousQualifications.lastUpdatedBy!!,
+    updatedByDisplayName = userService.getUserDetails(previousQualifications.lastUpdatedBy!!).name,
+    educationLevel = toEducationLevel(previousQualifications.educationLevel),
+    qualifications = toAchievedQualificationResponses(previousQualifications.qualifications),
+  )
+
+  fun toCreatePreviousQualificationsDto(prisonNumber: String, request: CreateEducationRequest): CreatePreviousQualificationsDto = CreatePreviousQualificationsDto(
+    prisonNumber = prisonNumber,
+    educationLevel = toEducationLevel(request.educationLevel),
+    qualifications = toCreateQualificationDtos(request.qualifications, request.prisonId),
+    prisonId = request.prisonId,
+  )
+
+  fun toUpdatePreviousQualificationsDto(prisonNumber: String, request: UpdateEducationRequest): UpdatePreviousQualificationsDto = UpdatePreviousQualificationsDto(
+    reference = request.reference,
+    prisonNumber = prisonNumber,
+    prisonId = request.prisonId,
+    educationLevel = toEducationLevel(request.educationLevel),
+    qualifications = toUpdateOrCreateQualificationDtos(request.qualifications, request.prisonId),
+  )
+
+  private fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse = AchievedQualificationResponse(
+    reference = qualification.reference,
+    createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
+    createdBy = qualification.createdBy,
+    createdAtPrison = qualification.createdAtPrison,
+    updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
+    updatedBy = qualification.lastUpdatedBy,
+    updatedAtPrison = qualification.lastUpdatedAtPrison,
+    subject = qualification.subject,
+    level = toQualificationLevel(qualification.level),
+    grade = qualification.grade,
+  )
+
+  private fun toAchievedQualificationResponses(qualifications: List<Qualification>): List<AchievedQualificationResponse> = qualifications.map { toAchievedQualificationResponse(it) }
+
+  private fun toCreateQualificationDto(createAchievedQualificationRequest: CreateAchievedQualificationRequest, prisonId: String): CreateQualificationDto = with(createAchievedQualificationRequest) {
+    CreateQualificationDto(
+      subject = subject,
+      level = toQualificationLevel(level),
+      grade = grade,
+      prisonId = prisonId,
     )
+  }
 
-  fun toCreatePreviousQualificationsDto(prisonNumber: String, request: CreateEducationRequest): CreatePreviousQualificationsDto =
-    CreatePreviousQualificationsDto(
-      prisonNumber = prisonNumber,
-      educationLevel = toEducationLevel(request.educationLevel),
-      qualifications = toCreateQualificationDtos(request.qualifications, request.prisonId),
-      prisonId = request.prisonId,
+  private fun toCreateQualificationDtos(createAchievedQualificationRequests: List<CreateAchievedQualificationRequest>, prisonId: String): List<CreateQualificationDto> = createAchievedQualificationRequests.map { toCreateQualificationDto(it, prisonId) }
+
+  private fun toCreateOrUpdateQualificationDto(achievedQualificationRequest: CreateOrUpdateAchievedQualificationRequest, prisonId: String): UpdateOrCreateQualificationDto = if (achievedQualificationRequest.reference == null) {
+    CreateQualificationDto(
+      subject = achievedQualificationRequest.subject,
+      level = toQualificationLevel(achievedQualificationRequest.level),
+      grade = achievedQualificationRequest.grade,
+      prisonId = prisonId,
     )
-
-  fun toUpdatePreviousQualificationsDto(prisonNumber: String, request: UpdateEducationRequest): UpdatePreviousQualificationsDto =
-    UpdatePreviousQualificationsDto(
-      reference = request.reference,
-      prisonNumber = prisonNumber,
-      prisonId = request.prisonId,
-      educationLevel = toEducationLevel(request.educationLevel),
-      qualifications = toUpdateOrCreateQualificationDtos(request.qualifications, request.prisonId),
+  } else {
+    UpdateQualificationDto(
+      reference = achievedQualificationRequest.reference,
+      subject = achievedQualificationRequest.subject,
+      level = toQualificationLevel(achievedQualificationRequest.level),
+      grade = achievedQualificationRequest.grade,
+      prisonId = prisonId,
     )
+  }
 
-  private fun toAchievedQualificationResponse(qualification: Qualification): AchievedQualificationResponse =
-    AchievedQualificationResponse(
-      reference = qualification.reference,
-      createdAt = instantMapper.toOffsetDateTime(qualification.createdAt)!!,
-      createdBy = qualification.createdBy,
-      createdAtPrison = qualification.createdAtPrison,
-      updatedAt = instantMapper.toOffsetDateTime(qualification.lastUpdatedAt)!!,
-      updatedBy = qualification.lastUpdatedBy,
-      updatedAtPrison = qualification.lastUpdatedAtPrison,
-      subject = qualification.subject,
-      level = toQualificationLevel(qualification.level),
-      grade = qualification.grade,
-    )
+  private fun toUpdateOrCreateQualificationDtos(createOrUpdateAchievedQualificationRequests: List<CreateOrUpdateAchievedQualificationRequest>, prisonId: String): List<UpdateOrCreateQualificationDto> = createOrUpdateAchievedQualificationRequests.map { toCreateOrUpdateQualificationDto(it, prisonId) }
 
-  private fun toAchievedQualificationResponses(qualifications: List<Qualification>): List<AchievedQualificationResponse> =
-    qualifications.map { toAchievedQualificationResponse(it) }
+  private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelApi = when (educationLevel) {
+    EducationLevelDomain.NOT_SURE -> EducationLevelApi.NOT_SURE
+    EducationLevelDomain.PRIMARY_SCHOOL -> EducationLevelApi.PRIMARY_SCHOOL
+    EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+    EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS
+    EducationLevelDomain.FURTHER_EDUCATION_COLLEGE -> EducationLevelApi.FURTHER_EDUCATION_COLLEGE
+    EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
+    EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY
+  }
 
-  private fun toCreateQualificationDto(createAchievedQualificationRequest: CreateAchievedQualificationRequest, prisonId: String): CreateQualificationDto =
-    with(createAchievedQualificationRequest) {
-      CreateQualificationDto(
-        subject = subject,
-        level = toQualificationLevel(level),
-        grade = grade,
-        prisonId = prisonId,
-      )
-    }
+  private fun toEducationLevel(educationLevel: EducationLevelApi): EducationLevelDomain = when (educationLevel) {
+    EducationLevelApi.NOT_SURE -> EducationLevelDomain.NOT_SURE
+    EducationLevelApi.PRIMARY_SCHOOL -> EducationLevelDomain.PRIMARY_SCHOOL
+    EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
+    EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS
+    EducationLevelApi.FURTHER_EDUCATION_COLLEGE -> EducationLevelDomain.FURTHER_EDUCATION_COLLEGE
+    EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
+    EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY
+  }
 
-  private fun toCreateQualificationDtos(createAchievedQualificationRequests: List<CreateAchievedQualificationRequest>, prisonId: String): List<CreateQualificationDto> =
-    createAchievedQualificationRequests.map { toCreateQualificationDto(it, prisonId) }
+  private fun toQualificationLevel(qualificationLevel: QualificationLevelDomain): QualificationLevelApi = when (qualificationLevel) {
+    QualificationLevelDomain.ENTRY_LEVEL -> QualificationLevelApi.ENTRY_LEVEL
+    QualificationLevelDomain.LEVEL_1 -> QualificationLevelApi.LEVEL_1
+    QualificationLevelDomain.LEVEL_2 -> QualificationLevelApi.LEVEL_2
+    QualificationLevelDomain.LEVEL_3 -> QualificationLevelApi.LEVEL_3
+    QualificationLevelDomain.LEVEL_4 -> QualificationLevelApi.LEVEL_4
+    QualificationLevelDomain.LEVEL_5 -> QualificationLevelApi.LEVEL_5
+    QualificationLevelDomain.LEVEL_6 -> QualificationLevelApi.LEVEL_6
+    QualificationLevelDomain.LEVEL_7 -> QualificationLevelApi.LEVEL_7
+    QualificationLevelDomain.LEVEL_8 -> QualificationLevelApi.LEVEL_8
+  }
 
-  private fun toCreateOrUpdateQualificationDto(achievedQualificationRequest: CreateOrUpdateAchievedQualificationRequest, prisonId: String): UpdateOrCreateQualificationDto =
-    if (achievedQualificationRequest.reference == null) {
-      CreateQualificationDto(
-        subject = achievedQualificationRequest.subject,
-        level = toQualificationLevel(achievedQualificationRequest.level),
-        grade = achievedQualificationRequest.grade,
-        prisonId = prisonId,
-      )
-    } else {
-      UpdateQualificationDto(
-        reference = achievedQualificationRequest.reference,
-        subject = achievedQualificationRequest.subject,
-        level = toQualificationLevel(achievedQualificationRequest.level),
-        grade = achievedQualificationRequest.grade,
-        prisonId = prisonId,
-      )
-    }
-
-  private fun toUpdateOrCreateQualificationDtos(createOrUpdateAchievedQualificationRequests: List<CreateOrUpdateAchievedQualificationRequest>, prisonId: String): List<UpdateOrCreateQualificationDto> =
-    createOrUpdateAchievedQualificationRequests.map { toCreateOrUpdateQualificationDto(it, prisonId) }
-
-  private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelApi =
-    when (educationLevel) {
-      EducationLevelDomain.NOT_SURE -> EducationLevelApi.NOT_SURE
-      EducationLevelDomain.PRIMARY_SCHOOL -> EducationLevelApi.PRIMARY_SCHOOL
-      EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
-      EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS
-      EducationLevelDomain.FURTHER_EDUCATION_COLLEGE -> EducationLevelApi.FURTHER_EDUCATION_COLLEGE
-      EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
-      EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY
-    }
-
-  private fun toEducationLevel(educationLevel: EducationLevelApi): EducationLevelDomain =
-    when (educationLevel) {
-      EducationLevelApi.NOT_SURE -> EducationLevelDomain.NOT_SURE
-      EducationLevelApi.PRIMARY_SCHOOL -> EducationLevelDomain.PRIMARY_SCHOOL
-      EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
-      EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS
-      EducationLevelApi.FURTHER_EDUCATION_COLLEGE -> EducationLevelDomain.FURTHER_EDUCATION_COLLEGE
-      EducationLevelApi.UNDERGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.UNDERGRADUATE_DEGREE_AT_UNIVERSITY
-      EducationLevelApi.POSTGRADUATE_DEGREE_AT_UNIVERSITY -> EducationLevelDomain.POSTGRADUATE_DEGREE_AT_UNIVERSITY
-    }
-
-  private fun toQualificationLevel(qualificationLevel: QualificationLevelDomain): QualificationLevelApi =
-    when (qualificationLevel) {
-      QualificationLevelDomain.ENTRY_LEVEL -> QualificationLevelApi.ENTRY_LEVEL
-      QualificationLevelDomain.LEVEL_1 -> QualificationLevelApi.LEVEL_1
-      QualificationLevelDomain.LEVEL_2 -> QualificationLevelApi.LEVEL_2
-      QualificationLevelDomain.LEVEL_3 -> QualificationLevelApi.LEVEL_3
-      QualificationLevelDomain.LEVEL_4 -> QualificationLevelApi.LEVEL_4
-      QualificationLevelDomain.LEVEL_5 -> QualificationLevelApi.LEVEL_5
-      QualificationLevelDomain.LEVEL_6 -> QualificationLevelApi.LEVEL_6
-      QualificationLevelDomain.LEVEL_7 -> QualificationLevelApi.LEVEL_7
-      QualificationLevelDomain.LEVEL_8 -> QualificationLevelApi.LEVEL_8
-    }
-
-  private fun toQualificationLevel(qualificationLevel: QualificationLevelApi): QualificationLevelDomain =
-    when (qualificationLevel) {
-      QualificationLevelApi.ENTRY_LEVEL -> QualificationLevelDomain.ENTRY_LEVEL
-      QualificationLevelApi.LEVEL_1 -> QualificationLevelDomain.LEVEL_1
-      QualificationLevelApi.LEVEL_2 -> QualificationLevelDomain.LEVEL_2
-      QualificationLevelApi.LEVEL_3 -> QualificationLevelDomain.LEVEL_3
-      QualificationLevelApi.LEVEL_4 -> QualificationLevelDomain.LEVEL_4
-      QualificationLevelApi.LEVEL_5 -> QualificationLevelDomain.LEVEL_5
-      QualificationLevelApi.LEVEL_6 -> QualificationLevelDomain.LEVEL_6
-      QualificationLevelApi.LEVEL_7 -> QualificationLevelDomain.LEVEL_7
-      QualificationLevelApi.LEVEL_8 -> QualificationLevelDomain.LEVEL_8
-    }
+  private fun toQualificationLevel(qualificationLevel: QualificationLevelApi): QualificationLevelDomain = when (qualificationLevel) {
+    QualificationLevelApi.ENTRY_LEVEL -> QualificationLevelDomain.ENTRY_LEVEL
+    QualificationLevelApi.LEVEL_1 -> QualificationLevelDomain.LEVEL_1
+    QualificationLevelApi.LEVEL_2 -> QualificationLevelDomain.LEVEL_2
+    QualificationLevelApi.LEVEL_3 -> QualificationLevelDomain.LEVEL_3
+    QualificationLevelApi.LEVEL_4 -> QualificationLevelDomain.LEVEL_4
+    QualificationLevelApi.LEVEL_5 -> QualificationLevelDomain.LEVEL_5
+    QualificationLevelApi.LEVEL_6 -> QualificationLevelDomain.LEVEL_6
+    QualificationLevelApi.LEVEL_7 -> QualificationLevelDomain.LEVEL_7
+    QualificationLevelApi.LEVEL_8 -> QualificationLevelDomain.LEVEL_8
+  }
 }

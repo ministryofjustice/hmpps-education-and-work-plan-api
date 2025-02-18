@@ -22,10 +22,9 @@ fun aValidHmppsDomainEventsSqsMessage(
       PRISONER_RELEASED_FROM_PRISON -> aValidPrisonerReleasedAdditionalInformation(prisonNumber)
       PRISONER_MERGED -> aValidPrisonerMergedAdditionalInformation(prisonNumber, removedNomsNumber)
     },
-): SqsMessage =
-  SqsMessage(
-    Type = "Notification",
-    Message = """
+): SqsMessage = SqsMessage(
+  Type = "Notification",
+  Message = """
         {
           "eventType": "${eventType.eventType}",
           "personReference": { "identifiers": [ { "type": "NOMS", "value": "$prisonNumber" } ] },
@@ -35,6 +34,6 @@ fun aValidHmppsDomainEventsSqsMessage(
           "version": "$version",
           "additionalInformation": ${ObjectMapper().writeValueAsString(additionalInformation)}
         }        
-    """.trimIndent(),
-    MessageId = UUID.randomUUID(),
-  )
+  """.trimIndent(),
+  MessageId = UUID.randomUUID(),
+)

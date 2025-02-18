@@ -12,8 +12,7 @@ fun assertThat(actual: GoalEntity?) = GoalEntityAssert(actual)
 /**
  * AssertJ custom assertion for [GoalEntity]
  */
-class GoalEntityAssert(actual: GoalEntity?) :
-  AbstractObjectAssert<GoalEntityAssert, GoalEntity?>(actual, GoalEntityAssert::class.java) {
+class GoalEntityAssert(actual: GoalEntity?) : AbstractObjectAssert<GoalEntityAssert, GoalEntity?>(actual, GoalEntityAssert::class.java) {
 
   fun hasJpaManagedFieldsPopulated(): GoalEntityAssert {
     isNotNull

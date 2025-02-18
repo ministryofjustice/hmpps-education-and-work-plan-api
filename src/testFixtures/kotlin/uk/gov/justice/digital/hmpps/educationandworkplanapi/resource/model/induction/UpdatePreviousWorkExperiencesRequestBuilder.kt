@@ -10,10 +10,9 @@ fun aValidUpdatePreviousWorkExperiencesRequest(
   hasWorkedBefore: HasWorkedBefore = HasWorkedBefore.YES,
   hasWorkedBeforeNotRelevantReason: String? = null,
   experiences: List<PreviousWorkExperience>? = listOf(aValidPreviousWorkExperience()),
-): UpdatePreviousWorkExperiencesRequest =
-  UpdatePreviousWorkExperiencesRequest(
-    reference = reference,
-    hasWorkedBefore = hasWorkedBefore,
-    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
-    experiences = experiences,
-  )
+): UpdatePreviousWorkExperiencesRequest = UpdatePreviousWorkExperiencesRequest(
+  reference = reference,
+  hasWorkedBefore = hasWorkedBefore,
+  hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+  experiences = experiences,
+)

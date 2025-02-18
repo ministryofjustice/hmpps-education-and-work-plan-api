@@ -96,7 +96,8 @@ class ArchiveGoalTest : IntegrationTestBase() {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
         .hasNumberOfEvents(4)
-        .event(4) { // the 4th Timeline event will be the GOAL_ARCHIVED event
+        .event(4) {
+          // the 4th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -149,7 +150,8 @@ class ArchiveGoalTest : IntegrationTestBase() {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
         .hasNumberOfEvents(4)
-        .event(4) { // the 4th Timeline event will be the GOAL_ARCHIVED event
+        .event(4) {
+          // the 4th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")

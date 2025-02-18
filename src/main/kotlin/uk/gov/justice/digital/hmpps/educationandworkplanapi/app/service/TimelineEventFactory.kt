@@ -69,43 +69,41 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     return events
   }
 
-  private fun getInductionContextInfo(induction: Induction): Map<TimelineEventContext, String> =
-    with(induction) {
-      // The `completedDate` in the Induction can be used to determine whether the Induction was created using the original UI Induction journey,
-      // or the new journey that asks who conducted the Induction, what their role was and when.
-      // The `completedDate` property is nullable/optional in the domain class to be backward compatible with the old journey that does not ask it.
-      // In the new UI journey it is mandatory (in the UI), so we can use the presence of this field to know whether it was the new or old journey.
-      // For the new journey we need to write the contextualInfo fields as part of the timeline event, for the old journey we do not need to.
-      completedDate?.let {
-        val noteContent = note?.content ?: ""
-        val conductedByPerson = conductedBy ?: ""
-        val conductedByRolePerson = conductedByRole ?: ""
+  private fun getInductionContextInfo(induction: Induction): Map<TimelineEventContext, String> = with(induction) {
+    // The `completedDate` in the Induction can be used to determine whether the Induction was created using the original UI Induction journey,
+    // or the new journey that asks who conducted the Induction, what their role was and when.
+    // The `completedDate` property is nullable/optional in the domain class to be backward compatible with the old journey that does not ask it.
+    // In the new UI journey it is mandatory (in the UI), so we can use the presence of this field to know whether it was the new or old journey.
+    // For the new journey we need to write the contextualInfo fields as part of the timeline event, for the old journey we do not need to.
+    completedDate?.let {
+      val noteContent = note?.content ?: ""
+      val conductedByPerson = conductedBy ?: ""
+      val conductedByRolePerson = conductedByRole ?: ""
 
-        mapOf(
-          TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
-          TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(induction.createdBy!!).name,
-          TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
-          TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
-          *conductedBy
-            ?.let {
-              arrayOf(
-                TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to conductedByPerson,
-                TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to conductedByRolePerson,
-              )
-            } ?: arrayOf(),
-        )
-      }
-        ?: emptyMap()
+      mapOf(
+        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
+        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(induction.createdBy!!).name,
+        TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
+        TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
+        *conductedBy
+          ?.let {
+            arrayOf(
+              TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to conductedByPerson,
+              TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to conductedByRolePerson,
+            )
+          } ?: arrayOf(),
+      )
     }
+      ?: emptyMap()
+  }
 
-  fun goalCreatedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
-    buildTimelineEvent(
-      goal = goal,
-      sourceReference = goal.reference,
-      eventType = TimelineEventType.GOAL_CREATED,
-      contextualInfo = mapOf(GOAL_TITLE to goal.title),
-      correlationId = correlationId,
-    )
+  fun goalCreatedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) = buildTimelineEvent(
+    goal = goal,
+    sourceReference = goal.reference,
+    eventType = TimelineEventType.GOAL_CREATED,
+    contextualInfo = mapOf(GOAL_TITLE to goal.title),
+    correlationId = correlationId,
+  )
 
   /**
    * Determines what type of [TimelineEvent]s have occurred, following an update to a [Goal]. For example, whether its title
@@ -158,43 +156,39 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     return timelineEvents
   }
 
-  fun goalArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
-    buildTimelineEvent(
-      goal = goal,
-      sourceReference = goal.reference,
-      eventType = GOAL_ARCHIVED,
-      contextualInfo = listOfNotNull(
-        GOAL_TITLE to goal.title,
-        GOAL_ARCHIVED_REASON to goal.archiveReason!!.toString(),
-        goal.archiveReasonOther?.let { GOAL_ARCHIVED_REASON_OTHER to it },
-      ).toMap(),
-      correlationId = correlationId,
-    )
+  fun goalArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) = buildTimelineEvent(
+    goal = goal,
+    sourceReference = goal.reference,
+    eventType = GOAL_ARCHIVED,
+    contextualInfo = listOfNotNull(
+      GOAL_TITLE to goal.title,
+      GOAL_ARCHIVED_REASON to goal.archiveReason!!.toString(),
+      goal.archiveReasonOther?.let { GOAL_ARCHIVED_REASON_OTHER to it },
+    ).toMap(),
+    correlationId = correlationId,
+  )
 
-  fun goalCompletedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
-    buildTimelineEvent(
-      goal = goal,
-      sourceReference = goal.reference,
-      eventType = GOAL_COMPLETED,
-      contextualInfo = mapOf(GOAL_TITLE to goal.title),
-      correlationId = correlationId,
-    )
+  fun goalCompletedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) = buildTimelineEvent(
+    goal = goal,
+    sourceReference = goal.reference,
+    eventType = GOAL_COMPLETED,
+    contextualInfo = mapOf(GOAL_TITLE to goal.title),
+    correlationId = correlationId,
+  )
 
-  fun goalUnArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) =
-    buildTimelineEvent(
-      goal = goal,
-      sourceReference = goal.reference,
-      eventType = GOAL_UNARCHIVED,
-      contextualInfo = mapOf(GOAL_TITLE to goal.title),
-      correlationId = correlationId,
-    )
+  fun goalUnArchivedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) = buildTimelineEvent(
+    goal = goal,
+    sourceReference = goal.reference,
+    eventType = GOAL_UNARCHIVED,
+    contextualInfo = mapOf(GOAL_TITLE to goal.title),
+    correlationId = correlationId,
+  )
 
-  private fun hasGoalBeenUpdated(previousGoal: Goal, updatedGoal: Goal) =
-    updatedGoal.title != previousGoal.title ||
-      updatedGoal.steps.size != previousGoal.steps.size ||
-      updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
-      updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
-      updatedGoal.notes != previousGoal.notes
+  private fun hasGoalBeenUpdated(previousGoal: Goal, updatedGoal: Goal) = updatedGoal.title != previousGoal.title ||
+    updatedGoal.steps.size != previousGoal.steps.size ||
+    updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
+    updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
+    updatedGoal.notes != previousGoal.notes
 
   fun getStepUpdatedEvents(
     updatedGoal: Goal,
@@ -230,17 +224,15 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     return stepEvents
   }
 
-  private fun hasStepBeenUpdated(previousStep: Step?, updatedStep: Step) =
-    previousStep != null && (
+  private fun hasStepBeenUpdated(previousStep: Step?, updatedStep: Step) = previousStep != null &&
+    (
       updatedStep.title != previousStep.title ||
         updatedStep.sequenceNumber != previousStep.sequenceNumber
       )
 
-  private fun hasStepStatusChanged(previousStep: Step?, updatedStep: Step) =
-    previousStep != null && previousStep.status != updatedStep.status
+  private fun hasStepStatusChanged(previousStep: Step?, updatedStep: Step) = previousStep != null && previousStep.status != updatedStep.status
 
-  private fun getPreviousStep(previousSteps: List<Step>, updatedStep: Step): Step? =
-    previousSteps.firstOrNull { it.reference == updatedStep.reference }
+  private fun getPreviousStep(previousSteps: List<Step>, updatedStep: Step): Step? = previousSteps.firstOrNull { it.reference == updatedStep.reference }
 
   private fun getStepStatusEventType(step: Step): TimelineEventType {
     val eventType = when (step.status) {
@@ -257,92 +249,87 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     eventType: TimelineEventType,
     contextualInfo: Map<TimelineEventContext, String>,
     correlationId: UUID = UUID.randomUUID(),
-  ) =
-    TimelineEvent.newTimelineEvent(
-      sourceReference = sourceReference.toString(),
-      eventType = eventType,
-      // we can use the lastUpdatedBy fields for create action plan/create goal events, since it will be the same as the actionedBy fields initially
-      prisonId = goal.lastUpdatedAtPrison,
-      actionedBy = goal.lastUpdatedBy!!,
-      contextualInfo = contextualInfo,
-      correlationId = correlationId,
-    )
+  ) = TimelineEvent.newTimelineEvent(
+    sourceReference = sourceReference.toString(),
+    eventType = eventType,
+    // we can use the lastUpdatedBy fields for create action plan/create goal events, since it will be the same as the actionedBy fields initially
+    prisonId = goal.lastUpdatedAtPrison,
+    actionedBy = goal.lastUpdatedBy!!,
+    contextualInfo = contextualInfo,
+    correlationId = correlationId,
+  )
 
   fun inductionScheduleCreatedTimelineEvent(
     inductionSchedule: InductionSchedule,
     correlationId: UUID = UUID.randomUUID(),
-  ) =
-    with(inductionSchedule) {
-      TimelineEvent.newTimelineEvent(
-        sourceReference = reference.toString(),
-        eventType = INDUCTION_SCHEDULE_CREATED,
-        prisonId = "N/A",
-        actionedBy = lastUpdatedBy!!,
-        contextualInfo = mapOf(
-          INDUCTION_SCHEDULE_STATUS to scheduleStatus.name,
-          INDUCTION_SCHEDULE_DEADLINE_DATE to deadlineDate.toString(),
-        ),
-        correlationId = correlationId,
-      )
-    }
+  ) = with(inductionSchedule) {
+    TimelineEvent.newTimelineEvent(
+      sourceReference = reference.toString(),
+      eventType = INDUCTION_SCHEDULE_CREATED,
+      prisonId = "N/A",
+      actionedBy = lastUpdatedBy!!,
+      contextualInfo = mapOf(
+        INDUCTION_SCHEDULE_STATUS to scheduleStatus.name,
+        INDUCTION_SCHEDULE_DEADLINE_DATE to deadlineDate.toString(),
+      ),
+      correlationId = correlationId,
+    )
+  }
 
-  fun inductionScheduleStatusUpdatedEvent(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus): TimelineEvent =
-    with(updatedInductionScheduleStatus) {
-      TimelineEvent.newTimelineEvent(
-        sourceReference = reference.toString(),
-        eventType = INDUCTION_SCHEDULE_STATUS_UPDATED,
-        actionedBy = updatedBy,
-        timestamp = updatedAt,
-        prisonId = updatedAtPrison,
-        contextualInfo = mapOf(
-          INDUCTION_SCHEDULE_STATUS_OLD to oldStatus.name,
-          INDUCTION_SCHEDULE_STATUS_NEW to newStatus.name,
-          INDUCTION_SCHEDULE_DEADLINE_OLD to oldDeadlineDate.toString(),
-          INDUCTION_SCHEDULE_DEADLINE_NEW to newDeadlineDate.toString(),
-          *exemptionReason
-            ?.let {
-              arrayOf(INDUCTION_SCHEDULE_EXEMPTION_REASON to it)
-            } ?: arrayOf(),
-        ),
-      )
-    }
+  fun inductionScheduleStatusUpdatedEvent(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus): TimelineEvent = with(updatedInductionScheduleStatus) {
+    TimelineEvent.newTimelineEvent(
+      sourceReference = reference.toString(),
+      eventType = INDUCTION_SCHEDULE_STATUS_UPDATED,
+      actionedBy = updatedBy,
+      timestamp = updatedAt,
+      prisonId = updatedAtPrison,
+      contextualInfo = mapOf(
+        INDUCTION_SCHEDULE_STATUS_OLD to oldStatus.name,
+        INDUCTION_SCHEDULE_STATUS_NEW to newStatus.name,
+        INDUCTION_SCHEDULE_DEADLINE_OLD to oldDeadlineDate.toString(),
+        INDUCTION_SCHEDULE_DEADLINE_NEW to newDeadlineDate.toString(),
+        *exemptionReason
+          ?.let {
+            arrayOf(INDUCTION_SCHEDULE_EXEMPTION_REASON to it)
+          } ?: arrayOf(),
+      ),
+    )
+  }
 
   fun reviewScheduleCreatedTimelineEvent(
     reviewSchedule: ReviewSchedule,
     correlationId: UUID = UUID.randomUUID(),
-  ) =
-    with(reviewSchedule) {
-      TimelineEvent.newTimelineEvent(
-        sourceReference = reference.toString(),
-        eventType = ACTION_PLAN_REVIEW_SCHEDULE_CREATED,
-        prisonId = createdAtPrison,
-        actionedBy = createdBy,
-        timestamp = createdAt,
-        contextualInfo = mapOf(
-          REVIEW_SCHEDULE_STATUS_NEW to scheduleStatus.name,
-          REVIEW_SCHEDULE_DEADLINE_NEW to reviewScheduleWindow.dateTo.toString(),
-        ),
-      )
-    }
+  ) = with(reviewSchedule) {
+    TimelineEvent.newTimelineEvent(
+      sourceReference = reference.toString(),
+      eventType = ACTION_PLAN_REVIEW_SCHEDULE_CREATED,
+      prisonId = createdAtPrison,
+      actionedBy = createdBy,
+      timestamp = createdAt,
+      contextualInfo = mapOf(
+        REVIEW_SCHEDULE_STATUS_NEW to scheduleStatus.name,
+        REVIEW_SCHEDULE_DEADLINE_NEW to reviewScheduleWindow.dateTo.toString(),
+      ),
+    )
+  }
 
-  fun reviewScheduleStatusUpdatedTimelineEvent(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus): TimelineEvent =
-    with(updatedReviewScheduleStatus) {
-      TimelineEvent.newTimelineEvent(
-        sourceReference = reference.toString(),
-        eventType = ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED,
-        prisonId = updatedAtPrison,
-        actionedBy = updatedBy,
-        timestamp = updatedAt,
-        contextualInfo = mapOf(
-          REVIEW_SCHEDULE_STATUS_OLD to oldStatus.name,
-          REVIEW_SCHEDULE_STATUS_NEW to newStatus.name,
-          REVIEW_SCHEDULE_DEADLINE_OLD to oldReviewDate.toString(),
-          REVIEW_SCHEDULE_DEADLINE_NEW to newReviewDate.toString(),
-          *exemptionReason
-            ?.let {
-              arrayOf(REVIEW_SCHEDULE_EXEMPTION_REASON to it)
-            } ?: arrayOf(),
-        ),
-      )
-    }
+  fun reviewScheduleStatusUpdatedTimelineEvent(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus): TimelineEvent = with(updatedReviewScheduleStatus) {
+    TimelineEvent.newTimelineEvent(
+      sourceReference = reference.toString(),
+      eventType = ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED,
+      prisonId = updatedAtPrison,
+      actionedBy = updatedBy,
+      timestamp = updatedAt,
+      contextualInfo = mapOf(
+        REVIEW_SCHEDULE_STATUS_OLD to oldStatus.name,
+        REVIEW_SCHEDULE_STATUS_NEW to newStatus.name,
+        REVIEW_SCHEDULE_DEADLINE_OLD to oldReviewDate.toString(),
+        REVIEW_SCHEDULE_DEADLINE_NEW to newReviewDate.toString(),
+        *exemptionReason
+          ?.let {
+            arrayOf(REVIEW_SCHEDULE_EXEMPTION_REASON to it)
+          } ?: arrayOf(),
+      ),
+    )
+  }
 }

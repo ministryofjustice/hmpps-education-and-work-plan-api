@@ -11,25 +11,22 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 @Component
 class ActionPlanResourceMapper(private val goalResourceMapper: GoalResourceMapper) {
 
-  fun fromModelToDto(prisonNumber: String, request: CreateActionPlanRequest) =
-    with(request) {
-      CreateActionPlanDto(
-        prisonNumber = prisonNumber,
-        goals = goals.map {
-          goalResourceMapper.fromModelToDto(it)
-        },
-      )
-    }
+  fun fromModelToDto(prisonNumber: String, request: CreateActionPlanRequest) = with(request) {
+    CreateActionPlanDto(
+      prisonNumber = prisonNumber,
+      goals = goals.map {
+        goalResourceMapper.fromModelToDto(it)
+      },
+    )
+  }
 
-  fun fromDomainToModel(actionPlan: ActionPlan) =
-    with(actionPlan) {
-      ActionPlanResponse(
-        reference = reference,
-        prisonNumber = prisonNumber,
-        goals = goals.map { goalResourceMapper.fromDomainToModel(it) },
-      )
-    }
+  fun fromDomainToModel(actionPlan: ActionPlan) = with(actionPlan) {
+    ActionPlanResponse(
+      reference = reference,
+      prisonNumber = prisonNumber,
+      goals = goals.map { goalResourceMapper.fromDomainToModel(it) },
+    )
+  }
 
-  fun fromDomainToModel(actionPlanSummaries: List<ActionPlanSummary>) =
-    actionPlanSummaries.map { ActionPlanSummaryResponse(it.reference, it.prisonNumber) }
+  fun fromDomainToModel(actionPlanSummaries: List<ActionPlanSummary>) = actionPlanSummaries.map { ActionPlanSummaryResponse(it.reference, it.prisonNumber) }
 }

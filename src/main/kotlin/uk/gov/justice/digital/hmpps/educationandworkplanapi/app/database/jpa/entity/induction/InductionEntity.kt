@@ -109,7 +109,5 @@ data class InductionEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, reference = $reference, prisonNumber = $prisonNumber)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, reference = $reference, prisonNumber = $prisonNumber)"
 }

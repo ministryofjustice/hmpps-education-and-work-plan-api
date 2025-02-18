@@ -10,12 +10,11 @@ fun aValidPrisoner(
   prisonId: String? = "BXI",
   isIndeterminateSentence: Boolean = false,
   isRecall: Boolean = false,
-): Prisoner =
-  Prisoner(
-    prisonerNumber = prisonerNumber,
-    legalStatus = legalStatus,
-    releaseDate = releaseDate,
-    prisonId = prisonId,
-    isRecall = isRecall,
-    isIndeterminateSentence = isIndeterminateSentence,
-  )
+): Prisoner = Prisoner(
+  prisonerNumber = prisonerNumber,
+  legalStatus = legalStatus,
+  releaseDate = releaseDate,
+  prisonId = prisonId,
+  isRecall = isRecall,
+  isIndeterminateSentence = isIndeterminateSentence,
+)

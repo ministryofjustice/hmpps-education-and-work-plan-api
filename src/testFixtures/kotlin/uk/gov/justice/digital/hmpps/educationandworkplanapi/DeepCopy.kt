@@ -13,6 +13,4 @@ private val OBJECT_MAPPER: ObjectMapper =
  * Extension function to perform a deep copy on any object.
  * Uses Jackson to serialize then deserialize to create the new object instance.
  */
-fun <T> T.deepCopy(): T {
-  return OBJECT_MAPPER.readValue(OBJECT_MAPPER.writeValueAsString(this), this!!::class.java)
-}
+fun <T> T.deepCopy(): T = OBJECT_MAPPER.readValue(OBJECT_MAPPER.writeValueAsString(this), this!!::class.java)

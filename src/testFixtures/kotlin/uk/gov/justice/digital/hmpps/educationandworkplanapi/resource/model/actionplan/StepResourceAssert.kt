@@ -10,8 +10,7 @@ fun assertThat(actual: StepResponse?) = StepResponseAssert(actual)
 /**
  * AssertJ custom assertion for a single [StepResponse]
  */
-class StepResponseAssert(actual: StepResponse?) :
-  AbstractObjectAssert<StepResponseAssert, StepResponse?>(actual, StepResponseAssert::class.java) {
+class StepResponseAssert(actual: StepResponse?) : AbstractObjectAssert<StepResponseAssert, StepResponse?>(actual, StepResponseAssert::class.java) {
 
   fun hasTitle(expected: String): StepResponseAssert {
     isNotNull

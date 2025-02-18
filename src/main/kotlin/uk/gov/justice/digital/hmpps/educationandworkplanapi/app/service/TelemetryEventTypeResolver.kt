@@ -68,23 +68,19 @@ class TelemetryEventTypeResolver {
     return updateTypes.toList()
   }
 
-  private fun hasGoalBeenUpdated(previousGoal: Goal, updatedGoal: Goal) =
-    updatedGoal.title != previousGoal.title ||
-      updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
-      updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
-      updatedGoal.notes != previousGoal.notes
+  private fun hasGoalBeenUpdated(previousGoal: Goal, updatedGoal: Goal) = updatedGoal.title != previousGoal.title ||
+    updatedGoal.lastUpdatedAtPrison != previousGoal.lastUpdatedAtPrison ||
+    updatedGoal.targetCompletionDate != previousGoal.targetCompletionDate ||
+    updatedGoal.notes != previousGoal.notes
 
-  private fun hasStepBeenUpdated(previousStep: Step, updatedStep: Step) =
-    updatedStep.title != previousStep.title ||
-      updatedStep.sequenceNumber != previousStep.sequenceNumber
+  private fun hasStepBeenUpdated(previousStep: Step, updatedStep: Step) = updatedStep.title != previousStep.title ||
+    updatedStep.sequenceNumber != previousStep.sequenceNumber
 
-  private fun hasStepStatusChanged(previousStep: Step, updatedStep: Step) =
-    previousStep.status != updatedStep.status
+  private fun hasStepStatusChanged(previousStep: Step, updatedStep: Step) = previousStep.status != updatedStep.status
 
-  private fun getTelemetryUpdateEventTypeForStepStatusChange(step: Step): GoalTelemetryEventType =
-    when (step.status) {
-      StepStatus.NOT_STARTED -> STEP_NOT_STARTED
-      StepStatus.ACTIVE -> STEP_STARTED
-      StepStatus.COMPLETE -> STEP_COMPLETED
-    }
+  private fun getTelemetryUpdateEventTypeForStepStatusChange(step: Step): GoalTelemetryEventType = when (step.status) {
+    StepStatus.NOT_STARTED -> STEP_NOT_STARTED
+    StepStatus.ACTIVE -> STEP_STARTED
+    StepStatus.COMPLETE -> STEP_COMPLETED
+  }
 }

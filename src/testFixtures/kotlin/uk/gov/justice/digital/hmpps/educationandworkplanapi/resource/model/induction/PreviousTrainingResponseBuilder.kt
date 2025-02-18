@@ -17,17 +17,16 @@ fun aValidPreviousTrainingResponse(
   updatedByDisplayName: String = "Alex Smith",
   updatedAt: OffsetDateTime = OffsetDateTime.now(),
   updatedAtPrison: String = "BXI",
-): PreviousTrainingResponse =
-  PreviousTrainingResponse(
-    reference = reference,
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-    createdBy = createdBy,
-    createdByDisplayName = createdByDisplayName,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    updatedBy = updatedBy,
-    updatedByDisplayName = updatedByDisplayName,
-    updatedAt = updatedAt,
-    updatedAtPrison = updatedAtPrison,
-  )
+): PreviousTrainingResponse = PreviousTrainingResponse(
+  reference = reference,
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+  createdBy = createdBy,
+  createdByDisplayName = createdByDisplayName,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  updatedBy = updatedBy,
+  updatedByDisplayName = updatedByDisplayName,
+  updatedAt = updatedAt,
+  updatedAtPrison = updatedAtPrison,
+)

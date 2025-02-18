@@ -20,16 +20,15 @@ class PrisonerMergedEventService(
   fun process(
     inboundEvent: InboundEvent,
     additionalInformation: AdditionalInformation.PrisonerMergedAdditionalInformation,
-  ) =
-    with(additionalInformation) {
-      log.info { "Processing Prisoner Merged event removed noms number [$removedNomsNumber]" }
-      handle(
-        REVIEW_SCHEDULE,
-      ) { reviewScheduleService.exemptActiveReviewScheduleStatusDueToMerge(removedNomsNumber) }
-      handle(
-        INDUCTION_SCHEDULE,
-      ) { inductionScheduleService.exemptActiveInductionScheduleStatusDueToMerge(removedNomsNumber) }
-    }
+  ) = with(additionalInformation) {
+    log.info { "Processing Prisoner Merged event removed noms number [$removedNomsNumber]" }
+    handle(
+      REVIEW_SCHEDULE,
+    ) { reviewScheduleService.exemptActiveReviewScheduleStatusDueToMerge(removedNomsNumber) }
+    handle(
+      INDUCTION_SCHEDULE,
+    ) { inductionScheduleService.exemptActiveInductionScheduleStatusDueToMerge(removedNomsNumber) }
+  }
 
   private fun handle(
     scheduleType: String,

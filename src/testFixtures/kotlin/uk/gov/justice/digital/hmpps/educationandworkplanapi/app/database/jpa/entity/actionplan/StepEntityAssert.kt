@@ -10,8 +10,7 @@ fun assertThat(actual: StepEntity?) = StepEntityAssert(actual)
 /**
  * AssertJ custom assertion for [StepEntity]
  */
-class StepEntityAssert(actual: StepEntity?) :
-  AbstractObjectAssert<StepEntityAssert, StepEntity?>(actual, StepEntityAssert::class.java) {
+class StepEntityAssert(actual: StepEntity?) : AbstractObjectAssert<StepEntityAssert, StepEntity?>(actual, StepEntityAssert::class.java) {
 
   fun hasJpaManagedFieldsPopulated(): StepEntityAssert {
     isNotNull

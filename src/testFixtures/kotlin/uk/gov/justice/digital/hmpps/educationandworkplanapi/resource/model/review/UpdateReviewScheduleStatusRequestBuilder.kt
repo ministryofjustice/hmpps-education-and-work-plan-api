@@ -7,9 +7,8 @@ fun aValidUpdateReviewScheduleStatusRequest(
   prisonId: String = "BXI",
   status: ReviewScheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
   exemptionReason: String? = null,
-): UpdateReviewScheduleStatusRequest =
-  UpdateReviewScheduleStatusRequest(
-    prisonId = prisonId,
-    status = status,
-    exemptionReason = exemptionReason,
-  )
+): UpdateReviewScheduleStatusRequest = UpdateReviewScheduleStatusRequest(
+  prisonId = prisonId,
+  status = status,
+  exemptionReason = exemptionReason,
+)

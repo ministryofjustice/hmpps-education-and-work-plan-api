@@ -62,20 +62,18 @@ data class ActionPlanEntity(
     /**
      * Returns new un-persisted [ActionPlanEntity] for the specified prisoner with an empty collection of [GoalEntity]s
      */
-    fun newActionPlanForPrisoner(prisonNumber: String): ActionPlanEntity =
-      ActionPlanEntity(
-        reference = UUID.randomUUID(),
-        prisonNumber = prisonNumber,
-        goals = mutableListOf(),
-      )
+    fun newActionPlanForPrisoner(prisonNumber: String): ActionPlanEntity = ActionPlanEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      goals = mutableListOf(),
+    )
   }
 
   /**
    * Returns the [GoalEntity] identified by its reference from this [ActionPlanEntity] instance.
    * Returns null if the Goal Entity cannot be found.
    */
-  fun getGoalByReference(goalReference: UUID): GoalEntity? =
-    goals.find { it.reference == goalReference }
+  fun getGoalByReference(goalReference: UUID): GoalEntity? = goals.find { it.reference == goalReference }
 
   /**
    * Adds a [GoalEntity] to this [ActionPlanEntity]
@@ -95,7 +93,5 @@ data class ActionPlanEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String {
-    return this::class.simpleName + "(id = $id, prisonNumber = $prisonNumber)"
-  }
+  override fun toString(): String = this::class.simpleName + "(id = $id, prisonNumber = $prisonNumber)"
 }

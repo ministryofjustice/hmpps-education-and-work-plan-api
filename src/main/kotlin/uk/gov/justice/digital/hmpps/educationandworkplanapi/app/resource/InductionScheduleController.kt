@@ -86,26 +86,25 @@ class InductionScheduleController(
     )
   }
 
-  private fun toReviewScheduleStatus(inductionScheduleStatus: InductionScheduleStatusModel): InductionScheduleStatus =
-    when (inductionScheduleStatus) {
-      InductionScheduleStatusModel.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
-      InductionScheduleStatusModel.SCHEDULED -> InductionScheduleStatus.SCHEDULED
-      InductionScheduleStatusModel.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
-      InductionScheduleStatusModel.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
-      InductionScheduleStatusModel.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
-      InductionScheduleStatusModel.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> InductionScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
-      InductionScheduleStatusModel.EXEMPT_PRISONER_SAFETY_ISSUES -> InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
-      InductionScheduleStatusModel.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> InductionScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
-      InductionScheduleStatusModel.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> InductionScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT
-      InductionScheduleStatusModel.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
-      InductionScheduleStatusModel.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
-      InductionScheduleStatusModel.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
-      InductionScheduleStatusModel.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER
-      InductionScheduleStatusModel.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
-      InductionScheduleStatusModel.EXEMPT_PRISONER_DEATH -> InductionScheduleStatus.EXEMPT_PRISONER_DEATH
-      InductionScheduleStatusModel.EXEMPT_PRISONER_MERGE -> InductionScheduleStatus.EXEMPT_PRISONER_MERGE
-      InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
-      InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
-      InductionScheduleStatusModel.COMPLETED -> InductionScheduleStatus.COMPLETED
-    }
+  private fun toReviewScheduleStatus(inductionScheduleStatus: InductionScheduleStatusModel): InductionScheduleStatus = when (inductionScheduleStatus) {
+    InductionScheduleStatusModel.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
+    InductionScheduleStatusModel.SCHEDULED -> InductionScheduleStatus.SCHEDULED
+    InductionScheduleStatusModel.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+    InductionScheduleStatusModel.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
+    InductionScheduleStatusModel.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
+    InductionScheduleStatusModel.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> InductionScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
+    InductionScheduleStatusModel.EXEMPT_PRISONER_SAFETY_ISSUES -> InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
+    InductionScheduleStatusModel.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> InductionScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+    InductionScheduleStatusModel.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> InductionScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT
+    InductionScheduleStatusModel.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
+    InductionScheduleStatusModel.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
+    InductionScheduleStatusModel.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
+    InductionScheduleStatusModel.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER
+    InductionScheduleStatusModel.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
+    InductionScheduleStatusModel.EXEMPT_PRISONER_DEATH -> InductionScheduleStatus.EXEMPT_PRISONER_DEATH
+    InductionScheduleStatusModel.EXEMPT_PRISONER_MERGE -> InductionScheduleStatus.EXEMPT_PRISONER_MERGE
+    InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
+    InductionScheduleStatusModel.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
+    InductionScheduleStatusModel.COMPLETED -> InductionScheduleStatus.COMPLETED
+  }
 }

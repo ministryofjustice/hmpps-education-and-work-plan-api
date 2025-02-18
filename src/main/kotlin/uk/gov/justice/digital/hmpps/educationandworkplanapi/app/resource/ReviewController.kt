@@ -114,38 +114,36 @@ class ReviewController(
     )
   }
 
-  private fun toReviewScheduleStatus(reviewStatus: ReviewScheduleStatusAPI): ReviewScheduleStatus =
-    when (reviewStatus) {
-      ReviewScheduleStatusAPI.SCHEDULED -> ReviewScheduleStatus.SCHEDULED
-      ReviewScheduleStatusAPI.COMPLETED -> ReviewScheduleStatus.COMPLETED
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> ReviewScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> ReviewScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> ReviewScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_SAFETY_ISSUES -> ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
-      ReviewScheduleStatusAPI.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
-      ReviewScheduleStatusAPI.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> ReviewScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT
-      ReviewScheduleStatusAPI.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> ReviewScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
-      ReviewScheduleStatusAPI.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
-      ReviewScheduleStatusAPI.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
-      ReviewScheduleStatusAPI.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatus.EXEMPT_PRISONER_MERGE
-      ReviewScheduleStatusAPI.EXEMPT_UNKNOWN -> ReviewScheduleStatus.EXEMPT_UNKNOWN
-    }
+  private fun toReviewScheduleStatus(reviewStatus: ReviewScheduleStatusAPI): ReviewScheduleStatus = when (reviewStatus) {
+    ReviewScheduleStatusAPI.SCHEDULED -> ReviewScheduleStatus.SCHEDULED
+    ReviewScheduleStatusAPI.COMPLETED -> ReviewScheduleStatus.COMPLETED
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> ReviewScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> ReviewScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> ReviewScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_SAFETY_ISSUES -> ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
+    ReviewScheduleStatusAPI.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+    ReviewScheduleStatusAPI.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> ReviewScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT
+    ReviewScheduleStatusAPI.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> ReviewScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
+    ReviewScheduleStatusAPI.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
+    ReviewScheduleStatusAPI.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatus.EXEMPT_PRISONER_MERGE
+    ReviewScheduleStatusAPI.EXEMPT_UNKNOWN -> ReviewScheduleStatus.EXEMPT_UNKNOWN
+  }
 
-  private fun toSentenceType(legalStatus: LegalStatus): SentenceType =
-    when (legalStatus) {
-      LegalStatus.RECALL -> SentenceType.RECALL
-      LegalStatus.DEAD -> SentenceType.DEAD
-      LegalStatus.INDETERMINATE_SENTENCE -> SentenceType.INDETERMINATE_SENTENCE
-      LegalStatus.SENTENCED -> SentenceType.SENTENCED
-      LegalStatus.CONVICTED_UNSENTENCED -> SentenceType.CONVICTED_UNSENTENCED
-      LegalStatus.CIVIL_PRISONER -> SentenceType.CIVIL_PRISONER
-      LegalStatus.IMMIGRATION_DETAINEE -> SentenceType.IMMIGRATION_DETAINEE
-      LegalStatus.REMAND -> SentenceType.REMAND
-      LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
-      LegalStatus.OTHER -> SentenceType.OTHER
-    }
+  private fun toSentenceType(legalStatus: LegalStatus): SentenceType = when (legalStatus) {
+    LegalStatus.RECALL -> SentenceType.RECALL
+    LegalStatus.DEAD -> SentenceType.DEAD
+    LegalStatus.INDETERMINATE_SENTENCE -> SentenceType.INDETERMINATE_SENTENCE
+    LegalStatus.SENTENCED -> SentenceType.SENTENCED
+    LegalStatus.CONVICTED_UNSENTENCED -> SentenceType.CONVICTED_UNSENTENCED
+    LegalStatus.CIVIL_PRISONER -> SentenceType.CIVIL_PRISONER
+    LegalStatus.IMMIGRATION_DETAINEE -> SentenceType.IMMIGRATION_DETAINEE
+    LegalStatus.REMAND -> SentenceType.REMAND
+    LegalStatus.UNKNOWN -> SentenceType.UNKNOWN
+    LegalStatus.OTHER -> SentenceType.OTHER
+  }
 }

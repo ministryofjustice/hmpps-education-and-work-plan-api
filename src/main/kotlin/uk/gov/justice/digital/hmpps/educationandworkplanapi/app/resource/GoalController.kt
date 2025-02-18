@@ -188,6 +188,5 @@ class GoalController(
   }
 
   // convert from the generated enum to the one we use in persistence
-  private fun convertStatuses(statuses: Set<GoalStatus>?) =
-    statuses?.map { status -> goalResourceMapper.toGoalStatus(status) }?.toSet()
+  private fun convertStatuses(statuses: Set<GoalStatus>?) = statuses?.map { status -> goalResourceMapper.toGoalStatus(status) }?.toSet()
 }

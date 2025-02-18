@@ -5,8 +5,7 @@ import java.util.UUID
 fun aValidActionPlanSummaryProjection(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "A1234BC",
-): ActionPlanSummaryProjection =
-  ActionPlanSummaryProjection(
-    reference = reference,
-    prisonNumber = prisonNumber,
-  )
+): ActionPlanSummaryProjection = ActionPlanSummaryProjection(
+  reference = reference,
+  prisonNumber = prisonNumber,
+)

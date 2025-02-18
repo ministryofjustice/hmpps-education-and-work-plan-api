@@ -58,32 +58,30 @@ class InductionScheduleResourceMapper(
     }
   }
 
-  fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRule): InductionScheduleCalculationRuleResponse =
-    when (inductionScheduleCalculationRule) {
-      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION
-      InductionScheduleCalculationRule.EXISTING_PRISONER -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER
-    }
+  fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRule): InductionScheduleCalculationRuleResponse = when (inductionScheduleCalculationRule) {
+    InductionScheduleCalculationRule.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION
+    InductionScheduleCalculationRule.EXISTING_PRISONER -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER
+  }
 
-  fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse =
-    when (inductionScheduleStatus) {
-      InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatusResponse.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
-      InductionScheduleStatus.SCHEDULED -> InductionScheduleStatusResponse.SCHEDULED
-      InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
-      InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
-      InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_FAILED_TO_ENGAGE
-      InductionScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> InductionScheduleStatusResponse.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
-      InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_SAFETY_ISSUES
-      InductionScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> InductionScheduleStatusResponse.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
-      InductionScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> InductionScheduleStatusResponse.EXEMPT_PRISON_STAFF_REDEPLOYMENT
-      InductionScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatusResponse.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
-      InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusResponse.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
-      InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusResponse.EXEMPT_SYSTEM_TECHNICAL_ISSUE
-      InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusResponse.EXEMPT_PRISONER_TRANSFER
-      InductionScheduleStatus.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_RELEASE
-      InductionScheduleStatus.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DEATH
-      InductionScheduleStatus.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_MERGE
-      InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
-      InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
-      InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
-    }
+  fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatus): InductionScheduleStatusResponse = when (inductionScheduleStatus) {
+    InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> InductionScheduleStatusResponse.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
+    InductionScheduleStatus.SCHEDULED -> InductionScheduleStatusResponse.SCHEDULED
+    InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
+    InductionScheduleStatus.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_OTHER_HEALTH_ISSUES
+    InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_FAILED_TO_ENGAGE
+    InductionScheduleStatus.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED -> InductionScheduleStatusResponse.EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED
+    InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES -> InductionScheduleStatusResponse.EXEMPT_PRISONER_SAFETY_ISSUES
+    InductionScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES -> InductionScheduleStatusResponse.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+    InductionScheduleStatus.EXEMPT_PRISON_STAFF_REDEPLOYMENT -> InductionScheduleStatusResponse.EXEMPT_PRISON_STAFF_REDEPLOYMENT
+    InductionScheduleStatus.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE -> InductionScheduleStatusResponse.EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE
+    InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusResponse.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
+    InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusResponse.EXEMPT_SYSTEM_TECHNICAL_ISSUE
+    InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusResponse.EXEMPT_PRISONER_TRANSFER
+    InductionScheduleStatus.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_RELEASE
+    InductionScheduleStatus.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DEATH
+    InductionScheduleStatus.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_MERGE
+    InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
+    InductionScheduleStatus.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE -> InductionScheduleStatusResponse.EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
+    InductionScheduleStatus.COMPLETED -> InductionScheduleStatusResponse.COMPLETED
+  }
 }

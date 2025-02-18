@@ -20,24 +20,23 @@ fun aValidReviewScheduleEntity(
   updatedAt: Instant? = Instant.now(),
   updatedBy: String? = "bjones_gen",
   updatedAtPrison: String = "BXI",
-): ReviewScheduleEntity =
-  ReviewScheduleEntity(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    earliestReviewDate = earliestReviewDate,
-    latestReviewDate = latestReviewDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    exemptionReason = exemptionReason,
-    createdAtPrison = createdAtPrison,
-    updatedAtPrison = updatedAtPrison,
-  ).apply {
-    this.id = id
-    this.createdBy = createdBy
-    this.createdAt = createdAt
-    this.updatedBy = updatedBy
-    this.updatedAt = updatedAt
-  }
+): ReviewScheduleEntity = ReviewScheduleEntity(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  earliestReviewDate = earliestReviewDate,
+  latestReviewDate = latestReviewDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  exemptionReason = exemptionReason,
+  createdAtPrison = createdAtPrison,
+  updatedAtPrison = updatedAtPrison,
+).apply {
+  this.id = id
+  this.createdBy = createdBy
+  this.createdAt = createdAt
+  this.updatedBy = updatedBy
+  this.updatedAt = updatedAt
+}
 
 fun aValidUnPersistedReviewScheduleEntity(
   reference: UUID = UUID.randomUUID(),
@@ -49,20 +48,19 @@ fun aValidUnPersistedReviewScheduleEntity(
   exemptionReason: String? = null,
   createdAtPrison: String = "BXI",
   updatedAtPrison: String = "BXI",
-): ReviewScheduleEntity =
-  aValidReviewScheduleEntity(
-    id = null,
-    reference = reference,
-    prisonNumber = prisonNumber,
-    earliestReviewDate = earliestReviewDate,
-    latestReviewDate = latestReviewDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    exemptionReason = exemptionReason,
-    createdBy = null,
-    createdAt = null,
-    createdAtPrison = createdAtPrison,
-    updatedBy = null,
-    updatedAt = null,
-    updatedAtPrison = updatedAtPrison,
-  )
+): ReviewScheduleEntity = aValidReviewScheduleEntity(
+  id = null,
+  reference = reference,
+  prisonNumber = prisonNumber,
+  earliestReviewDate = earliestReviewDate,
+  latestReviewDate = latestReviewDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  exemptionReason = exemptionReason,
+  createdBy = null,
+  createdAt = null,
+  createdAtPrison = createdAtPrison,
+  updatedBy = null,
+  updatedAt = null,
+  updatedAtPrison = updatedAtPrison,
+)

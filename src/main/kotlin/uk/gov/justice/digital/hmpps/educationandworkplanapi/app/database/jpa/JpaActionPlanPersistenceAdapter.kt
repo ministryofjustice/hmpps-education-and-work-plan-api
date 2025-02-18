@@ -22,14 +22,12 @@ class JpaActionPlanPersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
-  override fun getActionPlan(prisonNumber: String): ActionPlan? =
-    actionPlanRepository.findByPrisonNumber(prisonNumber)?.let {
-      actionPlanMapper.fromEntityToDomain(it)
-    }
+  override fun getActionPlan(prisonNumber: String): ActionPlan? = actionPlanRepository.findByPrisonNumber(prisonNumber)?.let {
+    actionPlanMapper.fromEntityToDomain(it)
+  }
 
   @Transactional(readOnly = true)
-  override fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> =
-    actionPlanRepository.findByPrisonNumberIn(prisonNumbers).let {
-      actionPlanMapper.fromEntitySummariesToDomainSummaries(it)
-    }
+  override fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> = actionPlanRepository.findByPrisonNumberIn(prisonNumbers).let {
+    actionPlanMapper.fromEntitySummariesToDomainSummaries(it)
+  }
 }

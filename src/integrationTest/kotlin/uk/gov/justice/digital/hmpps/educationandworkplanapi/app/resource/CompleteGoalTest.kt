@@ -138,7 +138,8 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) { // the 6th Timeline event will be the GOAL_ARCHIVED event
+        .event(6) {
+          // the 6th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")

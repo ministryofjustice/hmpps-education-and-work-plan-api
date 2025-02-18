@@ -10,8 +10,7 @@ fun assertThat(actual: GetGoalsResponse?) = GetGoalsResponseAssert(actual)
 /**
  * AssertJ custom assertion for a single [GetGoalsResponse]
  */
-class GetGoalsResponseAssert(actual: GetGoalsResponse?) :
-  AbstractObjectAssert<GetGoalsResponseAssert, GetGoalsResponse?>(actual, GetGoalsResponseAssert::class.java) {
+class GetGoalsResponseAssert(actual: GetGoalsResponse?) : AbstractObjectAssert<GetGoalsResponseAssert, GetGoalsResponse?>(actual, GetGoalsResponseAssert::class.java) {
 
   fun hasNumberOfGoals(expected: Int): GetGoalsResponseAssert {
     isNotNull

@@ -48,14 +48,13 @@ class PrisonerMergedEventServiceTest {
     )
   }
 
-  private fun anInboundEvent(additionalInformation: PrisonerMergedAdditionalInformation): InboundEvent =
-    InboundEvent(
-      eventType = EventType.PRISONER_MERGED,
-      personReference = PersonReference(listOf(Identifier(type = "noms", value = "A1234BC"))),
-      occurredAt = Instant.now(),
-      publishedAt = Instant.now(),
-      description = "Prisoner merged event",
-      version = "1.0",
-      additionalInformation = objectMapper.writeValueAsString(additionalInformation),
-    )
+  private fun anInboundEvent(additionalInformation: PrisonerMergedAdditionalInformation): InboundEvent = InboundEvent(
+    eventType = EventType.PRISONER_MERGED,
+    personReference = PersonReference(listOf(Identifier(type = "noms", value = "A1234BC"))),
+    occurredAt = Instant.now(),
+    publishedAt = Instant.now(),
+    description = "Prisoner merged event",
+    version = "1.0",
+    additionalInformation = objectMapper.writeValueAsString(additionalInformation),
+  )
 }

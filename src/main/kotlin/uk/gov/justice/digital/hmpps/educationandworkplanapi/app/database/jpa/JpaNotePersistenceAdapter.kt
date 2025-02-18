@@ -23,20 +23,16 @@ class JpaNotePersistenceAdapter(
     return NoteMapper.fromEntityToDomain(noteEntity)
   }
 
-  override fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> {
-    return noteRepository.findAllByEntityReferenceAndEntityType(
-      entityReference,
-      NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
-    ).map { NoteMapper.fromEntityToDomain(it) }
-  }
+  override fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> = noteRepository.findAllByEntityReferenceAndEntityType(
+    entityReference,
+    NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+  ).map { NoteMapper.fromEntityToDomain(it) }
 
-  override fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> {
-    return noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
-      entityReference,
-      NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
-      NoteMapper.fromDomainNoteTypeToEntityNoteType(noteType),
-    ).map { NoteMapper.fromEntityToDomain(it) }
-  }
+  override fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+    entityReference,
+    NoteMapper.fromDomainEntityTypeToEntityEntityType(entityType),
+    NoteMapper.fromDomainNoteTypeToEntityNoteType(noteType),
+  ).map { NoteMapper.fromEntityToDomain(it) }
 
   override fun updateNote(updateNoteDto: UpdateNoteDto): NoteDto {
     val noteEntity = noteRepository.findByReference(updateNoteDto.reference)

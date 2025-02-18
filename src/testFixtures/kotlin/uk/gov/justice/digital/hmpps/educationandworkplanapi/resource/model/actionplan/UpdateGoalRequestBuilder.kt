@@ -13,12 +13,11 @@ fun aValidUpdateGoalRequest(
   steps: List<UpdateStepRequest> = listOf(aValidUpdateStepRequest()),
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
   prisonId: String = "BXI",
-): UpdateGoalRequest =
-  UpdateGoalRequest(
-    goalReference = goalReference,
-    title = title,
-    targetCompletionDate = targetCompletionDate,
-    steps = steps,
-    notes = notes,
-    prisonId = prisonId,
-  )
+): UpdateGoalRequest = UpdateGoalRequest(
+  goalReference = goalReference,
+  title = title,
+  targetCompletionDate = targetCompletionDate,
+  steps = steps,
+  notes = notes,
+  prisonId = prisonId,
+)

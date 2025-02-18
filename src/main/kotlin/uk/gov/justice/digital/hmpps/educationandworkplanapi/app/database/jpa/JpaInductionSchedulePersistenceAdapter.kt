@@ -24,33 +24,28 @@ class JpaInductionSchedulePersistenceAdapter(
   private val inductionScheduleEntityMapper: InductionScheduleEntityMapper,
 ) : InductionSchedulePersistenceAdapter {
   @Transactional
-  override fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule =
-    inductionScheduleRepository.saveAndFlush(
-      inductionScheduleEntityMapper.fromCreateDtoToEntity(
-        createInductionScheduleDto,
-      ),
-    ).let {
-      saveInductionScheduleHistory(it)
-      inductionScheduleEntityMapper.fromEntityToDomain(it)
-    }
+  override fun createInductionSchedule(createInductionScheduleDto: CreateInductionScheduleDto): InductionSchedule = inductionScheduleRepository.saveAndFlush(
+    inductionScheduleEntityMapper.fromCreateDtoToEntity(
+      createInductionScheduleDto,
+    ),
+  ).let {
+    saveInductionScheduleHistory(it)
+    inductionScheduleEntityMapper.fromEntityToDomain(it)
+  }
 
   @Transactional(readOnly = true)
-  override fun getInductionSchedule(prisonNumber: String): InductionSchedule? =
-    inductionScheduleRepository.findByPrisonNumber(prisonNumber)?.let {
-      inductionScheduleEntityMapper.fromEntityToDomain(it)
-    }
-
-  override fun getActiveInductionSchedule(prisonNumber: String): InductionSchedule? =
-    inductionScheduleRepository.findByPrisonNumberAndScheduleStatusIn(
-      prisonNumber = prisonNumber,
-      scheduleStatuses = InductionScheduleStatus.ACTIVE_STATUSES,
-    )
-      ?.let { inductionScheduleEntityMapper.fromEntityToDomain(it) }
-
-  override fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> {
-    return inductionScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
-      .map { inductionScheduleEntityMapper.fromEntityToDomain(it) }
+  override fun getInductionSchedule(prisonNumber: String): InductionSchedule? = inductionScheduleRepository.findByPrisonNumber(prisonNumber)?.let {
+    inductionScheduleEntityMapper.fromEntityToDomain(it)
   }
+
+  override fun getActiveInductionSchedule(prisonNumber: String): InductionSchedule? = inductionScheduleRepository.findByPrisonNumberAndScheduleStatusIn(
+    prisonNumber = prisonNumber,
+    scheduleStatuses = InductionScheduleStatus.ACTIVE_STATUSES,
+  )
+    ?.let { inductionScheduleEntityMapper.fromEntityToDomain(it) }
+
+  override fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> = inductionScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
+    .map { inductionScheduleEntityMapper.fromEntityToDomain(it) }
 
   @Transactional
   override fun updateSchedule(
@@ -75,10 +70,8 @@ class JpaInductionSchedulePersistenceAdapter(
     }
   }
 
-  override fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory> {
-    return inductionScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
-      .map { inductionScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
-  }
+  override fun getInductionScheduleHistory(prisonNumber: String): List<InductionScheduleHistory> = inductionScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)
+    .map { inductionScheduleEntityMapper.fromScheduleHistoryEntityToDomain(it) }
 
   override fun updateInductionScheduleStatus(updateInductionScheduleStatusDto: UpdateInductionScheduleStatusDto): InductionSchedule {
     val inductionScheduleEntity =
