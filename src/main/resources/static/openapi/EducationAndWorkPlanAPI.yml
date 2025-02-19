@@ -2933,10 +2933,12 @@ components:
           type: string
           format: date
           description: if applicable this will be the date of the exemption
+          example: '2023-06-19'
         deadlineDate:
           type: string
           format: date
           description: The deadline for the induction to be completed
+          example: '2023-06-19'
         reference:
           type: string
           format: uuid
