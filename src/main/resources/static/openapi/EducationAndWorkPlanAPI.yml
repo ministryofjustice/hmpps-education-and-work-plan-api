@@ -1699,6 +1699,7 @@ components:
           type: string
           format: date
           description: The deadline for the induction to be completed
+          example: '2023-06-19'
         scheduleCalculationRule:
           $ref: '#/components/schemas/InductionScheduleCalculationRule'
         scheduleStatus:

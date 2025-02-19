@@ -24,6 +24,9 @@ services:
       - HMPPS_SAR_ADDITIONALACCESSROLE=ROLE_EDUCATION_WORK_PLAN_VIEWER
       - PRISON_API_URL=https://prison-api-dev.prison.service.justice.gov.uk/
       - MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
+      - CIAG_KPI_PROCESSING_RULE=PEF
+      - PRISONER_SEARCH_API_URL=https://prisoner-search-dev.prison.service.justice.gov.uk
+      - SERVICE_BASE_URL=http://localhost:8081"
 
   db:
     image: postgres:latest
