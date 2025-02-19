@@ -5,9 +5,9 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.2"
-  id("org.openapi.generator") version "7.10.0"
-  kotlin("plugin.spring") version "2.1.0"
-  kotlin("plugin.jpa") version "2.1.0"
+  id("org.openapi.generator") version "7.11.0"
+  kotlin("plugin.spring") version "2.1.10"
+  kotlin("plugin.jpa") version "2.1.10"
 
   id("jacoco")
   id("name.remal.integration-tests") version "5.0.0"
@@ -17,16 +17,16 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val postgresqlVersion = "42.7.4"
+val postgresqlVersion = "42.7.5"
 val kotlinLoggingVersion = "3.0.5"
-val springdocOpenapiVersion = "2.7.0"
-val hmppsSqsVersion = "5.2.0"
+val springdocOpenapiVersion = "2.8.5"
+val hmppsSqsVersion = "5.3.1"
 val awaitilityVersion = "4.2.2"
-val wiremockVersion = "3.10.0"
+val wiremockVersion = "3.12.0"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "10.0.1"
 val testContainersVersion = "1.20.4"
-val awsSdkVersion = "1.12.779"
+val awsSdkVersion = "1.12.781"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.18.1"
@@ -52,7 +52,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.1.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.2.1")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -83,7 +83,7 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:timeline")))
 
   // Test fixtures dependencies
-  testFixturesImplementation("org.assertj:assertj-core:3.26.3")
+  testFixturesImplementation("org.assertj:assertj-core:3.27.3")
   testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
   testFixturesImplementation("io.projectreactor:reactor-core")
   testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
