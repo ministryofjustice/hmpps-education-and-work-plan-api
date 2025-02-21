@@ -9,6 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
@@ -18,8 +20,10 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdate
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateStepDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateStepRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateStepRequest
@@ -27,6 +31,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidStepResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidUpdateStepRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus as GoalStatusApi
@@ -39,6 +44,9 @@ internal class GoalResourceMapperTest {
 
   @Mock
   private lateinit var stepMapper: StepResourceMapper
+
+  @Mock
+  private lateinit var noteResourceMapper: NoteResourceMapper
 
   @Mock
   private lateinit var instantMapper: InstantMapper
@@ -118,10 +126,18 @@ internal class GoalResourceMapperTest {
       lastUpdatedAtPrison = "MDI",
     )
 
+    val goalNote1 = aValidNoteDto(content = "Note 1", entityReference = goal.reference, entityType = EntityType.GOAL)
+    val goalNote2 = aValidNoteDto(content = "Note 2", entityReference = goal.reference, entityType = EntityType.GOAL)
+    val goalNotes = listOf(goalNote1, goalNote2)
+
     val expectedStepResponse = aValidStepResponse()
     val expectedDateTime = OffsetDateTime.now()
     given(stepMapper.fromDomainToModel(any())).willReturn(expectedStepResponse)
     given(instantMapper.toOffsetDateTime(any())).willReturn(expectedDateTime)
+
+    val expectedNote1 = aValidNoteResponse(content = "Note 1", type = NoteType.GOAL)
+    val expectedNote2 = aValidNoteResponse(content = "Note 2", type = NoteType.GOAL)
+    given(noteResourceMapper.fromDomainToModel(any())).willReturn(expectedNote1, expectedNote2)
 
     given(userService.getUserDetails(any())).willReturn(
       UserDetailsDto("asmith_gen", true, "Alex Smith"),
@@ -143,15 +159,17 @@ internal class GoalResourceMapperTest {
       updatedAtPrison = "MDI",
       updatedBy = "bjones_gen",
       updatedByDisplayName = "Barry Jones",
-      goalNotes = emptyList(),
+      goalNotes = listOf(expectedNote1, expectedNote2),
     )
 
     // When
-    val actual = mapper.fromDomainToModel(goal)
+    val actual = mapper.fromDomainToModel(goal, goalNotes)
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     verify(stepMapper).fromDomainToModel(step)
+    verify(noteResourceMapper).fromDomainToModel(goalNote1)
+    verify(noteResourceMapper).fromDomainToModel(goalNote2)
     verify(userService).getUserDetails("asmith_gen")
     verify(userService).getUserDetails("bjones_gen")
   }

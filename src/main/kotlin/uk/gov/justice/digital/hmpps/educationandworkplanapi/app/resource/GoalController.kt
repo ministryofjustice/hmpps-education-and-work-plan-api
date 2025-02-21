@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
@@ -44,7 +43,6 @@ class GoalController(
   private val goalService: GoalService,
   private val goalResourceMapper: GoalResourceMapper,
   private val noteService: NoteService,
-  private val noteResourceMapper: NoteResourceMapper,
 ) {
 
   @PostMapping
@@ -68,10 +66,9 @@ class GoalController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @PathVariable goalReference: UUID,
   ): GoalResponse {
-    val response = goalResourceMapper.fromDomainToModel(goalService.getGoal(prisonNumber, goalReference))
-    // Get the goal note and update the response if present
-    val notes = noteService.getNotes(response.goalReference, EntityType.GOAL)
-    return response.copy(goalNotes = notes.map { noteResourceMapper.fromDomainToModel(it) })
+    val goal = goalService.getGoal(prisonNumber, goalReference)
+    val goalNotes = noteService.getNotes(goal.reference, EntityType.GOAL)
+    return goalResourceMapper.fromDomainToModel(goal, goalNotes)
   }
 
   @PutMapping("{goalReference}")
@@ -166,25 +163,14 @@ class GoalController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
     @RequestParam(required = false, name = "status") statuses: Set<GoalStatus>?,
   ): GetGoalsResponse {
-    val response = GetGoalsResponse(
-      goalService.getGoals(
-        GetGoalsDto(prisonNumber, convertStatuses(statuses)),
-      ).map { goal -> goalResourceMapper.fromDomainToModel(goal) },
+    val goals = goalService.getGoals(GetGoalsDto(prisonNumber, convertStatuses(statuses)))
+
+    return GetGoalsResponse(
+      goals = goals.map {
+        val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
+        goalResourceMapper.fromDomainToModel(it, goalNotes)
+      },
     )
-
-    // Map each goal response to its corresponding version with notes
-    val goalResponsesWithNotes = response.goals.map { goalResponse ->
-      val notes = noteService.getNotes(goalResponse.goalReference, EntityType.GOAL)
-
-      // Map the notes into their respective models
-      val mappedNotes = notes.map { noteResourceMapper.fromDomainToModel(it) }
-
-      // Return a new goal response with the updated notes
-      goalResponse.copy(goalNotes = mappedNotes)
-    }
-
-    // Return the response with the updated goals
-    return response.copy(goals = goalResponsesWithNotes)
   }
 
   // convert from the generated enum to the one we use in persistence

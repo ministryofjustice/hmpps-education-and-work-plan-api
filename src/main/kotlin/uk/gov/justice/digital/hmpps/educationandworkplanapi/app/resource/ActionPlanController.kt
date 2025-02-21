@@ -20,7 +20,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.ActionPlanResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.note.NoteResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
@@ -35,9 +34,8 @@ private val log = KotlinLogging.logger {}
 @RequestMapping(value = ["/action-plans"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class ActionPlanController(
   private val actionPlanService: ActionPlanService,
-  private val actionPlanMapper: ActionPlanResourceMapper,
   private val noteService: NoteService,
-  private val noteResourceMapper: NoteResourceMapper,
+  private val actionPlanMapper: ActionPlanResourceMapper,
   private val scheduleAdapter: ScheduleAdapter,
 ) {
 
@@ -64,21 +62,11 @@ class ActionPlanController(
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_ACTIONPLANS)
   fun getActionPlan(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): ActionPlanResponse {
-    val response = actionPlanMapper.fromDomainToModel(actionPlanService.getActionPlan(prisonNumber))
-
-    // Map each goal response to its corresponding version with notes
-    val goalResponsesWithNotes = response.goals.map { goalResponse ->
-      val notes = noteService.getNotes(goalResponse.goalReference, EntityType.GOAL)
-
-      // Map the notes into their respective models
-      val mappedNotes = notes.map { noteResourceMapper.fromDomainToModel(it) }
-
-      // Return a new goal response with the updated notes
-      goalResponse.copy(goalNotes = mappedNotes)
-    }
-
-    // Return the response with the updated goals
-    return response.copy(goals = goalResponsesWithNotes)
+    val actionPlan = actionPlanService.getActionPlan(prisonNumber)
+    val goalNotesByGoalReference = actionPlan.goals.flatMap {
+      noteService.getNotes(it.reference, EntityType.GOAL)
+    }.groupBy { it.entityReference }
+    return actionPlanMapper.fromDomainToModel(actionPlan, goalNotesByGoalReference)
   }
 
   @PostMapping
