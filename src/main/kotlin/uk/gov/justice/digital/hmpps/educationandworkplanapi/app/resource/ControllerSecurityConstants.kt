@@ -37,3 +37,5 @@ const val HAS_VIEW_REVIEWS = """hasAnyAuthority("$EDITOR", "$VIEWER", "$REVIEWS_
 const val HAS_EDIT_REVIEWS = """hasAnyAuthority("$EDITOR", "$REVIEWS_RW")"""
 
 const val HAS_EDIT_SESSIONS = """hasAnyAuthority("$EDITOR", "$INDUCTIONS_RW", "$REVIEWS_RW")"""
+
+const val HAS_SEARCH_PRISONS = """hasAuthority("$HAS_VIEW_ACTIONPLANS") and hasAuthority("$HAS_VIEW_INDUCTIONS")"""

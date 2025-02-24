@@ -703,14 +703,7 @@ paths:
         - Session reporting
       description: Returns counts of overdue, due, and exempt reviews and inductions for a given prison.
       parameters:
-        - name: prisonId
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[A-Z]{3}$"
-            example: 'BXI'
-          description: The ID of the prison
+        - $ref: "#/components/parameters/prisonIdInPathParameter"
       responses:
         '200':
           $ref: '#/components/responses/SessionSummary'
@@ -735,15 +728,82 @@ paths:
         $ref: '#/components/requestBodies/GetSessionSummaries'
 
   '/search/prisons/{prisonId}/people':
-    post:
+    get:
       summary: Search people using prisonId and then filtering on various fields across prisoner search and PLP
       parameters:
-        - name: prisonId
-          in: path
-          required: true
-          description: ID of the prison
+        - $ref: "#/components/parameters/prisonIdInPathParameter"
+        - name: prisonerNameOrNumber
+          in: query
+          description: Search by prisoner name or prison number
+          schema:
+           type: string
+        - name: hasActionPlan
+          in: query
+          description: Filter by whether the prisoner has an action plan
+          schema:
+            type: boolean
+        - name: releaseDateBefore
+          in: query
+          description: Filter by release date before the given date
           schema:
             type: string
+            format: date
+        - name: releaseDateAfter
+          in: query
+          description: Filter by release date after the given date
+          schema:
+            type: string
+            format: date
+        - name: actionPlanLastUpdatedBefore
+          in: query
+          description: return action plans last updated date before the given date
+          schema:
+            type: string
+            format: date
+        - name: actionPlanLastUpdatedAfter
+          in: query
+          description: Filter by action plans last updated date after the given date
+          schema:
+            type: string
+            format: date
+        - name: nextActionDateBefore
+          in: query
+          description: Filter by next action date before the given date. The next action date can be a review or induction.
+          schema:
+            type: string
+            format: date
+        - name: nextActionDateAfter
+          in: query
+          description: Filter by next action date after the given date. The next action date can be a review or induction.
+          schema:
+            type: string
+            format: date
+        - name: sortBy
+          in: query
+          description: Column to sort by
+          schema:
+            type: string
+            enum: [ prisonerName, cellLocation, releaseDate, nextActionDate, planLastUpdated, hasPlan ]
+        - name: sortDirection
+          in: query
+          description: Sort direction (ascending or descending)
+          schema:
+            type: string
+            enum: [ asc, desc ]
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
       requestBody:
         required: true
         content:
@@ -3829,7 +3889,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateInductionScheduleStatusRequest'
+
   parameters:
+    prisonIdInPathParameter:
+      name: prisonId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[A-Z]{3}$"
+        example: "BXI"
+      description: The ID of the prison
     prisonNumberPathParameter:
       name: prisonNumber
       description: The NOMIS Prison Reference Number of the Prisoner that the operation is being performed on.
