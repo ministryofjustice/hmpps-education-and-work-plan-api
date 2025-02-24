@@ -42,11 +42,11 @@ class SessionSummaryService(
     log.info(
       """SESSION_SUMMARY: $prisonId, ${prisoners.size}
       | "Due reviews: ${sessionSummaries.dueReviews.size}
-      | "OverDue reviews: ${sessionSummaries.dueReviews.size}
-      | "Exempt reviews: ${sessionSummaries.dueReviews.size}
-      | "Due Inductions: ${sessionSummaries.dueReviews.size}
-      | "OverDue Inductions: ${sessionSummaries.dueReviews.size}
-      | "Exempt Inductions: ${sessionSummaries.dueReviews.size}
+      | "OverDue reviews: ${sessionSummaries.overdueReviews.size}
+      | "Exempt reviews: ${sessionSummaries.exemptReviews.size}
+      | "Due Inductions: ${sessionSummaries.dueInductions.size}
+      | "OverDue Inductions: ${sessionSummaries.overdueInductions.size}
+      | "Exempt Inductions: ${sessionSummaries.exemptInductions.size}
       """.trimMargin(),
     )
 
