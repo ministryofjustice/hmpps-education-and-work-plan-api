@@ -29,12 +29,12 @@ class PrisonerSearchApiService(
 
     return prisoners.toList()
       .also {
-        log.debug { "Returned ${it.size} prisoners for prison $prisonId from $page calls to Prisoner Search API" }
+        log.info { "Returned ${it.size} prisoners for prison $prisonId from $page calls to Prisoner Search API" }
       }
   }
 
   fun getPrisoner(prisonNumber: String): Prisoner = prisonerSearchApiClient.getPrisoner(prisonNumber)
     .also {
-      log.debug { "Retrieved prisoner [$prisonNumber] from Prisoner Search API" }
+      log.info { "Retrieved prisoner [$prisonNumber] from Prisoner Search API" }
     }
 }
