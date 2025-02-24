@@ -34,9 +34,21 @@ class SessionSummaryService(
    */
   fun getSessionSummaries(prisonId: String): SessionSummaryResponse {
     val prisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
+
     val prisonerNumbers = prisoners.map { it.prisonerNumber }
 
     val sessionSummaries = getSessionSummaries(prisonerNumbers)
+
+    log.info(
+      """SESSION_SUMMARY: $prisonId, ${prisoners.size}
+      | "Due reviews: ${sessionSummaries.dueReviews.size}
+      | "OverDue reviews: ${sessionSummaries.dueReviews.size}
+      | "Exempt reviews: ${sessionSummaries.dueReviews.size}
+      | "Due Inductions: ${sessionSummaries.dueReviews.size}
+      | "OverDue Inductions: ${sessionSummaries.dueReviews.size}
+      | "Exempt Inductions: ${sessionSummaries.dueReviews.size}
+      """.trimMargin(),
+    )
 
     return SessionSummaryResponse(
       dueReviews = sessionSummaries.dueReviews.size,
@@ -105,6 +117,7 @@ class SessionSummaryService(
     val reviewSchedules = reviewScheduleService.getInCompleteReviewSchedules(prisonerNumbers)
 
     inductionSchedules.forEach { schedule ->
+      log.info { "SESSION_SUMMARY Induction schedule count = ${inductionSchedules.size}" }
       when {
         schedule.scheduleStatus.includeExceptionOnSummary() -> sessionSummaries.exemptInductions.add(schedule)
         schedule.scheduleStatus == INDUCTION_SCHEDULED &&
