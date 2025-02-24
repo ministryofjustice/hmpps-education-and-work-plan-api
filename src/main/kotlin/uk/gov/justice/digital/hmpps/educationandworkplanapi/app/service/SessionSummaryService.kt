@@ -116,8 +116,10 @@ class SessionSummaryService(
     val inductionSchedules = inductionScheduleService.getInCompleteInductionSchedules(prisonerNumbers)
     val reviewSchedules = reviewScheduleService.getInCompleteReviewSchedules(prisonerNumbers)
 
+    log.info { "SESSION_SUMMARY Induction schedule count = ${inductionSchedules.size}" }
+    log.info { "SESSION_SUMMARY Review schedule count = ${reviewSchedules.size}" }
+
     inductionSchedules.forEach { schedule ->
-      log.info { "SESSION_SUMMARY Induction schedule count = ${inductionSchedules.size}" }
       when {
         schedule.scheduleStatus.includeExceptionOnSummary() -> sessionSummaries.exemptInductions.add(schedule)
         schedule.scheduleStatus == INDUCTION_SCHEDULED &&
