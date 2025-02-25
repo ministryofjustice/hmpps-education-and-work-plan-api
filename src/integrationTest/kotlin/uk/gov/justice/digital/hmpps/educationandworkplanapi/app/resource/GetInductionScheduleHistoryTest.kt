@@ -42,7 +42,7 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
       status = COMPLETED,
       version = 3,
     )
-    createInduction(randomPrisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(conductedAt = LocalDate.now()))
+    createInduction(randomPrisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(conductedAt = LocalDate.now(), conductedByRole = "Peer Mentor", conductedBy = "Bob Smith"))
 
     // When
     val response = webTestClient.get()
@@ -75,7 +75,8 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
       .wasStatus(InductionScheduleStatus.COMPLETED)
       .wasVersion(3)
-      .wasInductionPerformedBy("Albert User")
+      .wasInductionPerformedBy("Bob Smith")
+      .wasInductionPerformedByRole("Peer Mentor")
       .wasInductionPerformedAt(LocalDate.now())
 
     assertThat(inductionSchedules?.get(1)).isNotNull
