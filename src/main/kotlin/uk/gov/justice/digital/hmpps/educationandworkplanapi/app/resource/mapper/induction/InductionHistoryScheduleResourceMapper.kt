@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
-import java.time.ZoneId
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule as InductionScheduleCalculationRuleResponse
 
 @Component
@@ -35,7 +34,7 @@ class InductionHistoryScheduleResourceMapper(
         updatedAtPrison = lastUpdatedAtPrison,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
         inductionPerformedBy = if (isCompleted) induction?.let { userService.getUserDetails(it.lastUpdatedBy!!).name } else null,
-        inductionPerformedAt = if (isCompleted) induction?.lastUpdatedAt?.atZone(ZoneId.systemDefault())?.toLocalDate() else null,
+        inductionPerformedAt = if (isCompleted) induction?.completedDate else null,
         version = version,
         createdAtPrison = createdAtPrison,
       )
