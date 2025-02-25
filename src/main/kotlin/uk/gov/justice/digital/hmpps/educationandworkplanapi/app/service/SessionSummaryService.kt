@@ -42,11 +42,11 @@ class SessionSummaryService(
     log.info(
       """SESSION_SUMMARY: $prisonId, ${prisoners.size}
       | "Due reviews: ${sessionSummaries.dueReviews.size}
-      | "OverDue reviews: ${sessionSummaries.dueReviews.size}
-      | "Exempt reviews: ${sessionSummaries.dueReviews.size}
-      | "Due Inductions: ${sessionSummaries.dueReviews.size}
-      | "OverDue Inductions: ${sessionSummaries.dueReviews.size}
-      | "Exempt Inductions: ${sessionSummaries.dueReviews.size}
+      | "OverDue reviews: ${sessionSummaries.overdueReviews.size}
+      | "Exempt reviews: ${sessionSummaries.exemptReviews.size}
+      | "Due Inductions: ${sessionSummaries.dueInductions.size}
+      | "OverDue Inductions: ${sessionSummaries.overdueInductions.size}
+      | "Exempt Inductions: ${sessionSummaries.exemptInductions.size}
       """.trimMargin(),
     )
 
@@ -116,25 +116,36 @@ class SessionSummaryService(
     val inductionSchedules = inductionScheduleService.getInCompleteInductionSchedules(prisonerNumbers)
     val reviewSchedules = reviewScheduleService.getInCompleteReviewSchedules(prisonerNumbers)
 
-    inductionSchedules.forEach { schedule ->
-      log.info { "SESSION_SUMMARY Induction schedule count = ${inductionSchedules.size}" }
-      when {
-        schedule.scheduleStatus.includeExceptionOnSummary() -> sessionSummaries.exemptInductions.add(schedule)
-        schedule.scheduleStatus == INDUCTION_SCHEDULED &&
-          schedule.deadlineDate < today -> sessionSummaries.overdueInductions.add(
-          schedule,
-        )
+    log.info { "SESSION_SUMMARY Induction schedule count = ${inductionSchedules.size}" }
+    log.info { "SESSION_SUMMARY Review schedule count = ${reviewSchedules.size}" }
 
+    inductionSchedules.forEach { schedule ->
+      log.info("Processing schedule - Deadline: {}, Today: {}, Status: {}", schedule.deadlineDate, today, schedule.scheduleStatus)
+
+      when {
+        schedule.scheduleStatus.includeExceptionOnSummary() -> {
+          sessionSummaries.exemptInductions.add(schedule)
+          log.info("SESSION_SUMMARY Added to exemptInductions")
+        }
+        schedule.scheduleStatus == INDUCTION_SCHEDULED && schedule.deadlineDate < today -> {
+          sessionSummaries.overdueInductions.add(schedule)
+          log.info("SESSION_SUMMARY Added to overdueInductions")
+        }
         schedule.scheduleStatus == INDUCTION_SCHEDULED &&
-          today in schedule.deadlineDate.minusMonths(2)..schedule.deadlineDate -> sessionSummaries.dueInductions.add(
-          schedule,
-        )
+          today in schedule.deadlineDate.minusMonths(2)..schedule.deadlineDate -> {
+          sessionSummaries.dueInductions.add(schedule)
+          log.info("SESSION_SUMMARYAdded to dueInductions")
+        }
+        else -> {
+          log.info("SESSION_SUMMARY Schedule did not match any category")
+        }
       }
     }
 
     reviewSchedules.forEach { schedule ->
       when {
         schedule.scheduleStatus.includeExceptionOnSummary() -> sessionSummaries.exemptReviews.add(schedule)
+
         schedule.scheduleStatus == SCHEDULED &&
           schedule.reviewScheduleWindow.dateTo < today -> sessionSummaries.overdueReviews.add(
           schedule,
