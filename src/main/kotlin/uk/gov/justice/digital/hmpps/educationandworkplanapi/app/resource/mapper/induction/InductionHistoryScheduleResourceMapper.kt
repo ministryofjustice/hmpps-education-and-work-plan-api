@@ -39,7 +39,12 @@ class InductionHistoryScheduleResourceMapper(
           null
         },
         inductionPerformedAt = if (isCompleted) induction?.completedDate else null,
-        inductionPerformedByRole = if (isCompleted) induction?.conductedByRole else "CIAG",
+        inductionPerformedByRole = if (isCompleted) {
+          induction?.conductedByRole ?: "CIAG"
+        } else {
+          null
+        },
+        inductionPerformedAtPrison = if (isCompleted) induction?.lastUpdatedAtPrison else null,
         version = version,
         createdAtPrison = createdAtPrison,
       )
