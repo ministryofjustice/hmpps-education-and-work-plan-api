@@ -42,7 +42,7 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
       status = COMPLETED,
       version = 3,
     )
-    createInduction(randomPrisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
+    createInduction(randomPrisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(conductedAt = LocalDate.now()))
 
     // When
     val response = webTestClient.get()
