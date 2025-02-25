@@ -33,8 +33,13 @@ class InductionHistoryScheduleResourceMapper(
         updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
         updatedAtPrison = lastUpdatedAtPrison,
         updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
-        inductionPerformedBy = if (isCompleted) induction?.let { userService.getUserDetails(it.lastUpdatedBy!!).name } else null,
+        inductionPerformedBy = if (isCompleted) {
+          induction?.conductedBy ?: induction?.lastUpdatedBy?.let { userService.getUserDetails(it).name }
+        } else {
+          null
+        },
         inductionPerformedAt = if (isCompleted) induction?.completedDate else null,
+        inductionPerformedByRole = if (isCompleted) induction?.conductedByRole else "CIAG",
         version = version,
         createdAtPrison = createdAtPrison,
       )

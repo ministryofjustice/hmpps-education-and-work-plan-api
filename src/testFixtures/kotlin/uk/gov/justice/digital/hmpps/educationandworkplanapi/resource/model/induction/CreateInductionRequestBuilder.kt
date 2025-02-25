@@ -24,6 +24,8 @@ fun aValidCreateInductionRequestForPrisonerNotLookingToWork(
   personalSkillsAndInterests: CreatePersonalSkillsAndInterestsRequest? = null,
   futureWorkInterests: CreateFutureWorkInterestsRequest? = null,
   conductedAt: LocalDate? = null,
+  conductedBy: String? = null,
+  conductedByRole: String? = null,
 ): CreateInductionRequest = CreateInductionRequest(
   prisonId = prisonId,
   workOnRelease = workOnRelease,
@@ -34,6 +36,9 @@ fun aValidCreateInductionRequestForPrisonerNotLookingToWork(
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
   conductedAt = conductedAt,
+  conductedBy = conductedBy,
+  conductedByRole = conductedByRole,
+
 )
 
 fun aValidCreateInductionRequestForPrisonerLookingToWork(

@@ -139,6 +139,15 @@ class InductionScheduleResponseAssert(actual: InductionScheduleResponse?) :
     }
     return this
   }
+  fun wasInductionPerformedByRole(expected: String): InductionScheduleResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (inductionPerformedByRole != expected) {
+        failWithMessage("Expected inductionPerformedByRole to be $expected, but was $inductionPerformedByRole")
+      }
+    }
+    return this
+  }
 
   fun wasInductionPerformedAt(date: LocalDate): InductionScheduleResponseAssert {
     isNotNull
