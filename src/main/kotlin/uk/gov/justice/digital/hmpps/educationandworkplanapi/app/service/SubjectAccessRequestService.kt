@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
@@ -17,6 +19,7 @@ import java.time.ZoneOffset
 class SubjectAccessRequestService(
   private val inductionService: InductionService,
   private val actionPlanService: ActionPlanService,
+  private val noteService: NoteService,
   private val inductionMapper: InductionResourceMapper,
   private val goalMapper: GoalResourceMapper,
 ) : HmppsPrisonSubjectAccessRequestService {
@@ -48,7 +51,10 @@ class SubjectAccessRequestService(
     return HmppsSubjectAccessRequestContent(
       content = SubjectAccessRequestContent(
         induction = induction?.let { inductionMapper.toInductionResponse(induction) },
-        goals = goals.map { goalMapper.fromDomainToModel(it) }.toSet(),
+        goals = goals.map {
+          val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
+          goalMapper.fromDomainToModel(it, goalNotes)
+        }.toSet(),
       ),
     )
   }

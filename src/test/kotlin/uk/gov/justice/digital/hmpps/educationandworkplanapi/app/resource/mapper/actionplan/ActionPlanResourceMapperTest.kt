@@ -11,9 +11,13 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
@@ -21,6 +25,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 internal class ActionPlanResourceMapperTest {
@@ -51,23 +57,66 @@ internal class ActionPlanResourceMapperTest {
   }
 
   @Test
-  fun `should map from domain to model`() {
+  fun `should map from domain to model given there are goal notes for the goal`() {
     // Given
-    val actionPlan = aValidActionPlan()
-    val expectedGoal = aValidGoalResponse()
+    val goal = aValidGoal()
+    val actionPlan = aValidActionPlan(goals = listOf(goal))
+
+    val goalNotes = listOf(
+      aValidNoteDto(
+        entityType = EntityType.GOAL,
+        noteType = NoteType.GOAL,
+        entityReference = goal.reference,
+      ),
+    )
+    val goalNotesByGoalReference = mapOf(
+      goal.reference to goalNotes,
+    )
+
+    val expectedGoal = aValidGoalResponse(
+      goalNotes = listOf(aValidNoteResponse()),
+    )
+    given(goalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoal)
+
     val expectedActionPlan = aValidActionPlanResponse(
       reference = actionPlan.reference,
       prisonNumber = actionPlan.prisonNumber,
       goals = mutableListOf(expectedGoal),
     )
-    given(goalMapper.fromDomainToModel(any<Goal>())).willReturn(expectedGoal)
 
     // When
-    val actual = mapper.fromDomainToModel(actionPlan)
+    val actual = mapper.fromDomainToModel(actionPlan, goalNotesByGoalReference)
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expectedActionPlan)
-    verify(goalMapper).fromDomainToModel(actionPlan.goals[0])
+    verify(goalMapper).fromDomainToModel(actionPlan.goals[0], goalNotes)
+  }
+
+  @Test
+  fun `should map from domain to model given there are no goal notes for the goal`() {
+    // Given
+    val goal = aValidGoal()
+    val actionPlan = aValidActionPlan(goals = listOf(goal))
+
+    val goalNotesByGoalReference = mapOf<UUID, List<NoteDto>>(
+      goal.reference to emptyList(),
+    )
+
+    val expectedGoal = aValidGoalResponse(goalNotes = emptyList())
+    given(goalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoal)
+
+    val expectedActionPlan = aValidActionPlanResponse(
+      reference = actionPlan.reference,
+      prisonNumber = actionPlan.prisonNumber,
+      goals = mutableListOf(expectedGoal),
+    )
+
+    // When
+    val actual = mapper.fromDomainToModel(actionPlan, goalNotesByGoalReference)
+
+    // Then
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expectedActionPlan)
+    verify(goalMapper).fromDomainToModel(actionPlan.goals[0], emptyList())
   }
 
   @Test
