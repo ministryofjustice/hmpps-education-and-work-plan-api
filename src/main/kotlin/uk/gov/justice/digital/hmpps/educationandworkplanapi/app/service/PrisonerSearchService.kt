@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.Prisone
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Pagination
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
-import java.time.LocalDate
+import java.sql.Date
 import java.time.LocalDateTime
 
 @Service
@@ -86,7 +86,7 @@ class PrisonerSearchService(
           cellLocation = cellLocation,
           releaseDate = releaseDate,
           releaseType = releaseType,
-          nextActionDate = additionalData?.nextActionDate,
+          nextActionDate = additionalData?.nextActionDate?.toLocalDate(),
           planLastUpdated = additionalData?.actionPlanUpdatedAt?.toLocalDate(),
         )
       }
@@ -99,6 +99,6 @@ data class PrisonerActionDto(
   val prisonNumber: String,
   val hasActionPlan: Boolean,
   val actionPlanUpdatedAt: LocalDateTime?,
-  val nextActionDate: LocalDate?,
+  val nextActionDate: Date?,
   val nextActionType: String?,
 )

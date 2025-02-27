@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.constraints.Min
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,6 +16,7 @@ import java.time.LocalDate
 class PrisonerSearchController(private val prisonerSearchService: PrisonerSearchService) {
 
   @GetMapping
+  @PreAuthorize(HAS_VIEW_INDUCTIONS)
   fun getPrisoners(
     @PathVariable prisonId: String,
     @RequestParam(required = false) prisonerNameOrNumber: String?,

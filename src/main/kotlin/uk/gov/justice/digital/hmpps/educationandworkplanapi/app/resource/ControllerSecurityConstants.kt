@@ -25,7 +25,7 @@ const val HAS_EDIT_GOALS = """hasAnyAuthority("$EDITOR", "$GOALS_RW")"""
 const val HAS_VIEW_INDUCTIONS = """hasAnyAuthority("$EDITOR", "$VIEWER", "$INDUCTIONS_RO", "$INDUCTIONS_RW")"""
 const val HAS_EDIT_INDUCTIONS = """hasAnyAuthority("$EDITOR", "$INDUCTIONS_RW")"""
 
-const val HAS_VIEW_ACTIONPLANS = """hasAnyAuthority("$EDITOR", "$VIEWER", "$ACTIONPLANS_RO", "$ACTIONPLANS_RW")"""
+const val HAS_VIEW_ACTIONPLANS = """hasAnyAuthority("$EDITOR", "$VIEWER", "$ACTIONPLANS_RO", "$ACTIONPLANS_RO")"""
 const val HAS_EDIT_ACTIONPLANS = """hasAnyAuthority("$EDITOR", "$ACTIONPLANS_RW")"""
 
 const val HAS_VIEW_EDUCATION = """hasAnyAuthority("$EDITOR", "$VIEWER", "$EDUCATION_RO", "$EDUCATION_RW")"""
@@ -37,5 +37,3 @@ const val HAS_VIEW_REVIEWS = """hasAnyAuthority("$EDITOR", "$VIEWER", "$REVIEWS_
 const val HAS_EDIT_REVIEWS = """hasAnyAuthority("$EDITOR", "$REVIEWS_RW")"""
 
 const val HAS_EDIT_SESSIONS = """hasAnyAuthority("$EDITOR", "$INDUCTIONS_RW", "$REVIEWS_RW")"""
-
-const val HAS_SEARCH_PRISONS = """hasAuthority("$HAS_VIEW_ACTIONPLANS") and hasAuthority("$HAS_VIEW_INDUCTIONS")"""
