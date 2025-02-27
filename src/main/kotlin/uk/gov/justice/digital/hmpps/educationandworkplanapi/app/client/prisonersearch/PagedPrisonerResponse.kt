@@ -17,6 +17,12 @@ data class Prisoner(
   val isIndeterminateSentence: Boolean,
   @field:JsonProperty(value = "recall", defaultValue = "false")
   val isRecall: Boolean,
+  val lastName: String,
+  val firstName: String,
+  val dateOfBirth: LocalDate,
+  val cellLocation: String?,
+  @field:JsonProperty(value = "nonDtoReleaseDateType")
+  val releaseType: String?, // TODO this needs to be checked
 )
 
 enum class LegalStatus {

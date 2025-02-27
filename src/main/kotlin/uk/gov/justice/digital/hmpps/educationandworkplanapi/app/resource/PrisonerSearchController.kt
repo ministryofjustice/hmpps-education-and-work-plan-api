@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.constraints.Min
-import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,6 +16,8 @@ import java.time.LocalDate
 class PrisonerSearchController(private val prisonerSearchService: PrisonerSearchService) {
 
   @GetMapping
+  // TODO this should be HAS_SEARCH_PRISONS but it's not working
+  @PreAuthorize(HAS_VIEW_INDUCTIONS)
   fun getPrisoners(
     @PathVariable prisonId: String,
     @RequestParam(required = false) prisonerNameOrNumber: String?,
@@ -30,7 +32,7 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
     @RequestParam(required = false, defaultValue = "asc") sortDirection: String,
     @RequestParam(required = false, defaultValue = "1") @Min(1) page: Int,
     @RequestParam(required = false, defaultValue = "10") @Min(1) size: Int,
-  ): ResponseEntity<PersonSearchResult> {
+  ): PersonSearchResult {
     val searchCriteria = PrisonerSearchCriteria(
       prisonId,
       prisonerNameOrNumber,
