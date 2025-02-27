@@ -112,11 +112,3 @@ data class PrisonerActionDto(
     else -> null
   }
 }
-
-data class PrisonerActionDto(
-  val prisonNumber: String,
-  val hasActionPlan: Boolean,
-  val actionPlanUpdatedAt: LocalDateTime?,
-  val nextActionDate: Date?,
-  val nextActionType: String?,
-)
