@@ -16,6 +16,7 @@ import java.time.LocalDate
 class PrisonerSearchController(private val prisonerSearchService: PrisonerSearchService) {
 
   @GetMapping
+  // TODO this should be HAS_SEARCH_PRISONS but it's not working
   @PreAuthorize(HAS_VIEW_INDUCTIONS)
   fun getPrisoners(
     @PathVariable prisonId: String,
