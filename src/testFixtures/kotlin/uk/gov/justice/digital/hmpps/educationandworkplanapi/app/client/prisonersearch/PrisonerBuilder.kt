@@ -10,6 +10,11 @@ fun aValidPrisoner(
   prisonId: String? = "BXI",
   isIndeterminateSentence: Boolean = false,
   isRecall: Boolean = false,
+  firstName: String = "Bob",
+  lastName: String = "Smith",
+  cellLocation: String = "B-2-022",
+  dateOfBirth: LocalDate = LocalDate.now().minusYears(20),
+  releaseType: String = "ARD",
 ): Prisoner = Prisoner(
   prisonerNumber = prisonerNumber,
   legalStatus = legalStatus,
@@ -17,4 +22,9 @@ fun aValidPrisoner(
   prisonId = prisonId,
   isRecall = isRecall,
   isIndeterminateSentence = isIndeterminateSentence,
+  firstName = firstName,
+  lastName = lastName,
+  cellLocation = cellLocation,
+  dateOfBirth = dateOfBirth,
+  releaseType = releaseType,
 )

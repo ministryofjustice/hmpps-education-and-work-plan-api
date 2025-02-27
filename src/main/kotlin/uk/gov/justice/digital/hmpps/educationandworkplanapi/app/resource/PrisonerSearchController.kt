@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.constraints.Min
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -30,7 +29,7 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
     @RequestParam(required = false, defaultValue = "asc") sortDirection: String,
     @RequestParam(required = false, defaultValue = "1") @Min(1) page: Int,
     @RequestParam(required = false, defaultValue = "10") @Min(1) size: Int,
-  ): ResponseEntity<PersonSearchResult> {
+  ): PersonSearchResult {
     val searchCriteria = PrisonerSearchCriteria(
       prisonId,
       prisonerNameOrNumber,
