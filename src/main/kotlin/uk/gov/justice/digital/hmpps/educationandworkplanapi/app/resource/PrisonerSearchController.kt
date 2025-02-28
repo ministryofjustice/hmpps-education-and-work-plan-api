@@ -16,8 +16,7 @@ import java.time.LocalDate
 class PrisonerSearchController(private val prisonerSearchService: PrisonerSearchService) {
 
   @GetMapping
-  // TODO this should be HAS_SEARCH_PRISONS but it's not working
-  @PreAuthorize(HAS_VIEW_INDUCTIONS)
+  @PreAuthorize(HAS_SEARCH_PRISONS)
   fun getPrisoners(
     @PathVariable prisonId: String,
     @RequestParam(required = false) prisonerNameOrNumber: String?,
@@ -31,7 +30,7 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
     @RequestParam(required = false, defaultValue = "prisonerName") sortBy: String,
     @RequestParam(required = false, defaultValue = "asc") sortDirection: String,
     @RequestParam(required = false, defaultValue = "1") @Min(1) page: Int,
-    @RequestParam(required = false, defaultValue = "10") @Min(1) size: Int,
+    @RequestParam(required = false, defaultValue = "10") @Min(1) pageSize: Int,
   ): PersonSearchResult {
     val searchCriteria = PrisonerSearchCriteria(
       prisonId,
@@ -46,7 +45,7 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
       sortBy,
       sortDirection,
       page,
-      size,
+      pageSize,
     )
     return prisonerSearchService.searchPrisoners(prisonId, searchCriteria)
   }

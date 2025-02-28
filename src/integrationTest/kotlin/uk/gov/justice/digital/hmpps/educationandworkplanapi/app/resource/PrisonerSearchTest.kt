@@ -96,12 +96,75 @@ class PrisonerSearchTest : IntegrationTestBase() {
     assertThat(actual!!.people.size).isEqualTo(6)
   }
 
+  @Test
+  fun `sort by planLastUpdated asc  test`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeopleWithSort("planLastUpdated")
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.people.size).isEqualTo(6)
+    assertThat(actual.people[0].planLastUpdated).isNotNull()
+  }
+
+  @Test
+  fun `sort by planLastUpdated desc test`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeopleWithSort("planLastUpdated", "desc")
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.people.size).isEqualTo(6)
+    assertThat(actual.people[0].planLastUpdated).isNull()
+  }
+
   private fun searchPeople(): FluxExchangeResult<PersonSearchResult> {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, PRISON_ID)
       .bearerToken(
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
+          ACTIONPLANS_RW,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(PersonSearchResult::class.java)
+    return response
+  }
+
+  private fun searchPeopleWithSort(
+    sortBy: String,
+    sortDirection: String = "asc",
+  ): FluxExchangeResult<PersonSearchResult> {
+    val response = webTestClient.get()
+      .uri("$URI_TEMPLATE?sortBy=$sortBy&sortDirection=$sortDirection", PRISON_ID)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RW,
+          ACTIONPLANS_RW,
           privateKey = keyPair.private,
         ),
       )
@@ -113,6 +176,7 @@ class PrisonerSearchTest : IntegrationTestBase() {
   }
 
   fun setUpData() {
+    createActionPlan(prisoner1.prisonerNumber)
     // due induction
     createInductionSchedule(prisoner1.prisonerNumber, deadlineDate = LocalDate.now().plusDays(1), status = SCHEDULED)
     // overdue induction

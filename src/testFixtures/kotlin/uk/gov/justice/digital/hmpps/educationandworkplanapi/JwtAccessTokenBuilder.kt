@@ -9,12 +9,12 @@ import java.util.Date
 import java.util.UUID
 
 fun aValidTokenWithAuthority(
-  role: String,
+  vararg roles: String,
   username: String = "auser_gen",
   privateKey: PrivateKey,
 ): String = buildAccessToken(
   username = username,
-  roles = listOf(role),
+  roles = roles.toList(),
   privateKey = privateKey,
 )
 
