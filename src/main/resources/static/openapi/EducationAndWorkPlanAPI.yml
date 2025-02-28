@@ -1909,7 +1909,7 @@ components:
           minimum: 1
           default: 1
           description: Page number for pagination
-        size:
+        pageSize:
           type: integer
           minimum: 1
           default: 10
