@@ -6,8 +6,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.Prisone
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Pagination
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
@@ -89,7 +89,7 @@ class PrisonerSearchService(
           releaseDate = releaseDate,
           releaseType = releaseType,
           nextActionDate = additionalData?.getNextActionDateAsLocalDate(),
-          planLastUpdated = additionalData?.actionPlanUpdatedAt?.toLocalDate(),
+          planLastUpdated = additionalData?.getActionPlanUpdatedAt(),
         )
       }
     }
@@ -100,16 +100,19 @@ class PrisonerSearchService(
 data class PrisonerActionDto(
   val prisonNumber: String,
   val hasActionPlan: Boolean,
-  val actionPlanUpdatedAt: LocalDateTime?,
+  val actionPlanUpdatedAt: Any?,
   val nextActionDate: Any?,
   val nextActionType: String?,
 ) {
-  fun getNextActionDateAsLocalDate(): LocalDate? = when (nextActionDate) {
+  fun getNextActionDateAsLocalDate(): LocalDate? = localDate(nextActionDate)
+  fun getActionPlanUpdatedAt(): LocalDate? = localDate(actionPlanUpdatedAt)
+
+  private fun localDate(nextActionDate: Any?) = when (nextActionDate) {
     is java.sql.Date -> nextActionDate.toLocalDate() // Directly convert SQL Date
-    is java.util.Date -> nextActionDate.toInstant()
+    is Date -> nextActionDate.toInstant()
       .atZone(ZoneId.systemDefault())
       .toLocalDate()
-    is java.time.Instant -> nextActionDate.atZone(ZoneId.systemDefault()).toLocalDate()
+    is Instant -> nextActionDate.atZone(ZoneId.systemDefault()).toLocalDate()
     else -> null
   }
 }
