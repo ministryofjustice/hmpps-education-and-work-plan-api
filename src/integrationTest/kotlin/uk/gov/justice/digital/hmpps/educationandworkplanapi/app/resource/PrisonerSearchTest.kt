@@ -200,48 +200,65 @@ class PrisonerSearchTest : IntegrationTestBase() {
     assertThat(actual.people[0].planLastUpdated).isNull()
   }
 
-  private fun searchPeople(): FluxExchangeResult<PersonSearchResult> {
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, PRISON_ID)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          ACTIONPLANS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(PersonSearchResult::class.java)
-    return response
+  @Test
+  fun `filter on prisoner has action plan`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeopleWithActionPlan(true)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.people.size).isEqualTo(1)
+    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
   }
 
-  private fun searchPeopleWithPrisonNameNumberFilter(
-    prisonNameNumber: String,
-  ): FluxExchangeResult<PersonSearchResult> {
-    val response = webTestClient.get()
-      .uri("$URI_TEMPLATE?prisonerNameOrNumber=$prisonNameNumber", PRISON_ID)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          ACTIONPLANS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(PersonSearchResult::class.java)
-    return response
+  @Test
+  fun `filter on prisoner has no action plan`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeopleWithActionPlan(false)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.people.size).isEqualTo(5)
+    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner2.prisonerNumber)
+    assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner3.prisonerNumber)
+    assertThat(actual.people[2].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
+    assertThat(actual.people[3].prisonNumber).isEqualTo(prisoner5.prisonerNumber)
+    assertThat(actual.people[4].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
   }
 
-  private fun searchPeopleWithSort(
-    sortBy: String,
-    sortDirection: String = "asc",
-  ): FluxExchangeResult<PersonSearchResult> {
-    val response = webTestClient.get()
-      .uri("$URI_TEMPLATE?sortBy=$sortBy&sortDirection=$sortDirection", PRISON_ID)
+  private fun searchPeople(): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams()
+
+  private fun searchPeopleWithPrisonNameNumberFilter(prisonNameNumber: String): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("prisonerNameOrNumber" to prisonNameNumber)
+
+  private fun searchPeopleWithActionPlan(hasPlan: Boolean): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("hasActionPlan" to hasPlan.toString())
+
+  private fun searchPeopleWithSort(sortBy: String, sortDirection: String = "asc"): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("sortBy" to sortBy, "sortDirection" to sortDirection)
+
+  private fun searchPeopleWithParams(vararg params: Pair<String, String>): FluxExchangeResult<PersonSearchResult> {
+    val uri = URI_TEMPLATE + params.joinToString("&", prefix = "?") { "${it.first}=${it.second}" }
+
+    return webTestClient.get()
+      .uri(uri, PRISON_ID)
       .bearerToken(
         aValidTokenWithAuthority(
           INDUCTIONS_RW,
@@ -250,10 +267,8 @@ class PrisonerSearchTest : IntegrationTestBase() {
         ),
       )
       .exchange()
-      .expectStatus()
-      .isOk
+      .expectStatus().isOk
       .returnResult(PersonSearchResult::class.java)
-    return response
   }
 
   fun setUpData() {
