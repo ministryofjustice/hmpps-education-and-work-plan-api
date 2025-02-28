@@ -101,7 +101,7 @@ data class PrisonerActionDto(
   val prisonNumber: String,
   val hasActionPlan: Boolean,
   val actionPlanUpdatedAt: LocalDateTime?,
-  val nextActionDate: Date?,
+  val nextActionDate: Any?,
   val nextActionType: String?,
 ) {
   fun getNextActionDateAsLocalDate(): LocalDate? = when (nextActionDate) {
@@ -109,6 +109,7 @@ data class PrisonerActionDto(
     is java.util.Date -> nextActionDate.toInstant()
       .atZone(ZoneId.systemDefault())
       .toLocalDate()
+    is java.time.Instant -> nextActionDate.atZone(ZoneId.systemDefault()).toLocalDate()
     else -> null
   }
 }
