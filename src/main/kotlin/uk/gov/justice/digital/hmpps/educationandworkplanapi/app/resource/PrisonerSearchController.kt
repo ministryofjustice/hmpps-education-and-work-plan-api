@@ -63,6 +63,6 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
     val sortBy: String = "prisonerName",
     val sortDirection: String = "asc",
     val page: Int = 1,
-    val size: Int = 10,
+    val pageSize: Int = 50,
   )
 }

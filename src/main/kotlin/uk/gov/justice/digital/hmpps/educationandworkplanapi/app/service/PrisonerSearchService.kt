@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PersonSearchRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.PrisonerSearchController
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.PrisonerSearchController.PrisonerSearchCriteria
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Pagination
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
@@ -18,25 +18,15 @@ class PrisonerSearchService(
 ) {
   fun searchPrisoners(
     prisonId: String,
-    searchCriteria: PrisonerSearchController.PrisonerSearchCriteria,
+    searchCriteria: PrisonerSearchCriteria,
   ): PersonSearchResult {
     val personResponses = rawPersonData(prisonId)
-    // TODO - filtering on the following:
-    //
-    //  prisonerNameOrNumber
-    //  hasActionPlan
-    //  releaseDateBefore
-    //  releaseDateAfter
-    //  actionPlanLastUpdatedBefore
-    //  actionPlanLastUpdatedAfter
-    //  nextActionDateBefore
-    //  nextActionDateAfter
-
-    val sortedResponses = applySorting(searchCriteria, personResponses)
+    val filteredResults = applyFilters(searchCriteria, personResponses)
+    val sortedResponses = applySorting(searchCriteria, filteredResults)
 
     // Pagination
     val page = searchCriteria.page
-    val pageSize = searchCriteria.size
+    val pageSize = searchCriteria.pageSize
     val totalElements = sortedResponses.size
     val totalPages = (totalElements + pageSize - 1) / pageSize
     val pagedResponses = sortedResponses.drop((page - 1) * pageSize).take(pageSize)
@@ -54,8 +44,41 @@ class PrisonerSearchService(
     )
   }
 
+  fun applyFilters(
+    searchCriteria: PrisonerSearchCriteria,
+    personResponses: List<PersonResponse>,
+  ): List<PersonResponse> = personResponses.filter { person ->
+    // Filter by prisoner name or number
+    (
+      searchCriteria.prisonerNameOrNumber.isNullOrBlank() ||
+        person.name.contains(searchCriteria.prisonerNameOrNumber, ignoreCase = true) ||
+        person.prisonNumber.equals(searchCriteria.prisonerNameOrNumber, ignoreCase = true)
+      ) &&
+
+      // Filter by hasActionPlan
+      (searchCriteria.hasActionPlan == null || person.hasPlan == searchCriteria.hasActionPlan) &&
+
+      // Filter by releaseDateBefore
+      (searchCriteria.releaseDateBefore == null || person.releaseDate?.isBefore(searchCriteria.releaseDateBefore) == true) &&
+
+      // Filter by releaseDateAfter
+      (searchCriteria.releaseDateAfter == null || person.releaseDate?.isAfter(searchCriteria.releaseDateAfter) == true) &&
+
+      // Filter by actionPlanLastUpdatedBefore
+      (searchCriteria.actionPlanLastUpdatedBefore == null || person.planLastUpdated?.isBefore(searchCriteria.actionPlanLastUpdatedBefore) == true) &&
+
+      // Filter by actionPlanLastUpdatedAfter
+      (searchCriteria.actionPlanLastUpdatedAfter == null || person.planLastUpdated?.isAfter(searchCriteria.actionPlanLastUpdatedAfter) == true) &&
+
+      // Filter by nextActionDateBefore
+      (searchCriteria.nextActionDateBefore == null || person.nextActionDate?.isBefore(searchCriteria.nextActionDateBefore) == true) &&
+
+      // Filter by nextActionDateAfter
+      (searchCriteria.nextActionDateAfter == null || person.nextActionDate?.isAfter(searchCriteria.nextActionDateAfter) == true)
+  }
+
   private fun applySorting(
-    searchCriteria: PrisonerSearchController.PrisonerSearchCriteria,
+    searchCriteria: PrisonerSearchCriteria,
     personResponses: List<PersonResponse>,
   ): List<PersonResponse> {
     val comparator: Comparator<PersonResponse> = when (searchCriteria.sortBy) {
