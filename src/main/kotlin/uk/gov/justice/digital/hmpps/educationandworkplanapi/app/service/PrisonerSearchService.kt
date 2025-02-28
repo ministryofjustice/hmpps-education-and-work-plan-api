@@ -58,15 +58,22 @@ class PrisonerSearchService(
     searchCriteria: PrisonerSearchController.PrisonerSearchCriteria,
     personResponses: List<PersonResponse>,
   ): List<PersonResponse> {
-    val sortedResponses = when (searchCriteria.sortBy) {
-      "hasPlan" -> personResponses.sortedBy { it.hasPlan }
-      "releaseDate" -> personResponses.sortedBy { it.releaseDate }
-      "releaseType" -> personResponses.sortedBy { it.releaseType }
-      "cellLocation" -> personResponses.sortedBy { it.cellLocation }
-      "nextActionDate" -> personResponses.sortedBy { it.nextActionDate }
-      "planLastUpdated" -> personResponses.sortedBy { it.planLastUpdated }
-      else -> personResponses.sortedBy { it.name }
-    }.let { if (searchCriteria.sortDirection.lowercase() == "desc") it.reversed() else it }
+    val comparator: Comparator<PersonResponse> = when (searchCriteria.sortBy) {
+      "hasPlan" -> compareBy(nullsLast()) { it.hasPlan }
+      "releaseDate" -> compareBy(nullsLast()) { it.releaseDate }
+      "releaseType" -> compareBy(nullsLast()) { it.releaseType }
+      "cellLocation" -> compareBy(nullsLast()) { it.cellLocation }
+      "nextActionDate" -> compareBy(nullsLast()) { it.nextActionDate }
+      "planLastUpdated" -> compareBy(nullsLast()) { it.planLastUpdated }
+      else -> compareBy(nullsLast()) { it.name }
+    }
+
+    val sortedResponses = if (searchCriteria.sortDirection.lowercase() == "desc") {
+      personResponses.sortedWith(comparator.reversed())
+    } else {
+      personResponses.sortedWith(comparator)
+    }
+
     return sortedResponses
   }
 
