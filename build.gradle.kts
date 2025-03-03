@@ -4,8 +4,8 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.2"
-  id("org.openapi.generator") version "7.11.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.3"
+  id("org.openapi.generator") version "7.12.0"
   kotlin("plugin.spring") version "2.1.10"
   kotlin("plugin.jpa") version "2.1.10"
 
@@ -20,13 +20,13 @@ apply(plugin = "org.openapi.generator")
 val postgresqlVersion = "42.7.5"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.8.5"
-val hmppsSqsVersion = "5.3.1"
-val awaitilityVersion = "4.2.2"
+val hmppsSqsVersion = "5.3.2"
+val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.12.0"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "10.0.1"
-val testContainersVersion = "1.20.4"
-val awsSdkVersion = "1.12.781"
+val nimbusJwtVersion = "10.0.2"
+val testContainersVersion = "1.20.5"
+val awsSdkVersion = "1.12.782"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.18.1"
@@ -52,7 +52,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.2.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.1")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
