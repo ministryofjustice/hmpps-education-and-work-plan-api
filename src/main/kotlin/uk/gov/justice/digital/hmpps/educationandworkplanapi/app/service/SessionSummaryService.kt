@@ -26,15 +26,19 @@ class SessionSummaryService(
   private val inductionScheduleService: InductionScheduleService,
 ) {
 
-  val today: LocalDate = LocalDate.now()
-
   /**
    * returns due, overdue and on hold counts for Inductions and Reviews
    * for all prisoners within a given prison.
    */
   fun getSessionSummaries(prisonId: String): SessionSummaryResponse {
     val prisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
-    val prisonerNumbers = prisoners.map { it.prisonerNumber }
+      .also {
+        log.debug { "${it.size} prisoners returned from prisoner-search-api" }
+      }
+    val prisonerNumbers = prisoners.map { it.prisonerNumber }.toSet().sorted().toList()
+      .also {
+        log.debug { "${it.size} unique prisoners returned from prisoner-search-api" }
+      }
     val sessionSummaries = getSessionSummaries(prisonerNumbers)
 
     return SessionSummaryResponse(
@@ -99,44 +103,32 @@ class SessionSummaryService(
   private fun getSessionSummaries(
     prisonerNumbers: List<String>,
   ): SessionSummaries {
+    val today = LocalDate.now()
+
     val sessionSummaries = SessionSummaries()
     val inductionSchedules = inductionScheduleService.getInCompleteInductionSchedules(prisonerNumbers)
     val reviewSchedules = reviewScheduleService.getInCompleteReviewSchedules(prisonerNumbers)
 
     inductionSchedules.forEach { schedule ->
       when {
-        schedule.scheduleStatus.includeExceptionOnSummary() -> {
-          sessionSummaries.exemptInductions.add(schedule)
-        }
-        schedule.scheduleStatus == INDUCTION_SCHEDULED && schedule.deadlineDate < today -> {
-          sessionSummaries.overdueInductions.add(schedule)
-        }
-        schedule.scheduleStatus == INDUCTION_SCHEDULED &&
-          today in schedule.deadlineDate.minusMonths(2)..schedule.deadlineDate -> {
-          sessionSummaries.dueInductions.add(schedule)
-        }
+        schedule.includeInExemptCount() -> sessionSummaries.exemptInductions.add(schedule)
+        schedule.includeInOverdueCount(today) -> sessionSummaries.overdueInductions.add(schedule)
+        schedule.includeInDueCount(today) -> sessionSummaries.dueInductions.add(schedule)
       }
     }
 
     reviewSchedules.forEach { schedule ->
       when {
-        schedule.scheduleStatus.includeExceptionOnSummary() -> sessionSummaries.exemptReviews.add(schedule)
-
-        schedule.scheduleStatus == SCHEDULED &&
-          schedule.reviewScheduleWindow.dateTo < today -> sessionSummaries.overdueReviews.add(
-          schedule,
-        )
-
-        schedule.scheduleStatus == SCHEDULED &&
-          today in schedule.reviewScheduleWindow.dateFrom..schedule.reviewScheduleWindow.dateTo -> sessionSummaries.dueReviews.add(
-          schedule,
-        )
+        schedule.includeInExemptCount() -> sessionSummaries.exemptReviews.add(schedule)
+        schedule.includeInOverdueCount(today) -> sessionSummaries.overdueReviews.add(schedule)
+        schedule.includeInDueCount(today) -> sessionSummaries.dueReviews.add(schedule)
       }
     }
+
     return sessionSummaries
   }
 
-  data class SessionSummaries(
+  private data class SessionSummaries(
     val dueReviews: MutableList<ReviewSchedule> = mutableListOf(),
     val overdueReviews: MutableList<ReviewSchedule> = mutableListOf(),
     val exemptReviews: MutableList<ReviewSchedule> = mutableListOf(),
@@ -144,4 +136,46 @@ class SessionSummaryService(
     val overdueInductions: MutableList<InductionSchedule> = mutableListOf(),
     val exemptInductions: MutableList<InductionSchedule> = mutableListOf(),
   )
+
+  /**
+   * Returns true if the [InductionSchedule] is considered exempt for the purposes of the [SessionSummaries] counts
+   */
+  private fun InductionSchedule.includeInExemptCount(): Boolean = with(scheduleStatus) {
+    isExemptionOrExclusion() && includeExemptionOnSummary
+  }
+
+  /**
+   * Returns true if the [InductionSchedule] is considered overdue for the purposes of the [SessionSummaries] counts
+   */
+  private fun InductionSchedule.includeInOverdueCount(today: LocalDate): Boolean = with(scheduleStatus) {
+    this == INDUCTION_SCHEDULED && deadlineDate.isBefore(today)
+  }
+
+  /**
+   * Returns true if the [InductionSchedule] is considered due for the purposes of the [SessionSummaries] counts
+   */
+  private fun InductionSchedule.includeInDueCount(today: LocalDate): Boolean = with(scheduleStatus) {
+    this == INDUCTION_SCHEDULED && today in deadlineDate.minusMonths(2)..deadlineDate
+  }
+
+  /**
+   * Returns true if the [ReviewSchedule] is considered exempt for the purposes of the [SessionSummaries] counts
+   */
+  private fun ReviewSchedule.includeInExemptCount(): Boolean = with(scheduleStatus) {
+    isExemptionOrExclusion() && includeExemptionOnSummary
+  }
+
+  /**
+   * Returns true if the [ReviewSchedule] is considered overdue for the purposes of the [SessionSummaries] counts
+   */
+  private fun ReviewSchedule.includeInOverdueCount(today: LocalDate): Boolean = with(scheduleStatus) {
+    this == SCHEDULED && reviewScheduleWindow.dateTo.isBefore(today)
+  }
+
+  /**
+   * Returns true if the [ReviewSchedule] is considered due for the purposes of the [SessionSummaries] counts
+   */
+  private fun ReviewSchedule.includeInDueCount(today: LocalDate): Boolean = with(scheduleStatus) {
+    this == SCHEDULED && today in reviewScheduleWindow.dateFrom..reviewScheduleWindow.dateTo
+  }
 }

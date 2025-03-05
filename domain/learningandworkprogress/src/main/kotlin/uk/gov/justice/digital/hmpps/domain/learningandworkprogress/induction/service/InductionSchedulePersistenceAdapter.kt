@@ -44,6 +44,8 @@ interface InductionSchedulePersistenceAdapter {
    * Update the Induction schedule status and the deadlineDate.
    */
   fun updateInductionScheduleStatus(updateInductionScheduleStatusDto: UpdateInductionScheduleStatusDto): InductionSchedule
+
   fun getActiveInductionSchedule(prisonNumber: String): InductionSchedule?
+
   fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule>
 }

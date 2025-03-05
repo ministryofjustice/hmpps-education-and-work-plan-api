@@ -53,5 +53,6 @@ interface ReviewSchedulePersistenceAdapter {
    * Update the Review schedule status, prisonId and if present the latestReviewDate.
    */
   fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule
+
   fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule>
 }
