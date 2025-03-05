@@ -10,11 +10,12 @@ private val log = KotlinLogging.logger {}
 @Service
 class PrisonerSearchApiService(
   private val prisonerSearchApiClient: PrisonerSearchApiClient,
+// prisoner-search-api appears to be buggy in it's paged API implementation, so safest to request a large page size to get all records in one hit (arguably not the most efficient though)
+  private val pageSize: Int = 9999,
 ) {
 
   fun getAllPrisonersInPrison(prisonId: String): List<Prisoner> {
     var page = 0
-    val pageSize = 250
 
     val prisoners = mutableListOf<Prisoner>()
 

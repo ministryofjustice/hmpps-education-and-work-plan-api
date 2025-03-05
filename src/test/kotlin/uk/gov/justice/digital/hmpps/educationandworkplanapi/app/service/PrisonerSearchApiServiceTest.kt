@@ -4,11 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PagedPrisonerResponse
@@ -19,11 +18,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 
 @ExtendWith((MockitoExtension::class))
 class PrisonerSearchApiServiceTest {
-  @InjectMocks
-  private lateinit var service: PrisonerSearchApiService
+  private val prisonerSearchApiClient: PrisonerSearchApiClient = mock()
 
-  @Mock
-  private lateinit var prisonerSearchApiClient: PrisonerSearchApiClient
+  private val service = PrisonerSearchApiService(
+    prisonerSearchApiClient = prisonerSearchApiClient,
+    pageSize = 250,
+  )
 
   @Test
   fun `should get all prisoners in a prison given they are all returned in the first request`() {
