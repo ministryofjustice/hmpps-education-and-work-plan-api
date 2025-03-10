@@ -25,7 +25,7 @@ val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.12.1"
 val jsonWebTokenVersion = "0.12.6"
 val nimbusJwtVersion = "10.0.2"
-val testContainersVersion = "1.20.5"
+val testContainersVersion = "1.20.6"
 val awsSdkVersion = "1.12.782"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
@@ -52,7 +52,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.0")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
