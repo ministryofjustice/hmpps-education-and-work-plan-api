@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
@@ -50,7 +49,7 @@ import java.util.UUID
 @Component
 class TimelineEventFactory(private val userService: ManageUserService) {
 
-  fun actionPlanCreatedEvent(actionPlan: ActionPlan, induction: Induction): List<TimelineEvent> {
+  fun actionPlanCreatedEvent(actionPlan: ActionPlan): List<TimelineEvent> {
     val events = mutableListOf<TimelineEvent>()
 
     val correlationId = UUID.randomUUID()
@@ -59,7 +58,7 @@ class TimelineEventFactory(private val userService: ManageUserService) {
         actionPlan.goals[0],
         actionPlan.reference,
         TimelineEventType.ACTION_PLAN_CREATED,
-        contextualInfo = getInductionContextInfo(induction),
+        contextualInfo = emptyMap(),
         correlationId = correlationId,
       ),
     )
@@ -67,34 +66,6 @@ class TimelineEventFactory(private val userService: ManageUserService) {
       events.add(goalCreatedTimelineEvent(it, correlationId))
     }
     return events
-  }
-
-  private fun getInductionContextInfo(induction: Induction): Map<TimelineEventContext, String> = with(induction) {
-    // The `completedDate` in the Induction can be used to determine whether the Induction was created using the original UI Induction journey,
-    // or the new journey that asks who conducted the Induction, what their role was and when.
-    // The `completedDate` property is nullable/optional in the domain class to be backward compatible with the old journey that does not ask it.
-    // In the new UI journey it is mandatory (in the UI), so we can use the presence of this field to know whether it was the new or old journey.
-    // For the new journey we need to write the contextualInfo fields as part of the timeline event, for the old journey we do not need to.
-    completedDate?.let {
-      val noteContent = note?.content ?: ""
-      val conductedByPerson = conductedBy ?: ""
-      val conductedByRolePerson = conductedByRole ?: ""
-
-      mapOf(
-        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
-        TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(induction.createdBy!!).name,
-        TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
-        TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
-        *conductedBy
-          ?.let {
-            arrayOf(
-              TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY to conductedByPerson,
-              TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to conductedByRolePerson,
-            )
-          } ?: arrayOf(),
-      )
-    }
-      ?: emptyMap()
   }
 
   fun goalCreatedTimelineEvent(goal: Goal, correlationId: UUID = UUID.randomUUID()) = buildTimelineEvent(
