@@ -284,8 +284,8 @@ class UpdateGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(5) {
-          // the 5th Timeline event will be the GOAL_UPDATED event
+        .anyOfEventNumber(4, 5, 6) {
+          // Due to exact timestamps during testing it could be 4/5/6th entry
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
