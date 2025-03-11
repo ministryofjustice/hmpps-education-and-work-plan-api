@@ -244,7 +244,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       updatedByDisplayName = updateDisplayName,
       updatedAtPrison = "MDI",
     )
-    shortDelayForTimestampChecking()
+    shortDelay()
 
     // When
     webTestClient.put()
@@ -392,7 +392,7 @@ class UpdateInductionTest : IntegrationTestBase() {
       updatedByDisplayName = updateDisplayName,
       updatedAtPrison = "MDI",
     )
-    shortDelayForTimestampChecking()
+    shortDelay()
 
     // When
     webTestClient.put()
@@ -676,9 +676,5 @@ class UpdateInductionTest : IntegrationTestBase() {
         .wasUpdatedBy("buser_gen")
         .wasCreatedAtPrison("MDI")
     }
-  }
-
-  private fun shortDelayForTimestampChecking() {
-    Thread.sleep(200)
   }
 }
