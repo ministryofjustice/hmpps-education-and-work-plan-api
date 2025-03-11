@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.microsoft.applicationinsights.TelemetryClient
+import mu.KotlinLogging
 import org.awaitility.Awaitility
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
+import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.ArgumentCaptor
 import org.springframework.beans.factory.annotation.Autowired
@@ -92,6 +94,8 @@ import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
+
+private val log = KotlinLogging.logger {}
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("integration-test")
@@ -209,20 +213,30 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun clearDatabase() {
-    actionPlanRepository.deleteAll() // Will also remove all Goals and Steps due to cascade
-    timelineRepository.deleteAll() // Will also remove all TimelineEvents due to cascade
-    inductionRepository.deleteAll()
-    previousQualificationsRepository.deleteAll()
-    reviewRepository.deleteAll()
-    reviewScheduleRepository.deleteAll()
-    reviewScheduleHistoryRepository.deleteAll()
-    noteRepository.deleteAll()
-    inductionScheduleRepository.deleteAll()
-    inductionScheduleHistoryRepository.deleteAll()
+    repeat(2) { attempt ->
+      // this sometimes fails - try to do this twice with a delay
+      try {
+        actionPlanRepository.deleteAll()
+        timelineRepository.deleteAll()
+        inductionRepository.deleteAll()
+        previousQualificationsRepository.deleteAll()
+        reviewRepository.deleteAll()
+        reviewScheduleRepository.deleteAll()
+        reviewScheduleHistoryRepository.deleteAll()
+        noteRepository.deleteAll()
+        inductionScheduleRepository.deleteAll()
+        inductionScheduleHistoryRepository.deleteAll()
 
-    clearQueues()
+        clearQueues()
+        wiremockService.resetAllStubsAndMappings()
 
-    wiremockService.resetAllStubsAndMappings()
+        return
+      } catch (e: ConstraintViolationException) {
+        if (attempt == 1) throw e
+        log.info("Database cleanup failed due to constraint violation. Retrying...")
+        shortDelay()
+      }
+    }
   }
 
   fun clearQueues() {
@@ -650,6 +664,10 @@ abstract class IntegrationTestBase {
         objectMapper.writeValueAsString(message),
       ).build(),
   ).get()
+
+  fun shortDelay() {
+    Thread.sleep(200)
+  }
 }
 
 data class Notification(
