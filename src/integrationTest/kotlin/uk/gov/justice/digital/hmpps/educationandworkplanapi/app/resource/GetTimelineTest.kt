@@ -171,14 +171,6 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.INDUCTION_CREATED)
             .hasPrisonId("BXI")
             .wasActionedBy("auser_gen")
-        }
-        // Events 4 and 5 were all created as part of the same Action Plan created event so will all have the same timestamp
-        // so we cannot guarantee their order
-        .anyOfEventNumber(4, 5) {
-          it.hasSourceReference(actionPlan.reference.toString())
-            .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
-            .hasPrisonId("BXI")
-            .wasActionedBy("auser_gen")
             .hasActionedByDisplayName("Albert User")
             .hasContextualInfo(
               mapOf(
@@ -190,6 +182,15 @@ class GetTimelineTest : IntegrationTestBase() {
                 "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
               ),
             )
+        }
+        // Events 4 and 5 were all created as part of the same Action Plan created event so will all have the same timestamp
+        // so we cannot guarantee their order
+        .anyOfEventNumber(4, 5) {
+          it.hasSourceReference(actionPlan.reference.toString())
+            .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
+            .hasPrisonId("BXI")
+            .wasActionedBy("auser_gen")
+            .hasActionedByDisplayName("Albert User")
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .anyOfEventNumber(4, 5) {
@@ -314,16 +315,7 @@ class GetTimelineTest : IntegrationTestBase() {
           it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
             .hasSourceReference(actionPlanReference.toString())
-            .hasContextualInfo(
-              mapOf(
-                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE" to validInductionRequest.conductedAt.toString(),
-                "COMPLETED_INDUCTION_ENTERED_ONLINE_AT" to induction.createdAt.toString(),
-                "COMPLETED_INDUCTION_NOTES" to validInductionRequest.note.toString(),
-                "COMPLETED_INDUCTION_ENTERED_ONLINE_BY" to "Albert User",
-                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY" to validInductionRequest.conductedBy.toString(),
-                "COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE" to validInductionRequest.conductedByRole.toString(),
-              ),
-            )
+            .hasNoContextualInfo()
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
         .anyOfEventNumber(3, 4) {
