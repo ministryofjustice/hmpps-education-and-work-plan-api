@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -18,7 +18,7 @@ class UpdateActionPlanReviewStatusHistoryTest : IntegrationTestBase() {
     private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/schedule-status"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
+  private val prisonNumber = randomValidPrisonNumber()
 
   @Test
   fun `Test that review schedule history records are written when a schedule is exempted`() {

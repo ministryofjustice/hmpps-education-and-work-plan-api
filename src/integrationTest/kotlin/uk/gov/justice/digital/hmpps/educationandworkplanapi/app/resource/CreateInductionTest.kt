@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.firstValue
@@ -12,8 +13,6 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -33,6 +32,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
+@Isolated
 class CreateInductionTest : IntegrationTestBase() {
 
   companion object {
@@ -42,7 +42,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -52,7 +52,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidCreateInductionRequest())
       .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
@@ -63,7 +63,7 @@ class CreateInductionTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create induction given no induction data provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.post()
@@ -91,7 +91,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should fail to create induction given induction already exists`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
 
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork()
@@ -117,7 +117,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should fail to create induction given malformed prison id`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val invalidPrisonId = "does not meet pattern of 3 upper case letters"
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = invalidPrisonId)
@@ -144,7 +144,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should create an induction for a prisoner looking for work`() {
     // Given
-    val prisonNumber = anotherValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
     val dpsUsername = "auser_gen"
 
@@ -190,7 +190,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should create an induction for a prisoner not looking for work`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork()
     val dpsUsername = "auser_gen"
 
@@ -236,7 +236,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should create an induction for a prisoner whose previous work experience is declared as not relevant`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
       previousWorkExperiences = aValidCreatePreviousWorkExperiencesRequest(
         hasWorkedBefore = HasWorkedBefore.NOT_RELEVANT,
@@ -269,7 +269,7 @@ class CreateInductionTest : IntegrationTestBase() {
   @Test
   fun `should create an induction and not create a review schedule given the prisoner does not have goals created before the induction`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val createRequest = aValidCreateInductionRequest()
 
     // When
@@ -295,13 +295,13 @@ class CreateInductionTest : IntegrationTestBase() {
       .expectStatus()
       .isNotFound
 
-    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).isEmpty()
   }
 
   @Test
   fun `should create an induction and create the initial review schedule given the prisoner already has goals created before the induction`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
 
     val createRequest = aValidCreateInductionRequest()
@@ -331,12 +331,13 @@ class CreateInductionTest : IntegrationTestBase() {
     val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
 
     assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
-    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).size().isEqualTo(1)
   }
 
   @Test
   fun `should create induction and create initial review schedule given prisoner already has goals created before the induction, is sentenced without a release date and has the indeterminate flag`() {
     // Given
+    clearDatabase()
     val prisonNumber = "X9999XX" // Prisoner X9999XX is sentenced, but with no release date, and the has the `indeterminate` flag set
     createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
 
@@ -368,12 +369,13 @@ class CreateInductionTest : IntegrationTestBase() {
     val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
 
     assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
-    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).size().isEqualTo(1)
   }
 
   @Test
   fun `should create induction and not create initial review schedule given prisoner already has goals created before the induction, but is an unsupported sentence type for the release schedule`() {
     // Given
+    clearDatabase()
     val prisonNumber = "Z9999ZZ" // Prisoner Z9999ZZ is sentenced, but with no release date, which is an unsupported combination when creating the release schedule
     createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
 
@@ -402,13 +404,13 @@ class CreateInductionTest : IntegrationTestBase() {
       .expectStatus()
       .isNotFound
 
-    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).isEmpty()
   }
 
   @Test
   fun `should create an induction for a prisoner looking for work and complete the existing induction schedule`() {
     // Given
-    val prisonNumber = randomValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
     val dpsUsername = "auser_gen"
     // action plan and induction schedule exist

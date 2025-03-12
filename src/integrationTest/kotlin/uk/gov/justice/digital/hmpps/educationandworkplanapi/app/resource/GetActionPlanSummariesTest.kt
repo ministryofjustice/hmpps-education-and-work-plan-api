@@ -3,8 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -59,7 +58,7 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
   @Test
   fun `should get empty list of action plan summaries given prisoner has no action plan`() {
     // Given
-    val request = aValidGetActionPlanSummariesRequest(prisonNumbers = listOf(aValidPrisonNumber()))
+    val request = aValidGetActionPlanSummariesRequest(prisonNumbers = listOf(randomValidPrisonNumber()))
 
     // When
     val response = webTestClient.post()
@@ -80,8 +79,8 @@ class GetActionPlanSummariesTest : IntegrationTestBase() {
   @Test
   fun `should get multiple action plan summaries`() {
     // Given
-    val prisonNumber1 = aValidPrisonNumber()
-    val prisonNumber2 = anotherValidPrisonNumber()
+    val prisonNumber1 = randomValidPrisonNumber()
+    val prisonNumber2 = randomValidPrisonNumber()
     createActionPlan(prisonNumber1, aValidCreateActionPlanRequest())
     createActionPlan(prisonNumber2, aValidCreateActionPlanRequest())
     val request = aValidGetActionPlanSummariesRequest(listOf(prisonNumber1, prisonNumber2))

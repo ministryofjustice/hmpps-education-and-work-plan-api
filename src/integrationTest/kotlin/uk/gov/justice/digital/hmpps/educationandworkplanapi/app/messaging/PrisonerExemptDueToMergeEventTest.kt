@@ -6,7 +6,7 @@ import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
@@ -24,7 +24,7 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
   fun `should update Review Schedule given merged prisoner had an active Review Schedule`() {
     // Given
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
     createActionPlan(prisonNumber)
 
@@ -56,7 +56,7 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
   @Test
   fun `should not update Review Schedule given merged prisoner does not have an active Review Schedule`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
     createActionPlan(prisonNumber)
@@ -90,7 +90,7 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
   @Test
   fun `should not create or update Review Schedule given merged prisoner does not have a Review Schedule at all`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     assertThat(runCatching { getActionPlanReviews(prisonNumber) }.getOrNull()).isNull()
 
     val sqsMessage = sqsMessage(prisonNumber)
@@ -110,7 +110,7 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
   @Test
   fun `should update Induction Schedule given merged prisoner had an active Induction Schedule`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInductionSchedule(prisonNumber)
 
     val sqsMessage = sqsMessage(prisonNumber)
@@ -134,7 +134,7 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
   @Test
   fun `should not update Induction Schedule given merged prisoner had a completed Induction Schedule`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInductionSchedule(prisonNumber, status = InductionScheduleStatusEntity.COMPLETED)
 
     val sqsMessage = sqsMessage(prisonNumber)

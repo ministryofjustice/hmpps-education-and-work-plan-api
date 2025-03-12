@@ -11,8 +11,8 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -43,10 +43,9 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     private const val ARCHIVE_URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/archive"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
-
   @Test
   fun `should return unauthorized given no bearer token`() {
+    val prisonNumber = randomValidPrisonNumber()
     webTestClient.put()
       .uri(UNARCHIVE_URI_TEMPLATE, prisonNumber, aValidReference())
       .contentType(APPLICATION_JSON)
@@ -57,6 +56,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should require the edit role`() {
+    val prisonNumber = randomValidPrisonNumber()
     webTestClient.put()
       .uri(UNARCHIVE_URI_TEMPLATE, prisonNumber, aValidReference())
       .withBody(aValidArchiveGoalRequest())
@@ -75,6 +75,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and unarchive a goal and reset the reason and other text `() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val archiveRequestWithOtherReason = aValidArchiveGoalRequest(
@@ -127,6 +128,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and unarchive a goal and reset the reason and other text and archive note is deleted `() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val archiveNote = "an archive note"
@@ -192,6 +194,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal isn't found`() {
     // given
+    val prisonNumber = randomValidPrisonNumber()
     val unarchiveGoalRequest = aValidUnarchiveGoalRequest()
     val goalReference = unarchiveGoalRequest.goalReference
 
@@ -211,6 +214,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal is for a different prisoner`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val unarchiveGoalRequest = aValidUnarchiveGoalRequest(goalReference)
     val aDifferentPrisonNumber = "Z9876YX"
@@ -230,7 +234,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should return 400 if request is malformed`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     // When
@@ -264,6 +268,7 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 409 if goal is not archived`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val archiveGoalRequest = aValidUnarchiveGoalRequest(goalReference)
 

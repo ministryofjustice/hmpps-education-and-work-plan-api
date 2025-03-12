@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -23,7 +22,7 @@ class CreateEducationTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .exchange()
       .expectStatus()
       .isUnauthorized
@@ -32,7 +31,7 @@ class CreateEducationTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .withBody(aValidCreateEducationRequest())
       .bearerToken(
         aValidTokenWithAuthority(
@@ -48,7 +47,7 @@ class CreateEducationTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create education given no education data provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
 
     // When
     val response = webTestClient.post()
@@ -81,7 +80,7 @@ class CreateEducationTest : IntegrationTestBase() {
   @Test
   fun `should create a prisoner's education record given there is no education for the prisoner already`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
 
     val earliestCreateTime = OffsetDateTime.now()
 
@@ -114,7 +113,7 @@ class CreateEducationTest : IntegrationTestBase() {
   @Test
   fun `should fail to create a prisoner's education record given there is an education record for the prisoner already`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
 
     createEducation(prisonNumber)
 
@@ -138,6 +137,6 @@ class CreateEducationTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(409)
-      .hasUserMessage("An Education already exists for prisoner A1234BC")
+      .hasUserMessage("An Education already exists for prisoner $prisonNumber")
   }
 }

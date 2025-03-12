@@ -11,7 +11,6 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
@@ -41,10 +40,9 @@ class ArchiveGoalTest : IntegrationTestBase() {
     const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/archive"
   }
 
-  private val prisonNumber = randomValidPrisonNumber()
-
   @Test
   fun `should return unauthorized given no bearer token`() {
+    val prisonNumber = randomValidPrisonNumber()
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
       .contentType(APPLICATION_JSON)
@@ -55,6 +53,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should require the edit role`() {
+    val prisonNumber = randomValidPrisonNumber()
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
       .withBody(aValidArchiveGoalRequest())
@@ -68,6 +67,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and archive a goal and record the reason and other text `() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val archiveGoalRequest = aValidArchiveGoalRequest(
@@ -95,9 +95,9 @@ class ArchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .hasNumberOfEvents(4)
-        .event(4) {
-          // the 4th Timeline event will be the GOAL_ARCHIVED event
+        .hasNumberOfEvents(5)
+        .event(5) {
+          // the 5th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -120,6 +120,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and archive a goal and record the reason and other text and create an archive note`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val reasonOther = "Because it's Monday"
     val noteText = "no longer relevant"
@@ -149,9 +150,9 @@ class ArchiveGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .hasNumberOfEvents(4)
-        .event(4) {
-          // the 4th Timeline event will be the GOAL_ARCHIVED event
+        .hasNumberOfEvents(5)
+        .event(5) {
+          // the 5th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -169,7 +170,11 @@ class ArchiveGoalTest : IntegrationTestBase() {
       assertThat(goalArchivedEventProperties)
         .containsEntry("reference", goalReference.toString())
 
-      val note = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+      val note = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+        goalReference,
+        EntityType.GOAL,
+        NoteType.GOAL_ARCHIVAL,
+      ).firstOrNull()
       assertThat(note!!.content).isEqualTo(noteText)
     }
   }
@@ -177,6 +182,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal isn't found`() {
     // given
+    val prisonNumber = randomValidPrisonNumber()
     val archiveGoalRequest = aValidArchiveGoalRequest()
     val goalReference = archiveGoalRequest.goalReference
 
@@ -196,6 +202,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal is for a different prisoner`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val archiveGoalRequest = aValidArchiveGoalRequest(goalReference)
     val aDifferentPrisonNumber = "Z9876YX"
@@ -215,7 +222,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should return 400 if request is malformed`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     // When
@@ -244,6 +251,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 400 if other reason without description`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val archiveGoalRequest = aValidArchiveGoalRequest(
       goalReference = goalReference,
@@ -267,6 +275,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 409 if goal is already archived`() {
     // given
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val archiveGoalRequest = aValidArchiveGoalRequest(goalReference = goalReference)
     archiveAGoal(prisonNumber, goalReference, archiveGoalRequest)

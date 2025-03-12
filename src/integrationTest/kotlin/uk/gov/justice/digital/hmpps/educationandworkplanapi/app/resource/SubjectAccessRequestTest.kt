@@ -7,8 +7,7 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.util.UriBuilder
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -33,7 +32,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       .uri { uriBuilder: UriBuilder ->
         uriBuilder
           .path(URI_TEMPLATE)
-          .queryParam("prn", aValidPrisonNumber())
+          .queryParam("prn", randomValidPrisonNumber())
           .build()
       }
       .exchange()
@@ -48,7 +47,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       .uri { uriBuilder: UriBuilder ->
         uriBuilder
           .path(URI_TEMPLATE)
-          .queryParam("prn", aValidPrisonNumber())
+          .queryParam("prn", randomValidPrisonNumber())
           .build()
       }
       .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
@@ -71,7 +70,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       .uri { uriBuilder: UriBuilder ->
         uriBuilder
           .path(URI_TEMPLATE)
-          .queryParam("prn", aValidPrisonNumber())
+          .queryParam("prn", randomValidPrisonNumber())
           .build()
       }.bearerToken(
         buildAccessToken(
@@ -91,7 +90,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       .uri { uriBuilder: UriBuilder ->
         uriBuilder
           .path(URI_TEMPLATE)
-          .queryParam("crn", aValidPrisonNumber())
+          .queryParam("crn", randomValidPrisonNumber())
           .build()
       }.bearerToken(
         buildAccessToken(
@@ -134,7 +133,9 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
   @Test
   fun `should get induction and goals for specific prisoner without date filtering`() {
     // Given
-    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    val prisoner1 = setUpRandomPrisoner()
+    val prisoner2 = setUpRandomPrisoner()
+    val prisonNumbers = listOf(prisoner1, prisoner2)
     prisonNumbers.map {
       createInduction(
         prisonNumber = it,
@@ -149,7 +150,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     }
 
     // When
-    val response = webTestClient.sarRequest(aValidPrisonNumber(), null, null)
+    val response = webTestClient.sarRequest(prisoner1, null, null)
 
     // Then
     val responseBody = response
@@ -159,7 +160,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
 
     val content = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(content) {
-      assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
+      assertThat(induction?.prisonNumber).isEqualTo(prisoner1)
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
@@ -168,7 +169,9 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
   @Test
   fun `should get induction and goals for specific prisoner with from date filtering`() {
     // Given
-    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    val prisoner1 = setUpRandomPrisoner()
+    val prisoner2 = setUpRandomPrisoner()
+    val prisonNumbers = listOf(prisoner1, prisoner2)
     prisonNumbers.map {
       createInduction(
         prisonNumber = it,
@@ -183,8 +186,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     }
 
     // When
-    val responseFromLastWeek = webTestClient.sarRequest(aValidPrisonNumber(), LocalDate.now().minusWeeks(1), null)
-    val responseFromTomorrow = webTestClient.sarRequest(aValidPrisonNumber(), LocalDate.now().plusDays(1), null)
+    val responseFromLastWeek = webTestClient.sarRequest(prisoner1, LocalDate.now().minusWeeks(1), null)
+    val responseFromTomorrow = webTestClient.sarRequest(prisoner2, LocalDate.now().plusDays(1), null)
 
     // Then
     val responseBody = responseFromLastWeek
@@ -194,7 +197,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
 
     val fromLastWeekContent = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(fromLastWeekContent) {
-      assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
+      assertThat(induction?.prisonNumber).isEqualTo(prisoner1)
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
@@ -205,7 +208,9 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
   @Test
   fun `should get induction and goals for specific prisoner with to date filtering`() {
     // Given
-    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    val prisoner1 = setUpRandomPrisoner()
+    val prisoner2 = setUpRandomPrisoner()
+    val prisonNumbers = listOf(prisoner1, prisoner2)
     prisonNumbers.map {
       createInduction(
         prisonNumber = it,
@@ -220,8 +225,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     }
 
     // When
-    val responseToLastWeek = webTestClient.sarRequest(aValidPrisonNumber(), null, LocalDate.now().minusWeeks(1))
-    val responseToTomorrow = webTestClient.sarRequest(aValidPrisonNumber(), null, LocalDate.now().plusDays(1))
+    val responseToLastWeek = webTestClient.sarRequest(prisoner1, null, LocalDate.now().minusWeeks(1))
+    val responseToTomorrow = webTestClient.sarRequest(prisoner2, null, LocalDate.now().plusDays(1))
 
     // Then
     responseToLastWeek.expectStatus().isNoContent
@@ -233,7 +238,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
 
     val toTomorrowContent = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(toTomorrowContent) {
-      assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
+      assertThat(induction?.prisonNumber).isEqualTo(prisoner2)
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }
@@ -242,7 +247,9 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
   @Test
   fun `should get induction and goals for specific prisoner with from and to date filtering`() {
     // Given
-    val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+    val prisoner1 = setUpRandomPrisoner()
+    val prisoner2 = setUpRandomPrisoner()
+    val prisonNumbers = listOf(prisoner1, prisoner2)
     prisonNumbers.map {
       createInduction(
         prisonNumber = it,
@@ -257,8 +264,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     }
 
     // When
-    val responseThisWeek = webTestClient.sarRequest(aValidPrisonNumber(), LocalDate.now(), LocalDate.now().plusWeeks(1))
-    val responseLastWeek = webTestClient.sarRequest(aValidPrisonNumber(), LocalDate.now().minusWeeks(1), LocalDate.now())
+    val responseThisWeek = webTestClient.sarRequest(prisoner1, LocalDate.now(), LocalDate.now().plusWeeks(1))
+    val responseLastWeek = webTestClient.sarRequest(prisoner2, LocalDate.now().minusWeeks(1), LocalDate.now())
 
     // Then
     val responseBody = responseThisWeek
@@ -268,7 +275,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
 
     val thisWeekContent = objectMapper.convertValue(responseBody!!.content, SubjectAccessRequestContent::class.java)
     with(thisWeekContent) {
-      assertThat(induction?.prisonNumber).isEqualTo(aValidPrisonNumber())
+      assertThat(induction?.prisonNumber).isEqualTo(prisoner1)
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
     }

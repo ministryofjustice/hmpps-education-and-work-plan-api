@@ -3,8 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ciag
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -63,7 +62,7 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
   @Test
   fun `should get empty list of induction summaries given prisoner has no CIAG Induction`() {
     // Given
-    val request = aValidGetCiagInductionSummariesRequest(offenderIds = listOf(aValidPrisonNumber()))
+    val request = aValidGetCiagInductionSummariesRequest(offenderIds = listOf(randomValidPrisonNumber()))
 
     // When
     val response = webTestClient.post()
@@ -84,8 +83,8 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
   @Test
   fun `should get multiple induction summaries`() {
     // Given
-    val prisonNumber1 = aValidPrisonNumber()
-    val prisonNumber2 = anotherValidPrisonNumber()
+    val prisonNumber1 = randomValidPrisonNumber()
+    val prisonNumber2 = randomValidPrisonNumber()
     createInduction(prisonNumber1, aValidCreateInductionRequestForPrisonerNotLookingToWork())
     createInduction(prisonNumber2, aValidCreateInductionRequestForPrisonerLookingToWork())
 

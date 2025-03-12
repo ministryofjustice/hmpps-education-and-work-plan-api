@@ -11,9 +11,8 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -41,10 +40,9 @@ class CompleteGoalTest : IntegrationTestBase() {
     const val URI_TEMPLATE = "/action-plans/{prisonNumber}/goals/{goalReference}/complete"
   }
 
-  private val prisonNumber = anotherValidPrisonNumber()
-
   @Test
   fun `should return unauthorized given no bearer token`() {
+    val prisonNumber = randomValidPrisonNumber()
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
       .contentType(APPLICATION_JSON)
@@ -55,6 +53,7 @@ class CompleteGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should require the edit role`() {
+    val prisonNumber = randomValidPrisonNumber()
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
       .withBody(aValidArchiveGoalRequest())
@@ -68,6 +67,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and complete a goal`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(
       goalReference = goalReference,
@@ -91,7 +91,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) {
+        .event(7) {
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -114,6 +114,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 204 and complete a goal and create an completion note`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val noteText = "Completed the goal! "
     val completeGoalRequest = aValidCompleteGoalRequest(
@@ -138,8 +139,8 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(6) {
-          // the 6th Timeline event will be the GOAL_ARCHIVED event
+        .event(7) {
+          // the 7th Timeline event will be the GOAL_COMPLETED event
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -169,6 +170,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal isn't found`() {
     // given
+    val prisonNumber = randomValidPrisonNumber()
     val completeGoalRequest = aValidCompleteGoalRequest()
     val goalReference = completeGoalRequest.goalReference
 
@@ -188,6 +190,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if the goal is for a different prisoner`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(goalReference)
     val aDifferentPrisonNumber = "Z9876YX"
@@ -207,7 +210,7 @@ class CompleteGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should return 400 if request is malformed`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     // When
@@ -236,6 +239,7 @@ class CompleteGoalTest : IntegrationTestBase() {
   @Test
   fun `should return 409 if goal is already completed`() {
     // given
+    val prisonNumber = setUpRandomPrisoner()
     val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
     val completeGoalRequest = aValidCompleteGoalRequest(goalReference = goalReference)
     completeAGoal(prisonNumber, goalReference, completeGoalRequest)

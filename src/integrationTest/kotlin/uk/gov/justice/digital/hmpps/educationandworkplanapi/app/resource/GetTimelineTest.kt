@@ -4,7 +4,6 @@ import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
@@ -42,7 +41,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.get()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .exchange()
       .expectStatus()
       .isUnauthorized
@@ -51,7 +50,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token without required role`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.get()
@@ -100,7 +99,7 @@ class GetTimelineTest : IntegrationTestBase() {
   @Test
   fun `should get timeline for prisoner`() {
     // Given
-    val prisonNumber = randomValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val validInductionRequest = aFullyPopulatedCreateInductionRequest()
     createInduction(prisonNumber, validInductionRequest)
     wiremockService.stubGetPrisonTimelineFromPrisonApi(
@@ -121,6 +120,9 @@ class GetTimelineTest : IntegrationTestBase() {
         ),
       ),
     )
+    // Need this delay as async creation of timelines causes problems
+    shortDelay(500)
+
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )
@@ -150,7 +152,7 @@ class GetTimelineTest : IntegrationTestBase() {
       val actionPlanCreatedCorrelationId = actual.events[4].correlationId
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(5)
+        .hasNumberOfEvents(6)
         .event(1) {
           it.hasSourceReference("1")
             .hasEventType(TimelineEventType.PRISON_ADMISSION)
@@ -183,9 +185,9 @@ class GetTimelineTest : IntegrationTestBase() {
               ),
             )
         }
-        // Events 4 and 5 were all created as part of the same Action Plan created event so will all have the same timestamp
+        // Events 4, 5 and 6 were all created as part of the same Action Plan created event so will all have the same timestamp
         // so we cannot guarantee their order
-        .anyOfEventNumber(4, 5) {
+        .anyOfEventNumber(4, 5, 6) {
           it.hasSourceReference(actionPlan.reference.toString())
             .hasEventType(TimelineEventType.ACTION_PLAN_CREATED)
             .hasPrisonId("BXI")
@@ -193,7 +195,7 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasActionedByDisplayName("Albert User")
             .hasCorrelationId(actionPlanCreatedCorrelationId)
         }
-        .anyOfEventNumber(4, 5) {
+        .anyOfEventNumber(4, 5, 6) {
           it.hasSourceReference(goal.goalReference.toString())
             .hasEventType(TimelineEventType.GOAL_CREATED)
             .hasPrisonId("BXI")
@@ -201,6 +203,12 @@ class GetTimelineTest : IntegrationTestBase() {
             .hasActionedByDisplayName("Albert User")
             .hasContextualInfo(mapOf("GOAL_TITLE" to goal.title))
             .hasCorrelationId(actionPlanCreatedCorrelationId)
+        }
+        .anyOfEventNumber(4, 5, 6) {
+          it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_CREATED)
+            .hasPrisonId("BXI")
+            .wasActionedBy("auser_gen")
+            .hasActionedByDisplayName("Albert User")
         }
     }
   }

@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -32,7 +32,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     private const val URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
+  private val prisonNumber = randomValidPrisonNumber()
 
   @Test
   fun `should fail to update induction schedule status given no data provided`() {

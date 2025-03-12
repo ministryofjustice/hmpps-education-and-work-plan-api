@@ -6,9 +6,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
-import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -29,10 +27,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
   fun `should update Review Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has an active Review Schedule with review date later than adjusted date`() {
     // Given
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
-    val prisonNumber = randomValidPrisonNumber()
-    val prisoner = aValidPrisoner(prisonNumber)
-    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
-
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
     createActionPlan(prisonNumber)
 
@@ -95,9 +90,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
   fun `should update Review Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has an active Review Schedule with review date earlier than adjusted date`() {
     // Given
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
-    val prisonNumber = randomValidPrisonNumber()
-    val prisoner = aValidPrisoner(prisonNumber)
-    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
+    val prisonNumber = setUpRandomPrisoner()
 
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
     createActionPlan(prisonNumber)
@@ -160,7 +153,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
   @Test
   fun `should not update Review Schedule and not send outbound message given 'prisoner received' (transfer) event for prisoner that does not have a Review Schedule at all`() {
     // Given
-    val prisonNumber = randomValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(

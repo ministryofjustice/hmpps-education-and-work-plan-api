@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -26,7 +26,7 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
     private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
+  private val prisonNumber = randomValidPrisonNumber()
 
   @Test
   fun `should return unauthorized given no bearer token`() {
