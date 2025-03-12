@@ -9,8 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidFutureWorkInterests
@@ -24,6 +22,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidFutureWorkInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
@@ -70,7 +69,7 @@ class InductionEntityMapperTest {
   @Test
   fun `should map from dto to entity`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonId = "BXI"
     val createInductionDto = aValidCreateInductionDto(
       prisonNumber = prisonNumber,
@@ -124,7 +123,7 @@ class InductionEntityMapperTest {
   @Test
   fun `should map from entity to domain`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
     val previousQualificationsEntity =
       aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
@@ -195,7 +194,7 @@ class InductionEntityMapperTest {
   fun `should update induction and call related mappers`() {
     // Given
     val inductionReference = UUID.randomUUID()
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val existingInductionEntity = aValidInductionEntity(
       reference = inductionReference,
       prisonNumber = prisonNumber,
@@ -244,8 +243,8 @@ class InductionEntityMapperTest {
   @Test
   fun `should map from entity summaries to domain summaries`() {
     // Given
-    val summaryProjection1 = aValidInductionSummaryProjection(prisonNumber = aValidPrisonNumber())
-    val summaryProjection2 = aValidInductionSummaryProjection(prisonNumber = anotherValidPrisonNumber())
+    val summaryProjection1 = aValidInductionSummaryProjection(prisonNumber = randomValidPrisonNumber())
+    val summaryProjection2 = aValidInductionSummaryProjection(prisonNumber = randomValidPrisonNumber())
 
     val workOnRelease1 = aValidWorkOnRelease()
     val workOnRelease2 = aValidWorkOnRelease()

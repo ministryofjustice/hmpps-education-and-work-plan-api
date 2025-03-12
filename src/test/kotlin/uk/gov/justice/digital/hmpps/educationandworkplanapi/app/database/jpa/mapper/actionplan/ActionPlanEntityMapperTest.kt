@@ -9,12 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity
@@ -32,7 +31,7 @@ class ActionPlanEntityMapperTest {
   @Test
   fun `should map from DTO to entity`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val actionPlan = aValidActionPlan(
       prisonNumber = prisonNumber,
     )
@@ -50,7 +49,7 @@ class ActionPlanEntityMapperTest {
     )
     given(goalMapper.fromDtoToEntity(any())).willReturn(expectedGoalEntity)
 
-    val createActionPlanDto = aValidCreateActionPlanDto()
+    val createActionPlanDto = aValidCreateActionPlanDto(prisonNumber)
 
     // When
     val actual = mapper.fromDtoToEntity(createActionPlanDto)
@@ -67,12 +66,12 @@ class ActionPlanEntityMapperTest {
   @Test
   fun `should map from entity to domain`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber)
     val goalDomain = aValidGoal()
     given(goalMapper.fromEntityToDomain(any())).willReturn(goalDomain)
     val expected = aValidActionPlan(
-      reference = actionPlanEntity.reference!!,
+      reference = actionPlanEntity.reference,
       prisonNumber = prisonNumber,
       goals = mutableListOf(goalDomain),
     )
@@ -82,14 +81,14 @@ class ActionPlanEntityMapperTest {
 
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
-    verify(goalMapper).fromEntityToDomain(actionPlanEntity.goals!![0])
+    verify(goalMapper).fromEntityToDomain(actionPlanEntity.goals[0])
   }
 
   @Test
   fun `should map from entity summaries to domain summaries`() {
     // Given
-    val summaryProjection1 = aValidActionPlanSummaryProjection(prisonNumber = aValidPrisonNumber())
-    val summaryProjection2 = aValidActionPlanSummaryProjection(prisonNumber = anotherValidPrisonNumber())
+    val summaryProjection1 = aValidActionPlanSummaryProjection(prisonNumber = randomValidPrisonNumber())
+    val summaryProjection2 = aValidActionPlanSummaryProjection(prisonNumber = randomValidPrisonNumber())
     val expected = listOf(
       aValidActionPlanSummary(
         prisonNumber = summaryProjection1.prisonNumber,
