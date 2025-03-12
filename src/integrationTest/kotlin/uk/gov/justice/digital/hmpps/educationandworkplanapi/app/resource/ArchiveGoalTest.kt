@@ -97,7 +97,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
       assertThat(timeline)
         .hasNumberOfEvents(5)
         .event(5) {
-          // the 4th Timeline event will be the GOAL_ARCHIVED event
+          // the 5th Timeline event will be the GOAL_ARCHIVED event
           it.hasEventType(TimelineEventType.GOAL_ARCHIVED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -170,7 +170,11 @@ class ArchiveGoalTest : IntegrationTestBase() {
       assertThat(goalArchivedEventProperties)
         .containsEntry("reference", goalReference.toString())
 
-      val note = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+      val note = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+        goalReference,
+        EntityType.GOAL,
+        NoteType.GOAL_ARCHIVAL,
+      ).firstOrNull()
       assertThat(note!!.content).isEqualTo(noteText)
     }
   }
