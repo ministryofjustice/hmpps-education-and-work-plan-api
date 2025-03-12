@@ -12,8 +12,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
@@ -21,6 +19,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFu
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
 @ExtendWith(MockitoExtension::class)
 class InductionServiceTest {
@@ -150,7 +149,7 @@ class InductionServiceTest {
     @Test
     fun `should get induction summaries given one or more prison numbers`() {
       // Given
-      val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+      val prisonNumbers = listOf(randomValidPrisonNumber(), randomValidPrisonNumber())
 
       val expectedInductionSummaries = listOf(
         aValidInductionSummary(prisonNumber = prisonNumbers[0]),

@@ -9,8 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
@@ -20,6 +18,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidActionPlanResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidActionPlanSummaryResponse
@@ -39,7 +38,7 @@ internal class ActionPlanResourceMapperTest {
   @Test
   fun `should map from model to DTO`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val request = aValidCreateActionPlanRequest()
     val expectedCreateGoalDto = aValidCreateGoalDto()
     val expectedCreateActionPlanDto = aValidCreateActionPlanDto(
@@ -122,8 +121,8 @@ internal class ActionPlanResourceMapperTest {
   @Test
   fun `should map from domain summaries to model summaries`() {
     // Given
-    val summary1 = aValidActionPlanSummary(prisonNumber = aValidPrisonNumber())
-    val summary2 = aValidActionPlanSummary(prisonNumber = anotherValidPrisonNumber())
+    val summary1 = aValidActionPlanSummary(prisonNumber = randomValidPrisonNumber())
+    val summary2 = aValidActionPlanSummary(prisonNumber = randomValidPrisonNumber())
     val expected = listOf(
       aValidActionPlanSummaryResponse(
         prisonNumber = summary1.prisonNumber,

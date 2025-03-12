@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidQualificationEntity
@@ -62,7 +62,7 @@ class PreviousQualificationsEntityMapperTest {
   @Test
   fun `should map from entity to domain`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val qualificationsEntity = aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
     val expectedQualification = aValidQualification()
     val expectedPreviousQualifications = aValidPreviousQualifications(

@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -8,7 +8,7 @@ import java.util.UUID
 fun aPersistedInductionScheduleEntity(
   id: UUID = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   deadlineDate: LocalDate = LocalDate.now().plusDays(30),
   scheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
   scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
@@ -36,7 +36,7 @@ fun aPersistedInductionScheduleEntity(
 
 fun anUnPersistedInductionScheduleEntity(
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   deadlineDate: LocalDate = LocalDate.now().plusDays(30),
   scheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
   scheduleStatus: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,

@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.LocalDate
 
 fun aValidPrisoner(
-  prisonerNumber: String = aValidPrisonNumber(),
+  prisonerNumber: String = randomValidPrisonNumber(),
   legalStatus: LegalStatus = LegalStatus.SENTENCED,
   releaseDate: LocalDate? = LocalDate.now().plusYears(1),
   prisonId: String? = "BXI",

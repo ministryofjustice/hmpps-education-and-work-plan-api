@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aPersistedInductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.anUnPersistedInductionScheduleEntity
 import java.time.Instant
@@ -24,7 +24,7 @@ class InductionScheduleEntityMapperTest {
     val id = UUID.randomUUID()
     val reference = UUID.randomUUID()
     val deadlineDate = LocalDate.now().plusMonths(3)
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val inductionScheduleEntity = aPersistedInductionScheduleEntity(
       id = id,
@@ -63,7 +63,7 @@ class InductionScheduleEntityMapperTest {
   fun `should map createDto to entity`() {
     // Given
     val deadlineDate = LocalDate.now().plusMonths(3)
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val createInductionScheduleDto = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,

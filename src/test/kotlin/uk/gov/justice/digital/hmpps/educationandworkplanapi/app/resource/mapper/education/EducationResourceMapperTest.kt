@@ -9,13 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidQualification
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreateQualificationDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdateQualificationDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
@@ -120,7 +120,7 @@ class EducationResourceMapperTest {
   @Test
   fun `should map CreateEducationRequest to CreatePreviousQualificationsDto`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createEducationRequest = aValidCreateEducationRequest(
       prisonId = "BXI",
       educationLevel = EducationLevelApi.FURTHER_EDUCATION_COLLEGE,
@@ -156,7 +156,7 @@ class EducationResourceMapperTest {
   @Test
   fun `should map UpdateEducationRequest to UpdatePreviousQualificationsDto`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val qualificationsRecordReference = UUID.randomUUID()
     val potteryQualificationReference = UUID.randomUUID()
 

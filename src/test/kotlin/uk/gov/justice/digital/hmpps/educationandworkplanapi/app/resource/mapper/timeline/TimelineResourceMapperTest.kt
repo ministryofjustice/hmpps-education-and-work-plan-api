@@ -8,7 +8,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimeline
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.aValidTimelineEventResponse
@@ -26,7 +26,7 @@ class TimelineResourceMapperTest {
   fun `should map from domain to model given user is successfully looked up`() {
     // Given
     val reference = UUID.randomUUID()
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val timelineDomain = aValidTimeline(reference = reference, prisonNumber = prisonNumber)
     val timelineEventResponse = aValidTimelineEventResponse()
     val expected = TimelineResponse(

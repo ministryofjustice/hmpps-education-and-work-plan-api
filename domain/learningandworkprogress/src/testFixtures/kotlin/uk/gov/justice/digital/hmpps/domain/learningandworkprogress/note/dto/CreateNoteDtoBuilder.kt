@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto
 
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import java.time.Instant
 import java.util.UUID
 
 fun aValidCreateNoteDto(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   content: String = "Note content",
   entityReference: UUID = UUID.randomUUID(),
   entityType: EntityType = EntityType.GOAL,

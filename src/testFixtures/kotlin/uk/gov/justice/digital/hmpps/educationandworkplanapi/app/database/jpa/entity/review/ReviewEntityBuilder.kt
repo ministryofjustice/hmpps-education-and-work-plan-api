@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -8,7 +8,7 @@ import java.util.UUID
 fun aValidReviewEntity(
   id: UUID = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   deadlineDate: LocalDate = LocalDate.now().plusMonths(1),
   completedDate: LocalDate = LocalDate.now(),
   reviewScheduleReference: UUID = UUID.randomUUID(),

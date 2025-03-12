@@ -14,7 +14,6 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
@@ -26,6 +25,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.HopingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
@@ -70,7 +70,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should create induction and create qualifications given qualifications do not already exist for the prisoner and createInductionDto contains qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createInductionDto = aValidCreateInductionDto(
         prisonNumber = prisonNumber,
         previousQualifications = aValidCreatePreviousQualificationsDto(),
@@ -114,7 +114,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should create induction and update qualifications given qualifications already exist for the prisoner and createInductionDto contains qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createInductionDto = aValidCreateInductionDto(
         prisonNumber = prisonNumber,
         previousQualifications = aValidCreatePreviousQualificationsDto(),
@@ -152,7 +152,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should create induction and not create qualifications given qualifications do not already exist for the prisoner and createInductionDto does not contain qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createInductionDto = aValidCreateInductionDto(
         prisonNumber = prisonNumber,
         previousQualifications = null,
@@ -186,7 +186,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should create induction and delete qualifications given qualifications already exist for the prisoner and createInductionDto does not contain qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createInductionDto = aValidCreateInductionDto(
         prisonNumber = prisonNumber,
         previousQualifications = null,
@@ -222,7 +222,7 @@ class JpaInductionPersistenceAdapterTest {
   @Test
   fun `should get induction`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
     val previousQualificationsEntity = aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
     given(inductionRepository.findByPrisonNumber(any())).willReturn(inductionEntity)
@@ -244,7 +244,7 @@ class JpaInductionPersistenceAdapterTest {
   @Test
   fun `should not get induction given induction does not exist`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     given(inductionRepository.findByPrisonNumber(any())).willReturn(null)
 
     // When
@@ -262,7 +262,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should update induction including qualifications given qualifications exist for the prisoner and updateInductionDto contains qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(
@@ -324,7 +324,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should update induction and create qualifications given qualifications do not exist for the prisoner and updateInductionDto contains qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(
@@ -394,7 +394,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should update induction without adding or updating qualifications given qualifications do not exist for the prisoner and updateInductionDto does not contain qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(
@@ -452,7 +452,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should update induction without adding or updating qualifications given qualifications exist for the prisoner and updateInductionDto does not contain qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val inductionEntity = aValidInductionEntityWithJpaFieldsPopulated(
@@ -511,7 +511,7 @@ class JpaInductionPersistenceAdapterTest {
     @Test
     fun `should not update induction given induction does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val updateInductionDto = aValidUpdateInductionDto(prisonNumber = prisonNumber)
       given(inductionRepository.findByPrisonNumber(any())).willReturn(null)
 
@@ -529,7 +529,7 @@ class JpaInductionPersistenceAdapterTest {
   @Test
   fun `should retrieve Induction Summaries`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonNumbers = listOf(prisonNumber)
     val inductionSummaryProjections = listOf(aValidInductionSummaryProjection(prisonNumber = prisonNumber))
     val expectedInductionSummaries = listOf(aValidInductionSummary(prisonNumber = prisonNumber))

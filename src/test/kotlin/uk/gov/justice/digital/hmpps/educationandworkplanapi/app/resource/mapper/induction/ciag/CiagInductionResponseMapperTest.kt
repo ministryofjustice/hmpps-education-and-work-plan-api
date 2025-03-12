@@ -9,10 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
 import java.time.OffsetDateTime
@@ -32,13 +31,13 @@ class CiagInductionResponseMapperTest {
   fun `should map from domain summaries to model summaries`() {
     // Given
     val summary1 = aValidInductionSummary(
-      prisonNumber = aValidPrisonNumber(),
+      prisonNumber = randomValidPrisonNumber(),
       workOnRelease = aValidWorkOnRelease(
         hopingToWork = HopingToWorkDomain.YES,
       ),
     )
     val summary2 = aValidInductionSummary(
-      prisonNumber = anotherValidPrisonNumber(),
+      prisonNumber = randomValidPrisonNumber(),
       workOnRelease = aValidWorkOnRelease(
         hopingToWork = HopingToWorkDomain.NO,
       ),

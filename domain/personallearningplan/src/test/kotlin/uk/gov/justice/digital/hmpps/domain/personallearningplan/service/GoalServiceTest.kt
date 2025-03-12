@@ -19,7 +19,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalNotFoundException
@@ -35,6 +34,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiv
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
 @ExtendWith(MockitoExtension::class)
 class GoalServiceTest {
@@ -58,7 +58,7 @@ class GoalServiceTest {
     @Test
     fun `should create new goal for a prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goal = aValidGoal()
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(aValidActionPlan())
 
@@ -79,7 +79,7 @@ class GoalServiceTest {
     @Test
     fun `should not add goal to action plan given prisoner does not have an action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(null)
       val createGoalDto = aValidCreateGoalDto()
 
@@ -103,7 +103,7 @@ class GoalServiceTest {
     @Test
     fun `should create new goals for a prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goal1 = aValidGoal(title = "Goal 1")
       val goal2 = aValidGoal(title = "Goal 2")
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(aValidActionPlan())
@@ -128,7 +128,7 @@ class GoalServiceTest {
     @Test
     fun `should add goals to new action plan given prisoner does not have an action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(actionPlanPersistenceAdapter.getActionPlan(any())).willReturn(null)
 
       val createGoalDto1 = aValidCreateGoalDto(title = "Goal 1")
@@ -153,7 +153,7 @@ class GoalServiceTest {
   @Test
   fun `should get goal given goal exists`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     val goal = aValidGoal(reference = goalReference)
@@ -170,7 +170,7 @@ class GoalServiceTest {
   @Test
   fun `should not get goal given goal does not exist`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
@@ -189,7 +189,7 @@ class GoalServiceTest {
   @Test
   fun `should update goal given goal exists`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     val goal = aValidGoal(reference = goalReference)
@@ -210,7 +210,7 @@ class GoalServiceTest {
   @Test
   fun `should not update goal given goal does not exist`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
@@ -234,7 +234,7 @@ class GoalServiceTest {
 
     @Test
     fun `should return an error if goal to be archived can't be found`() {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(goalReference)
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
@@ -254,7 +254,7 @@ class GoalServiceTest {
       "COMPLETED",
     )
     fun `should return an error if goal to be archived is in an invalid state`(status: GoalStatus) {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(reference = goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = status)
@@ -273,7 +273,7 @@ class GoalServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     fun `Should return an error if reason description is null or empty and reason was OTHER`(reasonOther: String?) {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal =
         aValidArchiveGoalDto(reference = goalReference, reason = ReasonToArchiveGoal.OTHER, reasonOther = reasonOther)
@@ -291,7 +291,7 @@ class GoalServiceTest {
 
     @Test
     fun `should return an error if archiving the goal returns no goal`() {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
@@ -311,7 +311,7 @@ class GoalServiceTest {
 
     @Test
     fun `should return an updated goal if archiving the goal is successful`() {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val archiveGoal = aValidArchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ACTIVE)
@@ -333,7 +333,7 @@ class GoalServiceTest {
 
     @Test
     fun `should return an error if goal to be unarchived can't be found`() {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
       given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
@@ -354,7 +354,7 @@ class GoalServiceTest {
       "COMPLETED",
     )
     fun `should return an error if goal to be unarchived is in an invalid state`(status: GoalStatus) {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(reference = goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = status)
@@ -371,7 +371,7 @@ class GoalServiceTest {
 
     @Test
     fun `should return an error if unarchiving the goal returns no goal`() {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
@@ -390,7 +390,7 @@ class GoalServiceTest {
 
     @Test
     fun `should return an updated goal if unarchiving the goal is successful`() {
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val goalReference = aValidReference()
       val unarchiveGoal = aValidUnarchiveGoalDto(goalReference)
       val existingGoal = aValidGoal(reference = goalReference, status = GoalStatus.ARCHIVED)
@@ -409,7 +409,7 @@ class GoalServiceTest {
 
   @Nested
   inner class GetGoals {
-    private val prisonNumber = aValidPrisonNumber()
+    private val prisonNumber = randomValidPrisonNumber()
     private val activeGoal = aValidGoal(reference = aValidReference(), status = GoalStatus.ACTIVE)
     private val archivedGoal = aValidGoal(reference = aValidReference(), status = GoalStatus.ARCHIVED)
     private val completedGoal = aValidGoal(reference = aValidReference(), status = GoalStatus.COMPLETED)

@@ -14,7 +14,6 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
@@ -23,6 +22,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidArchiv
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUnarchiveGoalDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidUpdateGoalDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.GoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
@@ -52,7 +52,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should fail to create goals given action plan does not already exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createGoalDtos = listOf(aValidCreateGoalDto())
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 
@@ -72,7 +72,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should create goals given action plan already exists`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference1 = UUID.randomUUID()
       val reference2 = UUID.randomUUID()
 
@@ -125,7 +125,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should get goal given goal exists in prisoners action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(reference = reference)
@@ -147,7 +147,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should not get goal given goal does not exist in prisoners action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(reference = UUID.randomUUID())
@@ -166,7 +166,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should not get goal given prisoners action plan does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
@@ -186,7 +186,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should update goal given goal exists in prisoners action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity =
@@ -218,7 +218,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should not update goal given goal does not exist in prisoners action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(reference = UUID.randomUUID())
@@ -239,7 +239,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should not update goal given prisoners action plan does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
@@ -261,7 +261,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should return null if existing goal could not be found`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(reference = UUID.randomUUID())
@@ -283,7 +283,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should archive the goal`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(reference = reference)
@@ -332,7 +332,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should return null if existing goal could not be found`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(
@@ -357,7 +357,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should unarchive the goal`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = UUID.randomUUID()
 
       val goalEntity = aValidGoalEntity(
@@ -403,7 +403,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should get goals gived goals exists in prisoners action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val goalEntity1 = aValidGoalEntity()
       val goalEntity2 = aValidGoalEntity()
@@ -429,7 +429,7 @@ class JpaGoalPersistenceAdapterTest {
     @Test
     fun `should not get goal given prisoners action plan does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(null)
 

@@ -8,7 +8,6 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
@@ -26,6 +25,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousTrainingDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateWorkOnReleaseDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
@@ -70,7 +70,7 @@ class InductionResourceMapperTest {
   @Test
   fun `should map to CreateInductionDto`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonId = "BXI"
     val createInductionRequest = aFullyPopulatedCreateInductionRequest(prisonId = prisonId)
     val workOnRelease = aValidCreateWorkOnReleaseDto()
@@ -153,7 +153,7 @@ class InductionResourceMapperTest {
   @Test
   fun `should map to UpdateInductionDto`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonId = "BXI"
     val updateRequest = aFullyPopulatedUpdateInductionRequest(prisonId = prisonId)
     val workOnRelease = aValidUpdateWorkOnReleaseDto()

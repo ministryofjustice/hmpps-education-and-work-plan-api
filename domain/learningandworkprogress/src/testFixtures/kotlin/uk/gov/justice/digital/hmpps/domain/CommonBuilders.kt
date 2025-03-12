@@ -7,21 +7,10 @@ import java.util.UUID
  * prison numbers, times and dates etc.
  */
 
-fun aValidPrisonNumber() = "A1234BC"
-
-fun anotherValidPrisonNumber() = "B5678CD"
-
 fun randomValidPrisonNumber(): String {
-  val letters = ('A'..'Z')
-  val numbers = ('0'..'9')
-
-  val firstLetter = letters.random()
-  val secondLetter = letters.random()
-  val thirdLetter = letters.random()
-
-  val numberPart = numbers.random().toString().padStart(4, '0')
-
-  return "$firstLetter$numberPart$secondLetter$thirdLetter"
+  fun randomLetter() = ('A'..'Z').random()
+  fun randomNumbers(count: Int) = (1..count).map { ('0'..'9').random() }.joinToString("")
+  return "${randomLetter()}${randomNumbers(4)}${randomLetter()}${randomLetter()}"
 }
 
-fun aValidReference() = UUID.randomUUID()
+fun aValidReference(): UUID = UUID.randomUUID()

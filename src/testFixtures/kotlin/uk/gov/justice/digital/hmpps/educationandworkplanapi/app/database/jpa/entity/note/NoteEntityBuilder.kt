@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.Instant
 import java.util.UUID
 
 fun aValidNoteEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   content: String = "Note content",
   entityReference: UUID = UUID.randomUUID(),
   entityType: EntityType = EntityType.GOAL,

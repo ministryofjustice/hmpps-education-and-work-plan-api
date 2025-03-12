@@ -13,12 +13,12 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
 @ExtendWith(MockitoExtension::class)
 class EducationServiceTest {
@@ -38,7 +38,7 @@ class EducationServiceTest {
     @Test
     fun `should get previous qualifications for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val expected = aValidPreviousQualifications(prisonNumber = prisonNumber)
       given(persistenceAdapter.getPreviousQualifications(any())).willReturn(expected)
@@ -55,7 +55,7 @@ class EducationServiceTest {
     @Test
     fun `should throw exception given previous qualifications record for prisoner does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       given(persistenceAdapter.getPreviousQualifications(any())).willReturn(null)
 
@@ -77,7 +77,7 @@ class EducationServiceTest {
     @Test
     fun `should create previous qualifications for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createPreviousQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = prisonNumber)
 
       given(persistenceAdapter.getPreviousQualifications(any())).willReturn(null)
@@ -98,7 +98,7 @@ class EducationServiceTest {
     @Test
     fun `should throw exception given previous qualifications record for prisoner already exists`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createPreviousQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = prisonNumber)
 
       val previousQualifications = aValidPreviousQualifications(prisonNumber = prisonNumber)
@@ -122,7 +122,7 @@ class EducationServiceTest {
     @Test
     fun `should update previous qualifications for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val updatePreviousQualificationsDto = aValidUpdatePreviousQualificationsDto(prisonNumber = prisonNumber)
 
       val previousQualifications = aValidPreviousQualifications(prisonNumber = prisonNumber)
@@ -140,7 +140,7 @@ class EducationServiceTest {
     @Test
     fun `should throw exception given previous qualifications record for prisoner does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val updatePreviousQualificationsDto = aValidUpdatePreviousQualificationsDto(prisonNumber = prisonNumber)
 
       given(persistenceAdapter.updatePreviousQualifications(any())).willReturn(null)

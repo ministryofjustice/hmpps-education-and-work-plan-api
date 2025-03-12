@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -8,7 +8,7 @@ import java.util.UUID
 fun aValidReviewScheduleEntity(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   earliestReviewDate: LocalDate = LocalDate.now().minusMonths(1),
   latestReviewDate: LocalDate = LocalDate.now().plusMonths(1),
   scheduleCalculationRule: ReviewScheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
@@ -40,7 +40,7 @@ fun aValidReviewScheduleEntity(
 
 fun aValidUnPersistedReviewScheduleEntity(
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   earliestReviewDate: LocalDate = LocalDate.now().minusMonths(1),
   latestReviewDate: LocalDate = LocalDate.now().plusMonths(1),
   scheduleCalculationRule: ReviewScheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,

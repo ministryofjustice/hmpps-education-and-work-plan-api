@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.LocalDate
 
 fun aValidPrisonMovementEvents(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   prisonBookings: Map<Long, List<PrisonMovementEvent>> = mapOf(
     1L to listOf(
       aValidAdmissionPrisonMovementEvent(),
@@ -25,7 +25,7 @@ fun aValidPrisonMovementEvents(
 )
 
 fun anotherValidPrisonMovementEvents(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   prisonBookings: Map<Long, List<PrisonMovementEvent>> = mapOf(
     2L to listOf(
       anotherValidAdmissionPrisonMovementEvent(),

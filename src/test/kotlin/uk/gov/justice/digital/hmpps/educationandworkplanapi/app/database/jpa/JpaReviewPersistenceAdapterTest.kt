@@ -10,10 +10,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateCompletedReviewDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.aValidNoteEntity
@@ -42,7 +42,7 @@ class JpaReviewPersistenceAdapterTest {
   @Test
   fun `should get completed reviews for a prisoner given prisoner has some reviews`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val reviewEntity1 = aValidReviewEntity()
     val reviewEntity2 = aValidReviewEntity()
@@ -78,7 +78,7 @@ class JpaReviewPersistenceAdapterTest {
   @Test
   fun `should get empty completed reviews for a prisoner given prisoner has no reviews`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     given(reviewRepository.getAllByPrisonNumber(any())).willReturn(emptyList())
 

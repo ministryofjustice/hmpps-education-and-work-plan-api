@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidUpdateReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidUnPersistedReviewScheduleEntity
 import java.time.Instant
@@ -22,16 +23,19 @@ class ReviewScheduleEntityMapperTest {
   @Test
   fun `should map review schedule entity to review schedule domain`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val reference = UUID.randomUUID()
     val createdAt = Instant.now()
     val updatedAt = Instant.now()
 
     val entity = aValidReviewScheduleEntity(
+      prisonNumber = prisonNumber,
       reference = reference,
       createdAt = createdAt,
       updatedAt = updatedAt,
     )
     val expected = aValidReviewSchedule(
+      prisonNumber = prisonNumber,
       reference = reference,
       createdAt = createdAt,
       lastUpdatedAt = updatedAt,
@@ -47,14 +51,17 @@ class ReviewScheduleEntityMapperTest {
   @Test
   fun `should map create review schedule domain DTO to review schedule entity`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val earliestReviewDate = LocalDate.now().plusMonths(1)
     val latestReviewDate = LocalDate.now().plusMonths(3)
     val createReviewScheduleDto = aValidCreateReviewScheduleDto(
+      prisonNumber = prisonNumber,
       scheduleCalculationRule = ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE,
       reviewScheduleWindow = ReviewScheduleWindow(earliestReviewDate, latestReviewDate),
     )
 
     val expected = aValidUnPersistedReviewScheduleEntity(
+      prisonNumber = prisonNumber,
       scheduleCalculationRule = ReviewScheduleCalculationRuleEntity.MORE_THAN_60_MONTHS_TO_SERVE,
       earliestReviewDate = earliestReviewDate,
       latestReviewDate = latestReviewDate,

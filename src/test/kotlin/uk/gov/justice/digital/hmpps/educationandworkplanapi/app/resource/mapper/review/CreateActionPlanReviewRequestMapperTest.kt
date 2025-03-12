@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateCompletedReviewDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
 import java.time.LocalDate
 
@@ -14,7 +14,7 @@ class CreateActionPlanReviewRequestMapperTest {
   @Test
   fun `should map from model to domain`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonerReleaseDate = LocalDate.now().plusYears(5)
     val prisonerSentenceType = SentenceType.SENTENCED
     val isIndeterminate = true
