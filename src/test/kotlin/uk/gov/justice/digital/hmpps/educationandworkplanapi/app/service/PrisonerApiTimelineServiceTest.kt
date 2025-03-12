@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidPrisonMovementTimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.PrisonApiClient
@@ -32,7 +32,7 @@ class PrisonerApiTimelineServiceTest {
   @Test
   fun `should get Prison timeline events`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonMovementEvents = aValidPrisonMovementEvents()
     val expected = listOf(aValidPrisonMovementTimelineEvent())
     given(prisonApiClient.getPrisonMovementEvents(any())).willReturn(prisonMovementEvents)
@@ -50,7 +50,7 @@ class PrisonerApiTimelineServiceTest {
   @Test
   fun `should fail to get Prison timeline events given prison-api is unavailable`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     given(prisonApiClient.getPrisonMovementEvents(any())).willThrow(
       PrisonApiException("Error retrieving prison history for Prisoner $prisonNumber", RuntimeException()),
     )

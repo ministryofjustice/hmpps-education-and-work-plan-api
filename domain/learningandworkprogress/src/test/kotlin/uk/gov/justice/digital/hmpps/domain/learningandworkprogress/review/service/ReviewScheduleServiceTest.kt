@@ -17,7 +17,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
@@ -104,7 +103,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should exempt active Review Schedule status for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val prisonId = "BXI"
 
       val activeReviewSchedule = aValidReviewSchedule(
@@ -145,7 +144,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should not exempt Review Schedule status given prisoner does not have an active review schedule`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val prisonId = "BXI"
 
       given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
@@ -167,7 +166,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should exempt active Review Schedule status for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val prisonId = "BXI"
 
       val activeReviewSchedule = aValidReviewSchedule(
@@ -208,7 +207,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should not exempt Review Schedule status given prisoner does not have an active review schedule`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val prisonId = "BXI"
 
       given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
@@ -230,7 +229,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should exempt active Review Schedule status for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val prisonId = "BXI"
 
       val activeReviewSchedule = aValidReviewSchedule(
@@ -271,7 +270,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should not exempt Review Schedule status given prisoner does not have an active review schedule`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val prisonId = "BXI"
 
       given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
@@ -293,7 +292,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should exempt and re-schedule active Review Schedule for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val originalPrisonId = "BXI"
       val newPrisonId = "MDI"
 
@@ -374,7 +373,7 @@ class ReviewScheduleServiceTest {
     @Test
     fun `should not exempt and re-schedule Review Schedule given prisoner does not have an active review schedule`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val newPrisonId = "MDI"
 
       given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)

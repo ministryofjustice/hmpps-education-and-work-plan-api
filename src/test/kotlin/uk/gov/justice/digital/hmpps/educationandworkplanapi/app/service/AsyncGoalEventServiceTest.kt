@@ -16,9 +16,9 @@ import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.given
 import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import java.util.UUID
@@ -44,7 +44,7 @@ class AsyncGoalEventServiceTest {
   @Test
   fun `should send event details given single goal created`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createdGoal = aValidGoal()
     val createGoalTimelineEvent = aValidTimelineEvent()
     given(timelineEventFactory.goalCreatedTimelineEvent(any(), any())).willReturn(createGoalTimelineEvent)
@@ -65,7 +65,7 @@ class AsyncGoalEventServiceTest {
   @Test
   fun `should send event details given multiple goals created`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val createdGoal1 = aValidGoal()
     val createGoal1TimelineEvent = aValidTimelineEvent()
@@ -96,7 +96,7 @@ class AsyncGoalEventServiceTest {
   @Test
   fun `should send event details given goal updated`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val previousGoal = aValidGoal()
     val updatedGoal = aValidGoal()
     val expectedTimelineEvents = listOf(aValidTimelineEvent())
@@ -116,7 +116,7 @@ class AsyncGoalEventServiceTest {
   @Test
   fun `should send event details given goal archived`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val archivedGoal = aValidGoal(status = GoalStatus.ARCHIVED)
     val expectedTimelineEvent = aValidTimelineEvent()
     given(timelineEventFactory.goalArchivedTimelineEvent(any(), any())).willReturn(expectedTimelineEvent)
@@ -135,7 +135,7 @@ class AsyncGoalEventServiceTest {
   @Test
   fun `should send event details given goal unarchived`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val unArchivedGoal = aValidGoal(status = GoalStatus.ARCHIVED)
     val expectedTimelineEvent = aValidTimelineEvent()
     given(timelineEventFactory.goalUnArchivedTimelineEvent(any(), any())).willReturn(expectedTimelineEvent)

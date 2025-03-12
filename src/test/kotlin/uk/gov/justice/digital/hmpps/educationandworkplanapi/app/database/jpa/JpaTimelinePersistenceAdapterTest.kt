@@ -14,7 +14,7 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimeline
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.timeline.TimelineEntity
@@ -48,7 +48,7 @@ class JpaTimelinePersistenceAdapterTest {
     @Test
     fun `should add timeline event to new timeline given timeline does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val timelineEvent = aValidTimelineEvent()
       val timelineEventEntity = aValidTimelineEventEntity()
       given(timelineRepository.findByPrisonNumber(any())).willReturn(null)
@@ -68,7 +68,7 @@ class JpaTimelinePersistenceAdapterTest {
     @Test
     fun `should record timeline event given timeline already exists`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val timelineEvent = aValidTimelineEvent()
       val timelineEntity = aValidTimelineEntity()
       val timelineEventEntity = aValidTimelineEventEntity()
@@ -92,7 +92,7 @@ class JpaTimelinePersistenceAdapterTest {
     @Test
     fun `should add timeline events to new timeline given timeline does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val timelineEvent1 = aValidTimelineEvent()
       val timelineEvent2 = aValidTimelineEvent()
       val timelineEvents = listOf(timelineEvent1, timelineEvent2)
@@ -118,7 +118,7 @@ class JpaTimelinePersistenceAdapterTest {
     @Test
     fun `should record timeline events given timeline already exists`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val timelineEvent1 = aValidTimelineEvent()
       val timelineEvent2 = aValidTimelineEvent()
       val timelineEvents = listOf(timelineEvent1, timelineEvent2)
@@ -148,7 +148,7 @@ class JpaTimelinePersistenceAdapterTest {
     @Test
     fun `should get timeline for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val timeline = aValidTimeline()
       val timelineEntity = aValidTimelineEntity()
       given(timelineRepository.findByPrisonNumber(any())).willReturn(timelineEntity)
@@ -166,7 +166,7 @@ class JpaTimelinePersistenceAdapterTest {
     @Test
     fun `should not get timeline given timeline does not exist for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(timelineRepository.findByPrisonNumber(any())).willReturn(null)
 
       // When

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewConductedBy
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.aValidNoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
@@ -19,11 +20,13 @@ class ReviewEntityMapperTest {
   @Test
   fun `should map review entity to completed review given conducted by fields are populated`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val reference = UUID.randomUUID()
     val createdAt = Instant.now()
     val updatedAt = Instant.now()
 
     val reviewEntity = aValidReviewEntity(
+      prisonNumber = prisonNumber,
       reference = reference,
       conductedBy = "Barnie Jones",
       conductedByRole = "Peer mentor",
@@ -39,6 +42,7 @@ class ReviewEntityMapperTest {
 
     val expectedNote = NoteMapper.fromEntityToDomain(reviewNoteEntity)
     val expected = aValidCompletedReview(
+      prisonNumber = prisonNumber,
       reference = reference,
       note = expectedNote,
       conductedBy = ReviewConductedBy(name = "Barnie Jones", role = "Peer mentor"),
@@ -57,11 +61,13 @@ class ReviewEntityMapperTest {
   @Test
   fun `should map review entity to completed review given conducted by fields are not populated`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val reference = UUID.randomUUID()
     val createdAt = Instant.now()
     val updatedAt = Instant.now()
 
     val reviewEntity = aValidReviewEntity(
+      prisonNumber = prisonNumber,
       reference = reference,
       conductedBy = null,
       conductedByRole = null,
@@ -77,6 +83,7 @@ class ReviewEntityMapperTest {
 
     val expectedNote = NoteMapper.fromEntityToDomain(reviewNoteEntity)
     val expected = aValidCompletedReview(
+      prisonNumber = prisonNumber,
       reference = reference,
       note = expectedNote,
       conductedBy = null,
@@ -99,7 +106,9 @@ class ReviewEntityMapperTest {
     val reviewCreatedBy = "asmith_gen"
     val reviewCreatedAt = Instant.now()
     val reviewCreatedAtPrison = "BXI"
+    val prisonNumber = randomValidPrisonNumber()
     val reviewEntity = aValidReviewEntity(
+      prisonNumber = prisonNumber,
       reference = reviewReference,
       createdBy = reviewCreatedBy,
       createdAt = reviewCreatedAt,
@@ -131,6 +140,7 @@ class ReviewEntityMapperTest {
     )
 
     val expected = aValidCompletedReview(
+      prisonNumber = prisonNumber,
       reference = reviewReference,
       createdBy = reviewCreatedBy,
       createdAt = reviewCreatedAt,

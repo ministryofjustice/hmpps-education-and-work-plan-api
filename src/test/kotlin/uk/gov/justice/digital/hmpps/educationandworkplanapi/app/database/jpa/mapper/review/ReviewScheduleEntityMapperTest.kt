@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidUpdateReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidUnPersistedReviewScheduleEntity
 import java.time.Instant
@@ -22,16 +23,19 @@ class ReviewScheduleEntityMapperTest {
   @Test
   fun `should map review schedule entity to review schedule domain`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val reference = UUID.randomUUID()
     val createdAt = Instant.now()
     val updatedAt = Instant.now()
 
     val entity = aValidReviewScheduleEntity(
+      prisonNumber = prisonNumber,
       reference = reference,
       createdAt = createdAt,
       updatedAt = updatedAt,
     )
     val expected = aValidReviewSchedule(
+      prisonNumber = prisonNumber,
       reference = reference,
       createdAt = createdAt,
       lastUpdatedAt = updatedAt,

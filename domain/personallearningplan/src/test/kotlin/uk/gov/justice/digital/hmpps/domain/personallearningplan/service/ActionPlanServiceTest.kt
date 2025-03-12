@@ -12,7 +12,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
@@ -20,6 +19,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummar
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
 @ExtendWith(MockitoExtension::class)
 class ActionPlanServiceTest {
@@ -40,7 +40,7 @@ class ActionPlanServiceTest {
     @Test
     fun `should create action plan given prisoner does not already have an action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(persistenceAdapter.getActionPlan(any())).willReturn(null)
 
       val expectedActionPlan = aValidActionPlan(prisonNumber = prisonNumber)
@@ -61,7 +61,7 @@ class ActionPlanServiceTest {
     @Test
     fun `should not create action plan given prisoner already has an action plan`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val actionPlan = aValidActionPlan(prisonNumber = prisonNumber)
       given(persistenceAdapter.getActionPlan(any())).willReturn(actionPlan)
@@ -87,7 +87,7 @@ class ActionPlanServiceTest {
     fun `should retrieve action plan by prison number`() {
       // Given
       val actionPlan = aValidActionPlan()
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(persistenceAdapter.getActionPlan(any())).willReturn(actionPlan)
 
       // When
@@ -101,7 +101,7 @@ class ActionPlanServiceTest {
     @Test
     fun `should fail to get action plan given no action plan exists`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(persistenceAdapter.getActionPlan(any())).willReturn(null)
 
       // When
@@ -121,7 +121,7 @@ class ActionPlanServiceTest {
     @Test
     fun `should get action plan summaries given one or more prison numbers`() {
       // Given
-      val prisonNumbers = listOf(aValidPrisonNumber(), anotherValidPrisonNumber())
+      val prisonNumbers = listOf(randomValidPrisonNumber(), anotherValidPrisonNumber())
 
       val expectedActionPlanSummaries = listOf(
         aValidActionPlanSummary(prisonNumber = prisonNumbers[0]),

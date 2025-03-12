@@ -13,9 +13,9 @@ import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewConductedBy
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_CONDUCTED_IN_PERSON_BY
@@ -52,7 +52,7 @@ class AsyncReviewEventServiceTest {
   @Test
   fun `should handle completed review event given review was not conducted by someone else`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val completedReview = aValidCompletedReview(
       prisonNumber = prisonNumber,
@@ -93,7 +93,7 @@ class AsyncReviewEventServiceTest {
   @Test
   fun `should handle completed review event given review was conducted by someone else`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val completedReview = aValidCompletedReview(
       prisonNumber = prisonNumber,

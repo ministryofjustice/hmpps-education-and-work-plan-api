@@ -11,9 +11,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aPersistedInductionScheduleEntity
@@ -42,7 +42,7 @@ class JpaInductionSchedulePersistenceAdapterTest {
     @Test
     fun `should get induction schedule`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val inductionScheduleEntity = aPersistedInductionScheduleEntity(prisonNumber = prisonNumber)
       given(inductionScheduleRepository.findByPrisonNumber(any())).willReturn(inductionScheduleEntity)
@@ -62,7 +62,7 @@ class JpaInductionSchedulePersistenceAdapterTest {
     @Test
     fun `should not get induction schedule given induction schedule does not exist for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       given(inductionScheduleRepository.findByPrisonNumber(any())).willReturn(null)
 
@@ -81,7 +81,7 @@ class JpaInductionSchedulePersistenceAdapterTest {
     @Test
     fun `should create induction schedule`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
 

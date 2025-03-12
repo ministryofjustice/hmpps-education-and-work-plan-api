@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonPeriod
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.SignificantMovement
@@ -99,7 +99,7 @@ import java.time.format.DateTimeFormatter
  * ```
  */
 fun aValidPrisonerInPrisonSummary(
-  prisonerNumber: String = aValidPrisonNumber(),
+  prisonerNumber: String = randomValidPrisonNumber(),
   prisonPeriod: List<PrisonPeriod>? = listOf(
     aValidPrisonPeriod(),
     anotherValidPrisonPeriod(),

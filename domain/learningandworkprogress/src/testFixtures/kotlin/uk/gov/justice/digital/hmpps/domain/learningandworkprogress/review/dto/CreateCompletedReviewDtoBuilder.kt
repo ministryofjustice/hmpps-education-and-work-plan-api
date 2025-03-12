@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto
 
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import java.time.LocalDate
 
 fun aValidCreateCompletedReviewDto(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   prisonId: String = "BXI",
   note: String = "Note content",
   conductedAt: LocalDate = LocalDate.now(),

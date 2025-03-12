@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerMergedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerMergedAdditionalInformation.Reason
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 
 fun aValidPrisonerReceivedAdditionalInformation(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   prisonId: String = "BXI",
   reason: PrisonerReceivedAdditionalInformation.Reason = PrisonerReceivedAdditionalInformation.Reason.ADMISSION,
   details: String? = "ACTIVE IN:ADM-N",
@@ -25,7 +25,7 @@ fun aValidPrisonerReceivedAdditionalInformation(
 )
 
 fun aValidPrisonerReleasedAdditionalInformation(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   prisonId: String = "BXI",
   reason: PrisonerReleasedAdditionalInformation.Reason = PrisonerReleasedAdditionalInformation.Reason.RELEASED,
   details: String? = "Movement reason code CR",
@@ -43,7 +43,7 @@ fun aValidPrisonerReleasedAdditionalInformation(
 )
 
 fun aValidPrisonerMergedAdditionalInformation(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   removedNomsNumber: String,
   reason: Reason = Reason.MERGE,
 ): PrisonerMergedAdditionalInformation = PrisonerMergedAdditionalInformation(

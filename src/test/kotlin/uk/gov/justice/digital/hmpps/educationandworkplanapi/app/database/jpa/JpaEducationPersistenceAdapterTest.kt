@@ -12,11 +12,11 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
@@ -41,7 +41,7 @@ class JpaEducationPersistenceAdapterTest {
     @Test
     fun `should get previous qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val previousQualificationsEntity =
         aValidPreviousQualificationsEntityWithJpaFieldsPopulated(prisonNumber = prisonNumber)
       given(previousQualificationsRepository.findByPrisonNumber(any())).willReturn(previousQualificationsEntity)
@@ -61,7 +61,7 @@ class JpaEducationPersistenceAdapterTest {
     @Test
     fun `should not get induction given induction does not exist`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       given(previousQualificationsRepository.findByPrisonNumber(any())).willReturn(null)
 
       // When
@@ -79,7 +79,7 @@ class JpaEducationPersistenceAdapterTest {
     @Test
     fun `should create previous qualifications`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val createPreviousQualificationsDto = aValidCreatePreviousQualificationsDto(prisonNumber = prisonNumber)
 
       val newPreviousQualificationsEntity = aValidPreviousQualificationsEntity(prisonNumber = prisonNumber)
@@ -109,7 +109,7 @@ class JpaEducationPersistenceAdapterTest {
     @Test
     fun `should update prisoner's previous qualifications given previous qualifications exists`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
       val reference = aValidReference()
       val previousQualificationsEntity = aValidPreviousQualificationsEntity(
         reference = reference,
@@ -149,7 +149,7 @@ class JpaEducationPersistenceAdapterTest {
   @Test
   fun `should not update prisoner's previous qualifications given prisoner's previous qualifications does not exist`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val reference = aValidReference()
     given(previousQualificationsRepository.findByPrisonNumber(any())).willReturn(null)
 
@@ -171,7 +171,7 @@ class JpaEducationPersistenceAdapterTest {
   @Test
   fun `should not update prisoner's previous qualifications given prisoner's previous qualifications exists but with a different reference`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val previousQualificationsEntity = aValidPreviousQualificationsEntity(
       reference = UUID.randomUUID(),
       prisonNumber = prisonNumber,

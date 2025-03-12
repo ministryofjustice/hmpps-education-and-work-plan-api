@@ -7,7 +7,7 @@ import java.util.UUID
  * prison numbers, times and dates etc.
  */
 
-fun aValidPrisonNumber() = "A1234BC"
+fun randomValidPrisonNumber() = "A1234BC"
 
 fun anotherValidPrisonNumber() = "B5678CD"
 

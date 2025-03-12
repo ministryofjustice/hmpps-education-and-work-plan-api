@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.junit.jupiter.MockitoExtension
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
 @ExtendWith(MockitoExtension::class)
 class PrisonApiMapperTest {
@@ -16,7 +16,7 @@ class PrisonApiMapperTest {
   @Test
   fun `should convert to PrisonMovementEvents`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonSummary = aValidPrisonerInPrisonSummary()
     val expected = aValidPrisonMovementEvents(
       prisonNumber = prisonNumber,
@@ -46,7 +46,7 @@ class PrisonApiMapperTest {
   @Test
   fun `should convert to PrisonMovementEvents given empty prison periods`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonSummary = aValidPrisonerInPrisonSummary(
       // not expected to happen in practice - there should always be an admission event
       prisonPeriod = emptyList(),
@@ -63,7 +63,7 @@ class PrisonApiMapperTest {
   @Test
   fun `should convert to PrisonMovementEvents given empty prison bookings`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonSummary = aValidPrisonerInPrisonSummary(
       prisonPeriod = listOf(
         aValidPrisonPeriod(

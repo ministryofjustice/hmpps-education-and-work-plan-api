@@ -7,8 +7,6 @@ import java.util.UUID
  * prison numbers, times and dates etc.
  */
 
-fun aValidPrisonNumber() = "A1234BC"
-
 fun randomValidPrisonNumber(): String {
   val letters = ('A'..'Z')
   val numbers = ('0'..'9')

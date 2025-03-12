@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import java.util.UUID
 
 class ActionPlanEntityTest {
@@ -10,7 +10,7 @@ class ActionPlanEntityTest {
   @Test
   fun `should create new action plan for prisoner`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val actual = ActionPlanEntity.newActionPlanForPrisoner(prisonNumber = prisonNumber)

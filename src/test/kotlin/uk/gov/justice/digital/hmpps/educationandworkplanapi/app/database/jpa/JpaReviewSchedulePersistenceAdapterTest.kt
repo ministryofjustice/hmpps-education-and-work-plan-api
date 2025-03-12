@@ -14,12 +14,12 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidUpdateReviewScheduleDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.aValidReviewScheduleEntity
@@ -50,7 +50,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     @Test
     fun `should get active review schedule given review schedules exists for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val activeReviewScheduleEntity = aValidReviewScheduleEntity(
         scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
@@ -74,7 +74,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     @Test
     fun `should not get active review schedule given review schedule does not exist for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willReturn(null)
 
@@ -90,7 +90,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     @Test
     fun `should not get active review schedule given prisoner has multiple active review schedule records`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willThrow(NonUniqueResultException())
 
@@ -100,7 +100,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       }
 
       // Then
-      assertThat(exception).hasMessage("A prisoner cannot have more than one active ReviewSchedule. Please investigate the ReviewSchedule data for prisoner A1234BC")
+      assertThat(exception).hasMessage("A prisoner cannot have more than one active ReviewSchedule. Please investigate the ReviewSchedule data for prisoner $prisonNumber")
       verify(reviewScheduleRepository).findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
       verifyNoInteractions(reviewScheduleEntityMapper)
     }
@@ -111,7 +111,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     @Test
     fun `should get latest review schedule given review schedules exists for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val latestReviewScheduleEntity = aValidReviewScheduleEntity(
         scheduleStatus = ReviewScheduleStatusEntity.SCHEDULED,
@@ -134,7 +134,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     @Test
     fun `should not get latest review schedule given review schedule does not exist for prisoner`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       given(reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(any())).willReturn(null)
 
@@ -153,7 +153,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
     @Test
     fun `should create review schedule given prisoner does not already have one`() {
       // Given
-      val prisonNumber = aValidPrisonNumber()
+      val prisonNumber = randomValidPrisonNumber()
 
       val createReviewScheduleDto = aValidCreateReviewScheduleDto(
         prisonNumber = prisonNumber,
@@ -187,7 +187,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
   @Test
   fun `should not create review schedule given prisoner already has an active Review Schedule`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val createReviewScheduleDto = aValidCreateReviewScheduleDto(
       prisonNumber = prisonNumber,

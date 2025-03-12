@@ -1,15 +1,15 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RELEASED_FROM_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.Instant
 import java.util.UUID
 
 fun aValidHmppsDomainEventsSqsMessage(
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   eventType: EventType = PRISONER_RECEIVED_INTO_PRISON,
   occurredAt: Instant = Instant.now().minusSeconds(10),
   publishedAt: Instant = Instant.now(),

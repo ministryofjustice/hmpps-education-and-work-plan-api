@@ -9,8 +9,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.aValidTimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
@@ -33,7 +33,7 @@ class AsyncActionPlanEventServiceTest {
   @Test
   fun `should handle action plan created`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val actionPlan = aValidActionPlan(prisonNumber = prisonNumber)
     val createActionPlanEvents = listOf(
       aValidTimelineEvent(eventType = TimelineEventType.ACTION_PLAN_CREATED),

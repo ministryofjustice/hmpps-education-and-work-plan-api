@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
 import java.time.OffsetDateTime
 
 fun aValidCiagInductionSummaryResponse(
-  offenderId: String = aValidPrisonNumber(),
+  offenderId: String = randomValidPrisonNumber(),
   hopingToGetWork: HopingToWork = HopingToWork.NOT_SURE,
   desireToWork: Boolean = false,
   createdBy: String = "asmith_gen",

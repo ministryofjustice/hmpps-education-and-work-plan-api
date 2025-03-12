@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanSummaryProjection
@@ -34,7 +34,7 @@ class JpaActionPlanPersistenceAdapterTest {
   @Test
   fun `should save Action Plan`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val actionPlanDomain = aValidActionPlan(prisonNumber = prisonNumber)
     val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber)
     given(actionPlanMapper.fromDtoToEntity(any())).willReturn(actionPlanEntity)
@@ -56,7 +56,7 @@ class JpaActionPlanPersistenceAdapterTest {
   @Test
   fun `should retrieve Action Plan`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val actionPlanEntity = aValidActionPlanEntity(prisonNumber = prisonNumber)
     val expectedActionPlanDomain = aValidActionPlan(prisonNumber = prisonNumber)
     given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
@@ -74,7 +74,7 @@ class JpaActionPlanPersistenceAdapterTest {
   @Test
   fun `should retrieve Action Plan Summaries`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val prisonNumbers = listOf(prisonNumber)
     val actionPlanSummaryProjections = listOf(aValidActionPlanSummaryProjection(prisonNumber = prisonNumber))
     val expectedActionPlanSummaries = listOf(aValidActionPlanSummary(prisonNumber = prisonNumber))

@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -8,7 +8,7 @@ import java.util.UUID
 fun aValidInductionEntity(
   id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   workOnRelease: WorkOnReleaseEntity = aValidWorkOnReleaseEntity(),
   previousTraining: PreviousTrainingEntity = aValidPreviousTrainingEntity(),
   previousWorkExperiences: PreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntity(),
@@ -49,7 +49,7 @@ fun aValidInductionEntity(
 fun aValidInductionEntityWithJpaFieldsPopulated(
   id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = aValidPrisonNumber(),
+  prisonNumber: String = randomValidPrisonNumber(),
   workOnRelease: WorkOnReleaseEntity = aValidWorkOnReleaseEntityWithJpaFieldsPopulated(),
   previousTraining: PreviousTrainingEntity = aValidPreviousTrainingEntityWithJpaFieldsPopulated(),
   previousWorkExperiences: PreviousWorkExperiencesEntity = aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(),
