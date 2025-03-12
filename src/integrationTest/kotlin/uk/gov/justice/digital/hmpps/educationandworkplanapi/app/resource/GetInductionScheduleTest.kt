@@ -2,9 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
@@ -24,7 +22,7 @@ import java.time.OffsetDateTime
 class GetInductionScheduleTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule"
-    private val prisonNumber = aValidPrisonNumber()
+    private val prisonNumber = randomValidPrisonNumber()
   }
 
   @Test
@@ -60,7 +58,7 @@ class GetInductionScheduleTest : IntegrationTestBase() {
   @Test
   fun `should return not found given induction schedule does not exist`() {
     // Given
-    val prisonNumber = anotherValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.get()

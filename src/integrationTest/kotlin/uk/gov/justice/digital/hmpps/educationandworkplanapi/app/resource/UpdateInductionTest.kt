@@ -12,7 +12,7 @@ import org.mockito.kotlin.isNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -61,7 +61,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -71,7 +71,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidUpdateInductionRequest())
       .bearerToken(
         aValidTokenWithAuthority(
@@ -87,7 +87,7 @@ class UpdateInductionTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update induction given no induction data provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.put()
@@ -149,7 +149,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should update induction for prisoner who is no longer looking to work`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createUsername = "auser_gen"
     val createDisplayName = "Albert User"
     val updateUsername = "buser_gen"
@@ -311,7 +311,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should update induction for prisoner who is now looking to work`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createUsername = "auser_gen"
     val createDisplayName = "Albert User"
     val updateUsername = "buser_gen"
@@ -461,7 +461,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should update induction for prisoner who has no qualifications to start with but wants to add qualifications`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInduction(
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
@@ -529,7 +529,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should update induction for prisoner who wants to set their previous work experience as Not Relevant`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInduction(
       prisonNumber = prisonNumber,
       createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(),
@@ -583,7 +583,7 @@ class UpdateInductionTest : IntegrationTestBase() {
   @Test
   fun `should update Induction given request that adds a qualification, removes a qualification, and updates a qualification`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInduction(
       username = "auser_gen",
       prisonNumber = prisonNumber,

@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -34,7 +34,7 @@ class GetInductionTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.get()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .exchange()
       .expectStatus()
       .isUnauthorized
@@ -70,7 +70,7 @@ class GetInductionTest : IntegrationTestBase() {
   @Test
   fun `should get induction for prisoner not looking to work`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val initialDateTime = OffsetDateTime.now()
     createInduction(
       prisonNumber = prisonNumber,
@@ -120,7 +120,7 @@ class GetInductionTest : IntegrationTestBase() {
   @Test
   fun `should get induction for prisoner looking to work`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val initialDateTime = OffsetDateTime.now()
     createInduction(
       prisonNumber = prisonNumber,

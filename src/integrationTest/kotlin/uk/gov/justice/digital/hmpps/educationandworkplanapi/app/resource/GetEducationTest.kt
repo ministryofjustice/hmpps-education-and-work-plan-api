@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -25,7 +25,7 @@ class GetEducationTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.get()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .exchange()
       .expectStatus()
       .isUnauthorized
@@ -34,7 +34,7 @@ class GetEducationTest : IntegrationTestBase() {
   @Test
   fun `should return 404 if no education exists for prisoner yet`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
 
     // When
     val response = webTestClient.get()
@@ -55,13 +55,13 @@ class GetEducationTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()!!
     assertThat(actual)
       .hasStatus(404)
-      .hasUserMessage("Education not found for prisoner [A1234BC]")
+      .hasUserMessage("Education not found for prisoner [$prisonNumber]")
   }
 
   @Test
   fun `should get education for prisoner who has had their previous qualifications setup as part of their Induction`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val previousQualifications = aValidCreatePreviousQualificationsRequest(
       educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,

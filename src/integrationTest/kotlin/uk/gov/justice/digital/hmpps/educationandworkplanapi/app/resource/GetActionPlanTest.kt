@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -28,7 +28,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.get()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .exchange()
       .expectStatus()
       .isUnauthorized
@@ -37,7 +37,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token without required role`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.get()
@@ -59,7 +59,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should not get action plan given prisoner has no action plan`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.get()
@@ -80,7 +80,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should get action plan for prisoner`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createActionPlanRequest = aValidCreateActionPlanRequest()
     createActionPlan(prisonNumber, createActionPlanRequest)
 
@@ -112,7 +112,7 @@ class GetActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should get action plan with multiple goals in order`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createActionPlanRequest = aValidCreateActionPlanRequest(
       goals = listOf(aValidCreateGoalRequest(title = "Learn German")),
     )

@@ -11,8 +11,8 @@ import org.mockito.kotlin.secondValue
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -40,7 +40,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber(), aValidReference())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -50,7 +50,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber(), aValidReference())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber(), aValidReference())
       .withBody(aValidUpdateGoalRequest())
       .bearerToken(
         aValidTokenWithAuthority(
@@ -66,7 +66,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update goal given no steps provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
     val updateRequest = aValidUpdateGoalRequest(
       goalReference = goalReference,
@@ -99,7 +99,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update goal given null fields`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
 
     // When
@@ -132,7 +132,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update goal given goal does not exist`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
     val updateRequest = aValidUpdateGoalRequest(
       goalReference = goalReference,
@@ -163,7 +163,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update goal given goal references in URI path and request body do not match`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val goalReference = aValidReference()
     val someOtherGoalReference = aValidReference()
     val updateRequest = aValidUpdateGoalRequest(
@@ -196,7 +196,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   @Test
   fun `should update goal`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
@@ -319,7 +319,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   @Test
   fun `should update goal and delete goal note`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",
@@ -442,7 +442,7 @@ class UpdateGoalTest : IntegrationTestBase() {
   @Test
   fun `should update goal given the goal fields are unchanged and the only change is to add a step`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequest())
     createActionPlan(
       username = "auser_gen",

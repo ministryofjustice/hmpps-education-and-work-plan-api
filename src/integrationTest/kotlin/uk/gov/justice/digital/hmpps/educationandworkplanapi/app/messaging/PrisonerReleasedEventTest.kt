@@ -5,7 +5,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RELEASED_FROM_PRISON
@@ -23,7 +23,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
   fun `should update Review Schedule given released prisoner has an active Review Schedule`() {
     // Given
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
     createActionPlan(prisonNumber)
 
@@ -62,7 +62,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
   @Test
   fun `should not update Review Schedule given released prisoner does not have an active Review Schedule`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
     createActionPlan(prisonNumber)
@@ -103,7 +103,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
   @Test
   fun `should not create or update Review Schedule given released prisoner does not have a Review Schedule at all`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     assertThat(runCatching { getActionPlanReviews(prisonNumber) }.getOrNull()).isNull()
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
@@ -131,7 +131,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
   fun `should update Induction Schedule given released prisoner has an active Induction Schedule`() {
     // Given
     // an induction schedule exists
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInductionSchedule(prisonNumber)
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
@@ -162,7 +162,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
   @Test
   fun `should not update Induction Schedule given released prisoner does not have an active Induction Schedule`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createInductionSchedule(prisonNumber, status = COMPLETED)
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
@@ -193,7 +193,7 @@ class PrisonerReleasedEventTest : IntegrationTestBase() {
   @Test
   fun `should not create or update Induction Schedule given released prisoner does not have an Induction Schedule at all`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,

@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -31,7 +30,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -41,7 +40,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .withBody(aValidCreateActionPlanRequest())
       .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
@@ -52,7 +51,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create action plan given no goals provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val createRequest = aValidCreateActionPlanRequest(goals = emptyList())
 
     // When
@@ -76,7 +75,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create action plan given a goal with no steps provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val goalWithNoSteps = aValidCreateGoalRequest(steps = emptyList())
     val createRequest = aValidCreateActionPlanRequest(goals = listOf(goalWithNoSteps))
 
@@ -101,7 +100,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create action plan given null fields`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
 
     // When
     val response = webTestClient.post()
@@ -129,7 +128,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should fail to create action plan given action plan already exists`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createActionPlan(prisonNumber)
 
     val createRequest = aValidCreateActionPlanRequest()
@@ -155,7 +154,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should create a new action plan with multiple goals`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val createStepRequest1 = aValidCreateStepRequest(title = "Step 1 of Goal 1")
     val createGoalRequest1 = aValidCreateGoalRequest(title = "Goal 1", steps = listOf(createStepRequest1), notes = null)
 
@@ -224,7 +223,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
   @Test
   fun `should create a new action plan and not create a review schedule given the prisoner does not have an Induction created before the Action Plan`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
 
     val createActionPlanRequest = aValidCreateActionPlanRequest()
 
@@ -244,13 +243,13 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val actionPlan = getActionPlan(prisonNumber)
     assertThat(actionPlan).isNotNull
 
-    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).isEmpty()
   }
 
   @Test
   fun `should create a new action plan and create the initial review schedule given the prisoner already has an induction created before the action plan`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     createInduction(prisonNumber, aValidCreateInductionRequest())
 
     val createActionPlanRequest = aValidCreateActionPlanRequest()
@@ -281,7 +280,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
 
     assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
-    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).size().isEqualTo(1)
   }
 
   @Test
@@ -318,7 +317,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
 
     assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
-    assertThat(reviewScheduleHistoryRepository.findAll()).size().isEqualTo(1)
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).size().isEqualTo(1)
   }
 
   @Test
@@ -345,6 +344,6 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val actionPlan = getActionPlan(prisonNumber)
     assertThat(actionPlan).isNotNull
 
-    assertThat(reviewScheduleHistoryRepository.findAll()).isEmpty()
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).isEmpty()
   }
 }

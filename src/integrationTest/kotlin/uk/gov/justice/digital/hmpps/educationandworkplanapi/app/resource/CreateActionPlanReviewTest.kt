@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -38,7 +37,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     private const val URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
   }
 
-  private val prisonNumber = aValidPrisonNumber()
+  private val prisonNumber = randomValidPrisonNumber()
 
   @Test
   fun `should return unauthorized given no bearer token`() {
@@ -145,7 +144,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()
     assertThat(actual)
       .hasStatus(NOT_FOUND.value())
-      .hasUserMessage("Review Schedule not found for prisoner [A1234BC]")
+      .hasUserMessage("Review Schedule not found for prisoner [$prisonNumber]")
   }
 
   @Test

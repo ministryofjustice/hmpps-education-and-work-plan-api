@@ -11,7 +11,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
@@ -31,7 +31,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.post()
-      .uri(CREATE_GOALS_URI_TEMPLATE, aValidPrisonNumber())
+      .uri(CREATE_GOALS_URI_TEMPLATE, randomValidPrisonNumber())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -41,7 +41,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.post()
-      .uri(CREATE_GOALS_URI_TEMPLATE, aValidPrisonNumber())
+      .uri(CREATE_GOALS_URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidCreateGoalsRequest())
       .bearerToken(aValidTokenWithAuthority(GOALS_RO, privateKey = keyPair.private))
       .contentType(APPLICATION_JSON)
@@ -52,7 +52,7 @@ class CreateGoalsTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create goals given no goals provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createRequest = aValidCreateGoalsRequest(goals = emptyList())
 
     // When
@@ -76,7 +76,7 @@ class CreateGoalsTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create goals given a goal with no steps provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val createRequest = aValidCreateGoalsRequest(goals = listOf(aValidCreateGoalRequest(steps = emptyList())))
 
     // When
@@ -100,7 +100,7 @@ class CreateGoalsTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to create goals given null fields`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.post()
@@ -128,7 +128,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   @Test
   fun `should add goal to prisoner's existing action plan`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(
@@ -181,7 +181,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   @Test
   fun `should add goal with only mandatory fields populated`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(
@@ -238,7 +238,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   @Test
   fun `should add goal with no notes`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(
@@ -273,7 +273,7 @@ class CreateGoalsTest : IntegrationTestBase() {
   @Test
   fun `should add goal with notes`() {
     // Given
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     createActionPlan(prisonNumber)
 
     val createGoalRequest = aValidCreateGoalRequest(

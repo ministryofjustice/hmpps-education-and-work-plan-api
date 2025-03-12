@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.domain.aValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.aValidReference
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -30,7 +30,7 @@ class UpdateEductionTest : IntegrationTestBase() {
   @Test
   fun `should return unauthorized given no bearer token`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -40,7 +40,7 @@ class UpdateEductionTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token with view only role`() {
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidUpdateEducationRequest())
       .bearerToken(
         aValidTokenWithAuthority(
@@ -56,7 +56,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update education given no education data provided`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     // When
     val response = webTestClient.put()
@@ -88,7 +88,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
   @Test
   fun `should fail to update education given education record does not exist`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
     val reference = aValidReference()
     val updateEducationRequest = aValidUpdateEducationRequest(
       reference = reference,
@@ -96,7 +96,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
     // When
     val response = webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateEducationRequest)
       .bearerToken(
         aValidTokenWithAuthority(
@@ -119,7 +119,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
   @Test
   fun `should update education`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = setUpRandomPrisoner()
     val earliestExpectedCreateTime = OffsetDateTime.now()
 
     createEducation(
@@ -188,7 +188,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
     // When
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateEducationRequest)
       .bearerToken(
         aValidTokenWithAuthority(
@@ -252,7 +252,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
   @Test
   fun `should not update education given no changes in update request`() {
-    val prisonNumber = aValidPrisonNumber()
+    val prisonNumber = randomValidPrisonNumber()
 
     createEducation(
       prisonNumber = prisonNumber,
@@ -290,7 +290,7 @@ class UpdateEductionTest : IntegrationTestBase() {
 
     // When
     webTestClient.put()
-      .uri(URI_TEMPLATE, aValidPrisonNumber())
+      .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateEducationRequest)
       .bearerToken(
         aValidTokenWithAuthority(

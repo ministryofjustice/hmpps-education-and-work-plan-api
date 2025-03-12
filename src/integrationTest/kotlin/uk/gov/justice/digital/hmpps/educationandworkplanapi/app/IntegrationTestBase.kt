@@ -11,7 +11,6 @@ import org.awaitility.Awaitility
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
-import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.ArgumentCaptor
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,9 +28,11 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
+import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleHistoryEntity
@@ -141,7 +142,6 @@ abstract class IntegrationTestBase {
     Awaitility.setDefaultTimeout(30, SECONDS)
   }
 
-  @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   lateinit var webTestClient: WebTestClient
 
@@ -212,31 +212,26 @@ abstract class IntegrationTestBase {
   val testReviewScheduleEventQueueDlqClient by lazy { reviewScheduleEventQueue.sqsDlqClient }
 
   @BeforeEach
+  fun reset() {
+    clearQueues()
+    wiremockService.resetAllStubsAndMappings()
+  }
+
+  /**
+   * Use this sparingly as it will affect all tests that are running.
+   * Also Use @Isolated annotation in the tests that use it.
+   */
   fun clearDatabase() {
-    repeat(2) { attempt ->
-      // this sometimes fails - try to do this twice with a delay
-      try {
-        actionPlanRepository.deleteAll()
-        timelineRepository.deleteAll()
-        inductionRepository.deleteAll()
-        previousQualificationsRepository.deleteAll()
-        reviewRepository.deleteAll()
-        reviewScheduleRepository.deleteAll()
-        reviewScheduleHistoryRepository.deleteAll()
-        noteRepository.deleteAll()
-        inductionScheduleRepository.deleteAll()
-        inductionScheduleHistoryRepository.deleteAll()
-
-        clearQueues()
-        wiremockService.resetAllStubsAndMappings()
-
-        return
-      } catch (e: ConstraintViolationException) {
-        if (attempt == 1) throw e
-        log.info("Database cleanup failed due to constraint violation. Retrying...")
-        shortDelay()
-      }
-    }
+    actionPlanRepository.deleteAll()
+    timelineRepository.deleteAll()
+    inductionRepository.deleteAll()
+    previousQualificationsRepository.deleteAll()
+    reviewRepository.deleteAll()
+    reviewScheduleRepository.deleteAll()
+    reviewScheduleHistoryRepository.deleteAll()
+    noteRepository.deleteAll()
+    inductionScheduleRepository.deleteAll()
+    inductionScheduleHistoryRepository.deleteAll()
   }
 
   fun clearQueues() {
@@ -665,8 +660,15 @@ abstract class IntegrationTestBase {
       ).build(),
   ).get()
 
-  fun shortDelay() {
-    Thread.sleep(200)
+  fun shortDelay(delay: Long = 200) {
+    Thread.sleep(delay)
+  }
+
+  fun setUpRandomPrisoner(): String {
+    val prisonNumber = randomValidPrisonNumber()
+    val prisoner = aValidPrisoner(prisonNumber)
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
+    return prisonNumber
   }
 }
 
