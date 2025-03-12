@@ -51,14 +51,17 @@ class ReviewScheduleEntityMapperTest {
   @Test
   fun `should map create review schedule domain DTO to review schedule entity`() {
     // Given
+    val prisonNumber = randomValidPrisonNumber()
     val earliestReviewDate = LocalDate.now().plusMonths(1)
     val latestReviewDate = LocalDate.now().plusMonths(3)
     val createReviewScheduleDto = aValidCreateReviewScheduleDto(
+      prisonNumber = prisonNumber,
       scheduleCalculationRule = ReviewScheduleCalculationRuleDomain.MORE_THAN_60_MONTHS_TO_SERVE,
       reviewScheduleWindow = ReviewScheduleWindow(earliestReviewDate, latestReviewDate),
     )
 
     val expected = aValidUnPersistedReviewScheduleEntity(
+      prisonNumber = prisonNumber,
       scheduleCalculationRule = ReviewScheduleCalculationRuleEntity.MORE_THAN_60_MONTHS_TO_SERVE,
       earliestReviewDate = earliestReviewDate,
       latestReviewDate = latestReviewDate,
