@@ -12,7 +12,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.anotherValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
@@ -121,7 +120,7 @@ class ActionPlanServiceTest {
     @Test
     fun `should get action plan summaries given one or more prison numbers`() {
       // Given
-      val prisonNumbers = listOf(randomValidPrisonNumber(), anotherValidPrisonNumber())
+      val prisonNumbers = listOf(randomValidPrisonNumber(), randomValidPrisonNumber())
 
       val expectedActionPlanSummaries = listOf(
         aValidActionPlanSummary(prisonNumber = prisonNumbers[0]),
