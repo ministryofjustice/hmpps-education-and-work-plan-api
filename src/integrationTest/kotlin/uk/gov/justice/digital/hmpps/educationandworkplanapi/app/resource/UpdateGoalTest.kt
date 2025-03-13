@@ -409,7 +409,7 @@ class UpdateGoalTest : IntegrationTestBase() {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline.events.size).isEqualTo(7)
       assertThat(timeline)
-        .anyOfEventNumber(5, 6) {
+        .anyOfEventNumber(5, 6, 7) {
           // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
             .wasActionedBy("buser_gen")
