@@ -407,6 +407,7 @@ class UpdateGoalTest : IntegrationTestBase() {
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
+      assertThat(timeline.events.size).isEqualTo(7)
       assertThat(timeline)
         .anyOfEventNumber(5, 6) {
           // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
