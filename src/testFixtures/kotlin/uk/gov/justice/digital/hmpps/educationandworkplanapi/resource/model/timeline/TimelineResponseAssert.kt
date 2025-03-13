@@ -56,20 +56,25 @@ class TimelineResponseAssert(actual: TimelineResponse?) : AbstractObjectAssert<T
    * The `eventNumber` parameter is not zero indexed to make for better readability in tests. IE. the first event
    * should be referenced as `.event(1) { .... }`
    */
-  fun anyOfEventNumber(vararg eventNumbers: Int, consumer: Consumer<TimelineEventResponseAssert>): TimelineResponseAssert {
+  fun anyOfEventNumber(
+    vararg eventNumbers: Int,
+    consumer: Consumer<TimelineEventResponseAssert>,
+  ): TimelineResponseAssert {
     isNotNull
     with(actual!!) {
       val events = events.filterIndexed { index, _ -> eventNumbers.contains(index + 1) }
+      val assertionErrors = mutableListOf<String>()
       val assertionPassed = events.any {
         try {
           consumer.accept(assertThat(it))
           true
         } catch (e: AssertionError) {
+          assertionErrors.add(e.message ?: "Assertion failed")
           false
         }
       }
       if (!assertionPassed) {
-        failWithMessage("Expected timeline event to be not present")
+        failWithMessage("None of the specified events (${eventNumbers.joinToString(",")}) matched the assertion.\nErrors:\n${assertionErrors.joinToString("\n")}")
       }
     }
     return this
