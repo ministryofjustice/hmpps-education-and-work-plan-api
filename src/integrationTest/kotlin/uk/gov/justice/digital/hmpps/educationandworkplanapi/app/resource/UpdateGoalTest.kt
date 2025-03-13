@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
@@ -316,7 +317,7 @@ class UpdateGoalTest : IntegrationTestBase() {
     }
   }
 
-  @Test
+  @RepeatedTest(100)
   fun `should update goal and delete goal note`() {
     // Given
     val prisonNumber = setUpRandomPrisoner()
