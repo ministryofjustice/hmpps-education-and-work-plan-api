@@ -537,6 +537,43 @@ paths:
   '/timelines/{prisonNumber}':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - name: inductions
+        in: query
+        description: Filter events related to inductions.
+        required: false
+        schema:
+          type: boolean
+      - name: reviews
+        in: query
+        description: Filter events related to reviews.
+        required: false
+        schema:
+          type: boolean
+      - name: goals
+        in: query
+        description: Filter events related to goals.
+        required: false
+        schema:
+          type: boolean
+      - name: goals
+        in: query
+        description: Filter prison events.
+        required: false
+        schema:
+          type: boolean
+      - name: prisonId
+        in: query
+        description: Filter events by a specific prison id.
+        required: false
+        schema:
+          type: string
+      - name: eventsSince
+        in: query
+        description: Filter events that occurred after this date.
+        required: false
+        schema:
+          type: string
+          format: date
     get:
       summary: Return a Prisoner's Timeline.
       description: |
