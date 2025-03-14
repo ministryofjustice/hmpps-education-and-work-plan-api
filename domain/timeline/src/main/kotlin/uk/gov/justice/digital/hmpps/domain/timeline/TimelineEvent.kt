@@ -69,35 +69,35 @@ data class TimelineEvent(
 /**
  * The events that the business are interested in (for example to display a history of these events on screen).
  */
-enum class TimelineEventType(val isReview: Boolean, val isGoal: Boolean, val isInduction: Boolean) {
+enum class TimelineEventType(val isReview: Boolean, val isGoal: Boolean, val isInduction: Boolean, val isPrisonEvent: Boolean) {
   // Induction events
-  INDUCTION_CREATED(false, false, true),
-  INDUCTION_UPDATED(false, false, true),
-  INDUCTION_SCHEDULE_CREATED(false, false, true),
-  INDUCTION_SCHEDULE_UPDATED(false, false, true),
-  INDUCTION_SCHEDULE_STATUS_UPDATED(false, false, true),
+  INDUCTION_CREATED(false, false, true, false),
+  INDUCTION_UPDATED(false, false, true, false),
+  INDUCTION_SCHEDULE_CREATED(false, false, true, false),
+  INDUCTION_SCHEDULE_UPDATED(false, false, true, false),
+  INDUCTION_SCHEDULE_STATUS_UPDATED(false, false, true, false),
 
   // Action Plan/Goal/Step events
-  ACTION_PLAN_CREATED(false, true, false),
-  GOAL_CREATED(false, true, false),
-  GOAL_UPDATED(false, true, false),
-  GOAL_COMPLETED(false, true, false),
-  GOAL_ARCHIVED(false, true, false),
-  GOAL_UNARCHIVED(false, true, false),
-  STEP_UPDATED(false, true, false),
-  STEP_NOT_STARTED(false, true, false),
-  STEP_STARTED(false, true, false),
-  STEP_COMPLETED(false, true, false),
+  ACTION_PLAN_CREATED(false, true, false, false),
+  GOAL_CREATED(false, true, false, false),
+  GOAL_UPDATED(false, true, false, false),
+  GOAL_COMPLETED(false, true, false, false),
+  GOAL_ARCHIVED(false, true, false, false),
+  GOAL_UNARCHIVED(false, true, false, false),
+  STEP_UPDATED(false, true, false, false),
+  STEP_NOT_STARTED(false, true, false, false),
+  STEP_STARTED(false, true, false, false),
+  STEP_COMPLETED(false, true, false, false),
 
   // Action Plan Review events
-  ACTION_PLAN_REVIEW_COMPLETED(true, false, false),
-  ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED(true, false, false),
-  ACTION_PLAN_REVIEW_SCHEDULE_CREATED(true, false, false),
+  ACTION_PLAN_REVIEW_COMPLETED(true, false, false, false),
+  ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED(true, false, false, false),
+  ACTION_PLAN_REVIEW_SCHEDULE_CREATED(true, false, false, false),
 
   // Prison movement events (not related to induction, goals, or reviews)
-  PRISON_ADMISSION(false, false, false),
-  PRISON_RELEASE(false, false, false),
-  PRISON_TRANSFER(false, false, false),
+  PRISON_ADMISSION(false, false, false, true),
+  PRISON_RELEASE(false, false, false, true),
+  PRISON_TRANSFER(false, false, false, true),
 }
 
 enum class TimelineEventContext {
