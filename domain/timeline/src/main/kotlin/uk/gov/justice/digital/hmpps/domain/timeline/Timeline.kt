@@ -12,7 +12,7 @@ class Timeline(
   events: List<TimelineEvent> = emptyList(),
 ) {
 
-  val events: MutableList<TimelineEvent>
+  var events: MutableList<TimelineEvent>
     get() = field.also { events -> events.sortBy { it.timestamp } }
 
   init {
