@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.21.1'
+  version: '1.22.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -27,7 +27,7 @@ paths:
   '/person/{prisonNumber}/education':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
-    description: | 
+    description: |
       API endpoints to create, read and update an individual's education.  
       
       Personal Learning Plans currently considers "education" as meaning an individual's level of education and
@@ -40,7 +40,7 @@ paths:
       An individual cannot have more than one record of education.
     get:
       summary: Returns an individual's education record.
-      description: | 
+      description: |
         Returns an individual's education which includes their level of education, and a collection of 
         qualifications that have been achieved.
         
@@ -153,7 +153,7 @@ paths:
         $ref: '#/components/requestBodies/CreateActionPlan'
     get:
       summary: Return a Prisoner's Action Plan
-      description: | 
+      description: |
         Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, a 404 is returned.
 
         **Role Requirements:**  
@@ -270,7 +270,7 @@ paths:
         
         It is possible for a review schedule to be updated therefore this endpoint will return all versions of a
         review schedule - the highest version number will be the most recent schedule. 
-              
+        
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
           - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
@@ -347,7 +347,7 @@ paths:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     get:
       summary: Lists the Goals for a prisoner with an optional filter on Goal status
-      description: | 
+      description: |
         Returns Goals for the specified prisoner, optionally filtered on Goal status with the `status` query string parameter.  
         The optional `status` query string parameter can be one or more of the supported Goal statuses (see the `GoalStatus` schema definition for valid statuses).  
         If specifying multiple statuses these can either be a comma delimited list in a single `status` query string parameter, or multiple instances of the `status` query string parameter can be used.    
@@ -533,10 +533,46 @@ paths:
 
   #
   # Timeline
-  #
   '/timelines/{prisonNumber}':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
+      - name: inductions
+        in: query
+        description: Filter events related to inductions.
+        required: false
+        schema:
+          type: boolean
+      - name: reviews
+        in: query
+        description: Filter events related to reviews.
+        required: false
+        schema:
+          type: boolean
+      - name: goals
+        in: query
+        description: Filter events related to goals.
+        required: false
+        schema:
+          type: boolean
+      - name: goals
+        in: query
+        description: Filter prison events.
+        required: false
+        schema:
+          type: boolean
+      - name: prisonId
+        in: query
+        description: Filter events by a specific prison id.
+        required: false
+        schema:
+          type: string
+      - name: eventsSince
+        in: query
+        description: Filter events that occurred after this date.
+        required: false
+        schema:
+          type: string
+          format: date
     get:
       summary: Return a Prisoner's Timeline.
       description: |
@@ -720,7 +756,7 @@ paths:
           required: true
           description: Filter session summaries by status. Valid values are DUE, OVERDUE, or ON_HOLD.
           schema:
-              $ref: '#/components/schemas/SessionStatusType'
+            $ref: '#/components/schemas/SessionStatusType'
       responses:
         '200':
           $ref: '#/components/responses/Session'
@@ -736,7 +772,7 @@ paths:
           in: query
           description: Search by prisoner name or prison number
           schema:
-           type: string
+            type: string
         - name: hasActionPlan
           in: query
           description: Filter by whether the prisoner has an action plan
@@ -2474,7 +2510,7 @@ components:
     CreateOrUpdateAchievedQualificationRequest:
       title: CreateOrUpdateAchievedQualificationRequest
       type: object
-      description: | 
+      description: |
         A request object to create or update a qualification that a Prisoner has achieved.  
         If the object contains a reference field the corresponding qualification will be updated, or created as a new
         qualification if the corresponding qualification cannot be found.  
@@ -2673,7 +2709,7 @@ components:
           $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
-          description: | 
+          description: |
             A list of the Prisoner's previous qualifications.  
             These can either be new qualfications without a reference field, or for any qualifications with a reference field they
             will be treated as updates.
@@ -3275,14 +3311,14 @@ components:
           example: 'BXI'
         conductedBy:
           type: string
-          description: | 
+          description: |
             The name of the person who actually conducted the Review session with the Prisoner. 
             
             Only populated if the person who conducted the Review was not the person who keyed it into the system.
           example: 'Albert Mozzarella'
         conductedByRole:
           type: string
-          description: | 
+          description: |
             The role of the person who actually conducted the Review session with the Prisoner.
             
             Only populated if the person who conducted the Review was not the person who keyed it into the system.
@@ -3307,7 +3343,7 @@ components:
       type: object
       allOf:
         - $ref: '#/components/schemas/AuditedResource'
-      description: | 
+      description: |
         A Scheduled Review of a Prisoner's Action Plan.
         
         A DPS user will create a new Review Schedule (and therefore they will be recorded in the `createdBy...` fields)
@@ -3322,7 +3358,7 @@ components:
         reviewDateFrom:
           type: string
           format: date
-          description: | 
+          description: |
             An ISO-8601 date representing date that the Review window starts.
             
             A prisoner's Review should be conducted within a given timeframe and this field represents the date that the
