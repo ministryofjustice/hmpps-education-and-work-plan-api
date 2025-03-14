@@ -8,12 +8,16 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.domain.timeline.Timeline
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.timeline.TimelineResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
+import java.time.LocalDate
+import java.time.ZoneId
 
 @RestController
 @Validated
@@ -26,7 +30,42 @@ class TimelineController(
   @GetMapping("/{prisonNumber}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_TIMELINE)
-  fun getTimeline(@PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String): TimelineResponse = with(timelineService.getTimelineForPrisoner(prisonNumber)) {
-    timelineMapper.fromDomainToModel(this)
+  fun getTimeline(
+    @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
+    @RequestParam(required = false) inductions: Boolean?,
+    @RequestParam(required = false) goals: Boolean?,
+    @RequestParam(required = false) reviews: Boolean?,
+    @RequestParam(required = false) prisonId: String?,
+    @RequestParam(required = false) eventsSince: LocalDate?,
+  ): TimelineResponse {
+    val timeline = timelineService.getTimelineForPrisoner(prisonNumber)
+    applyFilter(timeline, inductions, goals, reviews, prisonId, eventsSince)
+    return timelineMapper.fromDomainToModel(timeline)
+  }
+
+  private fun applyFilter(
+    timeline: Timeline,
+    inductions: Boolean?,
+    goals: Boolean?,
+    reviews: Boolean?,
+    prisonId: String?,
+    eventsSince: LocalDate?,
+  ) {
+    // If all filters are null return all.
+    if (inductions == null && goals == null && reviews == null && prisonId == null && eventsSince == null) {
+      return
+    }
+
+    timeline.events.removeIf { event ->
+      val matchesInductions = inductions == null || (inductions && event.eventType.isInduction)
+      val matchesGoals = goals == null || (goals && event.eventType.isGoal)
+      val matchesReviews = reviews == null || (reviews && event.eventType.isReview)
+      val matchesPrison = prisonId == null || event.prisonId == prisonId
+      val matchesEventsSince =
+        eventsSince == null || event.timestamp.isAfter(eventsSince.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+      // Remove events that don't match any of these filters
+      !(matchesInductions && matchesGoals && matchesReviews && matchesPrison && matchesEventsSince)
+    }
   }
 }
