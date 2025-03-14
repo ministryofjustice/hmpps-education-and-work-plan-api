@@ -554,7 +554,7 @@ paths:
         required: false
         schema:
           type: boolean
-      - name: goals
+      - name: prisonEvents
         in: query
         description: Filter prison events.
         required: false
