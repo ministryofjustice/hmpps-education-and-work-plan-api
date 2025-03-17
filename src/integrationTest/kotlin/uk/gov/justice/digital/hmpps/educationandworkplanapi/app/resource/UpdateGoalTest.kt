@@ -279,6 +279,7 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasCreatedBy("auser_gen")
           .wasUpdatedBy("buser_gen")
           .hasGoalNote("Chris would like to improve his listening skills, not just his verbal communication - updated")
+          .hasGoalNoteUpdatedBy("buser_gen")
       }
 
     await.untilAsserted {

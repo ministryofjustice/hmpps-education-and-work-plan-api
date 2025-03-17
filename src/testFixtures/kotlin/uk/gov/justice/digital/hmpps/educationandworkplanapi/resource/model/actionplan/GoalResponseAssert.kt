@@ -197,6 +197,7 @@ class GoalResponseAssert(actual: GoalResponse?) : AbstractObjectAssert<GoalRespo
   fun hasArchiveNote(expected: String): GoalResponseAssert = hasNoteOfType(NoteType.GOAL_ARCHIVAL, expected, "archive")
 
   fun hasGoalNote(expected: String): GoalResponseAssert = hasNoteOfType(NoteType.GOAL, expected, "goal")
+  fun hasGoalNoteUpdatedBy(expected: String): GoalResponseAssert = hasGoalNoteUpdatedBy(NoteType.GOAL, expected)
 
   private fun hasNoteOfType(noteType: NoteType, expected: String, noteLabel: String): GoalResponseAssert {
     isNotNull
@@ -208,6 +209,21 @@ class GoalResponseAssert(actual: GoalResponse?) : AbstractObjectAssert<GoalRespo
 
         note.content != expected ->
           failWithMessage("Expected $noteLabel note to be $expected, but was ${note.content}")
+      }
+    }
+    return this
+  }
+
+  private fun hasGoalNoteUpdatedBy(noteType: NoteType, expected: String): GoalResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val note = goalNotes.firstOrNull { it.type == noteType }
+      when {
+        note == null ->
+          failWithMessage("Expected updatedBy note to be $expected, but was null")
+
+        note.updatedBy != expected ->
+          failWithMessage("Expected updatedBy note to be $expected, but was ${note.updatedBy}")
       }
     }
     return this
