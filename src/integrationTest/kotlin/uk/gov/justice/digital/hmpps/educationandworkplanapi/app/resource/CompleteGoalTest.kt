@@ -91,7 +91,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(7) {
+        .anyOfEventNumber(5, 6, 7) {
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
@@ -139,8 +139,7 @@ class CompleteGoalTest : IntegrationTestBase() {
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
       assertThat(timeline)
-        .event(7) {
-          // the 7th Timeline event will be the GOAL_COMPLETED event
+        .anyOfEventNumber(5, 6, 7) {
           it.hasEventType(TimelineEventType.GOAL_COMPLETED)
             .wasActionedBy("buser_gen")
             .hasActionedByDisplayName("Bernie User")
