@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -80,10 +79,9 @@ class ScheduleEtlController(
     }
   }
 
-  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_REVIEWS)
-  @RequestMapping(value = ["/action-plans/schedules/etl/{prisonId}"])
+  @PostMapping(value = ["/action-plans/schedules/etl/{prisonId}"])
   @Transactional
   fun createSchedulesForPrisonersInPrison(
     @PathVariable("prisonId") prisonId: String,
