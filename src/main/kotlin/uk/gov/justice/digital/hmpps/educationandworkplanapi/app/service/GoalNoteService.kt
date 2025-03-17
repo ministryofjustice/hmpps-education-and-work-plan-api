@@ -37,7 +37,7 @@ class GoalNoteService(
     note?.let {
       noteService.updateNote(
         UpdateNoteDto(
-          reference = note.reference,
+          reference = it.reference,
           content = updatedText,
           lastUpdatedAtPrison = lastUpdatedAtPrison,
         ),

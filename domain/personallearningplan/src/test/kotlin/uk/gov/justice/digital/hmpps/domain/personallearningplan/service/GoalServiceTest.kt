@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -150,83 +151,296 @@ class GoalServiceTest {
     }
   }
 
-  @Test
-  fun `should get goal given goal exists`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    val goalReference = aValidReference()
+  @Nested
+  inner class GetGoal {
+    @Test
+    fun `should get goal given goal exists`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val goalReference = aValidReference()
 
-    val goal = aValidGoal(reference = goalReference)
-    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+      val goal = aValidGoal(reference = goalReference)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
 
-    // When
-    val actual = service.getGoal(prisonNumber, goalReference)
+      // When
+      val actual = service.getGoal(prisonNumber, goalReference)
 
-    // Then
-    assertThat(actual).isEqualTo(goal)
-    verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+      // Then
+      assertThat(actual).isEqualTo(goal)
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+    }
+
+    @Test
+    fun `should not get goal given goal does not exist`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val goalReference = aValidReference()
+
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
+
+      // When
+      val exception =
+        catchThrowableOfType(GoalNotFoundException::class.java) { service.getGoal(prisonNumber, goalReference) }
+
+      // Then
+      assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      assertThat(exception.goalReference).isEqualTo(goalReference)
+      verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
+    }
   }
 
-  @Test
-  fun `should not get goal given goal does not exist`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    val goalReference = aValidReference()
+  @Nested
+  inner class UpdateGoal {
+    @Test
+    fun `should update goal given goal exists`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val goalReference = aValidReference()
 
-    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
+      val goal = aValidGoal(reference = goalReference)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+      given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
 
-    // When
-    val exception =
-      catchThrowableOfType(GoalNotFoundException::class.java) { service.getGoal(prisonNumber, goalReference) }
+      val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
-    // Then
-    assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
-    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-    assertThat(exception.goalReference).isEqualTo(goalReference)
-    verify(goalPersistenceAdapter).getGoal(prisonNumber, goalReference)
-  }
+      // When
+      val actual = service.updateGoal(prisonNumber, updatedGoal)
 
-  @Test
-  fun `should update goal given goal exists`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    val goalReference = aValidReference()
+      // Then
+      assertThat(actual).isEqualTo(goal)
+      verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+      verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+    }
 
-    val goal = aValidGoal(reference = goalReference)
-    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
-    given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+    @Test
+    fun `should not update goal given goal does not exist`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val goalReference = aValidReference()
 
-    val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
+      given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
 
-    // When
-    val actual = service.updateGoal(prisonNumber, updatedGoal)
+      val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
 
-    // Then
-    assertThat(actual).isEqualTo(goal)
-    verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
-    verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
-  }
+      // When
+      val exception =
+        catchThrowableOfType(GoalNotFoundException::class.java) { service.updateGoal(prisonNumber, updatedGoal) }
 
-  @Test
-  fun `should not update goal given goal does not exist`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    val goalReference = aValidReference()
+      // Then
+      assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      assertThat(exception.goalReference).isEqualTo(goalReference)
+      verify(goalPersistenceAdapter, never()).updateGoal(prisonNumber, updatedGoal)
+      verifyNoInteractions(goalNotesService)
+      verifyNoInteractions(goalEventService)
+    }
 
-    given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(null)
+    @Nested
+    inner class UpdateGoalNotes {
+      @Test
+      fun `should update goal with updated notes given different note content was previously on the goal`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
 
-    val updatedGoal = aValidUpdateGoalDto(reference = goalReference)
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
 
-    // When
-    val exception =
-      catchThrowableOfType(GoalNotFoundException::class.java) { service.updateGoal(prisonNumber, updatedGoal) }
+        val existingNote = "The previous goal note content"
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
 
-    // Then
-    assertThat(exception).hasMessage("Goal with reference [$goalReference] for prisoner [$prisonNumber] not found")
-    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-    assertThat(exception.goalReference).isEqualTo(goalReference)
-    verify(goalPersistenceAdapter, never()).updateGoal(prisonNumber, updatedGoal)
-    verifyNoInteractions(goalEventService)
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = "The new note content",
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verify(goalNotesService).updateNotes(goalReference, goal.lastUpdatedAtPrison, "The new note content")
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+
+      @Test
+      fun `should update goal with new notes given no note content was previously on the goal`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
+
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+
+        val existingNote = null
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
+
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = "The new note content",
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verify(goalNotesService).createNotes(prisonNumber, listOf(goal))
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+
+      @Test
+      fun `should update goal by deleting notes given notes on the goal and empty string notes in the request`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
+
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+
+        val existingNote = "The existing goal note"
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
+
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = "",
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verify(goalNotesService).deleteNote(goalReference)
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+
+      @Test
+      fun `should update goal by deleting notes given notes on the goal and null notes in the request`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
+
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+
+        val existingNote = "The existing goal note"
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
+
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = null,
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verify(goalNotesService).deleteNote(goalReference)
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+
+      @Test
+      fun `should update goal but not update notes given notes on the goal are the same as notes in the request`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
+
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+
+        val existingNote = "The goal notes"
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
+
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = "The goal notes",
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verifyNoMoreInteractions(goalNotesService)
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+
+      @Test
+      fun `should update goal but not update notes given no notes on the goal and null notes in the request`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
+
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+
+        val existingNote = null
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
+
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = null,
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verifyNoMoreInteractions(goalNotesService)
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+
+      @Test
+      fun `should update goal but not update notes given no notes on the goal and empty string notes in the request`() {
+        // Given
+        val prisonNumber = randomValidPrisonNumber()
+        val goalReference = aValidReference()
+
+        val goal = aValidGoal(reference = goalReference)
+        given(goalPersistenceAdapter.getGoal(any(), any())).willReturn(goal)
+        given(goalPersistenceAdapter.updateGoal(any(), any())).willReturn(goal)
+
+        val existingNote = null
+        given(goalNotesService.getNotes(any())).willReturn(existingNote)
+
+        val updatedGoal = aValidUpdateGoalDto(
+          reference = goalReference,
+          notes = "",
+        )
+
+        // When
+        val actual = service.updateGoal(prisonNumber, updatedGoal)
+
+        // Then
+        assertThat(actual).isEqualTo(goal)
+        verify(goalPersistenceAdapter).updateGoal(prisonNumber, updatedGoal)
+        verify(goalNotesService, times(2)).getNotes(goalReference)
+        verifyNoMoreInteractions(goalNotesService)
+        verify(goalEventService).goalUpdated(prisonNumber, goal, actual)
+      }
+    }
   }
 
   @Nested

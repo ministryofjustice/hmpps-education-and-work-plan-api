@@ -97,8 +97,8 @@ class GoalService(
     val existingGoal = getGoal(prisonNumber, updatedGoalDto.reference)
     return goalPersistenceAdapter.updateGoal(prisonNumber, updatedGoalDto)
       ?.also {
-        goalEventService.goalUpdated(prisonNumber = prisonNumber, previousGoal = existingGoal, updatedGoal = it)
         updateNote(prisonNumber, it, updatedGoalDto.notes)
+        goalEventService.goalUpdated(prisonNumber = prisonNumber, previousGoal = existingGoal, updatedGoal = it)
       }
       ?: throw GoalNotFoundException(prisonNumber, goalReference).also {
         log.info { "Goal with reference [$goalReference] for prisoner [$prisonNumber] not found" }
@@ -106,24 +106,24 @@ class GoalService(
   }
 
   // if the note is different to the note before then update/create the note
-  private fun updateNote(prisonNumber: String, goal: Goal, updatedNote: String?) {
-    val existingNote = goalNotesService.getNotes(goal.reference)
-
-    when {
-      existingNote == null && updatedNote != null -> {
-        goalNotesService.createNotes(prisonNumber, listOf(goal))
-      }
-
-      existingNote != updatedNote -> {
-        if (updatedNote.isNullOrEmpty()) {
-          goalNotesService.deleteNote(goal.reference)
-        } else {
-          goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
+  private fun updateNote(prisonNumber: String, goal: Goal, updatedNote: String?) =
+    goalNotesService.getNotes(goal.reference)
+      ?.run {
+        // Goal has a previous note
+        if (this != updatedNote) {
+          if (updatedNote.isNullOrEmpty()) {
+            goalNotesService.deleteNote(goal.reference)
+          } else {
+            goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
+          }
         }
       }
-      // No action if the note hasn't changed or both are null
-    }
-  }
+      ?: run {
+        // Goal did not previously have a note
+        if (!updatedNote.isNullOrEmpty()) {
+          goalNotesService.createNotes(prisonNumber, listOf(goal))
+        }
+      }
 
   /**
    * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
