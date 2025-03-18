@@ -46,10 +46,9 @@ class AsyncInductionEventService(
       prisonId = createdAtPrison,
       actionedBy = induction.createdBy!!,
       timestamp = induction.createdAt!!,
-      contextualInfo = mapOf(
+      contextualInfo = mutableMapOf(
         TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_AT to createdAt.toString(),
         TimelineEventContext.COMPLETED_INDUCTION_ENTERED_ONLINE_BY to userService.getUserDetails(createdBy!!).name,
-        TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE to completedDate.toString(),
         TimelineEventContext.COMPLETED_INDUCTION_NOTES to noteContent,
         *conductedBy
           ?.let {
@@ -58,7 +57,11 @@ class AsyncInductionEventService(
               TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_BY_ROLE to conductedByRolePerson,
             )
           } ?: arrayOf(),
-      ),
+      ).apply {
+        completedDate?.let {
+          this[TimelineEventContext.COMPLETED_INDUCTION_CONDUCTED_IN_PERSON_DATE] = it.toString()
+        }
+      },
     )
   }
 
