@@ -1,5 +1,5 @@
 #
-# The "-preprod" for use in the preprod environment (profile enabled in the helm dev config).
+# The "-preprod" for use in the preprod environment (profile enabled in the helm preprod config).
 #
 spring:
   flyway:
