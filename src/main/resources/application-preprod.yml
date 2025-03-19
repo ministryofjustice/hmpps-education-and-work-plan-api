@@ -1,0 +1,6 @@
+#
+# The "-preprod" for use in the preprod environment (profile enabled in the helm dev config).
+#
+spring:
+  flyway:
+    locations: classpath:/db/migration/common,classpath:/db/migration/preprod,classpath:/db/postgres/common,classpath:/db/postgres/preprod
