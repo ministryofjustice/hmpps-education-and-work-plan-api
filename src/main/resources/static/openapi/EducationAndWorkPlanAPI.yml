@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.21.1'
+  version: '1.21.2'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2912,6 +2912,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GoalResponse'
+        education:
+          $ref: '#/components/schemas/EducationResponse'
 
     SarSuccessResponse:
       properties:
