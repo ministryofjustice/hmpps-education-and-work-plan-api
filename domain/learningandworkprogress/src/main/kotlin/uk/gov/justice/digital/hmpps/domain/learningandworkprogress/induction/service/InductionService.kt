@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
 import mu.KotlinLogging
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
@@ -69,8 +68,5 @@ class InductionService(
   fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> {
     log.debug { "Retrieving Induction Summaries for ${prisonNumbers.size} prisoners" }
     return if (prisonNumbers.isNotEmpty()) persistenceAdapter.getInductionSummaries(prisonNumbers) else emptyList()
-  }
-  fun getQualifications(prisonNumber: String): PreviousQualifications? {
-    return persistenceAdapter.getPreviousQualifications(prisonNumber)
   }
 }

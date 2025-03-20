@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
@@ -8,8 +10,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education.EducationResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.QualificationsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -23,7 +25,8 @@ class SubjectAccessRequestService(
   private val noteService: NoteService,
   private val inductionMapper: InductionResourceMapper,
   private val goalMapper: GoalResourceMapper,
-  private val qualificationsResourceMapper: QualificationsResourceMapper,
+  private val educationService: EducationService,
+  private val educationResourceMapper: EducationResourceMapper,
 
 ) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
@@ -50,7 +53,11 @@ class SubjectAccessRequestService(
       null
     }
 
-    val qualifications = inductionService.getQualifications(prisonNumber)
+    val education = try {
+      educationService.getPreviousQualificationsForPrisoner(prisonNumber)
+    } catch (e: EducationNotFoundException) {
+      null
+    }
 
     if (goals.isEmpty() && induction == null) return null
     return HmppsSubjectAccessRequestContent(
@@ -60,8 +67,8 @@ class SubjectAccessRequestService(
           val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
           goalMapper.fromDomainToModel(it, goalNotes)
         }.toSet(),
-        previousQualifications = qualifications?.let {
-          qualificationsResourceMapper.toPreviousQualificationsResponse(qualifications)
+        education = education?.let {
+          educationResourceMapper.toEducationResponse(it)
         },
       ),
     )
