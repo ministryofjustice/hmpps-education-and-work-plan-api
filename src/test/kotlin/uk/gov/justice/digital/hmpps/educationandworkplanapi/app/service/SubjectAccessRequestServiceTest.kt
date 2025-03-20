@@ -16,6 +16,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
@@ -24,12 +26,14 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education.EducationResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCompletedActionPlanReviewResponse
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -61,6 +65,12 @@ class SubjectAccessRequestServiceTest {
 
   @Mock
   private lateinit var educationResourceMapper: EducationResourceMapper
+
+  @Mock
+  private lateinit var reviewService: ReviewService
+
+  @Mock
+  private lateinit var completedActionPlanReviewResponseMapper: CompletedActionPlanReviewResponseMapper
 
   @Test
   fun `should return induction and action plan data for a prisoner without date filtering`() {
@@ -171,14 +181,18 @@ class SubjectAccessRequestServiceTest {
       prisonNumber = prisonNumber,
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
     )
+    val completedReview = aValidCompletedReview()
     val expectedInductionResponse = aValidInductionResponse()
     val expectedEducationResponse = aValidEducationResponse(
       educationLevel = EducationLevel.NOT_SURE,
     )
+    val expectedCompletedActionPlanReviewResponse = aValidCompletedActionPlanReviewResponse()
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
     given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
     given(inductionMapper.toInductionResponse(any())).willReturn(expectedInductionResponse)
     given(educationResourceMapper.toEducationResponse(any())).willReturn(expectedEducationResponse)
+    given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(listOf(completedReview))
+    given(completedActionPlanReviewResponseMapper.fromDomainToModel(any())).willReturn(expectedCompletedActionPlanReviewResponse)
     val goal1 = aValidGoal(createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
     val goal2 = aValidGoal(createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
     val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal1, goal2))

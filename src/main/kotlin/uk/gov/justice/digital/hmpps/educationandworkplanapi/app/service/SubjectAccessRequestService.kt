@@ -7,11 +7,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education.EducationResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -27,6 +29,8 @@ class SubjectAccessRequestService(
   private val goalMapper: GoalResourceMapper,
   private val educationService: EducationService,
   private val educationResourceMapper: EducationResourceMapper,
+  private val reviewService: ReviewService,
+  private val completedActionPlanReviewResponseMapper: CompletedActionPlanReviewResponseMapper,
 
 ) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
@@ -59,6 +63,8 @@ class SubjectAccessRequestService(
       null
     }
 
+    val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
+
     if (goals.isEmpty() && induction == null) return null
     return HmppsSubjectAccessRequestContent(
       content = SubjectAccessRequestContent(
@@ -70,6 +76,7 @@ class SubjectAccessRequestService(
         education = education?.let {
           educationResourceMapper.toEducationResponse(it)
         },
+        completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
       ),
     )
   }
