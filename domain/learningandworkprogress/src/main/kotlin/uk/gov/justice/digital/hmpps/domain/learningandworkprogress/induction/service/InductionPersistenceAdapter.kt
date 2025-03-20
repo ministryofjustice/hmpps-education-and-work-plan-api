@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
@@ -38,4 +39,6 @@ interface InductionPersistenceAdapter {
    * that has an Induction. The list can be empty, but not null.
    */
   fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary>
+
+  fun getPreviousQualifications(prisonNumber: String): PreviousQualifications?
 }

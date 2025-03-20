@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFou
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.QualificationsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -22,6 +23,8 @@ class SubjectAccessRequestService(
   private val noteService: NoteService,
   private val inductionMapper: InductionResourceMapper,
   private val goalMapper: GoalResourceMapper,
+  private val qualificationsResourceMapper: QualificationsResourceMapper,
+
 ) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
     prisonNumber: String,
@@ -47,6 +50,8 @@ class SubjectAccessRequestService(
       null
     }
 
+    val qualifications = inductionService.getQualifications(prisonNumber)
+
     if (goals.isEmpty() && induction == null) return null
     return HmppsSubjectAccessRequestContent(
       content = SubjectAccessRequestContent(
@@ -55,6 +60,9 @@ class SubjectAccessRequestService(
           val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
           goalMapper.fromDomainToModel(it, goalNotes)
         }.toSet(),
+        previousQualifications = qualifications?.let {
+          qualificationsResourceMapper.toPreviousQualificationsResponse(qualifications)
+        },
       ),
     )
   }

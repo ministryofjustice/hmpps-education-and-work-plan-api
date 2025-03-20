@@ -22,9 +22,12 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPl
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.QualificationsResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
 import java.time.Instant
 import java.time.LocalDate
@@ -51,6 +54,9 @@ class SubjectAccessRequestServiceTest {
 
   @Mock
   private lateinit var goalMapper: GoalResourceMapper
+
+  @Mock
+  private lateinit var qualificationsResourceMapper: QualificationsResourceMapper
 
   @Test
   fun `should return induction and action plan data for a prisoner without date filtering`() {
@@ -161,9 +167,14 @@ class SubjectAccessRequestServiceTest {
       prisonNumber = prisonNumber,
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
     )
-    given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
     val expectedInductionResponse = aValidInductionResponse()
+    val expectedQualificationsResponse = aValidPreviousQualificationsResponse(
+      educationLevel = EducationLevel.NOT_SURE,
+    )
+    given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
+    given(inductionService.getQualifications(any())).willReturn(induction.previousQualifications)
     given(inductionMapper.toInductionResponse(any())).willReturn(expectedInductionResponse)
+    given(qualificationsResourceMapper.toPreviousQualificationsResponse(any())).willReturn(expectedQualificationsResponse)
 
     val goal1 = aValidGoal(createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
     val goal2 = aValidGoal(createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
@@ -192,6 +203,7 @@ class SubjectAccessRequestServiceTest {
     with(sarContent) {
       assertThat(this.induction).isEqualTo(expectedInductionResponse)
       assertThat(goals).isEqualTo(setOf(expectedGoalResponse1))
+      assertThat(previousQualifications).isEqualTo(expectedQualificationsResponse)
     }
   }
 
@@ -205,6 +217,7 @@ class SubjectAccessRequestServiceTest {
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
     )
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
+    given(inductionService.getQualifications(any())).willReturn(induction.previousQualifications)
 
     val goal1 = aValidGoal(title = "Goal 1", createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
     val goal2 = aValidGoal(title = "Goal 2", createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
@@ -225,6 +238,7 @@ class SubjectAccessRequestServiceTest {
 
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
+    verify(inductionService).getQualifications(prisonNumber)
     verify(inductionMapper, never()).toInductionResponse(any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)

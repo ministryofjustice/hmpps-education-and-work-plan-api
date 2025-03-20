@@ -2912,6 +2912,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GoalResponse'
+        previousQualifications:
+          $ref: '#/components/schemas/PreviousQualificationsResponse'
 
     SarSuccessResponse:
       properties:
