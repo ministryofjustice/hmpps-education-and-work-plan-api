@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.timeline.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -31,10 +32,22 @@ class TimelineServiceFilterTest {
     private const val PRISON_NUMBER = "A1234AB"
   }
 
-  @Test
-  fun `should get timeline events for prisoner`() {
-    // Given
+  @BeforeEach
+  fun setupTimelineEvents() {
     setUpEvents()
+    // A total of 42 events are created:
+    //  - 5 Induction events
+    //  - 9 Goal events
+    //  - 1 event relating to Goal and Inductions
+    //  - 3 Review events
+    //  - 3 Prison Movement events
+    // The 21 events are created for both PRISON1 and PRISON2, giving a total of 42 events
+  }
+
+  @Test
+  fun `should get all timeline events given no filtering`() {
+    // Given
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER)
     // Then
@@ -42,9 +55,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline review events for prisoner`() {
+  fun `should get 6 timeline events given filtering for reviews only`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true)
     // Then
@@ -52,9 +65,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline review events for prisoner for the last six months`() {
+  fun `should get 3 timeline events given filtering for reviews in the last six months`() {
     // Given
-    setUpEvents()
+
     // When
     val actual =
       service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true, eventsSince = LocalDate.now().minusMonths(6))
@@ -63,9 +76,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline induction events for prisoner for the last six months`() {
+  fun `should get 6 timeline events given filtering for inductions in the last six months`() {
     // Given
-    setUpEvents()
+
     // When
     val actual =
       service.getTimelineForPrisoner(PRISON_NUMBER, inductions = true, eventsSince = LocalDate.now().minusMonths(6))
@@ -74,9 +87,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline goal events for prisoner for the last six months`() {
+  fun `should get 10 timeline events given filtering for goals in the last six months`() {
     // Given
-    setUpEvents()
+
     // When
     val actual =
       service.getTimelineForPrisoner(PRISON_NUMBER, goals = true, eventsSince = LocalDate.now().minusMonths(6))
@@ -85,9 +98,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline review events for prisoner for the prison 1`() {
+  fun `should get 3 timeline =events given filtering for reviews in prison 1`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true, prisonId = "PRISON1")
     // Then
@@ -95,9 +108,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline review events for prisoner for the prison 2`() {
+  fun `should get 21 timeline events given filtering for prison 2 only`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, prisonId = "PRISON2")
     // Then
@@ -105,9 +118,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get zero timeline review events for prisoner for the prison 3`() {
+  fun `should get zero timeline review events given filtering for an unmatched prison`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, prisonId = "PRISON3")
     // Then
@@ -115,9 +128,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get zero timeline review events for prisoner when the date is in the future`() {
+  fun `should get zero timeline events given filtering for goals and a date in the future`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true, eventsSince = LocalDate.now().plusDays(1))
     // Then
@@ -125,9 +138,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline induction events for prisoner`() {
+  fun `should get 12 timeline events given filtering for inductions only`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, inductions = true, goals = false)
     // Then
@@ -135,9 +148,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline goal events for prisoner`() {
+  fun `should get 20 timeline events given filtering for goals only`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, goals = true)
     // Then
@@ -145,9 +158,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline prison events for prisoner`() {
+  fun `should get 6 timeline events given filtering for prison events only`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, prisonEvents = true)
     // Then
@@ -155,9 +168,9 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get timeline goal, induction and review events for prisoner`() {
+  fun `should get 36 timeline events given filtering for goals, inductions and reviews`() {
     // Given
-    setUpEvents()
+
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true, goals = true, inductions = true)
     // Then

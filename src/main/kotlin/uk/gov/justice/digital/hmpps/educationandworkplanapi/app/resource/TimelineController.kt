@@ -30,10 +30,10 @@ class TimelineController(
   @PreAuthorize(HAS_VIEW_TIMELINE)
   fun getTimeline(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
-    @RequestParam(required = false) inductions: Boolean?,
-    @RequestParam(required = false) goals: Boolean?,
-    @RequestParam(required = false) reviews: Boolean?,
-    @RequestParam(required = false) prisonEvents: Boolean?,
+    @RequestParam(required = false) inductions: Boolean = false,
+    @RequestParam(required = false) goals: Boolean = false,
+    @RequestParam(required = false) reviews: Boolean = false,
+    @RequestParam(required = false) prisonEvents: Boolean = false,
     @RequestParam(required = false) prisonId: String?,
     @RequestParam(required = false) eventsSince: LocalDate?,
   ): TimelineResponse {

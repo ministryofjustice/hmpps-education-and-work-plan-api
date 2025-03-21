@@ -40,10 +40,10 @@ class TimelineService(
    */
   fun getTimelineForPrisoner(
     prisonNumber: String,
-    inductions: Boolean? = null,
-    goals: Boolean? = null,
-    reviews: Boolean? = null,
-    prisonEvents: Boolean? = null,
+    inductions: Boolean = false,
+    goals: Boolean = false,
+    reviews: Boolean = false,
+    prisonEvents: Boolean = false,
     prisonId: String? = null,
     eventsSince: LocalDate? = null,
   ): Timeline {
@@ -76,55 +76,58 @@ class TimelineService(
 
 private fun applyFilter(
   timeline: Timeline,
-  inductions: Boolean?,
-  goals: Boolean?,
-  reviews: Boolean?,
-  prisonEvents: Boolean?,
+  inductions: Boolean,
+  goals: Boolean,
+  reviews: Boolean,
+  prisonEvents: Boolean,
   prisonId: String? = null,
   eventsSince: LocalDate? = null,
 ) {
   // If no filtering criteria are applied, return all events
-  if ((inductions == null || inductions == false) &&
-    (goals == null || goals == false) &&
-    (reviews == null || reviews == false) &&
-    (prisonEvents == null || prisonEvents == false) &&
-    prisonId == null &&
-    eventsSince == null
-  ) {
+  if (!inductions && !goals && !reviews && !prisonEvents && prisonId == null && eventsSince == null) {
     return
   }
 
-  val eventsSinceInstant = eventsSince?.atStartOfDay(ZoneId.systemDefault())?.toInstant()
+  // At least one of the filter options has been specified.
+  //
+  // The semantics of the filtering is such that if any of the booleans `inductions`, `goals`, `reviews` or `prisonEvents`
+  // are set, then we only want the events of those types; else we want all events.
+  // EG: If `inductions` only is true, then we only want Induction events, discarding all others
+  //     If `prisonEvents` and `goals` are true, then we only want Prison Movement and Goal events, discarding all others
+  //     If either no boolean option is true, or they are all true, then was want all events, discarding none
+  //
+  // Once we have the candidate set of events filtered by event type (as above), we should filter by prisonId and
+  // eventsSince if set.
 
-  val filteredTimeline: MutableList<TimelineEvent> = mutableListOf()
+  val filteredTimeline: MutableSet<TimelineEvent> = mutableSetOf() // Use a set because some event types can be matched more than once
 
-  // create a list filtered on eventsSince if eventSince is set
-  timeline.events.forEach {
-    if (eventsSinceInstant == null || it.timestamp.isAfter(eventsSinceInstant)) {
-      filteredTimeline.add(it)
+  // If none of the booleans are true the filtered list should contain all events
+  if (!inductions && !goals && !reviews && !prisonEvents) {
+    filteredTimeline.addAll(timeline.events)
+  } else {
+    if (inductions) {
+      filteredTimeline.addAll(timeline.events.filter { it.eventType.isInduction })
+    }
+    if (goals) {
+      filteredTimeline.addAll(timeline.events.filter { it.eventType.isGoal })
+    }
+    if (reviews) {
+      filteredTimeline.addAll(timeline.events.filter { it.eventType.isReview })
+    }
+    if (prisonEvents) {
+      filteredTimeline.addAll(timeline.events.filter { it.eventType.isPrisonEvent })
     }
   }
 
-  // remove any that don't match on prisonId if prisonId is set
-  if (prisonId != null) {
+  // Now filter the candidate list by prisonId and eventsSince if set
+  prisonId?.run {
     // remove any that don't match on prisonId
-    filteredTimeline.removeIf { event ->
-      prisonId != event.prisonId
-    }
+    filteredTimeline.removeIf { it.prisonId != this }
+  }
+  eventsSince?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.run {
+    // remove any that are earlier than the specified date
+    filteredTimeline.removeIf { it.timestamp.isBefore(this) }
   }
 
-  // now filter on eventType if any event types are set
-  if (inductions != null || goals != null || reviews != null || prisonEvents != null) {
-    filteredTimeline.removeIf { event ->
-      // if any of the filters return a true match then the event won't be removed from the list.
-      val anyEventTypeMatches =
-        (inductions != null && inductions == true && event.eventType.isInduction) ||
-          (goals != null && goals == true && event.eventType.isGoal) ||
-          (reviews != null && reviews == true && event.eventType.isReview) ||
-          (prisonEvents != null && prisonEvents == true && event.eventType.isPrisonEvent)
-      !(anyEventTypeMatches)
-    }
-  }
-
-  timeline.events = filteredTimeline
+  timeline.events = filteredTimeline.toMutableList()
 }
