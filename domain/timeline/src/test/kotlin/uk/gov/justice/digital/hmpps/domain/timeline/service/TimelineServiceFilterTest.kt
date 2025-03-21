@@ -52,6 +52,16 @@ class TimelineServiceFilterTest {
   }
 
   @Test
+  fun `should get timeline review events for prisoner when all flags are false`() {
+    // Given
+    setUpEvents()
+    // When
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = false, inductions = false, prisonEvents = false, goals = false)
+    // Then
+    assertThat(actual.events.size).isEqualTo(42)
+  }
+
+  @Test
   fun `should get timeline review events for prisoner for the last six months`() {
     // Given
     setUpEvents()

@@ -62,10 +62,10 @@ class TimelineService(
     // apply timeline filters
     applyFilter(
       timeline,
-      inductions,
-      goals,
-      reviews,
-      prisonEvents,
+      inductions == true,
+      goals == true,
+      reviews == true,
+      prisonEvents == true,
       prisonId,
       eventsSince,
     )
@@ -76,20 +76,15 @@ class TimelineService(
 
 private fun applyFilter(
   timeline: Timeline,
-  inductions: Boolean?,
-  goals: Boolean?,
-  reviews: Boolean?,
-  prisonEvents: Boolean?,
+  inductions: Boolean = false,
+  goals: Boolean = false,
+  reviews: Boolean = false,
+  prisonEvents: Boolean = false,
   prisonId: String? = null,
   eventsSince: LocalDate? = null,
 ) {
   // If no filtering criteria are applied, return all events
-  if ((inductions == null || inductions == false) &&
-    (goals == null || goals == false) &&
-    (reviews == null || reviews == false) &&
-    (prisonEvents == null || prisonEvents == false) &&
-    prisonId == null &&
-    eventsSince == null
+  if (!inductions && !goals && !reviews && !prisonEvents && prisonId == null && eventsSince == null
   ) {
     return
   }
@@ -114,14 +109,14 @@ private fun applyFilter(
   }
 
   // now filter on eventType if any event types are set
-  if (inductions != null || goals != null || reviews != null || prisonEvents != null) {
+  if (inductions || goals || reviews || prisonEvents) {
     filteredTimeline.removeIf { event ->
       // if any of the filters return a true match then the event won't be removed from the list.
       val anyEventTypeMatches =
-        (inductions != null && inductions == true && event.eventType.isInduction) ||
-          (goals != null && goals == true && event.eventType.isGoal) ||
-          (reviews != null && reviews == true && event.eventType.isReview) ||
-          (prisonEvents != null && prisonEvents == true && event.eventType.isPrisonEvent)
+        (inductions && event.eventType.isInduction) ||
+          (goals && event.eventType.isGoal) ||
+          (reviews && event.eventType.isReview) ||
+          (prisonEvents && event.eventType.isPrisonEvent)
       !(anyEventTypeMatches)
     }
   }
