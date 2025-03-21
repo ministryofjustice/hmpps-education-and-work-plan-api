@@ -78,7 +78,7 @@ enum class TimelineEventType(val isReview: Boolean, val isGoal: Boolean, val isI
   INDUCTION_SCHEDULE_STATUS_UPDATED(false, false, true, false),
 
   // Action Plan/Goal/Step events
-  ACTION_PLAN_CREATED(false, true, false, false),
+  ACTION_PLAN_CREATED(false, true, true, false),
   GOAL_CREATED(false, true, false, false),
   GOAL_UPDATED(false, true, false, false),
   GOAL_COMPLETED(false, true, false, false),

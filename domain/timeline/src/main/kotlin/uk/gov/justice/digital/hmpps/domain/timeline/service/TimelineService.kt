@@ -84,7 +84,13 @@ private fun applyFilter(
   eventsSince: LocalDate? = null,
 ) {
   // If no filtering criteria are applied, return all events
-  if (inductions == null && goals == null && reviews == null && prisonEvents == null && prisonId == null && eventsSince == null) {
+  if ((inductions == null || inductions == false) &&
+    (goals == null || goals == false) &&
+    (reviews == null || reviews == false) &&
+    (prisonEvents == null || prisonEvents == false) &&
+    prisonId == null &&
+    eventsSince == null
+  ) {
     return
   }
 
@@ -112,10 +118,10 @@ private fun applyFilter(
     filteredTimeline.removeIf { event ->
       // if any of the filters return a true match then the event won't be removed from the list.
       val anyEventTypeMatches =
-        (inductions != null && event.eventType.isInduction) ||
-          (goals != null && event.eventType.isGoal) ||
-          (reviews != null && event.eventType.isReview) ||
-          (prisonEvents != null && event.eventType.isPrisonEvent)
+        (inductions != null && inductions == true && event.eventType.isInduction) ||
+          (goals != null && goals == true && event.eventType.isGoal) ||
+          (reviews != null && reviews == true && event.eventType.isReview) ||
+          (prisonEvents != null && prisonEvents == true && event.eventType.isPrisonEvent)
       !(anyEventTypeMatches)
     }
   }

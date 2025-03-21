@@ -70,7 +70,7 @@ class TimelineServiceFilterTest {
     val actual =
       service.getTimelineForPrisoner(PRISON_NUMBER, inductions = true, eventsSince = LocalDate.now().minusMonths(6))
     // Then
-    assertThat(actual.events.size).isEqualTo(5)
+    assertThat(actual.events.size).isEqualTo(6)
   }
 
   @Test
@@ -129,9 +129,9 @@ class TimelineServiceFilterTest {
     // Given
     setUpEvents()
     // When
-    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, inductions = true)
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, inductions = true, goals = false)
     // Then
-    assertThat(actual.events.size).isEqualTo(10)
+    assertThat(actual.events.size).isEqualTo(12)
   }
 
   @Test
