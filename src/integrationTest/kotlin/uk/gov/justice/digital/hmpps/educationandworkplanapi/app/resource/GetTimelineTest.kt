@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.awaitility.kotlin.await
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -421,6 +422,261 @@ class GetTimelineTest : IntegrationTestBase() {
       }
   }
 
+  @Nested
+  inner class Filtering {
+    @Test
+    fun `should get review filtered timeline`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?reviews=true&inductions=false&goals=false&prisonEvents=false", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(1)
+      }
+    }
+
+    @Test
+    fun `should get induction filtered timeline`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?reviews=false&inductions=true&goals=false&prisonEvents=false", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(2)
+      }
+    }
+
+    @Test
+    fun `should get goal filtered timeline`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?reviews=false&inductions=false&goals=true&prisonEvents=false", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(6)
+      }
+    }
+
+    @Test
+    fun `should get prisonEvents filtered timeline`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?reviews=false&inductions=false&goals=false&prisonEvents=true", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(1)
+      }
+    }
+
+    @Test
+    fun `should get filtered timeline for all event types`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?reviews=true&inductions=true&goals=true&prisonEvents=true", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(9)
+      }
+    }
+
+    @Test
+    fun `should get filtered timeline for no event types`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?reviews=false&inductions=false&goals=false&prisonEvents=false", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(9)
+      }
+    }
+
+    @Test
+    fun `should get timeline with no filtering`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri(URI_TEMPLATE, prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(9)
+      }
+    }
+
+    @Test
+    fun `should get filtered timeline filtered on prisonId`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?prisonId=BXI&reviews=false&inductions=false&goals=false&prisonEvents=false", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(8)
+      }
+    }
+
+    @Test
+    fun `should get filtered timeline filtered on prisonId no results`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      setUpAPersonWithLotsOfEvents(prisonNumber)
+
+      // Then
+      await.untilAsserted {
+        val response = webTestClient.get()
+          .uri("${URI_TEMPLATE}?prisonId=XXX&reviews=false&inductions=false&goals=false&prisonEvents=false", prisonNumber)
+          .bearerToken(
+            aValidTokenWithAuthority(
+              TIMELINE_RO,
+              privateKey = keyPair.private,
+            ),
+          )
+          .exchange()
+          .expectStatus()
+          .isOk
+          .returnResult(TimelineResponse::class.java)
+
+        val actual = response.responseBody.blockFirst()!!
+        assertThat(actual)
+          .isForPrisonNumber(prisonNumber)
+          .hasNumberOfEvents(0)
+      }
+    }
+  }
+
   private fun createGoal(prisonNumber: String, createGoalRequest: CreateGoalRequest) {
     val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
     webTestClient.post()
@@ -452,146 +708,6 @@ class GetTimelineTest : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isNoContent()
-  }
-
-  @Test
-  fun `should get review filtered timeline`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    setUpAPersonWithLotsOfEvents(prisonNumber)
-
-    // Then
-    await.untilAsserted {
-      val response = webTestClient.get()
-        .uri("${URI_TEMPLATE}?reviews=true", prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
-        .exchange()
-        .expectStatus()
-        .isOk
-        .returnResult(TimelineResponse::class.java)
-
-      val actual = response.responseBody.blockFirst()!!
-      assertThat(actual)
-        .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(1)
-    }
-  }
-
-  @Test
-  fun `should get induction filtered timeline`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    setUpAPersonWithLotsOfEvents(prisonNumber)
-
-    // Then
-    await.untilAsserted {
-      val response = webTestClient.get()
-        .uri("${URI_TEMPLATE}?inductions=true", prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
-        .exchange()
-        .expectStatus()
-        .isOk
-        .returnResult(TimelineResponse::class.java)
-
-      val actual = response.responseBody.blockFirst()!!
-      assertThat(actual)
-        .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(2)
-    }
-  }
-
-  @Test
-  fun `should get goal filtered timeline`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    setUpAPersonWithLotsOfEvents(prisonNumber)
-
-    // Then
-    await.untilAsserted {
-      val response = webTestClient.get()
-        .uri("${URI_TEMPLATE}?goals=true", prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
-        .exchange()
-        .expectStatus()
-        .isOk
-        .returnResult(TimelineResponse::class.java)
-
-      val actual = response.responseBody.blockFirst()!!
-      assertThat(actual)
-        .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(6)
-    }
-  }
-
-  @Test
-  fun `should get filtered timeline filtered on prisonId`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    setUpAPersonWithLotsOfEvents(prisonNumber)
-
-    // Then
-    await.untilAsserted {
-      val response = webTestClient.get()
-        .uri("${URI_TEMPLATE}?prisonId=BXI", prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
-        .exchange()
-        .expectStatus()
-        .isOk
-        .returnResult(TimelineResponse::class.java)
-
-      val actual = response.responseBody.blockFirst()!!
-      assertThat(actual)
-        .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(8)
-    }
-  }
-
-  @Test
-  fun `should get filtered timeline filtered on prisonId no results`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    setUpAPersonWithLotsOfEvents(prisonNumber)
-
-    // Then
-    await.untilAsserted {
-      val response = webTestClient.get()
-        .uri("${URI_TEMPLATE}?prisonId=XXX", prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
-        .exchange()
-        .expectStatus()
-        .isOk
-        .returnResult(TimelineResponse::class.java)
-
-      val actual = response.responseBody.blockFirst()!!
-      assertThat(actual)
-        .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(0)
-    }
   }
 
   private fun setUpAPersonWithLotsOfEvents(prisonNumber: String) {
