@@ -32,6 +32,16 @@ class TimelineServiceFilterTest {
   }
 
   @Test
+  fun `should get timeline events for prisoner`() {
+    // Given
+    setUpEvents()
+    // When
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER)
+    // Then
+    assertThat(actual.events.size).isEqualTo(42)
+  }
+
+  @Test
   fun `should get timeline review events for prisoner`() {
     // Given
     setUpEvents()
@@ -89,9 +99,9 @@ class TimelineServiceFilterTest {
     // Given
     setUpEvents()
     // When
-    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true, prisonId = "PRISON2")
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, prisonId = "PRISON2")
     // Then
-    assertThat(actual.events.size).isEqualTo(3)
+    assertThat(actual.events.size).isEqualTo(21)
   }
 
   @Test
@@ -99,7 +109,7 @@ class TimelineServiceFilterTest {
     // Given
     setUpEvents()
     // When
-    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, reviews = true, prisonId = "PRISON3")
+    val actual = service.getTimelineForPrisoner(PRISON_NUMBER, prisonId = "PRISON3")
     // Then
     assertThat(actual.events.size).isEqualTo(0)
   }

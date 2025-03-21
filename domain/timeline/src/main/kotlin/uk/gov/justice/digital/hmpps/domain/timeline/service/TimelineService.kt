@@ -62,10 +62,10 @@ class TimelineService(
     // apply timeline filters
     applyFilter(
       timeline,
-      inductions ?: false,
-      goals ?: false,
-      reviews ?: false,
-      prisonEvents ?: false,
+      inductions,
+      goals,
+      reviews,
+      prisonEvents,
       prisonId,
       eventsSince,
     )
@@ -76,34 +76,49 @@ class TimelineService(
 
 private fun applyFilter(
   timeline: Timeline,
-  inductions: Boolean,
-  goals: Boolean,
-  reviews: Boolean,
-  prisonEvents: Boolean,
+  inductions: Boolean?,
+  goals: Boolean?,
+  reviews: Boolean?,
+  prisonEvents: Boolean?,
   prisonId: String? = null,
   eventsSince: LocalDate? = null,
 ) {
   // If no filtering criteria are applied, return all events
-  if (!inductions && !goals && !reviews && !prisonEvents && prisonId == null && eventsSince == null) {
+  if (inductions == null && goals == null && reviews == null && prisonEvents == null && prisonId == null && eventsSince == null) {
     return
   }
 
   val eventsSinceInstant = eventsSince?.atStartOfDay(ZoneId.systemDefault())?.toInstant()
 
-  timeline.events.removeIf { event ->
+  val filteredTimeline: MutableList<TimelineEvent> = mutableListOf()
 
-    // if any of the filters return a true match then the event won't be removed from the list.
-    val anyEventTypeMatches =
-      inductions && event.eventType.isInduction ||
-        goals && event.eventType.isGoal ||
-        reviews && event.eventType.isReview ||
-        prisonEvents && event.eventType.isPrisonEvent
-
-    val prisonMatches = prisonId == null || event.prisonId == prisonId
-
-    val eventSinceMatches = eventsSinceInstant == null || event.timestamp.isAfter(eventsSinceInstant)
-
-    // Remove event where there are no matches
-    !(anyEventTypeMatches && prisonMatches && eventSinceMatches)
+  // create a list filtered on eventsSince if eventSince is set
+  timeline.events.forEach {
+    if (eventsSinceInstant == null || it.timestamp.isAfter(eventsSinceInstant)) {
+      filteredTimeline.add(it)
+    }
   }
+
+  // remove any that don't match on prisonId if prisonId is set
+  if (prisonId != null) {
+    // remove any that don't match on prisonId
+    filteredTimeline.removeIf { event ->
+      prisonId != event.prisonId
+    }
+  }
+
+  // now filter on eventType if any event types are set
+  if (inductions != null || goals != null || reviews != null || prisonEvents != null) {
+    filteredTimeline.removeIf { event ->
+      // if any of the filters return a true match then the event won't be removed from the list.
+      val anyEventTypeMatches =
+        (inductions != null && event.eventType.isInduction) ||
+          (goals != null && event.eventType.isGoal) ||
+          (reviews != null && event.eventType.isReview) ||
+          (prisonEvents != null && event.eventType.isPrisonEvent)
+      !(anyEventTypeMatches)
+    }
+  }
+
+  timeline.events = filteredTimeline
 }
