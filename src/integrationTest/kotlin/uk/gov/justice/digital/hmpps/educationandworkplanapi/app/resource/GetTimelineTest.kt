@@ -506,7 +506,7 @@ class GetTimelineTest : IntegrationTestBase() {
       val actual = response.responseBody.blockFirst()!!
       assertThat(actual)
         .isForPrisonNumber(prisonNumber)
-        .hasNumberOfEvents(1)
+        .hasNumberOfEvents(2)
     }
   }
 
