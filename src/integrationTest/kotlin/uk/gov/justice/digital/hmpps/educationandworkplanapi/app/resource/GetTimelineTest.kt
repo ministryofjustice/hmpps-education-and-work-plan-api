@@ -538,6 +538,62 @@ class GetTimelineTest : IntegrationTestBase() {
     }
   }
 
+  @Test
+  fun `should get filtered timeline filtered on prisonId`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    setUpAPersonWithLotsOfEvents(prisonNumber)
+
+    // Then
+    await.untilAsserted {
+      val response = webTestClient.get()
+        .uri("${URI_TEMPLATE}?prisonId=BXI", prisonNumber)
+        .bearerToken(
+          aValidTokenWithAuthority(
+            TIMELINE_RO,
+            privateKey = keyPair.private,
+          ),
+        )
+        .exchange()
+        .expectStatus()
+        .isOk
+        .returnResult(TimelineResponse::class.java)
+
+      val actual = response.responseBody.blockFirst()!!
+      assertThat(actual)
+        .isForPrisonNumber(prisonNumber)
+        .hasNumberOfEvents(8)
+    }
+  }
+
+  @Test
+  fun `should get filtered timeline filtered on prisonId no results`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    setUpAPersonWithLotsOfEvents(prisonNumber)
+
+    // Then
+    await.untilAsserted {
+      val response = webTestClient.get()
+        .uri("${URI_TEMPLATE}?prisonId=XXX", prisonNumber)
+        .bearerToken(
+          aValidTokenWithAuthority(
+            TIMELINE_RO,
+            privateKey = keyPair.private,
+          ),
+        )
+        .exchange()
+        .expectStatus()
+        .isOk
+        .returnResult(TimelineResponse::class.java)
+
+      val actual = response.responseBody.blockFirst()!!
+      assertThat(actual)
+        .isForPrisonNumber(prisonNumber)
+        .hasNumberOfEvents(0)
+    }
+  }
+
   private fun setUpAPersonWithLotsOfEvents(prisonNumber: String) {
     createInduction(prisonNumber, aFullyPopulatedCreateInductionRequest())
 

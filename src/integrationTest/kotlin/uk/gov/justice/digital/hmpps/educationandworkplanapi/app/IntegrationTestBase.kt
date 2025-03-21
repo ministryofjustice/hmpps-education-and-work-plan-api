@@ -139,7 +139,7 @@ abstract class IntegrationTestBase {
   init {
     // set awaitility defaults
     Awaitility.setDefaultPollInterval(500, MILLISECONDS)
-    Awaitility.setDefaultTimeout(30, SECONDS)
+    Awaitility.setDefaultTimeout(5, SECONDS)
   }
 
   @Autowired
