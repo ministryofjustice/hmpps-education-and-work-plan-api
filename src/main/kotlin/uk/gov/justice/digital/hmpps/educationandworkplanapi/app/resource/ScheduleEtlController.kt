@@ -165,14 +165,13 @@ class ScheduleEtlController(
     val prisonersWithoutInductionSchedules = filterPrisonersWithoutInductionSchedule(allPrisoners).map { it.prisonerNumber }
 
     // filter out the prisoners with either a review schedule or an induction schedule
-    val prisonersWithoutReviewOrInductionSchedules = allPrisoners.map { it.prisonerNumber }
-      .filter { it in prisonersWithoutReviewSchedules || it in prisonersWithoutInductionSchedules }
+    val allPrisonersWithoutSchedules = (prisonersWithoutReviewSchedules + prisonersWithoutInductionSchedules).distinct()
 
     // Prepare response data
     val response = CheckSchedulesEtlResponse(
       prisonId = prisonId,
       totalNumberOfPrisoners = allPrisoners.size,
-      prisonersWithoutPLPData = prisonersWithoutReviewOrInductionSchedules,
+      prisonersWithoutPLPData = allPrisonersWithoutSchedules,
     )
 
     log.info("ETL check process completed for prison ID: $prisonId. Response: ${response.prisonersWithoutPLPData.size}")
