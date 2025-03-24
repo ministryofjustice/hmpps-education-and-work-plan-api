@@ -165,7 +165,8 @@ class ScheduleEtlController(
     val prisonersWithoutInductionSchedules = filterPrisonersWithoutInductionSchedule(allPrisoners).map { it.prisonerNumber }
 
     // filter out the prisoners with either a review schedule or an induction schedule
-    val allPrisonersWithoutSchedules = (prisonersWithoutReviewSchedules + prisonersWithoutInductionSchedules).distinct()
+    val allPrisonersWithoutSchedules = allPrisoners.map { it.prisonerNumber }
+      .filterNot { it in prisonersWithoutReviewSchedules || it in prisonersWithoutInductionSchedules }
 
     // Prepare response data
     val response = CheckSchedulesEtlResponse(
