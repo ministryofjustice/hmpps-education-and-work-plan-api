@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -143,6 +144,38 @@ class ScheduleEtlController(
     }
 
     log.info("ETL process completed for prison ID: $prisonId. Response: ${response.summary}")
+    return response
+  }
+
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @GetMapping(value = ["/action-plans/schedules/etl-check/{prisonId}"])
+  @Transactional
+  fun checkSchedulesForPrisonersInPrison(
+    @PathVariable("prisonId") prisonId: String,
+  ): CheckSchedulesEtlResponse {
+    log.info("Check ETL process for prison ID: $prisonId")
+
+    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId).also {
+      log.info("Total prisoners in prison $prisonId: ${it.size}")
+    }
+
+    // Get filtered prisoners step-by-step
+    val prisonersWithoutReviewSchedules = filterPrisonersWithoutReviewSchedules(allPrisoners).map { it.prisonerNumber }
+    val prisonersWithoutInductionSchedules = filterPrisonersWithoutInductionSchedule(allPrisoners).map { it.prisonerNumber }
+
+    // filter out the prisoners with either a review schedule or an induction schedule
+    val prisonersWithoutReviewOrInductionSchedules = allPrisoners.map { it.prisonerNumber }
+      .filter { it in prisonersWithoutReviewSchedules || it in prisonersWithoutInductionSchedules }
+
+    // Prepare response data
+    val response = CheckSchedulesEtlResponse(
+      prisonId = prisonId,
+      totalNumberOfPrisoners = allPrisoners.size,
+      prisonersWithoutPLPData = prisonersWithoutReviewOrInductionSchedules,
+    )
+
+    log.info("ETL check process completed for prison ID: $prisonId. Response: ${response.prisonersWithoutPLPData.size}")
     return response
   }
 
@@ -293,6 +326,24 @@ class ScheduleEtlController(
     log.info("Dry run rollback triggered. Response: ${e.schedulesEtlResponse.summary}")
     return ResponseEntity.ok(e.schedulesEtlResponse)
   }
+}
+
+data class CheckSchedulesEtlResponse(
+  val prisonId: String,
+  val prisonersWithoutPLPData: List<String> = listOf(),
+  val totalNumberOfPrisoners: Int,
+) {
+
+  val summary: String
+    get() =
+      (
+        """
+          Prison ID: $prisonId
+          Total number of prisoners: $totalNumberOfPrisoners
+          Prisoners with no PLP schedule: $totalNumberOfPrisoners
+          Prison IDs: $prisonersWithoutPLPData 
+        """.trimIndent()
+        )
 }
 
 data class MessagesEtlResponse(
