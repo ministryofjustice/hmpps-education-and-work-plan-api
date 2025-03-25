@@ -147,7 +147,7 @@ class ScheduleEtlController(
     return response
   }
 
-  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_EDIT_REVIEWS)
   @GetMapping(value = ["/action-plans/schedules/etl-check/{prisonId}"])
   @Transactional
@@ -160,13 +160,11 @@ class ScheduleEtlController(
       log.info("Total prisoners in prison $prisonId: ${it.size}")
     }
 
-    // Get filtered prisoners step-by-step
-    val prisonersWithoutReviewSchedules = filterPrisonersWithoutReviewSchedules(allPrisoners).map { it.prisonerNumber }
-    val prisonersWithoutInductionSchedules = filterPrisonersWithoutInductionSchedule(allPrisoners).map { it.prisonerNumber }
+    val prisonersWithSchedules = prisonersWithAnySchedule(allPrisoners)
 
     // filter out the prisoners with either a review schedule or an induction schedule
     val allPrisonersWithoutSchedules = allPrisoners.map { it.prisonerNumber }
-      .filterNot { it in prisonersWithoutReviewSchedules || it in prisonersWithoutInductionSchedules }
+      .filterNot { it in prisonersWithSchedules }
 
     // Prepare response data
     val response = CheckSchedulesEtlResponse(
@@ -227,6 +225,15 @@ class ScheduleEtlController(
     } else {
       today
     }
+  }
+
+  private fun prisonersWithAnySchedule(prisoners: List<Prisoner>): List<String> {
+    val prisonNumbers = prisoners.map { it.prisonerNumber }
+    val prisonersWithReviewSchedules =
+      reviewScheduleRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
+    val prisonersWithInductionSchedules =
+      inductionScheduleRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
+    return (prisonersWithReviewSchedules + prisonersWithInductionSchedules).toSet().toList()
   }
 
   private fun filterPrisonersWithNoInduction(
@@ -340,7 +347,7 @@ data class CheckSchedulesEtlResponse(
         """
           Prison ID: $prisonId
           Total number of prisoners: $totalNumberOfPrisoners
-          Prisoners with no PLP schedule: $totalNumberOfPrisoners
+          Number of prisoners with no PLP schedule: ${prisonersWithoutPLPData.size}
           Prison IDs: $prisonersWithoutPLPData 
         """.trimIndent()
         )
