@@ -3,8 +3,13 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.okJson
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
+import com.github.tomakehurst.wiremock.http.Fault
+import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PagedPrisonerResponse
@@ -23,6 +28,8 @@ class WiremockService(private val wireMockServer: WireMockServer) {
   fun resetAllStubsAndMappings() {
     wireMockServer.resetAll()
   }
+
+  fun getBaseUrl(): String = wireMockServer.baseUrl()
 
   fun stubGetPrisonTimelineFromPrisonApi(prisonNumber: String, response: PrisonerInPrisonSummary) {
     wireMockServer.stubFor(
@@ -79,6 +86,38 @@ class WiremockService(private val wireMockServer: WireMockServer) {
             .withStatus(404)
             .withHeader("Content-Type", "application/json"),
         ),
+    )
+  }
+
+  fun setUpManageUsersRepeatPass(username: String) {
+    wireMockServer.stubFor(
+      get(urlEqualTo("/users/$username"))
+        .inScenario("Retry scenario")
+        .whenScenarioStateIs(Scenario.STARTED)
+        .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+        .willSetStateTo("Attempt 2"),
+    )
+
+    wireMockServer.stubFor(
+      get(urlEqualTo("/users/$username"))
+        .inScenario("Retry scenario")
+        .whenScenarioStateIs("Attempt 2")
+        .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+        .willSetStateTo("Success"),
+    )
+
+    wireMockServer.stubFor(
+      get(urlEqualTo("/users/$username"))
+        .inScenario("Retry scenario")
+        .whenScenarioStateIs("Success")
+        .willReturn(okJson("""{"username":"$username","active":true,"name":"Test User"}""")),
+    )
+  }
+
+  fun setUpManageUsersRepeatFail(username: String) {
+    wireMockServer.stubFor(
+      get(urlEqualTo("/users/$username"))
+        .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)),
     )
   }
 }
