@@ -32,7 +32,6 @@ data class InductionScheduleEntity(
   @Column(updatable = false)
   val prisonNumber: String,
 
-  @Column(updatable = false)
   @Enumerated(value = EnumType.STRING)
   var scheduleCalculationRule: InductionScheduleCalculationRule,
 
