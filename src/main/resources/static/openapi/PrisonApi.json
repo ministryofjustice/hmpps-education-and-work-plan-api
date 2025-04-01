@@ -28935,11 +28935,6 @@
         "description": "Prisoners time in prison summary"
       },
       "SignificantMovement": {
-        "required": [
-          "admittedIntoPrisonId",
-          "inwardType",
-          "reasonInToPrison"
-        ],
         "type": "object",
         "properties": {
           "reasonInToPrison": {
