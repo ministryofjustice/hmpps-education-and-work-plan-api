@@ -15,6 +15,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
@@ -201,7 +202,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     // Then
     verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
-    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate)
+    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId, releaseDate = prisoner.releaseDate, InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
   }
 

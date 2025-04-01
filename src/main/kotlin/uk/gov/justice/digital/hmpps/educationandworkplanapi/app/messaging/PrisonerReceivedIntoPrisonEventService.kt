@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
@@ -66,12 +67,14 @@ class PrisonerReceivedIntoPrisonEventService(
         }
 
         else -> {
-          // The Induction was not completed so need to reschedule it with a new deadline date.
+          // The Induction was not completed so need to reschedule it with a new deadline date
+          // and update the calculation rule to be NEW_ADMISSION.
           inductionScheduleService.reschedulePrisonersInductionSchedule(
             nomsNumber,
             prisonerAdmissionDate = prisonerAdmissionDate,
             prisonId = prisonId,
             releaseDate = prisoner.releaseDate,
+            calculationRule = NEW_PRISON_ADMISSION,
           )
         }
       }
