@@ -92,7 +92,7 @@ class InductionScheduleService(
         newStatus = SCHEDULED,
         prisonId = prisonId,
         adjustedInductionDate = newInductionDeadlineDate,
-
+        calculationRule = calculationRule,
       )
     }
   }

@@ -12,9 +12,11 @@ import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule.EXISTING_PRISONER
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule
@@ -290,6 +292,7 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
       status = InductionScheduleStatus.SCHEDULED,
       deadlineDate = originalInductionDueDate,
       createdAtPrison = "BXI",
+      inductionScheduleCalculationRule = EXISTING_PRISONER,
     )
     createInductionScheduleHistory(
       reference = inductionScheduleReference,
@@ -307,6 +310,9 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
         reason = ADMISSION,
       ),
     )
+
+    val inductionSchedule = getInductionSchedule(prisonNumber)
+    assertThat(inductionSchedule.scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.EXISTING_PRISONER)
 
     with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
       createPrisonerAPIStub(prisonNumber, this)
@@ -339,6 +345,9 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
             .wasCreatedAtPrison("BXI")
             .wasUpdatedAtPrison("MDI")
         }
+
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule.scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
 
       // test that outbound event is also created:
       val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
