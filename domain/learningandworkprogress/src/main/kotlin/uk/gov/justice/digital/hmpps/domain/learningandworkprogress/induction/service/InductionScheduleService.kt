@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.se
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
@@ -69,6 +70,7 @@ class InductionScheduleService(
     prisonerAdmissionDate: LocalDate,
     prisonId: String,
     releaseDate: LocalDate?,
+    calculationRule: InductionScheduleCalculationRule? = null,
   ): InductionSchedule {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
       ?: throw InductionScheduleNotFoundException(prisonNumber)
@@ -90,6 +92,7 @@ class InductionScheduleService(
         newStatus = SCHEDULED,
         prisonId = prisonId,
         adjustedInductionDate = newInductionDeadlineDate,
+        calculationRule = calculationRule,
       )
     }
   }
@@ -226,6 +229,7 @@ class InductionScheduleService(
     exemptionReason: String? = null,
     adjustedInductionDate: LocalDate = inductionSchedule.deadlineDate,
     prisonId: String,
+    calculationRule: InductionScheduleCalculationRule? = null,
   ): InductionSchedule {
     val updatedSchedule = inductionSchedulePersistenceAdapter.updateInductionScheduleStatus(
       UpdateInductionScheduleStatusDto(
@@ -235,6 +239,7 @@ class InductionScheduleService(
         latestDeadlineDate = adjustedInductionDate,
         prisonNumber = inductionSchedule.prisonNumber,
         updatedAtPrison = prisonId,
+        calculationRule = calculationRule,
       ),
     ).also {
       performFollowOnEvents(

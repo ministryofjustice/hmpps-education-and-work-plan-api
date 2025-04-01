@@ -529,6 +529,7 @@ abstract class IntegrationTestBase {
     createdAtPrison: String = "BXI",
     updatedAtPrison: String = "BXI",
     exemptionReason: String? = null,
+    inductionScheduleCalculationRule: InductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
   ) {
     inductionScheduleRepository.save(
       InductionScheduleEntity(
@@ -536,7 +537,7 @@ abstract class IntegrationTestBase {
         deadlineDate = deadlineDate,
         reference = reference,
         scheduleStatus = status,
-        scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        scheduleCalculationRule = inductionScheduleCalculationRule,
         createdAtPrison = createdAtPrison,
         updatedAtPrison = updatedAtPrison,
         exemptionReason = exemptionReason,

@@ -85,6 +85,10 @@ class JpaInductionSchedulePersistenceAdapter(
       exemptionReason = updateInductionScheduleStatusDto.exemptionReason
       updateInductionScheduleStatusDto.latestDeadlineDate?.let { deadlineDate = it }
       updatedAtPrison = updateInductionScheduleStatusDto.updatedAtPrison
+      updateInductionScheduleStatusDto.calculationRule?.let {
+        scheduleCalculationRule =
+          inductionScheduleEntityMapper.toInductionScheduleCalculationRule(it)
+      }
     }
 
     return inductionScheduleRepository.saveAndFlush(inductionScheduleEntity).let {
