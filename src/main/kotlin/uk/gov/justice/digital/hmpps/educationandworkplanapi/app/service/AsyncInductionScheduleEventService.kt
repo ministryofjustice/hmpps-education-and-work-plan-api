@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import mu.KotlinLogging
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
@@ -37,10 +38,19 @@ class AsyncInductionScheduleEventService(
   override fun inductionScheduleStatusUpdated(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus) = with(updatedInductionScheduleStatus) {
     log.debug { "Induction schedule status updated event for prisoner [$prisonNumber]" }
 
-    timelineService.recordTimelineEvent(
-      prisonNumber,
-      timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
-    )
+    try {
+      timelineService.recordTimelineEvent(
+        prisonNumber,
+        timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
+      )
+    } catch (e: DataIntegrityViolationException) {
+      log.warn(e) { "DataIntegrityViolationException occurred, retrying recordTimelineEvent once more for prisoner [$prisonNumber]" }
+      // Retry once
+      timelineService.recordTimelineEvent(
+        prisonNumber,
+        timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
+      )
+    }
     telemetryService.trackInductionScheduleStatusUpdated(this)
     eventPublisher.createAndPublishInductionEvent(prisonNumber)
   }

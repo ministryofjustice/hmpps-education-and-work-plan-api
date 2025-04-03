@@ -34,7 +34,7 @@ class SubjectAccessRequestService(
 
 ) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
-    prisonNumber: String,
+    prn: String,
     fromDate: LocalDate?,
     toDate: LocalDate?,
   ): HmppsSubjectAccessRequestContent? {
@@ -42,7 +42,7 @@ class SubjectAccessRequestService(
     val toDateInstance = toDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
 
     val goals = try {
-      actionPlanService.getActionPlan(prisonNumber).goals
+      actionPlanService.getActionPlan(prn).goals
         .filter { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
         .filter { toDateInstance == null || it.createdAt?.isBefore(toDateInstance) ?: true }
     } catch (e: ActionPlanNotFoundException) {
@@ -50,7 +50,7 @@ class SubjectAccessRequestService(
     }
 
     val induction = try {
-      inductionService.getInductionForPrisoner(prisonNumber)
+      inductionService.getInductionForPrisoner(prn)
         .takeIf { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
         .takeIf { toDateInstance == null || it?.createdAt?.isBefore(toDateInstance) ?: true }
     } catch (e: InductionNotFoundException) {
@@ -58,12 +58,12 @@ class SubjectAccessRequestService(
     }
 
     val education = try {
-      educationService.getPreviousQualificationsForPrisoner(prisonNumber)
+      educationService.getPreviousQualificationsForPrisoner(prn)
     } catch (e: EducationNotFoundException) {
       null
     }
 
-    val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
+    val completedReviews = reviewService.getCompletedReviewsForPrisoner(prn)
 
     if (goals.isEmpty() && induction == null) return null
     return HmppsSubjectAccessRequestContent(

@@ -78,7 +78,7 @@ class SessionSummaryService(
       deadlineDate = it.reviewScheduleWindow.dateTo,
       reference = it.reference,
       exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
-      exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
+      exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.lastUpdatedAt) else null,
     )
   } + inductions.map {
     SessionResponse(
@@ -87,7 +87,7 @@ class SessionSummaryService(
       deadlineDate = it.deadlineDate,
       reference = it.reference,
       exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
-      exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.createdAt) else null,
+      exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.lastUpdatedAt) else null,
     )
   }
 

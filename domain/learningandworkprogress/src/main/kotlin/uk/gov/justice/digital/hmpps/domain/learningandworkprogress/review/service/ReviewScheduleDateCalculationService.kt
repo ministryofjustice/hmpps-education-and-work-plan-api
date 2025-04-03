@@ -30,9 +30,7 @@ private val log = KotlinLogging.logger {}
  * This class is deliberately final so that it cannot be subclassed, ensuring that the business rules stay within the
  * domain.
  */
-class ReviewScheduleDateCalculationService(
-  private val scheduleDateNotBefore: LocalDate? = null,
-) {
+class ReviewScheduleDateCalculationService {
   companion object {
     private val SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE = listOf(INDETERMINATE_SENTENCE, CONVICTED_UNSENTENCED, REMAND)
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
@@ -156,12 +154,5 @@ class ReviewScheduleDateCalculationService(
   /**
    * Returns the base date from which all Induction Schedule dates are calculated
    */
-  private fun baseScheduleDate(): LocalDate {
-    val today = LocalDate.now()
-    return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
-      scheduleDateNotBefore
-    } else {
-      today
-    }
-  }
+  private fun baseScheduleDate() = LocalDate.now()
 }

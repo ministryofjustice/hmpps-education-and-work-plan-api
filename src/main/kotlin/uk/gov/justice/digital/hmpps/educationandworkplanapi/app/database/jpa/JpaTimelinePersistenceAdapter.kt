@@ -34,7 +34,7 @@ class JpaTimelinePersistenceAdapter(
     }
 
     // use the persisted entity with the populated JPA fields, rather than the non persisted entity reference above
-    val persisted = timelineEntity.events!!.first { it.reference == timelineEventEntity.reference }
+    val persisted = timelineEntity.events.first { it.reference == timelineEventEntity.reference }
     return timelineEventMapper.fromEntityToDomain(persisted)
   }
 
