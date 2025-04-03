@@ -15,7 +15,7 @@ class PefInductionScheduleDateCalculationServiceTest {
   fun `should determine CreateInductionScheduleDto`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
-    val admissionDate = LocalDate.now().minusDays(1)
+    val admissionDate = LocalDate.now()
     val prisonId = "BXI"
 
     val expected = aValidCreateInductionScheduleDto(

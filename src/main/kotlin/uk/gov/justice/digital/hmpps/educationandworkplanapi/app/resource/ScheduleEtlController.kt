@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import io.swagger.v3.oas.annotations.Hidden
 import mu.KotlinLogging
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -37,7 +36,6 @@ private val log = KotlinLogging.logger {}
 @Hidden
 @RestController
 class ScheduleEtlController(
-  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val goLiveDate: LocalDate? = null,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val inductionRepository: InductionRepository,
   private val actionPlanRepository: ActionPlanRepository,
@@ -200,7 +198,7 @@ class ScheduleEtlController(
   ) {
     eligibleInductionSchedulePrisoners.forEach { prisoner ->
       if (prisoner.releaseDate != null &&
-        prisoner.releaseDate.isBefore(goLiveDate().plusDays(7))
+        prisoner.releaseDate.isBefore(LocalDate.now())
       ) {
         log.info { "Induction for prisoner ${prisoner.prisonerNumber} skipped due to release within 7 days of go-live." }
       } else {
@@ -212,18 +210,6 @@ class ScheduleEtlController(
           handleInductionScheduleCreationError(prisonNumber, e, failedInductionSchedules)
         }
       }
-    }
-  }
-
-  /**
-   * Returns go live date - this is configured in the specific values yaml or default to today.
-   */
-  protected fun goLiveDate(): LocalDate {
-    val today = LocalDate.now()
-    return if (goLiveDate != null && goLiveDate.isAfter(today)) {
-      goLiveDate
-    } else {
-      today
     }
   }
 

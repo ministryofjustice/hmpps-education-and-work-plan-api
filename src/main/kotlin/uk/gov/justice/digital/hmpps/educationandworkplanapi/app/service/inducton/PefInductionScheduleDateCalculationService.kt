@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducton
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -19,9 +18,7 @@ import java.time.LocalDate
 @Service
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
-class PefInductionScheduleDateCalculationService(
-  @Value("\${EDUCATION_CONTRACTS_START_DATE:}") private val scheduleDateNotBefore: LocalDate? = null,
-) : InductionScheduleDateCalculationService(scheduleDateNotBefore) {
+class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
 
   companion object {
     private const val DAYS_AFTER_ADMISSION = 20L
@@ -42,7 +39,7 @@ class PefInductionScheduleDateCalculationService(
   ): CreateInductionScheduleDto = if (newAdmission) {
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
-      deadlineDate = latestOf(admissionDate, scheduleDateNotBefore).plusDays(DAYS_AFTER_ADMISSION),
+      deadlineDate = latestOf(admissionDate, LocalDate.now()).plusDays(DAYS_AFTER_ADMISSION),
       scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
       prisonId = prisonId,
