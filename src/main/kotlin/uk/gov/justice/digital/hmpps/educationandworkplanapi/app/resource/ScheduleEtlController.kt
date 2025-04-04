@@ -80,6 +80,44 @@ class ScheduleEtlController(
 
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_REVIEWS)
+  @PostMapping(value = ["/action-plans/schedules/etl-inductions/{prisonId}"])
+  @Transactional
+  fun checkInductionSchedulesForPrisonersInPrison(
+    @PathVariable("prisonId") prisonId: String,
+  ): InductionSchedulesEtlResponse {
+    log.info("Starting ETL induction check process for prison ID: $prisonId")
+
+    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId).also {
+      log.info("Total prisoners in prison $prisonId: ${it.size}")
+    }
+
+    val totalPrisonersInPrison = allPrisoners.size
+
+    val prisonersWithoutInductionSchedule = filterPrisonersWithoutInductionSchedule(allPrisoners)
+    val prisonersWithInductions = filterPrisonersWithInductions(allPrisoners)
+
+    val eligibleInductionSchedulePrisoners =
+      filterPrisonersWithNoInduction(
+        prisonersWithoutInductionSchedule,
+        prisonersWithInductions,
+      ).filter { prisoner ->
+        val thresholdDate = LocalDate.now().plusDays(3)
+        prisoner.releaseDate == null || prisoner.releaseDate.isAfter(thresholdDate)
+      }
+
+    // Prepare response data
+    val response = InductionSchedulesEtlResponse(
+      prisonId,
+      eligibleInductionSchedulePrisoners.map { it.prisonerNumber },
+      totalPrisonersInPrison,
+    )
+
+    log.info("Completed ETL induction check process for prison ID: $prisonId. Response: ${response.summary}")
+    return response
+  }
+
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
   @PostMapping(value = ["/action-plans/schedules/etl/{prisonId}"])
   @Transactional
   fun createSchedulesForPrisonersInPrison(
@@ -223,11 +261,11 @@ class ScheduleEtlController(
   }
 
   private fun filterPrisonersWithNoInduction(
-    prisoners: List<Prisoner>,
+    prisonersWithoutInductionSchedules: List<Prisoner>,
     prisonersWithInductions: List<Prisoner>,
   ): List<Prisoner> {
     val prisonerNumbersWithInductions = prisonersWithInductions.map { it.prisonerNumber }.toSet()
-    return prisoners.filter { it.prisonerNumber !in prisonerNumbersWithInductions }
+    return prisonersWithoutInductionSchedules.filter { it.prisonerNumber !in prisonerNumbersWithInductions }
   }
 
   private fun filterPrisonersWithoutReviewSchedules(prisoners: List<Prisoner>): List<Prisoner> {
@@ -335,6 +373,24 @@ data class CheckSchedulesEtlResponse(
           Total number of prisoners: $totalNumberOfPrisoners
           Number of prisoners with no PLP schedule: ${prisonersWithoutPLPData.size}
           Prison IDs: $prisonersWithoutPLPData 
+        """.trimIndent()
+        )
+}
+
+data class InductionSchedulesEtlResponse(
+  val prisonId: String,
+  val eligiblePrisonNumbers: List<String> = listOf(),
+  val totalNumberOfPrisoners: Int,
+) {
+
+  val summary: String
+    get() =
+      (
+        """
+          Prison ID: $prisonId
+          Total number of prisoners: $totalNumberOfPrisoners
+          Number of prisoners eligible for induction schedule: ${eligiblePrisonNumbers.size}
+          Prison IDs: $eligiblePrisonNumbers 
         """.trimIndent()
         )
 }
