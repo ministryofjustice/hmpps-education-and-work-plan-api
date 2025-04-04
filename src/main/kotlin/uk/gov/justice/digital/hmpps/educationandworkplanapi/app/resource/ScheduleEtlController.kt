@@ -100,7 +100,10 @@ class ScheduleEtlController(
       filterPrisonersWithNoInduction(
         prisonersWithoutInductionSchedule,
         prisonersWithInductions,
-      ).filter { it.releaseDate != null && it.releaseDate > LocalDate.now().plusDays(3) }
+      ).filter { prisoner ->
+        val thresholdDate = LocalDate.now().plusDays(3)
+        prisoner.releaseDate == null || prisoner.releaseDate.isAfter(thresholdDate)
+      }
 
     // Prepare response data
     val response = InductionSchedulesEtlResponse(
