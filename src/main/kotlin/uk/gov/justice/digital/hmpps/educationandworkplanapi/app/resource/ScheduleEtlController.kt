@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -23,9 +24,16 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Identifier
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InboundEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PersonReference
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PrisonerReceivedIntoPrisonEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import java.time.Instant
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
@@ -45,6 +53,7 @@ class ScheduleEtlController(
   private val reviewScheduleService: ReviewScheduleService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
   private val eventPublisher: EventPublisher,
+  private val prisonerReceivedIntoPrisonEventService: PrisonerReceivedIntoPrisonEventService,
 ) {
 
   @PostMapping("/action-plans/schedules/etl-messages")
@@ -175,6 +184,75 @@ class ScheduleEtlController(
     return response
   }
 
+  /**
+   * ETL job to create schedules for any prisoners in a prison that were missed in the original ETL.
+   * This method uses the same message processing as if they were new prisoners.
+   */
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @PutMapping(value = ["/action-plans/schedules/etl-fix/{prisonId}"])
+  @Transactional
+  fun fixSchedulesForPrisonersInPrison(
+    @PathVariable("prisonId") prisonId: String,
+  ): CheckDataFixEtlResponse {
+    log.info("Check ETL process for prison ID: $prisonId")
+
+    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId).also {
+      log.info("Total prisoners in prison $prisonId: ${it.size}")
+    }
+
+    val prisonersWithSchedules = prisonersWithAnySchedule(allPrisoners)
+
+    // filter out the prisoners with either a review schedule or an induction schedule
+    val allPrisonersWithoutSchedules = allPrisoners.map { it.prisonerNumber }
+      .filterNot { it in prisonersWithSchedules }
+
+    allPrisonersWithoutSchedules.forEach {
+      prisonerReceivedIntoPrisonEventService.process(
+        inboundEvent = inboundEvent(it, prisonId),
+        additionalInformation = additionalInformation(it, prisonId),
+        dataCorrection = true,
+      )
+      // Pause for 1 second between each iteration
+      Thread.sleep(1000)
+    }
+
+    // Prepare response data
+    val response = CheckDataFixEtlResponse(
+      prisonId = prisonId,
+      totalNumberOfPrisoners = allPrisoners.size,
+      candidatePrisoners = allPrisonersWithoutSchedules,
+    )
+
+    log.info("ETL data fix process completed for prison ID: $prisonId. Response: ${response.candidatePrisoners.size}")
+    return response
+  }
+
+  fun additionalInformation(prisonNumber: String, prisonId: String): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
+    nomsNumber = prisonNumber,
+    reason = PrisonerReceivedAdditionalInformation.Reason.ADMISSION,
+    details = "ACTIVE IN:ADM-N",
+    currentLocation = PrisonerReceivedAdditionalInformation.Location.IN_PRISON,
+    prisonId = prisonId,
+    nomisMovementReasonCode = "N",
+    currentPrisonStatus = PrisonerReceivedAdditionalInformation.PrisonStatus.UNDER_PRISON_CARE,
+  )
+
+  private fun inboundEvent(prisonNumber: String, prisonId: String): InboundEvent {
+    val inboundEvent = InboundEvent(
+      eventType = EventType.PRISONER_RECEIVED_INTO_PRISON,
+      description = "A prisoner has been received into prison",
+      personReference = PersonReference(
+        identifiers = listOf(Identifier("NOMS", prisonNumber)),
+      ),
+      version = "1.0",
+      occurredAt = Instant.now(),
+      publishedAt = Instant.now(),
+      additionalInformation = "{ \"nomsNumber\": \"$prisonNumber\", \"reason\": \"ADMISSION\", \"details\": \"ACTIVE IN:ADM-N\", \"currentLocation\": \"IN_PRISON\", \"prisonId\": \"$prisonId\", \"nomisMovementReasonCode\": \"N\", \"currentPrisonStatus\": \"UNDER_PRISON_CARE\" }",
+    )
+    return inboundEvent
+  }
+
   private fun createReviewSchedules(
     eligibleReviewSchedulePrisoners: List<Prisoner>,
     createdReviewSchedules: MutableList<String>,
@@ -283,6 +361,7 @@ class ScheduleEtlController(
       prisonId = prisoner.prisonId ?: "N/A",
       newAdmission = false,
       releaseDate = prisoner.releaseDate,
+      dataCorrection = false,
     )
   }
 
@@ -319,6 +398,24 @@ class ScheduleEtlController(
     log.info("Dry run rollback triggered. Response: ${e.schedulesEtlResponse.summary}")
     return ResponseEntity.ok(e.schedulesEtlResponse)
   }
+}
+
+data class CheckDataFixEtlResponse(
+  val prisonId: String,
+  val candidatePrisoners: List<String> = listOf(),
+  val totalNumberOfPrisoners: Int,
+) {
+
+  val summary: String
+    get() =
+      (
+        """
+          Prison ID: $prisonId
+          Total number of prisoners: $totalNumberOfPrisoners
+          Created schedules for: ${candidatePrisoners.size}
+          Prison IDs: $candidatePrisoners 
+        """.trimIndent()
+        )
 }
 
 data class CheckSchedulesEtlResponse(

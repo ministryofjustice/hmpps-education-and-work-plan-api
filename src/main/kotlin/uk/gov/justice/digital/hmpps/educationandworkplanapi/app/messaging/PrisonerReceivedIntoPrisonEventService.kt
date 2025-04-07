@@ -33,9 +33,9 @@ class PrisonerReceivedIntoPrisonEventService(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
 ) {
-  fun process(inboundEvent: InboundEvent, additionalInformation: PrisonerReceivedAdditionalInformation) = with(additionalInformation) {
+  fun process(inboundEvent: InboundEvent, additionalInformation: PrisonerReceivedAdditionalInformation, dataCorrection: Boolean = false) = with(additionalInformation) {
     when (reason) {
-      ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt)
+      ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt, dataCorrection)
 
       TRANSFERRED -> processPrisonerTransferEvent()
 
@@ -44,7 +44,7 @@ class PrisonerReceivedIntoPrisonEventService(
     }
   }
 
-  private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant) {
+  private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant, dataCorrection: Boolean) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
 
     val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
@@ -57,6 +57,7 @@ class PrisonerReceivedIntoPrisonEventService(
         prisonerAdmissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
         releaseDate = prisoner.releaseDate,
+        dataCorrection = dataCorrection,
       )
     } catch (e: InductionScheduleAlreadyExistsException) {
       // Prisoner already has an Induction Schedule

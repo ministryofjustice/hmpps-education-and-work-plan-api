@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducton
 
+import mu.KotlinLogging
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -9,6 +10,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
 import java.time.LocalDate
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Implementation of [InductionScheduleDateCalculationService] with implemented behaviours specific to the CIAG PEF contracts.
@@ -36,7 +39,16 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
     prisonId: String,
     newAdmission: Boolean,
     releaseDate: LocalDate?,
-  ): CreateInductionScheduleDto = if (newAdmission) {
+    dataCorrection: Boolean,
+  ): CreateInductionScheduleDto = if (dataCorrection) {
+    CreateInductionScheduleDto(
+      prisonNumber = prisonNumber,
+      deadlineDate = calculateDeadlineDate(releaseDate),
+      scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
+      scheduleStatus = InductionScheduleStatus.SCHEDULED,
+      prisonId = prisonId,
+    )
+  } else if (newAdmission) {
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = latestOf(admissionDate, LocalDate.now()).plusDays(DAYS_AFTER_ADMISSION),
@@ -47,11 +59,22 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
   } else {
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
-      deadlineDate = calculateDeadlineDate(releaseDate),
+      deadlineDate = dataCorrectionDeadlineDate(releaseDate),
       scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
       prisonId = prisonId,
     )
+  }
+
+  private fun dataCorrectionDeadlineDate(releaseDate: LocalDate?): LocalDate {
+    val defaultDeadlineDate = LocalDate.of(2025, 10, 1)
+    if (releaseDate != null) {
+      val sevenDaysBeforeRelease = releaseDate.minusDays(7)
+      if (sevenDaysBeforeRelease.isBefore(defaultDeadlineDate)) {
+        return sevenDaysBeforeRelease
+      }
+    }
+    return defaultDeadlineDate
   }
 
   private fun calculateDeadlineDate(releaseDate: LocalDate?): LocalDate {
