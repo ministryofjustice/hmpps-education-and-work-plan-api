@@ -260,7 +260,54 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   }
 
   @Test
-  fun `should process event given reason is prisoner admission and prisoner already has an Induction Schedule that is not COMPLETED`() {
+  fun `should process event given reason is prisoner admission and prisoner does not have an Induction and already has an Induction Schedule that is not COMPLETED`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "MDI"
+
+    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber, prisonId = prisonId)
+    given(prisonerSearchApiService.getPrisoner(any())).willReturn(prisoner)
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = "BXI",
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willThrow(InductionNotFoundException(prisonNumber))
+
+    val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull(), any())).willThrow(
+      InductionScheduleAlreadyExistsException(inductionSchedule),
+    )
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService).createInductionSchedule(
+      prisonNumber,
+      prisonerAdmissionDate,
+      prisonId,
+      releaseDate = prisoner.releaseDate,
+    )
+    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(
+      prisonNumber,
+      prisonerAdmissionDate,
+      prisonId,
+      releaseDate = prisoner.releaseDate,
+      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+    )
+    verify(prisonerSearchApiService).getPrisoner(prisonNumber)
+  }
+
+  @Test
+  fun `should process event given reason is prisoner admission and prisoner already has an Induction but their Induction Schedule is not COMPLETED for some reason`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     val prisonerAdmissionDate = LocalDate.now()
@@ -285,27 +332,28 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
     given(inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)).willReturn(inductionSchedule)
 
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull(), any())).willThrow(
-      InductionScheduleAlreadyExistsException(inductionSchedule),
+    given(inductionScheduleService.updateInductionSchedule(any(), any(), anyOrNull(), any(), any(), anyOrNull()))
+      .willReturn(inductionSchedule)
+
+    val createReviewScheduleDto = aValidCreateInitialReviewScheduleDto()
+    given(createInitialReviewScheduleMapper.fromPrisonerToDomain(any(), any(), any())).willReturn(
+      createReviewScheduleDto,
     )
 
     // When
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(inductionScheduleService).createInductionSchedule(
-      prisonNumber,
-      prisonerAdmissionDate,
-      prisonId,
-      releaseDate = prisoner.releaseDate,
+    verify(inductionScheduleService).updateInductionSchedule(
+      inductionSchedule = inductionSchedule,
+      newStatus = COMPLETED,
+      prisonId = prisonId,
     )
-    verify(inductionScheduleService).reschedulePrisonersInductionSchedule(
-      prisonNumber,
-      prisonerAdmissionDate,
-      prisonId,
-      releaseDate = prisoner.releaseDate,
-      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
-    )
+    verifyNoMoreInteractions(inductionScheduleService)
+    verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
+    verify(prisonerSearchApiService).getPrisoner(prisonNumber)
+    verify(createInitialReviewScheduleMapper).fromPrisonerToDomain(prisoner, isTransfer = false, isReadmission = true)
+    verify(reviewScheduleService).createInitialReviewSchedule(createReviewScheduleDto)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
   }
 

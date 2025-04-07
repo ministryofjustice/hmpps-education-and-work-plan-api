@@ -62,10 +62,24 @@ class PrisonerReceivedIntoPrisonEventService(
     val prisonId = prisoner.prisonId ?: "N/A"
     val prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC)
 
-    if (prisonerAlreadyHasActionPlan(nomsNumber) && prisonerDoesNotHaveInductionSchedule(nomsNumber)) {
-      log.info { "Prisoner [$nomsNumber] already has an Action Plan but no InductionSchedule. Most likely a re-offender released before 01/04/25 and re-admitted after that date. Creating them a ReviewSchedule" }
-      rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
-      return
+    if (prisonerAlreadyHasActionPlan(nomsNumber)) {
+      if (prisonerDoesNotHaveInductionSchedule(nomsNumber)) {
+        log.info { "Prisoner [$nomsNumber] already has an Action Plan but no InductionSchedule. Most likely a re-offender released before 01/04/25 and re-admitted after that date. Creating them a ReviewSchedule" }
+        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
+        return
+      }
+
+      if (prisonerHasNonCompleteInductionSchedule(nomsNumber)) {
+        log.info { "Prisoner [$nomsNumber] already has an Action Plan but their InductionSchedule is in a non-complete state. Setting their InductionSchedule to COMPLETED and creating them a ReviewSchedule" }
+        val inductionSchedule = inductionScheduleService.getInductionScheduleForPrisoner(nomsNumber)
+        inductionScheduleService.updateInductionSchedule(
+          inductionSchedule = inductionSchedule,
+          newStatus = COMPLETED,
+          prisonId = prisonId,
+        )
+        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
+        return
+      }
     }
 
     try {
@@ -175,4 +189,10 @@ class PrisonerReceivedIntoPrisonEventService(
   private fun prisonerDoesNotHaveInductionSchedule(prisonNumber: String): Boolean = runCatching {
     inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
   }.getOrNull() == null
+
+  private fun prisonerHasNonCompleteInductionSchedule(prisonNumber: String): Boolean = runCatching {
+    inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
+  }.getOrNull()
+    ?.let { it.scheduleStatus != COMPLETED }
+    ?: false
 }
