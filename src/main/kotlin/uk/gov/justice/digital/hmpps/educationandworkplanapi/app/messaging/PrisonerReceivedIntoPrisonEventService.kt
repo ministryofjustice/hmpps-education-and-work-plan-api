@@ -7,8 +7,10 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
@@ -32,8 +34,14 @@ class PrisonerReceivedIntoPrisonEventService(
   private val reviewScheduleService: ReviewScheduleService,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
+  private val inductionService: InductionService,
+  private val actionPlanService: ActionPlanService,
 ) {
-  fun process(inboundEvent: InboundEvent, additionalInformation: PrisonerReceivedAdditionalInformation, dataCorrection: Boolean = false) = with(additionalInformation) {
+  fun process(
+    inboundEvent: InboundEvent,
+    additionalInformation: PrisonerReceivedAdditionalInformation,
+    dataCorrection: Boolean = false,
+  ) = with(additionalInformation) {
     when (reason) {
       ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt, dataCorrection)
 
@@ -44,12 +52,22 @@ class PrisonerReceivedIntoPrisonEventService(
     }
   }
 
-  private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(eventOccurredAt: Instant, dataCorrection: Boolean) {
+  private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(
+    eventOccurredAt: Instant,
+    dataCorrection: Boolean,
+  ) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
 
     val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
     val prisonId = prisoner.prisonId ?: "N/A"
     val prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC)
+
+    if (prisonerAlreadyHasActionPlan(nomsNumber) && prisonerDoesNotHaveInductionSchedule(nomsNumber)) {
+      log.info { "Prisoner [$nomsNumber] already has an Action Plan but no InductionSchedule. Most likely a re-offender released before 01/04/25 and re-admitted after that date. Creating them a ReviewSchedule" }
+      rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
+      return
+    }
+
     try {
       // Attempt to create the prisoner's Induction Schedule
       inductionScheduleService.createInductionSchedule(
@@ -141,4 +159,20 @@ class PrisonerReceivedIntoPrisonEventService(
       }
     }
   }
+
+  /**
+   * Returns true if the prisoner already has an Action Plan (consisting of an Induction and at least 1 Goal), irrespective
+   * of whether they have an InductionSchedule and/or ReviewSchedule or not
+   */
+  private fun prisonerAlreadyHasActionPlan(prisonNumber: String): Boolean = runCatching {
+    inductionService.getInductionForPrisoner(prisonNumber)
+  }.getOrNull() != null &&
+    runCatching { actionPlanService.getActionPlan(prisonNumber) }.getOrNull() != null
+
+  /**
+   * Returns true if the prisoner does not already have an InductionSchedule
+   */
+  private fun prisonerDoesNotHaveInductionSchedule(prisonNumber: String): Boolean = runCatching {
+    inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
+  }.getOrNull() == null
 }
