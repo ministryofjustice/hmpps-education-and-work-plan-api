@@ -291,7 +291,7 @@ class ScheduleEtlController(
     return response
   }
 
-  fun additionalInformation(prisonNumber: String, prisonId: String = "ABC"): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
+  fun additionalInformation(prisonNumber: String, prisonId: String = "N/A"): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
     nomsNumber = prisonNumber,
     reason = PrisonerReceivedAdditionalInformation.Reason.ADMISSION,
     details = "ACTIVE IN:ADM-N",
@@ -301,7 +301,7 @@ class ScheduleEtlController(
     currentPrisonStatus = PrisonerReceivedAdditionalInformation.PrisonStatus.UNDER_PRISON_CARE,
   )
 
-  private fun inboundEvent(prisonNumber: String, prisonId: String = "ABC"): InboundEvent {
+  private fun inboundEvent(prisonNumber: String, prisonId: String = "N/A"): InboundEvent {
     val inboundEvent = InboundEvent(
       eventType = EventType.PRISONER_RECEIVED_INTO_PRISON,
       description = "A prisoner has been received into prison",
