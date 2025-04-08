@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -9,7 +8,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.MethodSource
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
@@ -243,33 +241,6 @@ class ReviewScheduleDateCalculationServiceTest {
     assertThat(actual).isEqualTo(expectedReviewScheduleWindow)
   }
 
-  @ParameterizedTest
-  @CsvSource(
-    value = [
-      "RECALL",
-      "DEAD",
-      "SENTENCED",
-      "CIVIL_PRISONER",
-      "IMMIGRATION_DETAINEE",
-      "UNKNOWN",
-      "OTHER",
-    ],
-  )
-  fun `should not determine review schedule calculation rule given sentence type that requires a release date but no release date`(sentenceType: SentenceType) {
-    // Given
-    val releaseDate = null
-    val prisonNumber = randomValidPrisonNumber()
-
-    // When
-    val exception = catchThrowableOfType(ReviewScheduleNoReleaseDateForSentenceTypeException::class.javaObjectType) {
-      dateCalculationService.determineReviewScheduleCalculationRule(prisonNumber, sentenceType, releaseDate)
-    }
-
-    // Then
-    assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
-    assertThat(exception.sentenceType).isEqualTo(sentenceType)
-  }
-
   companion object {
     private val TODAY = LocalDate.now()
     private val PRISON_NUMBER = randomValidPrisonNumber()
@@ -481,6 +452,62 @@ class ReviewScheduleDateCalculationServiceTest {
           false,
           false,
           ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+        ),
+        Arguments.of(
+          "prisoner is sentenced with no release date",
+          null,
+          SentenceType.SENTENCED,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ),
+        Arguments.of(
+          "prisoner is on recall with no release date",
+          null,
+          SentenceType.RECALL,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ),
+        Arguments.of(
+          "prisoner is dead with no release date",
+          null,
+          SentenceType.DEAD,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ),
+        Arguments.of(
+          "prisoner is civil prisoner with no release date",
+          null,
+          SentenceType.CIVIL_PRISONER,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ),
+        Arguments.of(
+          "prisoner is immigration detainee with no release date",
+          null,
+          SentenceType.IMMIGRATION_DETAINEE,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ),
+        Arguments.of(
+          "prisoner has unknown sentence type with no release date",
+          null,
+          SentenceType.UNKNOWN,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ),
+        Arguments.of(
+          "prisoner has other sentence type with no release date",
+          null,
+          SentenceType.OTHER,
+          false,
+          false,
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
         ),
       )
   }

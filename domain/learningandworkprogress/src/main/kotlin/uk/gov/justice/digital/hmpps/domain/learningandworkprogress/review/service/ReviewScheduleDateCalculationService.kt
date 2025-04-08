@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_READMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_TRANSFER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
@@ -32,7 +31,6 @@ private val log = KotlinLogging.logger {}
  */
 class ReviewScheduleDateCalculationService {
   companion object {
-    private val SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE = listOf(INDETERMINATE_SENTENCE, CONVICTED_UNSENTENCED, REMAND)
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
     private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
@@ -55,13 +53,15 @@ class ReviewScheduleDateCalculationService {
     } else if (isTransfer) {
       PRISONER_TRANSFER
     } else {
-      validateSentenceTypeAndReleaseDate(prisonNumber, sentenceType, releaseDate)
-
       when (sentenceType) {
         REMAND -> PRISONER_ON_REMAND
         CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
         INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-        else -> reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate!!)
+        else -> if (releaseDate != null) {
+          reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
+        } else {
+          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
+        }
       }
     }
 
@@ -141,13 +141,6 @@ class ReviewScheduleDateCalculationService {
       else -> MORE_THAN_60_MONTHS_TO_SERVE
     }.also {
       log.debug { "Returning ReviewScheduleCalculationRule $it based on release date of $releaseDate" }
-    }
-  }
-
-  private fun validateSentenceTypeAndReleaseDate(prisonNumber: String, sentenceType: SentenceType, releaseDate: LocalDate?) {
-    when {
-      sentenceType !in SENTENCE_TYPES_NOT_REQUIRING_RELEASE_DATE && releaseDate == null ->
-        throw ReviewScheduleNoReleaseDateForSentenceTypeException(prisonNumber, sentenceType)
     }
   }
 
