@@ -81,7 +81,7 @@ class PrisonerReceivedIntoPrisonEventService(
           newStatus = COMPLETED,
           prisonId = prisonId,
         )
-        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId, dataCorrection)
+        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId, dataCorrection, treatAsTransfer)
         return
       }
     }
