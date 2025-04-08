@@ -635,6 +635,7 @@ abstract class IntegrationTestBase {
     val reviewScheduleEntity = reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
     reviewScheduleEntity?.run {
       scheduleStatus = status
+      this.exemptionReason = exemptionReason
       reviewScheduleRepository.saveAndFlush(this)
     }
   }
@@ -647,6 +648,17 @@ abstract class IntegrationTestBase {
     reviewScheduleEntity?.run {
       this.latestReviewDate = latestReviewDate
       reviewScheduleRepository.saveAndFlush(this)
+    }
+  }
+
+  fun updateInductionScheduleRecordStatus(
+    prisonNumber: String,
+    status: InductionScheduleStatus = InductionScheduleStatus.SCHEDULED,
+  ) {
+    val inductionScheduleEntity = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
+    inductionScheduleEntity?.run {
+      scheduleStatus = status
+      inductionScheduleRepository.saveAndFlush(this)
     }
   }
 
