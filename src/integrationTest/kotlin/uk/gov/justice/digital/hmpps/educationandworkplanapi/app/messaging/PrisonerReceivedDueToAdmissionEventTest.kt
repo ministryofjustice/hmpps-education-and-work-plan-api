@@ -17,10 +17,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
@@ -350,9 +352,9 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
       assertThat(inductionSchedule.scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
 
       // test that outbound event is also created:
-      val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
-      assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+      val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
+      assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+      assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
     }
   }
 
@@ -407,6 +409,151 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
       // test that no outbound events were created
       assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+    }
+  }
+
+  // Re-offending prisoner. Prisoner previously had a PLP Induction + Goals from long before the Reviews process, and therefore does not have an Induction Schedule or Review Schedule in any state.
+  @Test
+  fun `should create Review Schedule instead of Induction Schedule given prisoner that already has a PLP Induction and Goals but does not have an Induction Schedule or Review Schedule`() {
+    // Given
+    // prisoner has a PLP Action Plan (Induction + at least 1 Goal), but no Induction Schedule or Review Schedules
+    val prisonNumber = randomValidPrisonNumber()
+
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    createInduction(prisonNumber, aValidCreateInductionRequest())
+    createActionPlan(prisonNumber)
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Even though this test is simulating prisoners with an Action Plan (Induction + Goal(s)) but without an Induction or Review Schedule (ie. a prisoner from before Reviews),
+    // the above calls will have created the initial ReviewSchedule
+    // Before clearing the queues though we need to wait until the first "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+    reviewScheduleRepository.deleteAll()
+    reviewScheduleHistoryRepository.deleteAll()
+
+    assertThat(getInductionScheduleHistory(prisonNumber).inductionSchedules).hasSize(0)
+    assertThat(getReviewSchedules(prisonNumber).reviewSchedules).hasSize(0)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilAsserted {
+      // assert that no induction schedules exist or were created for this prisoner, and that no outbound induction events were created
+      assertThat(getInductionScheduleHistory(prisonNumber).inductionSchedules).hasSize(0)
+      assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+
+      // assert that there is a correctly setup ReviewSchedule
+      val reviewSchedules = getReviewSchedules(prisonNumber)
+      assertThat(reviewSchedules.reviewSchedules).hasSize(1)
+      assertThat(reviewSchedules.reviewSchedules[0].status).isEqualTo(ReviewScheduleStatus.SCHEDULED)
+      assertThat(reviewSchedules.reviewSchedules[0].calculationRule).isEqualTo(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+
+      // test that outbound event is also created:
+      val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.REVIEW)
+      assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+      assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+    }
+  }
+
+  // Re-offending prisoner. Prisoner previously had a PLP Induction + Goals, and has an InductionSchedule in a state other than COMPLETED. (this is a weird edge case)
+  @Test
+  fun `should update Induction Schedule and create Review Schedule given prisoner that already has a PLP Induction and Goals, and an Induction Schedule that is not COMPLETED`() {
+    // Given
+    // prisoner has a PLP Action Plan (Induction + at least 1 Goal), and an Induction Schedule that is not COMPLETED
+    val prisonNumber = randomValidPrisonNumber()
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    // Create the induction schedule, induction and action plan. This will have created the initial Review Schedule which for the purpose of this test we will need to delete
+    createInductionSchedule(
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatus.SCHEDULED,
+      createdAtPrison = "BXI",
+    )
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = "BXI"))
+    createActionPlan(prisonNumber)
+    updateInductionScheduleRecordStatus(prisonNumber, InductionScheduleStatus.SCHEDULED)
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Even though this test is simulating prisoners with an Action Plan (Induction + Goal(s)) but without an Induction or Review Schedule (ie. a prisoner from before Reviews),
+    // the above calls will have created the initial ReviewSchedule
+    // Before clearing the queues though we need to wait until the first "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+    reviewScheduleRepository.deleteAll()
+    reviewScheduleHistoryRepository.deleteAll()
+
+    assertThat(getInductionScheduleHistory(prisonNumber).inductionSchedules).hasSize(1)
+    assertThat(getReviewSchedules(prisonNumber).reviewSchedules).hasSize(0)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilAsserted {
+      // test induction schedule was updated
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(COMPLETED)
+
+      // test induction schedule history was updated
+      val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
+      assertThat(inductionScheduleHistories)
+        .hasNumberOfInductionScheduleVersions(2)
+
+      // test that outbound event is also created:
+      val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
+      assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+      assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+
+      // assert that there is a correctly setup ReviewSchedule
+      val reviewSchedules = getReviewSchedules(prisonNumber)
+      assertThat(reviewSchedules.reviewSchedules).hasSize(1)
+      assertThat(reviewSchedules.reviewSchedules[0].status).isEqualTo(ReviewScheduleStatus.SCHEDULED)
+      assertThat(reviewSchedules.reviewSchedules[0].calculationRule).isEqualTo(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+
+      // test that outbound event is also created:
+      val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.REVIEW)
+      assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+      assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
     }
   }
 }
