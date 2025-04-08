@@ -291,6 +291,32 @@ class ScheduleEtlController(
     return response
   }
 
+  /**
+   * ETL job to create schedules for any prisoners in a prison that were missed in the original ETL.
+   * This method uses the same message processing as if they were new prisoners.
+   */
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @PutMapping(value = ["/action-plans/schedules/etl-transfer-schedule-fix/{prisonerNumber}"])
+  @Transactional
+  fun fixSchedulesForTransferredPrisoner(
+    @PathVariable("prisonerNumber") prisonerNumber: String,
+  ): String {
+    log.info("Schedule fix for transferred prisoner $prisonerNumber")
+
+    prisonerReceivedIntoPrisonEventService.process(
+      inboundEvent = inboundEvent(prisonerNumber),
+      additionalInformation = additionalInformation(prisonerNumber),
+      dataCorrection = true,
+      treatAsTransfer = true,
+    )
+
+    // Prepare response data
+    val response = "Schedule data fix process completed for prisonerNumber ID: $prisonerNumber"
+    log.info(response)
+    return response
+  }
+
   fun additionalInformation(prisonNumber: String, prisonId: String = "N/A"): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
     nomsNumber = prisonNumber,
     reason = PrisonerReceivedAdditionalInformation.Reason.ADMISSION,
