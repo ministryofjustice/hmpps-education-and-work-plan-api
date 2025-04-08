@@ -69,11 +69,11 @@ class PrisonerReceivedIntoPrisonEventService(
         return
       }
 
-      if (prisonerHasNonCompleteInductionSchedule(nomsNumber)) {
+      val inductionSchedule = runCatching { inductionScheduleService.getInductionScheduleForPrisoner(nomsNumber) }.getOrNull()
+      if (inductionSchedule?.scheduleStatus != COMPLETED) {
         log.info { "Prisoner [$nomsNumber] already has an Action Plan but their InductionSchedule is in a non-complete state. Setting their InductionSchedule to COMPLETED and creating them a ReviewSchedule" }
-        val inductionSchedule = inductionScheduleService.getInductionScheduleForPrisoner(nomsNumber)
         inductionScheduleService.updateInductionSchedule(
-          inductionSchedule = inductionSchedule,
+          inductionSchedule = inductionSchedule!!,
           newStatus = COMPLETED,
           prisonId = prisonId,
         )
@@ -189,10 +189,4 @@ class PrisonerReceivedIntoPrisonEventService(
   private fun prisonerDoesNotHaveInductionSchedule(prisonNumber: String): Boolean = runCatching {
     inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
   }.getOrNull() == null
-
-  private fun prisonerHasNonCompleteInductionSchedule(prisonNumber: String): Boolean = runCatching {
-    inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
-  }.getOrNull()
-    ?.let { it.scheduleStatus != COMPLETED }
-    ?: false
 }
