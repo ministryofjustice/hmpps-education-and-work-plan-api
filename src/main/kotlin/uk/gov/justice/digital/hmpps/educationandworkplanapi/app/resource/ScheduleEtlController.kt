@@ -266,7 +266,32 @@ class ScheduleEtlController(
     return response
   }
 
-  fun additionalInformation(prisonNumber: String, prisonId: String): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
+  /**
+   * ETL job to create schedules for any prisoners in a prison that were missed in the original ETL.
+   * This method uses the same message processing as if they were new prisoners.
+   */
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @PutMapping(value = ["/action-plans/schedules/etl-schedule-fix/{prisonerNumber}"])
+  @Transactional
+  fun fixSchedulesForPrisoner(
+    @PathVariable("prisonerNumber") prisonerNumber: String,
+  ): String {
+    log.info("Schedule fix prisonerNumber $prisonerNumber")
+
+    prisonerReceivedIntoPrisonEventService.process(
+      inboundEvent = inboundEvent(prisonerNumber),
+      additionalInformation = additionalInformation(prisonerNumber),
+      dataCorrection = true,
+    )
+
+    // Prepare response data
+    val response = "Schedule data fix process completed for prisonerNumber ID: $prisonerNumber"
+    log.info(response)
+    return response
+  }
+
+  fun additionalInformation(prisonNumber: String, prisonId: String = "N/A"): PrisonerReceivedAdditionalInformation = PrisonerReceivedAdditionalInformation(
     nomsNumber = prisonNumber,
     reason = PrisonerReceivedAdditionalInformation.Reason.ADMISSION,
     details = "ACTIVE IN:ADM-N",
@@ -276,7 +301,7 @@ class ScheduleEtlController(
     currentPrisonStatus = PrisonerReceivedAdditionalInformation.PrisonStatus.UNDER_PRISON_CARE,
   )
 
-  private fun inboundEvent(prisonNumber: String, prisonId: String): InboundEvent {
+  private fun inboundEvent(prisonNumber: String, prisonId: String = "N/A"): InboundEvent {
     val inboundEvent = InboundEvent(
       eventType = EventType.PRISONER_RECEIVED_INTO_PRISON,
       description = "A prisoner has been received into prison",
