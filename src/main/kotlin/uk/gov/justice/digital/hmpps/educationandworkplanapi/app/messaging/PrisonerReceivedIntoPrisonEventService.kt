@@ -79,7 +79,7 @@ class PrisonerReceivedIntoPrisonEventService(
           newStatus = COMPLETED,
           prisonId = prisonId,
         )
-        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
+        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId, dataCorrection)
         return
       }
     }
@@ -140,7 +140,7 @@ class PrisonerReceivedIntoPrisonEventService(
     )
   }
 
-  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String) {
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String, dataCorrection: Boolean = false) {
     val reviewSchedule =
       runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
     if (reviewSchedule != null) {
@@ -151,11 +151,16 @@ class PrisonerReceivedIntoPrisonEventService(
       )
     }
 
+    var readmission = true
+    if (dataCorrection) {
+      readmission = false
+    }
+
     // Create a new Review Schedule for the prisoner
     val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
       prisoner = prisoner,
       // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)
-      isReadmission = true,
+      isReadmission = readmission,
       isTransfer = false,
     )
     reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
