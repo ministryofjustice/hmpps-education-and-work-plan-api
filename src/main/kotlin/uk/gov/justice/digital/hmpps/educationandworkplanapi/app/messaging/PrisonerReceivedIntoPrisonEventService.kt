@@ -63,17 +63,19 @@ class PrisonerReceivedIntoPrisonEventService(
     val prisonerAdmissionDate = LocalDate.ofInstant(eventOccurredAt, ZoneOffset.UTC)
 
     if (prisonerAlreadyHasActionPlan(nomsNumber)) {
-      if (prisonerDoesNotHaveInductionSchedule(nomsNumber)) {
+      val inductionSchedule =
+        runCatching { inductionScheduleService.getInductionScheduleForPrisoner(nomsNumber) }.getOrNull()
+
+      if (inductionSchedule == null) {
         log.info { "Prisoner [$nomsNumber] already has an Action Plan but no InductionSchedule. Most likely a re-offender released before 01/04/25 and re-admitted after that date. Creating them a ReviewSchedule" }
         rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
         return
       }
 
-      val inductionSchedule = runCatching { inductionScheduleService.getInductionScheduleForPrisoner(nomsNumber) }.getOrNull()
-      if (inductionSchedule?.scheduleStatus != COMPLETED) {
+      if (inductionSchedule.scheduleStatus != COMPLETED) {
         log.info { "Prisoner [$nomsNumber] already has an Action Plan but their InductionSchedule is in a non-complete state. Setting their InductionSchedule to COMPLETED and creating them a ReviewSchedule" }
         inductionScheduleService.updateInductionSchedule(
-          inductionSchedule = inductionSchedule!!,
+          inductionSchedule = inductionSchedule,
           newStatus = COMPLETED,
           prisonId = prisonId,
         )
@@ -182,11 +184,4 @@ class PrisonerReceivedIntoPrisonEventService(
     inductionService.getInductionForPrisoner(prisonNumber)
   }.getOrNull() != null &&
     runCatching { actionPlanService.getActionPlan(prisonNumber) }.getOrNull() != null
-
-  /**
-   * Returns true if the prisoner does not already have an InductionSchedule
-   */
-  private fun prisonerDoesNotHaveInductionSchedule(prisonNumber: String): Boolean = runCatching {
-    inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
-  }.getOrNull() == null
 }
