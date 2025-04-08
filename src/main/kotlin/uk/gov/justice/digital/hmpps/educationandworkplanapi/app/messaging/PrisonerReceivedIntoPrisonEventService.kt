@@ -41,9 +41,10 @@ class PrisonerReceivedIntoPrisonEventService(
     inboundEvent: InboundEvent,
     additionalInformation: PrisonerReceivedAdditionalInformation,
     dataCorrection: Boolean = false,
+    treatAsTransfer: Boolean = false,
   ) = with(additionalInformation) {
     when (reason) {
-      ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt, dataCorrection)
+      ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt, dataCorrection, treatAsTransfer)
 
       TRANSFERRED -> processPrisonerTransferEvent()
 
@@ -55,6 +56,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(
     eventOccurredAt: Instant,
     dataCorrection: Boolean,
+    treatAsTransfer: Boolean,
   ) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
 
@@ -140,7 +142,7 @@ class PrisonerReceivedIntoPrisonEventService(
     )
   }
 
-  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String, dataCorrection: Boolean = false) {
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String, dataCorrection: Boolean = false, treatAsTransfer: Boolean = false) {
     val reviewSchedule =
       runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
     if (reviewSchedule != null) {
@@ -155,13 +157,17 @@ class PrisonerReceivedIntoPrisonEventService(
     if (dataCorrection) {
       readmission = false
     }
+    var transfer = false
+    if (dataCorrection && treatAsTransfer) {
+      transfer = true
+    }
 
     // Create a new Review Schedule for the prisoner
     val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
       prisoner = prisoner,
       // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)
-      isReadmission = readmission,
-      isTransfer = false,
+      isReadmission = readmission, // true
+      isTransfer = transfer, // false
     )
     reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
   }
