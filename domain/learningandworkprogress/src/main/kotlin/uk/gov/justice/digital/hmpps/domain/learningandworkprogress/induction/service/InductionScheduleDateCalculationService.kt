@@ -18,6 +18,7 @@ abstract class InductionScheduleDateCalculationService(
   companion object {
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
+    private const val TWENTY_DAYS = 20L
     private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
   }
 
@@ -30,6 +31,9 @@ abstract class InductionScheduleDateCalculationService(
 
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate =
     with(inductionSchedule) {
+      if (inductionSchedule.scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
+        return baseScheduleDate().plusDays(TWENTY_DAYS)
+      }
       val additionalDays = getExtensionDays(scheduleStatus)
       val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
       maxOf(baseDatePlusAdditionalDays, deadlineDate)

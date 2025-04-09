@@ -84,7 +84,6 @@ class ReviewScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
         "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
         "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
-        "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
         "EXEMPT_PRISONER_MERGE",
@@ -108,6 +107,40 @@ class ReviewScheduleDateCalculationServiceTest {
       assertThat(actual).isEqualTo(expectedReviewDate)
     }
 
+    @Test
+    fun `should calculate adjusted review due date given an exemption status of EXEMPT_PRISONER_TRANSFER`() {
+      // Given
+      val reviewSchedule = aValidReviewSchedule(
+        latestReviewDate = TODAY.plusDays(6),
+        scheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+      )
+
+      val expectedReviewDate = TODAY.plusDays(10)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @Test
+    fun `should calculate adjusted review due date given an exemption status of EXEMPT_PRISONER_TRANSFER irrespective of original deadline`() {
+      // Given
+      val reviewSchedule = aValidReviewSchedule(
+        latestReviewDate = TODAY.plusDays(29),
+        scheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+      )
+
+      val expectedReviewDate = TODAY.plusDays(10)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
     @ParameterizedTest
     @CsvSource(
       value = [
@@ -115,7 +148,6 @@ class ReviewScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
         "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
         "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
-        "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
         "EXEMPT_PRISONER_MERGE",
