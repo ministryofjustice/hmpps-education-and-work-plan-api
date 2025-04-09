@@ -95,7 +95,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
     createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
     createActionPlan(prisonNumber)
 
-    val expectedLatestReviewDate = LocalDate.now().plusDays(5)
+    val expectedLatestReviewDate = LocalDate.now().plusDays(10)
     // Set the latest review date to be earlier than the adjusted date that a transfer will set
     updateReviewScheduleRecordLatestReviewDate(prisonNumber, LocalDate.now().plusDays(4))
 

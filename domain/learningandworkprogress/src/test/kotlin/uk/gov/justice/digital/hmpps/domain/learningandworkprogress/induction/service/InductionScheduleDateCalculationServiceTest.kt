@@ -95,7 +95,6 @@ class InductionScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
         "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
         "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
-        "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
         "EXEMPT_PRISONER_MERGE",
@@ -128,7 +127,6 @@ class InductionScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
         "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
         "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
-        "EXEMPT_PRISONER_TRANSFER",
         "EXEMPT_PRISONER_RELEASE",
         "EXEMPT_PRISONER_DEATH",
         "EXEMPT_PRISONER_MERGE",
@@ -144,6 +142,40 @@ class InductionScheduleDateCalculationServiceTest {
       )
 
       val expectedReviewDate = TODAY.plusDays(5)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @Test
+    fun `should calculate adjusted induction due date given an exemption a prisoner transfer status`() {
+      // Given
+      val inductionSchedule = aValidInductionSchedule(
+        deadlineDate = TODAY.plusDays(4),
+        scheduleStatus = InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+      )
+
+      val expectedReviewDate = TODAY.plusDays(20)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @Test
+    fun `should calculate adjusted induction due date given an exemption a prisoner transfer status irrespective of original deadline`() {
+      // Given
+      val inductionSchedule = aValidInductionSchedule(
+        deadlineDate = TODAY.plusDays(29),
+        scheduleStatus = InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+      )
+
+      val expectedReviewDate = TODAY.plusDays(20)
 
       // When
       val actual = dateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)

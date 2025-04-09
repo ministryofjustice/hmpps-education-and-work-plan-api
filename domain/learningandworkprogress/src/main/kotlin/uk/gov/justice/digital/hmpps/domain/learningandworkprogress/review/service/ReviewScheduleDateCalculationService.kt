@@ -35,6 +35,7 @@ class ReviewScheduleDateCalculationService {
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
     private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
     private const val RESCHEDULE_ADDITIONAL_DAYS = 10L
+    private const val TEN_DAYS = 10L
   }
 
   /**
@@ -114,6 +115,9 @@ class ReviewScheduleDateCalculationService {
    */
   fun calculateAdjustedReviewDueDate(reviewSchedule: ReviewSchedule): LocalDate =
     with(reviewSchedule) {
+      if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
+        return LocalDate.now().plusDays(TEN_DAYS)
+      }
       val additionalDays = getExtensionDays(scheduleStatus)
       val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
       maxOf(todayPlusAdditionalDays, reviewScheduleWindow.dateTo)
