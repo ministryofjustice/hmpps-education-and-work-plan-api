@@ -356,7 +356,6 @@ class CreateInductionTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    // Then
     val induction = getInduction(prisonNumber)
     assertThat(induction).isNotNull
     // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
@@ -373,10 +372,10 @@ class CreateInductionTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should create induction and not create initial review schedule given prisoner already has goals created before the induction, but is an unsupported sentence type for the release schedule`() {
+  fun `should create induction and create initial review schedule given prisoner already has goals created before the induction, but has no release date`() {
     // Given
     clearDatabase()
-    val prisonNumber = "Z9999ZZ" // Prisoner Z9999ZZ is sentenced, but with no release date, which is an unsupported combination when creating the release schedule
+    val prisonNumber = "Z9999ZZ" // Prisoner Z9999ZZ is sentenced, but with no release date
     createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
 
     val createRequest = aValidCreateInductionRequest()
@@ -396,15 +395,17 @@ class CreateInductionTest : IntegrationTestBase() {
     // Then
     val induction = getInduction(prisonNumber)
     assertThat(induction).isNotNull
-    // assert that there are no Action Plan Reviews (ie. no Review Schedule)
-    webTestClient.get()
-      .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isNotFound
+    // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
+    val actionPlanReviews = getActionPlanReviews(prisonNumber)
+    assertThat(actionPlanReviews)
+      .hasNumberOfCompletedReviews(0)
+      .latestReviewSchedule {
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+      }
+    val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
 
-    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).isEmpty()
+    assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).size().isEqualTo(1)
   }
 
   @Test
