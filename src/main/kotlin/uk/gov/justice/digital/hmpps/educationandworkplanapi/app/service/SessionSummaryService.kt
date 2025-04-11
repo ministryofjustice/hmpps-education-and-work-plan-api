@@ -174,8 +174,14 @@ class SessionSummaryService(
 
   /**
    * Returns true if the [ReviewSchedule] is considered due for the purposes of the [SessionSummaries] counts
+   * TODO RR-1409 at some point in the future when this returns no results:
+   *
+   * select count(*) from review_schedule where schedule_status = 'SCHEDULED'
+   * and latest_review_date < review_schedule.earliest_review_date
+   *
+   * remove the || reviewScheduleWindow.dateFrom > reviewScheduleWindow.dateTo
    */
   private fun ReviewSchedule.includeInDueCount(today: LocalDate): Boolean = with(scheduleStatus) {
-    this == SCHEDULED && today in reviewScheduleWindow.dateFrom..reviewScheduleWindow.dateTo
+    this == SCHEDULED && (today in reviewScheduleWindow.dateFrom..reviewScheduleWindow.dateTo || reviewScheduleWindow.dateFrom > reviewScheduleWindow.dateTo)
   }
 }
