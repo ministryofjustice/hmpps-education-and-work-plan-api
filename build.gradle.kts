@@ -10,7 +10,7 @@ plugins {
   kotlin("plugin.jpa") version "2.1.20"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "5.0.0"
+  id("name.remal.integration-tests") version "5.0.1"
 
   `java-test-fixtures`
 }
@@ -24,7 +24,7 @@ val hmppsSqsVersion = "5.4.2"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.12.1"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "10.0.2"
+val nimbusJwtVersion = "10.2"
 val testContainersVersion = "1.20.6"
 val awsSdkVersion = "1.12.782"
 val buildDirectory: Directory = layout.buildDirectory.get()
@@ -40,7 +40,7 @@ allOpen {
 }
 
 jacoco {
-  toolVersion = "0.8.12"
+  toolVersion = "0.8.13"
 }
 
 configurations {
