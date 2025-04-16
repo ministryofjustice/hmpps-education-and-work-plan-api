@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.21.3'
+  version: '1.22.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2101,9 +2101,12 @@ components:
         note:
           type: string
           description: An optional note to accompany the archive
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
       required:
         - goalReference
         - reason
+        - prisonId
 
     CompleteGoalRequest:
       title: CompleteGoalRequest
@@ -2118,8 +2121,12 @@ components:
         note:
           type: string
           description: An optional note to accompany the completion
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
+
       required:
         - goalReference
+        - prisonId
 
     NoteResponse:
       title: NoteResponse
@@ -2174,8 +2181,11 @@ components:
           format: uuid
           description: The Goal's unique reference. This is used as an identifier to unarchive the required Goal.
           example: c88a6c48-97e2-4c04-93b5-98619966447b
+        prisonId:
+          $ref: '#/components/schemas/PrisonId'
       required:
         - goalReference
+        - prisonId
 
     GoalStatus:
       title: GoalStatus
