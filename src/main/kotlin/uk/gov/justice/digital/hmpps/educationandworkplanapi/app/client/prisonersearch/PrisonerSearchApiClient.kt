@@ -16,6 +16,19 @@ class PrisonerSearchApiClient(
   companion object {
     const val FIRST_PAGE = 0
     const val DEFAULT_PAGE_SIZE = 9999
+    val RESPONSE_FIELDS = listOf(
+      "prisonerNumber",
+      "legalStatus",
+      "releaseDate",
+      "prisonId",
+      "indeterminateSentence",
+      "recall",
+      "lastName",
+      "firstName",
+      "dateOfBirth",
+      "cellLocation",
+      "nonDtoReleaseDateType",
+    )
   }
 
   /**
@@ -30,6 +43,7 @@ class PrisonerSearchApiClient(
       it.path("/prisoner-search/prison/$prisonId")
         .queryParam("page", page)
         .queryParam("size", pageSize)
+        .queryParam("responseFields", RESPONSE_FIELDS)
         .build()
     }
     .headers {
