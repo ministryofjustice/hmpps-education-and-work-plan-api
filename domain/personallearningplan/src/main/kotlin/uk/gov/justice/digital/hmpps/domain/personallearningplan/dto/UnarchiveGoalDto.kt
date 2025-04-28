@@ -7,4 +7,5 @@ import java.util.*
  */
 data class UnarchiveGoalDto(
   val reference: UUID,
+  val prisonId: String,
 )

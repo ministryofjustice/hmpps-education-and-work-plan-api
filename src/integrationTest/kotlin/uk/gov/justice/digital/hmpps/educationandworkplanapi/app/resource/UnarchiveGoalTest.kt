@@ -126,6 +126,38 @@ class UnarchiveGoalTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return 204 and unarchive a goal and change the updated at prison to WMI `() {
+    // given
+    val prisonNumber = setUpRandomPrisoner()
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
+    val reasonOther = "Because it's Monday"
+    val archiveRequestWithOtherReason = aValidArchiveGoalRequest(
+      goalReference = goalReference,
+      reason = ReasonToArchiveGoal.OTHER,
+      reasonOther = "Other reason",
+    )
+    archiveAGoal(prisonNumber, goalReference, archiveRequestWithOtherReason)
+    val unarchiveGoalRequest = aValidUnarchiveGoalRequest(goalReference, prisonId = "WMI")
+    // when
+    unarchiveAGoal(prisonNumber, goalReference, unarchiveGoalRequest)
+      .expectStatus()
+      .isNoContent()
+
+    // then
+    assertThat(getActionPlan(prisonNumber))
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasStatus(GoalStatus.ACTIVE)
+          .hasArchiveReason(null)
+          .hasArchiveReasonOther(null)
+          .wasUpdatedAtPrison("WMI")
+          .wasCreatedAtPrison("BXI")
+      }
+  }
+
+  @Test
   fun `should return 204 and unarchive a goal and reset the reason and other text and archive note is deleted `() {
     // given
     val prisonNumber = setUpRandomPrisoner()
@@ -142,7 +174,11 @@ class UnarchiveGoalTest : IntegrationTestBase() {
 
     // check that the note is there:
 
-    val noteBefore = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+    val noteBefore = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+      goalReference,
+      EntityType.GOAL,
+      NoteType.GOAL_ARCHIVAL,
+    ).firstOrNull()
     assertThat(noteBefore!!.content).isEqualTo(archiveNote)
 
     val unarchiveGoalRequest = aValidUnarchiveGoalRequest(goalReference)
@@ -187,7 +223,11 @@ class UnarchiveGoalTest : IntegrationTestBase() {
     }
 
     // check that the note has been deleted
-    val noteAfter = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(goalReference, EntityType.GOAL, NoteType.GOAL_ARCHIVAL).firstOrNull()
+    val noteAfter = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
+      goalReference,
+      EntityType.GOAL,
+      NoteType.GOAL_ARCHIVAL,
+    ).firstOrNull()
     assertThat(noteAfter).isNull()
   }
 
