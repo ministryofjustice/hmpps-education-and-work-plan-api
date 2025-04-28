@@ -88,18 +88,25 @@ class JpaGoalPersistenceAdapter(
     GoalStatus.ARCHIVED,
     archiveGoalDto.reason,
     archiveGoalDto.reasonOther,
+    archiveGoalDto.prisonId,
   )
 
   override fun completeGoal(prisonNumber: String, completeGoalDto: CompleteGoalDto): Goal? = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, completeGoalDto.reference)?.let { goalEntity ->
     goalEntity.apply {
       status = GoalStatus.COMPLETED
+      updatedAtPrison = completeGoalDto.prisonId
     }
     goalEntity.steps.forEach { it.apply { it.status = StepStatus.COMPLETE } }
     val persistedEntity = goalRepository.saveAndFlush(goalEntity)
     goalMapper.fromEntityToDomain(persistedEntity)
   }
 
-  override fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal? = updateStatus(prisonNumber, unarchiveGoalDto.reference, GoalStatus.ACTIVE)
+  override fun unarchiveGoal(prisonNumber: String, unarchiveGoalDto: UnarchiveGoalDto): Goal? = updateStatus(
+    prisonNumber,
+    unarchiveGoalDto.reference,
+    GoalStatus.ACTIVE,
+    prisonId = unarchiveGoalDto.prisonId,
+  )
 
   private fun updateStatus(
     prisonNumber: String,
@@ -107,11 +114,13 @@ class JpaGoalPersistenceAdapter(
     goalStatus: GoalStatus,
     reason: ReasonToArchiveGoal? = null,
     reasonOther: String? = null,
+    prisonId: String,
   ): Goal? = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, goalReference)?.let { goalEntity ->
     goalEntity.apply {
       status = goalStatus
       archiveReason = reason?.let { goalMapper.archiveReasonFromDomainToEntity(it) }
       archiveReasonOther = reasonOther
+      updatedAtPrison = prisonId
     }
     val persistedEntity = goalRepository.saveAndFlush(goalEntity)
     goalMapper.fromEntityToDomain(persistedEntity)

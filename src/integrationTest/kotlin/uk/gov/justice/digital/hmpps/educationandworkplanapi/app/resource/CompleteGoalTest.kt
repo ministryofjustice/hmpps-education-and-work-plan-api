@@ -167,6 +167,35 @@ class CompleteGoalTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return 204 and complete a goal and change the updated at prison to WMI`() {
+    // given
+    val prisonNumber = setUpRandomPrisoner()
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
+    val noteText = "Completed the goal! "
+    val completeGoalRequest = aValidCompleteGoalRequest(
+      goalReference = goalReference,
+      note = noteText,
+      prisonId = "WMI",
+    )
+    // when
+    completeAGoal(prisonNumber, goalReference, completeGoalRequest)
+      .expectStatus()
+      .isNoContent()
+
+    // then
+    assertThat(getActionPlan(prisonNumber))
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasStatus(GoalStatus.COMPLETED)
+          .hasCompletedNote(noteText)
+          .wasUpdatedAtPrison("WMI")
+          .wasCreatedAtPrison("BXI")
+      }
+  }
+
+  @Test
   fun `should return 404 if the goal isn't found`() {
     // given
     val prisonNumber = randomValidPrisonNumber()

@@ -78,12 +78,13 @@ class GoalResourceMapper(
       reference = goalReference,
       reason = toReasonToArchiveGoal(reason),
       reasonOther = reasonOther,
+      prisonId = prisonId,
     )
   }
 
-  fun fromModelToDto(unarchiveGoalRequest: UnarchiveGoalRequest): UnarchiveGoalDto = UnarchiveGoalDto(reference = unarchiveGoalRequest.goalReference)
+  fun fromModelToDto(unarchiveGoalRequest: UnarchiveGoalRequest): UnarchiveGoalDto = UnarchiveGoalDto(reference = unarchiveGoalRequest.goalReference, prisonId = unarchiveGoalRequest.prisonId)
 
-  fun fromModelToDto(completeGoalRequest: CompleteGoalRequest): CompleteGoalDto = CompleteGoalDto(reference = completeGoalRequest.goalReference)
+  fun fromModelToDto(completeGoalRequest: CompleteGoalRequest): CompleteGoalDto = CompleteGoalDto(reference = completeGoalRequest.goalReference, prisonId = completeGoalRequest.prisonId)
 
   fun toGoalStatus(status: GoalStatusApi): GoalStatusDomain = when (status) {
     GoalStatusApi.ACTIVE -> GoalStatusDomain.ACTIVE

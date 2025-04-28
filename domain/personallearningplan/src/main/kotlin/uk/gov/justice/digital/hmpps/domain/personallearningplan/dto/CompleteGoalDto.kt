@@ -7,4 +7,5 @@ import java.util.*
  */
 data class CompleteGoalDto(
   val reference: UUID,
+  val prisonId: String,
 )

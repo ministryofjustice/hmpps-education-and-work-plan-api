@@ -180,6 +180,40 @@ class ArchiveGoalTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return 204 and archive a goal and change the updatedAtPrison to WMI`() {
+    // given
+    val prisonNumber = setUpRandomPrisoner()
+    val goalReference = createAnActionPlanAndGetTheGoalReference(prisonNumber)
+    val reasonOther = "Because it's Monday"
+    val noteText = "no longer relevant"
+    val archiveGoalRequest = aValidArchiveGoalRequest(
+      goalReference = goalReference,
+      ReasonToArchiveGoal.OTHER,
+      reasonOther,
+      note = noteText,
+      prisonId = "WMI",
+    )
+
+    // when
+    archiveAGoal(prisonNumber, goalReference, archiveGoalRequest)
+      .expectStatus()
+      .isNoContent()
+
+    // then
+    assertThat(getActionPlan(prisonNumber))
+      .isForPrisonNumber(prisonNumber)
+      .hasNumberOfGoals(1)
+      .goal(1) { goal ->
+        goal
+          .hasStatus(GoalStatus.ARCHIVED)
+          .hasArchiveReason(ReasonToArchiveGoal.OTHER)
+          .hasArchiveReasonOther(reasonOther)
+          .wasCreatedAtPrison("BXI")
+          .wasUpdatedAtPrison("WMI")
+      }
+  }
+
+  @Test
   fun `should return 404 if the goal isn't found`() {
     // given
     val prisonNumber = randomValidPrisonNumber()

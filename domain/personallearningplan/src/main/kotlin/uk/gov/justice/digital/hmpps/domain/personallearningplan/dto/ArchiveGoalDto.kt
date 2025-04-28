@@ -9,6 +9,7 @@ data class ArchiveGoalDto(
   val reference: UUID,
   val reason: ReasonToArchiveGoal,
   val reasonOther: String?,
+  val prisonId: String,
 )
 
 enum class ReasonToArchiveGoal {
