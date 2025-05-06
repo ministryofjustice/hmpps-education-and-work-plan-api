@@ -69,6 +69,10 @@ generic-service:
       HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_QUEUE_NAME: "sqs_queue_name"
     education-and-work-plan-domain-events-sqs-dl-instance-output:
       HMPPS_SQS_QUEUES_EDUCATIONANDWORKPLAN_DLQ_NAME: "sqs_queue_name"
+    education-and-work-plan-assessments-queue:
+      HMPPS_SQS_QUEUES_ASSESSMENTEVENTS_QUEUE_NAME: "sqs_queue_name"
+    education-and-work-plan-assessments-dlq:
+      HMPPS_SQS_QUEUES_ASSESSMENTEVENTS_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
     groups:
