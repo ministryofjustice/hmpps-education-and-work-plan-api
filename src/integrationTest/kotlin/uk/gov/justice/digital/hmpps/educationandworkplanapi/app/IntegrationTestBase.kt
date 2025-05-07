@@ -53,6 +53,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.TimelineRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher.HmppsDomainEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsAssessmentEventMessage
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsMessage
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.ACTIONPLANS_RW
@@ -197,6 +198,12 @@ abstract class IntegrationTestBase {
   val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
   val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
 
+  val assessmentEventQueue by lazy {
+    hmppsQueueService.findByQueueId("assessmentevents")
+      ?: throw MissingQueueException("HmppsQueue assessmentevents not found")
+  }
+  val assessmentEventQueueClient by lazy { assessmentEventQueue.sqsClient }
+
   val inductionScheduleEventQueue by lazy {
     hmppsQueueService.findByQueueId("inductionscheduleeventqueue")
       ?: throw MissingQueueException("HmppsQueue inductionscheduleeventqueue not found")
@@ -239,6 +246,8 @@ abstract class IntegrationTestBase {
     domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()
     domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
       .get()
+
+    assessmentEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(assessmentEventQueue.queueUrl).build()).get()
 
     testInductionScheduleEventQueueClient.purgeQueue(
       PurgeQueueRequest.builder().queueUrl(inductionScheduleEventQueue.queueUrl).build(),
@@ -666,6 +675,17 @@ abstract class IntegrationTestBase {
     message: SqsMessage,
     queueUrl: String = domainEventQueue.queueUrl,
   ): SendMessageResponse = domainEventQueueClient.sendMessage(
+    SendMessageRequest.builder()
+      .queueUrl(queueUrl)
+      .messageBody(
+        objectMapper.writeValueAsString(message),
+      ).build(),
+  ).get()
+
+  fun sendAssessmentEvent(
+    message: SqsAssessmentEventMessage,
+    queueUrl: String = assessmentEventQueue.queueUrl,
+  ): SendMessageResponse = assessmentEventQueueClient.sendMessage(
     SendMessageRequest.builder()
       .queueUrl(queueUrl)
       .messageBody(

@@ -12,7 +12,7 @@ private val log = KotlinLogging.logger {}
 class InboundAssessmentEventsListener {
 
   @SqsListener("assessmentevents", factory = "hmppsQueueContainerFactoryProxy")
-  internal fun onMessage(sqsMessage: SqsAssessmentEventMessage) {
-    log.debug { "Inbound sqs assessment event message: $sqsMessage" }
+  internal fun onMessage(sqsAssessmentEventMessage: SqsAssessmentEventMessage) {
+    log.debug { "Inbound sqs assessment event message: $sqsAssessmentEventMessage" }
   }
 }
