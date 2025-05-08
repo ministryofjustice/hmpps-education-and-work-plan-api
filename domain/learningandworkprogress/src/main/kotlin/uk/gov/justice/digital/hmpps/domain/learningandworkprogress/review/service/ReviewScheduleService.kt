@@ -127,7 +127,7 @@ class ReviewScheduleService(
       }
 
       else -> {
-        updateScheduledStatus(reviewSchedule, prisonId, prisonNumber)
+        updateScheduledStatus(reviewSchedule, prisonId)
       }
     }
   }
@@ -212,11 +212,7 @@ class ReviewScheduleService(
     )
   }
 
-  private fun updateScheduledStatus(
-    reviewSchedule: ReviewSchedule,
-    prisonId: String,
-    prisonNumber: String,
-  ) {
+  private fun updateScheduledStatus(reviewSchedule: ReviewSchedule, prisonId: String) {
     val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
     val updatedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
       UpdateReviewScheduleStatusDto(
@@ -300,11 +296,13 @@ class ReviewScheduleService(
 
       // Then update the review schedule to be SCHEDULED with an adjusted review date
       val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
+      val adjustedEarliestReviewDate = LocalDate.now()
       val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
         UpdateReviewScheduleStatusDto(
           reference = reference,
           scheduleStatus = ReviewScheduleStatus.SCHEDULED,
           prisonId = prisonTransferredTo,
+          earliestReviewDate = adjustedEarliestReviewDate,
           latestReviewDate = adjustedReviewDate,
           prisonNumber = prisonNumber,
         ),

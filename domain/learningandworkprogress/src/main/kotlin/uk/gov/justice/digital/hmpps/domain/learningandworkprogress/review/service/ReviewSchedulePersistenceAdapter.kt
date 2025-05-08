@@ -50,7 +50,7 @@ interface ReviewSchedulePersistenceAdapter {
   fun getReviewScheduleHistory(prisonNumber: String): List<ReviewScheduleHistory>
 
   /**
-   * Update the Review schedule status, prisonId and if present the latestReviewDate.
+   * Update the Review schedule status, prisonId and if present the earliestReviewDate and latestReviewDate.
    */
   fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule
 

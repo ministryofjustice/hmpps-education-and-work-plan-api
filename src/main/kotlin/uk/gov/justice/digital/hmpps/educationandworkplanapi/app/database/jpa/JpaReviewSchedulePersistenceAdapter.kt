@@ -72,12 +72,13 @@ class JpaReviewSchedulePersistenceAdapter(
     val reviewScheduleEntity = reviewScheduleRepository.findByReference(updateReviewScheduleStatusDto.reference)
       ?: throw ReviewScheduleNotFoundException(updateReviewScheduleStatusDto.prisonNumber)
 
-    // Update the schedule status and optionally the latest review date
+    // Update the schedule status and optionally the earliest and latest review dates
     reviewScheduleEntity.apply {
       scheduleStatus = reviewScheduleEntityMapper.toReviewScheduleStatus(updateReviewScheduleStatusDto.scheduleStatus)
       exemptionReason = updateReviewScheduleStatusDto.exemptionReason
-      updateReviewScheduleStatusDto.latestReviewDate?.let { latestReviewDate = it }
       updatedAtPrison = updateReviewScheduleStatusDto.prisonId
+      updateReviewScheduleStatusDto.earliestReviewDate?.let { earliestReviewDate = it }
+      updateReviewScheduleStatusDto.latestReviewDate?.let { latestReviewDate = it }
     }
 
     return reviewScheduleRepository.saveAndFlush(reviewScheduleEntity).let {

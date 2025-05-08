@@ -109,6 +109,10 @@ class ReviewScheduleDateCalculationService {
    * Review Schedule should not get an adjusted due date. This is to help prevent a Review being extended repeatedly to
    * prevent it becoming overdue by repeatedly exempting and clearing the exemption.
    *
+   * The exception to this is when the existing Review Schedule Status is EXEMPT_PRISONER_TRANSFER. In this case we
+   * need to return a new date of today + 10 days, regardless of the existing review date. This means that all
+   * prison transfers will get their plan reviewed within 10 days of entering the new prison.
+   *
    * Returns a [LocalDate] that can be used as an adjusted Review Due date, based on whether specified [ReviewSchedule]
    * has a status that is an "exclusion" or an "exemption", and whether the calculated date is later than the existing
    * due date.

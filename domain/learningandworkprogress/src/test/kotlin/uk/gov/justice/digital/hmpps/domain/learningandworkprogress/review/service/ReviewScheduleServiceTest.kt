@@ -308,13 +308,17 @@ class ReviewScheduleServiceTest {
         lastUpdatedAtPrison = newPrisonId,
       )
 
-      val expectedNewReviewScheduleDeadlineDate = TODAY.plusDays(5)
+      val expectedNewReviewScheduleEarliestDate = TODAY
+      val expectedNewReviewScheduleDeadlineDate = TODAY.plusDays(10)
       given(reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(any()))
         .willReturn(expectedNewReviewScheduleDeadlineDate)
 
       val secondUpdatedReviewSchedule = firstUpdatedReviewSchedule.copy(
         scheduleStatus = ReviewScheduleStatus.SCHEDULED,
-        reviewScheduleWindow = firstUpdatedReviewSchedule.reviewScheduleWindow.copy(dateTo = expectedNewReviewScheduleDeadlineDate),
+        reviewScheduleWindow = ReviewScheduleWindow(
+          dateFrom = expectedNewReviewScheduleEarliestDate,
+          dateTo = expectedNewReviewScheduleDeadlineDate,
+        ),
       )
       given(reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(any())).willReturn(
         firstUpdatedReviewSchedule,
@@ -344,6 +348,7 @@ class ReviewScheduleServiceTest {
       assertThat(updateReviewScheduleStatusDto.prisonNumber).isEqualTo(prisonNumber)
       assertThat(updateReviewScheduleStatusDto.prisonId).isEqualTo(newPrisonId)
       assertThat(updateReviewScheduleStatusDto.scheduleStatus).isEqualTo(ReviewScheduleStatus.SCHEDULED)
+      assertThat(updateReviewScheduleStatusDto.earliestReviewDate).isEqualTo(expectedNewReviewScheduleEarliestDate)
       assertThat(updateReviewScheduleStatusDto.latestReviewDate).isEqualTo(expectedNewReviewScheduleDeadlineDate)
 
       val updateReviewScheduleStatusCaptor = argumentCaptor<UpdatedReviewScheduleStatus>()

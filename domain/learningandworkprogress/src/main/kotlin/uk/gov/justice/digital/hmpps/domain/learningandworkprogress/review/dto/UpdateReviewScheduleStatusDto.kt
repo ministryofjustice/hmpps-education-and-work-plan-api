@@ -9,6 +9,7 @@ data class UpdateReviewScheduleStatusDto(
   val scheduleStatus: ReviewScheduleStatus,
   val exemptionReason: String? = null,
   val prisonId: String,
+  val earliestReviewDate: LocalDate? = null,
   val latestReviewDate: LocalDate? = null,
   val prisonNumber: String,
 )
