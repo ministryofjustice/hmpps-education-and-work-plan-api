@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionSummaryProjectionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import java.util.UUID
@@ -25,6 +26,7 @@ private val log = KotlinLogging.logger {}
 @Component
 class JpaInductionPersistenceAdapter(
   private val inductionRepository: InductionRepository,
+  private val inductionSummaryProjectionRepository: InductionSummaryProjectionRepository,
   private val inductionMapper: InductionEntityMapper,
   private val previousQualificationsRepository: PreviousQualificationsRepository,
   private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
@@ -86,7 +88,7 @@ class JpaInductionPersistenceAdapter(
   }
 
   @Transactional(readOnly = true)
-  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> = inductionRepository.findByPrisonNumberIn(prisonNumbers).let {
+  override fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary> = inductionSummaryProjectionRepository.findByPrisonNumberIn(prisonNumbers).let {
     inductionMapper.fromEntitySummariesToDomainSummaries(it)
   }
 
