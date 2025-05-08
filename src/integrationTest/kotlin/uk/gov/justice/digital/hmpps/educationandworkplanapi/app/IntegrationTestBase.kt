@@ -649,12 +649,14 @@ abstract class IntegrationTestBase {
     }
   }
 
-  fun updateReviewScheduleRecordLatestReviewDate(
+  fun updateReviewScheduleReviewDates(
     prisonNumber: String,
+    earliestReviewDate: LocalDate,
     latestReviewDate: LocalDate,
   ) {
     val reviewScheduleEntity = reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(prisonNumber, STATUSES_FOR_ACTIVE_REVIEWS)
     reviewScheduleEntity?.run {
+      this.earliestReviewDate = earliestReviewDate
       this.latestReviewDate = latestReviewDate
       reviewScheduleRepository.saveAndFlush(this)
     }
