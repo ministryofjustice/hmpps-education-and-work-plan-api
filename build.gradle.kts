@@ -6,8 +6,8 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
   id("org.openapi.generator") version "7.13.0"
-  kotlin("plugin.spring") version "2.1.20"
-  kotlin("plugin.jpa") version "2.1.20"
+  kotlin("plugin.spring") version "2.1.21"
+  kotlin("plugin.jpa") version "2.1.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "5.0.1"
@@ -19,14 +19,14 @@ apply(plugin = "org.openapi.generator")
 
 val postgresqlVersion = "42.7.5"
 val kotlinLoggingVersion = "3.0.5"
-val springdocOpenapiVersion = "2.8.6"
+val springdocOpenapiVersion = "2.8.8"
 val hmppsSqsVersion = "5.4.4"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.0"
 val jsonWebTokenVersion = "0.12.6"
-val nimbusJwtVersion = "10.2"
+val nimbusJwtVersion = "10.3"
 val testContainersVersion = "1.21.0"
-val awsSdkVersion = "1.12.782"
+val awsSdkVersion = "1.12.783"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 ext["jackson-bom.version"] = "2.18.1"
