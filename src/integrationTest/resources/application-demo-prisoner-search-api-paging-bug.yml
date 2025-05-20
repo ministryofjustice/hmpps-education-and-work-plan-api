@@ -1,0 +1,86 @@
+prisoner-search-api:
+  client:
+    id: < prisoner-search-api-id >
+    secret: < prisoner-search-api-secret >
+
+hmpps:
+  auth:
+    url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+
+apis:
+  prisoner-search-api:
+    url: https://prisoner-search-dev.prison.service.justice.gov.uk
+  prison-api:
+    url: http://localhost:9093
+  manage-users-api:
+    url: http://localhost:9093
+
+
+
+
+server:
+  shutdown: immediate
+
+management.endpoint:
+  health.cache.time-to-live: 0
+  info.cache.time-to-live: 0
+
+spring:
+  jpa:
+    show-sql: true
+  datasource:
+    url: 'jdbc:postgresql://${DB_SERVER}/${DB_NAME}?sslmode=disable'
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:local-public-key.pub
+
+hmpps.sqs:
+  enabled: true
+  provider: localstack
+  queues:
+    educationandworkplan:
+      queueName: education-and-work-plan-queue
+      subscribeFilter: "{\"eventType\":[\"prison-offender-events.prisoner.received\", \"prison-offender-events.prisoner.released\"]}"
+      dlqName: education-and-work-plan-dead-letter-queue
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
+    inductionscheduleeventqueue:
+      queueName: induction-schedule-event-queue
+      subscribeFilter: "{\"eventType\":[\"plp.induction-schedule.updated\"]}"
+      dlqName: test-induction-event-queue-dlq
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
+    reviewscheduleeventqueue:
+      queueName: review-schedule-event-queue
+      subscribeFilter: "{\"eventType\":[\"plp.review-schedule.updated\"]}"
+      dlqName: test-review-event-queue-dlq
+      subscribeTopicId: domainevents
+      dlqMaxReceiveCount: 1
+      visibilityTimeout: 1
+    domaineventsqueue:
+      queueName: domainevents-queue
+      subscribeTopicId: domainevents
+  topics:
+    domainevents:
+      arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
+
+prison-api:
+  client:
+    id: prison-api-client-id
+    secret: client-secret
+
+manage-users-api:
+  client:
+    id: manage-users-api-client-id
+    secret: client-secret
+
+
+ciag-kpi-processing-rule: PEF
+
+
+service.base-url: http://localhost:8080
