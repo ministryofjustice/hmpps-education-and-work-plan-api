@@ -4,7 +4,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.2.0"
   id("org.openapi.generator") version "7.13.0"
   kotlin("plugin.spring") version "2.1.21"
   kotlin("plugin.jpa") version "2.1.21"
@@ -20,7 +20,7 @@ apply(plugin = "org.openapi.generator")
 val postgresqlVersion = "42.7.5"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.8.8"
-val hmppsSqsVersion = "5.4.4"
+val hmppsSqsVersion = "5.4.5"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.0"
 val jsonWebTokenVersion = "0.12.6"
@@ -52,7 +52,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.3")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.5")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
