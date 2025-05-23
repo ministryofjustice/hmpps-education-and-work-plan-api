@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLET
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLETED_REVIEW_NOTES
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 
 private val log = KotlinLogging.logger {}
 
@@ -26,12 +27,14 @@ class AsyncReviewEventService(
   private val timelineService: TimelineService,
   private val telemetryService: TelemetryService,
   private val userService: ManageUserService,
+  private val eventPublisher: EventPublisher,
 ) : ReviewEventService {
 
   override fun reviewCompleted(completedReview: CompletedReview) {
     log.debug { "Review completed event for prisoner [${completedReview.prisonNumber}]" }
     timelineService.recordTimelineEvent(completedReview.prisonNumber, buildReviewCompletedEvent(completedReview))
     telemetryService.trackReviewCompleted(completedReview = completedReview)
+    eventPublisher.createAndPublishReviewScheduleEvent(completedReview.prisonNumber)
   }
 
   private fun buildReviewCompletedEvent(completedReview: CompletedReview): TimelineEvent = with(completedReview) {
