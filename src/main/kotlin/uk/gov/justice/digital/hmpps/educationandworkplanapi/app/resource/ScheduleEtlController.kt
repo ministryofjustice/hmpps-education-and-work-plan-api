@@ -68,11 +68,22 @@ class ScheduleEtlController(
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_REVIEWS)
   @Transactional
-  fun generateMessages(
+  fun generateReviewMessages(
     @RequestBody prisonNumbersRequest: PrisonNumbersRequest,
   ) {
     val reviewPrisonNumbers = prisonNumbersRequest.prisonNumbers.distinct()
     reviewPrisonNumbers.forEach(eventPublisher::createAndPublishReviewScheduleEvent)
+  }
+
+  @PostMapping("/action-plans/schedules/publish-induction-messages")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @Transactional
+  fun generateInductionMessages(
+    @RequestBody prisonNumbersRequest: PrisonNumbersRequest,
+  ) {
+    val inductionPrisonNumbers = prisonNumbersRequest.prisonNumbers.distinct()
+    inductionPrisonNumbers.forEach(eventPublisher::createAndPublishInductionEvent)
   }
 
   private fun prisonersWithAnySchedule(prisoners: List<Prisoner>): List<String> {
