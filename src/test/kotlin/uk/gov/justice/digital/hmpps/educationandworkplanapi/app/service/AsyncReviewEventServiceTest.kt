@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.COMPLET
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.manageusers.UserDetailsDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 
 @ExtendWith(MockitoExtension::class)
 class AsyncReviewEventServiceTest {
@@ -41,6 +42,9 @@ class AsyncReviewEventServiceTest {
 
   @Mock
   private lateinit var userService: ManageUserService
+
+  @Mock
+  private lateinit var eventPublisher: EventPublisher
 
   @Captor
   private lateinit var timelineEventCaptor: ArgumentCaptor<TimelineEvent>
@@ -85,6 +89,7 @@ class AsyncReviewEventServiceTest {
     // Then
     verify(timelineService).recordTimelineEvent(eq(prisonNumber), capture(timelineEventCaptor))
     verify(telemetryService).trackReviewCompleted(completedReview)
+    verify(eventPublisher).createAndPublishReviewScheduleEvent(completedReview.prisonNumber)
     verify(userService).getUserDetails("asmith_gen")
 
     assertThat(timelineEventCaptor.value).usingRecursiveComparison().ignoringFields(*IGNORED_FIELDS).isEqualTo(expectedTimelineEvent)
