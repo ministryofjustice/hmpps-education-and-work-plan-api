@@ -39,7 +39,10 @@ class InboundEventsService(
       }
       PRISONER_MERGED -> {
         val additionalInformation = eventAdditionalInformation<PrisonerMergedAdditionalInformation>(inboundEvent)
+        log.info { "A prisoner has been merged from ${additionalInformation.removedNomsNumber} to ${additionalInformation.nomsNumber}" }
         prisonerMergedEventService.process(inboundEvent, additionalInformation)
+        log.info { "Processing the merged to nomis number [${additionalInformation.nomsNumber}] as a new admission." }
+        prisonerReceivedIntoPrisonEventService.processPrisonerAdmissionEvent(additionalInformation.nomsNumber, this.occurredAt)
       }
     }
   }

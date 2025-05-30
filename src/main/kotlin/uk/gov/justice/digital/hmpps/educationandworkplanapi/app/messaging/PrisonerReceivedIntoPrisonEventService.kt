@@ -44,7 +44,7 @@ class PrisonerReceivedIntoPrisonEventService(
     treatAsTransfer: Boolean = false,
   ) = with(additionalInformation) {
     when (reason) {
-      ADMISSION -> processPrisonerAdmissionEvent(inboundEvent.occurredAt, dataCorrection, treatAsTransfer)
+      ADMISSION -> processPrisonerAdmissionEvent(nomsNumber, inboundEvent.occurredAt, dataCorrection, treatAsTransfer)
 
       TRANSFERRED -> processPrisonerTransferEvent()
 
@@ -53,10 +53,11 @@ class PrisonerReceivedIntoPrisonEventService(
     }
   }
 
-  private fun PrisonerReceivedAdditionalInformation.processPrisonerAdmissionEvent(
+  public fun processPrisonerAdmissionEvent(
+    nomsNumber: String,
     eventOccurredAt: Instant,
-    dataCorrection: Boolean,
-    treatAsTransfer: Boolean,
+    dataCorrection: Boolean = false,
+    treatAsTransfer: Boolean = false,
   ) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
 
