@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilAsserted
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -51,6 +53,14 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
       .latestReviewSchedule {
         it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_MERGE)
       }
+
+    // assert that the other prison number is processed as a new admission
+    val rootNode = objectMapper.readTree(sqsMessage.Message)
+    val newNomisNumber = rootNode["additionalInformation"]["nomsNumber"].asText()
+
+    assertThat(
+      inductionScheduleRepository.findByPrisonNumber(newNomisNumber)!!.scheduleStatus == SCHEDULED,
+    )
   }
 
   @Test
