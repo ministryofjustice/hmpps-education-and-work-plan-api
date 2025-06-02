@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
+import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -20,12 +21,14 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.Crea
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
@@ -36,6 +39,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Unarc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import java.util.UUID
 
+private val log = KotlinLogging.logger {}
+
 @RestController
 @Validated
 @RequestMapping(value = ["/action-plans/{prisonNumber}/goals"], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -43,6 +48,7 @@ class GoalController(
   private val goalService: GoalService,
   private val goalResourceMapper: GoalResourceMapper,
   private val noteService: NoteService,
+  private val scheduleAdapter: ScheduleAdapter,
 ) {
 
   @PostMapping
@@ -57,6 +63,11 @@ class GoalController(
       prisonNumber = prisonNumber,
       createGoalDtos = request.goals.map { goalResourceMapper.fromModelToDto(it) },
     )
+    try {
+      scheduleAdapter.completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber)
+    } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
+      log.warn { "Exception thrown when completing induction or creating review schedule: ${e.message}" }
+    }
   }
 
   @GetMapping("{goalReference}")

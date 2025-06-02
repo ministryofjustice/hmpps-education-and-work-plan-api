@@ -39,6 +39,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -65,6 +66,9 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
   @Mock
   private lateinit var actionPlanService: ActionPlanService
+
+  @Mock
+  private lateinit var scheduleAdapter: ScheduleAdapter
 
   private val objectMapper = ObjectMapper()
 
@@ -101,6 +105,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       releaseDate = prisoner.releaseDate,
     )
     verifyNoInteractions(reviewScheduleService)
+    verifyNoInteractions(scheduleAdapter)
   }
 
   @Test

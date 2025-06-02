@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -36,6 +38,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
   private val inductionService: InductionService,
   private val actionPlanService: ActionPlanService,
+  private val scheduleAdapter: ScheduleAdapter,
 ) {
   fun process(
     inboundEvent: InboundEvent,
@@ -53,7 +56,7 @@ class PrisonerReceivedIntoPrisonEventService(
     }
   }
 
-  public fun processPrisonerAdmissionEvent(
+  fun processPrisonerAdmissionEvent(
     nomsNumber: String,
     eventOccurredAt: Instant,
     dataCorrection: Boolean = false,
@@ -121,6 +124,18 @@ class PrisonerReceivedIntoPrisonEventService(
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerTransferEvent() {
     log.info { "Processing Prisoner Transfer Event for prisoner [$nomsNumber] at prison [$prisonId]" }
+
+    /**
+     * It is possible that we can receive a transfer message without receiving a prisoner ADMISSION event.
+     * if this happens and the person had an induction completed from a previous prison stay then they will not
+     * have a review/induction schedule created and the prisoner will be stuck and require manual intervention
+     * This block is belt and braces to ensure that the prisoner has the correct schedules set up.
+     **/
+    try {
+      scheduleAdapter.completeInductionScheduleAndCreateInitialReviewSchedule(nomsNumber)
+    } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
+      log.warn { "Exception thrown when completing induction or creating review schedule: ${e.message}" }
+    }
 
     handle(
       scheduleType = REVIEW_SCHEDULE,
