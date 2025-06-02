@@ -22,10 +22,13 @@ class ScheduleAdapter(
 ) {
 
   fun completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber: String) {
+    log.info { "Attempting to complete induction or create review schedule for $prisonNumber" }
     // validate
+    val actionPlan = actionPlanPersistenceAdapter.getActionPlan(prisonNumber)
     if (
       inductionPersistenceAdapter.getInduction(prisonNumber) != null &&
-      actionPlanPersistenceAdapter.getActionPlan(prisonNumber) != null
+      actionPlan != null &&
+      actionPlan.goals.isNotEmpty()
     ) {
       // COMPLETE the induction schedule IF it is not already completed.
       val inductionSchedule = runCatching {
@@ -39,14 +42,19 @@ class ScheduleAdapter(
         )
       }
 
-      // Create initial review schedule
-      val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
-      val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
-        prisoner = prisoner,
-        isReadmission = false,
-        isTransfer = false,
-      )
-      reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
+      val activeReviewSchedule =
+        runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber) }.getOrNull()
+
+      if (activeReviewSchedule == null) {
+        // Create initial review schedule
+        val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
+        val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
+          prisoner = prisoner,
+          isReadmission = false,
+          isTransfer = false,
+        )
+        reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
+      }
     }
   }
 }
