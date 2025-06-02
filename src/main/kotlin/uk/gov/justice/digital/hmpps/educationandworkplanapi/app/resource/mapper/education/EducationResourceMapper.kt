@@ -103,6 +103,7 @@ class EducationResourceMapper(
 
   private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelApi = when (educationLevel) {
     EducationLevelDomain.NOT_SURE -> EducationLevelApi.NOT_SURE
+    EducationLevelDomain.NO_FORMAL_EDUCATION -> EducationLevelApi.NO_FORMAL_EDUCATION
     EducationLevelDomain.PRIMARY_SCHOOL -> EducationLevelApi.PRIMARY_SCHOOL
     EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
     EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS
@@ -113,6 +114,7 @@ class EducationResourceMapper(
 
   private fun toEducationLevel(educationLevel: EducationLevelApi): EducationLevelDomain = when (educationLevel) {
     EducationLevelApi.NOT_SURE -> EducationLevelDomain.NOT_SURE
+    EducationLevelApi.NO_FORMAL_EDUCATION -> EducationLevelDomain.NO_FORMAL_EDUCATION
     EducationLevelApi.PRIMARY_SCHOOL -> EducationLevelDomain.PRIMARY_SCHOOL
     EducationLevelApi.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
     EducationLevelApi.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS

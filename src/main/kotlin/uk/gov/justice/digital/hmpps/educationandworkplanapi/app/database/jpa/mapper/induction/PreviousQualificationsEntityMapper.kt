@@ -189,6 +189,7 @@ private fun toQualificationLevel(qualificationLevel: QualificationLevelDomain): 
 
 private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLevelEntity = when (educationLevel) {
   EducationLevelDomain.NOT_SURE -> EducationLevelEntity.NOT_SURE
+  EducationLevelDomain.NO_FORMAL_EDUCATION -> EducationLevelEntity.NO_FORMAL_EDUCATION
   EducationLevelDomain.PRIMARY_SCHOOL -> EducationLevelEntity.PRIMARY_SCHOOL
   EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
   EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS
@@ -199,6 +200,7 @@ private fun toEducationLevel(educationLevel: EducationLevelDomain): EducationLev
 
 private fun toEducationLevel(educationLevel: EducationLevelEntity): EducationLevelDomain = when (educationLevel) {
   EducationLevelEntity.NOT_SURE -> EducationLevelDomain.NOT_SURE
+  EducationLevelEntity.NO_FORMAL_EDUCATION -> EducationLevelDomain.NO_FORMAL_EDUCATION
   EducationLevelEntity.PRIMARY_SCHOOL -> EducationLevelDomain.PRIMARY_SCHOOL
   EducationLevelEntity.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_LEFT_BEFORE_TAKING_EXAMS
   EducationLevelEntity.SECONDARY_SCHOOL_TOOK_EXAMS -> EducationLevelDomain.SECONDARY_SCHOOL_TOOK_EXAMS

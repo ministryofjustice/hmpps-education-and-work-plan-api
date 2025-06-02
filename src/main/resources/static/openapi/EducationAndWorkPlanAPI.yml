@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.22.0'
+  version: '1.23.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2407,6 +2407,7 @@ components:
         - FURTHER_EDUCATION_COLLEGE
         - UNDERGRADUATE_DEGREE_AT_UNIVERSITY
         - POSTGRADUATE_DEGREE_AT_UNIVERSITY
+        - NO_FORMAL_EDUCATION
         - NOT_SURE
 
     TrainingType:
