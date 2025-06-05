@@ -8,14 +8,11 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
-import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
 import java.time.OffsetDateTime
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.HopingToWork as HopingToWorkDomain
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork as HopingToWorkApi
 
 @ExtendWith(MockitoExtension::class)
@@ -32,15 +29,9 @@ class CiagInductionResponseMapperTest {
     // Given
     val summary1 = aValidInductionSummary(
       prisonNumber = randomValidPrisonNumber(),
-      workOnRelease = aValidWorkOnRelease(
-        hopingToWork = HopingToWorkDomain.YES,
-      ),
     )
     val summary2 = aValidInductionSummary(
       prisonNumber = randomValidPrisonNumber(),
-      workOnRelease = aValidWorkOnRelease(
-        hopingToWork = HopingToWorkDomain.NO,
-      ),
     )
 
     val now = OffsetDateTime.now()
@@ -49,8 +40,8 @@ class CiagInductionResponseMapperTest {
     val expected = listOf(
       aValidCiagInductionSummaryResponse(
         offenderId = summary1.prisonNumber,
-        hopingToGetWork = HopingToWorkApi.YES,
-        desireToWork = true,
+        hopingToGetWork = HopingToWorkApi.NO,
+        desireToWork = false,
         createdBy = summary1.createdBy,
         createdDateTime = now,
         modifiedBy = summary1.lastUpdatedBy,
@@ -73,9 +64,5 @@ class CiagInductionResponseMapperTest {
     // Then
     assertThat(actual).hasSize(2)
     assertThat(actual).isEqualTo(expected)
-    verify(instantMapper).toOffsetDateTime(summary1.createdAt)
-    verify(instantMapper).toOffsetDateTime(summary1.workOnRelease.lastUpdatedAt)
-    verify(instantMapper).toOffsetDateTime(summary2.createdAt)
-    verify(instantMapper).toOffsetDateTime(summary2.workOnRelease.lastUpdatedAt)
   }
 }

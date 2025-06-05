@@ -10,7 +10,6 @@ import java.util.UUID
 data class InductionSummary(
   val reference: UUID,
   val prisonNumber: String,
-  val workOnRelease: WorkOnRelease,
   val createdBy: String,
   val createdAt: Instant,
   val lastUpdatedBy: String,

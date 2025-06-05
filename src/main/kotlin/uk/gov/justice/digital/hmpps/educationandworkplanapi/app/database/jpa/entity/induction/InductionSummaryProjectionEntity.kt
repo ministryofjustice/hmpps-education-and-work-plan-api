@@ -1,13 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction
 
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.Immutable
@@ -32,10 +28,6 @@ data class InductionSummaryProjectionEntity(
 
   @Column(updatable = false)
   val prisonNumber: String,
-
-  @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "work_on_release_id")
-  val workOnRelease: WorkOnReleaseEntity,
 
   @Column(updatable = false)
   val conductedBy: String? = null,

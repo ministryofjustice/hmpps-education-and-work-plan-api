@@ -246,15 +246,10 @@ class InductionEntityMapperTest {
     val summaryProjection1 = aValidInductionSummaryProjection(prisonNumber = randomValidPrisonNumber())
     val summaryProjection2 = aValidInductionSummaryProjection(prisonNumber = randomValidPrisonNumber())
 
-    val workOnRelease1 = aValidWorkOnRelease()
-    val workOnRelease2 = aValidWorkOnRelease()
-    given(workOnReleaseEntityMapper.fromEntityToDomain(any())).willReturn(workOnRelease1, workOnRelease2)
-
     val expected = listOf(
       aValidInductionSummary(
         prisonNumber = summaryProjection1.prisonNumber,
         reference = summaryProjection1.reference,
-        workOnRelease = workOnRelease1,
         createdBy = summaryProjection1.createdBy,
         createdAt = summaryProjection1.createdAt,
         lastUpdatedBy = summaryProjection1.updatedBy,
@@ -263,7 +258,6 @@ class InductionEntityMapperTest {
       aValidInductionSummary(
         prisonNumber = summaryProjection2.prisonNumber,
         reference = summaryProjection2.reference,
-        workOnRelease = workOnRelease2,
         createdBy = summaryProjection2.createdBy,
         createdAt = summaryProjection2.createdAt,
         lastUpdatedBy = summaryProjection2.updatedBy,
@@ -277,7 +271,5 @@ class InductionEntityMapperTest {
     // Then
     assertThat(actual).hasSize(2)
     assertThat(actual).isEqualTo(expected)
-    verify(workOnReleaseEntityMapper).fromEntityToDomain(summaryProjection1.workOnRelease)
-    verify(workOnReleaseEntityMapper).fromEntityToDomain(summaryProjection2.workOnRelease)
   }
 }
