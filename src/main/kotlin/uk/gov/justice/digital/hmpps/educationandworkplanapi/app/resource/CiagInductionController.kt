@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.ciag.CiagInductionResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryListResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetCiagInductionSummariesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork
+import java.time.OffsetDateTime
 
 @RestController
 @RequestMapping(value = ["/ciag/induction"], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -28,5 +31,17 @@ class CiagInductionController(
     @Valid
     @RequestBody
     request: GetCiagInductionSummariesRequest,
-  ): CiagInductionSummaryListResponse = CiagInductionSummaryListResponse(listOf())
+  ): CiagInductionSummaryListResponse = CiagInductionSummaryListResponse(
+    request.offenderIds.map {
+      CiagInductionSummaryResponse(
+        it,
+        false,
+        HopingToWork.NO,
+        "",
+        OffsetDateTime.now(),
+        "",
+        OffsetDateTime.now(),
+      )
+    },
+  )
 }
