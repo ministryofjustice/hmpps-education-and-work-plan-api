@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.NO
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.YES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
@@ -100,8 +99,8 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
         ),
         aValidCiagInductionSummaryResponse(
           offenderId = prisonNumber2,
-          desireToWork = true,
-          hopingToGetWork = YES,
+          desireToWork = false,
+          hopingToGetWork = NO,
           createdBy = "auser_gen",
           modifiedBy = "auser_gen",
         ),

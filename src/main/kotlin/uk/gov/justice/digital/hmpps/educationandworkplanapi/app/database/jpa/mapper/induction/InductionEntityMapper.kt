@@ -84,7 +84,6 @@ class InductionEntityMapper(
     InductionSummary(
       reference = it.reference,
       prisonNumber = it.prisonNumber,
-      workOnRelease = workOnReleaseEntityMapper.fromEntityToDomain(it.workOnRelease),
       createdBy = it.createdBy,
       createdAt = it.createdAt,
       lastUpdatedBy = it.updatedBy,
