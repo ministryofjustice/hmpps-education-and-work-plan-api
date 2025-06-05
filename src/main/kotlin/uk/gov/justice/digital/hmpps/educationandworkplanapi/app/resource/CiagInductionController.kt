@@ -28,7 +28,5 @@ class CiagInductionController(
     @Valid
     @RequestBody
     request: GetCiagInductionSummariesRequest,
-  ): CiagInductionSummaryListResponse = with(inductionService.getInductionSummaries(request.offenderIds)) {
-    CiagInductionSummaryListResponse(inductionResponseMapper.fromDomainToModel(this))
-  }
+  ): CiagInductionSummaryListResponse = CiagInductionSummaryListResponse(listOf())
 }

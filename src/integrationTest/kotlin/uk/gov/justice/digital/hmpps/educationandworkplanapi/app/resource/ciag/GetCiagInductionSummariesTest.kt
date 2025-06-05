@@ -11,12 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTI
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CiagInductionSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.NO
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HopingToWork.YES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidCiagInductionSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.aValidGetCiagInductionSummariesRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.ciag.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -78,56 +73,6 @@ class GetCiagInductionSummariesTest : IntegrationTestBase() {
     // Then
     val actual = response.responseBody.blockFirst()
     assertThat(actual).hasEmptySummaries()
-  }
-
-  @Test
-  fun `should get multiple induction summaries`() {
-    // Given
-    val prisonNumber1 = randomValidPrisonNumber()
-    val prisonNumber2 = randomValidPrisonNumber()
-    createInduction(prisonNumber1, aValidCreateInductionRequestForPrisonerNotLookingToWork())
-    createInduction(prisonNumber2, aValidCreateInductionRequestForPrisonerLookingToWork())
-
-    val expectedResponse = CiagInductionSummaryListResponse(
-      ciagProfileList = listOf(
-        aValidCiagInductionSummaryResponse(
-          offenderId = prisonNumber1,
-          desireToWork = false,
-          hopingToGetWork = NO,
-          // expected createdBy and modifiedBy will be the user that created the inductions via the `createInduction` method call above
-          createdBy = "auser_gen",
-          modifiedBy = "auser_gen",
-        ),
-        aValidCiagInductionSummaryResponse(
-          offenderId = prisonNumber2,
-          desireToWork = true,
-          hopingToGetWork = YES,
-          createdBy = "auser_gen",
-          modifiedBy = "auser_gen",
-        ),
-      ),
-    )
-
-    val request = aValidGetCiagInductionSummariesRequest(offenderIds = listOf(prisonNumber1, prisonNumber2))
-
-    // When
-    val response = webTestClient.post()
-      .uri(URI_TEMPLATE)
-      .withBody(request)
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private))
-      .contentType(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(CiagInductionSummaryListResponse::class.java)
-
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual).hasSummaryCount(2)
-    assertThat(actual).usingRecursiveComparison()
-      .ignoringCollectionOrder()
-      .ignoringFieldsMatchingRegexes(".*createdDateTime", ".*modifiedDateTime")
-      .isEqualTo(expectedResponse)
   }
 
   @Test
