@@ -15,6 +15,8 @@ fun aValidPrisoner(
   cellLocation: String = "B-2-022",
   dateOfBirth: LocalDate = LocalDate.now().minusYears(20),
   releaseType: String = "ARD",
+  receptionDate: LocalDate = LocalDate.now().minusYears(1),
+  sentenceStartDate: LocalDate = LocalDate.now().minusYears(1),
 ): Prisoner = Prisoner(
   prisonerNumber = prisonerNumber,
   legalStatus = legalStatus,
@@ -27,4 +29,6 @@ fun aValidPrisoner(
   cellLocation = cellLocation,
   dateOfBirth = dateOfBirth,
   releaseType = releaseType,
+  receptionDate = receptionDate,
+  sentenceStartDate = sentenceStartDate,
 )
