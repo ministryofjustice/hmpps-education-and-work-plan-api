@@ -17,9 +17,12 @@ class AssessmentService(
     log.info { "Checking eligibility of basic skills assessment for prisoner [$prisonNumber]" }
 
     return prisonerSearchApiService.getPrisoner(prisonNumber).let {
+      val receptionDate = it.receptionDate ?: throw MissingReceptionDateException(prisonNumber)
+      val sentenceStartDate = it.sentenceStartDate ?: throw MissingSentenceStartDateException(prisonNumber)
+
       when {
-        (it.receptionDate ?: throw MissingReceptionDateException(prisonNumber)).isBefore(pes.contractStartDate) -> false
-        (it.sentenceStartDate ?: throw MissingSentenceStartDateException(prisonNumber)).isBefore(pes.contractStartDate) -> false
+        receptionDate.isBefore(pes.contractStartDate) -> false
+        sentenceStartDate.isBefore(pes.contractStartDate) -> false
 
         else -> true
       }
