@@ -39,6 +39,8 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingReceptionDateException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
@@ -110,6 +112,11 @@ class GlobalExceptionHandler(
         userMessage = e.message,
       ),
     )
+
+  @ExceptionHandler(value = [MissingReceptionDateException::class, MissingSentenceStartDateException::class])
+  protected fun handleMissingDateException(e: RuntimeException, request: WebRequest) = ResponseEntity
+    .status(BAD_REQUEST)
+    .body(ErrorResponse(status = BAD_REQUEST.value(), userMessage = e.message))
 
   /**
    * Exception handler to return a 403 Forbidden ErrorResponse for a prohibited action (e.g. a business rule violation).

@@ -82,3 +82,6 @@ ciag-kpi-processing-rule: PEF
 
 
 service.base-url: http://localhost:8080
+
+pes:
+  contract-start-date: 2025-10-01
