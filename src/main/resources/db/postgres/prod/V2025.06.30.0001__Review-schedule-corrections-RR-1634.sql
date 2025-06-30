@@ -10,10 +10,10 @@ delete from review_schedule where reference = '25441500-45e8-4a6c-8baa-1330ee139
 delete from review_schedule_history where reference = '25441500-45e8-4a6c-8baa-1330ee13981d';
 
 --A1320AR
-delete from review_schedule where reference in ('82b86d51-a264-4638-ba4f-c036589aad48'
+delete from review_schedule where reference in ('82b86d51-a264-4638-ba4f-c036589aad48',
                                                 'df71e610-38f7-47a5-b632-6fba08a71220',
                                                 '3c99e5ca-5c00-425b-a7d1-3015c1f734c9');
-delete from review_schedule_history where reference in ('82b86d51-a264-4638-ba4f-c036589aad48'
+delete from review_schedule_history where reference in ('82b86d51-a264-4638-ba4f-c036589aad48',
                                                     'df71e610-38f7-47a5-b632-6fba08a71220',
                                                      '3c99e5ca-5c00-425b-a7d1-3015c1f734c9');
 
