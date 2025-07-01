@@ -30,4 +30,4 @@ generic-data-analytics-extractor:
   cronJobSchedule: '00 7 * * 1-5' # Start at 7am UTC Monday-Friday to allow for the fact that we terminate the resources (inc. RDS) overnight and all weekend in the preprod env (see scheduledDowntime above)
 
 queueHousekeeping:
-  cronJobSchedule: "*/10 07-21 * * 1-5" # Every 10 minutes between 7am and 9pm UTC Monday-Friday to allow for the fact that we terminate the resources overnight and all weekend in the preprod env (see scheduledDowntime above)
+  cronJobSchedule: "*/10 07-20 * * 1-5" # Every 10 minutes between 7am and 8:59pm UTC Monday-Friday to allow for the fact that we terminate the resources overnight and all weekend in the preprod env (see scheduledDowntime above)
