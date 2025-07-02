@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Education and Work Plan API
-  version: '1.23.0'
+  version: '1.24.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -853,6 +853,43 @@ paths:
         '400':
           $ref: '#/components/responses/400ErrorResponse'
 
+  #
+  # Assessments
+  # -------------------------------------------------------------------------------
+  /assessments/{prisonNumber}/required:
+    get:
+      summary: Returns education assessments' eligibility of a prisoner
+      description: |
+        Returns eligibility to education assessment of a prisoner
+        
+        **Role Requirements**: Access to this endpoint requires one of the following roles:
+        * `ROLE_EDUCATION_AND_WORK_PLAN__ASSESSMENTS__RO` (Read-Only)
+      tags:
+        - Assessments
+      parameters:
+        - $ref: "#/components/parameters/prisonNumberPathParameter"
+      responses:
+        '200':
+          $ref: "#/components/responses/AssessmentRequiredResponse"
+        '400':
+          description: The failure status is set when the request is invalid. An error response will be provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingReceptionDate:
+                  summary: Reception date is missing
+                  value:
+                    status: 400
+                    userMessage: "Reception date for Prisoner [A1234BC] is missing."
+                missingSentenceStartDate:
+                  summary: Sentence start date is missing
+                  value:
+                    status: 400
+                    userMessage: "Sentence start date for Prisoner [A1234BC] is missing."
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
 
 #
 # --------------------------------------------------------------------------------
@@ -3507,6 +3544,13 @@ components:
         - EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE
         - COMPLETED
 
+    EducationAssessmentRequired:
+      title: EducationAssessmentRequired
+      description: Eligibility of education assessment
+      properties:
+        basicSkillsAssessmentRequired:
+          type: boolean
+
   #
   # Response Body Definitions
   # --------------------------------------------------------------------------------
@@ -3842,6 +3886,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/PersonSearchResult'
+
+    AssessmentRequiredResponse:
+      description: Return an indicator whether the assessment is required or not.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EducationAssessmentRequired'
+          examples:
+            assessmentRequired:
+              summary: assessment is required
+              value:
+                basicSkillsAssessmentRequired: true
+            assessmentNotRequired:
+              summary: assessment is NOT required
+              value:
+                basicSkillsAssessmentRequired: false
 
   #
   # Request Body Definitions

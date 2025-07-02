@@ -23,6 +23,8 @@ data class Prisoner(
   val cellLocation: String?,
   @field:JsonProperty(value = "nonDtoReleaseDateType")
   val releaseType: String?, // TODO this needs to be checked
+  val receptionDate: LocalDate?,
+  val sentenceStartDate: LocalDate?,
 )
 
 enum class LegalStatus {

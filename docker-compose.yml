@@ -27,6 +27,7 @@ services:
       - CIAG_KPI_PROCESSING_RULE=PEF
       - PRISONER_SEARCH_API_URL=https://prisoner-search-dev.prison.service.justice.gov.uk
       - SERVICE_BASE_URL=http://localhost:8081"
+      - PES_CONTRACT_START_DATE=2025-10-01
 
   db:
     image: postgres:latest
