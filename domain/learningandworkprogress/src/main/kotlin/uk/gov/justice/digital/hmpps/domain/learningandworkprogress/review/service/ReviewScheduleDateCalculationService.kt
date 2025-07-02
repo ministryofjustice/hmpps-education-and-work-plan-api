@@ -59,8 +59,10 @@ class ReviewScheduleDateCalculationService {
         CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
         INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
         else -> if (releaseDate != null) {
+          log.info("release date was {$releaseDate} for prison number $prisonNumber using calculation rule based on time left to serve.")
           reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
         } else {
+          log.info("release date was null for prison number $prisonNumber using calculation rule INDETERMINATE_SENTENCE")
           ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
         }
       }
