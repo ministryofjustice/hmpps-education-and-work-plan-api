@@ -48,25 +48,25 @@ class ReviewScheduleDateCalculationService {
     releaseDate: LocalDate?,
     isReAdmission: Boolean = false,
     isTransfer: Boolean = false,
-  ): ReviewScheduleCalculationRule =
-    if (isReAdmission) {
-      PRISONER_READMISSION
-    } else if (isTransfer) {
-      PRISONER_TRANSFER
-    } else {
-      when (sentenceType) {
+  ): ReviewScheduleCalculationRule {
+    return when {
+      isReAdmission -> PRISONER_READMISSION
+      isTransfer -> PRISONER_TRANSFER
+      releaseDate != null -> {
+        log.info("release date was $releaseDate for prison number $prisonNumber using calculation rule based on time left to serve.")
+        reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
+      }
+      else -> when (sentenceType) {
         REMAND -> PRISONER_ON_REMAND
         CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
         INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-        else -> if (releaseDate != null) {
-          log.info("release date was {$releaseDate} for prison number $prisonNumber using calculation rule based on time left to serve.")
-          reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
-        } else {
+        else -> {
           log.info("release date was null for prison number $prisonNumber using calculation rule INDETERMINATE_SENTENCE")
           ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
         }
       }
     }
+  }
 
   /**
    * Returns a [ReviewScheduleWindow] based on the specified [ReviewScheduleCalculationRule] and prisoner release date.
