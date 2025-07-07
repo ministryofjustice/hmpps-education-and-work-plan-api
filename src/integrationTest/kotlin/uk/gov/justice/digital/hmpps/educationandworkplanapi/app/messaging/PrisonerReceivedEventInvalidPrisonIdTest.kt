@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 
 @Isolated

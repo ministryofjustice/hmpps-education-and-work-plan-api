@@ -46,8 +46,8 @@ class PrisonerReceivedIntoPrisonEventService(
     dataCorrection: Boolean = false,
     treatAsTransfer: Boolean = false,
   ) = with(additionalInformation) {
-    if (prisonId.length < 3) {
-      log.error { "Ignoring inbound message for prisoner ${additionalInformation.nomsNumber} due to invalid prison id ($prisonId)" }
+    if (prisonId.length > 3) {
+      log.error { "Ignoring inbound message for prisoner ${additionalInformation.nomsNumber} due to unsupported prison ID ($prisonId)" }
       return
     }
 
