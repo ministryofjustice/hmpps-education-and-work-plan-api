@@ -109,7 +109,7 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()!!
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
-      .hasUserMessage("Sentence start date and Reception date for Prisoner [$prisonNumber] are both missing.")
+      .hasUserMessage("Sentence start date and Reception date of Prisoner [$prisonNumber] are both missing.")
   }
 
   @Test

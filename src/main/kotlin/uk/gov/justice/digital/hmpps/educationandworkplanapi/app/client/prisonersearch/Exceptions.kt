@@ -10,4 +10,4 @@ class PrisonerNotFoundException(prisonNumber: String) : RuntimeException("Prison
 /**
  * Thrown when either sentence start date or reception date is expected but both missing, for the given prisoner
  */
-class MissingSentenceStartDateAndReceptionDateException(prisonNumber: String) : RuntimeException("Sentence start date and Reception date for Prisoner [$prisonNumber] are both missing.")
+class MissingSentenceStartDateAndReceptionDateException(prisonNumber: String) : RuntimeException("Sentence start date and Reception date of Prisoner [$prisonNumber] are both missing.")
