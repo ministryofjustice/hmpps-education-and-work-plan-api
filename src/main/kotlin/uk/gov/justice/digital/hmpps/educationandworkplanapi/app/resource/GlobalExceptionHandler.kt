@@ -41,8 +41,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingReceptionDateException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateAndReceptionDateException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
@@ -115,7 +114,7 @@ class GlobalExceptionHandler(
       ),
     )
 
-  @ExceptionHandler(value = [MissingReceptionDateException::class, MissingSentenceStartDateException::class])
+  @ExceptionHandler(value = [MissingSentenceStartDateAndReceptionDateException::class])
   protected fun handleMissingDateException(e: RuntimeException, request: WebRequest) = ResponseEntity
     .status(BAD_REQUEST)
     .body(ErrorResponse(status = BAD_REQUEST.value(), userMessage = e.message))

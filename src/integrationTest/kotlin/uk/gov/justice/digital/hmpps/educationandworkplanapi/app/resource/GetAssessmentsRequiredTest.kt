@@ -77,25 +77,29 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return bad request for prisoner without reception date`() {
+  fun `should return BSA eligibility for prisoner, even when reception date is missing`() {
     // Given
     val prisoner = aValidPrisoner(prisonerNumber = prisonNumber).copy(receptionDate = null)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
 
     // When
-    val response = assertGetIsBadRequest()
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .bearerToken(aValidBearerToken)
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(EducationAssessmentRequired::class.java)
 
     // Then
     val actual = response.responseBody.blockFirst()!!
-    assertThat(actual)
-      .hasStatus(HttpStatus.BAD_REQUEST.value())
-      .hasUserMessage("Reception date for Prisoner [$prisonNumber] is missing.")
+    assertThat(actual.basicSkillsAssessmentRequired).isNotNull
   }
 
   @Test
-  fun `should return bad request for prisoner without sentence start date`() {
+  fun `should return bad request for prisoner without both sentence start date and reception date`() {
     // Given
-    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber).copy(sentenceStartDate = null)
+    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber).copy(sentenceStartDate = null, receptionDate = null)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
 
     // When
@@ -105,7 +109,7 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     val actual = response.responseBody.blockFirst()!!
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
-      .hasUserMessage("Sentence start date for Prisoner [$prisonNumber] is missing")
+      .hasUserMessage("Sentence start date and Reception date for Prisoner [$prisonNumber] are both missing.")
   }
 
   @Test
