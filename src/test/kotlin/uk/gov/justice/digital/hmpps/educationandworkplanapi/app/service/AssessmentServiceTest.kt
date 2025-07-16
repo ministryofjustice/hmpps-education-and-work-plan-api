@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.PrisonEducationServiceProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.aPrisonEducationServiceProperties
+import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
 class AssessmentServiceTest {
@@ -37,24 +38,40 @@ class AssessmentServiceTest {
   @DisplayName("Given a prisoner with reception *before* PES contract start")
   inner class GivenPrisonerReceivedBeforePesContract {
     private lateinit var prisoner: Prisoner
+    private lateinit var receptionDate: LocalDate
+    private var sentenceStartDate: LocalDate? = null
 
     @BeforeEach
     internal fun setUp() {
-      prisoner = aValidPrisoner(
-        receptionDate = pesContractStartDate.minusDays(1),
-        sentenceStartDate = pesContractStartDate.plusDays(1),
-      )
-      given(prisonerSearchApiService.getPrisoner(prisoner.prisonerNumber)).willReturn(prisoner)
+      receptionDate = pesContractStartDate.minusDays(1)
     }
 
     @Test
     fun `should not require Basic Skills Assessment`() {
-      val prisonNumber = prisoner.prisonerNumber
-      val expected = false
+      givenPrisoner()
+      assertEquals(false, assessmentService.requireBasicSkillsAssessment(prisoner.prisonerNumber))
+    }
 
-      val actual = assessmentService.requireBasicSkillsAssessment(prisonNumber)
+    @Nested
+    @DisplayName("And sentence start date is found")
+    inner class AndSentenceStartDateFound {
+      @Test
+      fun `should not require Basic Skills Assessment, as sentence start before PES contract start`() {
+        givenPrisoner(sentenceStartDate = pesContractStartDate.minusDays(1))
+        assertEquals(false, assessmentService.requireBasicSkillsAssessment(prisoner.prisonerNumber))
+      }
 
-      assertEquals(expected, actual)
+      @Test
+      fun `should require Basic Skills Assessment, as sentence start after PES contract start`() {
+        givenPrisoner(sentenceStartDate = pesContractStartDate)
+        assertEquals(true, assessmentService.requireBasicSkillsAssessment(prisoner.prisonerNumber))
+      }
+    }
+
+    private fun givenPrisoner(sentenceStartDate: LocalDate? = null) {
+      this.sentenceStartDate = sentenceStartDate
+      prisoner = aValidPrisoner(receptionDate = receptionDate).copy(sentenceStartDate = sentenceStartDate)
+      given(prisonerSearchApiService.getPrisoner(prisoner.prisonerNumber)).willReturn(prisoner)
     }
   }
 
