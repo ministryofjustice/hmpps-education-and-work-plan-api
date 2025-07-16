@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -10,6 +12,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.given
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateAndReceptionDateException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.PrisonEducationServiceProperties
@@ -24,7 +29,7 @@ class AssessmentServiceTest {
   @Mock
   private lateinit var prisonerSearchApiService: PrisonerSearchApiService
 
-  @Mock
+  @Mock(lenient = true)
   private lateinit var pesProperities: PrisonEducationServiceProperties
 
   private val pesContractStartDate = aPrisonEducationServiceProperties().contractStartDate
@@ -122,6 +127,30 @@ class AssessmentServiceTest {
       val actual = assessmentService.requireBasicSkillsAssessment(prisonNumber)
 
       assertEquals(expected, actual)
+    }
+  }
+
+  @Nested
+  @DisplayName("Given a prisoner with both sentence start date and reception date missing")
+  inner class GivenPrisonerBothReceptionAndSentenceStartDatesMissing {
+    private lateinit var prisoner: Prisoner
+
+    @BeforeEach
+    internal fun setUp() {
+      prisoner = aValidPrisoner().copy(receptionDate = null, sentenceStartDate = null)
+      given(prisonerSearchApiService.getPrisoner(prisoner.prisonerNumber)).willReturn(prisoner)
+    }
+
+    @Test
+    fun `should throw exception`() {
+      val prisonNumber = prisoner.prisonerNumber
+      val expectedError = "Sentence start date and Reception date of Prisoner [$prisonNumber] are both missing."
+      val exception = assertThrows(MissingSentenceStartDateAndReceptionDateException::class.java) {
+        assessmentService.requireBasicSkillsAssessment(prisonNumber)
+      }
+
+      assertThat(exception.message).isEqualTo(expectedError)
+      verify(pesProperities, never()).contractStartDate
     }
   }
 }
