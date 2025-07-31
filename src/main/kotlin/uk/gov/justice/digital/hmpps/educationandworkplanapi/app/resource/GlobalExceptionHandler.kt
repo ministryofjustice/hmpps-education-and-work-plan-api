@@ -4,7 +4,9 @@ import jakarta.servlet.RequestDispatcher.ERROR_MESSAGE
 import jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
+import jakarta.validation.ElementKind
 import mu.KotlinLogging
+import org.hibernate.validator.internal.engine.path.PathImpl
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -39,8 +41,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingReceptionDateException
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateAndReceptionDateException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 
@@ -113,7 +114,7 @@ class GlobalExceptionHandler(
       ),
     )
 
-  @ExceptionHandler(value = [MissingReceptionDateException::class, MissingSentenceStartDateException::class])
+  @ExceptionHandler(value = [MissingSentenceStartDateAndReceptionDateException::class])
   protected fun handleMissingDateException(e: RuntimeException, request: WebRequest) = ResponseEntity
     .status(BAD_REQUEST)
     .body(ErrorResponse(status = BAD_REQUEST.value(), userMessage = e.message))
@@ -214,7 +215,13 @@ class GlobalExceptionHandler(
   ): ResponseEntity<Any>? {
     val violations: Set<ConstraintViolation<*>> = e.constraintViolations
     val errorMessage = if (violations.isNotEmpty()) {
-      violations.joinToString(" ") { it.message }
+      violations.joinToString {
+        if (it.relatesToNamedParameter()) {
+          "${it.propertyPath} ${it.message}"
+        } else {
+          it.message
+        }
+      }
     } else {
       "Validation error"
     }
@@ -271,4 +278,15 @@ class GlobalExceptionHandler(
     val body = errorAttributes.getErrorResponse(request)
     return handleExceptionInternal(exception, body, HttpHeaders(), status, request)
   }
+
+  /**
+   * Returns true is this [ConstraintViolation] relates to a named parameter such as a constraint annotation on a
+   * property in the request body, or a constraint annotation on the method argument.
+   * Knowing whether the constraint relates to a named parameter means we can use the name in the error response.
+   */
+  private fun ConstraintViolation<*>.relatesToNamedParameter(): Boolean = propertyPath is PathImpl &&
+    when ((propertyPath as PathImpl).leafNode.kind) {
+      ElementKind.PROPERTY, ElementKind.PARAMETER -> true
+      else -> false
+    }
 }
