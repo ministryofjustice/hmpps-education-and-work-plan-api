@@ -17,6 +17,7 @@ fun aValidPrisoner(
   releaseType: String = "ARD",
   receptionDate: LocalDate = LocalDate.now().minusYears(1),
   sentenceStartDate: LocalDate = LocalDate.now().minusYears(1),
+  allConvictedOffences: List<ConvictedOffence> = emptyList<ConvictedOffence>(),
 ): Prisoner = Prisoner(
   prisonerNumber = prisonerNumber,
   legalStatus = legalStatus,
@@ -31,4 +32,23 @@ fun aValidPrisoner(
   releaseType = releaseType,
   receptionDate = receptionDate,
   sentenceStartDate = sentenceStartDate,
+  allConvictedOffences = allConvictedOffences,
+)
+
+fun aConvictedOffence(
+  statuteCode: String = "CE79",
+  offenceCode: String = "CE79158C",
+  offenceDescription: String = "Conspire to fraudulently evade any duty",
+  offenceDate: LocalDate = LocalDate.now().minusYears(1),
+  latestBooking: Boolean = true,
+  sentenceStartDate: LocalDate = LocalDate.now(),
+  primarySentence: Boolean = true,
+): ConvictedOffence = ConvictedOffence(
+  statuteCode = statuteCode,
+  offenceCode = offenceCode,
+  offenceDescription = offenceDescription,
+  offenceDate = offenceDate,
+  latestBooking = latestBooking,
+  sentenceStartDate = sentenceStartDate,
+  primarySentence = primarySentence,
 )
