@@ -16,6 +16,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateAndReceptionDateException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aConvictedOffence
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.PrisonEducationServiceProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.aPrisonEducationServiceProperties
@@ -58,30 +59,54 @@ class AssessmentServiceTest {
     }
 
     @Nested
-    @DisplayName("And sentence start date is found")
-    inner class AndSentenceStartDateFound {
+    @DisplayName("And convicted offences sentence start date is found")
+    inner class AndConvictedOffencesSentenceStartDateFound {
       @Test
-      fun `should not require Basic Skills Assessment, as sentence start before PES contract start`() {
-        givenPrisoner(sentenceStartDate = pesContractStartDate.minusDays(1))
+      fun `should not require Basic Skills Assessment, as the convicted offences sentence start before PES contract start`() {
+        givenPrisonerWithConvictedOffences(
+          latestConvictedOffenceSentenceStartDates = listOf(
+            pesContractStartDate.minusDays(1),
+          ).toTypedArray(),
+        )
         assertEquals(false, assessmentService.requireBasicSkillsAssessment(prisoner.prisonerNumber))
       }
 
       @Test
-      fun `should require Basic Skills Assessment, as sentence start after PES contract start`() {
-        givenPrisoner(sentenceStartDate = pesContractStartDate)
+      fun `should require Basic Skills Assessment, as one of the convicted offences sentence start after PES contract start`() {
+        givenPrisonerWithConvictedOffences(
+          latestConvictedOffenceSentenceStartDates = listOf(
+            pesContractStartDate.minusDays(1),
+            pesContractStartDate,
+          ).toTypedArray(),
+        )
         assertEquals(true, assessmentService.requireBasicSkillsAssessment(prisoner.prisonerNumber))
       }
     }
 
     private fun givenPrisoner(sentenceStartDate: LocalDate? = null) {
+      givenPrisonerWithConvictedOffences(sentenceStartDate)
+    }
+
+    private fun givenPrisonerWithConvictedOffences(
+      sentenceStartDate: LocalDate? = null,
+      vararg latestConvictedOffenceSentenceStartDates: LocalDate?,
+    ) {
       this.sentenceStartDate = sentenceStartDate
-      prisoner = aValidPrisoner(receptionDate = receptionDate).copy(sentenceStartDate = sentenceStartDate)
+      val offences = latestConvictedOffenceSentenceStartDates
+        .filterNotNull()
+        .map { date ->
+          aConvictedOffence().copy(sentenceStartDate = date)
+        }
+      prisoner = aValidPrisoner(
+        receptionDate = receptionDate,
+        allConvictedOffences = offences,
+      )
       given(prisonerSearchApiService.getPrisoner(prisoner.prisonerNumber)).willReturn(prisoner)
     }
   }
 
   @Nested
-  @DisplayName("Given a prisoner with sentence start date *before* PES contract start")
+  @DisplayName("Given a prisoner with convicted offences latest sentence start date *before* PES contract start")
   inner class GivenPrisonerWithSentenceStartBeforePesContract {
     private lateinit var prisoner: Prisoner
 
@@ -89,7 +114,10 @@ class AssessmentServiceTest {
     internal fun setUp() {
       prisoner = aValidPrisoner(
         receptionDate = pesContractStartDate.plusDays(1),
-        sentenceStartDate = pesContractStartDate.minusDays(1),
+        allConvictedOffences = listOf(
+          aConvictedOffence(sentenceStartDate = pesContractStartDate.minusDays(1)),
+          aConvictedOffence(sentenceStartDate = pesContractStartDate.minusDays(2)),
+        ),
       )
       given(prisonerSearchApiService.getPrisoner(prisoner.prisonerNumber)).willReturn(prisoner)
     }
@@ -114,7 +142,10 @@ class AssessmentServiceTest {
     internal fun setUp() {
       prisoner = aValidPrisoner(
         receptionDate = pesContractStartDate,
-        sentenceStartDate = pesContractStartDate,
+        allConvictedOffences = listOf(
+          aConvictedOffence(sentenceStartDate = pesContractStartDate.minusDays(1)),
+          aConvictedOffence(sentenceStartDate = pesContractStartDate),
+        ),
       )
       given(prisonerSearchApiService.getPrisoner(prisoner.prisonerNumber)).willReturn(prisoner)
     }
