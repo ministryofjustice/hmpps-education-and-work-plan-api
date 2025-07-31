@@ -25,6 +25,17 @@ data class Prisoner(
   val releaseType: String?, // TODO this needs to be checked
   val receptionDate: LocalDate?,
   val sentenceStartDate: LocalDate?,
+  val allConvictedOffences: List<ConvictedOffence>? = emptyList<ConvictedOffence>(),
+)
+
+data class ConvictedOffence(
+  val statuteCode: String,
+  val offenceCode: String,
+  val offenceDescription: String,
+  val offenceDate: LocalDate?,
+  val latestBooking: Boolean,
+  val sentenceStartDate: LocalDate?,
+  val primarySentence: Boolean,
 )
 
 enum class LegalStatus {
