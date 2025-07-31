@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aConvictedOffence
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.aPrisonEducationServiceProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -79,7 +80,10 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
   @Test
   fun `should return BSA eligibility for prisoner, even when reception date is missing`() {
     // Given
-    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber).copy(receptionDate = null)
+    val prisoner =
+      aValidPrisoner(prisonerNumber = prisonNumber, allConvictedOffences = listOf(aConvictedOffence())).copy(
+        receptionDate = null,
+      )
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
 
     // When
@@ -144,8 +148,9 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     .isBadRequest
     .returnResult(ErrorResponse::class.java)
 
-  private val aValidBearerToken get() = aValidTokenWithAuthority(
-    ASSESSMENTS_RO,
-    privateKey = keyPair.private,
-  )
+  private val aValidBearerToken
+    get() = aValidTokenWithAuthority(
+      ASSESSMENTS_RO,
+      privateKey = keyPair.private,
+    )
 }
