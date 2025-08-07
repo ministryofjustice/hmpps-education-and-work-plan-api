@@ -20,9 +20,9 @@ dependencies {
   api("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
   // Test dependencies
-  testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+  testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-  testImplementation("org.assertj:assertj-core:3.27.3")
+  testImplementation("org.assertj:assertj-core:3.27.4")
   testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
