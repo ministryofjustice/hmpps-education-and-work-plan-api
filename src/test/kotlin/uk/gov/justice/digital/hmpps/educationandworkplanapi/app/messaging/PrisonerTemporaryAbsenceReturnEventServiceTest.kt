@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -34,9 +32,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPl
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TEMPORARY_ABSENCE_RETURN
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
@@ -45,7 +41,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 @ExtendWith(MockitoExtension::class)
-class PrisonerReceivedIntoPrisonEventServiceTest {
+class PrisonerTemporaryAbsenceReturnEventServiceTest {
   @InjectMocks
   private lateinit var eventService: PrisonerReceivedIntoPrisonEventService
 
@@ -81,7 +77,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
-      reason = ADMISSION,
+      reason = TEMPORARY_ABSENCE_RETURN,
       prisonId = prisonId,
     )
     val inboundEvent = anInboundEvent(
@@ -117,7 +113,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
-      reason = ADMISSION,
+      reason = TEMPORARY_ABSENCE_RETURN,
       prisonId = prisonId,
     )
     val inboundEvent = anInboundEvent(
@@ -159,7 +155,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
-      reason = ADMISSION,
+      reason = TEMPORARY_ABSENCE_RETURN,
       prisonId = prisonId,
     )
     val inboundEvent = anInboundEvent(
@@ -217,7 +213,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
-      reason = ADMISSION,
+      reason = TEMPORARY_ABSENCE_RETURN,
       prisonId = prisonId,
     )
     val inboundEvent = anInboundEvent(
@@ -276,7 +272,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
-      reason = ADMISSION,
+      reason = TEMPORARY_ABSENCE_RETURN,
       prisonId = "BXI",
     )
     val inboundEvent = anInboundEvent(
@@ -323,7 +319,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
       prisonNumber = prisonNumber,
-      reason = ADMISSION,
+      reason = TEMPORARY_ABSENCE_RETURN,
       prisonId = "BXI",
     )
     val inboundEvent = anInboundEvent(
@@ -360,42 +356,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     verify(createInitialReviewScheduleMapper).fromPrisonerToDomain(prisoner, isTransfer = false, isReadmission = true)
     verify(reviewScheduleService).createInitialReviewSchedule(createReviewScheduleDto)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
-  }
-
-  @Test
-  fun `should process event given reason is prisoner transfer`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-
-    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
-      prisonNumber = prisonNumber,
-      reason = TRANSFERRED,
-      prisonId = "BXI",
-    )
-    val inboundEvent = anInboundEvent(additionalInformation)
-
-    // When
-    eventService.process(inboundEvent, additionalInformation)
-
-    // Then
-    verify(reviewScheduleService).exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(prisonNumber, "BXI")
-  }
-
-  @ParameterizedTest
-  @CsvSource(value = ["RETURN_FROM_COURT"])
-  fun `should process event but not call service given reason is not a prisoner admission reason that we should process`(
-    reason: Reason,
-  ) {
-    // Given
-    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(reason = reason)
-    val inboundEvent = anInboundEvent(additionalInformation)
-
-    // When
-    eventService.process(inboundEvent, additionalInformation)
-
-    // Then
-    verifyNoInteractions(inductionScheduleService)
-    verifyNoInteractions(reviewScheduleService)
   }
 
   private fun anInboundEvent(

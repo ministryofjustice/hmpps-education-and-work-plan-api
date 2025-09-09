@@ -52,11 +52,11 @@ class PrisonerReceivedIntoPrisonEventService(
     }
 
     when (reason) {
-      ADMISSION -> processPrisonerAdmissionEvent(nomsNumber, inboundEvent.occurredAt, dataCorrection, treatAsTransfer)
+      ADMISSION, TEMPORARY_ABSENCE_RETURN -> processPrisonerAdmissionEvent(nomsNumber, inboundEvent.occurredAt, dataCorrection, treatAsTransfer)
 
       TRANSFERRED -> processPrisonerTransferEvent()
 
-      TEMPORARY_ABSENCE_RETURN, RETURN_FROM_COURT ->
+      RETURN_FROM_COURT ->
         log.debug { "Ignoring Processing Prisoner Received Into Prison Event with reason ${additionalInformation.reason}" }
     }
   }
