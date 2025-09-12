@@ -21,11 +21,7 @@ class AssessmentService(
         ?.maxByOrNull { offence -> offence.sentenceStartDate!! }
         ?.sentenceStartDate
       val referenceDate = latestSentenceStartDate ?: it.receptionDate
-      log.trace {
-        """
-          Input for eligibility check of basic skills assessment for prisoner [$prisonNumber]: referenceDate=$referenceDate, latest sentenceStartDate=$latestSentenceStartDate, receptionDate=${it.receptionDate}
-        """.trimIndent()
-      }
+      log.trace { "Input for eligibility check of basic skills assessment for prisoner [$prisonNumber]: referenceDate=$referenceDate, latest sentenceStartDate=$latestSentenceStartDate, receptionDate=${it.receptionDate}" }
       when {
         referenceDate == null -> throw MissingSentenceStartDateAndReceptionDateException(prisonNumber)
         referenceDate.isBefore(pes.contractStartDate) -> false
