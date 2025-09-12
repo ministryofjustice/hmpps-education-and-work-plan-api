@@ -16,15 +16,12 @@ class AssessmentService(
     log.info { "Checking eligibility of basic skills assessment for prisoner [$prisonNumber]" }
 
     return prisonerSearchApiService.getPrisoner(prisonNumber).let {
-      val referenceDate = it.allConvictedOffences
+      val latestSentenceStartDate = it.allConvictedOffences
         ?.filter { offence -> offence.sentenceStartDate != null }
         ?.maxByOrNull { offence -> offence.sentenceStartDate!! }
-        ?.sentenceStartDate ?: it.receptionDate
+        ?.sentenceStartDate
+      val referenceDate = latestSentenceStartDate ?: it.receptionDate
       log.trace {
-        val latestSentenceStartDate = it.allConvictedOffences
-          ?.filter { offence -> offence.sentenceStartDate != null }
-          ?.maxByOrNull { offence -> offence.sentenceStartDate!! }
-          ?.sentenceStartDate
         """
           Input for eligibility check of basic skills assessment for prisoner [$prisonNumber]: referenceDate=$referenceDate, latest sentenceStartDate=$latestSentenceStartDate, receptionDate=${it.receptionDate}
         """.trimIndent()
