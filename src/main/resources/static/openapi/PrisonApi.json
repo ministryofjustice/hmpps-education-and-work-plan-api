@@ -28988,9 +28988,6 @@
         "description": "A movement IN and OUT range"
       },
       "TransferDetail": {
-        "required": [
-          "toPrisonId"
-        ],
         "type": "object",
         "properties": {
           "dateOutOfPrison": {
