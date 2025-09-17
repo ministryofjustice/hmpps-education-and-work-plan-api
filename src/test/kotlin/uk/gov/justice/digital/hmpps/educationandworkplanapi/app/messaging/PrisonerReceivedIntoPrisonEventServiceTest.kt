@@ -382,7 +382,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = ["TEMPORARY_ABSENCE_RETURN", "RETURN_FROM_COURT"])
+  @CsvSource(value = ["RETURN_FROM_COURT"])
   fun `should process event but not call service given reason is not a prisoner admission reason that we should process`(
     reason: Reason,
   ) {

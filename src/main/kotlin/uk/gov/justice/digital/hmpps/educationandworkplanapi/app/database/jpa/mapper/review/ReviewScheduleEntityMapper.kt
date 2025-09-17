@@ -117,6 +117,7 @@ class ReviewScheduleEntityMapper {
     ReviewScheduleStatusEntity.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     ReviewScheduleStatusEntity.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     ReviewScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
+    ReviewScheduleStatusEntity.EXEMPT_TEMP_ABSENCE -> ReviewScheduleStatusDomain.EXEMPT_TEMP_ABSENCE
     ReviewScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
     ReviewScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH
     ReviewScheduleStatusEntity.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatusDomain.EXEMPT_PRISONER_MERGE
@@ -137,6 +138,7 @@ class ReviewScheduleEntityMapper {
     ReviewScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatusEntity.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     ReviewScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatusEntity.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
+    ReviewScheduleStatusDomain.EXEMPT_TEMP_ABSENCE -> ReviewScheduleStatusEntity.EXEMPT_TEMP_ABSENCE
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_DEATH
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatusEntity.EXEMPT_PRISONER_MERGE

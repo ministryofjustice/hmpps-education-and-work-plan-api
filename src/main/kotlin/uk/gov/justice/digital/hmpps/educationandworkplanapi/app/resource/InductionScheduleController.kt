@@ -100,6 +100,7 @@ class InductionScheduleController(
     InductionScheduleStatusModel.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     InductionScheduleStatusModel.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     InductionScheduleStatusModel.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER
+    InductionScheduleStatusModel.EXEMPT_TEMP_ABSENCE -> InductionScheduleStatus.EXEMPT_TEMP_ABSENCE
     InductionScheduleStatusModel.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
     InductionScheduleStatusModel.EXEMPT_PRISONER_DEATH -> InductionScheduleStatus.EXEMPT_PRISONER_DEATH
     InductionScheduleStatusModel.EXEMPT_PRISONER_MERGE -> InductionScheduleStatus.EXEMPT_PRISONER_MERGE

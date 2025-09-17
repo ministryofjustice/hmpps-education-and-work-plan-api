@@ -49,6 +49,7 @@ class ScheduledActionPlanReviewResponseMapper(
     ReviewScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatusApi.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     ReviewScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatusApi.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatusApi.EXEMPT_PRISONER_TRANSFER
+    ReviewScheduleStatusDomain.EXEMPT_TEMP_ABSENCE -> ReviewScheduleStatusApi.EXEMPT_TEMP_ABSENCE
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatusApi.EXEMPT_PRISONER_RELEASE
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatusApi.EXEMPT_PRISONER_DEATH
     ReviewScheduleStatusDomain.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatusApi.EXEMPT_PRISONER_MERGE
