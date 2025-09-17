@@ -57,6 +57,7 @@ enum class ReviewScheduleStatus(
   EXEMPT_PRISONER_DEATH(isExemption = true),
   EXEMPT_PRISONER_MERGE(isExemption = true),
   EXEMPT_UNKNOWN(includeExemptionOnSummary = true),
+  EXEMPT_TEMP_ABSENCE(isExemption = true),
   COMPLETED,
   ;
 

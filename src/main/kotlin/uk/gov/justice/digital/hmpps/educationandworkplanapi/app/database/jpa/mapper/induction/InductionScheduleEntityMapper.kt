@@ -86,6 +86,7 @@ class InductionScheduleEntityMapper {
     InductionScheduleStatusEntity.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     InductionScheduleStatusEntity.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
+    InductionScheduleStatusEntity.EXEMPT_TEMP_ABSENCE -> InductionScheduleStatusDomain.EXEMPT_TEMP_ABSENCE
     InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
     InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH
     InductionScheduleStatusEntity.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_MERGE
@@ -108,6 +109,7 @@ class InductionScheduleEntityMapper {
     InductionScheduleStatusDomain.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusEntity.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     InductionScheduleStatusDomain.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusEntity.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
+    InductionScheduleStatusDomain.EXEMPT_TEMP_ABSENCE -> InductionScheduleStatusEntity.EXEMPT_TEMP_ABSENCE
     InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
     InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH
     InductionScheduleStatusDomain.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_MERGE

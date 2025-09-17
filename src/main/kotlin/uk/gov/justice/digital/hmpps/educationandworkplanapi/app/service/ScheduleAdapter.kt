@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
+import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
@@ -21,14 +22,35 @@ class ScheduleAdapter(
   private val inductionScheduleService: InductionScheduleService,
 ) {
 
-  fun completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber: String) {
-    log.info { "Attempting to complete induction or create review schedule for $prisonNumber" }
-    // validate
+  fun requiresInductionSchedule(prisonNumber: String): Boolean {
+    val inductionSchedule = runCatching {
+      inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)
+    }.getOrNull()
+    return inductionSchedule == null && !isInductionComplete(prisonNumber)
+  }
+
+  fun isInductionComplete(prisonNumber: String): Boolean {
     val actionPlan = actionPlanPersistenceAdapter.getActionPlan(prisonNumber)
-    if (
-      inductionPersistenceAdapter.getInduction(prisonNumber) != null &&
+    return inductionPersistenceAdapter.getInduction(prisonNumber) != null &&
       actionPlan != null &&
       actionPlan.goals.isNotEmpty()
+  }
+
+  fun createInductionScheduleIfRequired(prisonNumber: String, prisonId: String = "N/A") {
+    if (requiresInductionSchedule(prisonNumber)) {
+      // Create the induction schedule for this person:
+      inductionScheduleService.createInductionSchedule(
+        prisonNumber = prisonNumber,
+        prisonerAdmissionDate = LocalDate.now(),
+        prisonId = prisonId,
+      )
+    }
+  }
+
+  fun completeInductionScheduleAndCreateInitialReviewSchedule(prisonNumber: String, prisonId: String = "N/A") {
+    log.info { "Attempting to complete induction or create review schedule for $prisonNumber" }
+    if (
+      isInductionComplete(prisonNumber)
     ) {
       // COMPLETE the induction schedule IF it is not already completed.
       val inductionSchedule = runCatching {
