@@ -7,9 +7,11 @@ import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TEMPORARY_ABSENCE_RETURN
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
@@ -83,6 +85,71 @@ class PrisonerReceivedEventDueToTempAbsenceTest : IntegrationTestBase() {
       assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
       assertThat(it.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
     }
+  }
+
+  @Test
+  fun `should not update Review Schedule and send outbound message given 'prisoner received' (TEMP_ABSENCE_RETURN) event for prisoner that has a manually Exempt Review Schedule`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+    val prisonNumber = setUpRandomPrisoner()
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
+    createActionPlan(prisonNumber)
+
+    // Set the review dates so that we can assert that they've been changed
+    updateReviewScheduleReviewDates(
+      prisonNumber = prisonNumber,
+      earliestReviewDate = LocalDate.now(),
+      latestReviewDate = LocalDate.now().plusDays(1),
+    )
+
+    // change the status of the review to be EXEMPT_PRISON_REGIME_CIRCUMSTANCES
+    updateReviewStatus(
+      prisonNumber = prisonNumber,
+      updateReviewScheduleStatusRequest = UpdateReviewScheduleStatusRequest(
+        prisonId = "BXI",
+        status = ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES,
+        exemptionReason = "",
+      ),
+    )
+
+    val expectedEarliestReviewDate = LocalDate.now()
+    val expectedLatestReviewDate = LocalDate.now().plusDays(1)
+
+    // The above calls set the data up, but they will also generate events so clear these out before starting the test.
+    // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = TEMPORARY_ABSENCE_RETURN,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val reviewSchedules = getReviewSchedules(prisonNumber)
+    assertThat(reviewSchedules)
+      // the schedules should not have changed
+      .hasNumberOfReviewSchedules(2)
+      .reviewScheduleAtVersion(2) {
+        // Review Schedule version 2 is the re-scheduled review schedule
+        it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES)
+          .hasReviewDateFrom(expectedEarliestReviewDate)
+          .hasReviewDateTo(expectedLatestReviewDate)
+      }
   }
 
   @Test
