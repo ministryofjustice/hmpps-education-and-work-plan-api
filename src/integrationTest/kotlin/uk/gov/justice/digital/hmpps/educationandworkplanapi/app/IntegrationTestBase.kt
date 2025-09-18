@@ -63,6 +63,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.GOALS_R
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.REVIEWS_RO
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.REVIEWS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.TIMELINE_RO
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.testcontainers.LocalStackContainer.setLocalStackProperties
@@ -82,6 +83,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
@@ -110,6 +112,7 @@ abstract class IntegrationTestBase {
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
     const val GET_REVIEW_SCHEDULES_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/review-schedules"
+    const val UPDATE_REVIEW_SCHEDULE_STATUS_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/schedule-status"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
     const val INDUCTION_URI_TEMPLATE = "/inductions/{prisonNumber}"
     const val EDUCATION_URI_TEMPLATE = "/person/{prisonNumber}/education"
@@ -369,6 +372,27 @@ abstract class IntegrationTestBase {
       .exchange()
       .expectStatus()
       .isCreated()
+  }
+
+  fun updateReviewStatus(
+    prisonNumber: String,
+    updateReviewScheduleStatusRequest: UpdateReviewScheduleStatusRequest,
+    username: String = "auser_gen",
+  ) {
+    webTestClient.put()
+      .uri(UPDATE_REVIEW_SCHEDULE_STATUS_URI_TEMPLATE, prisonNumber)
+      .withBody(updateReviewScheduleStatusRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          REVIEWS_RW,
+          privateKey = keyPair.private,
+          username = username,
+        ),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent
   }
 
   fun getInduction(prisonNumber: String): InductionResponse = webTestClient.get()
