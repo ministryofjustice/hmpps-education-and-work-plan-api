@@ -351,13 +351,11 @@ class ReviewScheduleService(
 
       // Then update the review schedule to be SCHEDULED with an adjusted review date
       val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
-      val adjustedEarliestReviewDate = LocalDate.now()
       val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
         UpdateReviewScheduleStatusDto(
           reference = reference,
           scheduleStatus = ReviewScheduleStatus.SCHEDULED,
           prisonId = prisonId,
-          earliestReviewDate = adjustedEarliestReviewDate,
           latestReviewDate = adjustedReviewDate,
           prisonNumber = prisonNumber,
         ),

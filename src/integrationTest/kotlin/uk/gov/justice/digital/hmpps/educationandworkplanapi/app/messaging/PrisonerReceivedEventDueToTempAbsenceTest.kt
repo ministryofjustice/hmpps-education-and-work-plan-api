@@ -31,11 +31,11 @@ class PrisonerReceivedEventDueToTempAbsenceTest : IntegrationTestBase() {
     // Set the review dates so that we can assert that they've been changed
     updateReviewScheduleReviewDates(
       prisonNumber = prisonNumber,
-      earliestReviewDate = LocalDate.now(),
+      earliestReviewDate = LocalDate.now().minusDays(5),
       latestReviewDate = LocalDate.now().plusDays(1),
     )
 
-    val expectedEarliestReviewDate = LocalDate.now()
+    val expectedEarliestReviewDate = LocalDate.now().minusDays(5)
     val expectedLatestReviewDate = LocalDate.now().plusDays(5)
 
     // The above calls set the data up, but they will also generate events so clear these out before starting the test.
@@ -98,8 +98,8 @@ class PrisonerReceivedEventDueToTempAbsenceTest : IntegrationTestBase() {
     // Set the review dates so that we can assert that they've been changed
     updateReviewScheduleReviewDates(
       prisonNumber = prisonNumber,
-      earliestReviewDate = LocalDate.now(),
-      latestReviewDate = LocalDate.now().plusDays(1),
+      earliestReviewDate = LocalDate.now().plusDays(5),
+      latestReviewDate = LocalDate.now().plusDays(10),
     )
 
     // change the status of the review to be EXEMPT_PRISON_REGIME_CIRCUMSTANCES
@@ -112,8 +112,8 @@ class PrisonerReceivedEventDueToTempAbsenceTest : IntegrationTestBase() {
       ),
     )
 
-    val expectedEarliestReviewDate = LocalDate.now()
-    val expectedLatestReviewDate = LocalDate.now().plusDays(1)
+    val expectedEarliestReviewDate = LocalDate.now().plusDays(5)
+    val expectedLatestReviewDate = LocalDate.now().plusDays(10)
 
     // The above calls set the data up, but they will also generate events so clear these out before starting the test.
     // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
