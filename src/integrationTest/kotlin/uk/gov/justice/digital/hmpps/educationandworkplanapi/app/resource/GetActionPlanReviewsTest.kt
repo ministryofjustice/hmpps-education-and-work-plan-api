@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import java.time.LocalDate
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus as ReviewScheduleStatusApi
 
 class GetActionPlanReviewsTest : IntegrationTestBase() {
   companion object {
@@ -156,5 +157,46 @@ class GetActionPlanReviewsTest : IntegrationTestBase() {
     noteRepository.saveAndFlush(reviewNoteEntity)
 
     return completedReviewEntity
+  }
+
+  // TODO - remove once RR-1919 is fixed
+  @Test
+  fun `should get review schedule given dateFrom is incorrectly too early`() {
+    // Given
+    val reviewScheduleEntity = ReviewScheduleEntity(
+      reference = UUID.randomUUID(),
+      prisonNumber = prisonNumber,
+      earliestReviewDate = LocalDate.parse("2025-09-18"), // One of the incorrectly set earliest dates
+      latestReviewDate = LocalDate.parse("2026-10-01"),
+      scheduleCalculationRule = ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+      scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+      exemptionReason = null,
+      createdAtPrison = "BXI",
+      updatedAtPrison = "BXI",
+    )
+    reviewScheduleRepository.saveAndFlush(reviewScheduleEntity)
+
+    // When
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          REVIEWS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(ActionPlanReviewsResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual).isNotNull()
+    with(actual!!.latestReviewSchedule) {
+      assertThat(this.status).isEqualTo(ReviewScheduleStatusApi.SCHEDULED)
+      assertThat(this.reviewDateFrom).isEqualTo(LocalDate.parse("2026-08-01")) // expect the from date to have been adjusted
+      assertThat(this.reviewDateTo).isEqualTo(LocalDate.parse("2026-10-01"))
+    }
   }
 }

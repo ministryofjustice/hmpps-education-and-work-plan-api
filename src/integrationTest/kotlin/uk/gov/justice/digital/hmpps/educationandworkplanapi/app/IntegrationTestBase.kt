@@ -591,13 +591,14 @@ abstract class IntegrationTestBase {
     exemptionReason: String? = null,
     earliestDate: LocalDate = LocalDate.now().minusMonths(1),
     latestDate: LocalDate = LocalDate.now().plusMonths(1),
+    scheduleCalculationRule: ReviewScheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
   ): ReviewScheduleEntity {
     val reviewScheduleEntity = ReviewScheduleEntity(
       reference = UUID.randomUUID(),
       prisonNumber = prisonNumber,
       earliestReviewDate = earliestDate,
       latestReviewDate = latestDate,
-      scheduleCalculationRule = ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE,
+      scheduleCalculationRule = scheduleCalculationRule,
       scheduleStatus = status,
       exemptionReason = exemptionReason,
       createdAtPrison = "BXI",
