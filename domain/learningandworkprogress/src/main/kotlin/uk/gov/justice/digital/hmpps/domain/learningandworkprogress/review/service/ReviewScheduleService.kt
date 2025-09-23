@@ -220,6 +220,16 @@ class ReviewScheduleService(
       }
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
+  fun exemptAndReScheduleActiveReviewScheduleDueToTAPReturn(prisonNumber: String, prisonId: String) =
+    reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
+      ?.run {
+        updateReviewScheduleFollowingPrisonerTAPReturn(this, prisonId)
+          .also {
+            log.debug { "Review Schedule for prisoner [$prisonNumber] set to exempt: EXEMPT_TEMP_ABSENCE, and then re-scheduled with deadline date [${reviewScheduleWindow.dateTo}]" }
+          }
+      }
+      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
   private fun updateExemptStatus(
     reviewSchedule: ReviewSchedule,
     newStatus: ReviewScheduleStatus,
@@ -334,6 +344,49 @@ class ReviewScheduleService(
           scheduleStatus = ReviewScheduleStatus.SCHEDULED,
           prisonId = prisonTransferredTo,
           earliestReviewDate = adjustedEarliestReviewDate,
+          latestReviewDate = adjustedReviewDate,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      performFollowOnEvents(
+        updatedReviewSchedule = updatedReviewScheduleSecond,
+        oldStatus = updatedReviewScheduleFirst.scheduleStatus,
+        oldReviewDate = updatedReviewScheduleFirst.reviewScheduleWindow.dateTo,
+      )
+    }
+  }
+
+  private fun updateReviewScheduleFollowingPrisonerTAPReturn(
+    reviewSchedule: ReviewSchedule,
+    prisonId: String,
+  ) {
+    with(reviewSchedule) {
+      // The prison that the prisoner transferred from is not in the event details. We need it when updating the Review Schedule
+      // with the EXEMPT_TEMP_ABSENCE status to maintain the audit history fields. The best we can do is to use the `lastUpdatedAtPrison`
+      // field from the current ReviewSchedule record before any changes are made.
+      val prisonTransferredFrom = lastUpdatedAtPrison
+      // Update the review schedule status to EXEMPT_TEMP_ABSENCE
+      val updatedReviewScheduleFirst = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE,
+          prisonId = prisonTransferredFrom,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      performFollowOnEvents(
+        updatedReviewSchedule = updatedReviewScheduleFirst,
+        oldStatus = scheduleStatus,
+        oldReviewDate = reviewScheduleWindow.dateTo,
+      )
+
+      // Then update the review schedule to be SCHEDULED with an adjusted review date
+      val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
+      val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
+        UpdateReviewScheduleStatusDto(
+          reference = reference,
+          scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+          prisonId = prisonId,
           latestReviewDate = adjustedReviewDate,
           prisonNumber = prisonNumber,
         ),

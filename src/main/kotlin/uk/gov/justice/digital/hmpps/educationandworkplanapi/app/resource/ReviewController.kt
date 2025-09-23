@@ -128,6 +128,7 @@ class ReviewController(
     ReviewScheduleStatusAPI.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> ReviewScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     ReviewScheduleStatusAPI.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
+    ReviewScheduleStatusAPI.EXEMPT_TEMP_ABSENCE -> ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatus.EXEMPT_PRISONER_MERGE

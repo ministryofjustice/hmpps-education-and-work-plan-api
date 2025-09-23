@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
@@ -204,6 +205,34 @@ class InductionScheduleService(
       adjustedInductionDate = adjustedInductionDate,
       prisonId = prisonTransferredTo,
     )
+  }
+
+  fun exemptAndReScheduleActiveInductionScheduleDueToTAPReturn(
+    prisonId: String,
+    prisonNumber: String,
+  ): InductionSchedule {
+    val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+      ?: throw InductionScheduleNotFoundException(prisonNumber)
+    if (inductionSchedule.scheduleStatus != COMPLETED) {
+      // Step 1: Mark as EXEMPT_TEMP_ABSENCE
+      val updatedSchedule = updateInductionSchedule(
+        inductionSchedule = inductionSchedule,
+        newStatus = InductionScheduleStatus.EXEMPT_TEMP_ABSENCE,
+        prisonId = inductionSchedule.lastUpdatedAtPrison,
+      )
+
+      // Step 2: Adjust induction date and reschedule
+      val adjustedInductionDate = inductionScheduleDateCalculationService
+        .calculateAdjustedInductionDueDate(updatedSchedule)
+      return updateInductionSchedule(
+        inductionSchedule = updatedSchedule,
+        newStatus = SCHEDULED,
+        adjustedInductionDate = adjustedInductionDate,
+        prisonId = prisonId,
+      )
+    } else {
+      throw InductionScheduleNotFoundException(prisonNumber)
+    }
   }
 
   /**
