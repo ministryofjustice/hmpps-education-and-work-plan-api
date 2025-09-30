@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
@@ -25,6 +26,7 @@ private val log = KotlinLogging.logger {}
 class ReviewRepairController(
   private val reviewScheduleService: ReviewScheduleService,
   private val reviewScheduleHistoryRepository: ReviewScheduleHistoryRepository,
+  private val eventPublisher: EventPublisher,
 ) {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_EDIT_REVIEWS)
@@ -53,7 +55,8 @@ class ReviewRepairController(
     val performUpdate = updatedEarliestStartDate != previousEarliestStartDate
     if (performUpdate) {
       log.info("updating earliest start date for prisoner $prisonNumber from $previousEarliestStartDate to $updatedEarliestStartDate")
-      // TODO - actually update the review start date and history and produce messages
+      reviewScheduleService.updateEarliestStartDate(prisonNumber, updatedEarliestStartDate)
+      eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
     } else {
       log.info("not updating earliest start date for prisoner $prisonNumber")
     }

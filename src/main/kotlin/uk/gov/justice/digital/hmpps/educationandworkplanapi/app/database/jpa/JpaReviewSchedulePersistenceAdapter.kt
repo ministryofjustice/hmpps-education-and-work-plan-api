@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
+import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
@@ -68,6 +69,7 @@ class JpaReviewSchedulePersistenceAdapter(
   override fun getLatestReviewSchedule(prisonNumber: String): ReviewSchedule? = reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber)
     ?.let { reviewScheduleEntityMapper.fromEntityToDomain(it) }
 
+  @Transactional
   override fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule {
     val reviewScheduleEntity = reviewScheduleRepository.findByReference(updateReviewScheduleStatusDto.reference)
       ?: throw ReviewScheduleNotFoundException(updateReviewScheduleStatusDto.prisonNumber)
@@ -89,6 +91,15 @@ class JpaReviewSchedulePersistenceAdapter(
 
   override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> = reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
     .map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+
+  @Transactional
+  override fun updateEarliestStartDate(prisonNumber: String, updatedEarliestStartDate: LocalDate) {
+    val reviewSchedule = reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    reviewSchedule.earliestReviewDate = updatedEarliestStartDate
+    reviewScheduleRepository.save(reviewSchedule)
+    // now update the review schedule history
+    saveReviewScheduleHistory(reviewSchedule)
+  }
 
   private fun saveReviewScheduleHistory(reviewScheduleEntity: ReviewScheduleEntity) {
     with(reviewScheduleEntity) {

@@ -423,4 +423,9 @@ class ReviewScheduleService(
   fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
     return reviewSchedulePersistenceAdapter.getInCompleteReviewSchedules(prisonerNumbers)
   }
+
+  // Temporary method to update the earliest review date for certain review schedules
+  fun updateEarliestStartDate(prisonNumber: String, updatedEarliestStartDate: LocalDate) {
+    reviewSchedulePersistenceAdapter.updateEarliestStartDate(prisonNumber, updatedEarliestStartDate)
+  }
 }
