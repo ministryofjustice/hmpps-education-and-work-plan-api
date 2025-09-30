@@ -170,7 +170,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private fun PrisonerReceivedAdditionalInformation.processPrisonerTAPReturnEvent() {
     log.info { "Processing Prisoner temporary release return Event for prisoner [$nomsNumber] at prison [$prisonId]" }
 
-    // only proceed if the status prisoner is currently EXEMPT_PRISONER_RELEASE, SCHEDULED or has no schedules at all
+    // only proceed if the status prisoner is currently EXEMPT_PRISONER_RELEASE, EXEMPT_TEMP_ABSENCE, SCHEDULED or has no schedules at all
     if (prisonerHasCorrectStatusForTAPReturnProcessing(nomsNumber)) {
       // If we received this message but didn't get the Admission message then we need to create an induction schedule
       scheduleAdapter.createInductionScheduleIfRequired(prisonNumber = nomsNumber, prisonId = prisonId)
@@ -228,7 +228,7 @@ class PrisonerReceivedIntoPrisonEventService(
       return true
     }
 
-    if (reviewSchedule?.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE || reviewSchedule?.scheduleStatus == ReviewScheduleStatus.SCHEDULED) {
+    if (reviewSchedule?.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE || reviewSchedule?.scheduleStatus == ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE || reviewSchedule?.scheduleStatus == ReviewScheduleStatus.SCHEDULED) {
       return true
     }
 
