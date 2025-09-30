@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
+import java.time.LocalDate
 
 interface ReviewSchedulePersistenceAdapter {
 
@@ -55,4 +56,6 @@ interface ReviewSchedulePersistenceAdapter {
   fun updateReviewScheduleStatus(updateReviewScheduleStatusDto: UpdateReviewScheduleStatusDto): ReviewSchedule
 
   fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule>
+
+  fun updateEarliestStartDate(prisonNumber: String, updatedEarliestStartDate: LocalDate)
 }
