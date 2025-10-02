@@ -96,7 +96,7 @@ class JpaReviewSchedulePersistenceAdapter(
   override fun updateEarliestStartDate(prisonNumber: String, updatedEarliestStartDate: LocalDate) {
     val reviewSchedule = reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonNumber) ?: throw ReviewScheduleNotFoundException(prisonNumber)
     reviewSchedule.earliestReviewDate = updatedEarliestStartDate
-    reviewScheduleRepository.save(reviewSchedule)
+    reviewScheduleRepository.saveAndFlush(reviewSchedule)
     // now update the review schedule history
     saveReviewScheduleHistory(reviewSchedule)
   }
