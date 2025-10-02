@@ -192,9 +192,9 @@ class SessionSummaryService(
         BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE, BETWEEN_12_AND_60_MONTHS_TO_SERVE, MORE_THAN_60_MONTHS_TO_SERVE, INDETERMINATE_SENTENCE -> reviewScheduleWindow.dateTo.minusMonths(2)
         else -> reviewScheduleWindow.dateFrom
       }.also {
-        if (it != reviewScheduleWindow.dateTo) {
+        if (it != reviewScheduleWindow.dateFrom) {
           log.debug {
-            "RR-1919 - ReviewSchedule.dateTo for prisoner [$prisonNumber] has been adjusted for the purpose of determining whether the review is due (original calculation rule [$scheduleCalculationRule])"
+            "RR-1919 - ReviewSchedule.dateFrom for prisoner [$prisonNumber] has been adjusted for the purpose of determining whether the review is due (original calculation rule [$scheduleCalculationRule], dateFrom [${reviewScheduleWindow.dateFrom}], new date [$it])"
           }
         }
       }
