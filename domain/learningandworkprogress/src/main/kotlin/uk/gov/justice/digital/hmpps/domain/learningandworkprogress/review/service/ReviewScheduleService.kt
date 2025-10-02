@@ -3,13 +3,6 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_12_AND_60_MONTHS_TO_SERVE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_ON_REMAND
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
@@ -47,33 +40,9 @@ class ReviewScheduleService(
    * Otherwise, throws [ReviewScheduleNotFoundException] if it cannot be found.
    */
   fun getLatestReviewScheduleForPrisoner(prisonNumber: String): ReviewSchedule =
-    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber)
-      ?.let { reviewSchedule ->
-        // TODO - temp fix for RR-1919 - the reviewScheduleWindow.dateFrom value _might_ be wrong in some cases
-        // Until a data fix is implemented, the safest option is to recalculate the dateFrom value by subtracting the relevant number of months
-        // from the dateTo value (ie reverse-engineer what ReviewScheduleDateCalculationService.calculateReviewWindow would have done)
-        val dateFrom =
-          with(reviewSchedule) {
-            when (scheduleCalculationRule) {
-              BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> reviewScheduleWindow.dateTo.minusMonths(1)
-              BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE, BETWEEN_12_AND_60_MONTHS_TO_SERVE, MORE_THAN_60_MONTHS_TO_SERVE, INDETERMINATE_SENTENCE -> reviewScheduleWindow.dateTo.minusMonths(2)
-              else -> reviewSchedule.reviewScheduleWindow.dateFrom
-            }.also {
-              if (it != reviewScheduleWindow.dateFrom) {
-                log.debug {
-                  "RR-1919 - ReviewSchedule.dateFrom for prisoner [$prisonNumber] has been adjusted for the purpose of determining whether the review is due (original calculation rule [$scheduleCalculationRule], dateFrom [${reviewScheduleWindow.dateFrom}], new date [$it])"
-                }
-              }
-            }
-          }
-
-        reviewSchedule.copy(
-          reviewScheduleWindow = reviewSchedule.reviewScheduleWindow.copy(
-            dateFrom = dateFrom,
-          ),
-        )
-      }
-      ?: throw ReviewScheduleNotFoundException(prisonNumber)
+    reviewSchedulePersistenceAdapter.getLatestReviewSchedule(prisonNumber) ?: throw ReviewScheduleNotFoundException(
+      prisonNumber,
+    )
 
   /**
    * Returns a list of [ReviewSchedule] for the prisoner identified by their prison number.
