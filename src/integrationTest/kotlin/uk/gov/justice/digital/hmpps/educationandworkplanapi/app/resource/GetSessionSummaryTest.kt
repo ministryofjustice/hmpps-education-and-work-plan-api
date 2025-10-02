@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -304,5 +305,30 @@ class GetSessionSummaryTest : IntegrationTestBase() {
       earliestDate = LocalDate.now().minusDays(10),
       status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
     )
+  }
+
+  // TODO - remove once RR-1919 is fixed
+  @Test
+  fun `should get review schedule where dateFrom is incorrectly too early`() {
+    // Given
+    createReviewScheduleRecord(
+      prisoner1.prisonerNumber,
+      earliestDate = LocalDate.parse("2025-09-18"), // One of the incorrectly set earliest dates
+      latestDate = LocalDate.parse("2026-10-01"),
+      status = ReviewScheduleStatus.SCHEDULED,
+      scheduleCalculationRule = ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
+    )
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1),
+    )
+
+    // When
+    val response = getSessionSummary()
+
+    // Then
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.dueReviews).isEqualTo(0) // expect there to be no due sessions, even though the review schedule dates would suggest it should be due
   }
 }
