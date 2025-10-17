@@ -6,12 +6,23 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
+import org.springframework.http.MediaType.APPLICATION_JSON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.REVIEWS_RW
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.LocalDate
 
@@ -21,6 +32,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
   companion object {
     private const val ORIGINAL_PRISON = "BXI"
     private const val PRISON_TRANSFERRING_TO = "MDI"
+    private const val COMPLETE_REVIEW_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
   }
 
   @Test
@@ -122,5 +134,96 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
 
     // test that no outbound events were created
     assertThat(reviewScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+  }
+
+  @Test
+  fun `prisoner has had their last review prior to release then has their sentence extended and is transferred new review schedule should be created`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
+    val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(100))
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+    createActionPlan(prisonNumber)
+
+    // complete the review Schedule
+    // change the release date for the prisoner
+    var prisonerFromApi = aValidPrisoner(
+      prisonerNumber = prisonNumber,
+      legalStatus = LegalStatus.SENTENCED,
+      releaseDate = LocalDate.now().plusDays(1),
+    )
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
+    completeReview(prisonNumber)
+
+    // check that the there is no new review schedule and the review is set to prerelease=true
+
+    val reviewSchedulesBefore = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedulesBefore.size).isEqualTo(1)
+    assertThat(reviewSchedulesBefore.first().scheduleStatus).isEqualTo(COMPLETED)
+
+    val reviewsBefore = reviewRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewsBefore.size).isEqualTo(1)
+    assertThat(reviewsBefore.first().preRelease).isTrue
+
+    // change the release date for the prisoner
+    prisonerFromApi = aValidPrisoner(
+      prisonerNumber = prisonNumber,
+      legalStatus = LegalStatus.SENTENCED,
+      releaseDate = LocalDate.now().plusYears(1),
+    )
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    // When a prisoner is transferred
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = PRISON_TRANSFERRING_TO,
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then the new review schedule should be created
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedulesAfter.size).isEqualTo(2)
+    assertThat(reviewSchedulesAfter.first().scheduleStatus).isEqualTo(COMPLETED)
+    assertThat(reviewSchedulesAfter.last().scheduleStatus).isEqualTo(SCHEDULED)
+    assertThat(reviewSchedulesAfter.last().latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
+  }
+
+  private fun completeReview(prisonNumber: String) {
+    webTestClient.post()
+      .uri(COMPLETE_REVIEW_URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidCreateActionPlanReviewRequest(
+          prisonId = "MDI",
+          conductedBy = "Barnie Jones",
+          conductedByRole = "Peer mentor",
+          note = "A great review today; prisoner is making good progress towards his goals",
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated
+      .returnResult(CreateActionPlanReviewResponse::class.java)
   }
 }
