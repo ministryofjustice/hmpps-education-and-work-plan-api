@@ -12,30 +12,35 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
+import java.time.Duration
 import kotlin.apply as kotlinApply
 
+private const val DEFAULT_TIMEOUT_SECONDS: Long = 30
+
 @Configuration
-class WebClientConfiguration {
+class WebClientConfiguration(
+  @param:Value("\${api.timeout:20s}") val timeout: Duration,
+) {
   @Bean(name = ["prisonApiWebClient"])
   fun prisonApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     @Value("\${apis.prison-api.url}") prisonApiUri: String,
-  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonApiUri)
+  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonApiUri, timeout)
 
   @Bean(name = ["manageUsersApiWebClient"])
   fun manageUsersApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     @Value("\${apis.manage-users-api.url}") manageUsersApiUri: String,
-  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri)
+  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri, timeout)
 
   @Bean(name = ["prisonerSearchApiWebClient"])
   fun prisonerSearchApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
     @Value("\${apis.prisoner-search-api.url}") prisonerSearchApiUri: String,
-  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search-api", url = prisonerSearchApiUri)
+  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search-api", url = prisonerSearchApiUri, timeout)
 
   @Bean
   fun authorizedClientManager(
@@ -53,13 +58,14 @@ class WebClientConfiguration {
     authorizedClientManager: OAuth2AuthorizedClientManager,
     registrationId: String,
     url: String,
+    timeout: Duration = Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS),
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager).kotlinApply {
       setDefaultClientRegistrationId(registrationId)
     }
 
     return baseUrl(url)
-      .clientConnector(ReactorClientHttpConnector(HttpClient.create()))
+      .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(timeout)))
       .filter(oauth2Client)
       .build()
   }
