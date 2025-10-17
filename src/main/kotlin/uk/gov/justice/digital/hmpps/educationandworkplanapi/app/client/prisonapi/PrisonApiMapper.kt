@@ -39,14 +39,16 @@ class PrisonApiMapper {
     return admissionsAndReleases
   }
 
-  private fun buildTransfers(transfers: List<TransferDetail>): List<PrisonMovementEvent> = transfers.map {
+  private fun buildTransfers(transfers: List<TransferDetail>): List<PrisonMovementEvent> = transfers.map { t ->
+    val date = t.dateInToPrison?.toLocalDate() ?: t.dateOutOfPrison.toLocalDate()
+
     PrisonMovementEvent(
-      date = it.dateInToPrison.toLocalDate(),
+      date = date,
       movementType = PrisonMovementType.TRANSFER,
-      fromPrisonId = it.fromPrisonId,
-      toPrisonId = it.toPrisonId,
+      fromPrisonId = t.fromPrisonId,
+      toPrisonId = t.toPrisonId ?: "N/A",
     )
-  } ?: emptyList()
+  }
 
   private fun toPrisonAdmissionEvent(movement: SignificantMovement): PrisonMovementEvent = PrisonMovementEvent(
     date = movement.dateInToPrison.toLocalDate(),

@@ -61,7 +61,7 @@ spring:
     password: ${DB_PASS}
     hikari:
       pool-name: EducationAndWorkPlan-DB-CP
-      connectionTimeout: 1000
+      connectionTimeout: 3000
       validationTimeout: 500
 
   flyway:

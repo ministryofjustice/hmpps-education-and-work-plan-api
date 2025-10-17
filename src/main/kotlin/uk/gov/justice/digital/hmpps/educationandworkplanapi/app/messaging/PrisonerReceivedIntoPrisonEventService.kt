@@ -5,11 +5,14 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
@@ -56,7 +59,9 @@ class PrisonerReceivedIntoPrisonEventService(
 
       TRANSFERRED -> processPrisonerTransferEvent()
 
-      TEMPORARY_ABSENCE_RETURN, RETURN_FROM_COURT ->
+      TEMPORARY_ABSENCE_RETURN -> processPrisonerTAPReturnEvent()
+
+      RETURN_FROM_COURT ->
         log.debug { "Ignoring Processing Prisoner Received Into Prison Event with reason ${additionalInformation.reason}" }
     }
   }
@@ -129,7 +134,6 @@ class PrisonerReceivedIntoPrisonEventService(
 
   private fun PrisonerReceivedAdditionalInformation.processPrisonerTransferEvent() {
     log.info { "Processing Prisoner Transfer Event for prisoner [$nomsNumber] at prison [$prisonId]" }
-
     /**
      * It is possible that we can receive a transfer message without receiving a prisoner ADMISSION event.
      * if this happens and the person had an induction completed from a previous prison stay then they will not
@@ -161,6 +165,78 @@ class PrisonerReceivedIntoPrisonEventService(
         )
       },
     )
+  }
+
+  private fun PrisonerReceivedAdditionalInformation.processPrisonerTAPReturnEvent() {
+    log.info { "Processing Prisoner temporary release return Event for prisoner [$nomsNumber] at prison [$prisonId]" }
+
+    // only proceed if the status prisoner is currently EXEMPT_PRISONER_RELEASE, EXEMPT_TEMP_ABSENCE, SCHEDULED or has no schedules at all
+    if (prisonerHasCorrectStatusForTAPReturnProcessing(nomsNumber)) {
+      // If we received this message but didn't get the Admission message then we need to create an induction schedule
+      scheduleAdapter.createInductionScheduleIfRequired(prisonNumber = nomsNumber, prisonId = prisonId)
+
+      /**
+       * It is possible that we can receive a temporary release return message without receiving a prisoner ADMISSION event.
+       * if this happens and the person had an induction completed from a previous prison stay then they will not
+       * have a review/induction schedule created and the prisoner will be stuck and require manual intervention
+       * This block is belt and braces to ensure that the prisoner has the correct schedules set up.
+       **/
+      try {
+        scheduleAdapter.completeInductionScheduleAndCreateInitialReviewSchedule(nomsNumber, prisonId)
+      } catch (e: ReviewScheduleNoReleaseDateForSentenceTypeException) {
+        log.warn { "Exception thrown when completing induction or creating review schedule: ${e.message}" }
+      }
+
+      handle(
+        scheduleType = REVIEW_SCHEDULE,
+        action = {
+          reviewScheduleService.exemptAndReScheduleActiveReviewScheduleDueToTAPReturn(
+            prisonNumber = nomsNumber,
+            prisonId = prisonId,
+          )
+        },
+      )
+
+      handle(
+        scheduleType = INDUCTION_SCHEDULE,
+        action = {
+          inductionScheduleService.exemptAndReScheduleActiveInductionScheduleDueToTAPReturn(
+            prisonNumber = nomsNumber,
+            prisonId = prisonId,
+          )
+        },
+      )
+    } else {
+      log.info { "Did not process Prisoner temporary release return Event for prisoner [$nomsNumber] at prison [$prisonId] due to prisoner not being exempt due to release" }
+    }
+  }
+
+  private fun prisonerHasCorrectStatusForTAPReturnProcessing(nomsNumber: String): Boolean {
+    val reviewSchedule = try {
+      reviewScheduleService.getLatestReviewScheduleForPrisoner(nomsNumber)
+    } catch (e: ReviewScheduleNotFoundException) {
+      null
+    }
+
+    val inductionSchedule = try {
+      inductionScheduleService.getInductionScheduleForPrisoner(nomsNumber)
+    } catch (e: InductionScheduleNotFoundException) {
+      null
+    }
+
+    if (inductionSchedule == null && reviewSchedule == null) {
+      return true
+    }
+
+    if (reviewSchedule?.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE || reviewSchedule?.scheduleStatus == ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE || reviewSchedule?.scheduleStatus == ReviewScheduleStatus.SCHEDULED) {
+      return true
+    }
+
+    if (inductionSchedule?.scheduleStatus == EXEMPT_PRISONER_RELEASE || inductionSchedule?.scheduleStatus == InductionScheduleStatus.SCHEDULED) {
+      return true
+    }
+
+    return false
   }
 
   private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String, dataCorrection: Boolean = false, treatAsTransfer: Boolean = false) {

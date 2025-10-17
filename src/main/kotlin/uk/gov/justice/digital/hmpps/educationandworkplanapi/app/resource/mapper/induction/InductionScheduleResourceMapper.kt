@@ -77,6 +77,7 @@ class InductionScheduleResourceMapper(
     InductionScheduleStatus.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF -> InductionScheduleStatusResponse.EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF
     InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> InductionScheduleStatusResponse.EXEMPT_SYSTEM_TECHNICAL_ISSUE
     InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusResponse.EXEMPT_PRISONER_TRANSFER
+    InductionScheduleStatus.EXEMPT_TEMP_ABSENCE -> InductionScheduleStatusResponse.EXEMPT_TEMP_ABSENCE
     InductionScheduleStatus.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_RELEASE
     InductionScheduleStatus.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusResponse.EXEMPT_PRISONER_DEATH
     InductionScheduleStatus.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusResponse.EXEMPT_PRISONER_MERGE
