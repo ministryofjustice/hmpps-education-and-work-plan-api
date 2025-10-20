@@ -8,21 +8,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.Upda
 import java.util.UUID
 
 class NoteService(private val notePersistenceAdapter: NotePersistenceAdapter) {
-  fun createNote(createNoteDto: CreateNoteDto): NoteDto {
-    return notePersistenceAdapter.createNote(createNoteDto)
-  }
+  fun createNote(createNoteDto: CreateNoteDto): NoteDto = notePersistenceAdapter.createNote(createNoteDto)
 
-  fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> {
-    return notePersistenceAdapter.getNotes(entityReference, entityType)
-  }
+  fun getNotes(entityReference: UUID, entityType: EntityType): List<NoteDto> = notePersistenceAdapter.getNotes(entityReference, entityType)
 
-  fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> {
-    return notePersistenceAdapter.getNotes(entityReference, entityType, noteType)
-  }
+  fun getNotes(entityReference: UUID, entityType: EntityType, noteType: NoteType): List<NoteDto> = notePersistenceAdapter.getNotes(entityReference, entityType, noteType)
 
-  fun updateNote(updateNoteDto: UpdateNoteDto): NoteDto {
-    return notePersistenceAdapter.updateNote(updateNoteDto)
-  }
+  fun updateNote(updateNoteDto: UpdateNoteDto): NoteDto = notePersistenceAdapter.updateNote(updateNoteDto)
 
   fun deleteNote(entityReference: UUID, entityType: EntityType, noteType: NoteType) {
     notePersistenceAdapter.deleteNoteByEntityReference(entityReference, entityType, noteType)

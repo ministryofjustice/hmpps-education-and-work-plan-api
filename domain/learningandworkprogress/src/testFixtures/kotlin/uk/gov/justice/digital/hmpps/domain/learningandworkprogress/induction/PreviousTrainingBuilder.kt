@@ -13,15 +13,14 @@ fun aValidPreviousTraining(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
-) =
-  PreviousTraining(
-    reference = reference,
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+) = PreviousTraining(
+  reference = reference,
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)

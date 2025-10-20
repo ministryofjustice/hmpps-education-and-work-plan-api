@@ -7,22 +7,20 @@ fun aValidCreatePreviousTrainingDto(
   trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
   trainingTypeOther: String? = "Kotlin course",
   prisonId: String = "BXI",
-) =
-  CreatePreviousTrainingDto(
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-    prisonId = prisonId,
-  )
+) = CreatePreviousTrainingDto(
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+  prisonId = prisonId,
+)
 
 fun aValidUpdatePreviousTrainingDto(
   reference: UUID = UUID.randomUUID(),
   trainingTypes: List<TrainingType> = listOf(TrainingType.OTHER),
   trainingTypeOther: String? = "Kotlin course",
   prisonId: String = "BXI",
-) =
-  UpdatePreviousTrainingDto(
-    reference = reference,
-    trainingTypes = trainingTypes,
-    trainingTypeOther = trainingTypeOther,
-    prisonId = prisonId,
-  )
+) = UpdatePreviousTrainingDto(
+  reference = reference,
+  trainingTypes = trainingTypes,
+  trainingTypeOther = trainingTypeOther,
+  prisonId = prisonId,
+)

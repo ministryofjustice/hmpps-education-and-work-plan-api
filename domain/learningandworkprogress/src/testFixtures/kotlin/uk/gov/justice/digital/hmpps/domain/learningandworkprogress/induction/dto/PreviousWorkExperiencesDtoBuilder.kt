@@ -10,13 +10,12 @@ fun aValidCreatePreviousWorkExperiencesDto(
   hasWorkedBeforeNotRelevantReason: String? = null,
   experiences: List<WorkExperience> = listOf(aValidWorkExperience()),
   prisonId: String = "BXI",
-) =
-  CreatePreviousWorkExperiencesDto(
-    hasWorkedBefore = hasWorkedBefore,
-    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
-    experiences = experiences,
-    prisonId = prisonId,
-  )
+) = CreatePreviousWorkExperiencesDto(
+  hasWorkedBefore = hasWorkedBefore,
+  hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+  experiences = experiences,
+  prisonId = prisonId,
+)
 
 fun aValidUpdatePreviousWorkExperiencesDto(
   reference: UUID = UUID.randomUUID(),
@@ -24,11 +23,10 @@ fun aValidUpdatePreviousWorkExperiencesDto(
   hasWorkedBeforeNotRelevantReason: String? = null,
   experiences: List<WorkExperience> = listOf(aValidWorkExperience()),
   prisonId: String = "BXI",
-) =
-  UpdatePreviousWorkExperiencesDto(
-    reference = reference,
-    hasWorkedBefore = hasWorkedBefore,
-    hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
-    experiences = experiences,
-    prisonId = prisonId,
-  )
+) = UpdatePreviousWorkExperiencesDto(
+  reference = reference,
+  hasWorkedBefore = hasWorkedBefore,
+  hasWorkedBeforeNotRelevantReason = hasWorkedBeforeNotRelevantReason,
+  experiences = experiences,
+  prisonId = prisonId,
+)

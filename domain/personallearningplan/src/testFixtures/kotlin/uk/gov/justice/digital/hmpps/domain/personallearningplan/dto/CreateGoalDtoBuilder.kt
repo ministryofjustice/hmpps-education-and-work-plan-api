@@ -11,12 +11,11 @@ fun aValidCreateGoalDto(
   steps: List<CreateStepDto> = listOf(aValidCreateStepDto(), anotherValidCreateStepDto()),
   status: GoalStatus = ACTIVE,
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
-): CreateGoalDto =
-  CreateGoalDto(
-    title = title,
-    prisonId = prisonId,
-    targetCompletionDate = targetCompletionDate,
-    steps = steps,
-    status = status,
-    notes = notes,
-  )
+): CreateGoalDto = CreateGoalDto(
+  title = title,
+  prisonId = prisonId,
+  targetCompletionDate = targetCompletionDate,
+  steps = steps,
+  status = status,
+  notes = notes,
+)

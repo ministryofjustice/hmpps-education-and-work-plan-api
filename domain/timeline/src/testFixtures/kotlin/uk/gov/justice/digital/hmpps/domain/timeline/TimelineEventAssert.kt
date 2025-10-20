@@ -8,8 +8,7 @@ fun assertThat(actual: TimelineEvent?) = TimelineEventAssert(actual)
 /**
  * AssertJ custom assertion for [TimelineEvent]
  */
-class TimelineEventAssert(actual: TimelineEvent?) :
-  AbstractObjectAssert<TimelineEventAssert, TimelineEvent?>(actual, TimelineEventAssert::class.java) {
+class TimelineEventAssert(actual: TimelineEvent?) : AbstractObjectAssert<TimelineEventAssert, TimelineEvent?>(actual, TimelineEventAssert::class.java) {
 
   fun wasActionedBy(expected: String): TimelineEventAssert {
     isNotNull

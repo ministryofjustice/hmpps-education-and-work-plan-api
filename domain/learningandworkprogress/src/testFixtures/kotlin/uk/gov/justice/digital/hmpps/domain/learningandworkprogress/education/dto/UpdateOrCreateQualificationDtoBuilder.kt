@@ -10,13 +10,12 @@ fun aValidCreateQualificationDto(
   subject: String = "English",
   level: QualificationLevel = QualificationLevel.LEVEL_1,
   grade: String = "C",
-): CreateQualificationDto =
-  CreateQualificationDto(
-    prisonId = prisonId,
-    subject = subject,
-    level = level,
-    grade = grade,
-  )
+): CreateQualificationDto = CreateQualificationDto(
+  prisonId = prisonId,
+  subject = subject,
+  level = level,
+  grade = grade,
+)
 
 fun aValidUpdateQualificationDto(
   reference: UUID = UUID.randomUUID(),
@@ -24,11 +23,10 @@ fun aValidUpdateQualificationDto(
   subject: String = "English",
   level: QualificationLevel = QualificationLevel.LEVEL_1,
   grade: String = "C",
-): UpdateQualificationDto =
-  UpdateQualificationDto(
-    prisonId = prisonId,
-    reference = reference,
-    subject = subject,
-    level = level,
-    grade = grade,
-  )
+): UpdateQualificationDto = UpdateQualificationDto(
+  prisonId = prisonId,
+  reference = reference,
+  subject = subject,
+  level = level,
+  grade = grade,
+)

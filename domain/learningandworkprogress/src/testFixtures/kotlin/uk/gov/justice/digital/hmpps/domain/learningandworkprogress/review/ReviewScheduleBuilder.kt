@@ -19,18 +19,17 @@ fun aValidReviewSchedule(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
-): ReviewSchedule =
-  ReviewSchedule(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    reviewScheduleWindow = ReviewScheduleWindow(earliestReviewDate, latestReviewDate),
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    exemptionReason = exemptionReason,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+): ReviewSchedule = ReviewSchedule(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  reviewScheduleWindow = ReviewScheduleWindow(earliestReviewDate, latestReviewDate),
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  exemptionReason = exemptionReason,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)

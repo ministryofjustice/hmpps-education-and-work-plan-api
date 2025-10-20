@@ -352,35 +352,34 @@ class ReviewServiceTest {
     private val TODAY = LocalDate.now()
 
     @JvmStatic
-    fun notPrisonersLastReview_testCases(): Stream<Arguments> =
-      Stream.of(
-        Arguments.of(
-          "prisoner has an indeterminate sentence - next review 10 to 12 months",
-          null,
-          SentenceType.INDETERMINATE_SENTENCE,
-          true,
-          false,
-          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
-          ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
-        ),
-        Arguments.of(
-          "prisoner is has been recalled - next review 2 to 3 months",
-          null,
-          SentenceType.RECALL,
-          false,
-          true,
-          ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
-          ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
-        ),
-        Arguments.of(
-          "prisoner is sentenced with 6 months to serve - next review 2 to 3 months",
-          TODAY.plusMonths(6),
-          SentenceType.SENTENCED,
-          false,
-          false,
-          ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
-          ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
-        ),
-      )
+    fun notPrisonersLastReview_testCases(): Stream<Arguments> = Stream.of(
+      Arguments.of(
+        "prisoner has an indeterminate sentence - next review 10 to 12 months",
+        null,
+        SentenceType.INDETERMINATE_SENTENCE,
+        true,
+        false,
+        ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE,
+        ReviewScheduleWindow(TODAY.plusMonths(10), TODAY.plusMonths(12)),
+      ),
+      Arguments.of(
+        "prisoner is has been recalled - next review 2 to 3 months",
+        null,
+        SentenceType.RECALL,
+        false,
+        true,
+        ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
+        ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
+      ),
+      Arguments.of(
+        "prisoner is sentenced with 6 months to serve - next review 2 to 3 months",
+        TODAY.plusMonths(6),
+        SentenceType.SENTENCED,
+        false,
+        false,
+        ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
+        ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
+      ),
+    )
   }
 }

@@ -9,35 +9,32 @@ fun aValidUpdateStepDto(
   title: String = "Book communication skills course",
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 1,
-): UpdateStepDto =
-  UpdateStepDto(
-    reference = reference,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-  )
+): UpdateStepDto = UpdateStepDto(
+  reference = reference,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+)
 
 fun anotherValidUpdateStepDto(
   reference: UUID? = UUID.randomUUID(),
   title: String = "Complete communication skills course",
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 2,
-): UpdateStepDto =
-  UpdateStepDto(
-    reference = reference,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-  )
+): UpdateStepDto = UpdateStepDto(
+  reference = reference,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+)
 
 fun aValidUpdateStepDtoWithNoReference(
   title: String = "Complete communication skills course",
   status: StepStatus = NOT_STARTED,
   sequenceNumber: Int = 2,
-): UpdateStepDto =
-  UpdateStepDto(
-    reference = null,
-    title = title,
-    status = status,
-    sequenceNumber = sequenceNumber,
-  )
+): UpdateStepDto = UpdateStepDto(
+  reference = null,
+  title = title,
+  status = status,
+  sequenceNumber = sequenceNumber,
+)

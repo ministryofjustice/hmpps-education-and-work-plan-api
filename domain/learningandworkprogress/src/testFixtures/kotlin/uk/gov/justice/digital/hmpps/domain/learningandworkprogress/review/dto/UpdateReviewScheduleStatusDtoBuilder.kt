@@ -13,13 +13,12 @@ fun aValidUpdateReviewScheduleStatusDto(
   earliestReviewDate: LocalDate? = LocalDate.now(),
   latestReviewDate: LocalDate? = LocalDate.now().plusMonths(6),
   prisonNumber: String = randomValidPrisonNumber(),
-): UpdateReviewScheduleStatusDto =
-  UpdateReviewScheduleStatusDto(
-    reference = reference,
-    scheduleStatus = scheduleStatus,
-    exemptionReason = exemptionReason,
-    prisonId = prisonId,
-    earliestReviewDate = earliestReviewDate,
-    latestReviewDate = latestReviewDate,
-    prisonNumber = prisonNumber,
-  )
+): UpdateReviewScheduleStatusDto = UpdateReviewScheduleStatusDto(
+  reference = reference,
+  scheduleStatus = scheduleStatus,
+  exemptionReason = exemptionReason,
+  prisonId = prisonId,
+  earliestReviewDate = earliestReviewDate,
+  latestReviewDate = latestReviewDate,
+  prisonNumber = prisonNumber,
+)
