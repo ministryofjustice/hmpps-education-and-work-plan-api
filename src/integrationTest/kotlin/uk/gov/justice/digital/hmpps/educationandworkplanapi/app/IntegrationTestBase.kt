@@ -723,9 +723,9 @@ abstract class IntegrationTestBase {
     Thread.sleep(delay)
   }
 
-  fun setUpRandomPrisoner(): String {
+  fun setUpRandomPrisoner(releaseDate: LocalDate = LocalDate.now().plusYears(1)): String {
     val prisonNumber = randomValidPrisonNumber()
-    val prisoner = aValidPrisoner(prisonNumber)
+    val prisoner = aValidPrisoner(prisonNumber, releaseDate = releaseDate)
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
     return prisonNumber
   }

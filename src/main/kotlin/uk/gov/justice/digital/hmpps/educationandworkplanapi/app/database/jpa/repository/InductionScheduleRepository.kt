@@ -23,4 +23,6 @@ interface InductionScheduleRepository : JpaRepository<InductionScheduleEntity, U
     prisonNumbers: List<String>,
     status: InductionScheduleStatus = InductionScheduleStatus.COMPLETED,
   ): List<InductionScheduleEntity>
+
+  fun getAllByPrisonNumber(prisonNumber: String): MutableList<InductionScheduleEntity>
 }
