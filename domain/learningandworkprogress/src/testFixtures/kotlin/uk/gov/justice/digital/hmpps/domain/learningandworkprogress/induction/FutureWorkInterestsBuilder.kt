@@ -12,17 +12,16 @@ fun aValidFutureWorkInterests(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
-) =
-  FutureWorkInterests(
-    reference = reference,
-    interests = interests,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+) = FutureWorkInterests(
+  reference = reference,
+  interests = interests,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)
 
 fun aValidWorkInterest(
   workType: WorkInterestType = WorkInterestType.CONSTRUCTION,

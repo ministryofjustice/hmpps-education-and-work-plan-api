@@ -29,23 +29,21 @@ abstract class InductionScheduleDateCalculationService(
    */
   abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean = true, releaseDate: LocalDate? = null, dataCorrection: Boolean = false): CreateInductionScheduleDto
 
-  fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate =
-    with(inductionSchedule) {
-      if (inductionSchedule.scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
-        return baseScheduleDate().plusDays(TWENTY_DAYS)
-      }
-      val additionalDays = getExtensionDays(scheduleStatus)
-      val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
-      maxOf(baseDatePlusAdditionalDays, deadlineDate)
+  fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
+    if (inductionSchedule.scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
+      return baseScheduleDate().plusDays(TWENTY_DAYS)
     }
+    val additionalDays = getExtensionDays(scheduleStatus)
+    val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
+    maxOf(baseDatePlusAdditionalDays, deadlineDate)
+  }
 
-  private fun getExtensionDays(status: InductionScheduleStatus): Long =
-    when {
-      status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
-      status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-      status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
-      else -> 0 // Default case, if no condition matches
-    }
+  private fun getExtensionDays(status: InductionScheduleStatus): Long = when {
+    status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
+    status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
+    status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
+    else -> 0 // Default case, if no condition matches
+  }
 
   /**
    * Returns the base date from which all Induction Schedule dates are calculated

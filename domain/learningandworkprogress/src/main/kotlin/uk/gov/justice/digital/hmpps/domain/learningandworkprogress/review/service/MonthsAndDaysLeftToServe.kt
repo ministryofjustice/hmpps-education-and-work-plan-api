@@ -11,8 +11,7 @@ data class MonthsAndDaysLeftToServe(
 
   fun isNoMoreThan3Months(): Boolean = months < 3 || isExactMonths(3)
   fun isBetween3MonthsAnd3Months7Days(): Boolean = months == 3L && days in 1..7
-  fun isBetween3Months8DaysAnd6Months(): Boolean =
-    ((months == 3L && days >= 8) || months >= 4) && (months < 6 || isExactMonths(6))
+  fun isBetween3Months8DaysAnd6Months(): Boolean = ((months == 3L && days >= 8) || months >= 4) && (months < 6 || isExactMonths(6))
 
   fun isBetween6And12Months(): Boolean = months >= 6 && !isExactMonths(6) && (months < 12 || isExactMonths(12))
   fun isBetween12And60Months(): Boolean = months >= 12 && !isExactMonths(12) && (months < 60 || isExactMonths(60))

@@ -48,22 +48,20 @@ class ReviewScheduleDateCalculationService {
     releaseDate: LocalDate?,
     isReAdmission: Boolean = false,
     isTransfer: Boolean = false,
-  ): ReviewScheduleCalculationRule {
-    return when {
-      isReAdmission -> PRISONER_READMISSION
-      isTransfer -> PRISONER_TRANSFER
-      releaseDate != null -> {
-        log.info("release date was $releaseDate for prison number $prisonNumber using calculation rule based on time left to serve.")
-        reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
-      }
-      else -> when (sentenceType) {
-        REMAND -> PRISONER_ON_REMAND
-        CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
-        INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-        else -> {
-          log.info("release date was null for prison number $prisonNumber using calculation rule INDETERMINATE_SENTENCE")
-          ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
-        }
+  ): ReviewScheduleCalculationRule = when {
+    isReAdmission -> PRISONER_READMISSION
+    isTransfer -> PRISONER_TRANSFER
+    releaseDate != null -> {
+      log.info("release date was $releaseDate for prison number $prisonNumber using calculation rule based on time left to serve.")
+      reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
+    }
+    else -> when (sentenceType) {
+      REMAND -> PRISONER_ON_REMAND
+      CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
+      INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
+      else -> {
+        log.info("release date was null for prison number $prisonNumber using calculation rule INDETERMINATE_SENTENCE")
+        ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE
       }
     }
   }
@@ -77,29 +75,28 @@ class ReviewScheduleDateCalculationService {
   fun calculateReviewWindow(
     reviewScheduleCalculationRule: ReviewScheduleCalculationRule,
     releaseDate: LocalDate?,
-  ): ReviewScheduleWindow? =
-    when (reviewScheduleCalculationRule) {
-      BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
-      PRISONER_READMISSION, PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays(baseScheduleDate())
-      BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> {
-        // If the prisoner has between 3 months and 3 months 7 days left to serve their Review Schedule Window would be between 1 and 3 months
-        // as they would fall into the "between 3 and 6 months left to serve" rule. This would mean their deadline date would be within the last
-        // week before release.
-        // Prisoners and CIAGs need a clear 7 days between their final review deadline and release (their last week in prison is busy), so
-        // we need to set the deadline date to be the prisoner's release date minus 7 days
-        ReviewScheduleWindow.fromOneMonthToSpecificDate(baseScheduleDate(), releaseDate!!.minusDays(7))
-      }
-
-      BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths(baseScheduleDate())
-      BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths(baseScheduleDate())
-      BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths(baseScheduleDate())
-      MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths(baseScheduleDate())
-    }.also {
-      when {
-        it == null -> log.debug { "Returning no ReviewScheduleWindow because ReviewScheduleCalculationRule is $reviewScheduleCalculationRule" }
-        else -> log.debug { "Returning ReviewScheduleWindow $it based on ReviewScheduleCalculationRule $reviewScheduleCalculationRule" }
-      }
+  ): ReviewScheduleWindow? = when (reviewScheduleCalculationRule) {
+    BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE -> null
+    PRISONER_READMISSION, PRISONER_TRANSFER -> ReviewScheduleWindow.fromTodayToTenDays(baseScheduleDate())
+    BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE -> {
+      // If the prisoner has between 3 months and 3 months 7 days left to serve their Review Schedule Window would be between 1 and 3 months
+      // as they would fall into the "between 3 and 6 months left to serve" rule. This would mean their deadline date would be within the last
+      // week before release.
+      // Prisoners and CIAGs need a clear 7 days between their final review deadline and release (their last week in prison is busy), so
+      // we need to set the deadline date to be the prisoner's release date minus 7 days
+      ReviewScheduleWindow.fromOneMonthToSpecificDate(baseScheduleDate(), releaseDate!!.minusDays(7))
     }
+
+    BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths(baseScheduleDate())
+    BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths(baseScheduleDate())
+    BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths(baseScheduleDate())
+    MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths(baseScheduleDate())
+  }.also {
+    when {
+      it == null -> log.debug { "Returning no ReviewScheduleWindow because ReviewScheduleCalculationRule is $reviewScheduleCalculationRule" }
+      else -> log.debug { "Returning ReviewScheduleWindow $it based on ReviewScheduleCalculationRule $reviewScheduleCalculationRule" }
+    }
+  }
 
   /**
    * When clearing an exemption on a [ReviewSchedule] the Review Due date might need to be adjusted. This is to allow for
@@ -119,24 +116,22 @@ class ReviewScheduleDateCalculationService {
    * has a status that is an "exclusion" or an "exemption", and whether the calculated date is later than the existing
    * due date.
    */
-  fun calculateAdjustedReviewDueDate(reviewSchedule: ReviewSchedule): LocalDate =
-    with(reviewSchedule) {
-      if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
-        return LocalDate.now().plusDays(TEN_DAYS)
-      }
-      val additionalDays = getExtensionDays(scheduleStatus)
-      val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
-      maxOf(todayPlusAdditionalDays, reviewScheduleWindow.dateTo)
+  fun calculateAdjustedReviewDueDate(reviewSchedule: ReviewSchedule): LocalDate = with(reviewSchedule) {
+    if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
+      return LocalDate.now().plusDays(TEN_DAYS)
     }
+    val additionalDays = getExtensionDays(scheduleStatus)
+    val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
+    maxOf(todayPlusAdditionalDays, reviewScheduleWindow.dateTo)
+  }
 
-  private fun getExtensionDays(status: ReviewScheduleStatus): Long =
-    when {
-      status == ReviewScheduleStatus.EXEMPT_UNKNOWN -> RESCHEDULE_ADDITIONAL_DAYS
-      status == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
-      status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
-      status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-      else -> 0 // Default case, if no condition matches
-    }
+  private fun getExtensionDays(status: ReviewScheduleStatus): Long = when {
+    status == ReviewScheduleStatus.EXEMPT_UNKNOWN -> RESCHEDULE_ADDITIONAL_DAYS
+    status == ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
+    status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
+    status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
+    else -> 0 // Default case, if no condition matches
+  }
 
   private fun reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate: LocalDate): ReviewScheduleCalculationRule {
     val timeLeftToServe = from(baseScheduleDate()).until(releaseDate)

@@ -42,9 +42,7 @@ class GoalService(
   /**
    * Creates a new [Goal] for the prisoner identified by their prison number, with the data in the specified [CreateGoalDto]
    */
-  fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal {
-    return createGoals(prisonNumber, listOf(createGoalDto))[0]
-  }
+  fun createGoal(prisonNumber: String, createGoalDto: CreateGoalDto): Goal = createGoals(prisonNumber, listOf(createGoalDto))[0]
 
   /**
    * Creates new [Goal]s for the prisoner identified by their prison number, with the goal data in the specified list of [CreateGoalDto]s
@@ -62,15 +60,13 @@ class GoalService(
     }
   }
 
-  fun getGoals(getGoalsDto: GetGoalsDto): List<Goal> {
-    return goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
-      ?.filter { getGoalsDto.statuses.isNullOrEmpty() || it.status in getGoalsDto.statuses }
-      ?.onEach { it.notes = goalNotesService.getNotes(it.reference) }
-      ?: run {
-        log.info { "No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet" }
-        throw PrisonerHasNoGoalsException(getGoalsDto.prisonNumber)
-      }
-  }
+  fun getGoals(getGoalsDto: GetGoalsDto): List<Goal> = goalPersistenceAdapter.getGoals(getGoalsDto.prisonNumber)
+    ?.filter { getGoalsDto.statuses.isNullOrEmpty() || it.status in getGoalsDto.statuses }
+    ?.onEach { it.notes = goalNotesService.getNotes(it.reference) }
+    ?: run {
+      log.info { "No goals have been created for prisoner [${getGoalsDto.prisonNumber}] yet" }
+      throw PrisonerHasNoGoalsException(getGoalsDto.prisonNumber)
+    }
 
   /**
    * Returns a [Goal] identified by its `prisonNumber` and `goalReference`.
@@ -106,24 +102,23 @@ class GoalService(
   }
 
   // if the note is different to the note before then update/create the note
-  private fun updateNote(prisonNumber: String, goal: Goal, updatedNote: String?) =
-    goalNotesService.getNotes(goal.reference)
-      ?.run {
-        // Goal has a previous note
-        if (this != updatedNote) {
-          if (updatedNote.isNullOrEmpty()) {
-            goalNotesService.deleteNote(goal.reference)
-          } else {
-            goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
-          }
+  private fun updateNote(prisonNumber: String, goal: Goal, updatedNote: String?) = goalNotesService.getNotes(goal.reference)
+    ?.run {
+      // Goal has a previous note
+      if (this != updatedNote) {
+        if (updatedNote.isNullOrEmpty()) {
+          goalNotesService.deleteNote(goal.reference)
+        } else {
+          goalNotesService.updateNotes(goal.reference, goal.lastUpdatedAtPrison, updatedNote)
         }
       }
-      ?: run {
-        // Goal did not previously have a note
-        if (!updatedNote.isNullOrEmpty()) {
-          goalNotesService.createNotes(prisonNumber, listOf(goal))
-        }
+    }
+    ?: run {
+      // Goal did not previously have a note
+      if (!updatedNote.isNullOrEmpty()) {
+        goalNotesService.createNotes(prisonNumber, listOf(goal))
       }
+    }
 
   /**
    * Archives a [Goal], identified by its `prisonNumber` and `goalReference`, from the specified [ArchiveGoalDto].
@@ -220,15 +215,12 @@ class GoalService(
     }
   }
 
-  private fun checkReasonIsSpecifiedIfOther(archiveGoalDto: ArchiveGoalDto) =
-    archiveGoalDto.reason == ReasonToArchiveGoal.OTHER && archiveGoalDto.reasonOther.isNullOrEmpty()
+  private fun checkReasonIsSpecifiedIfOther(archiveGoalDto: ArchiveGoalDto) = archiveGoalDto.reason == ReasonToArchiveGoal.OTHER && archiveGoalDto.reasonOther.isNullOrEmpty()
 
-  private fun actionPlanDoesNotExist(prisonNumber: String) =
-    actionPlanPersistenceAdapter.getActionPlan(prisonNumber) == null
+  private fun actionPlanDoesNotExist(prisonNumber: String) = actionPlanPersistenceAdapter.getActionPlan(prisonNumber) == null
 
-  private fun newActionPlan(prisonNumber: String, createGoalDtos: List<CreateGoalDto>) =
-    CreateActionPlanDto(
-      prisonNumber = prisonNumber,
-      goals = createGoalDtos,
-    )
+  private fun newActionPlan(prisonNumber: String, createGoalDtos: List<CreateGoalDto>) = CreateActionPlanDto(
+    prisonNumber = prisonNumber,
+    goals = createGoalDtos,
+  )
 }

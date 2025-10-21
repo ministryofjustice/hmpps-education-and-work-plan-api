@@ -10,12 +10,11 @@ fun aValidUpdateGoalDto(
   targetCompletionDate: LocalDate = LocalDate.now().plusMonths(6),
   steps: List<UpdateStepDto> = listOf(aValidUpdateStepDto(), anotherValidUpdateStepDto()),
   notes: String? = "Chris would like to improve his listening skills, not just his verbal communication",
-): UpdateGoalDto =
-  UpdateGoalDto(
-    reference = reference,
-    title = title,
-    prisonId = prisonId,
-    targetCompletionDate = targetCompletionDate,
-    steps = steps,
-    notes = notes,
-  )
+): UpdateGoalDto = UpdateGoalDto(
+  reference = reference,
+  title = title,
+  prisonId = prisonId,
+  targetCompletionDate = targetCompletionDate,
+  steps = steps,
+  notes = notes,
+)

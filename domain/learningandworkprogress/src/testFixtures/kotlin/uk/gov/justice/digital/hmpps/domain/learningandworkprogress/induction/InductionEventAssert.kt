@@ -7,8 +7,7 @@ fun assertThat(actual: Induction?) = InductionAssert(actual)
 /**
  * AssertJ custom assertion for [Induction].
  */
-class InductionAssert(actual: Induction?) :
-  AbstractObjectAssert<InductionAssert, Induction?>(actual, InductionAssert::class.java) {
+class InductionAssert(actual: Induction?) : AbstractObjectAssert<InductionAssert, Induction?>(actual, InductionAssert::class.java) {
 
   fun hasPrisonNumber(expected: String): InductionAssert {
     isNotNull

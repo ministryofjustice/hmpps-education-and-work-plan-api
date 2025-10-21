@@ -34,8 +34,7 @@ class ReviewService(
    * Returns a list of all [CompletedReview]s for the prisoner identified by their prison number. An empty list is
    * returned if the prisoner has no Completed Reviews.
    */
-  fun getCompletedReviewsForPrisoner(prisonNumber: String): List<CompletedReview> =
-    reviewPersistenceAdapter.getCompletedReviews(prisonNumber)
+  fun getCompletedReviewsForPrisoner(prisonNumber: String): List<CompletedReview> = reviewPersistenceAdapter.getCompletedReviews(prisonNumber)
 
   /**
    * Creates a [CompletedReview] for the prisoner. and updates their current [ReviewSchedule] to be COMPLETED.
@@ -55,54 +54,53 @@ class ReviewService(
    * types require a release date. Throws a [ReviewScheduleNoReleaseDateForSentenceTypeException] if this condition
    * is not satisfied.
    */
-  fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto =
-    with(createCompletedReviewDto) {
-      val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
+  fun createReview(createCompletedReviewDto: CreateCompletedReviewDto): CompletedReviewDto = with(createCompletedReviewDto) {
+    val sentenceType = effectiveSentenceType(prisonerSentenceType, prisonerHasIndeterminateFlag, prisonerHasRecallFlag)
 
-      // Get the active review schedule
-      val currentReviewSchedule = reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber)
+    // Get the active review schedule
+    val currentReviewSchedule = reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber)
 
-      // Persist a new CompletedReview
-      val completedReview = reviewPersistenceAdapter.createCompletedReview(
-        createCompletedReviewDto = this,
-        reviewSchedule = currentReviewSchedule,
-      )
+    // Persist a new CompletedReview
+    val completedReview = reviewPersistenceAdapter.createCompletedReview(
+      createCompletedReviewDto = this,
+      reviewSchedule = currentReviewSchedule,
+    )
 
-      // Update the current review schedule to mark it as Completed
-      val completedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewSchedule(
-        UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, prisonId),
-      )
+    // Update the current review schedule to mark it as Completed
+    val completedReviewSchedule = reviewSchedulePersistenceAdapter.updateReviewSchedule(
+      UpdateReviewScheduleDto.setStatusToCompletedAtPrison(currentReviewSchedule, prisonId),
+    )
 
-      // Work out the next review schedule calculation rule and schedule window
-      val releaseDate = prisonerReleaseDate
-      val reviewScheduleCalculationRule = reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
-        prisonNumber = prisonNumber,
-        sentenceType = sentenceType,
-        releaseDate = releaseDate,
-      )
-      val reviewScheduleWindow = reviewScheduleDateCalculationService.calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
+    // Work out the next review schedule calculation rule and schedule window
+    val releaseDate = prisonerReleaseDate
+    val reviewScheduleCalculationRule = reviewScheduleDateCalculationService.determineReviewScheduleCalculationRule(
+      prisonNumber = prisonNumber,
+      sentenceType = sentenceType,
+      releaseDate = releaseDate,
+    )
+    val reviewScheduleWindow = reviewScheduleDateCalculationService.calculateReviewWindow(reviewScheduleCalculationRule, releaseDate)
 
-      CompletedReviewDto(
-        completedReview = completedReview,
-        wasLastReviewBeforeRelease = reviewScheduleWindow == null,
-        latestReviewSchedule = reviewScheduleWindow?.let {
-          // If a new ReviewScheduleWindow was calculated, create a new ReviewSchedule with it
-          reviewSchedulePersistenceAdapter.createReviewSchedule(
-            CreateReviewScheduleDto(
-              prisonNumber = prisonNumber,
-              prisonId = prisonId,
-              reviewScheduleWindow = it,
-              scheduleCalculationRule = reviewScheduleCalculationRule,
-            ),
-          )
-        } ?: let {
-          // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
-          // update the completed review to have preRelease flag set to true:
-          reviewPersistenceAdapter.markCompletedReviewAsThePrisonersPreReleaseReview(completedReview.reference)
-          completedReviewSchedule!!
-        },
-      ).also {
-        reviewEventService.reviewCompleted(it.completedReview)
-      }
+    CompletedReviewDto(
+      completedReview = completedReview,
+      wasLastReviewBeforeRelease = reviewScheduleWindow == null,
+      latestReviewSchedule = reviewScheduleWindow?.let {
+        // If a new ReviewScheduleWindow was calculated, create a new ReviewSchedule with it
+        reviewSchedulePersistenceAdapter.createReviewSchedule(
+          CreateReviewScheduleDto(
+            prisonNumber = prisonNumber,
+            prisonId = prisonId,
+            reviewScheduleWindow = it,
+            scheduleCalculationRule = reviewScheduleCalculationRule,
+          ),
+        )
+      } ?: let {
+        // No new ReviewScheduleWindow was calculated, so this was the prisoners last Review before release
+        // update the completed review to have preRelease flag set to true:
+        reviewPersistenceAdapter.markCompletedReviewAsThePrisonersPreReleaseReview(completedReview.reference)
+        completedReviewSchedule!!
+      },
+    ).also {
+      reviewEventService.reviewCompleted(it.completedReview)
     }
+  }
 }

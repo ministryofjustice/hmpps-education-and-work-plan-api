@@ -13,18 +13,17 @@ fun aValidPersonalSkillsAndInterests(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
-) =
-  PersonalSkillsAndInterests(
-    reference = reference,
-    skills = skills,
-    interests = interests,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+) = PersonalSkillsAndInterests(
+  reference = reference,
+  skills = skills,
+  interests = interests,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)
 
 fun aValidPersonalSkill(
   skillType: SkillType = SkillType.OTHER,

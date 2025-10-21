@@ -27,10 +27,7 @@ class ActionPlan(
   /**
    * Adds a [Goal] to this ActionPlan.
    */
-  fun addGoal(goal: Goal) =
-    goals.add(goal)
+  fun addGoal(goal: Goal) = goals.add(goal)
 
-  override fun toString(): String {
-    return "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', goals=$goals)"
-  }
+  override fun toString(): String = "ActionPlan(reference=$reference, prisonNumber='$prisonNumber', goals=$goals)"
 }

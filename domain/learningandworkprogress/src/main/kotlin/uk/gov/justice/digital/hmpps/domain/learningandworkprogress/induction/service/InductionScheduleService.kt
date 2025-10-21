@@ -108,9 +108,8 @@ class InductionScheduleService(
     }
   }
 
-  fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule =
-    inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
-      ?: throw InductionScheduleNotFoundException(prisonNumber)
+  fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+    ?: throw InductionScheduleNotFoundException(prisonNumber)
 
   fun getInductionScheduleHistoryForPrisoner(prisonNumber: String): List<InductionScheduleHistory> {
     val responses = inductionSchedulePersistenceAdapter.getInductionScheduleHistory(prisonNumber)
@@ -253,14 +252,11 @@ class InductionScheduleService(
     )
   }
 
-  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) =
-    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_DEATH)
+  fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) = exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_DEATH)
 
-  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) =
-    exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
+  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) = exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
 
-  fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String) =
-    exemptActiveInductionSchedule(prisonNumber = prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
+  fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String) = exemptActiveInductionSchedule(prisonNumber = prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
 
   fun updateInductionSchedule(
     inductionSchedule: InductionSchedule,
@@ -311,7 +307,5 @@ class InductionScheduleService(
     )
   }
 
-  fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> {
-    return inductionSchedulePersistenceAdapter.getInCompleteInductionSchedules(prisonerNumbers)
-  }
+  fun getInCompleteInductionSchedules(prisonerNumbers: List<String>): List<InductionSchedule> = inductionSchedulePersistenceAdapter.getInCompleteInductionSchedules(prisonerNumbers)
 }

@@ -37,7 +37,6 @@ class Timeline(
 
   companion object {
     @JvmStatic
-    fun newTimeline(prisonNumber: String, events: List<TimelineEvent>) =
-      Timeline(UUID.randomUUID(), prisonNumber, events)
+    fun newTimeline(prisonNumber: String, events: List<TimelineEvent>) = Timeline(UUID.randomUUID(), prisonNumber, events)
   }
 }

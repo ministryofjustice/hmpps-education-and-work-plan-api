@@ -13,14 +13,13 @@ fun aValidCreateInitialReviewScheduleDto(
   prisonerHasRecallFlag: Boolean = false,
   isReadmission: Boolean = false,
   isTransfer: Boolean = false,
-): CreateInitialReviewScheduleDto =
-  CreateInitialReviewScheduleDto(
-    prisonNumber = prisonNumber,
-    prisonId = prisonId,
-    prisonerReleaseDate = prisonerReleaseDate,
-    prisonerSentenceType = prisonerSentenceType,
-    prisonerHasIndeterminateFlag = prisonerHasIndeterminateFlag,
-    prisonerHasRecallFlag = prisonerHasRecallFlag,
-    isReadmission = isReadmission,
-    isTransfer = isTransfer,
-  )
+): CreateInitialReviewScheduleDto = CreateInitialReviewScheduleDto(
+  prisonNumber = prisonNumber,
+  prisonId = prisonId,
+  prisonerReleaseDate = prisonerReleaseDate,
+  prisonerSentenceType = prisonerSentenceType,
+  prisonerHasIndeterminateFlag = prisonerHasIndeterminateFlag,
+  prisonerHasRecallFlag = prisonerHasRecallFlag,
+  isReadmission = isReadmission,
+  isTransfer = isTransfer,
+)

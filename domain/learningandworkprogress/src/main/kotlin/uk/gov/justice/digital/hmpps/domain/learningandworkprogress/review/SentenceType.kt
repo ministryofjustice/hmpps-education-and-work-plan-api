@@ -23,9 +23,8 @@ enum class SentenceType {
  *   * If they have the `isRecall` flag set, they are considered RECALL
  *   * Else return the sentence type from the prisoner record
  */
-fun effectiveSentenceType(prisonerSentenceType: SentenceType, prisonerHasIndeterminateFlag: Boolean, prisonerHasRecallFlag: Boolean) =
-  when {
-    prisonerHasIndeterminateFlag -> INDETERMINATE_SENTENCE
-    prisonerHasRecallFlag -> RECALL
-    else -> prisonerSentenceType
-  }
+fun effectiveSentenceType(prisonerSentenceType: SentenceType, prisonerHasIndeterminateFlag: Boolean, prisonerHasRecallFlag: Boolean) = when {
+  prisonerHasIndeterminateFlag -> INDETERMINATE_SENTENCE
+  prisonerHasRecallFlag -> RECALL
+  else -> prisonerSentenceType
+}

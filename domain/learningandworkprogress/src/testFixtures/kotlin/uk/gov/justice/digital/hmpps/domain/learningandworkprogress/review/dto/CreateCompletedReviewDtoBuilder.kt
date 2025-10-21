@@ -15,16 +15,15 @@ fun aValidCreateCompletedReviewDto(
   prisonerSentenceType: SentenceType = SentenceType.SENTENCED,
   prisonerHasIndeterminateFlag: Boolean = false,
   prisonerHasRecallFlag: Boolean = false,
-): CreateCompletedReviewDto =
-  CreateCompletedReviewDto(
-    prisonNumber = prisonNumber,
-    prisonId = prisonId,
-    note = note,
-    conductedAt = conductedAt,
-    conductedBy = conductedBy,
-    conductedByRole = conductedByRole,
-    prisonerReleaseDate = prisonerReleaseDate,
-    prisonerSentenceType = prisonerSentenceType,
-    prisonerHasIndeterminateFlag = prisonerHasIndeterminateFlag,
-    prisonerHasRecallFlag = prisonerHasRecallFlag,
-  )
+): CreateCompletedReviewDto = CreateCompletedReviewDto(
+  prisonNumber = prisonNumber,
+  prisonId = prisonId,
+  note = note,
+  conductedAt = conductedAt,
+  conductedBy = conductedBy,
+  conductedByRole = conductedByRole,
+  prisonerReleaseDate = prisonerReleaseDate,
+  prisonerSentenceType = prisonerSentenceType,
+  prisonerHasIndeterminateFlag = prisonerHasIndeterminateFlag,
+  prisonerHasRecallFlag = prisonerHasRecallFlag,
+)
