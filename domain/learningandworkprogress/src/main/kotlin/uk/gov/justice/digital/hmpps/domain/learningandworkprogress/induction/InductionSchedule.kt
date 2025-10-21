@@ -69,7 +69,5 @@ enum class InductionScheduleStatus(
   COMPLETED,
   ;
 
-  fun isExemptionOrExclusion(): Boolean {
-    return isExemption || isExclusion
-  }
+  fun isExemptionOrExclusion(): Boolean = isExemption || isExclusion
 }

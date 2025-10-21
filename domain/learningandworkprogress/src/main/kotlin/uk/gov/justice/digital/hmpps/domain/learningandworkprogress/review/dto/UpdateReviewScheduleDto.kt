@@ -14,15 +14,14 @@ data class UpdateReviewScheduleDto(
   val prisonId: String,
 ) {
   companion object {
-    fun setStatusToCompletedAtPrison(reviewSchedule: ReviewSchedule, prisonId: String) =
-      with(reviewSchedule) {
-        UpdateReviewScheduleDto(
-          reference = reference,
-          prisonId = prisonId,
-          reviewScheduleWindow = reviewScheduleWindow,
-          scheduleCalculationRule = scheduleCalculationRule,
-          scheduleStatus = ReviewScheduleStatus.COMPLETED,
-        )
-      }
+    fun setStatusToCompletedAtPrison(reviewSchedule: ReviewSchedule, prisonId: String) = with(reviewSchedule) {
+      UpdateReviewScheduleDto(
+        reference = reference,
+        prisonId = prisonId,
+        reviewScheduleWindow = reviewScheduleWindow,
+        scheduleCalculationRule = scheduleCalculationRule,
+        scheduleStatus = ReviewScheduleStatus.COMPLETED,
+      )
+    }
   }
 }

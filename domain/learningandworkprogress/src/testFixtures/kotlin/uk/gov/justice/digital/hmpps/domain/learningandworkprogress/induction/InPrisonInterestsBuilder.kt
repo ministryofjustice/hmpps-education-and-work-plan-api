@@ -36,8 +36,7 @@ fun aValidInPrisonWorkInterest(
 fun aValidInPrisonTrainingInterest(
   trainingType: InPrisonTrainingType = InPrisonTrainingType.OTHER,
   trainingTypeOther: String? = "Any in-prison training",
-) =
-  InPrisonTrainingInterest(
-    trainingType = trainingType,
-    trainingTypeOther = trainingTypeOther,
-  )
+) = InPrisonTrainingInterest(
+  trainingType = trainingType,
+  trainingTypeOther = trainingTypeOther,
+)

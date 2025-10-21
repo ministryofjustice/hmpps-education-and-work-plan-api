@@ -12,11 +12,10 @@ fun aValidUpdateReviewScheduleDto(
   scheduleCalculationRule: ReviewScheduleCalculationRule = ReviewScheduleCalculationRule.MORE_THAN_60_MONTHS_TO_SERVE,
   scheduleStatus: ReviewScheduleStatus = ReviewScheduleStatus.SCHEDULED,
   prisonId: String = "BXI",
-): UpdateReviewScheduleDto =
-  UpdateReviewScheduleDto(
-    reference = reference,
-    reviewScheduleWindow = reviewScheduleWindow,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    prisonId = prisonId,
-  )
+): UpdateReviewScheduleDto = UpdateReviewScheduleDto(
+  reference = reference,
+  reviewScheduleWindow = reviewScheduleWindow,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  prisonId = prisonId,
+)

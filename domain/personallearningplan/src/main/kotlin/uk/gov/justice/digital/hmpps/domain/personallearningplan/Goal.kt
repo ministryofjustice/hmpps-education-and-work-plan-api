@@ -56,20 +56,19 @@ class Goal(
   /**
    * Adds a [Step] to this Goal, observing its sequenceNumber relative to the existing list of [Step]s
    */
-  fun addStep(step: Step) =
-    steps.apply {
-      // Current steps list is ordered with sequential sequenceNumbers by virtue of steps getter
-      // Work out where to insert this new step based on it's sequenceNumber
-      val insertionIndex =
-        if (step.sequenceNumber > this.size) {
-          this.size
-        } else if (step.sequenceNumber < 1) {
-          0
-        } else {
-          step.sequenceNumber - 1
-        }
-      add(insertionIndex, step)
-    }
+  fun addStep(step: Step) = steps.apply {
+    // Current steps list is ordered with sequential sequenceNumbers by virtue of steps getter
+    // Work out where to insert this new step based on it's sequenceNumber
+    val insertionIndex =
+      if (step.sequenceNumber > this.size) {
+        this.size
+      } else if (step.sequenceNumber < 1) {
+        0
+      } else {
+        step.sequenceNumber - 1
+      }
+    add(insertionIndex, step)
+  }
 
   fun complete() {
     status = COMPLETED
@@ -79,9 +78,7 @@ class Goal(
     status = ARCHIVED
   }
 
-  override fun toString(): String {
-    return "Goal(reference=$reference, title='$title', targetCompletionDate=$targetCompletionDate, status=$status, createdBy='$createdBy', createdAt=$createdAt, lastUpdatedBy='$lastUpdatedBy', lastUpdatedAt=$lastUpdatedAt, steps=$steps)"
-  }
+  override fun toString(): String = "Goal(reference=$reference, title='$title', targetCompletionDate=$targetCompletionDate, status=$status, createdBy='$createdBy', createdAt=$createdAt, lastUpdatedBy='$lastUpdatedBy', lastUpdatedAt=$lastUpdatedAt, steps=$steps)"
 }
 
 enum class GoalStatus {

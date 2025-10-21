@@ -27,26 +27,24 @@ class InductionService(
   /**
    * Records an [Induction] that has taken place for a prisoner.
    */
-  fun createInduction(createInductionDto: CreateInductionDto): Induction =
-    with(createInductionDto) {
-      log.info { "Creating Induction for prisoner [$prisonNumber]" }
+  fun createInduction(createInductionDto: CreateInductionDto): Induction = with(createInductionDto) {
+    log.info { "Creating Induction for prisoner [$prisonNumber]" }
 
-      if (persistenceAdapter.getInduction(prisonNumber) != null) {
-        throw InductionAlreadyExistsException(prisonNumber)
-      }
-
-      return persistenceAdapter.createInduction(createInductionDto)
-        .also {
-          inductionEventService.inductionCreated(it)
-        }
+    if (persistenceAdapter.getInduction(prisonNumber) != null) {
+      throw InductionAlreadyExistsException(prisonNumber)
     }
+
+    return persistenceAdapter.createInduction(createInductionDto)
+      .also {
+        inductionEventService.inductionCreated(it)
+      }
+  }
 
   /**
    * Returns the [Induction] for the prisoner identified by their prison number. Otherwise, throws
    * [InductionNotFoundException] if it cannot be found.
    */
-  fun getInductionForPrisoner(prisonNumber: String): Induction =
-    persistenceAdapter.getInduction(prisonNumber) ?: throw InductionNotFoundException(prisonNumber)
+  fun getInductionForPrisoner(prisonNumber: String): Induction = persistenceAdapter.getInduction(prisonNumber) ?: throw InductionNotFoundException(prisonNumber)
 
   /**
    * Updates an [Induction], identified by its `prisonNumber`, from the specified [UpdateInductionDto].

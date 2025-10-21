@@ -8,8 +8,7 @@ fun assertThat(actual: CreateNoteDto?) = CreateNoteDtoAssert(actual)
 /**
  * AssertJ custom assertion for [CreateNoteDto].
  */
-class CreateNoteDtoAssert(actual: CreateNoteDto?) :
-  AbstractObjectAssert<CreateNoteDtoAssert, CreateNoteDto?>(actual, CreateNoteDtoAssert::class.java) {
+class CreateNoteDtoAssert(actual: CreateNoteDto?) : AbstractObjectAssert<CreateNoteDtoAssert, CreateNoteDto?>(actual, CreateNoteDtoAssert::class.java) {
 
   fun hasPrisonNumber(expected: String): CreateNoteDtoAssert {
     isNotNull

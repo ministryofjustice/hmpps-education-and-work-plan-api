@@ -61,9 +61,7 @@ enum class ReviewScheduleStatus(
   COMPLETED,
   ;
 
-  fun isExemptionOrExclusion(): Boolean {
-    return isExemption || isExclusion
-  }
+  fun isExemptionOrExclusion(): Boolean = isExemption || isExclusion
 }
 
 data class ReviewScheduleWindow(
@@ -71,22 +69,16 @@ data class ReviewScheduleWindow(
   val dateTo: LocalDate,
 ) {
   companion object {
-    fun fromTodayToTenDays(baseDate: LocalDate): ReviewScheduleWindow =
-      ReviewScheduleWindow(baseDate, baseDate.plusDays(10))
+    fun fromTodayToTenDays(baseDate: LocalDate): ReviewScheduleWindow = ReviewScheduleWindow(baseDate, baseDate.plusDays(10))
 
-    fun fromOneToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow =
-      ReviewScheduleWindow(baseDate.plusMonths(1), baseDate.plusMonths(3))
+    fun fromOneToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow = ReviewScheduleWindow(baseDate.plusMonths(1), baseDate.plusMonths(3))
 
-    fun fromOneMonthToSpecificDate(baseDate: LocalDate, dateTo: LocalDate): ReviewScheduleWindow =
-      ReviewScheduleWindow(baseDate.plusMonths(1), dateTo)
+    fun fromOneMonthToSpecificDate(baseDate: LocalDate, dateTo: LocalDate): ReviewScheduleWindow = ReviewScheduleWindow(baseDate.plusMonths(1), dateTo)
 
-    fun fromTwoToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow =
-      ReviewScheduleWindow(baseDate.plusMonths(2), baseDate.plusMonths(3))
+    fun fromTwoToThreeMonths(baseDate: LocalDate): ReviewScheduleWindow = ReviewScheduleWindow(baseDate.plusMonths(2), baseDate.plusMonths(3))
 
-    fun fromFourToSixMonths(baseDate: LocalDate): ReviewScheduleWindow =
-      ReviewScheduleWindow(baseDate.plusMonths(4), baseDate.plusMonths(6))
+    fun fromFourToSixMonths(baseDate: LocalDate): ReviewScheduleWindow = ReviewScheduleWindow(baseDate.plusMonths(4), baseDate.plusMonths(6))
 
-    fun fromTenToTwelveMonths(baseDate: LocalDate): ReviewScheduleWindow =
-      ReviewScheduleWindow(baseDate.plusMonths(10), baseDate.plusMonths(12))
+    fun fromTenToTwelveMonths(baseDate: LocalDate): ReviewScheduleWindow = ReviewScheduleWindow(baseDate.plusMonths(10), baseDate.plusMonths(12))
   }
 }

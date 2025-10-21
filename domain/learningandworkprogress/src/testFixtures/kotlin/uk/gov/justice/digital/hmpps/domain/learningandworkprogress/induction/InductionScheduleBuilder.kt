@@ -18,18 +18,17 @@ fun aValidInductionSchedule(
   lastUpdatedAt: Instant = Instant.now(),
   createdAtPrison: String = "BXI",
   updatedAtPrison: String = "BXI",
-): InductionSchedule =
-  InductionSchedule(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    deadlineDate = deadlineDate,
-    scheduleCalculationRule = scheduleCalculationRule,
-    scheduleStatus = scheduleStatus,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    exemptionReason = exemptionReason,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedAtPrison = updatedAtPrison,
-  )
+): InductionSchedule = InductionSchedule(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  deadlineDate = deadlineDate,
+  scheduleCalculationRule = scheduleCalculationRule,
+  scheduleStatus = scheduleStatus,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  exemptionReason = exemptionReason,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedAtPrison = updatedAtPrison,
+)

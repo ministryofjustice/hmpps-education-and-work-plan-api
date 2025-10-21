@@ -27,26 +27,24 @@ class EducationService(
    * Returns the [PreviousQualifications] for the prisoner identified by their prison number. Otherwise, throws
    * [EducationNotFoundException] if it cannot be found.
    */
-  fun getPreviousQualificationsForPrisoner(prisonNumber: String): PreviousQualifications =
-    persistenceAdapter.getPreviousQualifications(prisonNumber) ?: throw EducationNotFoundException(prisonNumber)
+  fun getPreviousQualificationsForPrisoner(prisonNumber: String): PreviousQualifications = persistenceAdapter.getPreviousQualifications(prisonNumber) ?: throw EducationNotFoundException(prisonNumber)
 
   /**
    * Records the [PreviousQualifications] for a prisoner.
    * Throws [EducationAlreadyExistsException] is the prisoner already has a record of [PreviousQualifications].
    */
-  fun createPreviousQualifications(createPreviousQualificationsDto: CreatePreviousQualificationsDto): PreviousQualifications =
-    with(createPreviousQualificationsDto) {
-      log.info { "Creating Previous Qualifications record for prisoner [$prisonNumber]" }
+  fun createPreviousQualifications(createPreviousQualificationsDto: CreatePreviousQualificationsDto): PreviousQualifications = with(createPreviousQualificationsDto) {
+    log.info { "Creating Previous Qualifications record for prisoner [$prisonNumber]" }
 
-      if (persistenceAdapter.getPreviousQualifications(prisonNumber) != null) {
-        throw EducationAlreadyExistsException(prisonNumber)
-      }
-
-      return persistenceAdapter.createPreviousQualifications(createPreviousQualificationsDto)
-        .also {
-          educationEventService.previousQualificationsCreated(it)
-        }
+    if (persistenceAdapter.getPreviousQualifications(prisonNumber) != null) {
+      throw EducationAlreadyExistsException(prisonNumber)
     }
+
+    return persistenceAdapter.createPreviousQualifications(createPreviousQualificationsDto)
+      .also {
+        educationEventService.previousQualificationsCreated(it)
+      }
+  }
 
   /**
    * Updates a [PreviousQualifications] with the highest level of education and qualifications from the specified [UpdatePreviousQualificationsDto].

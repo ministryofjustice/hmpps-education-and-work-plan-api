@@ -10,12 +10,11 @@ fun aValidInductionSummary(
   createdAt: Instant = Instant.now(),
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
-): InductionSummary =
-  InductionSummary(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-  )
+): InductionSummary = InductionSummary(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+)

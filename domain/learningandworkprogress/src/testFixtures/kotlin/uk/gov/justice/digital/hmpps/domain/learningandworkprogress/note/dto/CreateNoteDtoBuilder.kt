@@ -12,16 +12,15 @@ fun aValidCreateNoteDto(
   noteType: NoteType = NoteType.GOAL,
   createdAtPrison: String = "BXI",
   lastUpdatedAtPrison: String = "MDI",
-): CreateNoteDto =
-  CreateNoteDto(
-    prisonNumber = prisonNumber,
-    content = content,
-    entityReference = entityReference,
-    entityType = entityType,
-    noteType = noteType,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+): CreateNoteDto = CreateNoteDto(
+  prisonNumber = prisonNumber,
+  content = content,
+  entityReference = entityReference,
+  entityType = entityType,
+  noteType = noteType,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)
 
 fun aValidNoteDto(
   content: String = "Note content",
@@ -35,17 +34,16 @@ fun aValidNoteDto(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "MDI",
-): NoteDto =
-  NoteDto(
-    content = content,
-    reference = reference,
-    entityReference = entityReference,
-    entityType = entityType,
-    noteType = noteType,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-    createdAt = createdAt,
-    lastUpdatedAt = lastUpdatedAt,
-    createdBy = createdBy,
-    lastUpdatedBy = lastUpdatedBy,
-  )
+): NoteDto = NoteDto(
+  content = content,
+  reference = reference,
+  entityReference = entityReference,
+  entityType = entityType,
+  noteType = noteType,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+  createdAt = createdAt,
+  lastUpdatedAt = lastUpdatedAt,
+  createdBy = createdBy,
+  lastUpdatedBy = lastUpdatedBy,
+)

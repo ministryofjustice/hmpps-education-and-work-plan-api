@@ -25,14 +25,12 @@ class TimelineService(
   /**
    * Records an [TimelineEvent] that has taken place for a prisoner.
    */
-  fun recordTimelineEvent(prisonNumber: String, event: TimelineEvent) =
-    persistenceAdapter.recordTimelineEvent(prisonNumber, event)
+  fun recordTimelineEvent(prisonNumber: String, event: TimelineEvent) = persistenceAdapter.recordTimelineEvent(prisonNumber, event)
 
   /**
    * Records a collection of [TimelineEvent]s that have taken place for a prisoner.
    */
-  fun recordTimelineEvents(prisonNumber: String, events: List<TimelineEvent>) =
-    persistenceAdapter.recordTimelineEvents(prisonNumber, events)
+  fun recordTimelineEvents(prisonNumber: String, events: List<TimelineEvent>) = persistenceAdapter.recordTimelineEvents(prisonNumber, events)
 
   /**
    * Returns the [Timeline] for the prisoner identified by their prison number. Otherwise, throws

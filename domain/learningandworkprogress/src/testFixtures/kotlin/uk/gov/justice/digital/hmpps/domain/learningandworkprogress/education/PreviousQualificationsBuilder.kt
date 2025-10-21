@@ -15,19 +15,18 @@ fun aValidPreviousQualifications(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
-) =
-  PreviousQualifications(
-    reference = reference,
-    prisonNumber = prisonNumber,
-    educationLevel = educationLevel,
-    qualifications = qualifications,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+) = PreviousQualifications(
+  reference = reference,
+  prisonNumber = prisonNumber,
+  educationLevel = educationLevel,
+  qualifications = qualifications,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)
 
 fun aValidQualification(
   reference: UUID = UUID.randomUUID(),
@@ -40,16 +39,15 @@ fun aValidQualification(
   lastUpdatedBy: String = "bjones_gen",
   lastUpdatedAt: Instant = Instant.now(),
   lastUpdatedAtPrison: String = "BXI",
-) =
-  Qualification(
-    reference = reference,
-    subject = subject,
-    level = level,
-    grade = grade,
-    createdBy = createdBy,
-    createdAt = createdAt,
-    createdAtPrison = createdAtPrison,
-    lastUpdatedBy = lastUpdatedBy,
-    lastUpdatedAt = lastUpdatedAt,
-    lastUpdatedAtPrison = lastUpdatedAtPrison,
-  )
+) = Qualification(
+  reference = reference,
+  subject = subject,
+  level = level,
+  grade = grade,
+  createdBy = createdBy,
+  createdAt = createdAt,
+  createdAtPrison = createdAtPrison,
+  lastUpdatedBy = lastUpdatedBy,
+  lastUpdatedAt = lastUpdatedAt,
+  lastUpdatedAtPrison = lastUpdatedAtPrison,
+)
