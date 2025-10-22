@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.buildAccessToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
@@ -222,6 +223,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
           goals = listOf(aValidCreateGoalRequest(title = "Goal 1")),
         ),
       )
+      createInductionScheduleHistory(prisonNumber = it)
     }
 
     // When
@@ -241,6 +243,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       assertThat(induction?.prisonNumber).isEqualTo(prisoner2)
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
+      assertThat(inductionScheduleHistory?.size).isEqualTo(1)
+      assertThat(inductionScheduleHistory?.first()?.scheduleStatus).isEqualTo(InductionScheduleStatus.SCHEDULED)
     }
   }
 
@@ -261,6 +265,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
           goals = listOf(aValidCreateGoalRequest(title = "Goal 1")),
         ),
       )
+      createInductionScheduleHistory(prisonNumber = it)
     }
 
     // When
@@ -278,6 +283,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       assertThat(induction?.prisonNumber).isEqualTo(prisoner1)
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
+      assertThat(inductionScheduleHistory?.size).isEqualTo(1)
+      assertThat(inductionScheduleHistory?.first()?.scheduleStatus).isEqualTo(InductionScheduleStatus.SCHEDULED)
     }
 
     responseLastWeek.expectStatus().isNoContent
