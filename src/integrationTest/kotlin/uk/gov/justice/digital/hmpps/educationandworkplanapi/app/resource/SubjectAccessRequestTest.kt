@@ -10,10 +10,12 @@ import org.springframework.web.util.UriBuilder
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.buildAccessToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
@@ -223,7 +225,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
           goals = listOf(aValidCreateGoalRequest(title = "Goal 1")),
         ),
       )
-      createInductionScheduleHistory(prisonNumber = it)
+      createInductionScheduleHistory(prisonNumber = it, status = COMPLETED)
     }
 
     // When
@@ -244,7 +246,9 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       assertThat(goals).hasSize(1)
       assertThat(goals?.first()?.title).isEqualTo("Goal 1")
       assertThat(inductionScheduleHistory?.size).isEqualTo(1)
-      assertThat(inductionScheduleHistory?.first()?.scheduleStatus).isEqualTo(InductionScheduleStatus.SCHEDULED)
+      assertThat(inductionScheduleHistory?.first()?.scheduleStatus).isEqualTo(InductionScheduleStatus.COMPLETED)
+      assertThat(reviewScheduleHistory?.size).isEqualTo(1)
+      assertThat(reviewScheduleHistory?.first()?.status).isEqualTo(ReviewScheduleStatus.SCHEDULED)
     }
   }
 
