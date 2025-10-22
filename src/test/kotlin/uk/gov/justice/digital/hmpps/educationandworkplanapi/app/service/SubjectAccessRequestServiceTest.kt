@@ -19,6 +19,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.Enti
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidCompletedReview
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewScheduleHistory
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
@@ -30,12 +32,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionHistoryScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ReviewScheduleHistoryResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionScheduleResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidReviewScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCompletedActionPlanReviewResponse
 import java.time.Instant
@@ -81,6 +85,12 @@ class SubjectAccessRequestServiceTest {
 
   @Mock
   private lateinit var inductionScheduleMapper: InductionHistoryScheduleResourceMapper
+
+  @Mock
+  private lateinit var reviewScheduleService: ReviewScheduleService
+
+  @Mock
+  private lateinit var reviewScheduleMapper: ReviewScheduleHistoryResponseMapper
 
   @Test
   fun `should return induction and action plan data for a prisoner without date filtering`() {
@@ -200,6 +210,7 @@ class SubjectAccessRequestServiceTest {
     )
     val expectedCompletedActionPlanReviewResponse = aValidCompletedActionPlanReviewResponse()
     val expectedInductionScheduleResponse = aValidInductionScheduleResponse()
+    val expectedReviewScheduleResponse = aValidReviewScheduleResponse()
 
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
     given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
@@ -208,6 +219,7 @@ class SubjectAccessRequestServiceTest {
     given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(listOf(completedReview))
     given(completedActionPlanReviewResponseMapper.fromDomainToModel(any())).willReturn(expectedCompletedActionPlanReviewResponse)
     given(inductionScheduleMapper.toInductionResponse(any(), any())).willReturn(expectedInductionScheduleResponse)
+    given(reviewScheduleMapper.fromDomainToModel(any())).willReturn(expectedReviewScheduleResponse)
     val goal1 = aValidGoal(createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
     val goal2 = aValidGoal(createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
     val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal1, goal2))
@@ -222,6 +234,13 @@ class SubjectAccessRequestServiceTest {
     given(inductionScheduleService.getInductionScheduleHistoryForPrisoner(prisonNumber)).willReturn(
       listOf(
         inductionScheduleHistory,
+      ),
+    )
+
+    val reviewScheduleHistory = aValidReviewScheduleHistory()
+    given(reviewScheduleService.getReviewSchedulesForPrisoner(prisonNumber)).willReturn(
+      listOf(
+        reviewScheduleHistory,
       ),
     )
 
@@ -243,6 +262,8 @@ class SubjectAccessRequestServiceTest {
       assertThat(this.induction).isEqualTo(expectedInductionResponse)
       assertThat(goals).isEqualTo(setOf(expectedGoalResponse1))
       assertThat(education).isEqualTo(expectedEducationResponse)
+      assertThat(this.inductionScheduleHistory?.size).isEqualTo(1)
+      assertThat(this.reviewScheduleHistory?.size).isEqualTo(1)
     }
   }
 
