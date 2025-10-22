@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.EntityType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFou
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education.EducationResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionHistoryScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
@@ -31,6 +33,8 @@ class SubjectAccessRequestService(
   private val educationResourceMapper: EducationResourceMapper,
   private val reviewService: ReviewService,
   private val completedActionPlanReviewResponseMapper: CompletedActionPlanReviewResponseMapper,
+  private val inductionScheduleService: InductionScheduleService,
+  private val inductionScheduleMapper: InductionHistoryScheduleResourceMapper,
 
 ) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
@@ -63,6 +67,8 @@ class SubjectAccessRequestService(
       null
     }
 
+    val inductionScheduleHistory = inductionScheduleService.getInductionScheduleHistoryForPrisoner(prn)
+
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prn)
 
     if (goals.isEmpty() && induction == null) return null
@@ -77,6 +83,7 @@ class SubjectAccessRequestService(
           educationResourceMapper.toEducationResponse(it)
         },
         completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
+        inductionScheduleHistory = inductionScheduleHistory.map { inductionScheduleMapper.toInductionResponse(it, induction) },
       ),
     )
   }

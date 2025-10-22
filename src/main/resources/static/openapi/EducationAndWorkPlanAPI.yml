@@ -2952,6 +2952,11 @@ components:
           description: A List containing zero or more CompletedReviews.
           items:
             $ref: '#/components/schemas/CompletedActionPlanReviewResponse'
+        inductionScheduleHistory:
+          type: array
+          description: A List containing zero or more Induction Schedule Records.
+          items:
+            $ref: '#/components/schemas/InductionScheduleResponse'
 
     SarSuccessResponse:
       properties:
