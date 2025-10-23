@@ -6,11 +6,14 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.UpstreamResponseException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.WebClientExtension
 
 @Component
 class PrisonerSearchApiClient(
-  @Qualifier("prisonerSearchApiWebClient")
+  @param:Qualifier("prisonerSearchApiWebClient")
   private val prisonerSearchApiWebClient: WebClient,
+  private val webClientExtension: WebClientExtension,
 ) {
 
   companion object {
@@ -60,17 +63,21 @@ class PrisonerSearchApiClient(
    * Returns a specific prisoner from prisoner-search-api, identified by their prisonNumber
    */
   fun getPrisoner(prisonNumber: String): Prisoner = try {
+    val uri = "/prisoner/{prisonNumber}"
     prisonerSearchApiWebClient
       .get()
-      .uri("/prisoner/{prisonNumber}", prisonNumber)
+      .uri(uri, prisonNumber)
       .headers {
         it.contentType = MediaType.APPLICATION_JSON
       }
       .retrieve()
       .bodyToMono(Prisoner::class.java)
+      .retryWhen(webClientExtension.retryForIdempotentRequest(uri, "Prisoner Search"))
       .block()!!
   } catch (e: WebClientResponseException.NotFound) {
     throw PrisonerNotFoundException(prisonNumber)
+  } catch (e: UpstreamResponseException) {
+    throw e
   } catch (e: Exception) {
     throw PrisonerSearchApiException("Error retrieving prisoner by prisonNumber $prisonNumber", e)
   }
