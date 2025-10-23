@@ -74,7 +74,7 @@ class PrisonerSearchApiClient(
       .bodyToMono(Prisoner::class.java)
       .retryWhen(webClientExtension.retryForIdempotentRequest(uri, "Prisoner Search"))
       .block()!!
-  } catch (e: WebClientResponseException.NotFound) {
+  } catch (_: WebClientResponseException.NotFound) {
     throw PrisonerNotFoundException(prisonNumber)
   } catch (e: UpstreamResponseException) {
     throw e
