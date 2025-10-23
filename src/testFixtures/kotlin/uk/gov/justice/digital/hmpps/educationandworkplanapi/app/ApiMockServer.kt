@@ -50,7 +50,7 @@ open class ApiMockServer(
     numberOfRequests: Int = 3,
     failedStatus: Int,
     endStatus: Int,
-    body: String,
+    body: String? = null,
   ) = stubForRetryGet(scenario, mappingBuilder(path = path), numberOfRequests, failedStatus, endStatus, body)
 
   fun stubForRetryGet(
@@ -59,7 +59,7 @@ open class ApiMockServer(
     numberOfRequests: Int = 3,
     failedStatus: Int,
     endStatus: Int,
-    body: String,
+    body: String? = null,
   ) = stubForRetryGet(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, failedStatus, endStatus, body)
 
   fun stubForRetryGetWithFault(
@@ -68,7 +68,7 @@ open class ApiMockServer(
     numberOfRequests: Int = 3,
     fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
     endStatus: Int = 200,
-    body: String,
+    body: String? = null,
   ) = stubForRetryGetWithFault(scenario, mappingBuilder(path = path), numberOfRequests, fault, endStatus, body)
 
   fun stubForRetryGetWithFault(
@@ -77,7 +77,7 @@ open class ApiMockServer(
     numberOfRequests: Int = 3,
     fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
     endStatus: Int = 200,
-    body: String,
+    body: String? = null,
   ) = stubForRetryGetWithFault(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, fault, endStatus, body)
 
   fun stubForRetryGetWithDelays(
@@ -86,7 +86,7 @@ open class ApiMockServer(
     numberOfRequests: Int = 3,
     delayMs: Int = 5_000,
     endStatus: Int = 200,
-    body: String,
+    body: String? = null,
   ) = stubForRetryGetWithDelays(scenario, mappingBuilder(path = path), numberOfRequests, delayMs, endStatus, body)
 
   fun stubForRetryGetWithDelays(
@@ -95,109 +95,131 @@ open class ApiMockServer(
     numberOfRequests: Int = 3,
     delayMs: Int = 5_000,
     endStatus: Int = 200,
-    body: String,
-  ) = stubForRetryGetWithDelays(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, delayMs, endStatus, body)
-
-  private fun stubForGet(
-    mappingBuilder: () -> MappingBuilder,
     body: String? = null,
-    status: Int,
-  ) {
+  ) = stubForRetryGetWithDelays(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, delayMs, endStatus, body)
+}
+
+fun WireMockServer.stubForRetryGetWithFault(
+  scenario: String,
+  path: String,
+  numberOfRequests: Int = 3,
+  fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
+  endStatus: Int = 200,
+  body: String? = null,
+) = stubForRetryGetWithFault(scenario, mappingBuilder(path = path), numberOfRequests, fault, endStatus, body)
+
+fun WireMockServer.stubForRetryGetWithDelays(
+  scenario: String,
+  path: String,
+  numberOfRequests: Int = 3,
+  delayMs: Int = 5_000,
+  endStatus: Int = 200,
+  body: String? = null,
+) = stubForRetryGetWithDelays(scenario, mappingBuilder(path = path), numberOfRequests, delayMs, endStatus, body)
+
+private fun WireMockServer.stubForGet(
+  mappingBuilder: () -> MappingBuilder,
+  body: String? = null,
+  status: Int,
+) {
+  stubFor(
+    mappingBuilder.invoke()
+      .willReturn(
+        aResponse()
+          .withHeader("Content-Type", "application/json")
+          .withStatus(status)
+          .also {
+            body?.let { body -> it.withBody(body.trimIndent()) }
+          },
+      ),
+  )
+}
+
+private fun WireMockServer.stubForRetryGet(
+  scenario: String,
+  mappingBuilder: () -> MappingBuilder,
+  numberOfRequests: Int,
+  failedStatus: Int,
+  endStatus: Int,
+  body: String?,
+) {
+  (1..numberOfRequests).forEach {
     stubFor(
       mappingBuilder.invoke()
+        .inScenario(scenario)
+        .whenScenarioStateIs(if (it == 1) Scenario.STARTED else "RETRY${it - 1}")
+        .willReturn(
+          if ((failedStatus == -1 && it != numberOfRequests) || (endStatus == -1 && it == numberOfRequests)) {
+            serviceUnavailable()
+          } else {
+            aResponse()
+              .withHeader("Content-Type", "application/json")
+              .withStatus(if (it == numberOfRequests) endStatus else failedStatus)
+              .also { response ->
+                if (it == numberOfRequests) body?.let { body -> response.withBody(body.trimIndent()) }
+              }
+          },
+        ).willSetStateTo("RETRY$it"),
+    )
+  }
+}
+
+private fun WireMockServer.stubForRetryGetWithFault(
+  scenario: String,
+  mappingBuilder: () -> MappingBuilder,
+  numberOfRequests: Int,
+  fault: Fault,
+  endStatus: Int,
+  body: String?,
+) {
+  (1..numberOfRequests).forEach {
+    stubFor(
+      mappingBuilder.invoke()
+        .inScenario(scenario)
+        .whenScenarioStateIs(if (it == 1) Scenario.STARTED else "RETRY${it - 1}")
+        .willReturn(
+          when (it) {
+            numberOfRequests -> aResponse()
+              .withHeader("Content-Type", "application/json")
+              .withStatus(endStatus)
+              .also {
+                body?.let { body -> it.withBody(body.trimIndent()) }
+              }
+
+            else -> aResponse().withFault(fault)
+          },
+        ).willSetStateTo("RETRY$it"),
+    )
+  }
+}
+
+private fun WireMockServer.stubForRetryGetWithDelays(
+  scenario: String,
+  mappingBuilder: () -> MappingBuilder,
+  numberOfRequests: Int,
+  delayMs: Int,
+  endStatus: Int,
+  body: String?,
+) {
+  (1..numberOfRequests).forEach {
+    stubFor(
+      mappingBuilder.invoke()
+        .inScenario(scenario)
+        .whenScenarioStateIs(if (it == 1) Scenario.STARTED else "RETRY${it - 1}")
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
-            .withStatus(status)
-            .also {
-              body?.let { body -> it.withBody(body.trimIndent()) }
+            .withStatus(endStatus)
+            .also { response ->
+              body?.let { body -> response.withBody(body.trimIndent()) }
+              if (it != numberOfRequests) response.withFixedDelay(delayMs)
             },
-        ),
+        ).willSetStateTo("RETRY$it"),
     )
   }
-
-  private fun stubForRetryGet(
-    scenario: String,
-    mappingBuilder: () -> MappingBuilder,
-    numberOfRequests: Int,
-    failedStatus: Int,
-    endStatus: Int,
-    body: String,
-  ) {
-    (1..numberOfRequests).forEach {
-      stubFor(
-        mappingBuilder.invoke()
-          .inScenario(scenario)
-          .whenScenarioStateIs(if (it == 1) Scenario.STARTED else "RETRY${it - 1}")
-          .willReturn(
-            if ((failedStatus == -1 && it != numberOfRequests) || (endStatus == -1 && it == numberOfRequests)) {
-              serviceUnavailable()
-            } else {
-              aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withStatus(if (it == numberOfRequests) endStatus else failedStatus)
-                .also { response ->
-                  if (it == numberOfRequests) response.withBody(body)
-                }
-            },
-          ).willSetStateTo("RETRY$it"),
-      )
-    }
-  }
-
-  private fun stubForRetryGetWithFault(
-    scenario: String,
-    mappingBuilder: () -> MappingBuilder,
-    numberOfRequests: Int,
-    fault: Fault,
-    endStatus: Int,
-    body: String,
-  ) {
-    (1..numberOfRequests).forEach {
-      stubFor(
-        mappingBuilder.invoke()
-          .inScenario(scenario)
-          .whenScenarioStateIs(if (it == 1) Scenario.STARTED else "RETRY${it - 1}")
-          .willReturn(
-            when (it) {
-              numberOfRequests -> aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withStatus(endStatus)
-                .withBody(body)
-
-              else -> aResponse().withFault(fault)
-            },
-          ).willSetStateTo("RETRY$it"),
-      )
-    }
-  }
-
-  private fun stubForRetryGetWithDelays(
-    scenario: String,
-    mappingBuilder: () -> MappingBuilder,
-    numberOfRequests: Int,
-    delayMs: Int,
-    endStatus: Int,
-    body: String,
-  ) {
-    (1..numberOfRequests).forEach {
-      stubFor(
-        mappingBuilder.invoke()
-          .inScenario(scenario)
-          .whenScenarioStateIs(if (it == 1) Scenario.STARTED else "RETRY${it - 1}")
-          .willReturn(
-            aResponse()
-              .withHeader("Content-Type", "application/json")
-              .withStatus(endStatus)
-              .withBody(body)
-              .also { response -> if (it != numberOfRequests) response.withFixedDelay(delayMs) },
-          ).willSetStateTo("RETRY$it"),
-      )
-    }
-  }
-
-  private fun mappingBuilder(
-    path: String? = null,
-    pathPattern: UrlPathPattern? = null,
-  ): () -> MappingBuilder = { path?.let { get(path) } ?: get(pathPattern!!) }
 }
+
+private fun WireMockServer.mappingBuilder(
+  path: String? = null,
+  pathPattern: UrlPathPattern? = null,
+): () -> MappingBuilder = { path?.let { get(path) } ?: get(pathPattern!!) }
