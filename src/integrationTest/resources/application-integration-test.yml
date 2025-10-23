@@ -74,6 +74,9 @@ apis:
   prisoner-search-api:
     url: http://localhost:9093
 
+api:
+  timeout: 150ms
+
 hmpps:
   auth:
     url: http://localhost:9093/auth

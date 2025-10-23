@@ -1,15 +1,19 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch
 
+import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
+import reactor.util.retry.Retry
+import java.time.Duration
 
 @Component
 class PrisonerSearchApiClient(
-  @Qualifier("prisonerSearchApiWebClient")
+  @param:Qualifier("prisonerSearchApiWebClient")
   private val prisonerSearchApiWebClient: WebClient,
 ) {
 
@@ -29,6 +33,8 @@ class PrisonerSearchApiClient(
       "cellLocation",
       "nonDtoReleaseDateType",
     )
+
+    private val log = KotlinLogging.logger {}
   }
 
   /**
@@ -68,8 +74,20 @@ class PrisonerSearchApiClient(
       }
       .retrieve()
       .bodyToMono(Prisoner::class.java)
+      .retryWhen(
+        Retry.backoff(3, Duration.ofMillis(500))
+          .filter { ex -> ex is WebClientRequestException }
+          .doBeforeRetry { retrySignal ->
+            log.warn(
+              "Retrying request for prisoner with prisonNumber:{} due to {} (attempt #{})",
+              prisonNumber,
+              retrySignal.failure().javaClass.simpleName,
+              retrySignal.totalRetries() + 1,
+            )
+          },
+      )
       .block()!!
-  } catch (e: WebClientResponseException.NotFound) {
+  } catch (_: WebClientResponseException.NotFound) {
     throw PrisonerNotFoundException(prisonNumber)
   } catch (e: Exception) {
     throw PrisonerSearchApiException("Error retrieving prisoner by prisonNumber $prisonNumber", e)

@@ -2,6 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.kotlin.capture
@@ -10,15 +13,19 @@ import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -31,6 +38,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import java.time.LocalDate
 
 @Isolated
 class CreateInductionTest : IntegrationTestBase() {
@@ -463,4 +471,129 @@ class CreateInductionTest : IntegrationTestBase() {
     val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
     assertThat(inductionSchedule!!.scheduleStatus).isEqualTo(COMPLETED)
   }
+
+  @Nested
+  @DisplayName("Given upstream error (from Prisoner Search)")
+  inner class GivenUpstreamError {
+    private val maxAttempts = apiClientMaxAttempts
+
+    private lateinit var prisonNumber: String
+    private lateinit var prisoner: Prisoner
+    private lateinit var dpsUsername: String
+
+    @BeforeEach
+    internal fun setUp() {
+      // Given for each test
+      prisonNumber = randomValidPrisonNumber()
+      prisoner = aValidPrisoner(prisonNumber, releaseDate = LocalDate.now().plusYears(1))
+      dpsUsername = "auser_gen"
+    }
+
+    @Nested
+    @DisplayName("And the prisoner already has goals created before the induction")
+    inner class AndGoalCreatedBeforeInduction {
+      @BeforeEach
+      internal fun setUp() {
+        // Given for each test
+        createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
+      }
+
+      @Test
+      fun `should create an induction and create initial review schedule, given earlier connection reset by peer (RST)`() {
+        // Given connection reset errors, before that last successful call (4th)
+        val numberOfRequests = 4
+        wiremockService.stubGetPrisonerWithEarlierConnectionResetError(prisonNumber, prisoner, numberOfRequests)
+        val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
+
+        // When
+        createInductionIsCreated(prisonNumber, createRequest)
+
+        // Then
+        assertInductionCreated(prisonNumber, createRequest, dpsUsername)
+        wiremockService.verifyGetPrisoner(numberOfRequests)
+      }
+
+      @Test
+      fun `should create an induction and create initial review schedule, given earlier connection timed out`() {
+        // Given
+        val numberOfRequests = 4
+        // connection timed out errors, before that last successful call (4th)
+        wiremockService.stubGetPrisonerWithEarlierConnectionTimedOutError(prisonNumber, prisoner, numberOfRequests)
+        val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
+
+        // When
+        createInductionIsCreated(prisonNumber, createRequest)
+
+        // Then
+        assertInductionCreated(prisonNumber, createRequest, dpsUsername)
+        wiremockService.verifyGetPrisoner(numberOfRequests)
+      }
+
+      @Test
+      fun `should fail to create induction, given the upstream error remains`() {
+        // Given
+        val expectedAttempts = maxAttempts
+        // upstream error remains at all time connection
+        wiremockService.stubGetPrisonerWithConnectionResetError(prisonNumber)
+        val createRequest = aValidCreateInductionRequestForPrisonerLookingToWork()
+
+        // When
+        val response = createInductionIsAsExpected(prisonNumber, createRequest, aReadWriteBearerToken())
+          .expectStatus().is5xxServerError
+          .returnError()
+
+        // Then
+        val actual = response.body()
+        assertThat(actual)
+          .hasStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        wiremockService.verifyGetPrisoner(expectedAttempts)
+      }
+    }
+  }
+
+  private fun createInductionIsAsExpected(
+    prisonNumber: String,
+    createRequest: Any? = null,
+    bearerToken: String? = null,
+  ) = webTestClient.post()
+    .uri(URI_TEMPLATE, prisonNumber)
+    .let { bearerToken?.let { bearerToken -> it.bearerToken(bearerToken) } ?: it }
+    .contentType(APPLICATION_JSON)
+    .let { responseSpec -> createRequest?.let { responseSpec.withBody(it) } ?: responseSpec }
+    .exchange()
+
+  private fun createInductionIsCreated(
+    prisonNumber: String,
+    createRequest: CreateInductionRequest,
+  ) = createInductionIsAsExpected(prisonNumber, createRequest, bearerToken = aReadWriteBearerToken())
+    .expectStatus().isCreated
+
+  private fun assertInductionCreated(
+    prisonNumber: String,
+    createRequest: CreateInductionRequest,
+    dpsUsername: String,
+  ) {
+    val induction = getInduction(prisonNumber)
+    assertThat(induction)
+      .wasCreatedBy(dpsUsername)
+      .wasUpdatedBy(dpsUsername)
+      .wasCreatedAtPrison(createRequest.prisonId)
+      .wasUpdatedAtPrison(createRequest.prisonId)
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("INDUCTION_CREATED"),
+        capture(eventPropertiesCaptor),
+        isNull(),
+      )
+      val createInductionEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonId", createRequest.prisonId)
+        .containsEntry("userId", dpsUsername)
+        .containsKey("reference")
+    }
+  }
+
+  private fun aReadWriteBearerToken() = aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private)
 }
