@@ -23,6 +23,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.bean.override.mockito.MockReset
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+import org.springframework.test.web.reactive.server.FluxExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
@@ -79,6 +80,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionSchedulesResponse
@@ -105,6 +107,9 @@ private val log = KotlinLogging.logger {}
 @ActiveProfiles("integration-test")
 @AutoConfigureWebTestClient(timeout = "PT5M")
 abstract class IntegrationTestBase {
+  protected val apiClientMaxRetryAttempts = 2
+  protected val apiClientMaxAttempts = 1 + apiClientMaxRetryAttempts
+  protected val apiClientRetryExhaustedStatus = 503
 
   companion object {
     const val CREATE_GOALS_URI_TEMPLATE = "/action-plans/{prisonNumber}/goals"
@@ -729,15 +734,18 @@ abstract class IntegrationTestBase {
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
     return prisonNumber
   }
+
+  protected fun WebTestClient.ResponseSpec.returnError() = this.returnResult(ErrorResponse::class.java)
+  protected fun <T> FluxExchangeResult<T>.body(): T = this.responseBody.blockFirst()!!
 }
 
 data class Notification(
-  @JsonProperty("Message") val message: String,
-  @JsonProperty("MessageAttributes") val attributes: MessageAttributes = MessageAttributes(),
+  @param:JsonProperty("Message") val message: String,
+  @param:JsonProperty("MessageAttributes") val attributes: MessageAttributes = MessageAttributes(),
 )
 
 data class MessageAttributes(
-  @JsonAnyGetter @JsonAnySetter
+  @JsonAnyGetter @param:JsonAnySetter
   private val attributes: MutableMap<String, MessageAttribute> = mutableMapOf(),
 ) : MutableMap<String, MessageAttribute> by attributes {
   override operator fun get(key: String): MessageAttribute? = attributes[key]
@@ -746,4 +754,4 @@ data class MessageAttributes(
   }
 }
 
-data class MessageAttribute(@JsonProperty("Type") val type: String, @JsonProperty("Value") val value: String)
+data class MessageAttribute(@param:JsonProperty("Type") val type: String, @param:JsonProperty("Value") val value: String)

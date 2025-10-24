@@ -26,7 +26,7 @@ import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSum
 @Service
 class WiremockService(private val wireMockServer: WireMockServer) {
   private val maxRetryAttempts = 2
-  private val apiClientTimeoutMs = 200
+  private val apiClientTimeoutMs = 150
 
   @Autowired
   private lateinit var objectMapper: ObjectMapper
@@ -95,7 +95,7 @@ class WiremockService(private val wireMockServer: WireMockServer) {
         ),
     )
   }
-  fun stubGetPrisonerWithConnectionResetError(
+  fun stubGetPrisonerWithEarlierConnectionResetError(
     prisonNumber: String,
     response: Prisoner?,
     numberOfRequests: Int = 1 + maxRetryAttempts,
@@ -109,7 +109,12 @@ class WiremockService(private val wireMockServer: WireMockServer) {
     body = response?.let { objectMapper.writeValueAsString(response) },
   )
 
-  fun stubGetPrisonerWithConnectionTimedOutError(
+  fun stubGetPrisonerWithConnectionResetError(prisonNumber: String) = wireMockServer.stubForGetWithFault(
+    path = "/prisoner/$prisonNumber",
+    fault = Fault.CONNECTION_RESET_BY_PEER,
+  )
+
+  fun stubGetPrisonerWithEarlierConnectionTimedOutError(
     prisonNumber: String,
     response: Prisoner?,
     numberOfRequests: Int = 1 + maxRetryAttempts,
@@ -118,7 +123,7 @@ class WiremockService(private val wireMockServer: WireMockServer) {
     scenario = "Retry Get Prisoner with connection timeout",
     path = "/prisoner/$prisonNumber",
     numberOfRequests = numberOfRequests,
-    delayMs = apiClientTimeoutMs + 1,
+    delayMs = apiClientTimeoutMs + 10,
     endStatus = endStatus,
     body = response?.let { objectMapper.writeValueAsString(response) },
   )

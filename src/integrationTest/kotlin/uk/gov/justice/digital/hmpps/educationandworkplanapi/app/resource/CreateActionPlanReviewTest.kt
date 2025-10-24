@@ -2,6 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.eq
@@ -12,12 +15,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
@@ -319,4 +326,175 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           }
       }
   }
+
+  @Nested
+  @DisplayName("Given upstream error (from Prisoner Search)")
+  inner class GivenUpstreamError {
+    private val maxAttempts = 3
+
+    private lateinit var prisonNumber: String
+    private lateinit var prisoner: Prisoner
+    private lateinit var dpsUsername: String
+    private lateinit var dpsUserDisplayName: String
+    private lateinit var earliestCreationTime: OffsetDateTime
+
+    @BeforeEach
+    internal fun setUp() {
+      // Given for each test
+      earliestCreationTime = OffsetDateTime.now()
+      prisonNumber = randomValidPrisonNumber()
+      prisoner = aValidPrisoner(
+        prisonerNumber = prisonNumber,
+        legalStatus = LegalStatus.SENTENCED,
+        releaseDate = LocalDate.now().plusYears(1),
+      )
+      dpsUsername = "auser_gen"
+      dpsUserDisplayName = "Albert User"
+    }
+
+    @Nested
+    @DisplayName("And prisoner has a review schedule")
+    inner class AndAReviewSchedule {
+      private lateinit var reviewSchedule: ReviewScheduleEntity
+
+      @BeforeEach
+      internal fun setUp() {
+        // Given for each test
+        reviewSchedule = createReviewScheduleRecord(prisonNumber)
+      }
+
+      @Test
+      fun `should create a review, given earlier connection reset by peer (RST)`() {
+        // Given
+        // connection reset errors, before that last successful call (3rd)
+        val numberOfRequests = 3
+        wiremockService.stubGetPrisonerWithEarlierConnectionResetError(prisonNumber, prisoner, numberOfRequests)
+        val createRequest = aValidCreateActionPlanReviewRequest()
+
+        // When
+        val response = createActionPlanReviewIsCreated(prisonNumber, createRequest, dpsUsername)
+          .returnCreationResponse()
+
+        // Then
+        val actual = response.responseBody.blockFirst()
+        assertThat(actual).isNotNull
+        assertReviewCreated(dpsUsername, dpsUserDisplayName, earliestCreationTime, reviewSchedule)
+        wiremockService.verifyGetPrisoner(numberOfRequests)
+      }
+
+      @Test
+      fun `should create a review, given earlier connection timed out`() {
+        // Given
+        val numberOfRequests = 3
+        // connection timed out errors, before that last successful call (3rd)
+        wiremockService.stubGetPrisonerWithEarlierConnectionTimedOutError(prisonNumber, prisoner, numberOfRequests)
+        val createRequest = aValidCreateActionPlanReviewRequest()
+
+        // When
+        val response = createActionPlanReviewIsCreated(prisonNumber, createRequest, dpsUsername)
+          .returnCreationResponse()
+
+        // Then
+        val actual = response.responseBody.blockFirst()
+        assertThat(actual).isNotNull
+        assertReviewCreated(dpsUsername, dpsUserDisplayName, earliestCreationTime, reviewSchedule)
+        wiremockService.verifyGetPrisoner(numberOfRequests)
+      }
+
+      @Test
+      fun `should fail to create review, given the upstream error remains`() {
+        // Given
+        val expectedAttempts = maxAttempts
+        // upstream error remains at all time connection
+        wiremockService.stubGetPrisonerWithConnectionResetError(prisonNumber)
+        val createRequest = aValidCreateActionPlanReviewRequest()
+
+        // When
+        val response = createActionPlanReviewIsAsExpected(prisonNumber, createRequest, aReadWriteBearerToken(dpsUsername))
+          .expectStatus().is5xxServerError
+          .returnError()
+
+        // Then
+        val actual = response.body()
+        assertThat(actual)
+          .hasStatus(apiClientRetryExhaustedStatus)
+          .hasUserMessage("Failed to process after $apiClientMaxRetryAttempts retries")
+        wiremockService.verifyGetPrisoner(expectedAttempts)
+      }
+    }
+
+    private fun assertReviewCreated(
+      username: String,
+      userDisplayName: String,
+      earliestCreationTime: OffsetDateTime,
+      reviewSchedule: ReviewScheduleEntity,
+    ) {
+      val reviews = getActionPlanReviews(prisonNumber)
+      assertThat(reviews)
+        .latestReviewSchedule {
+          it.wasCreatedAtOrAfter(earliestCreationTime)
+            .wasCreatedBy(username)
+            .wasCreatedByDisplayName(userDisplayName)
+            .wasUpdatedAtOrAfter(earliestCreationTime)
+            .wasUpdatedBy(username)
+            .wasUpdatedByDisplayName(userDisplayName)
+        }
+        .completedReview(1) {
+          it.wasCreatedAtOrAfter(earliestCreationTime)
+            .wasCreatedBy(username)
+            .note {
+              it.wasCreatedAtOrAfter(earliestCreationTime)
+                .wasCreatedBy(username)
+                .wasCreatedByDisplayName(userDisplayName)
+            }
+        }
+
+      // Test that the completed review has the correct review schedule reference
+      assertThat(reviews.completedReviews[0].reviewScheduleReference).isEqualTo(reviewSchedule.reference)
+
+      await.untilAsserted {
+        val timeline = getTimeline(prisonNumber)
+        assertThat(timeline)
+          .event(1) {
+            it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_COMPLETED)
+              .wasActionedBy(username)
+              .hasActionedByDisplayName(userDisplayName)
+          }
+
+        val eventPropertiesCaptor = createCaptor<Map<String, String>>()
+
+        verify(telemetryClient).trackEvent(
+          eq("REVIEW_COMPLETED"),
+          capture(eventPropertiesCaptor),
+          isNull(),
+        )
+
+        val reviewCompleteEventProperties = eventPropertiesCaptor.firstValue
+        assertThat(reviewCompleteEventProperties)
+          .containsEntry("reference", reviews.completedReviews.first().reference.toString())
+      }
+    }
+  }
+
+  private fun createActionPlanReviewIsAsExpected(
+    prisonNumber: String,
+    createRequest: Any? = null,
+    bearerToken: String? = null,
+  ) = webTestClient.post()
+    .uri(URI_TEMPLATE, prisonNumber)
+    .let { bearerToken?.let { bearerToken -> it.bearerToken(bearerToken) } ?: it }
+    .contentType(APPLICATION_JSON)
+    .let { responseSpec -> createRequest?.let { responseSpec.withBody(it) } ?: responseSpec }
+    .exchange()
+
+  private fun createActionPlanReviewIsCreated(
+    prisonNumber: String,
+    createRequest: CreateActionPlanReviewRequest,
+    username: String,
+  ) = createActionPlanReviewIsAsExpected(prisonNumber, createRequest, bearerToken = aReadWriteBearerToken(username))
+    .expectStatus().isCreated
+
+  private fun aReadWriteBearerToken(username: String = "auser_gen") = aValidTokenWithAuthority(REVIEWS_RW, username = username, privateKey = keyPair.private)
+
+  private fun WebTestClient.ResponseSpec.returnCreationResponse() = this.returnResult(CreateActionPlanReviewResponse::class.java)
 }

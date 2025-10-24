@@ -41,6 +41,11 @@ fun WireMockServer.stubForGet(
   status: Int = HttpStatus.OK_200,
 ) = stubForGet(mappingBuilder(pathPattern = pathPattern), body, status)
 
+fun WireMockServer.stubForGetWithFault(
+  path: String,
+  fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
+) = stubForGetWithFault(mappingBuilder(path = path), fault)
+
 fun WireMockServer.stubForRetryGet(
   scenario: String,
   path: String,
@@ -110,6 +115,16 @@ private fun WireMockServer.stubForGet(
             body?.let { body -> it.withBody(body.trimIndent()) }
           },
       ),
+  )
+}
+
+private fun WireMockServer.stubForGetWithFault(
+  mappingBuilder: () -> MappingBuilder,
+  fault: Fault,
+) {
+  stubFor(
+    mappingBuilder.invoke()
+      .willReturn(aResponse().withFault(fault)),
   )
 }
 

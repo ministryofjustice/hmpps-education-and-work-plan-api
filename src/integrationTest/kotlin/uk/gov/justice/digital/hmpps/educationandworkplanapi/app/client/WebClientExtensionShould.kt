@@ -31,6 +31,7 @@ import reactor.util.retry.Retry
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ApiMockServerExtension
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ApiMockServerExtension.Companion.apiMockServer
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForGet
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForGetWithFault
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForRetryGet
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForRetryGetWithDelays
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForRetryGetWithFault
@@ -41,10 +42,14 @@ class WebClientExtensionShould {
   private val webClient: WebClient = TestWebClient(apiMockServer.baseUrl(), connectTimeoutMillis = 100, responseTimeoutMillis = 150).client
   private val unreachableWebClient: WebClient = TestWebClient(baseUrl = "http://10.255.255.1:81", connectTimeoutMillis = 1, responseTimeoutMillis = 1).client
 
+  private val maxRetryAttempts = 2
+  private val maxAttempts = 1 + maxRetryAttempts
+  private val statusCodeRetryExhausted = 599
+
   private val webClientExtension = WebClientExtension(
-    maxRetryAttempts = 2,
+    maxRetryAttempts = maxRetryAttempts.toLong(),
     minBackOffDuration = Duration.ofMillis(5),
-    statusCodeRetryExhausted = 599,
+    statusCodeRetryExhausted = statusCodeRetryExhausted,
   )
 
   @Nested
@@ -130,7 +135,19 @@ class WebClientExtensionShould {
 
       @Test
       fun `retry idempotent request of GET, after connection timed out`() {
-        assertThrows<UpstreamResponseException> { getRequestWithRetry(getPath3, client = unreachableWebClient) }
+        val ex = assertThrows<UpstreamResponseException> { getRequestWithRetry(getPath3, client = unreachableWebClient) }
+
+        assertThat(ex.statusCode).isEqualTo(statusCodeRetryExhausted)
+      }
+
+      @Test
+      fun `fail after retrying idempotent request of GET, given connection reset by peer (RST) remains`() {
+        apiMockServer.stubForGetWithFault(getPath3, Fault.CONNECTION_RESET_BY_PEER)
+
+        val ex = assertThrows<UpstreamResponseException> { getRequestWithRetry(getPath3) }
+
+        assertThat(ex.statusCode).isEqualTo(statusCodeRetryExhausted)
+        verifyApiGetPath(url = getPath3, expectedCount = maxAttempts)
       }
     }
 
