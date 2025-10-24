@@ -6,8 +6,8 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.1.3"
   id("org.openapi.generator") version "7.16.0"
-  kotlin("plugin.spring") version "2.2.20"
-  kotlin("plugin.jpa") version "2.2.20"
+  kotlin("plugin.spring") version "2.2.21"
+  kotlin("plugin.jpa") version "2.2.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "5.0.3"
