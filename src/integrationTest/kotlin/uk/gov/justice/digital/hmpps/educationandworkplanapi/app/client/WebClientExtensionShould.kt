@@ -60,8 +60,20 @@ class WebClientExtensionShould {
     private val body = """{"success": true}"""
 
     @Nested
-    @DisplayName("Given successful response from upstream")
     @Order(1)
+    inner class GivenNoError {
+      @Test
+      fun `receive response`() {
+        val path = "/path"
+        apiMockServer.stubForGet(path, body)
+        val result = getRequestWithRetry(path)
+        assertThat(result.success).isTrue
+      }
+    }
+
+    @Nested
+    @DisplayName("Given successful response from upstream")
+    @Order(2)
     inner class GivenResponseFromUpstream {
       private val getPath = "/path"
       private val getPathById = "/path/{id}"
@@ -86,7 +98,7 @@ class WebClientExtensionShould {
 
     @Nested
     @DisplayName("Given an error response from upstream")
-    @Order(2)
+    @Order(3)
     inner class GivenErrorResponseReceived {
       private val getPath2 = "/path2"
       private val getPath2ById = "/path2/{id}"
@@ -113,7 +125,7 @@ class WebClientExtensionShould {
 
     @Nested
     @DisplayName("Given no response from upstream")
-    @Order(3)
+    @Order(4)
     inner class GivenNoResponseFromUpstream {
       private val getPath3 = "/path3"
 
