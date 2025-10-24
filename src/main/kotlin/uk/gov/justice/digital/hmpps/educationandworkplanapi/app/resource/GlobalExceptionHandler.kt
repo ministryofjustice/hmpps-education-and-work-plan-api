@@ -9,7 +9,6 @@ import mu.KotlinLogging
 import org.hibernate.validator.internal.engine.path.PathImpl
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -41,6 +40,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.InvalidGoalState
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.NoArchiveReasonException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.PrisonerHasNoGoalsException
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineNotFoundException
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.UpstreamResponseException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.MissingSentenceStartDateAndReceptionDateException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -242,6 +242,12 @@ class GlobalExceptionHandler(
     return populateErrorResponseAndHandleExceptionInternal(e, SERVICE_UNAVAILABLE, request)
   }
 
+  @ExceptionHandler(UpstreamResponseException::class)
+  fun handleUpstreamResponseException(
+    e: UpstreamResponseException,
+    request: WebRequest,
+  ) = populateErrorResponseAndHandleExceptionInternal(e, HttpStatusCode.valueOf(e.statusCode), request)
+
   /**
    * Overrides the MethodArgumentNotValidException exception handler to return a 400 Bad Request ErrorResponse
    */
@@ -271,7 +277,7 @@ class GlobalExceptionHandler(
 
   private fun populateErrorResponseAndHandleExceptionInternal(
     exception: Exception,
-    status: HttpStatus,
+    status: HttpStatusCode,
     request: WebRequest,
   ): ResponseEntity<Any>? {
     request.setAttribute(ERROR_STATUS_CODE, status.value(), SCOPE_REQUEST)
