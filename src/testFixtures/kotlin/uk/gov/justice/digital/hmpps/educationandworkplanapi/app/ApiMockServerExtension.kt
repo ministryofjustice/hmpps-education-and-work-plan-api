@@ -21,7 +21,7 @@ class ApiMockServerExtension :
   AfterAllCallback,
   BeforeEachCallback {
   companion object {
-    val apiMockServer = ApiMockServer()
+    val apiMockServer = WireMockServer(WIREMOCK_PORT)
   }
 
   override fun beforeAll(context: ExtensionContext): Unit = apiMockServer.start()
@@ -29,75 +29,35 @@ class ApiMockServerExtension :
   override fun afterAll(context: ExtensionContext): Unit = apiMockServer.stop()
 }
 
-open class ApiMockServer(
-  port: Int = WIREMOCK_PORT,
-) : WireMockServer(port) {
-  fun stubForGet(
-    path: String,
-    body: String? = null,
-    status: Int = HttpStatus.OK_200,
-  ) = stubForGet(mappingBuilder(path = path), body, status)
+fun WireMockServer.stubForGet(
+  path: String,
+  body: String? = null,
+  status: Int = HttpStatus.OK_200,
+) = stubForGet(mappingBuilder(path = path), body, status)
 
-  fun stubForGet(
-    pathPattern: UrlPathPattern,
-    body: String? = null,
-    status: Int = HttpStatus.OK_200,
-  ) = stubForGet(mappingBuilder(pathPattern = pathPattern), body, status)
+fun WireMockServer.stubForGet(
+  pathPattern: UrlPathPattern,
+  body: String? = null,
+  status: Int = HttpStatus.OK_200,
+) = stubForGet(mappingBuilder(pathPattern = pathPattern), body, status)
 
-  fun stubForRetryGet(
-    scenario: String,
-    path: String,
-    numberOfRequests: Int = 3,
-    failedStatus: Int,
-    endStatus: Int,
-    body: String? = null,
-  ) = stubForRetryGet(scenario, mappingBuilder(path = path), numberOfRequests, failedStatus, endStatus, body)
+fun WireMockServer.stubForRetryGet(
+  scenario: String,
+  path: String,
+  numberOfRequests: Int = 3,
+  failedStatus: Int,
+  endStatus: Int,
+  body: String? = null,
+) = stubForRetryGet(scenario, mappingBuilder(path = path), numberOfRequests, failedStatus, endStatus, body)
 
-  fun stubForRetryGet(
-    scenario: String,
-    pathPattern: UrlPathPattern,
-    numberOfRequests: Int = 3,
-    failedStatus: Int,
-    endStatus: Int,
-    body: String? = null,
-  ) = stubForRetryGet(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, failedStatus, endStatus, body)
-
-  fun stubForRetryGetWithFault(
-    scenario: String,
-    path: String,
-    numberOfRequests: Int = 3,
-    fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
-    endStatus: Int = 200,
-    body: String? = null,
-  ) = stubForRetryGetWithFault(scenario, mappingBuilder(path = path), numberOfRequests, fault, endStatus, body)
-
-  fun stubForRetryGetWithFault(
-    scenario: String,
-    pathPattern: UrlPathPattern,
-    numberOfRequests: Int = 3,
-    fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
-    endStatus: Int = 200,
-    body: String? = null,
-  ) = stubForRetryGetWithFault(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, fault, endStatus, body)
-
-  fun stubForRetryGetWithDelays(
-    scenario: String,
-    path: String,
-    numberOfRequests: Int = 3,
-    delayMs: Int = 5_000,
-    endStatus: Int = 200,
-    body: String? = null,
-  ) = stubForRetryGetWithDelays(scenario, mappingBuilder(path = path), numberOfRequests, delayMs, endStatus, body)
-
-  fun stubForRetryGetWithDelays(
-    scenario: String,
-    pathPattern: UrlPathPattern,
-    numberOfRequests: Int = 3,
-    delayMs: Int = 5_000,
-    endStatus: Int = 200,
-    body: String? = null,
-  ) = stubForRetryGetWithDelays(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, delayMs, endStatus, body)
-}
+fun WireMockServer.stubForRetryGet(
+  scenario: String,
+  pathPattern: UrlPathPattern,
+  numberOfRequests: Int = 3,
+  failedStatus: Int,
+  endStatus: Int,
+  body: String? = null,
+) = stubForRetryGet(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, failedStatus, endStatus, body)
 
 fun WireMockServer.stubForRetryGetWithFault(
   scenario: String,
@@ -108,6 +68,15 @@ fun WireMockServer.stubForRetryGetWithFault(
   body: String? = null,
 ) = stubForRetryGetWithFault(scenario, mappingBuilder(path = path), numberOfRequests, fault, endStatus, body)
 
+fun WireMockServer.stubForRetryGetWithFault(
+  scenario: String,
+  pathPattern: UrlPathPattern,
+  numberOfRequests: Int = 3,
+  fault: Fault = Fault.CONNECTION_RESET_BY_PEER,
+  endStatus: Int = 200,
+  body: String? = null,
+) = stubForRetryGetWithFault(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, fault, endStatus, body)
+
 fun WireMockServer.stubForRetryGetWithDelays(
   scenario: String,
   path: String,
@@ -116,6 +85,15 @@ fun WireMockServer.stubForRetryGetWithDelays(
   endStatus: Int = 200,
   body: String? = null,
 ) = stubForRetryGetWithDelays(scenario, mappingBuilder(path = path), numberOfRequests, delayMs, endStatus, body)
+
+fun WireMockServer.stubForRetryGetWithDelays(
+  scenario: String,
+  pathPattern: UrlPathPattern,
+  numberOfRequests: Int = 3,
+  delayMs: Int = 5_000,
+  endStatus: Int = 200,
+  body: String? = null,
+) = stubForRetryGetWithDelays(scenario, mappingBuilder(pathPattern = pathPattern), numberOfRequests, delayMs, endStatus, body)
 
 private fun WireMockServer.stubForGet(
   mappingBuilder: () -> MappingBuilder,
@@ -219,7 +197,7 @@ private fun WireMockServer.stubForRetryGetWithDelays(
   }
 }
 
-private fun WireMockServer.mappingBuilder(
+private fun mappingBuilder(
   path: String? = null,
   pathPattern: UrlPathPattern? = null,
 ): () -> MappingBuilder = { path?.let { get(path) } ?: get(pathPattern!!) }

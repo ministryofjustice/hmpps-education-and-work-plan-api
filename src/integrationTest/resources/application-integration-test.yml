@@ -74,7 +74,10 @@ apis:
   prisoner-search-api:
     url: http://localhost:9093
 
-api.timeout: 150ms
+api:
+  timeout: 150ms
+  min-back-off-duration: 5ms
+  max-retry-attempts: 2
 
 hmpps:
   auth:

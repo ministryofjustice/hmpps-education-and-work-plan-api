@@ -30,6 +30,10 @@ import reactor.netty.http.client.HttpClient
 import reactor.util.retry.Retry
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ApiMockServerExtension
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.ApiMockServerExtension.Companion.apiMockServer
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForGet
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForRetryGet
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForRetryGetWithDelays
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.stubForRetryGetWithFault
 import java.time.Duration
 
 @ExtendWith(ApiMockServerExtension::class)

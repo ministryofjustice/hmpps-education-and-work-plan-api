@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.FluxExchangeResult
@@ -125,36 +127,40 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     assertThat(actual.basicSkillsAssessmentRequired).isTrue()
   }
 
-  @Test
-  fun `should retry and succeed at last, given earlier connection reset by peer (RST) from upstream`() {
-    // Given
-    val numberOfRequests = 3
-    // Retry after RST error, succeed at last
-    wiremockService.stubGetPrisonerWithConnectionResetError(prisonNumber, knownPrisoner, numberOfRequests)
+  @Nested
+  @DisplayName("Given upstream error (from Prisoner Search)")
+  inner class GivenUpstreamError {
+    @Test
+    fun `should return BSA eligibility for prisoner, given earlier connection reset by peer (RST)`() {
+      // Given
+      val numberOfRequests = 3
+      // Retry after RST error, succeed at last
+      wiremockService.stubGetPrisonerWithConnectionResetError(prisonNumber, knownPrisoner, numberOfRequests)
 
-    // When
-    val response = getAssessmentsRequiredIsOk(prisonNumber)
+      // When
+      val response = getAssessmentsRequiredIsOk(prisonNumber)
 
-    // Then
-    val actual = response.body()
-    assertThat(actual.basicSkillsAssessmentRequired).isNotNull
-    wiremockService.verifyGetPrisoner(numberOfRequests)
-  }
+      // Then
+      val actual = response.body()
+      assertThat(actual.basicSkillsAssessmentRequired).isNotNull
+      wiremockService.verifyGetPrisoner(numberOfRequests)
+    }
 
-  @Test
-  fun `should retry and succeed at last, given earlier connection timed out`() {
-    // Given
-    val numberOfRequests = 3
-    // Retry after response timed out, succeed at last
-    wiremockService.stubGetPrisonerWithConnectionTimedOutError(prisonNumber, knownPrisoner, numberOfRequests)
+    @Test
+    fun `should return BSA eligibility for prisoner, given earlier connection timed out`() {
+      // Given
+      val numberOfRequests = 3
+      // Retry after response timed out, succeed at last
+      wiremockService.stubGetPrisonerWithConnectionTimedOutError(prisonNumber, knownPrisoner, numberOfRequests)
 
-    // When
-    val response = getAssessmentsRequiredIsOk(prisonNumber)
+      // When
+      val response = getAssessmentsRequiredIsOk(prisonNumber)
 
-    // Then
-    val actual = response.body()
-    assertThat(actual.basicSkillsAssessmentRequired).isNotNull
-    wiremockService.verifyGetPrisoner(numberOfRequests)
+      // Then
+      val actual = response.body()
+      assertThat(actual.basicSkillsAssessmentRequired).isNotNull
+      wiremockService.verifyGetPrisoner(numberOfRequests)
+    }
   }
 
   private val aValidBearerToken
