@@ -95,6 +95,7 @@ class WiremockService(private val wireMockServer: WireMockServer) {
         ),
     )
   }
+
   fun stubGetPrisonerWithEarlierConnectionResetError(
     prisonNumber: String,
     response: Prisoner?,
