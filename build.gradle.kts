@@ -20,7 +20,7 @@ apply(plugin = "org.openapi.generator")
 val postgresqlVersion = "42.7.8"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.8.13"
-val hmppsSqsVersion = "5.6.0"
+val hmppsSqsVersion = "5.6.1"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.1"
 val jsonWebTokenVersion = "0.13.0"
@@ -50,7 +50,7 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.7.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.8.1")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
