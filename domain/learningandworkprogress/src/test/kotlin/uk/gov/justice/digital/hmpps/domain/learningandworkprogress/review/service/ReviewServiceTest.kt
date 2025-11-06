@@ -380,6 +380,15 @@ class ReviewServiceTest {
         ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE,
         ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
       ),
+      Arguments.of(
+        "prisoner is sentenced with release date in the past - next review 2 to 3 months",
+        TODAY.minusMonths(1),
+        SentenceType.SENTENCED,
+        false,
+        false,
+        ReviewScheduleCalculationRule.RELEASE_DATE_IN_PAST,
+        ReviewScheduleWindow(TODAY.plusMonths(2), TODAY.plusMonths(3)),
+      ),
     )
   }
 }

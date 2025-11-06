@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import java.time.LocalDate
 
 @Isolated
 class CreateInductionTest : IntegrationTestBase() {
@@ -302,6 +303,42 @@ class CreateInductionTest : IntegrationTestBase() {
   fun `should create an induction and create the initial review schedule given the prisoner already has goals created before the induction`() {
     // Given
     val prisonNumber = setUpRandomPrisoner()
+    createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
+
+    val createRequest = aValidCreateInductionRequest()
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction).isNotNull
+    // assert that there is an Action Plan Reviews object, and that it contains no completed reviews, and the latestReviewSchedule has a SCHEDULED status
+    val actionPlanReviews = getActionPlanReviews(prisonNumber)
+    assertThat(actionPlanReviews)
+      .hasNumberOfCompletedReviews(0)
+      .latestReviewSchedule {
+        it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+      }
+    val reviewScheduleReference = actionPlanReviews.latestReviewSchedule.reference
+
+    assertThat(reviewScheduleHistoryRepository.findAllByReference(reviewScheduleReference)).isNotNull
+    assertThat(reviewScheduleHistoryRepository.findAllByPrisonNumber(prisonNumber)).size().isEqualTo(1)
+  }
+
+  @Test
+  fun `should create an induction and create the initial review schedule given the prisoner already has goals created before the induction and the release date is in the past`() {
+    // Given
+    val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().minusDays(1))
     createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
 
     val createRequest = aValidCreateInductionRequest()

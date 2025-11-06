@@ -87,6 +87,7 @@ class ReviewScheduleEntityMapper {
     ReviewScheduleCalculationRuleEntity.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRuleDomain.INDETERMINATE_SENTENCE
     ReviewScheduleCalculationRuleEntity.PRISONER_ON_REMAND -> ReviewScheduleCalculationRuleDomain.PRISONER_ON_REMAND
     ReviewScheduleCalculationRuleEntity.PRISONER_UN_SENTENCED -> ReviewScheduleCalculationRuleDomain.PRISONER_UN_SENTENCED
+    ReviewScheduleCalculationRuleEntity.RELEASE_DATE_IN_PAST -> ReviewScheduleCalculationRuleDomain.RELEASE_DATE_IN_PAST
   }
 
   private fun toReviewScheduleCalculationRule(calculationRule: ReviewScheduleCalculationRuleDomain): ReviewScheduleCalculationRuleEntity = when (calculationRule) {
@@ -101,6 +102,7 @@ class ReviewScheduleEntityMapper {
     ReviewScheduleCalculationRuleDomain.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRuleEntity.INDETERMINATE_SENTENCE
     ReviewScheduleCalculationRuleDomain.PRISONER_ON_REMAND -> ReviewScheduleCalculationRuleEntity.PRISONER_ON_REMAND
     ReviewScheduleCalculationRuleDomain.PRISONER_UN_SENTENCED -> ReviewScheduleCalculationRuleEntity.PRISONER_UN_SENTENCED
+    ReviewScheduleCalculationRuleDomain.RELEASE_DATE_IN_PAST -> ReviewScheduleCalculationRuleEntity.RELEASE_DATE_IN_PAST
   }
 
   private fun toReviewScheduleStatus(reviewScheduleStatus: ReviewScheduleStatusEntity): ReviewScheduleStatusDomain = when (reviewScheduleStatus) {
