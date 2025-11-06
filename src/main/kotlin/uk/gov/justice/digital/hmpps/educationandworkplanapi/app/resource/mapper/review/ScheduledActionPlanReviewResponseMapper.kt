@@ -68,5 +68,6 @@ class ScheduledActionPlanReviewResponseMapper(
     ReviewScheduleCalculationRuleDomain.INDETERMINATE_SENTENCE -> ReviewScheduleCalculationRuleApi.INDETERMINATE_SENTENCE
     ReviewScheduleCalculationRuleDomain.PRISONER_ON_REMAND -> ReviewScheduleCalculationRuleApi.PRISONER_ON_REMAND
     ReviewScheduleCalculationRuleDomain.PRISONER_UN_SENTENCED -> ReviewScheduleCalculationRuleApi.PRISONER_UN_SENTENCED
+    ReviewScheduleCalculationRuleDomain.RELEASE_DATE_IN_PAST -> ReviewScheduleCalculationRuleApi.RELEASE_DATE_IN_PAST
   }
 }

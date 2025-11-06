@@ -34,6 +34,7 @@ enum class ReviewScheduleCalculationRule {
   INDETERMINATE_SENTENCE,
   PRISONER_ON_REMAND,
   PRISONER_UN_SENTENCED,
+  RELEASE_DATE_IN_PAST,
 }
 
 enum class ReviewScheduleStatus(

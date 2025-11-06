@@ -356,6 +356,14 @@ class ReviewScheduleDateCalculationServiceTest {
     @JvmStatic
     fun determineReviewScheduleCalculationRule_testCases(): Stream<Arguments> = Stream.of(
       Arguments.of(
+        "release date in the past",
+        TODAY.minusMonths(1),
+        SentenceType.SENTENCED,
+        false,
+        false,
+        ReviewScheduleCalculationRule.RELEASE_DATE_IN_PAST,
+      ),
+      Arguments.of(
         "prisoner is a transfer",
         TODAY.plusMonths(24),
         SentenceType.SENTENCED,

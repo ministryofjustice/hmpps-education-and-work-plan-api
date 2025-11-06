@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_READMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_TRANSFER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_UN_SENTENCED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.RELEASE_DATE_IN_PAST
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleWindow
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
@@ -55,6 +56,7 @@ class ReviewScheduleDateCalculationService {
       log.info("release date was $releaseDate for prison number $prisonNumber using calculation rule based on time left to serve.")
       reviewScheduleCalculationRuleBasedOnTimeLeftToServe(releaseDate)
     }
+
     else -> when (sentenceType) {
       REMAND -> PRISONER_ON_REMAND
       CONVICTED_UNSENTENCED -> PRISONER_UN_SENTENCED
@@ -88,9 +90,14 @@ class ReviewScheduleDateCalculationService {
     }
 
     BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromOneToThreeMonths(baseScheduleDate())
-    BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED -> ReviewScheduleWindow.fromTwoToThreeMonths(baseScheduleDate())
+    BETWEEN_6_AND_12_MONTHS_TO_SERVE, PRISONER_ON_REMAND, PRISONER_UN_SENTENCED, RELEASE_DATE_IN_PAST -> ReviewScheduleWindow.fromTwoToThreeMonths(
+      baseScheduleDate(),
+    )
+
     BETWEEN_12_AND_60_MONTHS_TO_SERVE -> ReviewScheduleWindow.fromFourToSixMonths(baseScheduleDate())
-    MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths(baseScheduleDate())
+    MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths(
+      baseScheduleDate(),
+    )
   }.also {
     when {
       it == null -> log.debug { "Returning no ReviewScheduleWindow because ReviewScheduleCalculationRule is $reviewScheduleCalculationRule" }
@@ -137,6 +144,7 @@ class ReviewScheduleDateCalculationService {
     val timeLeftToServe = from(baseScheduleDate()).until(releaseDate)
 
     return when {
+      releaseDate < LocalDate.now() -> RELEASE_DATE_IN_PAST
       timeLeftToServe.isNoMoreThan3Months() -> BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
       timeLeftToServe.isBetween3MonthsAnd3Months7Days() -> BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
       timeLeftToServe.isBetween3Months8DaysAnd6Months() -> BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
