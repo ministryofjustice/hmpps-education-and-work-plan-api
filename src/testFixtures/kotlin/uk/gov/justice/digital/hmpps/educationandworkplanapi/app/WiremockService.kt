@@ -4,16 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.exactly
 import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import com.github.tomakehurst.wiremock.http.Fault
+import com.github.tomakehurst.wiremock.matching.UrlPattern
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PagedPrisonerResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSummary
 
 /**
@@ -21,6 +25,8 @@ import uk.gov.justice.digital.hmpps.prisonapi.resource.model.PrisonerInPrisonSum
  */
 @Service
 class WiremockService(private val wireMockServer: WireMockServer) {
+  private val maxRetryAttempts = 3
+  private val apiClientTimeoutMs = 150
 
   @Autowired
   private lateinit var objectMapper: ObjectMapper
@@ -84,10 +90,44 @@ class WiremockService(private val wireMockServer: WireMockServer) {
         .willReturn(
           responseDefinition()
             .withStatus(404)
-            .withHeader("Content-Type", "application/json"),
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(ErrorResponse(status = 404, userMessage = "$prisonNumber not found"))),
         ),
     )
   }
+
+  fun stubGetPrisonerWithEarlierConnectionResetError(
+    prisonNumber: String,
+    response: Prisoner?,
+    numberOfRequests: Int = 1 + maxRetryAttempts,
+    endStatus: Int = 200,
+  ) = wireMockServer.stubForRetryGetWithFault(
+    scenario = "Retry Get Prisoner with connection reset error",
+    path = "/prisoner/$prisonNumber",
+    numberOfRequests = numberOfRequests,
+    fault = Fault.CONNECTION_RESET_BY_PEER,
+    endStatus = endStatus,
+    body = response?.let { objectMapper.writeValueAsString(response) },
+  )
+
+  fun stubGetPrisonerWithConnectionResetError(prisonNumber: String) = wireMockServer.stubForGetWithFault(
+    path = "/prisoner/$prisonNumber",
+    fault = Fault.CONNECTION_RESET_BY_PEER,
+  )
+
+  fun stubGetPrisonerWithEarlierConnectionTimedOutError(
+    prisonNumber: String,
+    response: Prisoner?,
+    numberOfRequests: Int = 1 + maxRetryAttempts,
+    endStatus: Int = 200,
+  ) = wireMockServer.stubForRetryGetWithDelays(
+    scenario = "Retry Get Prisoner with connection timeout",
+    path = "/prisoner/$prisonNumber",
+    numberOfRequests = numberOfRequests,
+    delayMs = apiClientTimeoutMs + 10,
+    endStatus = endStatus,
+    body = response?.let { objectMapper.writeValueAsString(response) },
+  )
 
   fun setUpManageUsersRepeatPass(username: String) {
     wireMockServer.stubFor(
@@ -120,4 +160,8 @@ class WiremockService(private val wireMockServer: WireMockServer) {
         .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)),
     )
   }
+
+  fun verifyGetPrisoner(expectedCount: Int = 1) = verifyUpstreamApi(expectedCount, urlPathMatching("/prisoner/([A-Za-z0-9])+"))
+
+  private fun verifyUpstreamApi(expectedCount: Int = 1, urlPattern: UrlPattern) = wireMockServer.verify(exactly(expectedCount), getRequestedFor(urlPattern))
 }
