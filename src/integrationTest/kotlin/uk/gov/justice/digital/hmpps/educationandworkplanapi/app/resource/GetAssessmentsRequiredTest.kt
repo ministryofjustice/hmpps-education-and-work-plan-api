@@ -2,54 +2,60 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aConvictedOffence
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.aPrisonEducationServiceProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationAssessmentRequired
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 
 private const val URI_TEMPLATE = "/assessments/{prisonNumber}/required"
 
 class GetAssessmentsRequiredTest : IntegrationTestBase() {
   private lateinit var prisonNumber: String
+  private lateinit var unknownPrisonNumber: String
   private val pesContractStartDate = aPrisonEducationServiceProperties().contractStartDate
+  private lateinit var knownPrisoner: Prisoner
 
   @BeforeEach
   internal fun setUp() {
     prisonNumber = randomValidPrisonNumber()
+    knownPrisoner = aValidPrisoner(
+      prisonerNumber = prisonNumber,
+      receptionDate = pesContractStartDate.plusDays(1),
+      sentenceStartDate = pesContractStartDate,
+    )
+
+    unknownPrisonNumber = randomValidPrisonNumber()
   }
 
   @Test
   fun `should return unauthorised given no bearer token`() {
     // When
-    webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .exchange()
-      .expectStatus()
-      .isUnauthorized
+    getAssessmentsRequired(prisonNumber, bearerToken = null)
+      .expectStatus().isUnauthorized
   }
 
   @Test
   fun `should return forbidden given bearer token without required role`() {
     // When
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
-      .exchange()
-      .expectStatus()
-      .isForbidden
-      .returnResult(ErrorResponse::class.java)
+    val bearerToken = aValidTokenWithNoAuthorities(privateKey = keyPair.private)
+    val response = getAssessmentsRequired(prisonNumber, bearerToken)
+      .expectStatus().isForbidden
+      .returnError()
 
     // Then
-    val actual = response.responseBody.blockFirst()
+    val actual = response.body()
     assertThat(actual)
       .hasStatus(HttpStatus.FORBIDDEN.value())
       .hasUserMessage("Access Denied")
@@ -59,22 +65,18 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
   @Test
   fun `should return not found given prisoner does not exist`() {
     // Given
-    wiremockService.stubGetPrisonerNotFound(prisonNumber)
+    wiremockService.stubGetPrisonerNotFound(unknownPrisonNumber)
 
     // When
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidBearerToken)
-      .exchange()
-      .expectStatus()
-      .isNotFound
-      .returnResult(ErrorResponse::class.java)
+    val response = getAssessmentsRequired(unknownPrisonNumber)
+      .expectStatus().isNotFound
+      .returnError()
 
     // Then
-    val actual = response.responseBody.blockFirst()
+    val actual = response.body()
     assertThat(actual)
       .hasStatus(HttpStatus.NOT_FOUND.value())
-      .hasUserMessage("Prisoner [$prisonNumber] not returned by Prisoner Search API")
+      .hasUserMessage("Prisoner [$unknownPrisonNumber] not returned by Prisoner Search API")
   }
 
   @Test
@@ -87,16 +89,10 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
 
     // When
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidBearerToken)
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(EducationAssessmentRequired::class.java)
+    val response = getAssessmentsRequiredIsOk(prisonNumber)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
+    val actual = response.body()
     assertThat(actual.basicSkillsAssessmentRequired).isNotNull
   }
 
@@ -107,10 +103,10 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
 
     // When
-    val response = assertGetIsBadRequest()
+    val response = getAssessmentsRequiredIsBadRequest(prisoner.prisonerNumber)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
+    val actual = response.body()
     assertThat(actual)
       .hasStatus(HttpStatus.BAD_REQUEST.value())
       .hasUserMessage("Sentence start date and Reception date of Prisoner [$prisonNumber] are both missing.")
@@ -119,38 +115,92 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
   @Test
   fun `should return BSA eligibility for prisoner`() {
     // Given
-    val prisoner = aValidPrisoner(
-      prisonerNumber = prisonNumber,
-      receptionDate = pesContractStartDate.plusDays(1),
-      sentenceStartDate = pesContractStartDate,
-    )
-    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisoner)
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, knownPrisoner)
 
     // When
-    val response = webTestClient.get()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidBearerToken)
-      .exchange()
-      .expectStatus()
-      .isOk
-      .returnResult(EducationAssessmentRequired::class.java)
+    val response = getAssessmentsRequiredIsOk(prisonNumber)
 
     // Then
-    val actual = response.responseBody.blockFirst()!!
+    val actual = response.body()
     assertThat(actual.basicSkillsAssessmentRequired).isTrue()
   }
 
-  private fun assertGetIsBadRequest() = webTestClient.get()
-    .uri(URI_TEMPLATE, prisonNumber)
-    .bearerToken(aValidBearerToken)
-    .exchange()
-    .expectStatus()
-    .isBadRequest
-    .returnResult(ErrorResponse::class.java)
+  @Nested
+  @DisplayName("Given upstream error (from Prisoner Search)")
+  inner class GivenUpstreamError {
+    @Test
+    fun `should return BSA eligibility for prisoner, given earlier connection reset by peer (RST)`() {
+      // Given
+      val numberOfRequests = 3
+      // Retry after RST error, succeed at last
+      wiremockService.stubGetPrisonerWithEarlierConnectionResetError(prisonNumber, knownPrisoner, numberOfRequests)
+
+      // When
+      val response = getAssessmentsRequiredIsOk(prisonNumber)
+
+      // Then
+      val actual = response.body()
+      assertThat(actual.basicSkillsAssessmentRequired).isNotNull
+      wiremockService.verifyGetPrisoner(numberOfRequests)
+    }
+
+    @Test
+    fun `should return BSA eligibility for prisoner, given earlier connection timed out`() {
+      // Given
+      val numberOfRequests = 3
+      // Retry after response timed out, succeed at last
+      wiremockService.stubGetPrisonerWithEarlierConnectionTimedOutError(prisonNumber, knownPrisoner, numberOfRequests)
+
+      // When
+      val response = getAssessmentsRequiredIsOk(prisonNumber)
+
+      // Then
+      val actual = response.body()
+      assertThat(actual.basicSkillsAssessmentRequired).isNotNull
+      wiremockService.verifyGetPrisoner(numberOfRequests)
+    }
+
+    @Test
+    fun `should fail, given earlier connection reset errors remain`() {
+      // Given
+      // Retry after response timed out, succeed at last
+      wiremockService.stubGetPrisonerWithConnectionResetError(prisonNumber)
+      val expectedAttempts = apiClientMaxAttempts
+
+      // When
+      val response = getAssessmentsRequired(prisonNumber)
+        .expectStatus().is5xxServerError
+        .returnError()
+
+      // Then
+      val actual = response.body()
+      assertThat(actual)
+        .hasStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+      wiremockService.verifyGetPrisoner(expectedAttempts)
+    }
+  }
 
   private val aValidBearerToken
     get() = aValidTokenWithAuthority(
       ASSESSMENTS_RO,
       privateKey = keyPair.private,
     )
+
+  private fun getAssessmentsRequired(
+    prisonNumber: String,
+    bearerToken: String? = aValidBearerToken,
+  ) = webTestClient.get()
+    .uri(URI_TEMPLATE, prisonNumber)
+    .let { bearerToken?.let { bearerToken -> it.bearerToken(bearerToken) } ?: it }
+    .exchange()
+
+  private fun getAssessmentsRequiredIsOk(prisonNumber: String) = getAssessmentsRequired(prisonNumber, aValidBearerToken)
+    .expectStatus().isOk
+    .returnEducationAssessmentRequired()
+
+  private fun getAssessmentsRequiredIsBadRequest(prisonNumber: String) = getAssessmentsRequired(prisonNumber)
+    .expectStatus().isBadRequest
+    .returnError()
+
+  private fun WebTestClient.ResponseSpec.returnEducationAssessmentRequired() = this.returnResult(EducationAssessmentRequired::class.java)
 }
