@@ -17,8 +17,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PrisonerReceivedIntoPrisonEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
-import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
@@ -34,6 +34,7 @@ class ScheduleEtlController(
   private val eventPublisher: EventPublisher,
   private val inductionRepository: InductionRepository,
   private val goalPersistenceAdapter: GoalPersistenceAdapter,
+  private val prisonerReceivedIntoPrisonEventService: PrisonerReceivedIntoPrisonEventService,
 ) {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_EDIT_REVIEWS)
@@ -67,63 +68,6 @@ class ScheduleEtlController(
 
   data class PrisonNumbersRequest(
     val prisonNumbers: List<String>,
-  )
-
-  @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_REVIEWS)
-  @GetMapping("/release-dates/{prisonId}")
-  fun releaseDatesByPrisonId(
-    @PathVariable prisonId: String,
-  ): ReleaseDates {
-    log.info("Getting release dates for prison ID: $prisonId")
-
-    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId).also {
-      log.info("Total prisoners in prison $prisonId: ${it.size}")
-    }
-
-    val tomorrow = LocalDate.now().plusDays(1)
-
-    // we are only interested in prisoners with no release date or ones with the date < tomorrow
-    val prisonerReleaseDates: List<PrisonerReleaseDate> = allPrisoners.mapNotNull { prisoner ->
-      val date = prisoner.releaseDate
-      if (date == null || date.isBefore(tomorrow)) {
-        PrisonerReleaseDate(
-          prisoner.prisonerNumber,
-          date,
-          hasCompletedInduction(prisoner.prisonerNumber),
-          getCurrentReviewScheduleStatus(prisoner.prisonerNumber),
-        )
-      } else {
-        null
-      }
-    }
-
-    val releaseDates = ReleaseDates(prisonerReleaseDates)
-    log.info(
-      "Release date check completed for prison ID: $prisonId. " +
-        "Returning ${releaseDates.prisonerReleaseDates.size} result(s).",
-    )
-    return releaseDates
-  }
-
-  private fun getCurrentReviewScheduleStatus(prisonerNumber: String): String? {
-    val review = reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(prisonerNumber)
-    return review?.scheduleStatus?.name
-  }
-
-  // returns true if the person has a completed induction and goal
-  private fun hasCompletedInduction(prisonerNumber: String): Boolean {
-    val induction = inductionRepository.findByPrisonNumber(prisonerNumber)
-    val goals = goalPersistenceAdapter.getGoals(prisonerNumber)
-    return induction != null && !goals.isNullOrEmpty()
-  }
-
-  data class ReleaseDates(val prisonerReleaseDates: List<PrisonerReleaseDate>)
-  data class PrisonerReleaseDate(
-    val prisonerNumber: String,
-    val releaseDate: LocalDate?,
-    val completedInduction: Boolean,
-    val currentReviewStatus: String?,
   )
 
   @PostMapping("/action-plans/schedules/publish-review-messages")
