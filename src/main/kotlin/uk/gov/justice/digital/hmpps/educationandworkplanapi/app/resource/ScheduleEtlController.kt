@@ -119,16 +119,12 @@ class ScheduleEtlController(
   ) {
     log.info("Getting release dates for prison ID: $prisonId")
 
-    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId).also {
-      log.info("Total prisoners in prison $prisonId: ${it.size}")
-    }
-
-    val tomorrow = LocalDate.now().plusDays(1)
+    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
 
     // we are only interested in prisoners with no release date or ones with the date < tomorrow
     val prisonerReleaseDates: List<PrisonerReleaseDate> = allPrisoners.mapNotNull { prisoner ->
       val date = prisoner.releaseDate
-      if (date == null || date.isBefore(tomorrow)) {
+      if (date != null && date.isBefore(LocalDate.now())) {
         PrisonerReleaseDate(
           prisoner.prisonerNumber,
           date,
@@ -144,7 +140,7 @@ class ScheduleEtlController(
     // have no current review schedule and their release date is in the past.
 
     prisonerReleaseDates.forEach {
-      if (it.completedInduction && it.currentReviewStatus == null && it.releaseDate != null && it.releaseDate < LocalDate.now()) {
+      if (it.completedInduction && it.currentReviewStatus == null) {
         log.debug("Creating review schedule for prisoner: ${it.prisonerNumber} at prison $prisonId")
         prisonerReceivedIntoPrisonEventService.processPrisonerAdmissionEvent(nomsNumber = it.prisonerNumber, eventOccurredAt = Instant.now())
         Thread.sleep(500) // have a rest between each one so it doesn't kill the database
