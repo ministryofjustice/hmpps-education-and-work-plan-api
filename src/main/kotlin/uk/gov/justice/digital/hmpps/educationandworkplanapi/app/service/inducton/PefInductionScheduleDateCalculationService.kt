@@ -85,6 +85,7 @@ class PefInductionScheduleDateCalculationService(private val inductionExtensionC
       !today.isBefore(period.start) && !today.isAfter(period.end)
     }
 
+    log.debug("Holiday periods: {}", inductionExtensionConfig.periods)
     log.debug("today: {}, inHolidayPeriod: {}", today, inHolidayPeriod)
     return if (inHolidayPeriod) {
       InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD

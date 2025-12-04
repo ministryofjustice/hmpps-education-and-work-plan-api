@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
@@ -20,7 +21,6 @@ import java.time.OffsetDateTime
 @Isolated
 class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBase() {
 
-  // New prison admission, prisoner has never had a PLP
   @Test
   fun `should create new Induction Schedule given prisoner does not already have an Induction`() {
     // Given
@@ -47,15 +47,11 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
     sendDomainEvent(sqsMessage)
 
     // Then
-    // wait until the queue is drained / message is processed
     await untilCallTo {
       domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
     } matches { it == 0 }
 
-    // TODO uncomment NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
-
     await untilAsserted {
-      // test induction schedule was created
       val inductionSchedule = getInductionSchedule(prisonNumber)
       assertThat(inductionSchedule)
         .wasCreatedAtOrAfter(earliestDateTime)
@@ -66,10 +62,9 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
         .wasUpdatedBy("system")
         .wasUpdatedByDisplayName("system")
         .wasUpdatedAtPrison("MDI")
-//        .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
+        .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION) // TODO NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
         .wasStatus(SCHEDULED)
 
-      // test induction schedule history is created
       val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
       assertThat(inductionScheduleHistories)
         .hasNumberOfInductionScheduleVersions(1)
@@ -82,12 +77,11 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
             .wasUpdatedBy("system")
             .wasUpdatedByDisplayName("system")
             .wasUpdatedAtPrison("MDI")
-//            .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
+            .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION) // TODO NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
             .wasStatus(SCHEDULED)
             .wasVersion(1)
         }
 
-      // test that outbound event is also created:
       val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
       assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
       assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
