@@ -38,8 +38,8 @@ generic-data-analytics-extractor:
 queueHousekeeping:
   cronJobSchedule: "*/10 07-20 * * 1-5" # Every 10 minutes between 7am and 8:59pm UTC Monday-Friday to allow for the fact that we terminate the resources overnight and all weekend in the dev env (see scheduledDowntime above)
 
-config:
-  inductionExtension:
-    periods:
-      - start: 2025-12-20
-        end: 2026-01-01
+
+inductionExtension:
+  periods:
+    - start: 2025-12-20
+      end: 2026-01-01

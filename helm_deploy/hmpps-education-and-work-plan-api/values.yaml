@@ -93,8 +93,7 @@ generic-data-analytics-extractor:
 queueHousekeeping:
   cronJobSchedule: "*/10 * * * *"
 
-config:
-  inductionExtension:
-    periods:
-      - start: 2025-12-20
-        end: 2026-01-01
+inductionExtension:
+  periods:
+    - start: 2025-12-20
+      end: 2026-01-01
