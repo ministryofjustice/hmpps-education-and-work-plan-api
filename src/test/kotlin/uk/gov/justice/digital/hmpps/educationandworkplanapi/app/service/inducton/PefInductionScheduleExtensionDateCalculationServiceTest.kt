@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import java.time.LocalDate
 
-class PefInductionScheduleDateCalculationServiceTest {
+class PefInductionScheduleExtensionDateCalculationServiceTest {
 
   private val service = PefInductionScheduleDateCalculationService(InductionExtensionConfig())
 
@@ -20,6 +20,7 @@ class PefInductionScheduleDateCalculationServiceTest {
     val admissionDate = LocalDate.now()
     val prisonId = "BXI"
 
+    // TODO this needs to be 25 days and EXTENDED_DEADLINE
     val expected = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = admissionDate.plusDays(20),

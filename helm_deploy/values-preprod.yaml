@@ -19,6 +19,10 @@ generic-service:
     MANAGE_USERS_API_URL: https://manage-users-api-preprod.hmpps.service.justice.gov.uk/
     PRISONER_SEARCH_API_URL: https://prisoner-search-preprod.prison.service.justice.gov.uk
     SERVICE_BASE_URL: "https://learningandworkprogress-api-preprod.hmpps.service.justice.gov.uk"
+    INDUCTION_EXTENSION_PERIODS: |
+      [
+        {"start": "2025-12-20", "end": "2026-01-01"}
+      ]
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts

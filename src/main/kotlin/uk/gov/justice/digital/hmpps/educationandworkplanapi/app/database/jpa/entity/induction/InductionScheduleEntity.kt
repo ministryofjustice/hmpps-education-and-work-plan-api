@@ -86,6 +86,7 @@ data class InductionScheduleEntity(
 enum class InductionScheduleCalculationRule {
   NEW_PRISON_ADMISSION,
   EXISTING_PRISONER,
+  NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD,
 }
 
 enum class InductionScheduleStatus(val active: Boolean) {

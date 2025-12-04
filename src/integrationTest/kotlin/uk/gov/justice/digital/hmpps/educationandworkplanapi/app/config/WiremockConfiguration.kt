@@ -8,16 +8,35 @@ import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
 @Configuration
 class WiremockConfiguration {
+  companion object {
+    private val loggingInitialised = AtomicBoolean(false)
+
+    // Shared WireMock instance for all Spring contexts
+    val sharedWireMockServer: WireMockServer by lazy {
+      WireMockServer(
+        options()
+          .port(9093)
+          .usingFilesUnderClasspath("simulations"),
+      ).apply {
+        start()
+      }
+    }
+  }
 
   @Bean
-  fun wireMockServer(@Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean): WireMockServer = WireMockServer(options().port(9093).usingFilesUnderClasspath("simulations")).apply {
-    if (logWiremockRequests) {
-      addMockServiceRequestListener { request: Request, _: Response ->
+  fun wireMockServer(
+    @Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean,
+  ): WireMockServer {
+    val server = sharedWireMockServer
+
+    if (logWiremockRequests && loggingInitialised.compareAndSet(false, true)) {
+      server.addMockServiceRequestListener { request: Request, _: Response ->
         val formattedHeaders = request.headers.all().joinToString("\n") {
           "${it.key()}: ${it.values().joinToString(", ")}"
         }
@@ -31,6 +50,6 @@ class WiremockConfiguration {
       }
     }
 
-    start()
+    return server
   }
 }
