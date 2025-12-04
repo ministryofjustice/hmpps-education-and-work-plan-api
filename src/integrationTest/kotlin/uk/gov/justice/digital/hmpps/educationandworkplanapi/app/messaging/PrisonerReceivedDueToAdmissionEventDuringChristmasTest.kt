@@ -7,8 +7,6 @@ import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
-import org.mockito.kotlin.whenever
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
@@ -17,28 +15,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
-import java.time.Clock
-import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.time.ZoneId
 
 @Isolated
 class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBase() {
 
-  @MockitoBean
-  lateinit var clock: Clock
-
   // New prison admission, prisoner has never had a PLP
   @Test
   fun `should create new Induction Schedule given prisoner does not already have an Induction`() {
-    val zone = ZoneId.systemDefault()
-    val instant = LocalDate.of(2025, 12, 20)
-      .atStartOfDay(zone)
-      .toInstant()
-
-    whenever(clock.instant()).thenReturn(instant)
-    whenever(clock.zone).thenReturn(zone)
-
     // Given
     val prisonNumber = randomValidPrisonNumber()
     with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
