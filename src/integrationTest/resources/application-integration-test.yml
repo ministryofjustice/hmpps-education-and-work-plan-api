@@ -90,6 +90,4 @@ pes:
   contract-start-date: 2025-10-01
 
 induction-extension:
-  periods:
-    - start: 2024-12-20
-      end: 2025-01-01
+  periods: "2024-12-20:2025-01-01"
