@@ -7,6 +7,7 @@ import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
+import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
@@ -19,6 +20,7 @@ import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.OffsetDateTime
 
 @Isolated
+@ActiveProfiles("integration-test", "christmas-clock")
 class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBase() {
 
   @Test
@@ -62,7 +64,7 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
         .wasUpdatedBy("system")
         .wasUpdatedByDisplayName("system")
         .wasUpdatedAtPrison("MDI")
-        .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION) // TODO NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
+        .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
         .wasStatus(SCHEDULED)
 
       val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
@@ -77,7 +79,7 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
             .wasUpdatedBy("system")
             .wasUpdatedByDisplayName("system")
             .wasUpdatedAtPrison("MDI")
-            .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION) // TODO NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
+            .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
             .wasStatus(SCHEDULED)
             .wasVersion(1)
         }

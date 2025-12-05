@@ -8,9 +8,14 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionPeriod
+import java.time.Clock
 import java.time.LocalDate
+import java.time.ZoneId
 
 class PefInductionScheduleExtensionDateCalculationServiceTest {
+
+  private val fixedDate = LocalDate.now()
+  private val clock = Clock.fixed(fixedDate.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
 
   private val inductionExtensionConfig = InductionExtensionConfig(
     periods = listOf(
@@ -21,7 +26,7 @@ class PefInductionScheduleExtensionDateCalculationServiceTest {
     ),
   )
 
-  private val service = PefInductionScheduleDateCalculationService(inductionExtensionConfig)
+  private val service = PefInductionScheduleDateCalculationService(inductionExtensionConfig, clock)
 
   @Test
   fun `should determine CreateInductionScheduleDto`() {
