@@ -15,7 +15,7 @@ class PefInductionScheduleDateCalculationServiceTest {
 
   private val fixedDate = LocalDate.now()
   private val clock = Clock.fixed(fixedDate.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
-  private val service = PefInductionScheduleDateCalculationService(InductionExtensionConfig(), clock)
+  private val service = PefInductionScheduleDateCalculationService(InductionExtensionConfig("2024-12-20:2025-01-01"), clock)
 
   @Test
   fun `should determine CreateInductionScheduleDto`() {
