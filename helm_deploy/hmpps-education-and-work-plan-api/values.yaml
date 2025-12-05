@@ -45,10 +45,10 @@ generic-service:
     - name: app-config
       configMap:
         name: hmpps-education-and-work-plan-api-config
-      volumeMounts:
-        - name: app-config
-          mountPath: /config
-          readOnly: true
+  volumeMounts:
+    - name: app-config
+      mountPath: /config
+      readOnly: true
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
