@@ -54,5 +54,6 @@ class InductionHistoryScheduleResourceMapper(
   fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRule): InductionScheduleCalculationRuleResponse = when (inductionScheduleCalculationRule) {
     InductionScheduleCalculationRule.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION
     InductionScheduleCalculationRule.EXISTING_PRISONER -> InductionScheduleCalculationRuleResponse.EXISTING_PRISONER
+    InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
   }
 }

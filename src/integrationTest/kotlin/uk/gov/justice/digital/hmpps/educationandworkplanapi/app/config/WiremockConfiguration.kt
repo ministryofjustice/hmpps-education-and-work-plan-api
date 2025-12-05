@@ -8,29 +8,50 @@ import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
 @Configuration
 class WiremockConfiguration {
 
+  companion object {
+    private val listenerRegistered = AtomicBoolean(false)
+
+    /** Shared WireMock instance for all Spring test contexts */
+    val sharedWireMockServer: WireMockServer by lazy {
+      WireMockServer(
+        options()
+          .port(9093)
+          .usingFilesUnderClasspath("simulations"),
+      ).apply { start() }
+    }
+  }
+
   @Bean
-  fun wireMockServer(@Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean): WireMockServer = WireMockServer(options().port(9093).usingFilesUnderClasspath("simulations")).apply {
-    if (logWiremockRequests) {
-      addMockServiceRequestListener { request: Request, _: Response ->
-        val formattedHeaders = request.headers.all().joinToString("\n") {
-          "${it.key()}: ${it.values().joinToString(", ")}"
-        }
-        val logMessage = StringBuilder()
-          .appendLine("Request sent to wiremock:")
-          .appendLine("${request.method} ${request.absoluteUrl}")
-          .appendLine(formattedHeaders)
-          .appendLine()
-          .appendLine(request.bodyAsString)
-        logger.info { logMessage }
+  fun wireMockServer(
+    @Value("\${logWiremockRequests:false}") logWiremockRequests: Boolean,
+  ): WireMockServer {
+    val server = sharedWireMockServer
+
+    if (logWiremockRequests && listenerRegistered.compareAndSet(false, true)) {
+      server.addMockServiceRequestListener { request: Request, _: Response ->
+        val headers = request.headers.all()
+          .joinToString("\n") { "${it.key()}: ${it.values().joinToString(", ")}" }
+
+        val msg = """
+          |WireMock request received:
+          |${request.method} ${request.absoluteUrl}
+          |
+          |$headers
+          |
+          |${request.bodyAsString}
+        """.trimMargin()
+
+        logger.info { msg }
       }
     }
 
-    start()
+    return server
   }
 }

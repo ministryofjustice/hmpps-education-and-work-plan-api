@@ -92,6 +92,7 @@ dependencies {
 
   integrationTestImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
   testFixturesImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
+  testImplementation(kotlin("test"))
 }
 
 java {
@@ -142,8 +143,23 @@ tasks.named("check") {
 tasks.named("test") {
   finalizedBy("jacocoTestReport")
 }
-tasks.named("integrationTest") {
+
+tasks.register<Test>("specialTests") {
+  description = "Runs the clock-sensitive integration tests"
+  group = "verification"
+
+  useJUnitPlatform()
+  val integrationTest = tasks.named<Test>("integrationTest").get()
+  testClassesDirs = integrationTest.testClassesDirs
+  classpath = integrationTest.classpath
+
+  include("**/specialtests/**")
   finalizedBy("jacocoIntegrationTestReport")
+}
+
+tasks.named<Test>("integrationTest") {
+  exclude("**/specialtests/**")
+  finalizedBy("specialTests")
 }
 
 tasks.named<JacocoReport>("jacocoTestReport") {
