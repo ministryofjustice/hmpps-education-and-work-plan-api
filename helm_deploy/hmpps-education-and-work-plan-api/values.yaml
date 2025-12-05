@@ -40,6 +40,16 @@ generic-service:
     SERVICE_BASE_URL: "https://learningandworkprogress-api.hmpps.service.justice.gov.uk"
     PES_CONTRACT_START_DATE: 2025-10-01
 
+  # additional config for the application
+  volumes:
+    - name: app-config
+      configMap:
+        name: hmpps-education-and-work-plan-api-config
+      volumeMounts:
+        - name: app-config
+          mountPath: /config
+          readOnly: true
+
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
   #   [name of kubernetes secret]:
