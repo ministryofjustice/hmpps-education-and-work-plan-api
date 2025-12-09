@@ -123,3 +123,7 @@ ciag-kpi-processing-rule: ${CIAG_KPI_PROCESSING_RULE}
 
 service:
   base-url: ${SERVICE_BASE_URL}
+
+induction-extension:
+  periods: ${INDUCTION_EXTENSION_PERIODS}
+

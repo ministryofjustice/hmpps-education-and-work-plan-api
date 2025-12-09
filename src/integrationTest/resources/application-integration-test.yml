@@ -88,3 +88,6 @@ service.base-url: http://localhost:8080
 
 pes:
   contract-start-date: 2025-10-01
+
+induction-extension:
+  periods: "2024-12-20:2025-01-01"
