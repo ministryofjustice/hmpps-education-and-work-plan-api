@@ -11,11 +11,16 @@ import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
 
-class PefInductionScheduleDateCalculationServiceTest {
+class PefInductionScheduleExtensionDateCalculationServiceTest {
 
   private val fixedDate = LocalDate.now()
   private val clock = Clock.fixed(fixedDate.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
-  private val service = PefInductionScheduleDateCalculationService(InductionExtensionConfig("2024-12-20:2025-01-01"), clock)
+
+  private val inductionExtensionConfig = InductionExtensionConfig(
+    "${LocalDate.now().minusDays(1)}:${LocalDate.now().plusDays(1)}",
+  )
+
+  private val service = PefInductionScheduleDateCalculationService(inductionExtensionConfig, clock)
 
   @Test
   fun `should determine CreateInductionScheduleDto`() {
@@ -26,8 +31,8 @@ class PefInductionScheduleDateCalculationServiceTest {
 
     val expected = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,
-      deadlineDate = admissionDate.plusDays(20),
-      scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+      deadlineDate = admissionDate.plusDays(25),
+      scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
       prisonId = prisonId,
     )

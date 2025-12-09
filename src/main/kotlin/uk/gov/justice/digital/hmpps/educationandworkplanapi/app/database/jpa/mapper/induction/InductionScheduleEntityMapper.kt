@@ -65,11 +65,13 @@ class InductionScheduleEntityMapper {
   fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleEntity): InductionScheduleCalculationRuleDomain = when (inductionScheduleCalculationRule) {
     InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION
     InductionScheduleCalculationRuleEntity.EXISTING_PRISONER -> InductionScheduleCalculationRuleDomain.EXISTING_PRISONER
+    InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
   }
 
   fun toInductionScheduleCalculationRule(inductionScheduleCalculationRule: InductionScheduleCalculationRuleDomain): InductionScheduleCalculationRuleEntity = when (inductionScheduleCalculationRule) {
     InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION -> InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION
     InductionScheduleCalculationRuleDomain.EXISTING_PRISONER -> InductionScheduleCalculationRuleEntity.EXISTING_PRISONER
+    InductionScheduleCalculationRuleDomain.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> InductionScheduleCalculationRuleEntity.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
   }
 
   private fun toInductionScheduleStatus(inductionScheduleStatus: InductionScheduleStatusEntity): InductionScheduleStatusDomain = when (inductionScheduleStatus) {

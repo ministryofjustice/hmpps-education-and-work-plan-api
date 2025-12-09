@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -19,28 +18,41 @@ private const val DEFAULT_TIMEOUT_SECONDS: Long = 30
 
 @Configuration
 class WebClientConfiguration(
-  @param:Value("\${api.timeout:20s}") val timeout: Duration,
+  private val apiProperties: ApiProperties,
+  private val apisProperties: ApisProperties,
 ) {
   @Bean(name = ["prisonApiWebClient"])
   fun prisonApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
-    @Value("\${apis.prison-api.url}") prisonApiUri: String,
-  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonApiUri, timeout)
+  ): WebClient = builder.authorisedWebClient(
+    authorizedClientManager,
+    registrationId = "prison-api",
+    url = apisProperties.prisonApi.url,
+    timeout = apiProperties.timeout,
+  )
 
   @Bean(name = ["manageUsersApiWebClient"])
   fun manageUsersApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
-    @Value("\${apis.manage-users-api.url}") manageUsersApiUri: String,
-  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "manage-users-api", url = manageUsersApiUri, timeout)
+  ): WebClient = builder.authorisedWebClient(
+    authorizedClientManager,
+    registrationId = "manage-users-api",
+    url = apisProperties.manageUsersApi.url,
+    timeout = apiProperties.timeout,
+  )
 
   @Bean(name = ["prisonerSearchApiWebClient"])
   fun prisonerSearchApiWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
     builder: WebClient.Builder,
-    @Value("\${apis.prisoner-search-api.url}") prisonerSearchApiUri: String,
-  ): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search-api", url = prisonerSearchApiUri, timeout)
+  ): WebClient = builder.authorisedWebClient(
+    authorizedClientManager,
+    registrationId = "prisoner-search-api",
+    url = apisProperties.prisonerSearchApi.url,
+    timeout = apiProperties.timeout,
+  )
 
   @Bean
   fun authorizedClientManager(
