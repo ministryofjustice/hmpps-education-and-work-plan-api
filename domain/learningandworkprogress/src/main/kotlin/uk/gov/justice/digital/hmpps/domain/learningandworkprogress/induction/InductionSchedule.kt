@@ -39,6 +39,7 @@ data class InductionSchedule(
 
 enum class InductionScheduleCalculationRule(val existingPrisonerWhenScheduleCreated: Boolean) {
   NEW_PRISON_ADMISSION(false),
+  NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD(false),
   EXISTING_PRISONER(true),
 }
 

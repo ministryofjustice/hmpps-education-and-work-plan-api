@@ -90,20 +90,19 @@ class InductionScheduleService(
       inductionScheduleStatusTransitionValidator.validate(prisonNumber, scheduleStatus, SCHEDULED)
 
       // A rescheduled Induction Schedule must have its due date set as if it were a new Induction Schedule based on the prisoner's admission date
-      val newInductionDeadlineDate = inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(
+      val inductionScheduleDto = inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(
         prisonNumber = prisonNumber,
         admissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
         releaseDate = releaseDate,
         dataCorrection = false,
-      ).deadlineDate
-
+      )
       updateInductionSchedule(
         inductionSchedule = this,
         newStatus = SCHEDULED,
         prisonId = prisonId,
-        adjustedInductionDate = newInductionDeadlineDate,
-        calculationRule = calculationRule,
+        adjustedInductionDate = inductionScheduleDto.deadlineDate,
+        calculationRule = inductionScheduleDto.scheduleCalculationRule,
       )
     }
   }

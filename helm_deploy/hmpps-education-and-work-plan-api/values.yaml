@@ -39,6 +39,7 @@ generic-service:
     CIAG_KPI_PROCESSING_RULE: "PEF" # Set to PEF or PES depending on Curious support
     SERVICE_BASE_URL: "https://learningandworkprogress-api.hmpps.service.justice.gov.uk"
     PES_CONTRACT_START_DATE: 2025-10-01
+    INDUCTION_EXTENSION_PERIODS: "2025-12-20:2026-01-01"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

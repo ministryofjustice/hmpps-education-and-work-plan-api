@@ -9,6 +9,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
+import java.time.Clock
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
@@ -21,10 +23,11 @@ private val log = KotlinLogging.logger {}
 @Service
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
-class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
+class PefInductionScheduleDateCalculationService(private val inductionExtensionConfig: InductionExtensionConfig, private val clock: Clock) : InductionScheduleDateCalculationService() {
 
   companion object {
     private const val DAYS_AFTER_ADMISSION = 20L
+    private const val DAYS_AFTER_ADMISSION_EXTENDED = 25L
   }
 
   /**
@@ -49,10 +52,11 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
       prisonId = prisonId,
     )
   } else if (newAdmission) {
+    val calculationRule = getNewAdmissionCalculationRule()
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
-      deadlineDate = latestOf(admissionDate, LocalDate.now()).plusDays(DAYS_AFTER_ADMISSION),
-      scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+      deadlineDate = latestOf(admissionDate, LocalDate.now(clock)).plusDays(getNewAdmissionAdditionalDays(calculationRule)),
+      scheduleCalculationRule = calculationRule,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
       prisonId = prisonId,
     )
@@ -64,6 +68,31 @@ class PefInductionScheduleDateCalculationService : InductionScheduleDateCalculat
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
       prisonId = prisonId,
     )
+  }
+
+  private fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long = when (calculationRule) {
+    InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> {
+      DAYS_AFTER_ADMISSION_EXTENDED
+    }
+    else -> DAYS_AFTER_ADMISSION
+  }
+
+  // This is to check whether today's date is during a period when the deadline is extended.
+  // e.g. during a special holiday like Christmas
+  fun getNewAdmissionCalculationRule(): InductionScheduleCalculationRule {
+    val today = LocalDate.now(clock)
+
+    val inHolidayPeriod = inductionExtensionConfig.periods.any { period ->
+      !today.isBefore(period.start) && !today.isAfter(period.end)
+    }
+
+    log.debug("Holiday periods: {}", inductionExtensionConfig.periods)
+    log.debug("today: {}, inHolidayPeriod: {}", today, inHolidayPeriod)
+    return if (inHolidayPeriod) {
+      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
+    } else {
+      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
+    }
   }
 
   private fun dataCorrectionDeadlineDate(releaseDate: LocalDate?): LocalDate {

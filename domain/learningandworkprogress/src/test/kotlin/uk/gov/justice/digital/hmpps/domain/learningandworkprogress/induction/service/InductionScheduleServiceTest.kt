@@ -15,6 +15,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
@@ -234,6 +235,7 @@ class InductionScheduleServiceTest {
         exemptionReason = null,
         latestDeadlineDate = expectedDueDate,
         updatedAtPrison = PRISON_ID,
+        calculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       )
       val expectedUpdatedInductionScheduleStatus = UpdatedInductionScheduleStatus(
         reference = inductionSchedule.reference,
