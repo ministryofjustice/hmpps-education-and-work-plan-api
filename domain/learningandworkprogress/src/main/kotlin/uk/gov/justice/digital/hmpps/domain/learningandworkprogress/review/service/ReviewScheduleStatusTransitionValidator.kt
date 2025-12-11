@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_MERGE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE_HOSPITAL
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.EXEMPT_UNKNOWN
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.SCHEDULED
@@ -65,6 +66,7 @@ class ReviewScheduleStatusTransitionValidator {
     private val unsupportedNewStatuses = setOf(
       EXEMPT_PRISONER_TRANSFER,
       EXEMPT_PRISONER_RELEASE,
+      EXEMPT_PRISONER_RELEASE_HOSPITAL,
       EXEMPT_PRISONER_DEATH,
       EXEMPT_PRISONER_MERGE,
       EXEMPT_UNKNOWN,

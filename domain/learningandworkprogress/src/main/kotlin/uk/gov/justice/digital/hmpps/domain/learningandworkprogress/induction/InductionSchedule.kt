@@ -63,6 +63,7 @@ enum class InductionScheduleStatus(
   EXEMPT_PRISONER_TRANSFER(isExemption = true),
   EXEMPT_TEMP_ABSENCE(isExemption = true),
   EXEMPT_PRISONER_RELEASE(isExemption = true),
+  EXEMPT_PRISONER_RELEASE_HOSPITAL(isExemption = true),
   EXEMPT_PRISONER_DEATH(isExemption = true),
   EXEMPT_PRISONER_MERGE(isExemption = true),
   EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS(isExemption = true, includeExemptionOnSummary = true),

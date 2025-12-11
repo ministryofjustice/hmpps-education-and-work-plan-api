@@ -90,6 +90,7 @@ class InductionScheduleEntityMapper {
     InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER
     InductionScheduleStatusEntity.EXEMPT_TEMP_ABSENCE -> InductionScheduleStatusDomain.EXEMPT_TEMP_ABSENCE
     InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE
+    InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE_HOSPITAL -> InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE_HOSPITAL
     InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH
     InductionScheduleStatusEntity.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusDomain.EXEMPT_PRISONER_MERGE
     InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
@@ -113,6 +114,7 @@ class InductionScheduleEntityMapper {
     InductionScheduleStatusDomain.EXEMPT_PRISONER_TRANSFER -> InductionScheduleStatusEntity.EXEMPT_PRISONER_TRANSFER
     InductionScheduleStatusDomain.EXEMPT_TEMP_ABSENCE -> InductionScheduleStatusEntity.EXEMPT_TEMP_ABSENCE
     InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE
+    InductionScheduleStatusDomain.EXEMPT_PRISONER_RELEASE_HOSPITAL -> InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE_HOSPITAL
     InductionScheduleStatusDomain.EXEMPT_PRISONER_DEATH -> InductionScheduleStatusEntity.EXEMPT_PRISONER_DEATH
     InductionScheduleStatusDomain.EXEMPT_PRISONER_MERGE -> InductionScheduleStatusEntity.EXEMPT_PRISONER_MERGE
     InductionScheduleStatusDomain.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS -> InductionScheduleStatusEntity.EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS
