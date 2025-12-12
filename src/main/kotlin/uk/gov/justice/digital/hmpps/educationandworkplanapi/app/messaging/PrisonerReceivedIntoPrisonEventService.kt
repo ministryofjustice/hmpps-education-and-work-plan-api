@@ -46,7 +46,6 @@ class PrisonerReceivedIntoPrisonEventService(
   fun process(
     inboundEvent: InboundEvent,
     additionalInformation: PrisonerReceivedAdditionalInformation,
-    dataCorrection: Boolean = false,
     treatAsTransfer: Boolean = false,
   ) = with(additionalInformation) {
     if (prisonId.length > 3) {
@@ -55,7 +54,7 @@ class PrisonerReceivedIntoPrisonEventService(
     }
 
     when (reason) {
-      ADMISSION -> processPrisonerAdmissionEvent(nomsNumber, inboundEvent.occurredAt, dataCorrection, treatAsTransfer)
+      ADMISSION -> processPrisonerAdmissionEvent(nomsNumber, inboundEvent.occurredAt, treatAsTransfer)
 
       TRANSFERRED -> processPrisonerTransferEvent()
 
@@ -69,7 +68,6 @@ class PrisonerReceivedIntoPrisonEventService(
   fun processPrisonerAdmissionEvent(
     nomsNumber: String,
     eventOccurredAt: Instant,
-    dataCorrection: Boolean = false,
     treatAsTransfer: Boolean = false,
   ) {
     log.info { "Processing Prisoner Admission Event for prisoner [$nomsNumber]" }
@@ -95,7 +93,7 @@ class PrisonerReceivedIntoPrisonEventService(
           newStatus = COMPLETED,
           prisonId = prisonId,
         )
-        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId, dataCorrection, treatAsTransfer)
+        rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId, treatAsTransfer)
         return
       }
     }
@@ -107,7 +105,6 @@ class PrisonerReceivedIntoPrisonEventService(
         prisonerAdmissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
         releaseDate = prisoner.releaseDate,
-        dataCorrection = dataCorrection,
       )
     } catch (e: InductionScheduleAlreadyExistsException) {
       // Prisoner already has an Induction Schedule
@@ -239,7 +236,7 @@ class PrisonerReceivedIntoPrisonEventService(
     return false
   }
 
-  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String, dataCorrection: Boolean = false, treatAsTransfer: Boolean = false) {
+  private fun rescheduleOrCreatePrisonersReviewSchedule(prisoner: Prisoner, prisonId: String, treatAsTransfer: Boolean = false) {
     val reviewSchedule =
       runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisoner.prisonerNumber) }.getOrNull()
     if (reviewSchedule != null) {
@@ -250,12 +247,9 @@ class PrisonerReceivedIntoPrisonEventService(
       )
     }
 
-    var readmission = true
-    if (dataCorrection) {
-      readmission = false
-    }
+    val readmission = true
     var transfer = false
-    if (dataCorrection && treatAsTransfer) {
+    if (treatAsTransfer) {
       transfer = true
     }
 

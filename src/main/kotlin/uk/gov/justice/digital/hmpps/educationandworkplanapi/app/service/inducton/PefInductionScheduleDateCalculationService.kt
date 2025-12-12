@@ -42,16 +42,7 @@ class PefInductionScheduleDateCalculationService(private val inductionExtensionC
     prisonId: String,
     newAdmission: Boolean,
     releaseDate: LocalDate?,
-    dataCorrection: Boolean,
-  ): CreateInductionScheduleDto = if (dataCorrection) {
-    CreateInductionScheduleDto(
-      prisonNumber = prisonNumber,
-      deadlineDate = calculateDeadlineDate(releaseDate),
-      scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
-      scheduleStatus = InductionScheduleStatus.SCHEDULED,
-      prisonId = prisonId,
-    )
-  } else if (newAdmission) {
+  ): CreateInductionScheduleDto = if (newAdmission) {
     val calculationRule = getNewAdmissionCalculationRule()
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
@@ -63,7 +54,7 @@ class PefInductionScheduleDateCalculationService(private val inductionExtensionC
   } else {
     CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
-      deadlineDate = dataCorrectionDeadlineDate(releaseDate),
+      deadlineDate = calculateDeadlineDate(releaseDate),
       scheduleCalculationRule = InductionScheduleCalculationRule.EXISTING_PRISONER,
       scheduleStatus = InductionScheduleStatus.SCHEDULED,
       prisonId = prisonId,
@@ -93,17 +84,6 @@ class PefInductionScheduleDateCalculationService(private val inductionExtensionC
     } else {
       InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
     }
-  }
-
-  private fun dataCorrectionDeadlineDate(releaseDate: LocalDate?): LocalDate {
-    val defaultDeadlineDate = LocalDate.of(2025, 10, 1)
-    if (releaseDate != null) {
-      val sevenDaysBeforeRelease = releaseDate.minusDays(7)
-      if (sevenDaysBeforeRelease.isBefore(defaultDeadlineDate)) {
-        return sevenDaysBeforeRelease
-      }
-    }
-    return defaultDeadlineDate
   }
 
   private fun calculateDeadlineDate(releaseDate: LocalDate?): LocalDate {

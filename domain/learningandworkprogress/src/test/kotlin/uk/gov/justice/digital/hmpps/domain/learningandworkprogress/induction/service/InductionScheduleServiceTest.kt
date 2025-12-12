@@ -155,7 +155,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
 
       val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull(), any())).willReturn(createInductionScheduleDto)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull())).willReturn(createInductionScheduleDto)
 
       val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
       given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
@@ -166,7 +166,7 @@ class InductionScheduleServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId, true, null, false)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId, true, null)
       verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
       verify(inductionScheduleEventService).inductionScheduleCreated(actual)
     }
@@ -215,7 +215,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
 
       val expectedDueDate = prisonerAdmissionDate.plusDays(20)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull(), any())).willReturn(
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull())).willReturn(
         aValidCreateInductionScheduleDto(
           prisonNumber = prisonNumber,
           deadlineDate = expectedDueDate,
