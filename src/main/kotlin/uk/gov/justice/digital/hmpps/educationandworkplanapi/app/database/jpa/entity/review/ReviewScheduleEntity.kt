@@ -114,6 +114,7 @@ enum class ReviewScheduleStatus(val activeReview: Boolean) {
   EXEMPT_PRISONER_TRANSFER(false),
   EXEMPT_TEMP_ABSENCE(true),
   EXEMPT_PRISONER_RELEASE(false),
+  EXEMPT_PRISONER_RELEASE_HOSPITAL(false),
   EXEMPT_PRISONER_DEATH(false),
   EXEMPT_PRISONER_MERGE(false),
   EXEMPT_UNKNOWN(false),

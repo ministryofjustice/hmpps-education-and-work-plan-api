@@ -114,7 +114,7 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
   // Re-offending prisoner, re-admitted to prison. Prisoner previously had a PLP Induction that was completed and Review Schedule that is not active
   @ParameterizedTest
-  @CsvSource(value = ["COMPLETED", "EXEMPT_PRISONER_DEATH", "EXEMPT_PRISONER_RELEASE"])
+  @CsvSource(value = ["COMPLETED", "EXEMPT_PRISONER_DEATH", "EXEMPT_PRISONER_RELEASE", "EXEMPT_PRISONER_RELEASE_HOSPITAL"])
   fun `should create a new Review Schedule given prisoner that already has a completed Induction and Review Schedule in status`(reviewScheduleStatus: ReviewScheduleStatusEntity) {
     // Given
     val prisonNumber = randomValidPrisonNumber()

@@ -130,6 +130,7 @@ class ReviewController(
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_TRANSFER -> ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
     ReviewScheduleStatusAPI.EXEMPT_TEMP_ABSENCE -> ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_RELEASE -> ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE
+    ReviewScheduleStatusAPI.EXEMPT_PRISONER_RELEASE_HOSPITAL -> ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE_HOSPITAL
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_DEATH -> ReviewScheduleStatus.EXEMPT_PRISONER_DEATH
     ReviewScheduleStatusAPI.EXEMPT_PRISONER_MERGE -> ReviewScheduleStatus.EXEMPT_PRISONER_MERGE
     ReviewScheduleStatusAPI.EXEMPT_UNKNOWN -> ReviewScheduleStatus.EXEMPT_UNKNOWN

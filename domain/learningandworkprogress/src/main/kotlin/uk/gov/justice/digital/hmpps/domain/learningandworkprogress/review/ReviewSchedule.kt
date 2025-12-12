@@ -55,6 +55,7 @@ enum class ReviewScheduleStatus(
   EXEMPT_SYSTEM_TECHNICAL_ISSUE(includeExemptionOnSummary = true), // system down
   EXEMPT_PRISONER_TRANSFER(isExemption = true),
   EXEMPT_PRISONER_RELEASE(isExemption = true),
+  EXEMPT_PRISONER_RELEASE_HOSPITAL(isExemption = true),
   EXEMPT_PRISONER_DEATH(isExemption = true),
   EXEMPT_PRISONER_MERGE(isExemption = true),
   EXEMPT_UNKNOWN(includeExemptionOnSummary = true),

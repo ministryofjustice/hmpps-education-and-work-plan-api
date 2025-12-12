@@ -253,7 +253,7 @@ class InductionScheduleService(
 
   fun exemptActiveInductionScheduleStatusDueToPrisonerDeath(prisonNumber: String, prisonId: String) = exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_DEATH)
 
-  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) = exemptActiveInductionSchedule(prisonNumber, prisonId, InductionScheduleStatus.EXEMPT_PRISONER_RELEASE)
+  fun exemptActiveInductionScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String, status: InductionScheduleStatus = InductionScheduleStatus.EXEMPT_PRISONER_RELEASE) = exemptActiveInductionSchedule(prisonNumber, prisonId, status)
 
   fun exemptActiveInductionScheduleStatusDueToMerge(prisonNumber: String) = exemptActiveInductionSchedule(prisonNumber = prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
 

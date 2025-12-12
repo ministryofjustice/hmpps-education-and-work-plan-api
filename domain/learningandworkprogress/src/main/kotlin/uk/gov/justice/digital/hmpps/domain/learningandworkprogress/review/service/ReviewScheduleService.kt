@@ -155,7 +155,7 @@ class ReviewScheduleService(
       ?: throw ReviewScheduleNotFoundException(prisonNumber)
   }
 
-  fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String) = exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE)
+  fun exemptActiveReviewScheduleStatusDueToPrisonerRelease(prisonNumber: String, prisonId: String, status: ReviewScheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_RELEASE) = exemptActiveReviewSchedule(prisonNumber, prisonId, status)
 
   fun exemptActiveReviewScheduleStatusDueToMerge(prisonNumber: String) = exemptActiveReviewSchedule(prisonNumber = prisonNumber, status = ReviewScheduleStatus.EXEMPT_PRISONER_MERGE)
 

@@ -89,7 +89,7 @@ class PrisonerReleasedFromPrisonEventServiceTest {
     )
     val inboundEvent = anInboundEvent(additionalInformation)
 
-    given(reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerRelease(any(), any()))
+    given(reviewScheduleService.exemptActiveReviewScheduleStatusDueToPrisonerRelease(any(), any(), any()))
       .willThrow(ReviewScheduleNotFoundException("A1234BC"))
 
     // When
@@ -127,7 +127,7 @@ class PrisonerReleasedFromPrisonEventServiceTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = ["TEMPORARY_ABSENCE_RELEASE", "RELEASED_TO_HOSPITAL", "SENT_TO_COURT", "TRANSFERRED", "UNKNOWN"])
+  @CsvSource(value = ["TEMPORARY_ABSENCE_RELEASE", "SENT_TO_COURT", "TRANSFERRED", "UNKNOWN"])
   fun `should process event but not call service given reason is not a prisoner release reason that we should process`(reason: Reason) {
     // Given
     val additionalInformation = aValidPrisonerReleasedAdditionalInformation(
