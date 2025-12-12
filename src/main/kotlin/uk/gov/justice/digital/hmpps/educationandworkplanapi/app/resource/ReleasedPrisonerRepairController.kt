@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReleasedAdditionalInformation
@@ -35,27 +36,40 @@ class ReleasedPrisonerRepairController(
   @Transactional
   fun fixRelease(
     @PathVariable("prisonNumber") prisonNumber: String,
+    @RequestParam(name = "releasedToHospital", required = false, defaultValue = "false")
+    releasedToHospital: Boolean,
   ) {
-    log.info("fixing prisoner:  $prisonNumber")
+    log.info("fixing prisoner: $prisonNumber (releasedToHospital=$releasedToHospital)")
+
     inboundEventsService.process(
       inboundEvent = InboundEvent(
         EventType.PRISONER_RELEASED_FROM_PRISON,
         personReference = PersonReference(
           identifiers = listOf(Identifier("NOMS", prisonNumber)),
         ),
-        additionalInformation = objectMapper.writeValueAsString(additionalInformation(prisonNumber)),
+        additionalInformation = objectMapper.writeValueAsString(
+          additionalInformation(prisonNumber, releasedToHospital),
+        ),
         occurredAt = Instant.now(),
         publishedAt = Instant.now(),
         description = "Test message to correct data",
         version = "1",
       ),
     )
-    log.info("fixed prisoner:  $prisonNumber")
+
+    log.info("fixed prisoner: $prisonNumber")
   }
 
-  private fun additionalInformation(prisonNumber: String): PrisonerReleasedAdditionalInformation = PrisonerReleasedAdditionalInformation(
+  private fun additionalInformation(
+    prisonNumber: String,
+    releasedToHospital: Boolean,
+  ): PrisonerReleasedAdditionalInformation = PrisonerReleasedAdditionalInformation(
     nomsNumber = prisonNumber,
-    reason = PrisonerReleasedAdditionalInformation.Reason.RELEASED_TO_HOSPITAL,
+    reason = if (releasedToHospital) {
+      PrisonerReleasedAdditionalInformation.Reason.RELEASED_TO_HOSPITAL
+    } else {
+      PrisonerReleasedAdditionalInformation.Reason.RELEASED
+    },
     prisonId = "OUT",
     nomisMovementReasonCode = "nomisMovementReasonCode",
     details = null,
