@@ -27,7 +27,7 @@ abstract class InductionScheduleDateCalculationService(
    * Known implementations at this time are those for the CIAG PEF and PES contracts, where a prisoner's initial Induction Schedule
    * is created differently under those contracts.
    */
-  abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean = true, releaseDate: LocalDate? = null, dataCorrection: Boolean = false): CreateInductionScheduleDto
+  abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean = true, releaseDate: LocalDate? = null): CreateInductionScheduleDto
 
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
     if (inductionSchedule.scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {

@@ -28,7 +28,7 @@ class PesInductionScheduleDateCalculationService : InductionScheduleDateCalculat
    * Once the S&A's have been completed in Curious the [InductionSchedule] has it's status set to SCHEDULED and the
    * deadline date correctly set (via a listener on the event sent from Curious)
    */
-  override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean, releaseDate: LocalDate?, dataCorrection: Boolean): CreateInductionScheduleDto = CreateInductionScheduleDto(
+  override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean, releaseDate: LocalDate?): CreateInductionScheduleDto = CreateInductionScheduleDto(
     prisonNumber = prisonNumber,
     deadlineDate = LocalDate.now(),
     scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
