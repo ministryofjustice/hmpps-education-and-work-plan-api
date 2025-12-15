@@ -42,20 +42,24 @@ class ReleasedPrisonerRepairController(
     @RequestParam(name = "releasedToHospital", required = false, defaultValue = "false")
     releasedToHospital: Boolean,
   ) {
-    var sendMessage = false
-    log.info("fixing prisoner: $prisonNumber (releasedToHospital=$releasedToHospital)")
-    try {
+    val sendMessage = try {
       val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
-      if (prisoner.inOutStatus.isNullOrBlank()) {
-        log.info("couldn't determine in out status of: $prisonNumber not processing")
-      } else {
-        sendMessage = true
+
+      val status = prisoner.inOutStatus
+      when {
+        status.isNullOrBlank() -> {
+          log.info("couldn't determine in/out status of: {} - not processing", prisonNumber)
+          false
+        }
+        status == "OUT" -> true
+        else -> false
       }
     } catch (e: PrisonerNotFoundException) {
-      log.info("Prisoner not found: $prisonNumber continue to process.")
-      sendMessage = true
+      log.info("Prisoner not found: {} - continue to process.", prisonNumber)
+      true
     } catch (e: Exception) {
-      log.info("Some exception looking up prisoner $prisonNumber not processing.")
+      log.warn("Exception looking up prisoner {} - not processing.", prisonNumber, e)
+      false
     }
 
     if (sendMessage) {
