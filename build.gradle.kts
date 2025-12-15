@@ -26,7 +26,7 @@ val wiremockVersion = "3.13.2"
 val jsonWebTokenVersion = "0.13.0"
 val nimbusJwtVersion = "10.6"
 val testContainersVersion = "1.21.3"
-val awsSdkVersion = "1.12.794"
+val awsSdkVersion = "1.12.795"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
