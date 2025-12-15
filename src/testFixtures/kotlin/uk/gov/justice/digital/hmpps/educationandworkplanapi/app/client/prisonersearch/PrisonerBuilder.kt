@@ -33,6 +33,7 @@ fun aValidPrisoner(
   receptionDate = receptionDate,
   sentenceStartDate = sentenceStartDate,
   allConvictedOffences = allConvictedOffences,
+  inOutStatus = "IN",
 )
 
 fun aConvictedOffence(
