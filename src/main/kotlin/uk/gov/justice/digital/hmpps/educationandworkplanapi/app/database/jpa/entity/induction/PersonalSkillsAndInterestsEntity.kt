@@ -142,7 +142,7 @@ data class PersonalSkillEntity(
     this.parent = parent as PersonalSkillsAndInterestsEntity
   }
 
-  override fun key(): String = skillType!!.name
+  override fun key(): String = skillType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -208,7 +208,7 @@ data class PersonalInterestEntity(
     this.parent = parent as PersonalSkillsAndInterestsEntity
   }
 
-  override fun key(): String = interestType!!.name
+  override fun key(): String = interestType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

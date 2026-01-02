@@ -252,7 +252,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     // Then
     val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
     assertThat(inductionSchedule).isNotNull
-    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED?.name)
+    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED.name)
     assertThat(inductionSchedule?.deadlineDate).isEqualTo(LocalDate.now().plusDays(5))
   }
 
@@ -283,7 +283,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     // Then
     val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
     assertThat(inductionSchedule).isNotNull
-    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED?.name)
+    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED.name)
     assertThat(inductionSchedule?.deadlineDate).isEqualTo(LocalDate.now().plusDays(5))
   }
 
@@ -314,7 +314,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     // Then
     val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
     assertThat(inductionSchedule).isNotNull
-    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED?.name)
+    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED.name)
     assertThat(inductionSchedule?.deadlineDate).isEqualTo(LocalDate.now().plusDays(10))
   }
 

@@ -106,7 +106,7 @@ class ActionPlanEntityAssert(actual: ActionPlanEntity?) : AbstractObjectAssert<A
     isNotNull
     with(actual!!) {
       if (goals.size != numberOfGoals) {
-        failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals!!.size}")
+        failWithMessage("Expected ActionPlan to be have $numberOfGoals goals set, but has ${goals.size}")
       }
     }
     return this

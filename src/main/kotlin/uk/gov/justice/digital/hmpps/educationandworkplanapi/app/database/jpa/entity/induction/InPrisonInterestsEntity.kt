@@ -139,7 +139,7 @@ data class InPrisonWorkInterestEntity(
     this.parent = parent as InPrisonInterestsEntity
   }
 
-  override fun key(): String = workType!!.name
+  override fun key(): String = workType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -198,7 +198,7 @@ data class InPrisonTrainingInterestEntity(
     this.parent = parent as InPrisonInterestsEntity
   }
 
-  override fun key(): String = trainingType!!.name
+  override fun key(): String = trainingType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

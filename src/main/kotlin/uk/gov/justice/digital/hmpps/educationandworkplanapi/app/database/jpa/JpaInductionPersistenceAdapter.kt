@@ -40,17 +40,17 @@ class JpaInductionPersistenceAdapter(
 
     val noteEntity = createInductionDto.note
       ?.takeIf { it.isNotBlank() }
-      ?.let {
+      ?.let { note ->
         noteRepository.saveAndFlush(
           NoteEntity(
             reference = UUID.randomUUID(),
             prisonNumber = createInductionDto.prisonNumber,
-            content = it,
+            content = note,
             noteType = NoteType.INDUCTION,
             entityType = EntityType.INDUCTION,
-            entityReference = inductionEntity.reference!!,
-            createdAtPrison = inductionEntity.createdAtPrison ?: "N/A",
-            updatedAtPrison = inductionEntity.updatedAtPrison ?: "N/A",
+            entityReference = inductionEntity.reference,
+            createdAtPrison = inductionEntity.createdAtPrison.takeIf { it.isNotBlank() } ?: "N/A",
+            updatedAtPrison = inductionEntity.updatedAtPrison.takeIf { it.isNotBlank() } ?: "N/A",
           ),
         )
       }
@@ -62,7 +62,7 @@ class JpaInductionPersistenceAdapter(
   override fun getInduction(prisonNumber: String): Induction? = inductionRepository.findByPrisonNumber(prisonNumber)?.let {
     val previousQualificationsEntity = previousQualificationsRepository.findByPrisonNumber(prisonNumber)
     val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
-      entityReference = it.reference!!,
+      entityReference = it.reference,
       entityType = EntityType.INDUCTION,
     ).firstOrNull()
     inductionMapper.fromEntityToDomain(it, previousQualificationsEntity, noteEntity)
@@ -78,7 +78,7 @@ class JpaInductionPersistenceAdapter(
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
       val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto)
       val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
-        entityReference = inductionEntity.reference!!,
+        entityReference = inductionEntity.reference,
         entityType = EntityType.INDUCTION,
       ).firstOrNull()
       inductionMapper.fromEntityToDomain(updatedInductionEntity, previousQualificationsEntity, noteEntity)

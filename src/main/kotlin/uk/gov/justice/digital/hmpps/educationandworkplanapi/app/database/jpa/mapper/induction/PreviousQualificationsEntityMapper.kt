@@ -158,7 +158,7 @@ class QualificationEntityMapper {
       createdAt = createdAt!!,
       lastUpdatedBy = updatedBy!!,
       lastUpdatedAt = updatedAt!!,
-      lastUpdatedAtPrison = updatedAtPrison!!,
+      lastUpdatedAtPrison = updatedAtPrison,
     )
   }
 }

@@ -26,12 +26,12 @@ class InPrisonInterestsResourceMapper(
   fun toInPrisonInterestsResponse(inPrisonInterests: InPrisonInterests): InPrisonInterestsResponse? = with(inPrisonInterests) {
     InPrisonInterestsResponse(
       reference = reference,
-      createdBy = createdBy!!,
-      createdByDisplayName = userService.getUserDetails(createdBy!!).name,
+      createdBy = createdBy,
+      createdByDisplayName = userService.getUserDetails(createdBy).name,
       createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
       createdAtPrison = createdAtPrison,
-      updatedBy = lastUpdatedBy!!,
-      updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
+      updatedBy = lastUpdatedBy,
+      updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
       updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
       updatedAtPrison = lastUpdatedAtPrison,
       inPrisonWorkInterests = inPrisonWorkInterests.map { toPrisonWorkInterest(it) },

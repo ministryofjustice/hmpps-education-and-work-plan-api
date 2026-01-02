@@ -46,15 +46,15 @@ class WorkOnReleaseEntityMapperTest {
     // Given
     val workOnReleaseEntity = aValidWorkOnReleaseEntityWithJpaFieldsPopulated()
     val expectedWorkOnReleaseEntity = aValidWorkOnRelease(
-      reference = workOnReleaseEntity.reference!!,
+      reference = workOnReleaseEntity.reference,
       hopingToWork = HopingToWorkDomain.NO,
       affectAbilityToWork = mutableListOf(AffectAbilityToWorkDomain.OTHER),
       affectAbilityToWorkOther = "Negative attitude",
       createdAt = workOnReleaseEntity.createdAt!!,
-      createdAtPrison = workOnReleaseEntity.createdAtPrison!!,
+      createdAtPrison = workOnReleaseEntity.createdAtPrison,
       createdBy = workOnReleaseEntity.createdBy!!,
       lastUpdatedAt = workOnReleaseEntity.updatedAt!!,
-      lastUpdatedAtPrison = workOnReleaseEntity.updatedAtPrison!!,
+      lastUpdatedAtPrison = workOnReleaseEntity.updatedAtPrison,
       lastUpdatedBy = workOnReleaseEntity.updatedBy!!,
     )
 

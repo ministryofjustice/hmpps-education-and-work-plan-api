@@ -84,6 +84,6 @@ class PreviousQualificationsEntityMapperTest {
 
     // Then
     assertThat(actual).isEqualTo(expectedPreviousQualifications)
-    verify(qualificationEntityMapper).fromEntityToDomain(qualificationsEntity.qualifications!![0])
+    verify(qualificationEntityMapper).fromEntityToDomain(qualificationsEntity.qualifications[0])
   }
 }

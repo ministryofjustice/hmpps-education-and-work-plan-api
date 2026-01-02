@@ -152,7 +152,7 @@ data class WorkExperienceEntity(
     this.parent = parent as PreviousWorkExperiencesEntity
   }
 
-  override fun key(): String = experienceType!!.name
+  override fun key(): String = experienceType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

@@ -176,55 +176,65 @@ class UpdateInductionTest : IntegrationTestBase() {
     )
 
     // the response fields match the original create request ones, except for the auto generated fields
-    val expectedUnchangedWorkExperience = aValidPreviousWorkExperiencesResponse(
-      reference = persistedInduction.previousWorkExperiences!!.reference,
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.previousWorkExperiences!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.previousWorkExperiences!!.updatedAt,
-    )
-    val expectedUnchangedSkillsAndInterests = aValidPersonalSkillsAndInterestsResponse(
-      reference = persistedInduction.personalSkillsAndInterests!!.reference,
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.personalSkillsAndInterests!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.personalSkillsAndInterests!!.updatedAt,
-    )
-    val expectedUnchangedQualifications = aValidPreviousQualificationsResponse(
-      reference = persistedInduction.previousQualifications!!.reference,
-      qualifications = listOf(
-        aValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
-        anotherValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
-      ),
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.previousQualifications!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.previousQualifications!!.updatedAt,
-    )
-    val expectedUnchangedTraining = aValidPreviousTrainingResponse(
-      reference = persistedInduction.previousTraining!!.reference,
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.previousTraining!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.previousTraining!!.updatedAt,
-    )
-    val expectedUnchangedWorkInterests = aValidFutureWorkInterestsResponse(
-      reference = persistedInduction.futureWorkInterests!!.reference,
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.futureWorkInterests!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.futureWorkInterests!!.updatedAt,
-    )
+    val expectedUnchangedWorkExperience = with(persistedInduction.previousWorkExperiences!!) {
+      aValidPreviousWorkExperiencesResponse(
+        reference = reference,
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
+    val expectedUnchangedSkillsAndInterests = with(persistedInduction.personalSkillsAndInterests!!) {
+      aValidPersonalSkillsAndInterestsResponse(
+        reference = reference,
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
+    val expectedUnchangedQualifications = with(persistedInduction.previousQualifications!!) {
+      aValidPreviousQualificationsResponse(
+        reference = reference,
+        qualifications = listOf(
+          aValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
+          anotherValidAchievedQualificationResponse(createdBy = createUsername, updatedBy = createUsername),
+        ),
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
+    val expectedUnchangedTraining = with(persistedInduction.previousTraining!!) {
+      aValidPreviousTrainingResponse(
+        reference = reference,
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
+    val expectedUnchangedWorkInterests = with(persistedInduction.futureWorkInterests!!) {
+      aValidFutureWorkInterestsResponse(
+        reference = reference,
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
     // only workOnRelease and inPrisonInterests should be different
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerNotLookingToWork(
       createdBy = createUsername,
@@ -338,24 +348,28 @@ class UpdateInductionTest : IntegrationTestBase() {
     )
 
     // the response builder fields match the original create induction builder ones, except for the auto generated fields
-    val expectedUnchangedTraining = aValidPreviousTrainingResponse(
-      reference = persistedInduction.previousTraining!!.reference,
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.previousTraining!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.previousTraining!!.updatedAt,
-    )
-    val expectedUnchangedInPrisonInterests = aValidInPrisonInterestsResponse(
-      reference = persistedInduction.inPrisonInterests!!.reference,
-      createdBy = createUsername,
-      createdByDisplayName = createDisplayName,
-      createdAt = persistedInduction.inPrisonInterests!!.createdAt,
-      updatedBy = createUsername,
-      updatedByDisplayName = createDisplayName,
-      updatedAt = persistedInduction.inPrisonInterests!!.updatedAt,
-    )
+    val expectedUnchangedTraining = with(persistedInduction.previousTraining!!) {
+      aValidPreviousTrainingResponse(
+        reference = reference,
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
+    val expectedUnchangedInPrisonInterests = with(persistedInduction.inPrisonInterests!!) {
+      aValidInPrisonInterestsResponse(
+        reference = reference,
+        createdBy = createUsername,
+        createdByDisplayName = createDisplayName,
+        createdAt = createdAt,
+        updatedBy = createUsername,
+        updatedByDisplayName = createDisplayName,
+        updatedAt = updatedAt,
+      )
+    }
     // these fields should have been modified
     val expectedWorkOnRelease = aValidWorkOnReleaseResponseForPrisonerLookingToWork(
       createdBy = createUsername,
@@ -601,13 +615,13 @@ class UpdateInductionTest : IntegrationTestBase() {
     )
     val persistedInduction = getInduction(prisonNumber)
     val referenceOfMathsQualification = persistedInduction.previousQualifications!!.qualifications.first { it.subject == "Maths" }.reference
-    val referenceOfPhysicsQualification = persistedInduction.previousQualifications!!.qualifications.first { it.subject == "Physics" }.reference
+    val referenceOfPhysicsQualification = persistedInduction.previousQualifications.qualifications.first { it.subject == "Physics" }.reference
 
     val updateInductionRequest = aValidUpdateInductionRequestForPrisonerNotLookingToWork(
       prisonId = "MDI",
       reference = persistedInduction.reference,
       previousQualifications = aValidUpdatePreviousQualificationsRequest(
-        reference = persistedInduction.previousQualifications!!.reference,
+        reference = persistedInduction.previousQualifications.reference,
         educationLevel = EducationLevel.SECONDARY_SCHOOL_TOOK_EXAMS,
         qualifications = listOf(
           // Update the Maths qualification with a new grade

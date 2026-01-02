@@ -37,12 +37,12 @@ class SkillsAndInterestsResourceMapper(
   fun toPersonalSkillsAndInterestsResponse(personalSkillsAndInterests: PersonalSkillsAndInterests): PersonalSkillsAndInterestsResponse? = with(personalSkillsAndInterests) {
     PersonalSkillsAndInterestsResponse(
       reference = reference,
-      createdBy = createdBy!!,
-      createdByDisplayName = userService.getUserDetails(createdBy!!).name,
+      createdBy = createdBy,
+      createdByDisplayName = userService.getUserDetails(createdBy).name,
       createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
       createdAtPrison = createdAtPrison,
-      updatedBy = lastUpdatedBy!!,
-      updatedByDisplayName = userService.getUserDetails(lastUpdatedBy!!).name,
+      updatedBy = lastUpdatedBy,
+      updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
       updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
       updatedAtPrison = lastUpdatedAtPrison,
       interests = interests.map { toPersonalInterests(it) },
