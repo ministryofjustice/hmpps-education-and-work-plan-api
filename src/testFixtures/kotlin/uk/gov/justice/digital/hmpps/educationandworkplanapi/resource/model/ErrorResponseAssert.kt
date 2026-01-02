@@ -39,7 +39,7 @@ class ErrorResponseAssert(actual: ErrorResponse?) : AbstractAssert<ErrorResponse
   fun hasUserMessageContaining(expected: String): ErrorResponseAssert {
     isNotNull
     with(actual!!) {
-      if (userMessage == null || !userMessage!!.contains(expected)) {
+      if (userMessage == null || !userMessage.contains(expected)) {
         failWithMessage("Expected message to contain $expected, but was $userMessage")
       }
     }
@@ -59,7 +59,7 @@ class ErrorResponseAssert(actual: ErrorResponse?) : AbstractAssert<ErrorResponse
   fun hasDeveloperMessageContaining(expected: String): ErrorResponseAssert {
     isNotNull
     with(actual!!) {
-      if (developerMessage == null || !developerMessage!!.contains(expected)) {
+      if (developerMessage == null || !developerMessage.contains(expected)) {
         failWithMessage("Expected message to contain $expected, but was $developerMessage")
       }
     }

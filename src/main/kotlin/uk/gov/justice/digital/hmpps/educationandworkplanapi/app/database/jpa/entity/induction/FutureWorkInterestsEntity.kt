@@ -138,7 +138,7 @@ data class WorkInterestEntity(
     this.parent = parent as FutureWorkInterestsEntity
   }
 
-  override fun key(): String = workType!!.name
+  override fun key(): String = workType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

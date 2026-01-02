@@ -84,7 +84,7 @@ class JpaNotePersistenceAdapterTest {
     val updateNoteDto = UpdateNoteDto(UUID.randomUUID(), "new content", "some prison")
     val noteEntity = aValidNoteEntity()
     val expected = NoteMapper.fromEntityToDomain(noteEntity)
-      .copy(content = updateNoteDto.content!!, lastUpdatedAtPrison = updateNoteDto.lastUpdatedAtPrison)
+      .copy(content = updateNoteDto.content, lastUpdatedAtPrison = updateNoteDto.lastUpdatedAtPrison)
 
     given(noteRepository.findByReference(updateNoteDto.reference)).willReturn(noteEntity)
     given(noteRepository.save(any<NoteEntity>())).willReturn(noteEntity)

@@ -27,7 +27,7 @@ class JpaEducationPersistenceAdapter(
     val previousQualificationsEntity = previousQualificationsRepository.saveAndFlush(
       previousQualificationsMapper.fromCreateDtoToEntity(createPreviousQualificationsDto),
     )
-    return previousQualificationsMapper.fromEntityToDomain(previousQualificationsEntity)!!
+    return previousQualificationsMapper.fromEntityToDomain(previousQualificationsEntity)
   }
 
   @Transactional
