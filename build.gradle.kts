@@ -104,6 +104,10 @@ java {
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+    /* added as a result of this:
+    https://youtrack.jetbrains.com/issue/KT-73255
+     */
+    compilerOptions.freeCompilerArgs.add("-Xannotation-default-target=first-only")
   }
 }
 
@@ -185,7 +189,6 @@ tasks.register<JacocoReport>("combineJacocoReports") {
 tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
   validateSpec.set(true)
   generatorName.set("kotlin-spring")
-  templateDir.set("$projectDir/src/main/resources/static/openapi/templates")
   inputSpec.set("$projectDir/src/main/resources/static/openapi/EducationAndWorkPlanAPI.yml")
   outputDir.set("$buildDirectory/generated")
   modelPackage.set("uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model")
@@ -208,7 +211,6 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
 tasks.register<GenerateTask>("buildPrisonApiModel") {
   validateSpec.set(true)
   generatorName.set("kotlin-spring")
-  templateDir.set("$projectDir/src/main/resources/static/openapi/templates")
   inputSpec.set("$projectDir/src/main/resources/static/openapi/PrisonApi.json")
   outputDir.set("$buildDirectory/generated")
   modelPackage.set("uk.gov.justice.digital.hmpps.prisonapi.resource.model")

@@ -12,7 +12,7 @@ import java.time.Duration
 private val log = KotlinLogging.logger {}
 
 @Component
-class ManageUsersApiClient(@Qualifier("manageUsersApiWebClient") private val manageUsersApiClient: WebClient) {
+class ManageUsersApiClient(@param:Qualifier("manageUsersApiWebClient") private val manageUsersApiClient: WebClient) {
   fun getUserDetails(username: String): UserDetailsDto = try {
     manageUsersApiClient
       .get()
