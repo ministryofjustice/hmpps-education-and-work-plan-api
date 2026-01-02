@@ -11,7 +11,7 @@ data class InductionExtensionPeriod(
 
 @Component
 class InductionExtensionConfig(
-  @Value("\${induction-extension.periods:}")
+  @param:Value("\${induction-extension.periods:}")
   private val periodsConfig: String,
 ) {
 

@@ -7,7 +7,7 @@ import java.time.Instant
 data class InboundEvent(
   val eventType: EventType,
   val personReference: PersonReference,
-  @JsonDeserialize(using = RawJsonDeserializer::class) val additionalInformation: String,
+  @param:JsonDeserialize(using = RawJsonDeserializer::class) val additionalInformation: String,
   val occurredAt: Instant,
   val publishedAt: Instant,
   val description: String,

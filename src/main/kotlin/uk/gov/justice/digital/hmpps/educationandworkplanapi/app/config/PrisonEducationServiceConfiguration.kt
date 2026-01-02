@@ -12,5 +12,5 @@ class PrisonEducationServiceConfiguration
 
 @ConfigurationProperties(prefix = "pes")
 data class PrisonEducationServiceProperties(
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) val contractStartDate: LocalDate,
+  @param:DateTimeFormat(iso = DateTimeFormat.ISO.DATE) val contractStartDate: LocalDate,
 )

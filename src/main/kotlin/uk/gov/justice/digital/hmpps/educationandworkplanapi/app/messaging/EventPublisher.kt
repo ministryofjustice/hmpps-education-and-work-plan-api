@@ -19,7 +19,7 @@ private val log = KotlinLogging.logger {}
 class EventPublisher(
   private val hmppsQueueService: HmppsQueueService,
   private val objectMapper: ObjectMapper,
-  @Value("\${service.base-url}") private val serviceBaseUrl: String,
+  @param:Value("\${service.base-url}") private val serviceBaseUrl: String,
 ) {
 
   internal val eventTopic by lazy { hmppsQueueService.findByTopicId("domainevents") as HmppsTopic }

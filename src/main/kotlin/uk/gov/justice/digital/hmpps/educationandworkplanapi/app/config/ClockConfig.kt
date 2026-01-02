@@ -9,7 +9,7 @@ import java.time.ZoneId
 
 @Configuration
 class ClockConfig(
-  @Value("\${app.clock.fixed-date:}") private val fixedDate: String?,
+  @param:Value("\${app.clock.fixed-date:}") private val fixedDate: String?,
 ) {
 
   @Bean
