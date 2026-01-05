@@ -41,7 +41,7 @@ class JpaGoalPersistenceAdapter(
     }
 
     val goalEntityMap = goalEntities.associateBy { it.reference }
-    val persistedGoals = actionPlanEntity.goals!!.filter { goalEntityMap.containsKey(it.reference) }
+    val persistedGoals = actionPlanEntity.goals.filter { goalEntityMap.containsKey(it.reference) }
 
     // Set the notes from the corresponding goalEntity
     persistedGoals.forEach { persistedGoal ->

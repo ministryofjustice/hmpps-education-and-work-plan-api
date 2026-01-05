@@ -238,7 +238,7 @@ class TimelineEventFactory(private val userService: ManageUserService) {
       sourceReference = reference.toString(),
       eventType = INDUCTION_SCHEDULE_CREATED,
       prisonId = "N/A",
-      actionedBy = lastUpdatedBy!!,
+      actionedBy = lastUpdatedBy,
       contextualInfo = mapOf(
         INDUCTION_SCHEDULE_STATUS to scheduleStatus.name,
         INDUCTION_SCHEDULE_DEADLINE_DATE to deadlineDate.toString(),

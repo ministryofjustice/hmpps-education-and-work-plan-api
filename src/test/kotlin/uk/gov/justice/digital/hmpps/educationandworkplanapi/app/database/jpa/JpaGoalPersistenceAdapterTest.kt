@@ -411,8 +411,8 @@ class JpaGoalPersistenceAdapterTest {
         aValidActionPlanEntity(prisonNumber = prisonNumber, goals = listOf(goalEntity1, goalEntity2))
       given(actionPlanRepository.findByPrisonNumber(any())).willReturn(actionPlanEntity)
 
-      val expectedDomainGoal1 = aValidGoal(reference = goalEntity1.reference!!)
-      val expectedDomainGoal2 = aValidGoal(reference = goalEntity2.reference!!)
+      val expectedDomainGoal1 = aValidGoal(reference = goalEntity1.reference)
+      val expectedDomainGoal2 = aValidGoal(reference = goalEntity2.reference)
       given(goalMapper.fromEntityToDomain(goalEntity1)).willReturn(expectedDomainGoal1)
       given(goalMapper.fromEntityToDomain(goalEntity2)).willReturn(expectedDomainGoal2)
 

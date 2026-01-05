@@ -16,7 +16,7 @@ enum class InductionScheduleTelemetryEventType(
     { inductionSchedule ->
       mapOf(
         "reference" to inductionSchedule.reference.toString(),
-        "userId" to inductionSchedule.lastUpdatedBy!!,
+        "userId" to inductionSchedule.lastUpdatedBy,
         "deadlineDate" to inductionSchedule.deadlineDate.toString(),
         "scheduleStatus" to inductionSchedule.scheduleStatus.name,
         "scheduleCalculationRule" to inductionSchedule.scheduleCalculationRule.name,
@@ -29,7 +29,7 @@ enum class InductionScheduleTelemetryEventType(
     { inductionSchedule ->
       mapOf(
         "reference" to inductionSchedule.reference.toString(),
-        "userId" to inductionSchedule.lastUpdatedBy!!,
+        "userId" to inductionSchedule.lastUpdatedBy,
         "deadlineDate" to inductionSchedule.deadlineDate.toString(),
         "scheduleStatus" to inductionSchedule.scheduleStatus.name,
         "scheduleCalculationRule" to inductionSchedule.scheduleCalculationRule.name,
