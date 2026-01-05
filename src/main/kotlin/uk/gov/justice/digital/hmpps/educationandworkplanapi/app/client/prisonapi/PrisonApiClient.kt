@@ -11,7 +11,7 @@ private val log = KotlinLogging.logger {}
 
 @Component
 class PrisonApiClient(
-  @Qualifier("prisonApiWebClient")
+  @param:Qualifier("prisonApiWebClient")
   private val prisonApiWebClient: WebClient,
   private val prisonApiMapper: PrisonApiMapper,
 ) {

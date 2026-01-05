@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import java.time.LocalDate
 
 class CreateGoalsTest : IntegrationTestBase() {
 
@@ -301,5 +302,36 @@ class CreateGoalsTest : IntegrationTestBase() {
       .goal(1) { goal ->
         goal.hasGoalNote("This feels like an appropriate and achievable goal for Chris")
       }
+  }
+
+  @Test
+  fun `should fail to add goal with target completion date in the past`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    createActionPlan(prisonNumber)
+
+    val createGoalRequest = aValidCreateGoalRequest(
+      targetCompletionDate = LocalDate.now().minusDays(1),
+    )
+    val createGoalsRequest = aValidCreateGoalsRequest(goals = listOf(createGoalRequest))
+
+    // When
+    val response = webTestClient.post()
+      .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
+      .withBody(createGoalsRequest)
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isBadRequest
+      .returnResult(ErrorResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasStatus(BAD_REQUEST.value())
+      .hasUserMessage("Validation failed for object='createGoalsRequest'. Error count: 1")
+      .hasDeveloperMessageContaining("Error on field 'goals[0].targetCompletionDate'")
+      .hasDeveloperMessageContaining("Cannot be in the past")
   }
 }
