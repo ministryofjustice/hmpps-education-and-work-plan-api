@@ -50,6 +50,9 @@ class ReviewScheduleServiceTest {
   @Mock
   private lateinit var reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService
 
+  @Mock
+  private lateinit var reviewService: ReviewService
+
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
     private val TODAY = LocalDate.now()

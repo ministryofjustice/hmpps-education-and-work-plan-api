@@ -279,6 +279,133 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `prisoner has had their last review prior to release and is transferred new review schedule should be created if they have 17 days left to serve`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
+    val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(100))
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+    createActionPlan(prisonNumber)
+
+    // complete the review Schedule
+    // change the release date for the prisoner
+    var prisonerFromApi = aValidPrisoner(
+      prisonerNumber = prisonNumber,
+      legalStatus = LegalStatus.SENTENCED,
+      releaseDate = LocalDate.now().plusDays(17),
+    )
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
+    completeReview(prisonNumber)
+
+    // check that there is no new review schedule and the review is set to prerelease=true
+
+    val reviewSchedulesBefore = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedulesBefore.size).isEqualTo(1)
+    assertThat(reviewSchedulesBefore.first().scheduleStatus).isEqualTo(COMPLETED)
+
+    val reviewsBefore = reviewRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewsBefore.size).isEqualTo(1)
+    assertThat(reviewsBefore.first().preRelease).isTrue
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    // When a prisoner is transferred
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = PRISON_TRANSFERRING_TO,
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then the new review schedule should be created
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedulesAfter.size).isEqualTo(2)
+    assertThat(reviewSchedulesAfter.first().scheduleStatus).isEqualTo(COMPLETED)
+    assertThat(reviewSchedulesAfter.last().scheduleStatus).isEqualTo(SCHEDULED)
+    assertThat(reviewSchedulesAfter.last().latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
+  }
+
+  @Test
+  fun `prisoner has had their last review prior to release and is transferred NO new review schedule should be created if they have less than 17 days left to serve`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
+    val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(100))
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+    createActionPlan(prisonNumber)
+
+    // complete the review Schedule
+    // change the release date for the prisoner
+    val prisonerFromApi = aValidPrisoner(
+      prisonerNumber = prisonNumber,
+      legalStatus = LegalStatus.SENTENCED,
+      releaseDate = LocalDate.now().plusDays(16),
+    )
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, prisonerFromApi)
+
+    completeReview(prisonNumber)
+
+    // check that there is no new review schedule and the review is set to prerelease=true
+
+    val reviewSchedulesBefore = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedulesBefore.size).isEqualTo(1)
+    assertThat(reviewSchedulesBefore.first().scheduleStatus).isEqualTo(COMPLETED)
+
+    val reviewsBefore = reviewRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewsBefore.size).isEqualTo(1)
+    assertThat(reviewsBefore.first().preRelease).isTrue
+
+    // The above calls set the data up but they will also generate events so clear these out before starting the test.
+    // Before clearing the queues though we need to wait until the "plp.review-schedule.updated" event on the REVIEW queue is received.
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    // When a prisoner is transferred
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = PRISON_TRANSFERRING_TO,
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then the new review schedule should be created
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedulesAfter.size).isEqualTo(1)
+    assertThat(reviewSchedulesAfter.last().scheduleStatus).isEqualTo(COMPLETED)
+    assertThat(reviewSchedulesAfter.last().latestReviewDate).isEqualTo(LocalDate.now().plusDays(90))
+  }
+
+  @Test
   fun `prisoner has had their last review prior to release then is transferred new review schedule should be created`() {
     // Given
     // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED

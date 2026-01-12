@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servi
 import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ActiveReviewScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule.PRISONER_TRANSFER_AFTER_FINAL_REVIEW
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
@@ -180,6 +181,25 @@ class ReviewScheduleService(
         }
     }
     ?: throw ReviewScheduleNotFoundException(prisonNumber)
+
+  fun handle17DayTransferRule(prisonNumber: String, prisonTransferredTo: String, releaseDate: LocalDate) {
+    if (reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) == null) {
+      val reviewScheduleWindow =
+        reviewScheduleDateCalculationService.calculateReviewWindow(PRISONER_TRANSFER_AFTER_FINAL_REVIEW, releaseDate)
+      if (reviewScheduleWindow != null) {
+        reviewSchedulePersistenceAdapter.createReviewSchedule(
+          CreateReviewScheduleDto(
+            prisonNumber = prisonNumber,
+            prisonId = prisonTransferredTo,
+            reviewScheduleWindow = reviewScheduleWindow,
+            scheduleCalculationRule = PRISONER_TRANSFER_AFTER_FINAL_REVIEW,
+          ),
+        ).also {
+          reviewScheduleEventService.reviewScheduleCreated(it)
+        }
+      }
+    }
+  }
 
   fun exemptAndReScheduleActiveReviewScheduleDueToTAPReturn(prisonNumber: String, prisonId: String) = reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber)
     ?.run {

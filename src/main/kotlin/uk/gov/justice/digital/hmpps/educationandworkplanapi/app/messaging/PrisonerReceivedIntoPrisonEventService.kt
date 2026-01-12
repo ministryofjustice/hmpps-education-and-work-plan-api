@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
@@ -40,6 +41,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
   private val inductionService: InductionService,
+  private val reviewService: ReviewService,
   private val actionPlanService: ActionPlanService,
   private val scheduleAdapter: ScheduleAdapter,
 ) {
@@ -50,7 +52,7 @@ class PrisonerReceivedIntoPrisonEventService(
   ) = with(additionalInformation) {
     if (prisonId.length > 3) {
       log.error { "Ignoring inbound message for prisoner ${additionalInformation.nomsNumber} due to unsupported prison ID ($prisonId)" }
-      return
+      return@with
     }
 
     when (reason) {
@@ -133,7 +135,7 @@ class PrisonerReceivedIntoPrisonEventService(
     log.info { "Processing Prisoner Transfer Event for prisoner [$nomsNumber] at prison [$prisonId]" }
     /**
      * It is possible that we can receive a transfer message without receiving a prisoner ADMISSION event.
-     * if this happens and the person had an induction completed from a previous prison stay then they will not
+     * If this happens and the person had an induction completed from a previous prison stay then they will not
      * have a review/induction schedule created and the prisoner will be stuck and require manual intervention
      * This block is belt and braces to ensure that the prisoner has the correct schedules set up.
      **/
@@ -152,6 +154,22 @@ class PrisonerReceivedIntoPrisonEventService(
         )
       },
     )
+
+    val reviews = reviewService.getCompletedReviewsForPrisoner(nomsNumber)
+    // If the person has completed their final review
+    // AND they have 17 days or more left to serve AND they don't have an active review schedule,
+    // then create a new review schedule.
+    val mostRecentReview = reviews.maxByOrNull { it.completedDate }
+    if (mostRecentReview != null && mostRecentReview.preRelease) {
+      val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
+      if (prisoner.releaseDate != null && prisoner.releaseDate.isAfter(LocalDate.now().plusDays(16))) {
+        reviewScheduleService.handle17DayTransferRule(
+          prisonNumber = nomsNumber,
+          prisonTransferredTo = prisonId,
+          releaseDate = prisoner.releaseDate,
+        )
+      }
+    }
 
     handle(
       scheduleType = INDUCTION_SCHEDULE,
