@@ -378,7 +378,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonId = "BXI",
     )
     val inboundEvent = anInboundEvent(additionalInformation)
-    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(prisoner)
     given(reviewService.getCompletedReviewsForPrisoner(prisonNumber)).willReturn(emptyList())
 
     // When
