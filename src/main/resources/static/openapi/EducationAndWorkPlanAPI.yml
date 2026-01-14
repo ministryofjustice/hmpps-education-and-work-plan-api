@@ -3155,7 +3155,6 @@ components:
         - surname
         - prisonNumber
         - dateOfBirth
-        - sentenceType
         - planStatus
 
     SessionResponse:
