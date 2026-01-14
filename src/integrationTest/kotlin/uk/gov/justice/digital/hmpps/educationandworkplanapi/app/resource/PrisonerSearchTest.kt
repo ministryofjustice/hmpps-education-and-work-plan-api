@@ -15,6 +15,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import java.time.LocalDate
 
@@ -24,7 +27,7 @@ class PrisonerSearchTest : IntegrationTestBase() {
     private const val PRISON_ID = "BXI"
   }
 
-  val prisoner1 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
+  val prisoner1 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber(), releaseDate = LocalDate.now().plusYears(30))
   val prisoner2 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
   val prisoner3 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
   val prisoner4 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
@@ -97,7 +100,7 @@ class PrisonerSearchTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `sort by planLastUpdated asc`() {
+  fun `sort by release date ascending`() {
     // Given
     setUpData()
 
@@ -107,14 +110,35 @@ class PrisonerSearchTest : IntegrationTestBase() {
     )
 
     // When
-    val response = searchPeopleWithSort("planLastUpdated")
+    val response = searchPeopleWithSort(SearchSortField.RELEASE_DATE.name)
 
     // Then
     val actual = response.responseBody.blockFirst()
 
     assertThat(actual).isNotNull
     assertThat(actual!!.people.size).isEqualTo(6)
-    assertThat(actual.people[0].planLastUpdated).isNotNull()
+    assertThat(actual.people[5].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
+  }
+
+  @Test
+  fun `sort by release date descending`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeopleWithSort(SearchSortField.RELEASE_DATE.name, SearchSortDirection.DESC.name)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.people.size).isEqualTo(6)
+    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
   }
 
   @Test
@@ -122,9 +146,9 @@ class PrisonerSearchTest : IntegrationTestBase() {
     // Given
     setUpData()
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+      prisoner1.prisonerNumber,
+      prisoner1,
     )
 
     // When
@@ -180,27 +204,6 @@ class PrisonerSearchTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `sort by planLastUpdated desc test`() {
-    // Given
-    setUpData()
-
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
-
-    // When
-    val response = searchPeopleWithSort("planLastUpdated", "desc")
-
-    // Then
-    val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(6)
-    assertThat(actual.people[0].planLastUpdated).isNull()
-  }
-
-  @Test
   fun `filter on prisoner has action plan`() {
     // Given
     setUpData()
@@ -211,7 +214,7 @@ class PrisonerSearchTest : IntegrationTestBase() {
     )
 
     // When
-    val response = searchPeopleWithActionPlan(true)
+    val response = searchPeopleWithActionPlanStatus(PlanStatus.ACTIVE_PLAN.name)
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -222,7 +225,7 @@ class PrisonerSearchTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `filter on prisoner has no action plan`() {
+  fun `filter by needs plan`() {
     // Given
     setUpData()
 
@@ -232,27 +235,27 @@ class PrisonerSearchTest : IntegrationTestBase() {
     )
 
     // When
-    val response = searchPeopleWithActionPlan(false)
+    val response = searchPeopleWithActionPlanStatus(PlanStatus.NEEDS_PLAN.name)
 
     // Then
     val actual = response.responseBody.blockFirst()
 
     assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(5)
+
+    assertThat(actual!!.people.size).isEqualTo(4)
     assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner2.prisonerNumber)
-    assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner3.prisonerNumber)
-    assertThat(actual.people[2].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
-    assertThat(actual.people[3].prisonNumber).isEqualTo(prisoner5.prisonerNumber)
-    assertThat(actual.people[4].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
+    assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
+    assertThat(actual.people[2].prisonNumber).isEqualTo(prisoner5.prisonerNumber)
+    assertThat(actual.people[3].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
   }
 
   private fun searchPeople(): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams()
 
   private fun searchPeopleWithPrisonNameNumberFilter(prisonNameNumber: String): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("prisonerNameOrNumber" to prisonNameNumber)
 
-  private fun searchPeopleWithActionPlan(hasPlan: Boolean): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("hasActionPlan" to hasPlan.toString())
+  private fun searchPeopleWithActionPlanStatus(planStatus: String): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("planStatus" to planStatus)
 
-  private fun searchPeopleWithSort(sortBy: String, sortDirection: String = "asc"): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("sortBy" to sortBy, "sortDirection" to sortDirection)
+  private fun searchPeopleWithSort(sortBy: String, sortDirection: String = SearchSortDirection.ASC.name): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("sortBy" to sortBy, "sortDirection" to sortDirection)
 
   private fun searchPeopleWithParams(vararg params: Pair<String, String>): FluxExchangeResult<PersonSearchResult> {
     val uri = URI_TEMPLATE + params.joinToString("&", prefix = "?") { "${it.first}=${it.second}" }

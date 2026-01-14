@@ -3,36 +3,44 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PersonSearchRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.PrisonerSearchController.PrisonerSearchCriteria
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Pagination
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PaginationMetaData
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 
 @Service
 class PrisonerSearchService(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val personSearchRepository: PersonSearchRepository,
 ) {
+
+  private fun isPrisonNumber(prisonerNameOrNumber: String?): Boolean {
+    if (prisonerNameOrNumber.isNullOrBlank()) return false
+
+    val prnRegex = Regex("^[A-Z]\\d{4}[A-Z]{2}$")
+    return prnRegex.matches(prisonerNameOrNumber)
+  }
+
   fun searchPrisoners(
-    prisonId: String,
     searchCriteria: PrisonerSearchCriteria,
   ): PersonSearchResult {
-    val personResponses = rawPersonData(prisonId)
-    val filteredResults = applyFilters(searchCriteria, personResponses)
-    val sortedResponses = applySorting(searchCriteria, filteredResults)
+    val personResponses = rawPersonData(searchCriteria)
+
+    val sortedAndFilteredResponses = personResponses
+      .sortBy(searchCriteria)
+      .filterByCriteria(searchCriteria)
 
     // Pagination
     val page = searchCriteria.page
     val pageSize = searchCriteria.pageSize
-    val totalElements = sortedResponses.size
+    val totalElements = sortedAndFilteredResponses.size
     val totalPages = (totalElements + pageSize - 1) / pageSize
-    val pagedResponses = sortedResponses.drop((page - 1) * pageSize).take(pageSize)
+    val pagedResponses = sortedAndFilteredResponses.drop((page - 1) * pageSize).take(pageSize)
 
     return PersonSearchResult(
-      Pagination(
+      PaginationMetaData(
         totalElements = totalElements,
         totalPages = totalPages,
         page = page,
@@ -44,54 +52,54 @@ class PrisonerSearchService(
     )
   }
 
-  fun applyFilters(
-    searchCriteria: PrisonerSearchCriteria,
-    personResponses: List<PersonResponse>,
-  ): List<PersonResponse> = personResponses.filter { person ->
+  private fun List<PersonResponse>.filterByCriteria(searchCriteria: PrisonerSearchCriteria): List<PersonResponse> = this.filter { prisoner ->
     // Filter by prisoner name or number
     (
       searchCriteria.prisonerNameOrNumber.isNullOrBlank() ||
-        person.name.contains(searchCriteria.prisonerNameOrNumber, ignoreCase = true) ||
-        person.prisonNumber.equals(searchCriteria.prisonerNameOrNumber, ignoreCase = true)
+        prisoner.forename.contains(searchCriteria.prisonerNameOrNumber, ignoreCase = true) ||
+        prisoner.surname.contains(searchCriteria.prisonerNameOrNumber, ignoreCase = true) ||
+        prisoner.prisonNumber.equals(searchCriteria.prisonerNameOrNumber, ignoreCase = true)
       ) &&
 
       // Filter by hasActionPlan
-      (searchCriteria.hasActionPlan == null || person.hasPlan == searchCriteria.hasActionPlan) &&
-
-      // Filter by releaseDateBefore
-      (searchCriteria.releaseDateBefore == null || person.releaseDate?.isBefore(searchCriteria.releaseDateBefore) == true) &&
-
-      // Filter by releaseDateAfter
-      (searchCriteria.releaseDateAfter == null || person.releaseDate?.isAfter(searchCriteria.releaseDateAfter) == true) &&
-
-      // Filter by actionPlanLastUpdatedBefore
-      (searchCriteria.actionPlanLastUpdatedBefore == null || person.planLastUpdated?.isBefore(searchCriteria.actionPlanLastUpdatedBefore) == true) &&
-
-      // Filter by actionPlanLastUpdatedAfter
-      (searchCriteria.actionPlanLastUpdatedAfter == null || person.planLastUpdated?.isAfter(searchCriteria.actionPlanLastUpdatedAfter) == true) &&
-
-      // Filter by nextActionDateBefore
-      (searchCriteria.nextActionDateBefore == null || person.nextActionDate?.isBefore(searchCriteria.nextActionDateBefore) == true) &&
-
-      // Filter by nextActionDateAfter
-      (searchCriteria.nextActionDateAfter == null || person.nextActionDate?.isAfter(searchCriteria.nextActionDateAfter) == true)
+      (searchCriteria.planStatus == null || prisoner.planStatus == searchCriteria.planStatus)
   }
+
+  private fun List<PersonResponse>.sortBy(searchCriteria: PrisonerSearchCriteria): List<PersonResponse> {
+    val comparator: Comparator<PersonResponse> = when (searchCriteria.sortBy) {
+      SearchSortField.PRISONER_NAME -> compareBy { it.surname }
+      SearchSortField.PRISON_NUMBER -> compareBy { it.prisonNumber }
+      SearchSortField.RELEASE_DATE -> compareBy(nullsLast()) { it.releaseDate }
+      SearchSortField.ENTERED_PRISON_DATE -> compareBy(nullsLast()) { it.enteredPrisonOn }
+      SearchSortField.CELL_LOCATION -> compareBy(nullsLast()) { it.cellLocation }
+      SearchSortField.PLAN_STATUS -> compareBy { person -> customPlanStatusOrder[person.planStatus] }
+    }
+
+    return when (searchCriteria.sortDirection) {
+      SearchSortDirection.ASC -> this.sortedWith(comparator)
+      SearchSortDirection.DESC -> this.sortedWith(comparator.reversed())
+    }
+  }
+
+  val customPlanStatusOrder = listOf(
+    PlanStatus.ACTIVE_PLAN,
+    PlanStatus.NEEDS_PLAN,
+    PlanStatus.EXEMPT,
+  ).withIndex().associate { it.value to it.index }
 
   private fun applySorting(
     searchCriteria: PrisonerSearchCriteria,
     personResponses: List<PersonResponse>,
   ): List<PersonResponse> {
-    val comparator: Comparator<PersonResponse> = when (searchCriteria.sortBy) {
-      "hasPlan" -> compareBy(nullsLast()) { it.hasPlan }
+    val comparator: Comparator<PersonResponse> = when (searchCriteria.sortBy.name) {
+      "planStatus" -> compareBy(nullsLast()) { it.planStatus }
       "releaseDate" -> compareBy(nullsLast()) { it.releaseDate }
-      "releaseType" -> compareBy(nullsLast()) { it.releaseType }
+      "enteredPrisonOn" -> compareBy(nullsLast()) { it.enteredPrisonOn }
       "cellLocation" -> compareBy(nullsLast()) { it.cellLocation }
-      "nextActionDate" -> compareBy(nullsLast()) { it.nextActionDate }
-      "planLastUpdated" -> compareBy(nullsLast()) { it.planLastUpdated }
-      else -> compareBy(nullsLast()) { it.name }
+      else -> compareBy(nullsLast()) { it.surname }
     }
 
-    val sortedResponses = if (searchCriteria.sortDirection.lowercase() == "desc") {
+    val sortedResponses = if (searchCriteria.sortDirection.name.lowercase() == "desc") {
       personResponses.sortedWith(comparator.reversed())
     } else {
       personResponses.sortedWith(comparator)
@@ -100,8 +108,20 @@ class PrisonerSearchService(
     return sortedResponses
   }
 
-  private fun rawPersonData(prisonId: String): List<PersonResponse> {
-    val prisonerList = prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
+  private fun rawPersonData(searchCriteria: PrisonerSearchCriteria): List<PersonResponse> {
+    // If the user supplied a prison number, only search for that prisoner
+    val prisonerList =
+      searchCriteria.prisonerNameOrNumber
+        ?.takeIf { isPrisonNumber(it) }
+        ?.let { prisonNumber ->
+          prisonerSearchApiService
+            .getPrisoner(prisonNumber)
+            .takeIf { it.prisonId == searchCriteria.prisonId }
+            ?.let { listOf(it) }
+            ?: emptyList()
+        }
+        ?: prisonerSearchApiService.getAllPrisonersInPrison(searchCriteria.prisonId)
+
     val prisonNumberList = prisonerList.map { it.prisonerNumber }
     val additionalDataList = personSearchRepository.additionalSearchData(prisonNumberList)
 
@@ -112,37 +132,27 @@ class PrisonerSearchService(
         val additionalData = additionalDataListMap[prisonerNumber]
         PersonResponse(
           prisonNumber = prisonerNumber,
-          name = "$lastName, $firstName",
+          forename = firstName,
+          surname = lastName,
           dateOfBirth = dateOfBirth,
-          hasPlan = additionalData?.hasActionPlan ?: false,
           cellLocation = cellLocation,
           releaseDate = releaseDate,
-          releaseType = releaseType,
-          nextActionDate = additionalData?.getNextActionDateAsLocalDate(),
-          planLastUpdated = additionalData?.getActionPlanUpdatedAt(),
+          enteredPrisonOn = receptionDate,
+          planStatus = mapStatus(additionalData?.planStatus),
         )
       }
     }
     return personResponses
   }
-}
 
-data class PrisonerActionDto(
-  val prisonNumber: String,
-  val hasActionPlan: Boolean,
-  val actionPlanUpdatedAt: Any?,
-  val nextActionDate: Any?,
-  val nextActionType: String?,
-) {
-  fun getNextActionDateAsLocalDate(): LocalDate? = localDate(nextActionDate)
-  fun getActionPlanUpdatedAt(): LocalDate? = localDate(actionPlanUpdatedAt)
-
-  private fun localDate(nextActionDate: Any?) = when (nextActionDate) {
-    is java.sql.Date -> nextActionDate.toLocalDate() // Directly convert SQL Date
-    is Date -> nextActionDate.toInstant()
-      .atZone(ZoneId.systemDefault())
-      .toLocalDate()
-    is Instant -> nextActionDate.atZone(ZoneId.systemDefault()).toLocalDate()
-    else -> null
+  private fun mapStatus(planStatus: String?): PlanStatus = when (planStatus) {
+    "ACTIVE_PLAN" -> PlanStatus.ACTIVE_PLAN
+    "EXEMPT" -> PlanStatus.EXEMPT
+    else -> PlanStatus.NEEDS_PLAN
   }
 }
+
+data class AdditionalPrisonerDataDto(
+  val prisonNumber: String,
+  val planStatus: String,
+)
