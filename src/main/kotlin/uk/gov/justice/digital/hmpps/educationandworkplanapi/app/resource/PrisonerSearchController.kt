@@ -37,11 +37,11 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
       page,
       pageSize,
     )
-    return prisonerSearchService.searchPrisoners(prisonId, searchCriteria)
+    return prisonerSearchService.searchPrisoners(searchCriteria)
   }
 
   data class PrisonerSearchCriteria(
-    val prisonId: String? = null,
+    val prisonId: String,
     val prisonerNameOrNumber: String? = null,
     val planStatus: PlanStatus? = null,
     val sortBy: SearchSortField = SearchSortField.PRISONER_NAME,

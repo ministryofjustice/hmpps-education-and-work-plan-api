@@ -3137,14 +3137,16 @@ components:
           type: string
           description: The prisoner's cell location within prison
           example: "B-3-047"
+        enteredPrisonOn:
+          type: string
+          format: date
+          description: The date the person entered prison returned by prisoner-search-api.
+          example: "2035-11-01"
         releaseDate:
           type: string
           format: date
           description: The prisoner's release date as returned by prisoner-search-api.
           example: "2035-11-01"
-        sentenceType:
-          $ref: '#/components/schemas/SentenceType'
-          description: The prisoner's sentence type.
         planStatus:
           $ref: '#/components/schemas/PlanStatus'
           description: The status of the persons plan.
