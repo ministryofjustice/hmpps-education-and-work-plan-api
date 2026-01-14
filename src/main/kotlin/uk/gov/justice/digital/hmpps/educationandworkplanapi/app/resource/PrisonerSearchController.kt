@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
-import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 
 @RestController
 @RequestMapping("/search/prisons/{prisonId}/people")
@@ -20,28 +22,16 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
   fun getPrisoners(
     @PathVariable prisonId: String,
     @RequestParam(required = false) prisonerNameOrNumber: String?,
-    @RequestParam(required = false) hasActionPlan: Boolean?,
-    @RequestParam(required = false) releaseDateBefore: LocalDate?,
-    @RequestParam(required = false) releaseDateAfter: LocalDate?,
-    @RequestParam(required = false) actionPlanLastUpdatedBefore: LocalDate?,
-    @RequestParam(required = false) actionPlanLastUpdatedAfter: LocalDate?,
-    @RequestParam(required = false) nextActionDateBefore: LocalDate?,
-    @RequestParam(required = false) nextActionDateAfter: LocalDate?,
-    @RequestParam(required = false, defaultValue = "prisonerName") sortBy: String,
-    @RequestParam(required = false, defaultValue = "asc") sortDirection: String,
-    @RequestParam(required = false, defaultValue = "1") @Min(1) page: Int,
-    @RequestParam(required = false, defaultValue = "10") @Min(1) pageSize: Int,
+    @RequestParam(required = false) planStatus: PlanStatus?,
+    @RequestParam(required = false) sortBy: SearchSortField = SearchSortField.PRISONER_NAME,
+    @RequestParam(required = false) sortDirection: SearchSortDirection = SearchSortDirection.ASC,
+    @RequestParam(required = false) @Min(1) page: Int = 1,
+    @RequestParam(required = false) @Min(1) pageSize: Int = 50,
   ): PersonSearchResult {
     val searchCriteria = PrisonerSearchCriteria(
       prisonId,
       prisonerNameOrNumber,
-      hasActionPlan,
-      releaseDateBefore,
-      releaseDateAfter,
-      actionPlanLastUpdatedBefore,
-      actionPlanLastUpdatedAfter,
-      nextActionDateBefore,
-      nextActionDateAfter,
+      planStatus,
       sortBy,
       sortDirection,
       page,
@@ -53,15 +43,9 @@ class PrisonerSearchController(private val prisonerSearchService: PrisonerSearch
   data class PrisonerSearchCriteria(
     val prisonId: String? = null,
     val prisonerNameOrNumber: String? = null,
-    val hasActionPlan: Boolean? = null,
-    val releaseDateBefore: LocalDate? = null,
-    val releaseDateAfter: LocalDate? = null,
-    val actionPlanLastUpdatedBefore: LocalDate? = null,
-    val actionPlanLastUpdatedAfter: LocalDate? = null,
-    val nextActionDateBefore: LocalDate? = null,
-    val nextActionDateAfter: LocalDate? = null,
-    val sortBy: String = "prisonerName",
-    val sortDirection: String = "asc",
+    val planStatus: PlanStatus? = null,
+    val sortBy: SearchSortField = SearchSortField.PRISONER_NAME,
+    val sortDirection: SearchSortDirection = SearchSortDirection.ASC,
     val page: Int = 1,
     val pageSize: Int = 50,
   )

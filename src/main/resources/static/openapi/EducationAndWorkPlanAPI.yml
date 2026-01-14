@@ -1,13 +1,20 @@
-openapi: 3.0.0
+openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.24.5'
+  version: '1.25.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
     email: learningandworkprogress@digital.justice.gov.uk
 servers:
-  - url: /
+  - url: https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk
+    description: Development
+  - url: https://learningandworkprogress-api-preprod.hmpps.service.justice.gov.uk
+    description: Pre-Production
+  - url: https://learningandworkprogress-api.hmpps.service.justice.gov.uk
+    description: Production
+  - url: http://localhost:8080
+    description: Local
 
 security:
   - bearerAuth: [ ]
@@ -30,7 +37,7 @@ paths:
     description: | 
       API endpoints to create, read and update an individual's education.  
       
-      Personal Learning Plans currently considers "education" as meaning an individual's level of education and
+      Learning & Work Progress plans currently considers "education" as meaning an individual's level of education and
       achieved qualifications. Typically the term "qualifications" is used to refer to things like formal school,
       college and university education. It can in theory include other education providers, but specifically excludes
       education that has been taken and delivered whilst in-prison. In-prison education is mastered and returned by
@@ -709,10 +716,9 @@ paths:
   # --------------------------------------------------------------------------------
   '/subject-access-request':
     get:
-      summary: Retrieves PLP SAR data
+      summary: Retrieves LWP SAR data
       tags:
         - Subject Access Request
-
       parameters:
         - $ref: "#/components/parameters/prnQueryStringParameter"
         - $ref: "#/components/parameters/fromDate"
@@ -766,87 +772,18 @@ paths:
 
   '/search/prisons/{prisonId}/people':
     get:
-      summary: Search people using prisonId and then filtering on various fields across prisoner search and PLP
+      summary: List people in the specified prison, optionally filtering on various prisoner and LWP related fields.
+      tags:
+        - Search
+      operationId: search-by-prison
       parameters:
         - $ref: "#/components/parameters/prisonIdInPathParameter"
-        - name: prisonerNameOrNumber
-          in: query
-          description: Search by prisoner name or prison number
-          schema:
-           type: string
-        - name: hasActionPlan
-          in: query
-          description: Filter by whether the prisoner has an action plan
-          schema:
-            type: boolean
-        - name: releaseDateBefore
-          in: query
-          description: Filter by release date before the given date
-          schema:
-            type: string
-            format: date
-        - name: releaseDateAfter
-          in: query
-          description: Filter by release date after the given date
-          schema:
-            type: string
-            format: date
-        - name: actionPlanLastUpdatedBefore
-          in: query
-          description: return action plans last updated date before the given date
-          schema:
-            type: string
-            format: date
-        - name: actionPlanLastUpdatedAfter
-          in: query
-          description: Filter by action plans last updated date after the given date
-          schema:
-            type: string
-            format: date
-        - name: nextActionDateBefore
-          in: query
-          description: Filter by next action date before the given date. The next action date can be a review or induction.
-          schema:
-            type: string
-            format: date
-        - name: nextActionDateAfter
-          in: query
-          description: Filter by next action date after the given date. The next action date can be a review or induction.
-          schema:
-            type: string
-            format: date
-        - name: sortBy
-          in: query
-          description: Column to sort by
-          schema:
-            type: string
-            enum: [ prisonerName, cellLocation, releaseDate, nextActionDate, planLastUpdated, hasPlan ]
-        - name: sortDirection
-          in: query
-          description: Sort direction (ascending or descending)
-          schema:
-            type: string
-            enum: [ asc, desc ]
-        - name: page
-          in: query
-          description: Page number for pagination
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: size
-          in: query
-          description: Number of items per page
-          schema:
-            type: integer
-            minimum: 1
-            default: 10
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PrisonerSearchCriteria'
+        - $ref: "#/components/parameters/prisonNameOrNumberQueryStringParameter"
+        - $ref: "#/components/parameters/planStatusQueryStringParameter"
+        - $ref: "#/components/parameters/sortByQueryStringParameter"
+        - $ref: "#/components/parameters/sortDirectionQueryStringParameter"
+        - $ref: "#/components/parameters/pageNumberQueryStringParameter"
+        - $ref: "#/components/parameters/pageSizeQueryStringParameter"
       responses:
         '200':
           $ref: '#/components/responses/PersonSearchResponse'
@@ -912,6 +849,23 @@ components:
       description: The Prison identifier.
       example: BXI
       pattern: "^[A-Z]{3}$"
+
+    SearchSortField:
+      type: string
+      enum:
+        - PRISONER_NAME
+        - PRISON_NUMBER
+        - CELL_LOCATION
+        - RELEASE_DATE
+        - ENTERED_PRISON_DATE
+        - PLAN_STATUS
+
+    SearchSortDirection:
+      type: string
+      enum:
+        - ASC
+        - DESC
+
     ErrorResponse:
       title: ErrorResponse
       description: |
@@ -1930,62 +1884,6 @@ components:
             pattern: "^[A-Z]\\d{4}[A-Z]{2}$"
       required:
         - prisonNumbers
-
-    PrisonerSearchCriteria:
-      title: Prisoner search Criteria
-      type: object
-      properties:
-        prisonerNameOrNumber:
-          type: string
-          description: Search by prisoner name or prison number
-        hasActionPlan:
-          type: boolean
-          description: Filter by whether the prisoner has an action plan
-        releaseDateBefore:
-          type: string
-          format: date
-          description: Filter by release date before the given date
-        releaseDateAfter:
-          type: string
-          format: date
-          description: Filter by release date after the given date
-        actionPlanLastUpdatedBefore:
-          type: string
-          format: date
-          description: Filter by action plans last updated before the given date
-        actionPlanLastUpdatedAfter:
-          type: string
-          format: date
-          description: Filter by action plans last updated after the given date
-        nextActionDateBefore:
-          type: string
-          format: date
-          description: Filter by next action date before the given date
-        nextActionDateAfter:
-          type: string
-          format: date
-          description: Filter by next action date after the given date
-        sortBy:
-          type: string
-          enum: [ prisonerName, cellLocation, releaseDate, nextActionDate, planLastUpdated, hasPlan ]
-          default: prisonerName
-          description: Column to sort by
-        sortDirection:
-          type: string
-          enum: [ asc, desc ]
-          default: asc
-          description: Sort direction (ascending or descending)
-        page:
-          type: integer
-          minimum: 1
-          default: 1
-          description: Page number for pagination
-        pageSize:
-          type: integer
-          minimum: 1
-          default: 10
-          description: Number of items per page
-
 
     CreateActionPlanRequest:
       title: CreateActionPlanRequest
@@ -3138,44 +3036,73 @@ components:
       required:
         - sessions
 
+    SentenceType:
+      type: string
+      description: An enumeration of prisoner sentence types.
+      enum:
+        - RECALL
+        - DEAD
+        - INDETERMINATE_SENTENCE
+        - SENTENCED
+        - CONVICTED_UNSENTENCED
+        - CIVIL_PRISONER
+        - IMMIGRATION_DETAINEE
+        - REMAND
+        - UNKNOWN
+        - OTHER
+
+    PlanStatus:
+      type: string
+      description: An enumeration of plan status.
+      enum:
+        - ACTIVE_PLAN
+        - NEEDS_PLAN
+        - EXEMPT
+
     PersonSearchResult:
-      title: personSearchResult
-      description: a list of results and pagination information
+      title: PersonSearchResult
+      description: Response body containing a Search by prison paginated results response.
       type: object
       properties:
         pagination:
-          $ref: '#/components/schemas/Pagination'
+          $ref: '#/components/schemas/PaginationMetaData'
         people:
           type: array
-          description: A List containing zero or more PersonResponse.
+          description: A List containing zero or more people matching the search.
           items:
             $ref: '#/components/schemas/PersonResponse'
       required:
         - people
         - pagination
 
-    Pagination:
-      description: Pagination details for search results.
+    PaginationMetaData:
+      description: Pagination metadata for the search results.
       type: object
       properties:
         totalElements:
           type: integer
           description: Total number of elements matching the criteria
+          example: 100
         totalPages:
           type: integer
           description: Total number of pages
+          example: 5
         page:
           type: integer
           description: Current page number
+          example: 2
         last:
           type: boolean
           description: Indicates this is the last page
+          example: false
         first:
           type: boolean
           description: Indicates this is the first page
+          example: false
         pageSize:
           type: integer
           description: Number of items per page
+          example: 20
       required:
         - totalElements
         - totalPages
@@ -3186,47 +3113,48 @@ components:
 
     PersonResponse:
       title: PersonResponse
-      description: Person response data
+      description: A summary of a person in prison, including the status of their plan recorded in the service.
       type: object
       properties:
-        name:
+        forename:
           type: string
-          example: "Smith, Bob"
+          description: The prisoner's forename.
+          example: Bob
+        surname:
+          type: string
+          description: The prisoner's surname.
+          example: Smith
         prisonNumber:
           type: string
-          example: "A1234BC"
+          description: The prisoner's NOMIS number.
+          example: A1234BC
         dateOfBirth:
           type: string
           format: date
-          example: "01/12/1999"
+          description: The prisoner's date of birth.
+          example: "1999-12-01"
         cellLocation:
           type: string
+          description: The prisoner's cell location within prison
           example: "B-3-047"
         releaseDate:
           type: string
           format: date
-          example: "01/11/2035"
-        releaseType:
-          type: string
-          nullable: true
-        nextActionDate:
-          type: string
-          format: date
-          nullable: true
-          example: "20/11/2026"
-        hasPlan:
-          type: boolean
-        planLastUpdated:
-          type: string
-          format: date
-          nullable: true
-          description: An ISO-8601 timestamp representing when this resource was last updated. This will be the same as the created date if it has not yet been updated.
-          example: '2023-06-19T09:39:44Z'
+          description: The prisoner's release date as returned by prisoner-search-api.
+          example: "2035-11-01"
+        sentenceType:
+          $ref: '#/components/schemas/SentenceType'
+          description: The prisoner's sentence type.
+        planStatus:
+          $ref: '#/components/schemas/PlanStatus'
+          description: The status of the persons plan.
       required:
-        - name
+        - forename
+        - surname
         - prisonNumber
         - dateOfBirth
-        - hasPlan
+        - sentenceType
+        - planStatus
 
     SessionResponse:
       title: SessionResponse
@@ -4027,6 +3955,13 @@ components:
       example: 'A1234BC'
       in: path
       required: true
+    prisonNameOrNumberQueryStringParameter:
+      name: prisonerNameOrNumber
+      in: query
+      description: Filter by prisoner name or prison number
+      schema:
+        type: string
+        example: 'Bloggs'
     goalReferencePathParameter:
       name: goalReference
       description: The Goal's unique reference
@@ -4059,3 +3994,42 @@ components:
       schema:
         type: string
         format: date
+    sortByQueryStringParameter:
+      name: sortBy
+      in: query
+      description: Column to sort by
+      schema:
+        $ref: '#/components/schemas/SearchSortField'
+        example: 'PRISONER_NAME'
+    sortDirectionQueryStringParameter:
+      name: sortDirection
+      in: query
+      description: Sort direction (ascending or descending)
+      schema:
+        $ref: '#/components/schemas/SearchSortDirection'
+        example: 'ASC'
+    pageNumberQueryStringParameter:
+      name: page
+      in: query
+      description: Page number for pagination
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+    pageSizeQueryStringParameter:
+      name: size
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        default: 50
+        example: 50
+    planStatusQueryStringParameter:
+      name: planStatus
+      in: query
+      description: Filter by plan status
+      schema:
+        $ref: '#/components/schemas/PlanStatus'
+        example: 'ACTIVE_PLAN'

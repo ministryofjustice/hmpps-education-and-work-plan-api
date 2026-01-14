@@ -3,9 +3,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PersonSearchRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.PrisonerSearchController.PrisonerSearchCriteria
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Pagination
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PaginationMetaData
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SentenceType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -21,8 +23,8 @@ class PrisonerSearchService(
     searchCriteria: PrisonerSearchCriteria,
   ): PersonSearchResult {
     val personResponses = rawPersonData(prisonId)
-    val filteredResults = applyFilters(searchCriteria, personResponses)
-    val sortedResponses = applySorting(searchCriteria, filteredResults)
+    val filteredResults = personResponses // TODO applyFilters(searchCriteria, personResponses)
+    val sortedResponses = filteredResults // TODO applySorting(searchCriteria, filteredResults)
 
     // Pagination
     val page = searchCriteria.page
@@ -32,7 +34,7 @@ class PrisonerSearchService(
     val pagedResponses = sortedResponses.drop((page - 1) * pageSize).take(pageSize)
 
     return PersonSearchResult(
-      Pagination(
+      PaginationMetaData(
         totalElements = totalElements,
         totalPages = totalPages,
         page = page,
@@ -44,6 +46,7 @@ class PrisonerSearchService(
     )
   }
 
+  /*
   fun applyFilters(
     searchCriteria: PrisonerSearchCriteria,
     personResponses: List<PersonResponse>,
@@ -99,6 +102,7 @@ class PrisonerSearchService(
 
     return sortedResponses
   }
+   */
 
   private fun rawPersonData(prisonId: String): List<PersonResponse> {
     val prisonerList = prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
@@ -112,14 +116,13 @@ class PrisonerSearchService(
         val additionalData = additionalDataListMap[prisonerNumber]
         PersonResponse(
           prisonNumber = prisonerNumber,
-          name = "$lastName, $firstName",
+          forename = firstName,
+          surname = lastName,
           dateOfBirth = dateOfBirth,
-          hasPlan = additionalData?.hasActionPlan ?: false,
           cellLocation = cellLocation,
           releaseDate = releaseDate,
-          releaseType = releaseType,
-          nextActionDate = additionalData?.getNextActionDateAsLocalDate(),
-          planLastUpdated = additionalData?.getActionPlanUpdatedAt(),
+          sentenceType = SentenceType.SENTENCED, // TODO - correctly map from PrisonerSearch legalStatus field
+          planStatus = PlanStatus.NEEDS_PLAN, // TODO - correctly map
         )
       }
     }
