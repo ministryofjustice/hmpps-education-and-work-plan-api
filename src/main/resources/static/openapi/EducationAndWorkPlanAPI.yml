@@ -3036,21 +3036,6 @@ components:
       required:
         - sessions
 
-    SentenceType:
-      type: string
-      description: An enumeration of prisoner sentence types.
-      enum:
-        - RECALL
-        - DEAD
-        - INDETERMINATE_SENTENCE
-        - SENTENCED
-        - CONVICTED_UNSENTENCED
-        - CIVIL_PRISONER
-        - IMMIGRATION_DETAINEE
-        - REMAND
-        - UNKNOWN
-        - OTHER
-
     PlanStatus:
       type: string
       description: An enumeration of plan status.
