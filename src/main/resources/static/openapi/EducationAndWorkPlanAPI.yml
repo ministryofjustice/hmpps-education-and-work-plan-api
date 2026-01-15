@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.25.0'
+  version: '1.25.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3151,6 +3151,8 @@ components:
           type: string
           enum:
             - REVIEW
+            - PRE_RELEASE_REVIEW
+            - TRANSFER_REVIEW
             - INDUCTION
         prisonNumber:
           type: string
