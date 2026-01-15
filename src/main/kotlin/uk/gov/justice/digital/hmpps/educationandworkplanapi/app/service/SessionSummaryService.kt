@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PrisonerIdsRequest
@@ -73,7 +74,7 @@ class SessionSummaryService(
     inductions: List<InductionSchedule>,
   ): List<SessionResponse> = reviews.map {
     SessionResponse(
-      sessionType = SessionResponse.SessionType.REVIEW,
+      sessionType = determineSessionType(it),
       prisonNumber = it.prisonNumber,
       deadlineDate = it.reviewScheduleWindow.dateTo,
       reference = it.reference,
@@ -89,6 +90,14 @@ class SessionSummaryService(
       exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
       exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.lastUpdatedAt) else null,
     )
+  }
+
+  private fun determineSessionType(it: ReviewSchedule): SessionResponse.SessionType {
+    if (it.scheduleCalculationRule == ReviewScheduleCalculationRule.PRISONER_TRANSFER || it.scheduleCalculationRule == ReviewScheduleCalculationRule.PRISONER_TRANSFER_AFTER_FINAL_REVIEW) {
+      return SessionResponse.SessionType.TRANSFER_REVIEW
+    } else {
+      return SessionResponse.SessionType.REVIEW
+    }
   }
 
   fun convertInstantToLocalDate(instant: Instant, zoneId: ZoneId = ZoneId.systemDefault()): LocalDate = instant.atZone(zoneId).toLocalDate()
