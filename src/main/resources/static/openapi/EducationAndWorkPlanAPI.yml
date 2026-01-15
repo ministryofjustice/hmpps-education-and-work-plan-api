@@ -3097,14 +3097,6 @@ components:
         - REVIEW
         - PRE_RELEASE_REVIEW
 
-    SessionStatus:
-      type: string
-      description: An enumeration of session status.
-      enum:
-        - DUE
-        - OVER_DUE
-        - ON_HOLD
-
     PersonSearchResult:
       title: PersonSearchResult
       description: Response body containing a Search by prison paginated results response.
@@ -4179,9 +4171,9 @@ components:
         $ref: '#/components/schemas/SessionType'
         example: 'INDUCTION'
     sessionStatusQueryStringParameter:
-      name: sessionStatus
+      name: sessionStatusType
       in: query
-      description: Filter by session status
+      description: Filter by session status type
       schema:
-        $ref: '#/components/schemas/SessionStatus'
+        $ref: '#/components/schemas/SessionStatusType'
         example: 'DUE'
