@@ -788,8 +788,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/SessionSearch'
-      requestBody:
-        $ref: '#/components/requestBodies/GetSessionSummaries'
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
 
   '/search/prisons/{prisonId}/people':
     get:
