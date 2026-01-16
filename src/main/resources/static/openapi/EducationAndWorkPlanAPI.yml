@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.25.0'
+  version: '1.26.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -34,7 +34,7 @@ paths:
   '/person/{prisonNumber}/education':
     parameters:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
-    description: | 
+    description: |
       API endpoints to create, read and update an individual's education.  
       
       Learning & Work Progress plans currently considers "education" as meaning an individual's level of education and
@@ -47,7 +47,7 @@ paths:
       An individual cannot have more than one record of education.
     get:
       summary: Returns an individual's education record.
-      description: | 
+      description: |
         Returns an individual's education which includes their level of education, and a collection of 
         qualifications that have been achieved.
         
@@ -160,7 +160,7 @@ paths:
         $ref: '#/components/requestBodies/CreateActionPlan'
     get:
       summary: Return a Prisoner's Action Plan
-      description: | 
+      description: |
         Return a Prisoner's Action Plan with the goals ordered in chronological order (oldest first). If the prisoner does not yet have any goals set, a 404 is returned.
 
         **Role Requirements:**  
@@ -277,7 +277,7 @@ paths:
         
         It is possible for a review schedule to be updated therefore this endpoint will return all versions of a
         review schedule - the highest version number will be the most recent schedule. 
-              
+        
         **Role Requirements:**
         Access to this endpoint requires one of the following roles:
           - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
@@ -354,7 +354,7 @@ paths:
       - $ref: "#/components/parameters/prisonNumberPathParameter"
     get:
       summary: Lists the Goals for a prisoner with an optional filter on Goal status
-      description: | 
+      description: |
         Returns Goals for the specified prisoner, optionally filtered on Goal status with the `status` query string parameter.  
         The optional `status` query string parameter can be one or more of the supported Goal statuses (see the `GoalStatus` schema definition for valid statuses).  
         If specifying multiple statuses these can either be a comma delimited list in a single `status` query string parameter, or multiple instances of the `status` query string parameter can be used.    
@@ -763,12 +763,33 @@ paths:
           required: true
           description: Filter session summaries by status. Valid values are DUE, OVERDUE, or ON_HOLD.
           schema:
-              $ref: '#/components/schemas/SessionStatusType'
+            $ref: '#/components/schemas/SessionStatusType'
       responses:
         '200':
           $ref: '#/components/responses/Session'
       requestBody:
         $ref: '#/components/requestBodies/GetSessionSummaries'
+
+  '/session/prisons/{prisonId}/search':
+    get:
+      summary: Retrieve a list of prisoner session summaries for a given prison
+      tags:
+        - Session reporting
+      description: Returns details of overdue, due, and exempt reviews and inductions.
+      parameters:
+        - $ref: "#/components/parameters/sessionTypeQueryStringParameter"
+        - $ref: "#/components/parameters/sessionStatusQueryStringParameter"
+        - $ref: "#/components/parameters/prisonIdInPathParameter"
+        - $ref: "#/components/parameters/prisonNameOrNumberQueryStringParameter"
+        - $ref: "#/components/parameters/sessionSortByQueryStringParameter"
+        - $ref: "#/components/parameters/sortDirectionQueryStringParameter"
+        - $ref: "#/components/parameters/pageNumberQueryStringParameter"
+        - $ref: "#/components/parameters/pageSizeQueryStringParameter"
+      responses:
+        '200':
+          $ref: '#/components/responses/SessionSearch'
+        '400':
+          $ref: '#/components/responses/400ErrorResponse'
 
   '/search/prisons/{prisonId}/people':
     get:
@@ -859,6 +880,16 @@ components:
         - RELEASE_DATE
         - ENTERED_PRISON_DATE
         - PLAN_STATUS
+
+    SessionSearchSortField:
+      type: string
+      enum:
+        - PRISONER_NAME
+        - PRISON_NUMBER
+        - CELL_LOCATION
+        - RELEASE_DATE
+        - SESSION_TYPE
+        - DUE_BY
 
     SearchSortDirection:
       type: string
@@ -2446,7 +2477,7 @@ components:
     CreateOrUpdateAchievedQualificationRequest:
       title: CreateOrUpdateAchievedQualificationRequest
       type: object
-      description: | 
+      description: |
         A request object to create or update a qualification that a Prisoner has achieved.  
         If the object contains a reference field the corresponding qualification will be updated, or created as a new
         qualification if the corresponding qualification cannot be found.  
@@ -2644,7 +2675,7 @@ components:
           $ref: '#/components/schemas/EducationLevel'
         qualifications:
           type: array
-          description: | 
+          description: |
             A list of the Prisoner's previous qualifications.  
             These can either be new qualfications without a reference field, or for any qualifications with a reference field they
             will be treated as updates.
@@ -3036,6 +3067,19 @@ components:
       required:
         - sessions
 
+    SessionSearchResponses:
+      title: SessionSearchResponses
+      description: A list of session search responses.
+      type: object
+      properties:
+        sessions:
+          type: array
+          description: A List containing zero or more SessionSearchResponse.
+          items:
+            $ref: '#/components/schemas/SessionSearchResponse'
+      required:
+        - sessions
+
     PlanStatus:
       type: string
       description: An enumeration of plan status.
@@ -3043,6 +3087,15 @@ components:
         - ACTIVE_PLAN
         - NEEDS_PLAN
         - EXEMPT
+
+    SessionType:
+      type: string
+      description: An enumeration of session type.
+      enum:
+        - ALL
+        - INDUCTION
+        - REVIEW
+        - PRE_RELEASE_REVIEW
 
     PersonSearchResult:
       title: PersonSearchResult
@@ -3181,6 +3234,73 @@ components:
         - sessionType
         - prisonNumber
 
+    SessionSearchResponse:
+      title: SessionResponse
+      description: Session response data
+      type: object
+      properties:
+        forename:
+          type: string
+          description: The prisoner's forename.
+          example: Bob
+        surname:
+          type: string
+          description: The prisoner's surname.
+          example: Smith
+        prisonNumber:
+          type: string
+          description: The prisoner's NOMIS number.
+          example: A1234BC
+        dateOfBirth:
+          type: string
+          format: date
+          description: The prisoner's date of birth.
+          example: "1999-12-01"
+        cellLocation:
+          type: string
+          description: The prisoner's cell location within prison
+          example: "B-3-047"
+        releaseDate:
+          type: string
+          format: date
+          description: The prisoner's release date as returned by prisoner-search-api.
+          example: "2035-11-01"
+        exemptionReason:
+          type: string
+          description: if applicable this will be the reason for the exemption
+          example: 'could not attend due to illness'
+        exemptionDate:
+          type: string
+          format: date
+          description: if applicable this will be the date of the exemption
+          example: '2023-06-19'
+        deadlineDate:
+          type: string
+          format: date
+          description: The deadline for the induction to be completed
+          example: '2023-06-19'
+        reference:
+          type: string
+          format: uuid
+          description: The unique reference of this session
+          example: c88a6c48-97e2-4c04-93b5-98619966447b
+        sessionType:
+          type: string
+          enum:
+            - REVIEW
+            - PRE_RELEASE_REVIEW
+            - TRANSFER_REVIEW
+            - INDUCTION
+      required:
+        - reference
+        - deadlineDate
+        - sessionType
+        - prisonNumber
+        - dateOfBirth
+        - forename
+        - surname
+        - cellLocation
+
     SessionSummaryResponse:
       title: SessionSummaryResponse
       description: Summary data for the specified prison
@@ -3277,14 +3397,14 @@ components:
           example: 'BXI'
         conductedBy:
           type: string
-          description: | 
+          description: |
             The name of the person who actually conducted the Review session with the Prisoner. 
             
             Only populated if the person who conducted the Review was not the person who keyed it into the system.
           example: 'Albert Mozzarella'
         conductedByRole:
           type: string
-          description: | 
+          description: |
             The role of the person who actually conducted the Review session with the Prisoner.
             
             Only populated if the person who conducted the Review was not the person who keyed it into the system.
@@ -3309,7 +3429,7 @@ components:
       type: object
       allOf:
         - $ref: '#/components/schemas/AuditedResource'
-      description: | 
+      description: |
         A Scheduled Review of a Prisoner's Action Plan.
         
         A DPS user will create a new Review Schedule (and therefore they will be recorded in the `createdBy...` fields)
@@ -3324,7 +3444,7 @@ components:
         reviewDateFrom:
           type: string
           format: date
-          description: | 
+          description: |
             An ISO-8601 date representing date that the Review window starts.
             
             A prisoner's Review should be conducted within a given timeframe and this field represents the date that the
@@ -3787,6 +3907,23 @@ components:
           schema:
             $ref: '#/components/schemas/SessionResponses'
 
+    SessionSearch:
+      description: Response body containing a session search response.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SessionSearchResponses'
+
     PersonSearchResponse:
       description: Response body containing a Search results response.
       headers:
@@ -3987,6 +4124,13 @@ components:
       schema:
         $ref: '#/components/schemas/SearchSortField'
         example: 'PRISONER_NAME'
+    sessionSortByQueryStringParameter:
+      name: sortBy
+      in: query
+      description: Column to sort by
+      schema:
+        $ref: '#/components/schemas/SessionSearchSortField'
+        example: 'PRISONER_NAME'
     sortDirectionQueryStringParameter:
       name: sortDirection
       in: query
@@ -4019,3 +4163,17 @@ components:
       schema:
         $ref: '#/components/schemas/PlanStatus'
         example: 'ACTIVE_PLAN'
+    sessionTypeQueryStringParameter:
+      name: sessionType
+      in: query
+      description: Filter by session type
+      schema:
+        $ref: '#/components/schemas/SessionType'
+        example: 'INDUCTION'
+    sessionStatusQueryStringParameter:
+      name: sessionStatusType
+      in: query
+      description: Filter by session status type
+      schema:
+        $ref: '#/components/schemas/SessionStatusType'
+        example: 'DUE'
