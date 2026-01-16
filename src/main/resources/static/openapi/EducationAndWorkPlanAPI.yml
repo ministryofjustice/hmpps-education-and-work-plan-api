@@ -3068,7 +3068,7 @@ components:
         - sessions
 
     SessionSearchResponses:
-      title: SessionResponse
+      title: SessionSearchResponses
       description: A list of session search responses.
       type: object
       properties:
