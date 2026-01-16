@@ -16,7 +16,6 @@ class PrisonerSearchApiClient(
   @param:Qualifier("prisonerSearchApiWebClient")
   private val prisonerSearchApiWebClient: WebClient,
 ) {
-
   companion object {
     const val FIRST_PAGE = 0
     const val DEFAULT_PAGE_SIZE = 9999
@@ -24,6 +23,7 @@ class PrisonerSearchApiClient(
       "prisonerNumber",
       "legalStatus",
       "releaseDate",
+      "receptionDate",
       "prisonId",
       "indeterminateSentence",
       "recall",
@@ -43,7 +43,11 @@ class PrisonerSearchApiClient(
    * The page number and page size can be controlled with the relevant method args; otherwise the first page using a page
    * size of 9999 is returned; which for all intents and purposes would be all prisoners in the prison.
    */
-  fun getPrisonersByPrisonId(prisonId: String, page: Int = FIRST_PAGE, pageSize: Int = DEFAULT_PAGE_SIZE): PagedPrisonerResponse = prisonerSearchApiWebClient
+  fun getPrisonersByPrisonId(
+    prisonId: String,
+    page: Int = FIRST_PAGE,
+    pageSize: Int = DEFAULT_PAGE_SIZE,
+  ): PagedPrisonerResponse = prisonerSearchApiWebClient
     .get()
     .uri {
       it.path("/prisoner-search/prison/$prisonId")
