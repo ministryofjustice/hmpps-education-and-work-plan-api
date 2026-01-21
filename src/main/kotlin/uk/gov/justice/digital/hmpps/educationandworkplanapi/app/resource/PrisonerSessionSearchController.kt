@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSessionSearchService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSearchResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionStatusType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionType
 
 @RestController
 @RequestMapping("/session/prisons/{prisonId}/search")
-class PrisonerSessionSearchController(private val prisonerSearchService: PrisonerSearchService) {
+class PrisonerSessionSearchController(private val prisonerSessionSearchService: PrisonerSessionSearchService) {
 
   @GetMapping
   @PreAuthorize(HAS_SEARCH_PRISONS)
@@ -29,7 +29,7 @@ class PrisonerSessionSearchController(private val prisonerSearchService: Prisone
     @RequestParam(required = false) sortDirection: SearchSortDirection = SearchSortDirection.ASC,
     @RequestParam(required = false) @Min(1) page: Int = 1,
     @RequestParam(required = false) @Min(1) pageSize: Int = 50,
-  ): PersonSearchResult {
+  ): SessionSearchResponses {
     val searchCriteria = PrisonerSessionSearchCriteria(
       prisonId,
       prisonerNameOrNumber,
@@ -40,8 +40,8 @@ class PrisonerSessionSearchController(private val prisonerSearchService: Prisone
       page,
       pageSize,
     )
-    TODO("Not yet implemented")
-    // return prisonerSearchService.searchPrisonersBySession(searchCriteria)
+
+    return prisonerSessionSearchService.searchPrisoners(searchCriteria)
   }
 
   data class PrisonerSessionSearchCriteria(

@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.26.0'
+  version: '1.26.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3072,6 +3072,8 @@ components:
       description: A list of session search responses.
       type: object
       properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationMetaData'
         sessions:
           type: array
           description: A List containing zero or more SessionSearchResponse.
@@ -3209,6 +3211,10 @@ components:
           type: string
           description: The ID of the prisoner
           example: 'A1234BC'
+        scheduleCalculationRule:
+          type: string
+          description: The schedule calculation rule
+          example: 'A1234BC'
         exemptionReason:
           type: string
           description: if applicable this will be the reason for the exemption
@@ -3233,6 +3239,7 @@ components:
         - deadlineDate
         - sessionType
         - prisonNumber
+        - scheduleCalculationRule
 
     SessionSearchResponse:
       title: SessionResponse
@@ -3279,11 +3286,6 @@ components:
           format: date
           description: The deadline for the induction to be completed
           example: '2023-06-19'
-        reference:
-          type: string
-          format: uuid
-          description: The unique reference of this session
-          example: c88a6c48-97e2-4c04-93b5-98619966447b
         sessionType:
           type: string
           enum:
@@ -3292,8 +3294,6 @@ components:
             - TRANSFER_REVIEW
             - INDUCTION
       required:
-        - reference
-        - deadlineDate
         - sessionType
         - prisonNumber
         - dateOfBirth
