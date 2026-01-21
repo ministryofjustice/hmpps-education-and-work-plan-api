@@ -97,7 +97,7 @@ class PrisonerSessionSearchService(
         sessionType = getSessionType(
           additionalData.sessionType,
           additionalData.scheduleCalculationRule,
-          additionalData.deadlineDate,
+          prisoner.releaseDate,
         ),
         deadlineDate = additionalData.deadlineDate,
         exemptionReason = additionalData.exemptionReason,
