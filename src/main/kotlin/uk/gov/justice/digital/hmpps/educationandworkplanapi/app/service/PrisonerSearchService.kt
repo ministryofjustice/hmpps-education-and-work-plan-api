@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PersonSearchRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.PrisonerSearchController.PrisonerSearchCriteria
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PaginationMetaData
@@ -26,30 +27,33 @@ class PrisonerSearchService(
   fun searchPrisoners(
     searchCriteria: PrisonerSearchCriteria,
   ): PersonSearchResult {
-    val personResponses = rawPersonData(searchCriteria)
+    val personResponses = getPrisonersBySearchCriteria(searchCriteria)
 
     val sortedAndFilteredResponses = personResponses
       .sortBy(searchCriteria)
       .filterByCriteria(searchCriteria)
 
-    // Pagination
-    val page = searchCriteria.page
-    val pageSize = searchCriteria.pageSize
-    val totalElements = sortedAndFilteredResponses.size
-    val totalPages = (totalElements + pageSize - 1) / pageSize
-    val pagedResponses = sortedAndFilteredResponses.drop((page - 1) * pageSize).take(pageSize)
+    val (metadata, pagedResponses) =
+      sortedAndFilteredResponses.paginate(searchCriteria.page, searchCriteria.pageSize)
+    return PersonSearchResult(metadata, pagedResponses)
+  }
 
-    return PersonSearchResult(
-      PaginationMetaData(
-        totalElements = totalElements,
-        totalPages = totalPages,
-        page = page,
-        pageSize = pageSize,
-        first = page == 1,
-        last = page == totalPages || pagedResponses.isEmpty(),
-      ),
-      pagedResponses,
-    )
+  fun <T> List<T>.paginate(
+    page: Int,
+    pageSize: Int,
+  ): Pair<PaginationMetaData, List<T>> {
+    val totalElements = size
+    val totalPages = (totalElements + pageSize - 1) / pageSize
+    val paged = drop((page - 1) * pageSize).take(pageSize)
+
+    return PaginationMetaData(
+      totalElements = totalElements,
+      totalPages = totalPages,
+      page = page,
+      pageSize = pageSize,
+      first = page == 1,
+      last = page == totalPages || paged.isEmpty(),
+    ) to paged
   }
 
   private fun List<PersonResponse>.filterByCriteria(searchCriteria: PrisonerSearchCriteria): List<PersonResponse> = this.filter { prisoner ->
@@ -87,40 +91,10 @@ class PrisonerSearchService(
     PlanStatus.EXEMPT,
   ).withIndex().associate { it.value to it.index }
 
-  private fun applySorting(
-    searchCriteria: PrisonerSearchCriteria,
-    personResponses: List<PersonResponse>,
-  ): List<PersonResponse> {
-    val comparator: Comparator<PersonResponse> = when (searchCriteria.sortBy.name) {
-      "planStatus" -> compareBy(nullsLast()) { it.planStatus }
-      "releaseDate" -> compareBy(nullsLast()) { it.releaseDate }
-      "enteredPrisonOn" -> compareBy(nullsLast()) { it.enteredPrisonOn }
-      "cellLocation" -> compareBy(nullsLast()) { it.cellLocation }
-      else -> compareBy(nullsLast()) { it.surname }
-    }
-
-    val sortedResponses = if (searchCriteria.sortDirection.name.lowercase() == "desc") {
-      personResponses.sortedWith(comparator.reversed())
-    } else {
-      personResponses.sortedWith(comparator)
-    }
-
-    return sortedResponses
-  }
-
-  private fun rawPersonData(searchCriteria: PrisonerSearchCriteria): List<PersonResponse> {
+  private fun getPrisonersBySearchCriteria(searchCriteria: PrisonerSearchCriteria): List<PersonResponse> {
     // If the user supplied a prison number, only search for that prisoner
     val prisonerList =
-      searchCriteria.prisonerNameOrNumber
-        ?.takeIf { isPrisonNumber(it) }
-        ?.let { prisonNumber ->
-          prisonerSearchApiService
-            .getPrisoner(prisonNumber)
-            .takeIf { it.prisonId == searchCriteria.prisonId }
-            ?.let { listOf(it) }
-            ?: emptyList()
-        }
-        ?: prisonerSearchApiService.getAllPrisonersInPrison(searchCriteria.prisonId)
+      getPrisonerList(searchCriteria.prisonerNameOrNumber, searchCriteria.prisonId)
 
     val prisonNumberList = prisonerList.map { it.prisonerNumber }
     val additionalDataList = personSearchRepository.additionalSearchData(prisonNumberList)
@@ -143,6 +117,24 @@ class PrisonerSearchService(
       }
     }
     return personResponses
+  }
+
+  /**
+   * get the list of prisoners or if the prison number is supplied, only return that prisoner
+   */
+  private fun getPrisonerList(prisonerNameOrNumber: String?, prisonId: String): List<Prisoner> {
+    val prisonerList =
+      prisonerNameOrNumber
+        ?.takeIf { isPrisonNumber(it) }
+        ?.let { prisonNumber ->
+          prisonerSearchApiService
+            .getPrisoner(prisonNumber)
+            .takeIf { it.prisonId == prisonId }
+            ?.let { listOf(it) }
+            ?: emptyList()
+        }
+        ?: prisonerSearchApiService.getAllPrisonersInPrison(prisonId)
+    return prisonerList
   }
 
   private fun mapStatus(planStatus: String?): PlanStatus = when (planStatus) {
