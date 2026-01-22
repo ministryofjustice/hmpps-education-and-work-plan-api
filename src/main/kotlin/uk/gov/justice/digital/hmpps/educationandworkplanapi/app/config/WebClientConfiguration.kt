@@ -3,11 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
@@ -53,18 +49,6 @@ class WebClientConfiguration(
     url = apisProperties.prisonerSearchApi.url,
     timeout = apiProperties.timeout,
   )
-
-  @Bean
-  fun authorizedClientManager(
-    clientRegistrationRepository: ClientRegistrationRepository,
-    oAuth2AuthorizedClientService: OAuth2AuthorizedClientService,
-  ): OAuth2AuthorizedClientManager {
-    val authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
-    return AuthorizedClientServiceOAuth2AuthorizedClientManager(
-      clientRegistrationRepository,
-      oAuth2AuthorizedClientService,
-    ).kotlinApply { setAuthorizedClientProvider(authorizedClientProvider) }
-  }
 
   private fun WebClient.Builder.authorisedWebClient(
     authorizedClientManager: OAuth2AuthorizedClientManager,
