@@ -23,7 +23,7 @@ class PrisonerSessionSearchController(private val prisonerSessionSearchService: 
   fun getPrisoners(
     @PathVariable prisonId: String,
     @RequestParam(required = false) prisonerNameOrNumber: String?,
-    @RequestParam(required = false) sessionType: SessionType = SessionType.ALL,
+    @RequestParam(required = false) sessionType: SessionType?,
     @RequestParam(required = false) sessionStatusType: SessionStatusType = SessionStatusType.DUE,
     @RequestParam(required = false) sortBy: SessionSearchSortField = SessionSearchSortField.PRISONER_NAME,
     @RequestParam(required = false) sortDirection: SearchSortDirection = SearchSortDirection.ASC,
@@ -47,7 +47,7 @@ class PrisonerSessionSearchController(private val prisonerSessionSearchService: 
   data class PrisonerSessionSearchCriteria(
     val prisonId: String,
     val prisonerNameOrNumber: String? = null,
-    val sessionType: SessionType,
+    val sessionType: SessionType?,
     val sessionStatusType: SessionStatusType,
     val sortBy: SessionSearchSortField = SessionSearchSortField.PRISONER_NAME,
     val sortDirection: SearchSortDirection = SearchSortDirection.ASC,

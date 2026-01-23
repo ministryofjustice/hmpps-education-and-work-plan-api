@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.26.1'
+  version: '1.26.2'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3094,10 +3094,10 @@ components:
       type: string
       description: An enumeration of session type.
       enum:
-        - ALL
         - INDUCTION
         - REVIEW
         - PRE_RELEASE_REVIEW
+        - TRANSFER_REVIEW
 
     PersonSearchResult:
       title: PersonSearchResult
@@ -3287,12 +3287,7 @@ components:
           description: The deadline for the induction to be completed
           example: '2023-06-19'
         sessionType:
-          type: string
-          enum:
-            - REVIEW
-            - PRE_RELEASE_REVIEW
-            - TRANSFER_REVIEW
-            - INDUCTION
+          $ref: '#/components/schemas/SessionType'
       required:
         - sessionType
         - prisonNumber
@@ -4166,14 +4161,14 @@ components:
     sessionTypeQueryStringParameter:
       name: sessionType
       in: query
-      description: Filter by session type
+      description: Filter by session type - blank will return all session types
       schema:
         $ref: '#/components/schemas/SessionType'
         example: 'INDUCTION'
     sessionStatusQueryStringParameter:
       name: sessionStatusType
       in: query
-      description: Filter by session status type
+      description: Filter by session status type defaults to DUE
       schema:
         $ref: '#/components/schemas/SessionStatusType'
         example: 'DUE'

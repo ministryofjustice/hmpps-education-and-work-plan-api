@@ -16,9 +16,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSearchResponse.SessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSearchResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionStatusType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import java.time.LocalDate
 
@@ -199,7 +199,7 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
     )
 
     // When
-    val response = searchPeopleWithSessionTypeAndName("ALL", "smith", "OVERDUE")
+    val response = searchPeopleWithSessionStatusTypeAndName("smith", "OVERDUE")
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -260,12 +260,10 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
 
   private fun searchPeopleWithActionSessionType(sessionType: String): FluxExchangeResult<SessionSearchResponses> = searchPeopleWithParams("sessionType" to sessionType)
 
-  private fun searchPeopleWithSessionTypeAndName(
-    sessionType: String,
+  private fun searchPeopleWithSessionStatusTypeAndName(
     prisonerNameOrNumber: String,
     sessionStatusType: String,
   ): FluxExchangeResult<SessionSearchResponses> = searchPeopleWithParams(
-    "sessionType" to sessionType,
     "prisonerNameOrNumber" to prisonerNameOrNumber,
     "sessionStatusType" to sessionStatusType,
   )
