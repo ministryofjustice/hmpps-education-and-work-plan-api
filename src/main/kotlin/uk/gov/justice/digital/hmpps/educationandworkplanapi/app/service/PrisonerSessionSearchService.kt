@@ -43,8 +43,8 @@ class PrisonerSessionSearchService(
         prisoner.prisonNumber.equals(searchCriteria.prisonerNameOrNumber, ignoreCase = true)
 
     val matchesSessionType =
-      searchCriteria.sessionType == SessionType.ALL ||
-        prisoner.sessionType.name == searchCriteria.sessionType.name
+      searchCriteria.sessionType == null ||
+        prisoner.sessionType == searchCriteria.sessionType
 
     matchesNameOrNumber && matchesSessionType
   }
@@ -66,10 +66,10 @@ class PrisonerSessionSearchService(
   }
 
   val customSessionTypeOrder = listOf(
-    SessionSearchResponse.SessionType.PRE_RELEASE_REVIEW,
-    SessionSearchResponse.SessionType.REVIEW,
-    SessionSearchResponse.SessionType.TRANSFER_REVIEW,
-    SessionSearchResponse.SessionType.INDUCTION,
+    SessionType.PRE_RELEASE_REVIEW,
+    SessionType.REVIEW,
+    SessionType.TRANSFER_REVIEW,
+    SessionType.INDUCTION,
   ).withIndex().associate { it.value to it.index }
 
   private fun getPrisonersBySearchCriteria(
@@ -110,7 +110,7 @@ class PrisonerSessionSearchService(
     sessionType: SessionResponse.SessionType,
     scheduleCalculationRule: String,
     releaseDate: LocalDate?,
-  ): SessionSearchResponse.SessionType {
+  ): SessionType {
     if (sessionType == SessionResponse.SessionType.REVIEW) {
       val now = LocalDate.now()
       val threeMonthsFromNow = now.plusMonths(3)
@@ -120,19 +120,19 @@ class PrisonerSessionSearchService(
         releaseDate != null &&
           !releaseDate.isBefore(now) &&
           !releaseDate.isAfter(threeMonthsFromNow) ->
-          SessionSearchResponse.SessionType.PRE_RELEASE_REVIEW
+          SessionType.PRE_RELEASE_REVIEW
 
         // Transfer review
         scheduleCalculationRule.contains("TRANSFER") ->
-          SessionSearchResponse.SessionType.TRANSFER_REVIEW
+          SessionType.TRANSFER_REVIEW
 
         // Otherwise regular review
         else ->
-          SessionSearchResponse.SessionType.REVIEW
+          SessionType.REVIEW
       }
     }
 
-    return SessionSearchResponse.SessionType.INDUCTION
+    return SessionType.INDUCTION
   }
 
   private fun getSessions(
