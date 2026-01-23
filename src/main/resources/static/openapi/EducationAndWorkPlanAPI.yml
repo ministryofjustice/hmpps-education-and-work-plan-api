@@ -890,6 +890,8 @@ components:
         - RELEASE_DATE
         - SESSION_TYPE
         - DUE_BY
+        - EXEMPTION_DATE
+        - EXEMPTION_REASON
 
     SearchSortDirection:
       type: string

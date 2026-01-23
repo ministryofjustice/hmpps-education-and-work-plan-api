@@ -57,6 +57,8 @@ class PrisonerSessionSearchService(
       SessionSearchSortField.CELL_LOCATION -> compareBy(nullsLast()) { it.cellLocation }
       SessionSearchSortField.SESSION_TYPE -> compareBy { person -> customSessionTypeOrder[person.sessionType] }
       SessionSearchSortField.DUE_BY -> compareBy { it.deadlineDate }
+      SessionSearchSortField.EXEMPTION_DATE -> compareBy { it.exemptionDate }
+      SessionSearchSortField.EXEMPTION_REASON -> compareBy { it.exemptionReason }
     }
 
     return when (searchCriteria.sortDirection) {
