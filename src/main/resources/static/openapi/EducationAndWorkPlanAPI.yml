@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.26.2'
+  version: '1.26.3'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3101,6 +3101,14 @@ components:
         - PRE_RELEASE_REVIEW
         - TRANSFER_REVIEW
 
+    ReviewType:
+      type: string
+      description: An enumeration of review type.
+      enum:
+        - REVIEW
+        - PRE_RELEASE_REVIEW
+        - TRANSFER_REVIEW
+
     PersonSearchResult:
       title: PersonSearchResult
       description: Response body containing a Search by prison paginated results response.
@@ -3458,6 +3466,8 @@ components:
           example: '2023-12-19'
         status:
           $ref: '#/components/schemas/ReviewScheduleStatus'
+        reviewType:
+          $ref: '#/components/schemas/ReviewType'
         calculationRule:
           $ref: '#/components/schemas/ReviewScheduleCalculationRule'
         exemptionReason:

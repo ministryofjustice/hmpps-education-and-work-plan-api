@@ -16,6 +16,7 @@ import java.time.LocalDate
 class PrisonerSessionSearchService(
   prisonerSearchApiService: PrisonerSearchApiService,
   private val sessionSummaryService: SessionSummaryService,
+  private val reviewTypeService: ReviewTypeService,
 ) : AbstractPrisonerSearchService(prisonerSearchApiService) {
 
   fun searchPrisoners(
@@ -114,24 +115,7 @@ class PrisonerSessionSearchService(
     releaseDate: LocalDate?,
   ): SessionType {
     if (sessionType == SessionResponse.SessionType.REVIEW) {
-      val now = LocalDate.now()
-      val threeMonthsFromNow = now.plusMonths(3)
-
-      return when {
-        // PRE_RELEASE_REVIEW only if release is within the next 3 months
-        releaseDate != null &&
-          !releaseDate.isBefore(now) &&
-          !releaseDate.isAfter(threeMonthsFromNow) ->
-          SessionType.PRE_RELEASE_REVIEW
-
-        // Transfer review
-        scheduleCalculationRule.contains("TRANSFER") ->
-          SessionType.TRANSFER_REVIEW
-
-        // Otherwise regular review
-        else ->
-          SessionType.REVIEW
-      }
+      return reviewTypeService.mapToSessionType(reviewTypeService.reviewType(releaseDate, scheduleCalculationRule))
     }
 
     return SessionType.INDUCTION
