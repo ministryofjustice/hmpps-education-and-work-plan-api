@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ScheduledActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ReviewTypeService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
@@ -36,6 +37,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Revie
 class ReviewController(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val reviewService: ReviewService,
+  private val reviewTypeService: ReviewTypeService,
   private val reviewScheduleService: ReviewScheduleService,
   private val scheduledActionPlanReviewResponseMapper: ScheduledActionPlanReviewResponseMapper,
   private val completedActionPlanReviewResponseMapper: CompletedActionPlanReviewResponseMapper,
@@ -48,10 +50,13 @@ class ReviewController(
   fun getActionPlanReviews(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ): ActionPlanReviewsResponse {
+    val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
+    val prisonerReleaseDate = prisoner.releaseDate
     val latestReviewSchedule = reviewScheduleService.getLatestReviewScheduleForPrisoner(prisonNumber)
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
+    val reviewType = reviewTypeService.reviewType(prisonerReleaseDate, latestReviewSchedule.scheduleCalculationRule.name)
     return ActionPlanReviewsResponse(
-      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModel(latestReviewSchedule),
+      latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModelWithReviewType(latestReviewSchedule, reviewType),
       completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
     )
   }

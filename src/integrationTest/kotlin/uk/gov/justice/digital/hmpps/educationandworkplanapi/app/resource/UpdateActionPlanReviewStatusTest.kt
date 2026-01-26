@@ -17,6 +17,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -363,7 +364,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     // Given
     val today = LocalDate.now()
     val fiveDaysAgo = today.minusDays(5)
-
+    wiremockService.stubGetPrisonerFromPrisonerSearchApi(prisonNumber, aValidPrisoner(prisonNumber))
     // Create a review schedule record, scheduled to be completed by today
     createReviewScheduleRecord(
       prisonNumber,

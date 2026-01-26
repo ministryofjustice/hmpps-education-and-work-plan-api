@@ -370,7 +370,6 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
         val numberOfRequests = 4
         wiremockService.stubGetPrisonerWithEarlierConnectionResetError(prisonNumber, prisoner, numberOfRequests)
         val createRequest = aValidCreateActionPlanReviewRequest()
-
         // When
         val response = createActionPlanReviewIsCreated(prisonNumber, createRequest, dpsUsername)
           .returnCreationResponse()
@@ -379,7 +378,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
         val actual = response.responseBody.blockFirst()
         assertThat(actual).isNotNull
         assertReviewCreated(dpsUsername, dpsUserDisplayName, earliestCreationTime, reviewSchedule)
-        wiremockService.verifyGetPrisoner(numberOfRequests)
+        wiremockService.verifyGetPrisoner(numberOfRequests + 1)
       }
 
       @Test
@@ -398,7 +397,8 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
         val actual = response.responseBody.blockFirst()
         assertThat(actual).isNotNull
         assertReviewCreated(dpsUsername, dpsUserDisplayName, earliestCreationTime, reviewSchedule)
-        wiremockService.verifyGetPrisoner(numberOfRequests)
+        // plus 1 below as the verify will also call get prisoner
+        wiremockService.verifyGetPrisoner(numberOfRequests + 1)
       }
 
       @Test

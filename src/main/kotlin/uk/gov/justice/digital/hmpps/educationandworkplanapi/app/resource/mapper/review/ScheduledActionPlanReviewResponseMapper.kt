@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ScheduledActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleCalculationRule as ReviewScheduleCalculationRuleDomain
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus as ReviewScheduleStatusDomain
@@ -32,6 +33,26 @@ class ScheduledActionPlanReviewResponseMapper(
       updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
       updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
       updatedAtPrison = lastUpdatedAtPrison,
+    )
+  }
+
+  fun fromDomainToModelWithReviewType(reviewSchedule: ReviewSchedule, reviewType: ReviewType): ScheduledActionPlanReviewResponse = with(reviewSchedule) {
+    ScheduledActionPlanReviewResponse(
+      reference = reference,
+      reviewDateFrom = reviewScheduleWindow.dateFrom,
+      reviewDateTo = reviewScheduleWindow.dateTo,
+      status = toReviewScheduleStatus(scheduleStatus),
+      exemptionReason = exemptionReason,
+      calculationRule = toReviewScheduleCalculationRule(scheduleCalculationRule),
+      createdBy = createdBy,
+      createdByDisplayName = userService.getUserDetails(createdBy).name,
+      createdAt = instantMapper.toOffsetDateTime(createdAt)!!,
+      createdAtPrison = createdAtPrison,
+      updatedBy = lastUpdatedBy,
+      updatedByDisplayName = userService.getUserDetails(lastUpdatedBy).name,
+      updatedAt = instantMapper.toOffsetDateTime(lastUpdatedAt)!!,
+      updatedAtPrison = lastUpdatedAtPrison,
+      reviewType = reviewType,
     )
   }
 
