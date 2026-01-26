@@ -4,6 +4,7 @@ import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ScheduledActionPlanReviewResponse
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -155,6 +156,16 @@ class ScheduledActionPlanReviewResponseAssert(actual: ScheduledActionPlanReviewR
     with(actual!!) {
       if (calculationRule != expected) {
         failWithMessage("Expected calculationRule to be $expected, but was $calculationRule")
+      }
+    }
+    return this
+  }
+
+  fun hasReviewType(expected: ReviewType): ScheduledActionPlanReviewResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (reviewType != expected) {
+        failWithMessage("Expected reviewType to be $expected, but was $reviewType")
       }
     }
     return this

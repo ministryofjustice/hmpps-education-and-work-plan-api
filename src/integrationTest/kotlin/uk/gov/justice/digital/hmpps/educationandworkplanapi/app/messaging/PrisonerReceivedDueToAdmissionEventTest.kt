@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
@@ -172,6 +173,7 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
         .latestReviewSchedule {
           it.hasStatus(ReviewScheduleStatus.SCHEDULED)
             .hasCalculationRule(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+            .hasReviewType(ReviewType.TRANSFER_REVIEW)
             .wasCreatedAtOrAfter(earliestDateTime)
             .wasUpdatedAtOrAfter(earliestDateTime)
             .wasCreatedAtPrison("MDI")

@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.NoteType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
@@ -218,6 +219,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           .wasUpdatedByDisplayName("Albert User")
           .wasUpdatedAtPrison("MDI")
           .hasStatus(ReviewScheduleStatusApi.SCHEDULED)
+          .hasReviewType(ReviewType.REVIEW)
           // Prisoner's release date is 1 year away, so next review is between 2 and 3 months from today, based on the calculation rule BETWEEN_6_AND_12_MONTHS_TO_SERVE
           .hasReviewDateFrom(LocalDate.now().plusMonths(2))
           .hasReviewDateTo(LocalDate.now().plusMonths(3))

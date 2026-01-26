@@ -17,7 +17,7 @@ class ReviewTypeService {
         !releaseDate.isAfter(threeMonthsFromNow) ->
         ReviewType.PRE_RELEASE_REVIEW
 
-      scheduleCalculationRule.contains("TRANSFER") ->
+      scheduleCalculationRule.contains("TRANSFER") || scheduleCalculationRule.contains("PRISONER_READMISSION") ->
         ReviewType.TRANSFER_REVIEW
 
       else ->
