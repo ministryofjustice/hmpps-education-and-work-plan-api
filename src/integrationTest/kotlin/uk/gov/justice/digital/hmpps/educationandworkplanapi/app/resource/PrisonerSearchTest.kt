@@ -242,11 +242,33 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     assertThat(actual).isNotNull
 
-    assertThat(actual!!.people.size).isEqualTo(4)
+    assertThat(actual!!.people.size).isEqualTo(3)
     assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner2.prisonerNumber)
     assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
     assertThat(actual.people[2].prisonNumber).isEqualTo(prisoner5.prisonerNumber)
-    assertThat(actual.people[3].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
+  }
+
+  @Test
+  fun `filter by exempt`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeopleWithActionPlanStatus(PlanStatus.EXEMPT.name)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+
+    assertThat(actual!!.people.size).isEqualTo(2)
+    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner3.prisonerNumber)
+    assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
   }
 
   private fun searchPeople(): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams()

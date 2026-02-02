@@ -12,38 +12,55 @@ interface PersonSearchRepository : JpaRepository<ActionPlanEntity, String> {
 
   @Query(
     value = """
-    select
-      p.prison_number as prisonNumber,
-      case
-        when exists (
-          select 1
-          from action_plan ap
-          where ap.prison_number = p.prison_number
-            and exists (
+        select
+          p.prison_number as prisonNumber,
+          case
+            -- EXEMPT has priority
+            when exists (
               select 1
-              from goal g
-              where g.action_plan_id = ap.id
-            )
-        ) then 'ACTIVE_PLAN'
-        when exists (
-          select 1
-          from induction_schedule isch
-          where isch.prison_number = p.prison_number
-            and isch.schedule_status ilike '%EXEMPT%'
-        ) then 'EXEMPT'
-        else 'NEEDS_PLAN'
-      end as planStatus
-    from (
-      select prison_number
-      from action_plan
-      where prison_number in (:prisonNumbers)
-
-      union
-
-      select prison_number
-      from induction_schedule
-      where prison_number in (:prisonNumbers)
-    ) p
+              from induction_schedule isch
+              where isch.prison_number = p.prison_number
+                and isch.schedule_status ilike '%EXEMPT%'
+            ) then 'EXEMPT'
+        
+            when (
+              select rs.schedule_status
+              from review_schedule rs
+              where rs.prison_number = p.prison_number
+              order by rs.created_at desc
+              limit 1
+            ) ilike '%EXEMPT%' then 'EXEMPT'
+        
+            when exists (
+              select 1
+              from action_plan ap
+              where ap.prison_number = p.prison_number
+                and exists (
+                  select 1
+                  from goal g
+                  where g.action_plan_id = ap.id
+                )
+            ) then 'ACTIVE_PLAN'
+        
+            else 'NEEDS_PLAN'
+          end as planStatus
+        from (
+            select prison_number
+            from action_plan
+            where prison_number in (:prisonNumbers)
+          
+            union
+          
+            select prison_number
+            from induction_schedule
+            where prison_number in (:prisonNumbers)
+          
+            union
+        
+            select prison_number
+            from review_schedule
+            where prison_number in (:prisonNumbers)
+        ) p;
   """,
     nativeQuery = true,
   )

@@ -402,7 +402,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
     val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
     assertThat(reviewSchedulesAfter.size).isEqualTo(1)
     assertThat(reviewSchedulesAfter.last().scheduleStatus).isEqualTo(COMPLETED)
-    assertThat(reviewSchedulesAfter.last().latestReviewDate).isEqualTo(LocalDate.now().plusDays(90))
+    assertThat(reviewSchedulesAfter.last().latestReviewDate).isEqualTo(LocalDate.now().plusMonths(3))
   }
 
   @Test
