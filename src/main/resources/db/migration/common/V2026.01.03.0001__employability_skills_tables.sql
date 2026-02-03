@@ -41,7 +41,7 @@ CREATE TABLE employability_skill
                               'COMMUNICATION',
                               'PLANNING',
                               'ORGANISATION',
-                              'PROBLEM SOLVING',
+                              'PROBLEM_SOLVING',
                               'INITIATIVE',
                               'ADAPTABILITY',
                               'RELIABILITY',
