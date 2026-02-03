@@ -3757,7 +3757,7 @@ components:
         employabilitySkills:
           type: array
           minItems: 1
-          description: A List of at least one Goal.
+          description: A List of at least one employability skill.
           items:
             $ref: '#/components/schemas/CreateEmployabilitySkillRequest'
       required:
