@@ -20,6 +20,7 @@ data class ReviewSchedule(
   val lastUpdatedBy: String,
   val lastUpdatedAt: Instant,
   val lastUpdatedAtPrison: String,
+  val reviewType: String = "REVIEW",
 )
 
 enum class ReviewScheduleCalculationRule {

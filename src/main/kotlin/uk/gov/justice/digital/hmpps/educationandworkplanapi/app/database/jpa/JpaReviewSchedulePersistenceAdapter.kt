@@ -89,8 +89,13 @@ class JpaReviewSchedulePersistenceAdapter(
     }
   }
 
-  override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> = reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
-    .map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+  override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
+    val nonCompleteReviewSchedules = reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
+    // also get the previous review schedule status for each person.
+    val reviewScheduleHistories = reviewScheduleHistoryRepository.findAllByPrisonNumberInOrderByUpdatedAtDesc(prisonerNumbers)
+
+    return nonCompleteReviewSchedules.map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+  }
 
   @Transactional
   override fun updateEarliestStartDate(prisonNumber: String, updatedEarliestStartDate: LocalDate) {
