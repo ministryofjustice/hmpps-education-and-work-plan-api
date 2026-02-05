@@ -80,6 +80,7 @@ class SessionSummaryService(
       exemptionReason = if (it.scheduleStatus.isExemptionOrExclusion()) it.scheduleStatus.name else null,
       exemptionDate = if (it.scheduleStatus.isExemptionOrExclusion()) convertInstantToLocalDate(it.lastUpdatedAt) else null,
       scheduleCalculationRule = it.scheduleCalculationRule.name,
+      followingTransfer = it.followingTransfer,
     )
   } + inductions.map {
     SessionResponse(

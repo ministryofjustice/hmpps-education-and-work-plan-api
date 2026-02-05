@@ -14,11 +14,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.Up
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleHistoryEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.review.ReviewScheduleEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import java.time.LocalDate
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -90,11 +92,26 @@ class JpaReviewSchedulePersistenceAdapter(
   }
 
   override fun getInCompleteReviewSchedules(prisonerNumbers: List<String>): List<ReviewSchedule> {
-    val nonCompleteReviewSchedules = reviewScheduleRepository.findAllByPrisonNumberInAndScheduleStatusNot(prisonerNumbers)
-    // also get the previous review schedule status for each person.
-    val reviewScheduleHistories = reviewScheduleHistoryRepository.findAllByPrisonNumberInOrderByUpdatedAtDesc(prisonerNumbers)
+    val nonComplete = reviewScheduleRepository
+      .findAllByPrisonNumberInAndScheduleStatusNot(prisonNumbers = prisonerNumbers)
 
-    return nonCompleteReviewSchedules.map { reviewScheduleEntityMapper.fromEntityToDomain(it) }
+    val histories = reviewScheduleHistoryRepository
+      .findAllByPrisonNumberInOrderByUpdatedAtDesc(prisonNumbers = prisonerNumbers)
+
+    // Group history rows by (prisonNumber, reference)
+    val historyByPrisonAndRef: Map<Pair<String, UUID>, List<ReviewScheduleHistoryEntity>> =
+      histories.groupBy { it.prisonNumber to it.reference }
+
+    return nonComplete.map { schedule ->
+      val key = schedule.prisonNumber to schedule.reference
+
+      // "Second one" (index 1) within the (prisonNumber, reference) history list
+      val secondLatestHistoryEntity: ReviewScheduleHistoryEntity? =
+        historyByPrisonAndRef[key]?.getOrNull(1)
+
+      val followingTransfer = secondLatestHistoryEntity?.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
+      reviewScheduleEntityMapper.fromEntityToDomain(schedule, followingTransfer)
+    }
   }
 
   @Transactional

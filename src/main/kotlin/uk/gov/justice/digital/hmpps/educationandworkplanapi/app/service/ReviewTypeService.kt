@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 @Service
 class ReviewTypeService {
-  fun reviewType(releaseDate: LocalDate?, scheduleCalculationRule: String, scheduleStatus: String? = null): ReviewType {
+  fun reviewType(releaseDate: LocalDate?, scheduleCalculationRule: String, scheduleStatus: String? = null, followingTransfer: Boolean = false): ReviewType {
     val now = LocalDate.now()
     val threeMonthsFromNow = now.plusMonths(3)
 
@@ -17,7 +17,7 @@ class ReviewTypeService {
         !releaseDate.isAfter(threeMonthsFromNow) ->
         ReviewType.PRE_RELEASE_REVIEW
 
-      scheduleStatus?.contains("TRANSFER") == true || scheduleCalculationRule.contains("TRANSFER") || scheduleCalculationRule.contains("PRISONER_READMISSION") ->
+      followingTransfer || scheduleStatus?.contains("TRANSFER") == true || scheduleCalculationRule.contains("TRANSFER") || scheduleCalculationRule.contains("PRISONER_READMISSION") ->
         ReviewType.TRANSFER_REVIEW
 
       else ->

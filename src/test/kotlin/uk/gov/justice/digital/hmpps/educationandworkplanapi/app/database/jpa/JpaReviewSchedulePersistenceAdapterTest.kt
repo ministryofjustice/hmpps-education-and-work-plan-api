@@ -62,7 +62,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       val activeReviewSchedule = aValidReviewSchedule(
         scheduleStatus = ReviewScheduleStatusDomain.SCHEDULED,
       )
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(activeReviewSchedule)
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any(), any())).willReturn(activeReviewSchedule)
 
       // When
       val actual = persistenceAdapter.getActiveReviewSchedule(prisonNumber)
@@ -122,7 +122,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       given(reviewScheduleRepository.findFirstByPrisonNumberOrderByUpdatedAtDesc(any())).willReturn(latestReviewScheduleEntity)
 
       val latestReviewSchedule = aValidReviewSchedule()
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(latestReviewSchedule)
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any(), any())).willReturn(latestReviewSchedule)
 
       // When
       val actual = persistenceAdapter.getLatestReviewSchedule(prisonNumber)
@@ -170,7 +170,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       given(reviewScheduleRepository.saveAndFlush(any<ReviewScheduleEntity>())).willReturn(reviewScheduleEntity)
 
       val expectedReviewSchedule = aValidReviewSchedule()
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(expectedReviewSchedule)
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any(), any())).willReturn(expectedReviewSchedule)
 
       // When
       val actual = persistenceAdapter.createReviewSchedule(createReviewScheduleDto)
@@ -201,7 +201,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       given(reviewScheduleRepository.findByPrisonNumberAndScheduleStatusIn(any(), any())).willReturn(reviewScheduleEntity)
 
       val reviewSchedule = aValidReviewSchedule()
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(reviewSchedule)
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any(), any())).willReturn(reviewSchedule)
 
       // When
       val exception = assertThrows(ActiveReviewScheduleAlreadyExistsException::class.java) {
@@ -231,7 +231,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       given(reviewScheduleRepository.saveAndFlush(any<ReviewScheduleEntity>())).willReturn(reviewScheduleEntity)
 
       val expectedReviewSchedule = aValidReviewSchedule()
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(expectedReviewSchedule)
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any(), any())).willReturn(expectedReviewSchedule)
 
       val updateReviewScheduleDto = aValidUpdateReviewScheduleDto(
         reference = reference,
@@ -288,7 +288,7 @@ class JpaReviewSchedulePersistenceAdapterTest {
       given(reviewScheduleEntityMapper.toReviewScheduleStatus(any())).willReturn(ReviewScheduleStatusEntity.SCHEDULED)
 
       val expectedReviewSchedule = aValidReviewSchedule()
-      given(reviewScheduleEntityMapper.fromEntityToDomain(any())).willReturn(expectedReviewSchedule)
+      given(reviewScheduleEntityMapper.fromEntityToDomain(any(), any())).willReturn(expectedReviewSchedule)
       val updateReviewScheduleStatusDto = aValidUpdateReviewScheduleStatusDto(
         reference = reference,
       )
