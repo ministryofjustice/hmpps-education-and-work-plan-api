@@ -54,7 +54,15 @@ class ReviewController(
     val prisonerReleaseDate = prisoner.releaseDate
     val latestReviewSchedule = reviewScheduleService.getLatestReviewScheduleForPrisoner(prisonNumber)
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
-    val reviewType = reviewTypeService.reviewType(prisonerReleaseDate, latestReviewSchedule.scheduleCalculationRule.name)
+
+    val previousScheduleStatus = reviewScheduleService.getPreviousScheduleStatus(prisonNumber)
+
+    val reviewType = reviewTypeService.reviewType(
+      prisonerReleaseDate,
+      latestReviewSchedule.scheduleCalculationRule.name,
+      previousScheduleStatus?.name,
+    )
+
     return ActionPlanReviewsResponse(
       latestReviewSchedule = scheduledActionPlanReviewResponseMapper.fromDomainToModelWithReviewType(latestReviewSchedule, reviewType),
       completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
