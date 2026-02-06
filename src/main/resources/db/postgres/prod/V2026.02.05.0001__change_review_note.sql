@@ -1,0 +1,2 @@
+--Review added in error for this person change the note as it was for another person RR-2144
+update note set content = 'Review added in error' where id = 'f8477227-e4a7-4abb-829f-9ce1878f282b' and prison_number = 'A6085FH'
