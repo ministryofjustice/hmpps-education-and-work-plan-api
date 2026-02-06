@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.27.0'
+  version: '1.27.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3301,6 +3301,9 @@ components:
           format: uuid
           description: The unique reference of this session
           example: c88a6c48-97e2-4c04-93b5-98619966447b
+        followingTransfer:
+          type: boolean
+          description: whether or not this schedule was created as a result of a transfer
       required:
         - reference
         - deadlineDate
@@ -3353,6 +3356,9 @@ components:
           format: date
           description: The deadline for the induction to be completed
           example: '2023-06-19'
+        followingTransfer:
+          type: boolean
+          description: whether or not this schedule was created as a result of a transfer
         sessionType:
           $ref: '#/components/schemas/SessionType'
       required:

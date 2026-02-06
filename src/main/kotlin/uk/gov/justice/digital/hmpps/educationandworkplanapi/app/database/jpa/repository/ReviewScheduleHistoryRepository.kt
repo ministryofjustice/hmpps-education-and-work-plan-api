@@ -14,4 +14,6 @@ interface ReviewScheduleHistoryRepository : JpaRepository<ReviewScheduleHistoryE
   fun findAllByReference(reviewScheduleReference: UUID): List<ReviewScheduleHistoryEntity>
 
   fun findAllByPrisonNumber(prisonNumber: String): List<ReviewScheduleHistoryEntity>
+
+  fun findAllByPrisonNumberInOrderByUpdatedAtDesc(prisonNumbers: List<String>): List<ReviewScheduleHistoryEntity>
 }
