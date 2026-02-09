@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.em
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillEntity
@@ -16,7 +17,16 @@ class EmployabilitySkillEntityMapper {
   fun fromEntityToDomain(employabilitySkillEntity: EmployabilitySkillEntity): EmployabilitySkill = with(employabilitySkillEntity) {
     EmployabilitySkill(
       reference = reference,
-      // TODO add the other fields
+      prisonNumber = prisonNumber,
+      employabilitySkillType = skillType.toDomain(),
+      ratingCode = ratingCode,
+      activityName = activityName,
+      evidence = evidence,
+      createdAtPrison = createdAtPrison!!,
+      updatedAtPrison = updatedAtPrison!!,
+      createdBy = createdBy!!,
+      updatedBy = updatedBy!!,
+      conversationDate = conversationDate,
     )
   }
 
@@ -34,6 +44,6 @@ class EmployabilitySkillEntityMapper {
   }
 }
 
-private fun EntityEmployabilitySkillType.toDomain(): DomainEmployabilitySkillType = DomainEmployabilitySkillType.valueOf(this.name)
+private fun EntityEmployabilitySkillType.toDomain(): EmployabilitySkillType = EmployabilitySkillType.valueOf(this.name)
 
 private fun DomainEmployabilitySkillType.toEntity(): EntityEmployabilitySkillType = EntityEmployabilitySkillType.valueOf(this.name)

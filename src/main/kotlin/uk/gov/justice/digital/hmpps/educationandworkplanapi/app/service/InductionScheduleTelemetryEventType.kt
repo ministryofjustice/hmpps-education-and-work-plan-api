@@ -23,17 +23,4 @@ enum class InductionScheduleTelemetryEventType(
       )
     },
   ),
-
-  INDUCTION_SCHEDULE_UPDATED(
-    "INDUCTION_SCHEDULE_UPDATED",
-    { inductionSchedule ->
-      mapOf(
-        "reference" to inductionSchedule.reference.toString(),
-        "userId" to inductionSchedule.lastUpdatedBy,
-        "deadlineDate" to inductionSchedule.deadlineDate.toString(),
-        "scheduleStatus" to inductionSchedule.scheduleStatus.name,
-        "scheduleCalculationRule" to inductionSchedule.scheduleCalculationRule.name,
-      )
-    },
-  ),
 }

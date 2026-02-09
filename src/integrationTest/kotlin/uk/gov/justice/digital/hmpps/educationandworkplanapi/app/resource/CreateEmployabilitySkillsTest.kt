@@ -1,7 +1,14 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.firstValue
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
@@ -98,5 +105,19 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
     assertThat(skills[0].updatedAtPrison).isEqualTo("BXI")
     assertThat(skills[0].activityName).isEqualTo("Maths class")
     assertThat(skills[0].conversationDate).isEqualTo(LocalDate.now())
+
+    await.untilAsserted {
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("EMPLOYABILITY_SKILL_CREATED"),
+        capture(eventPropertiesCaptor),
+        isNull(),
+      )
+      val createEmployabilitySkillsEventProperties = eventPropertiesCaptor.firstValue
+      assertThat(createEmployabilitySkillsEventProperties)
+        .containsEntry("prisonId", "BXI")
+        .containsEntry("userId", "auser_gen")
+        .containsKey("reference")
+    }
   }
 }

@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Upd
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.CompletedReview
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
@@ -17,7 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTele
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.STEP_REMOVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionScheduleTelemetryEventType.INDUCTION_SCHEDULE_CREATED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionScheduleTelemetryEventType.INDUCTION_SCHEDULE_UPDATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_CREATED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.InductionTelemetryEventType.INDUCTION_UPDATED
 import java.util.UUID
@@ -86,17 +86,17 @@ class TelemetryService(
     )
   }
 
+  fun trackEmployabilitySkillCreated(employabilitySkill: EmployabilitySkill) {
+    sendTelemetryEventForEmployabilitySkill(
+      employabilitySkill = employabilitySkill,
+      telemetryEventType = EmployabilitySkillTelemetryEventType.EMPLOYABILITY_SKILL_CREATED,
+    )
+  }
+
   fun trackInductionScheduleCreated(inductionSchedule: InductionSchedule) {
     sendTelemetryEventForInductionSchedule(
       inductionSchedule = inductionSchedule,
       telemetryEventType = INDUCTION_SCHEDULE_CREATED,
-    )
-  }
-
-  fun trackInductionScheduleUpdated(inductionSchedule: InductionSchedule) {
-    sendTelemetryEventForInductionSchedule(
-      inductionSchedule = inductionSchedule,
-      telemetryEventType = INDUCTION_SCHEDULE_UPDATED,
     )
   }
 
@@ -157,4 +157,6 @@ class TelemetryService(
   private fun sendTelemetryEventForInduction(induction: Induction, telemetryEventType: InductionTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(induction))
 
   private fun sendTelemetryEventForInductionSchedule(inductionSchedule: InductionSchedule, telemetryEventType: InductionScheduleTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(inductionSchedule))
+
+  private fun sendTelemetryEventForEmployabilitySkill(employabilitySkill: EmployabilitySkill, telemetryEventType: EmployabilitySkillTelemetryEventType) = telemetryClient.trackEvent(telemetryEventType.value, telemetryEventType.customDimensions(employabilitySkill))
 }

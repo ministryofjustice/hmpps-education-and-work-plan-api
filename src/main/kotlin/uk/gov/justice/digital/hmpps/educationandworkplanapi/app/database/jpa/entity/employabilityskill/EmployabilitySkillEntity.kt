@@ -43,7 +43,7 @@ data class EmployabilitySkillEntity(
   @Column
   val skillType: EmployabilitySkillType,
   @Column
-  val evidence: String? = null,
+  val evidence: String,
   @Column(name = "rating_code")
   val ratingCode: String,
 

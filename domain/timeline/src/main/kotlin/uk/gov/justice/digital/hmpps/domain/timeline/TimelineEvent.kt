@@ -89,6 +89,9 @@ enum class TimelineEventType(val isReview: Boolean, val isGoal: Boolean, val isI
   STEP_STARTED(false, true, false, false),
   STEP_COMPLETED(false, true, false, false),
 
+  // Employability Skill Type events
+  EMPLOYABILITY_SKILL_TYPE(false, false, false, false),
+
   // Action Plan Review events
   ACTION_PLAN_REVIEW_COMPLETED(true, false, false, false),
   ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED(true, false, false, false),
@@ -130,4 +133,5 @@ enum class TimelineEventContext {
   INDUCTION_SCHEDULE_DEADLINE_OLD,
   INDUCTION_SCHEDULE_DEADLINE_NEW,
   INDUCTION_SCHEDULE_EXEMPTION_REASON,
+  EMPLOYABILITY_SKILL_TYPE,
 }
