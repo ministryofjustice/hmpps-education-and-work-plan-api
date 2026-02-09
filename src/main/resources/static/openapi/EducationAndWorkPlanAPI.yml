@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.27.1'
+  version: '1.27.2'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2238,6 +2238,7 @@ components:
         - PRISON_ADMISSION
         - PRISON_RELEASE
         - PRISON_TRANSFER
+        - EMPLOYABILITY_SKILL_TYPE
     ReasonToArchiveGoal:
       title: ReasonToArchiveGoal
       description: Enum describing the various reasons a goal might be archived
