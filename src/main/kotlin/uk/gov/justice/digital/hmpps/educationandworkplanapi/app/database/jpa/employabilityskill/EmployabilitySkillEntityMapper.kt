@@ -26,6 +26,8 @@ class EmployabilitySkillEntityMapper {
       updatedAtPrison = updatedAtPrison!!,
       createdBy = createdBy!!,
       updatedBy = updatedBy!!,
+      createdAt = createdAt!!,
+      updatedAt = updatedAt!!,
       conversationDate = conversationDate,
     )
   }
