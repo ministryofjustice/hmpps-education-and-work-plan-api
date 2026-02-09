@@ -53,9 +53,10 @@ class EmployabilitySkillsController(
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_VIEW_ACTIONPLANS)
-  fun getGoals(
+  fun getEmployabilitySkills(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
-  ): GetEmployabilitySkillResponses {
-    TODO("Not yet implemented")
-  }
+  ): GetEmployabilitySkillResponses = GetEmployabilitySkillResponses(
+    employabilitySkillsService.getEmployabilitySkills(prisonNumber)
+      .map { employabilitySkillsResourceMapper.fromModelToResponse(it) },
+  )
 }
