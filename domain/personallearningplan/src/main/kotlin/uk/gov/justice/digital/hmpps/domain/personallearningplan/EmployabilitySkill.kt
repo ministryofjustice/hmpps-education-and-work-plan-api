@@ -12,7 +12,7 @@ class EmployabilitySkill(
   val prisonNumber: String,
   val employabilitySkillType: EmployabilitySkillType,
   val ratingCode: String,
-  val activityName: String,
+  val activityName: String?,
   val evidence: String,
   val createdAtPrison: String,
   val updatedAtPrison: String,

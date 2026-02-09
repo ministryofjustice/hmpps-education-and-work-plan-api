@@ -60,7 +60,7 @@ data class EmployabilitySkillEntity(
   val rating: EmployabilitySkillRatingEntity? = null,
 
   @Column
-  val activityName: String,
+  val activityName: String?,
 
   @Column
   val conversationDate: LocalDate? = null,
