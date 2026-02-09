@@ -23,6 +23,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servic
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalNotesService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
@@ -57,6 +59,11 @@ class DomainConfiguration {
     actionPlanEventService: ActionPlanEventService,
     goalNotesService: GoalNotesService,
   ): ActionPlanService = ActionPlanService(actionPlanPersistenceAdapter, actionPlanEventService, goalNotesService)
+
+  @Bean
+  fun employabilitySkillsDomainService(
+    employabilitySkillPersistenceAdapter: EmployabilitySkillPersistenceAdapter,
+  ): EmployabilitySkillsService = EmployabilitySkillsService(employabilitySkillPersistenceAdapter)
 
   @Bean
   fun noteService(
