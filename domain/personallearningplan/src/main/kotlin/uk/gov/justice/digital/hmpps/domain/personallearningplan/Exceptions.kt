@@ -19,6 +19,11 @@ class InvalidActionPlanException(message: String) : RuntimeException(message)
 class ActionPlanNotFoundException(prisonNumber: String) : RuntimeException("ActionPlan for prisoner [$prisonNumber] not found")
 
 /**
+ * Thrown when an Employability skill cannot be found.
+ */
+class EmployabilitySkillNotFoundException(prisonNumber: String, reference: UUID) : RuntimeException("EmployabilitySkill for prisoner [$prisonNumber] and reference [$reference] not found")
+
+/**
  * Thrown when an Attempt is made to create an ActionPlan for a prisoner who already has one.
  */
 class ActionPlanAlreadyExistsException(prisonNumber: String) : RuntimeException("An Action Plan already exists for prisoner $prisonNumber.")

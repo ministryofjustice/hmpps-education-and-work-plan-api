@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillsService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.EmployabilitySkillsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
@@ -23,8 +25,14 @@ private val log = KotlinLogging.logger {}
 
 @RestController
 @Validated
-@RequestMapping(value = ["/action-plans/{prisonNumber}/employability-skills"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class EmployabilitySkillsController {
+@RequestMapping(
+  value = ["/action-plans/{prisonNumber}/employability-skills"],
+  produces = [MediaType.APPLICATION_JSON_VALUE],
+)
+class EmployabilitySkillsController(
+  private val employabilitySkillsService: EmployabilitySkillsService,
+  private val employabilitySkillsResourceMapper: EmployabilitySkillsResourceMapper,
+) {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -34,7 +42,12 @@ class EmployabilitySkillsController {
     @Valid @RequestBody request: CreateEmployabilitySkillsRequest,
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
-    TODO("Not yet implemented")
+    employabilitySkillsService.createEmployabilitySkills(
+      employabilitySkillsResourceMapper.fromModelToDto(
+        prisonNumber,
+        request,
+      ),
+    )
   }
 
   @GetMapping
