@@ -11,7 +11,7 @@ data class EmployabilitySkillDto(
   val prisonId: String,
   val employabilitySkillType: EmployabilitySkillType,
   val employabilitySkillRating: EmployabilitySkillRating,
-  val activityName: String,
+  val activityName: String?,
   val evidence: String,
   val conversationDate: LocalDate? = null,
 )
