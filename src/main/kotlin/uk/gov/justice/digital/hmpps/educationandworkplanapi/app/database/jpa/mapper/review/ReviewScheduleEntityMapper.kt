@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 @Component
 class ReviewScheduleEntityMapper {
 
-  fun fromEntityToDomain(reviewScheduleEntity: ReviewScheduleEntity): ReviewSchedule = with(reviewScheduleEntity) {
+  fun fromEntityToDomain(reviewScheduleEntity: ReviewScheduleEntity, followingTransfer: Boolean = false): ReviewSchedule = with(reviewScheduleEntity) {
     ReviewSchedule(
       reference = reference,
       prisonNumber = prisonNumber,
@@ -31,6 +31,7 @@ class ReviewScheduleEntityMapper {
       lastUpdatedBy = updatedBy!!,
       lastUpdatedAt = updatedAt!!,
       lastUpdatedAtPrison = updatedAtPrison,
+      followingTransfer = followingTransfer,
     )
   }
 

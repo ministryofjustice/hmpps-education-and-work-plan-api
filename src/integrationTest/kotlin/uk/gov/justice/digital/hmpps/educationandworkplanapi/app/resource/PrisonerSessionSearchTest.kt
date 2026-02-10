@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.FluxExchangeResult
@@ -12,6 +15,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisoners
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidHmppsDomainEventsSqsMessage
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidPrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
@@ -20,6 +27,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Sessi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionStatusType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
+import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.LocalDate
 
 class PrisonerSessionSearchTest : IntegrationTestBase() {
@@ -250,6 +259,56 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
 
     assertThat(actual!!.sessions.size).isEqualTo(1)
     assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
+  }
+
+  @Test
+  fun `should return prisoner with TRANSFER_REVIEW reviewType`() {
+    // Given
+    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
+    val prisonNumber = setUpRandomPrisoner()
+    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber)
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner),
+    )
+
+    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = "BXI"))
+    createActionPlan(prisonNumber)
+
+    await untilCallTo {
+      reviewScheduleEventQueue.countAllMessagesOnQueue()
+    } matches { it != null && it > 0 }
+    clearQueues()
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        prisonId = "WWW",
+        reason = TRANSFERRED,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // When
+    // When
+    val response = searchPeople()
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.sessions.size).isEqualTo(1)
+    assertThat(actual.sessions[0].sessionType).isEqualTo(SessionType.TRANSFER_REVIEW)
   }
 
   private fun searchPeople(): FluxExchangeResult<SessionSearchResponses> = searchPeopleWithParams()

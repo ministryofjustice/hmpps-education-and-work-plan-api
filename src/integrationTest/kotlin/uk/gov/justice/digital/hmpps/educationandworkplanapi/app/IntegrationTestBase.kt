@@ -44,6 +44,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EmployabilitySkillRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
@@ -158,6 +159,9 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var actionPlanRepository: ActionPlanRepository
+
+  @Autowired
+  lateinit var employabilitySkillRepository: EmployabilitySkillRepository
 
   @Autowired
   lateinit var timelineRepository: TimelineRepository
