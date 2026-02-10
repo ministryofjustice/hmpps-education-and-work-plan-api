@@ -35,13 +35,14 @@ class TimelineServiceFilterTest {
   @BeforeEach
   fun setupTimelineEvents() {
     setUpEvents()
-    // A total of 42 events are created:
+    // A total of 44 events are created:
     //  - 5 Induction events
     //  - 9 Goal events
     //  - 1 event relating to Goal and Inductions
     //  - 3 Review events
     //  - 3 Prison Movement events
-    // The 21 events are created for both PRISON1 and PRISON2, giving a total of 42 events
+    //  - 1 Employability skill event
+    // The 22 events are created for both PRISON1 and PRISON2, giving a total of 44 events
   }
 
   @Test
@@ -51,7 +52,7 @@ class TimelineServiceFilterTest {
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER)
     // Then
-    assertThat(actual.events.size).isEqualTo(42)
+    assertThat(actual.events.size).isEqualTo(44)
   }
 
   @Test
@@ -108,13 +109,13 @@ class TimelineServiceFilterTest {
   }
 
   @Test
-  fun `should get 21 timeline events given filtering for prison 2 only`() {
+  fun `should get 22 timeline events given filtering for prison 2 only`() {
     // Given
 
     // When
     val actual = service.getTimelineForPrisoner(PRISON_NUMBER, prisonId = "PRISON2")
     // Then
-    assertThat(actual.events.size).isEqualTo(21)
+    assertThat(actual.events.size).isEqualTo(22)
   }
 
   @Test

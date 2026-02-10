@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Upd
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.UpdatedReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Step
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus.ACTIVE
@@ -73,6 +74,24 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     sourceReference = goal.reference,
     eventType = TimelineEventType.GOAL_CREATED,
     contextualInfo = mapOf(GOAL_TITLE to goal.title),
+    correlationId = correlationId,
+  )
+
+  fun employabilitySkillsCreatedEvent(employabilitySkills: List<EmployabilitySkill>): List<TimelineEvent> {
+    val events = mutableListOf<TimelineEvent>()
+
+    val correlationId = UUID.randomUUID()
+    employabilitySkills.forEach {
+      events.add(employabilitySkillCreatedTimelineEvent(it, correlationId))
+    }
+    return events
+  }
+
+  fun employabilitySkillCreatedTimelineEvent(employabilitySkill: EmployabilitySkill, correlationId: UUID = UUID.randomUUID()) = employabilitySkillTimelineEvent(
+    employabilitySkill = employabilitySkill,
+    sourceReference = employabilitySkill.reference,
+    eventType = TimelineEventType.GOAL_CREATED,
+    contextualInfo = mapOf(TimelineEventContext.EMPLOYABILITY_SKILL_TYPE to employabilitySkill.employabilitySkillType.name),
     correlationId = correlationId,
   )
 
@@ -226,6 +245,21 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     // we can use the lastUpdatedBy fields for create action plan/create goal events, since it will be the same as the actionedBy fields initially
     prisonId = goal.lastUpdatedAtPrison,
     actionedBy = goal.lastUpdatedBy!!,
+    contextualInfo = contextualInfo,
+    correlationId = correlationId,
+  )
+
+  private fun employabilitySkillTimelineEvent(
+    employabilitySkill: EmployabilitySkill,
+    sourceReference: UUID,
+    eventType: TimelineEventType,
+    contextualInfo: Map<TimelineEventContext, String>,
+    correlationId: UUID = UUID.randomUUID(),
+  ) = TimelineEvent.newTimelineEvent(
+    sourceReference = sourceReference.toString(),
+    eventType = eventType,
+    prisonId = employabilitySkill.updatedAtPrison,
+    actionedBy = employabilitySkill.updatedBy,
     contextualInfo = contextualInfo,
     correlationId = correlationId,
   )

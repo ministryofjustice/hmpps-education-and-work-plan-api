@@ -98,9 +98,10 @@ class PrisonerSessionSearchService(
         cellLocation = prisoner.cellLocation!!,
         releaseDate = prisoner.releaseDate,
         sessionType = getSessionType(
-          additionalData.sessionType,
-          additionalData.scheduleCalculationRule,
-          prisoner.releaseDate,
+          sessionType = additionalData.sessionType,
+          scheduleCalculationRule = additionalData.scheduleCalculationRule,
+          releaseDate = prisoner.releaseDate,
+          followingTransfer = additionalData.followingTransfer == true,
         ),
         deadlineDate = additionalData.deadlineDate,
         exemptionReason = additionalData.exemptionReason,
@@ -113,9 +114,10 @@ class PrisonerSessionSearchService(
     sessionType: SessionResponse.SessionType,
     scheduleCalculationRule: String,
     releaseDate: LocalDate?,
+    followingTransfer: Boolean = false,
   ): SessionType {
     if (sessionType == SessionResponse.SessionType.REVIEW) {
-      return reviewTypeService.mapToSessionType(reviewTypeService.reviewType(releaseDate, scheduleCalculationRule))
+      return reviewTypeService.mapToSessionType(reviewTypeService.reviewType(releaseDate = releaseDate, scheduleCalculationRule = scheduleCalculationRule, followingTransfer = followingTransfer))
     }
 
     return SessionType.INDUCTION

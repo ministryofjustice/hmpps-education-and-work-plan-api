@@ -62,6 +62,7 @@ class TimelineEventEntityMapper {
     TimelineEventTypeEntity.PRISON_ADMISSION -> TimelineEventTypeDomain.PRISON_ADMISSION
     TimelineEventTypeEntity.PRISON_RELEASE -> TimelineEventTypeDomain.PRISON_RELEASE
     TimelineEventTypeEntity.PRISON_TRANSFER -> TimelineEventTypeDomain.PRISON_TRANSFER
+    TimelineEventTypeEntity.EMPLOYABILITY_SKILL_TYPE -> TimelineEventTypeDomain.EMPLOYABILITY_SKILL_TYPE
   }
 
   private fun toTimelineEventType(eventType: TimelineEventTypeDomain): TimelineEventTypeEntity = when (eventType) {
@@ -86,6 +87,7 @@ class TimelineEventEntityMapper {
     TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
     TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_CREATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
     TimelineEventTypeDomain.INDUCTION_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeEntity.INDUCTION_SCHEDULE_STATUS_UPDATED
+    TimelineEventTypeDomain.EMPLOYABILITY_SKILL_TYPE -> TimelineEventTypeEntity.EMPLOYABILITY_SKILL_TYPE
   }
 
   private fun toTimelineEventContext(eventType: TimelineEventContextEntity): TimelineEventContextDomain = when (eventType) {
@@ -118,6 +120,7 @@ class TimelineEventEntityMapper {
     TimelineEventContextEntity.INDUCTION_SCHEDULE_DEADLINE_OLD -> TimelineEventContextDomain.INDUCTION_SCHEDULE_DEADLINE_OLD
     TimelineEventContextEntity.INDUCTION_SCHEDULE_DEADLINE_NEW -> TimelineEventContextDomain.INDUCTION_SCHEDULE_DEADLINE_NEW
     TimelineEventContextEntity.INDUCTION_SCHEDULE_EXEMPTION_REASON -> TimelineEventContextDomain.INDUCTION_SCHEDULE_EXEMPTION_REASON
+    TimelineEventContextEntity.EMPLOYABILITY_SKILL_TYPE -> TimelineEventContextDomain.EMPLOYABILITY_SKILL_TYPE
   }
 
   private fun toTimelineEventContext(eventType: TimelineEventContextDomain): TimelineEventContextEntity = when (eventType) {
@@ -150,5 +153,6 @@ class TimelineEventEntityMapper {
     TimelineEventContextDomain.INDUCTION_SCHEDULE_DEADLINE_OLD -> TimelineEventContextEntity.INDUCTION_SCHEDULE_DEADLINE_OLD
     TimelineEventContextDomain.INDUCTION_SCHEDULE_DEADLINE_NEW -> TimelineEventContextEntity.INDUCTION_SCHEDULE_DEADLINE_NEW
     TimelineEventContextDomain.INDUCTION_SCHEDULE_EXEMPTION_REASON -> TimelineEventContextEntity.INDUCTION_SCHEDULE_EXEMPTION_REASON
+    TimelineEventContextDomain.EMPLOYABILITY_SKILL_TYPE -> TimelineEventContextEntity.EMPLOYABILITY_SKILL_TYPE
   }
 }
