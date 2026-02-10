@@ -25,7 +25,7 @@ class ResourceServerConfiguration {
       authorizeHttpRequests {
         listOf(
           "/webjars/**",
-          "favicon.ico",
+          "/favicon.ico",
           "/health/**",
           "/info",
           "/swagger-resources/**",

@@ -12,9 +12,9 @@ class UserPrincipalAuditorAwareTest {
 
   companion object {
     private val ROLES = emptyList<GrantedAuthority>()
-
     private val PRINCIPAL = "auser_gen"
-    private val AUTHENTICATION = TestingAuthenticationToken(PRINCIPAL, null, ROLES)
+    private val CREDENTIALS = {}
+    private val AUTHENTICATION = TestingAuthenticationToken(PRINCIPAL, CREDENTIALS, ROLES)
   }
 
   private val auditorAware = UserPrincipalAuditorAware()

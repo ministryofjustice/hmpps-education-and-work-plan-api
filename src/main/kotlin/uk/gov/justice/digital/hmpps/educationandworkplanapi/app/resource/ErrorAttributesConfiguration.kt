@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
 import org.springframework.boot.web.error.ErrorAttributeOptions
 import org.springframework.boot.web.error.ErrorAttributeOptions.Include
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes
+import org.springframework.boot.webmvc.error.DefaultErrorAttributes
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -45,15 +45,15 @@ class ApiRequestErrorAttributes(
     )
   }
 
-  private fun Map<String, Any>.getTimeStamp(): OffsetDateTime = (this[TIMESTAMP] as Date).toInstant().atOffset(ZoneOffset.UTC)
+  private fun Map<String, Any?>.getTimeStamp(): OffsetDateTime = (this[TIMESTAMP] as Date).toInstant().atOffset(ZoneOffset.UTC)
 
-  private fun Map<String, Any>.getStatus(): Int = this[STATUS] as Int
+  private fun Map<String, Any?>.getStatus(): Int = this[STATUS] as Int
 
-  private fun Map<String, Any>.getError(): String = this[ERROR].toString()
+  private fun Map<String, Any?>.getError(): String = this[ERROR].toString()
 
-  private fun Map<String, Any>.getMessage(): String = this[MESSAGE].toString()
+  private fun Map<String, Any?>.getMessage(): String = this[MESSAGE].toString()
 
-  private fun Map<String, Any>.getErrors(): List<String>? = (this[ERRORS] as List<*>?)
+  private fun Map<String, Any?>.getErrors(): List<String>? = (this[ERRORS] as List<*>?)
     ?.map { it as FieldError }
     ?.map {
       with(it) {
