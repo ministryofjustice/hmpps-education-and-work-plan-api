@@ -1,0 +1,1 @@
+update employability_skill_rating set code = 'LITTLE_CONFIDENCE' where code = 'LITTLE_CONFIDENT'
