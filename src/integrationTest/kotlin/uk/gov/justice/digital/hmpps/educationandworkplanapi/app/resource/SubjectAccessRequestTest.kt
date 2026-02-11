@@ -299,9 +299,9 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       uriBuilder
         .path(URI_TEMPLATE)
         .queryParam("prn", prisonNumber)
-        .queryParam("fromDate", fromDate)
-        .queryParam("toDate", toDate)
-        .build()
+      fromDate?.also { uriBuilder.queryParam("fromDate", it) }
+      toDate?.also { uriBuilder.queryParam("toDate", it) }
+      uriBuilder.build()
     }
     .bearerToken(
       buildAccessToken(

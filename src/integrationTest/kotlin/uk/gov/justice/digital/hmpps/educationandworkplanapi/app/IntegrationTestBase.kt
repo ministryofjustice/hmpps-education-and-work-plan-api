@@ -14,9 +14,9 @@ import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.ArgumentCaptor
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -739,7 +739,7 @@ abstract class IntegrationTestBase {
   }
 
   protected fun WebTestClient.ResponseSpec.returnError() = this.returnResult(ErrorResponse::class.java)
-  protected fun <T> FluxExchangeResult<T>.body(): T = this.responseBody.blockFirst()!!
+  protected fun <T : Any> FluxExchangeResult<T>.body(): T = this.responseBody.blockFirst()!!
 }
 
 data class Notification(

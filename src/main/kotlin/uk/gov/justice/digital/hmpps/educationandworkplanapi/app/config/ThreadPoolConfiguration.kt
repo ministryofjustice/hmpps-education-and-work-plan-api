@@ -12,6 +12,6 @@ class ThreadPoolConfiguration {
     corePoolSize = 200
     maxPoolSize = 1000
     this.setWaitForTasksToCompleteOnShutdown(true)
-    threadNamePrefix = "Async-"
+    this.setThreadNamePrefix("Async-")
   }
 }
