@@ -46,9 +46,10 @@ class ReviewScheduleService(
   fun getPreviousScheduleStatus(prisonNumber: String): ReviewScheduleStatus? {
     // To determine whether this is a transfer review, we need the *previous* schedule status
     // (i.e. the second most recent schedule for the same reference), if one exists.
+    // the statuses are coming back in last updated order so simply drop the first one and then return
+    // the second one.
     return getReviewSchedulesForPrisoner(prisonNumber)
       .asSequence()
-      .sortedByDescending { it.version }
       .drop(1)
       .firstOrNull()
       ?.scheduleStatus
