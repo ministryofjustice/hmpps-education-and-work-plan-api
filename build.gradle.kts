@@ -17,7 +17,7 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val postgresqlVersion = "42.7.9"
+val postgresqlVersion = "42.7.10"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "2.8.15"
 val hmppsSqsVersion = "5.6.3"
