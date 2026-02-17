@@ -32,7 +32,7 @@ class PrisonerSearchApiClient(
       "dateOfBirth",
       "cellLocation",
       "nonDtoReleaseDateType",
-    )
+    ).toTypedArray()
 
     private val log = KotlinLogging.logger {}
   }
