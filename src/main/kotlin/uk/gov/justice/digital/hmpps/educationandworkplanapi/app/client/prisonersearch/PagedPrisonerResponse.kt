@@ -36,7 +36,7 @@ data class ConvictedOffence(
   val offenceDate: LocalDate?,
   val latestBooking: Boolean,
   val sentenceStartDate: LocalDate?,
-  val primarySentence: Boolean,
+  val primarySentence: Boolean?,
 )
 
 enum class LegalStatus {
