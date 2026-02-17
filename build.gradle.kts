@@ -5,7 +5,7 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.0.3"
-  id("org.openapi.generator") version "7.19.0"
+  id("org.openapi.generator") version "7.20.0"
   kotlin("plugin.spring") version "2.3.10"
   kotlin("plugin.jpa") version "2.3.10"
 
@@ -17,7 +17,7 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val postgresqlVersion = "42.7.9"
+val postgresqlVersion = "42.7.10"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "3.0.1"
 val hmppsSqsStarterVersion = "6.0.1"

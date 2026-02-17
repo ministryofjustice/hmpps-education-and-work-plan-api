@@ -21,7 +21,7 @@ dependencies {
   api("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
   // Test dependencies
-  testImplementation("org.junit.jupiter:junit-jupiter:6.0.2")
+  testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
   testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
