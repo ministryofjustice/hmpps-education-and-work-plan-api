@@ -5,9 +5,6 @@ info.app:
 spring:
   application:
     name: hmpps-education-and-work-plan-api
-  codec:
-    max-in-memory-size: 20MB
-
   security:
     oauth2:
       resourceserver:
@@ -71,6 +68,9 @@ spring:
     placeholders:
       dpr_user: ${DPR_USER}
       dpr_password: ${DPR_PASSWORD}
+  http:
+    codecs:
+      max-in-memory-size: 20MB
 
 server:
   port: 8080
