@@ -27,7 +27,7 @@ dependencies {
 }
 
 extensions.getByType(JacocoPluginExtension::class).apply {
-  toolVersion = "0.8.11"
+  toolVersion = "0.8.14"
 }
 
 java {
