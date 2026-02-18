@@ -5,9 +5,6 @@ info.app:
 spring:
   application:
     name: hmpps-education-and-work-plan-api
-  codec:
-    max-in-memory-size: 20MB
-
   security:
     oauth2:
       resourceserver:
@@ -71,6 +68,12 @@ spring:
     placeholders:
       dpr_user: ${DPR_USER}
       dpr_password: ${DPR_PASSWORD}
+  http:
+    codecs:
+      max-in-memory-size: 20MB
+  web:
+    error:
+      include-message: always
 
 server:
   port: 8080
@@ -83,8 +86,6 @@ server:
       protocol-header: x-forwarded-proto
       internal-proxies: 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1|::1|100\.6[4-9]\.\d{1,3}\.\d{1,3}|100\.[7-9][0-9]{1}\.\d{1,3}\.\d{1,3}|100\.1[0-1][0-9]{1}\.\d{1,3}\.\d{1,3}|100\.12[0-7]\.\d{1,3}\.\d{1,3}
   shutdown: graceful
-  error:
-    include-message: always
 
 management:
   endpoints:
