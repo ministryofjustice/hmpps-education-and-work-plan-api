@@ -19,7 +19,7 @@ The application has a ping endpoint found at `/ping` which indicates that the ap
 ## Configuring the project
 
 ### JDK
-To develop and build the application locally you will need JDK 21 installed and configured.
+To develop and build the application locally you will need JDK 25 installed and configured.
 
 ### Ktlint formatting
 Ktlint is used to format the source code and a task runs in the Circle build to check the formatting.

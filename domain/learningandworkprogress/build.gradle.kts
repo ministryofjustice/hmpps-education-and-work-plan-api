@@ -31,16 +31,16 @@ dependencies {
 }
 
 extensions.getByType(JacocoPluginExtension::class).apply {
-  toolVersion = "0.8.11"
+  toolVersion = "0.8.14"
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 tasks {
   withType<KotlinCompile> {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_25)
   }
 }
 
