@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Senten
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.PrisonerNotFoundException
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateActionPlanReviewRequestMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ReviewScheduleHistoryResponseMapper
@@ -50,8 +51,15 @@ class ReviewController(
   fun getActionPlanReviews(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ): ActionPlanReviewsResponse {
-    val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
-    val prisonerReleaseDate = prisoner.releaseDate
+    val prisoner = try {
+      prisonerSearchApiService.getPrisoner(prisonNumber)
+    } catch (e: PrisonerNotFoundException) {
+      // this is intentional. Ordinarily the prisoner will be found, however, when
+      // a prisoner is merged it will fail. But we still beed to be able to call this
+      // method from the integration API.
+      null
+    }
+    val prisonerReleaseDate = prisoner?.releaseDate
     val latestReviewSchedule = reviewScheduleService.getLatestReviewScheduleForPrisoner(prisonNumber)
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prisonNumber)
 
