@@ -3,13 +3,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.acti
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating
-import java.time.LocalDate
 
 fun aValidCreateEmployabilitySkillRequest() = CreateEmployabilitySkillRequest(
   prisonId = "BXI",
   employabilitySkillType = uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType.COMMUNICATION,
   employabilitySkillRating = EmployabilitySkillRating.VERY_CONFIDENT,
-  activityName = "Maths class",
+  sessionType = "Education review",
+  sessionTypeDescription = "Maths class",
   evidence = "evidence",
-  conversationDate = LocalDate.now(),
 )

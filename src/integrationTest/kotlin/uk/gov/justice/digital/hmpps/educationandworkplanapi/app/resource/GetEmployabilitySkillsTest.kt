@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.LocalDate
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType as APIEmployabilitySkillType
 
 class GetEmployabilitySkillsTest : IntegrationTestBase() {
@@ -74,7 +73,7 @@ class GetEmployabilitySkillsTest : IntegrationTestBase() {
     assertThat(actual.employabilitySkills[0].employabilitySkillRating.name).isEqualTo("VERY_CONFIDENT")
     assertThat(actual.employabilitySkills[0].createdAtPrison).isEqualTo("BXI")
     assertThat(actual.employabilitySkills[0].updatedAtPrison).isEqualTo("BXI")
-    assertThat(actual.employabilitySkills[0].activityName).isEqualTo("Maths class")
-    assertThat(actual.employabilitySkills[0].conversationDate).isEqualTo(LocalDate.now())
+    assertThat(actual.employabilitySkills[0].sessionTypeDescription).isEqualTo("Maths class")
+    assertThat(actual.employabilitySkills[0].sessionType).isEqualTo("Education review")
   }
 }

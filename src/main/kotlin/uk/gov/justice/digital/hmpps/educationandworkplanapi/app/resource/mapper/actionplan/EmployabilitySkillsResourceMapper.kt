@@ -37,9 +37,9 @@ class EmployabilitySkillsResourceMapper(
       prisonId = prisonId,
       employabilitySkillType = employabilitySkillType.toDomain(),
       employabilitySkillRating = employabilitySkillRating.toDomain(),
-      activityName = request.activityName,
+      sessionType = request.sessionType,
+      sessionTypeDescription = request.sessionTypeDescription,
       evidence = request.evidence,
-      conversationDate = request.conversationDate,
     )
   }
 
@@ -55,9 +55,10 @@ class EmployabilitySkillsResourceMapper(
       updatedAtPrison = updatedAtPrison,
       employabilitySkillType = ApiEmployabilitySkillType.valueOf(employabilitySkillType.name),
       employabilitySkillRating = ApiEmployabilitySkillRating.valueOf(ratingCode),
-      activityName = activityName,
+      sessionType = sessionType,
+      sessionTypeDescription = sessionTypeDescription,
       evidence = evidence,
-      conversationDate = conversationDate,
+
     )
   }
 }

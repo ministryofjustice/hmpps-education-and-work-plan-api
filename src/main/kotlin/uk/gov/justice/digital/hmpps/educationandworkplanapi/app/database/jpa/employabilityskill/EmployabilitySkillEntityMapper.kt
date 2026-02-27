@@ -19,8 +19,9 @@ class EmployabilitySkillEntityMapper {
       reference = reference,
       prisonNumber = prisonNumber,
       employabilitySkillType = skillType.toDomain(),
+      sessionType = sessionType,
+      sessionTypeDescription = sessionTypeDescription,
       ratingCode = ratingCode,
-      activityName = activityName,
       evidence = evidence,
       createdAtPrison = createdAtPrison!!,
       updatedAtPrison = updatedAtPrison!!,
@@ -28,7 +29,6 @@ class EmployabilitySkillEntityMapper {
       updatedBy = updatedBy!!,
       createdAt = createdAt!!,
       updatedAt = updatedAt!!,
-      conversationDate = conversationDate,
     )
   }
 
@@ -38,8 +38,8 @@ class EmployabilitySkillEntityMapper {
       skillType = employabilitySkillType.toEntity(),
       evidence = evidence,
       ratingCode = employabilitySkillRating.name,
-      activityName = activityName,
-      conversationDate = conversationDate,
+      sessionType = sessionType,
+      sessionTypeDescription = sessionTypeDescription,
       createdAtPrison = prisonId,
       updatedAtPrison = prisonId,
     )

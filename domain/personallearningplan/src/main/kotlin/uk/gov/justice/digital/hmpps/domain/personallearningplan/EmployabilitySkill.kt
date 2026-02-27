@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan
 
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -11,8 +10,9 @@ class EmployabilitySkill(
   val reference: UUID,
   val prisonNumber: String,
   val employabilitySkillType: EmployabilitySkillType,
+  val sessionType: String?,
+  val sessionTypeDescription: String?,
   val ratingCode: String,
-  val activityName: String?,
   val evidence: String,
   val createdAtPrison: String,
   val updatedAtPrison: String,
@@ -20,7 +20,6 @@ class EmployabilitySkill(
   val createdAt: Instant,
   val updatedBy: String,
   val updatedAt: Instant,
-  val conversationDate: LocalDate? = null,
 
 )
 

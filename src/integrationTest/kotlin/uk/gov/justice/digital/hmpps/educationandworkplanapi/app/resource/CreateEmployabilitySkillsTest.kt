@@ -20,7 +20,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
-import java.time.LocalDate
 
 class CreateEmployabilitySkillsTest : IntegrationTestBase() {
 
@@ -103,8 +102,8 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
     assertThat(skills[0].createdAtPrison).isEqualTo("BXI")
     assertThat(skills[0].prisonNumber).isEqualTo(prisonNumber)
     assertThat(skills[0].updatedAtPrison).isEqualTo("BXI")
-    assertThat(skills[0].activityName).isEqualTo("Maths class")
-    assertThat(skills[0].conversationDate).isEqualTo(LocalDate.now())
+    assertThat(skills[0].sessionTypeDescription).isEqualTo("Maths class")
+    assertThat(skills[0].sessionType).isEqualTo("Education review")
 
     await.untilAsserted {
       val eventPropertiesCaptor = createCaptor<Map<String, String>>()

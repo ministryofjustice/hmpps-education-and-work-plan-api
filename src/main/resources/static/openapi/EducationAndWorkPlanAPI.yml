@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.27.3'
+  version: '1.27.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3684,17 +3684,15 @@ components:
           $ref: '#/components/schemas/EmployabilitySkillType'
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
-        activityName:
+        session_type:
           type: string
-          description: The name of the activity where the skill was assessed.
+          description: Session type eg Education review.
+        session_type_description:
+            type: string
+            description: Free text about the session type eg Mathematics A level.
         evidence:
           type: string
           description: Any evidence to support the skill rating.
-        conversationDate:
-          type: string
-          format: date
-          description: The date the conversation about skills took place (optional).
-          example: "1999-12-01"
       required:
         - prisonId
         - employabilitySkillType
@@ -3712,17 +3710,15 @@ components:
           $ref: '#/components/schemas/EmployabilitySkillType'
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
-        activityName:
+        session_type:
           type: string
-          description: The name of the activity where the skill was assessed.
+          description: Session type eg Education review.
+        session_type_description:
+          type: string
+          description: Free text about the session type eg Mathematics A level.
         evidence:
           type: string
           description: Any evidence to support the skill rating.
-        conversationDate:
-          type: string
-          format: date
-          description: The date the conversation about skills took place (optional).
-          example: "1999-12-01"
       required:
         - employabilitySkillType
         - employabilitySkillRating
