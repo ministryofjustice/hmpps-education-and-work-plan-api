@@ -19,7 +19,7 @@ apply(plugin = "org.openapi.generator")
 
 val postgresqlVersion = "42.7.10"
 val kotlinLoggingVersion = "3.0.5"
-val springdocOpenapiVersion = "3.0.1"
+val springdocOpenapiVersion = "3.0.2"
 val hmppsSqsStarterVersion = "7.0.1"
 val hmppsKotlinSpringBootStarterVersion = "2.0.2"
 val awaitilityVersion = "4.3.0"
