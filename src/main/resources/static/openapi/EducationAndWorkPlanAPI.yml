@@ -3159,6 +3159,15 @@ components:
         - PRE_RELEASE_REVIEW
         - TRANSFER_REVIEW
 
+    EmployabilitySkillSessionType:
+      type: string
+      description: An enumeration of Employability skill session type.
+      enum:
+        - CIAG_INDUCTION
+        - CIAG_REVIEW
+        - EDUCATION_REVIEW
+        - INDUSTRIES_REVIEW
+
     ReviewType:
       type: string
       description: An enumeration of review type.
@@ -3685,8 +3694,7 @@ components:
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
         sessionType:
-          type: string
-          description: Session type eg Education review.
+          $ref: '#/components/schemas/EmployabilitySkillSessionType'
         sessionTypeDescription:
             type: string
             description: Free text about the session type eg Mathematics A level.
@@ -3711,8 +3719,7 @@ components:
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
         sessionType:
-          type: string
-          description: Session type eg Education review.
+          $ref: '#/components/schemas/EmployabilitySkillSessionType'
         sessionTypeDescription:
           type: string
           description: Free text about the session type eg Mathematics A level.

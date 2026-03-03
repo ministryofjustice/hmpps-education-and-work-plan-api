@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -74,6 +75,6 @@ class GetEmployabilitySkillsTest : IntegrationTestBase() {
     assertThat(actual.employabilitySkills[0].createdAtPrison).isEqualTo("BXI")
     assertThat(actual.employabilitySkills[0].updatedAtPrison).isEqualTo("BXI")
     assertThat(actual.employabilitySkills[0].sessionTypeDescription).isEqualTo("Maths class")
-    assertThat(actual.employabilitySkills[0].sessionType).isEqualTo("Education review")
+    assertThat(actual.employabilitySkills[0].sessionType).isEqualTo(EmployabilitySkillSessionType.CIAG_INDUCTION)
   }
 }

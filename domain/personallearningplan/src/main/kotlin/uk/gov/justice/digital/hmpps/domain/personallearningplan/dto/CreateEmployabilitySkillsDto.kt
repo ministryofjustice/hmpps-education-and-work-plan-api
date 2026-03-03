@@ -13,7 +13,7 @@ data class EmployabilitySkillDto(
   val employabilitySkillRating: EmployabilitySkillRating,
   val evidence: String,
   val conversationDate: LocalDate? = null,
-  val sessionType: String? = null,
+  val sessionType: EmployabilitySkillSessionType? = null,
   val sessionTypeDescription: String? = null,
 )
 
@@ -28,6 +28,13 @@ enum class EmployabilitySkillType {
   ADAPTABILITY,
   RELIABILITY,
   CREATIVITY,
+}
+
+enum class EmployabilitySkillSessionType {
+  CIAG_INDUCTION,
+  CIAG_REVIEW,
+  EDUCATION_REVIEW,
+  INDUSTRIES_REVIEW,
 }
 
 enum class EmployabilitySkillRating {

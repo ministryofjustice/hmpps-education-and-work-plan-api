@@ -47,7 +47,7 @@ data class EmployabilitySkillEntity(
   val ratingCode: String,
 
   @Column
-  val sessionType: String?,
+  val sessionType: EmployabilitySkillSessionType?,
 
   @Column
   val sessionTypeDescription: String?,
@@ -109,4 +109,11 @@ enum class EmployabilitySkillType {
   ADAPTABILITY,
   RELIABILITY,
   CREATIVITY,
+}
+
+enum class EmployabilitySkillSessionType {
+  CIAG_INDUCTION,
+  CIAG_REVIEW,
+  EDUCATION_REVIEW,
+  INDUSTRIES_REVIEW,
 }

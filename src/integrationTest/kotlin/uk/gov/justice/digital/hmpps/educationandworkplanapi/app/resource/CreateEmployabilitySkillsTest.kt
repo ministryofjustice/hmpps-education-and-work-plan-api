@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillSessionType.CIAG_INDUCTION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
@@ -103,7 +104,7 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
     assertThat(skills[0].prisonNumber).isEqualTo(prisonNumber)
     assertThat(skills[0].updatedAtPrison).isEqualTo("BXI")
     assertThat(skills[0].sessionTypeDescription).isEqualTo("Maths class")
-    assertThat(skills[0].sessionType).isEqualTo("Education review")
+    assertThat(skills[0].sessionType).isEqualTo(CIAG_INDUCTION)
 
     await.untilAsserted {
       val eventPropertiesCaptor = createCaptor<Map<String, String>>()

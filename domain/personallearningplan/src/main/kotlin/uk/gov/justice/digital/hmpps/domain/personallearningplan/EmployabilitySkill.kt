@@ -10,7 +10,7 @@ class EmployabilitySkill(
   val reference: UUID,
   val prisonNumber: String,
   val employabilitySkillType: EmployabilitySkillType,
-  val sessionType: String?,
+  val sessionType: EmployabilitySkillSessionType?,
   val sessionTypeDescription: String?,
   val ratingCode: String,
   val evidence: String,
@@ -41,4 +41,11 @@ enum class EmployabilitySkillRating {
   LITTLE_CONFIDENCE,
   QUITE_CONFIDENT,
   VERY_CONFIDENT,
+}
+
+enum class EmployabilitySkillSessionType {
+  CIAG_INDUCTION,
+  CIAG_REVIEW,
+  EDUCATION_REVIEW,
+  INDUSTRIES_REVIEW,
 }

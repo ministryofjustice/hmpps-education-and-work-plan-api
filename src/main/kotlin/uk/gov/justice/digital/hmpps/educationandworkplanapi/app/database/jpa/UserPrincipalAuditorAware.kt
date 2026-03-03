@@ -9,8 +9,6 @@ import java.util.Optional
 @Component
 class UserPrincipalAuditorAware : AuditorAware<String> {
   override fun getCurrentAuditor(): Optional<String> = Optional.of(
-    SecurityContextHolder.getContext()?.authentication?.principal?.let {
-      it.toString()
-    } ?: SYSTEM_USER,
+    SecurityContextHolder.getContext()?.authentication?.principal?.toString() ?: SYSTEM_USER,
   )
 }
