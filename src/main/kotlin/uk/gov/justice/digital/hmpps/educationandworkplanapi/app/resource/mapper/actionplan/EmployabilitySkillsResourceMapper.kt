@@ -10,8 +10,10 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillsResponse
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillRating as DomainEmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillSessionType as DomainEmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillType as DomainEmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating as ApiEmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType as ApiEmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType as ApiEmployabilitySkillType
 
 @Component
@@ -37,9 +39,9 @@ class EmployabilitySkillsResourceMapper(
       prisonId = prisonId,
       employabilitySkillType = employabilitySkillType.toDomain(),
       employabilitySkillRating = employabilitySkillRating.toDomain(),
-      activityName = request.activityName,
+      sessionType = sessionType?.toDomain(),
+      sessionTypeDescription = request.sessionTypeDescription,
       evidence = request.evidence,
-      conversationDate = request.conversationDate,
     )
   }
 
@@ -55,12 +57,14 @@ class EmployabilitySkillsResourceMapper(
       updatedAtPrison = updatedAtPrison,
       employabilitySkillType = ApiEmployabilitySkillType.valueOf(employabilitySkillType.name),
       employabilitySkillRating = ApiEmployabilitySkillRating.valueOf(ratingCode),
-      activityName = activityName,
+      sessionType = sessionType?.let { ApiEmployabilitySkillSessionType.valueOf(it.name) },
+      sessionTypeDescription = sessionTypeDescription,
       evidence = evidence,
-      conversationDate = conversationDate,
+
     )
   }
 }
 
 private fun ApiEmployabilitySkillType.toDomain(): DomainEmployabilitySkillType = DomainEmployabilitySkillType.valueOf(this.name)
+private fun ApiEmployabilitySkillSessionType.toDomain(): DomainEmployabilitySkillSessionType = DomainEmployabilitySkillSessionType.valueOf(this.name)
 private fun ApiEmployabilitySkillRating.toDomain(): DomainEmployabilitySkillRating = DomainEmployabilitySkillRating.valueOf(this.name)

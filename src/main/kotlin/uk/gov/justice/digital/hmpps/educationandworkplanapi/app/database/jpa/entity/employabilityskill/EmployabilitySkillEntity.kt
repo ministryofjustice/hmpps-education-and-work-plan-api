@@ -19,7 +19,6 @@ import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 @Table(name = "employability_skill")
@@ -47,6 +46,11 @@ data class EmployabilitySkillEntity(
   @Column(name = "rating_code")
   val ratingCode: String,
 
+  @Column
+  val sessionType: EmployabilitySkillSessionType?,
+
+  @Column
+  val sessionTypeDescription: String?,
   /**
    * Convenience association to the rating lookup table.
    */
@@ -58,12 +62,6 @@ data class EmployabilitySkillEntity(
     updatable = false,
   )
   val rating: EmployabilitySkillRatingEntity? = null,
-
-  @Column
-  val activityName: String?,
-
-  @Column
-  val conversationDate: LocalDate? = null,
 
   @CreatedBy
   @Column
@@ -111,4 +109,11 @@ enum class EmployabilitySkillType {
   ADAPTABILITY,
   RELIABILITY,
   CREATIVITY,
+}
+
+enum class EmployabilitySkillSessionType {
+  CIAG_INDUCTION,
+  CIAG_REVIEW,
+  EDUCATION_REVIEW,
+  INDUSTRIES_REVIEW,
 }

@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.27.3'
+  version: '1.27.4'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -3159,6 +3159,15 @@ components:
         - PRE_RELEASE_REVIEW
         - TRANSFER_REVIEW
 
+    EmployabilitySkillSessionType:
+      type: string
+      description: An enumeration of Employability skill session type.
+      enum:
+        - CIAG_INDUCTION
+        - CIAG_REVIEW
+        - EDUCATION_REVIEW
+        - INDUSTRIES_REVIEW
+
     ReviewType:
       type: string
       description: An enumeration of review type.
@@ -3684,17 +3693,14 @@ components:
           $ref: '#/components/schemas/EmployabilitySkillType'
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
-        activityName:
-          type: string
-          description: The name of the activity where the skill was assessed.
+        sessionType:
+          $ref: '#/components/schemas/EmployabilitySkillSessionType'
+        sessionTypeDescription:
+            type: string
+            description: Free text about the session type eg Mathematics A level.
         evidence:
           type: string
           description: Any evidence to support the skill rating.
-        conversationDate:
-          type: string
-          format: date
-          description: The date the conversation about skills took place (optional).
-          example: "1999-12-01"
       required:
         - prisonId
         - employabilitySkillType
@@ -3712,17 +3718,14 @@ components:
           $ref: '#/components/schemas/EmployabilitySkillType'
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
-        activityName:
+        sessionType:
+          $ref: '#/components/schemas/EmployabilitySkillSessionType'
+        sessionTypeDescription:
           type: string
-          description: The name of the activity where the skill was assessed.
+          description: Free text about the session type eg Mathematics A level.
         evidence:
           type: string
           description: Any evidence to support the skill rating.
-        conversationDate:
-          type: string
-          format: date
-          description: The date the conversation about skills took place (optional).
-          example: "1999-12-01"
       required:
         - employabilitySkillType
         - employabilitySkillRating

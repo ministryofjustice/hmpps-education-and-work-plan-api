@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.dto
 
-import java.time.LocalDate
-
 data class CreateEmployabilitySkillsDto(
   val employabilitySkills: List<EmployabilitySkillDto>,
 )
@@ -11,9 +9,9 @@ data class EmployabilitySkillDto(
   val prisonId: String,
   val employabilitySkillType: EmployabilitySkillType,
   val employabilitySkillRating: EmployabilitySkillRating,
-  val activityName: String?,
   val evidence: String,
-  val conversationDate: LocalDate? = null,
+  val sessionType: EmployabilitySkillSessionType? = null,
+  val sessionTypeDescription: String? = null,
 )
 
 enum class EmployabilitySkillType {
@@ -27,6 +25,13 @@ enum class EmployabilitySkillType {
   ADAPTABILITY,
   RELIABILITY,
   CREATIVITY,
+}
+
+enum class EmployabilitySkillSessionType {
+  CIAG_INDUCTION,
+  CIAG_REVIEW,
+  EDUCATION_REVIEW,
+  INDUSTRIES_REVIEW,
 }
 
 enum class EmployabilitySkillRating {

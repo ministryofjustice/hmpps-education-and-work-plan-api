@@ -31,7 +31,7 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
   }
 
   private fun extractAuthorities(jwt: Jwt): Collection<GrantedAuthority> = mutableListOf<GrantedAuthority>().apply {
-    addAll(jwtGrantedAuthoritiesConverter.convert(jwt)!!)
+    addAll(jwtGrantedAuthoritiesConverter.convert(jwt))
     jwt.getClaimAsStringList("authorities")?.map(::SimpleGrantedAuthority)?.let(::addAll)
   }.toSet()
 }
