@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.domain.personallearningplan.dto
 
-import java.time.LocalDate
-
 data class CreateEmployabilitySkillsDto(
   val employabilitySkills: List<EmployabilitySkillDto>,
 )
@@ -12,7 +10,6 @@ data class EmployabilitySkillDto(
   val employabilitySkillType: EmployabilitySkillType,
   val employabilitySkillRating: EmployabilitySkillRating,
   val evidence: String,
-  val conversationDate: LocalDate? = null,
   val sessionType: EmployabilitySkillSessionType? = null,
   val sessionTypeDescription: String? = null,
 )
