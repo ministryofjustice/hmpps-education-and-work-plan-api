@@ -3684,10 +3684,10 @@ components:
           $ref: '#/components/schemas/EmployabilitySkillType'
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
-        session_type:
+        sessionType:
           type: string
           description: Session type eg Education review.
-        session_type_description:
+        sessionTypeDescription:
             type: string
             description: Free text about the session type eg Mathematics A level.
         evidence:
@@ -3710,10 +3710,10 @@ components:
           $ref: '#/components/schemas/EmployabilitySkillType'
         employabilitySkillRating:
           $ref: '#/components/schemas/EmployabilitySkillRating'
-        session_type:
+        sessionType:
           type: string
           description: Session type eg Education review.
-        session_type_description:
+        sessionTypeDescription:
           type: string
           description: Free text about the session type eg Mathematics A level.
         evidence:
