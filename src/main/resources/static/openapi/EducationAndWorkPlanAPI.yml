@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.27.4'
+  version: '1.28.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2669,6 +2669,8 @@ components:
           $ref: '#/components/schemas/CreatePersonalSkillsAndInterestsRequest'
         futureWorkInterests:
           $ref: '#/components/schemas/CreateFutureWorkInterestsRequest'
+        employabilitySkills:
+          $ref: '#/components/schemas/CreateEmployabilitySkillsRequest'
         note:
           type: string
           description: The notes taken when conducting the prisoner's Induction.
