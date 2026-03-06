@@ -30,7 +30,7 @@ class SkillsAndInterestsResourceMapper(
     CreatePersonalSkillsAndInterestsDto(
       prisonId = prisonId,
       interests = interests.map { toPersonalInterests(it) },
-      skills = skills.map { toPersonalSkills(it) },
+      skills = skills?.map { toPersonalSkills(it) } ?: listOf(),
     )
   }
 
@@ -58,7 +58,7 @@ class SkillsAndInterestsResourceMapper(
       reference = reference,
       prisonId = prisonId,
       interests = interests.map { toPersonalInterests(it) },
-      skills = skills.map { toPersonalSkills(it) },
+      skills = skills?.map { toPersonalSkills(it) } ?: listOf(),
     )
   }
 

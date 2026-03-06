@@ -22,19 +22,25 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillSessionType.CIAG_INDUCTION
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePersonalSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePreviousWorkExperiencesRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
@@ -506,6 +512,51 @@ class CreateInductionTest : IntegrationTestBase() {
 
     val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
     assertThat(inductionSchedule!!.scheduleStatus).isEqualTo(COMPLETED)
+  }
+
+  @Test
+  fun `should create an induction with employability skills and no personal interest skill`() {
+    // Given
+    val prisonNumber = setUpRandomPrisoner()
+    createActionPlan(prisonNumber, aValidCreateActionPlanRequest())
+
+    val personalSkillsAndInterests = CreatePersonalSkillsAndInterestsRequest(interests = listOf(aValidPersonalInterest()))
+
+    val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
+      personalSkillsAndInterests = personalSkillsAndInterests,
+      employabilitySkills = CreateEmployabilitySkillsRequest(listOf(aValidCreateEmployabilitySkillRequest())),
+    )
+
+    // When
+    webTestClient.post()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(createRequest)
+      .bearerToken(
+        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+      )
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isCreated()
+
+    // Then
+    val induction = getInduction(prisonNumber)
+    assertThat(induction).isNotNull
+
+    assertThat(induction.personalSkillsAndInterests?.skills).isEmpty()
+
+    val skills = employabilitySkillRepository.findByPrisonNumber(prisonNumber)
+    assertThat(skills).hasSize(1)
+    assertThat(skills[0].skillType).isEqualTo(EmployabilitySkillType.COMMUNICATION)
+    assertThat(skills[0].evidence).isEqualTo("evidence")
+    assertThat(skills[0].rating?.code).isEqualTo("VERY_CONFIDENT")
+    assertThat(skills[0].rating?.description).isEqualTo("very confident")
+    assertThat(skills[0].rating?.score).isEqualTo(4)
+    assertThat(skills[0].createdAtPrison).isEqualTo("BXI")
+    assertThat(skills[0].prisonNumber).isEqualTo(prisonNumber)
+    assertThat(skills[0].updatedAtPrison).isEqualTo("BXI")
+    assertThat(skills[0].sessionTypeDescription).isEqualTo("Maths class")
+    assertThat(skills[0].sessionType).isEqualTo(CIAG_INDUCTION)
   }
 
   @Nested
