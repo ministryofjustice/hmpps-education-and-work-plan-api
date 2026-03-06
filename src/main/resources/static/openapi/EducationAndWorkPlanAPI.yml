@@ -1792,7 +1792,6 @@ components:
           example: 'BXI'
       required:
         - reference
-        - skills
         - interests
         - createdBy
         - createdByDisplayName
@@ -2796,7 +2795,6 @@ components:
           items:
             $ref: '#/components/schemas/PersonalInterest'
       required:
-        - skills
         - interests
     CreateFutureWorkInterestsRequest:
       title: CreateFutureWorkInterestsRequest
