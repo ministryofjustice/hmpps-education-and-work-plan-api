@@ -4,9 +4,12 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.EmployabilitySkillsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
 
@@ -21,6 +24,7 @@ class InductionResourceMapper(
   private val workInterestsMapper: WorkInterestsResourceMapper,
   private val instantMapper: InstantMapper,
   private val userService: ManageUserService,
+  private val employabilitySkillsResourceMapper: EmployabilitySkillsResourceMapper,
 ) {
 
   fun toCreateInductionDto(prisonNumber: String, request: CreateInductionRequest): CreateInductionDto {
@@ -61,7 +65,7 @@ class InductionResourceMapper(
     }
   }
 
-  fun toInductionResponse(induction: Induction): InductionResponse {
+  fun toInductionResponse(induction: Induction, employabilitySkills: List<EmployabilitySkill> = emptyList()): InductionResponse {
     with(induction) {
       return InductionResponse(
         reference = reference,
@@ -73,6 +77,7 @@ class InductionResourceMapper(
         inPrisonInterests = inPrisonInterests?.let { inPrisonInterestsMapper.toInPrisonInterestsResponse(it) },
         personalSkillsAndInterests = personalSkillsAndInterests?.let { skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(it) },
         futureWorkInterests = futureWorkInterests?.let { workInterestsMapper.toFutureWorkInterestsResponse(it) },
+        employabilitySkills = GetEmployabilitySkillResponses(employabilitySkills.map { employabilitySkillsResourceMapper.fromModelToResponse(it) }),
         createdBy = createdBy!!,
         createdByDisplayName = userService.getUserDetails(createdBy!!).name,
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,

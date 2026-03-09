@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.FutureWorkInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
@@ -54,44 +55,6 @@ fun aValidInductionResponseForPrisonerNotLookingToWork(
   updatedAtPrison = updatedAtPrison,
 )
 
-fun aValidInductionResponseForPrisonerLookingToWork(
-  reference: UUID = UUID.randomUUID(),
-  prisonNumber: String = "A1234AB",
-  workOnRelease: WorkOnReleaseResponse = aValidWorkOnReleaseResponseForPrisonerLookingToWork(),
-  previousQualifications: PreviousQualificationsResponse? = aValidPreviousQualificationsResponse(),
-  previousTraining: PreviousTrainingResponse? = aValidPreviousTrainingResponse(),
-  previousWorkExperiences: PreviousWorkExperiencesResponse? = aValidPreviousWorkExperiencesResponse(),
-  inPrisonInterests: InPrisonInterestsResponse? = null,
-  personalSkillsAndInterests: PersonalSkillsAndInterestsResponse? = aValidPersonalSkillsAndInterestsResponse(),
-  futureWorkInterests: FutureWorkInterestsResponse? = aValidFutureWorkInterestsResponse(),
-  createdBy: String = "asmith_gen",
-  createdByDisplayName: String = "Alex Smith",
-  createdAt: OffsetDateTime = OffsetDateTime.now(),
-  createdAtPrison: String = "BXI",
-  updatedBy: String = "asmith_gen",
-  updatedByDisplayName: String = "Alex Smith",
-  updatedAt: OffsetDateTime = OffsetDateTime.now(),
-  updatedAtPrison: String = "BXI",
-): InductionResponse = InductionResponse(
-  reference = reference,
-  prisonNumber = prisonNumber,
-  workOnRelease = workOnRelease,
-  previousQualifications = previousQualifications,
-  previousTraining = previousTraining,
-  previousWorkExperiences = previousWorkExperiences,
-  inPrisonInterests = inPrisonInterests,
-  personalSkillsAndInterests = personalSkillsAndInterests,
-  futureWorkInterests = futureWorkInterests,
-  createdBy = createdBy,
-  createdByDisplayName = createdByDisplayName,
-  createdAt = createdAt,
-  createdAtPrison = createdAtPrison,
-  updatedBy = updatedBy,
-  updatedByDisplayName = updatedByDisplayName,
-  updatedAt = updatedAt,
-  updatedAtPrison = updatedAtPrison,
-)
-
 fun aFullyPopulatedInductionResponse(
   reference: UUID = UUID.randomUUID(),
   prisonNumber: String = "A1234AB",
@@ -102,6 +65,7 @@ fun aFullyPopulatedInductionResponse(
   inPrisonInterests: InPrisonInterestsResponse? = aValidInPrisonInterestsResponse(),
   personalSkillsAndInterests: PersonalSkillsAndInterestsResponse? = aValidPersonalSkillsAndInterestsResponse(),
   futureWorkInterests: FutureWorkInterestsResponse? = aValidFutureWorkInterestsResponse(),
+  employabilitySkills: GetEmployabilitySkillResponses = GetEmployabilitySkillResponses(listOf()),
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
@@ -120,6 +84,7 @@ fun aFullyPopulatedInductionResponse(
   inPrisonInterests = inPrisonInterests,
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
+  employabilitySkills = employabilitySkills,
   createdBy = createdBy,
   createdByDisplayName = createdByDisplayName,
   createdAt = createdAt,
