@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -7,9 +8,13 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
@@ -166,5 +171,41 @@ class GetInductionTest : IntegrationTestBase() {
       .inPrisonInterests { it.isNull() }
       .personalSkillsAndInterests { it.isEquivalentTo(expectedSkillsAndInterests) }
       .futureWorkInterests { it.isEquivalentTo(expectedFutureWorkInterests) }
+  }
+
+  @Test
+  fun `should get induction for prisoner with employability skills`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    createInduction(
+      prisonNumber = prisonNumber,
+      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(employabilitySkills = CreateEmployabilitySkillsRequest(listOf(aValidCreateEmployabilitySkillRequest()))),
+      username = "asmith_gen",
+    )
+
+    // When
+    val response = webTestClient.get()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .bearerToken(
+        aValidTokenWithAuthority(
+          INDUCTIONS_RO,
+          privateKey = keyPair.private,
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk
+      .returnResult(InductionResponse::class.java)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    Assertions.assertThat(actual!!.employabilitySkills?.employabilitySkills).hasSize(1)
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.employabilitySkillType).isEqualTo(EmployabilitySkillType.COMMUNICATION)
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.evidence).isEqualTo("evidence")
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.employabilitySkillRating?.name).isEqualTo("VERY_CONFIDENT")
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.createdAtPrison).isEqualTo("BXI")
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.updatedAtPrison).isEqualTo("BXI")
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.sessionTypeDescription).isEqualTo("Maths class")
+    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.sessionType).isEqualTo(EmployabilitySkillSessionType.CIAG_INDUCTION)
   }
 }

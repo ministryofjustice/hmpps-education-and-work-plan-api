@@ -103,7 +103,7 @@ class SubjectAccessRequestServiceTest {
     )
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
     val expectedInductionResponse = aValidInductionResponse()
-    given(inductionMapper.toInductionResponse(any())).willReturn(expectedInductionResponse)
+    given(inductionMapper.toInductionResponse(any(), any())).willReturn(expectedInductionResponse)
 
     val goal1 = aValidGoal(title = "Goal 1", createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
     val goal2 = aValidGoal(title = "Goal 2", createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
@@ -179,7 +179,7 @@ class SubjectAccessRequestServiceTest {
 
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
-    verify(inductionMapper, never()).toInductionResponse(any())
+    verify(inductionMapper, never()).toInductionResponse(any(), any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(goalMapper).fromDomainToModel(goal2, listOf(note1ForGoal2))
@@ -214,7 +214,7 @@ class SubjectAccessRequestServiceTest {
 
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
     given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
-    given(inductionMapper.toInductionResponse(any())).willReturn(expectedInductionResponse)
+    given(inductionMapper.toInductionResponse(any(), any())).willReturn(expectedInductionResponse)
     given(educationResourceMapper.toEducationResponse(any())).willReturn(expectedEducationResponse)
     given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(listOf(completedReview))
     given(completedActionPlanReviewResponseMapper.fromDomainToModel(any())).willReturn(expectedCompletedActionPlanReviewResponse)
@@ -299,7 +299,7 @@ class SubjectAccessRequestServiceTest {
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(educationService).getPreviousQualificationsForPrisoner(prisonNumber)
-    verify(inductionMapper, never()).toInductionResponse(any())
+    verify(inductionMapper, never()).toInductionResponse(any(), any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(goalMapper).fromDomainToModel(goal2, emptyList())
@@ -326,7 +326,7 @@ class SubjectAccessRequestServiceTest {
 
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
-    verify(inductionMapper, never()).toInductionResponse(any())
+    verify(inductionMapper, never()).toInductionResponse(any(), any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(goalMapper, never()).fromDomainToModel(any(), any())

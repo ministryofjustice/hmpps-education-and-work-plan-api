@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.28.0'
+  version: '1.29.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -1363,6 +1363,8 @@ components:
           $ref: '#/components/schemas/PersonalSkillsAndInterestsResponse'
         futureWorkInterests:
           $ref: '#/components/schemas/FutureWorkInterestsResponse'
+        employabilitySkills:
+          $ref: '#/components/schemas/GetEmployabilitySkillResponses'
         createdBy:
           type: string
           description: The DPS username of the person who created the Induction.
