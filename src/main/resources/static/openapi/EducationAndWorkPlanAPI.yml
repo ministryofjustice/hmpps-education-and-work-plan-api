@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.29.0'
+  version: '1.30.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -1364,7 +1364,10 @@ components:
         futureWorkInterests:
           $ref: '#/components/schemas/FutureWorkInterestsResponse'
         employabilitySkills:
-          $ref: '#/components/schemas/GetEmployabilitySkillResponses'
+          type: array
+          description: A List of employability skills.
+          items:
+            $ref: '#/components/schemas/GetEmployabilitySkillsResponse'
         createdBy:
           type: string
           description: The DPS username of the person who created the Induction.
@@ -2671,7 +2674,10 @@ components:
         futureWorkInterests:
           $ref: '#/components/schemas/CreateFutureWorkInterestsRequest'
         employabilitySkills:
-          $ref: '#/components/schemas/CreateEmployabilitySkillsRequest'
+          type: array
+          description: A list of employability skills. An empty list means the person has no employability skills.
+          items:
+            $ref: '#/components/schemas/CreateEmployabilitySkillRequest'
         note:
           type: string
           description: The notes taken when conducting the prisoner's Induction.

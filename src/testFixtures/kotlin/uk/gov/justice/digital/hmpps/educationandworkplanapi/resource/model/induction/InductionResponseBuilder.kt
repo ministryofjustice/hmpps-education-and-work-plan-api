@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.FutureWorkInterestsResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
@@ -65,7 +65,7 @@ fun aFullyPopulatedInductionResponse(
   inPrisonInterests: InPrisonInterestsResponse? = aValidInPrisonInterestsResponse(),
   personalSkillsAndInterests: PersonalSkillsAndInterestsResponse? = aValidPersonalSkillsAndInterestsResponse(),
   futureWorkInterests: FutureWorkInterestsResponse? = aValidFutureWorkInterestsResponse(),
-  employabilitySkills: GetEmployabilitySkillResponses = GetEmployabilitySkillResponses(listOf()),
+  employabilitySkills: List<GetEmployabilitySkillsResponse> = emptyList(),
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
