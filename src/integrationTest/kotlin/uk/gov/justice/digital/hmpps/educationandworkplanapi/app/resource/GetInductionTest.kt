@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
@@ -179,7 +178,7 @@ class GetInductionTest : IntegrationTestBase() {
     val prisonNumber = randomValidPrisonNumber()
     createInduction(
       prisonNumber = prisonNumber,
-      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(employabilitySkills = CreateEmployabilitySkillsRequest(listOf(aValidCreateEmployabilitySkillRequest()))),
+      createInductionRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(employabilitySkills = listOf(aValidCreateEmployabilitySkillRequest())),
       username = "asmith_gen",
     )
 
@@ -198,14 +197,14 @@ class GetInductionTest : IntegrationTestBase() {
       .returnResult(InductionResponse::class.java)
 
     // Then
-    val actual = response.responseBody.blockFirst()
-    Assertions.assertThat(actual!!.employabilitySkills?.employabilitySkills).hasSize(1)
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.employabilitySkillType).isEqualTo(EmployabilitySkillType.COMMUNICATION)
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.evidence).isEqualTo("evidence")
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.employabilitySkillRating?.name).isEqualTo("VERY_CONFIDENT")
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.createdAtPrison).isEqualTo("BXI")
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.updatedAtPrison).isEqualTo("BXI")
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.sessionTypeDescription).isEqualTo("Maths class")
-    Assertions.assertThat(actual.employabilitySkills?.employabilitySkills[0]?.sessionType).isEqualTo(EmployabilitySkillSessionType.CIAG_INDUCTION)
+    val actual = response.responseBody.blockFirst()!!
+    assertThat(actual.employabilitySkills).hasSize(1)
+    assertThat(actual.employabilitySkills?.get(0)?.employabilitySkillType).isEqualTo(EmployabilitySkillType.COMMUNICATION)
+    assertThat(actual.employabilitySkills?.get(0)?.evidence).isEqualTo("evidence")
+    assertThat(actual.employabilitySkills?.get(0)?.employabilitySkillRating?.name).isEqualTo("VERY_CONFIDENT")
+    assertThat(actual.employabilitySkills?.get(0)?.createdAtPrison).isEqualTo("BXI")
+    assertThat(actual.employabilitySkills?.get(0)?.updatedAtPrison).isEqualTo("BXI")
+    assertThat(actual.employabilitySkills?.get(0)?.sessionTypeDescription).isEqualTo("Maths class")
+    assertThat(actual.employabilitySkills?.get(0)?.sessionType).isEqualTo(EmployabilitySkillSessionType.CIAG_INDUCTION)
   }
 }

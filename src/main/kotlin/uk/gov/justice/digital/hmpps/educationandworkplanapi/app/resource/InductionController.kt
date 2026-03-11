@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.EmployabilitySkillsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
@@ -51,13 +52,12 @@ class InductionController(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ) {
     inductionService.createInduction(inductionMapper.toCreateInductionDto(prisonNumber, request))
-    request.employabilitySkills?.let {
-      employabilitySkillsService.createEmployabilitySkills(
-        employabilitySkillsResourceMapper.fromModelToDto(
-          prisonNumber,
-          it,
-        ),
-      )
+    request.employabilitySkills?.map {
+      employabilitySkillsResourceMapper.fromModelToDto(prisonNumber, it)
+    }?.let {
+      CreateEmployabilitySkillsDto(it)
+    }?.also {
+      employabilitySkillsService.createEmployabilitySkills(it)
     }
 
     try {

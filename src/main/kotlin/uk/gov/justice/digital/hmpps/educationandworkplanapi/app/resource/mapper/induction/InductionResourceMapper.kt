@@ -9,7 +9,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.EmployabilitySkillsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateInductionRequest
 
@@ -77,7 +76,7 @@ class InductionResourceMapper(
         inPrisonInterests = inPrisonInterests?.let { inPrisonInterestsMapper.toInPrisonInterestsResponse(it) },
         personalSkillsAndInterests = personalSkillsAndInterests?.let { skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(it) },
         futureWorkInterests = futureWorkInterests?.let { workInterestsMapper.toFutureWorkInterestsResponse(it) },
-        employabilitySkills = GetEmployabilitySkillResponses(employabilitySkills.map { employabilitySkillsResourceMapper.fromModelToResponse(it) }),
+        employabilitySkills = employabilitySkills.map { employabilitySkillsResourceMapper.fromModelToResponse(it) },
         createdBy = createdBy!!,
         createdByDisplayName = userService.getUserDetails(createdBy!!).name,
         createdAt = instantMapper.toOffsetDateTime(createdAt)!!,

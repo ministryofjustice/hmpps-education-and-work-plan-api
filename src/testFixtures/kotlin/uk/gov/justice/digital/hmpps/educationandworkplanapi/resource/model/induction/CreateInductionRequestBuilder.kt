@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction
 
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateFutureWorkInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInPrisonInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
@@ -27,7 +27,7 @@ fun aValidCreateInductionRequestForPrisonerNotLookingToWork(
   conductedAt: LocalDate? = null,
   conductedBy: String? = null,
   conductedByRole: String? = null,
-  employabilitySkills: CreateEmployabilitySkillsRequest? = null,
+  employabilitySkills: List<CreateEmployabilitySkillRequest>? = null,
 ): CreateInductionRequest = CreateInductionRequest(
   prisonId = prisonId,
   workOnRelease = workOnRelease,
@@ -41,7 +41,6 @@ fun aValidCreateInductionRequestForPrisonerNotLookingToWork(
   conductedBy = conductedBy,
   conductedByRole = conductedByRole,
   employabilitySkills = employabilitySkills,
-
 )
 
 fun aValidCreateInductionRequestForPrisonerLookingToWork(

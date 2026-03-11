@@ -27,7 +27,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePersonalSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -524,7 +523,7 @@ class CreateInductionTest : IntegrationTestBase() {
 
     val createRequest = aValidCreateInductionRequestForPrisonerNotLookingToWork(
       personalSkillsAndInterests = personalSkillsAndInterests,
-      employabilitySkills = CreateEmployabilitySkillsRequest(listOf(aValidCreateEmployabilitySkillRequest())),
+      employabilitySkills = listOf(aValidCreateEmployabilitySkillRequest()),
     )
 
     // When
