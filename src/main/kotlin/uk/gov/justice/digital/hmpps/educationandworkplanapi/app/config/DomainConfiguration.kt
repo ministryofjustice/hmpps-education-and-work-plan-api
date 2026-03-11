@@ -2,6 +2,9 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.assessment.service.EducationAssessmentEventEventService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.assessment.service.EducationAssessmentEventPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.assessment.service.EducationAssessmentEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
@@ -93,6 +96,15 @@ class DomainConfiguration {
     inductionSchedulePersistenceAdapter,
     inductionScheduleEventService,
     inductionScheduleDateCalculationService,
+  )
+
+  @Bean
+  fun educationAssessmentEventDomainService(
+    educationAssessmentEventPersistenceAdapter: EducationAssessmentEventPersistenceAdapter,
+    educationAssessmentEventEventService: EducationAssessmentEventEventService,
+  ): EducationAssessmentEventService = EducationAssessmentEventService(
+    educationAssessmentEventPersistenceAdapter,
+    educationAssessmentEventEventService,
   )
 
   @Bean
