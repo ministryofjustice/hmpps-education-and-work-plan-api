@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
@@ -55,9 +57,9 @@ class EmployabilitySkillsResourceMapper(
       updatedAt = instantMapper.toOffsetDateTime(updatedAt)!!,
       updatedBy = updatedBy,
       updatedAtPrison = updatedAtPrison,
-      employabilitySkillType = ApiEmployabilitySkillType.valueOf(employabilitySkillType.name),
-      employabilitySkillRating = ApiEmployabilitySkillRating.valueOf(ratingCode),
-      sessionType = sessionType?.let { ApiEmployabilitySkillSessionType.valueOf(it.name) },
+      employabilitySkillType = employabilitySkillType.toApi(),
+      employabilitySkillRating = ratingCodeToApi(ratingCode),
+      sessionType = sessionType?.toApi(),
       sessionTypeDescription = sessionTypeDescription,
       evidence = evidence,
 
@@ -65,6 +67,57 @@ class EmployabilitySkillsResourceMapper(
   }
 }
 
-private fun ApiEmployabilitySkillType.toDomain(): DomainEmployabilitySkillType = DomainEmployabilitySkillType.valueOf(this.name)
-private fun ApiEmployabilitySkillSessionType.toDomain(): DomainEmployabilitySkillSessionType = DomainEmployabilitySkillSessionType.valueOf(this.name)
-private fun ApiEmployabilitySkillRating.toDomain(): DomainEmployabilitySkillRating = DomainEmployabilitySkillRating.valueOf(this.name)
+private fun EmployabilitySkillType.toApi(): ApiEmployabilitySkillType = when (this) {
+  EmployabilitySkillType.TEAMWORK -> ApiEmployabilitySkillType.TEAMWORK
+  EmployabilitySkillType.TIMEKEEPING -> ApiEmployabilitySkillType.TIMEKEEPING
+  EmployabilitySkillType.COMMUNICATION -> ApiEmployabilitySkillType.COMMUNICATION
+  EmployabilitySkillType.PLANNING -> ApiEmployabilitySkillType.PLANNING
+  EmployabilitySkillType.ORGANISATION -> ApiEmployabilitySkillType.ORGANISATION
+  EmployabilitySkillType.PROBLEM_SOLVING -> ApiEmployabilitySkillType.PROBLEM_SOLVING
+  EmployabilitySkillType.INITIATIVE -> ApiEmployabilitySkillType.INITIATIVE
+  EmployabilitySkillType.ADAPTABILITY -> ApiEmployabilitySkillType.ADAPTABILITY
+  EmployabilitySkillType.RELIABILITY -> ApiEmployabilitySkillType.RELIABILITY
+  EmployabilitySkillType.CREATIVITY -> ApiEmployabilitySkillType.CREATIVITY
+}
+
+private fun ratingCodeToApi(ratingCode: String): ApiEmployabilitySkillRating = when (ratingCode) {
+  "NOT_CONFIDENT" -> ApiEmployabilitySkillRating.NOT_CONFIDENT
+  "LITTLE_CONFIDENCE" -> ApiEmployabilitySkillRating.LITTLE_CONFIDENCE
+  "QUITE_CONFIDENT" -> ApiEmployabilitySkillRating.QUITE_CONFIDENT
+  "VERY_CONFIDENT" -> ApiEmployabilitySkillRating.VERY_CONFIDENT
+  else -> throw IllegalArgumentException("Unknown ratingCode: $ratingCode")
+}
+
+private fun EmployabilitySkillSessionType.toApi(): ApiEmployabilitySkillSessionType = when (this) {
+  EmployabilitySkillSessionType.CIAG_INDUCTION -> ApiEmployabilitySkillSessionType.CIAG_INDUCTION
+  EmployabilitySkillSessionType.CIAG_REVIEW -> ApiEmployabilitySkillSessionType.CIAG_REVIEW
+  EmployabilitySkillSessionType.EDUCATION_REVIEW -> ApiEmployabilitySkillSessionType.EDUCATION_REVIEW
+  EmployabilitySkillSessionType.INDUSTRIES_REVIEW -> ApiEmployabilitySkillSessionType.INDUSTRIES_REVIEW
+}
+
+private fun ApiEmployabilitySkillType.toDomain(): DomainEmployabilitySkillType = when (this) {
+  ApiEmployabilitySkillType.TEAMWORK -> DomainEmployabilitySkillType.TEAMWORK
+  ApiEmployabilitySkillType.TIMEKEEPING -> DomainEmployabilitySkillType.TIMEKEEPING
+  ApiEmployabilitySkillType.COMMUNICATION -> DomainEmployabilitySkillType.COMMUNICATION
+  ApiEmployabilitySkillType.PLANNING -> DomainEmployabilitySkillType.PLANNING
+  ApiEmployabilitySkillType.ORGANISATION -> DomainEmployabilitySkillType.ORGANISATION
+  ApiEmployabilitySkillType.PROBLEM_SOLVING -> DomainEmployabilitySkillType.PROBLEM_SOLVING
+  ApiEmployabilitySkillType.INITIATIVE -> DomainEmployabilitySkillType.INITIATIVE
+  ApiEmployabilitySkillType.ADAPTABILITY -> DomainEmployabilitySkillType.ADAPTABILITY
+  ApiEmployabilitySkillType.RELIABILITY -> DomainEmployabilitySkillType.RELIABILITY
+  ApiEmployabilitySkillType.CREATIVITY -> DomainEmployabilitySkillType.CREATIVITY
+}
+
+private fun ApiEmployabilitySkillSessionType.toDomain(): DomainEmployabilitySkillSessionType = when (this) {
+  ApiEmployabilitySkillSessionType.CIAG_INDUCTION -> DomainEmployabilitySkillSessionType.CIAG_INDUCTION
+  ApiEmployabilitySkillSessionType.CIAG_REVIEW -> DomainEmployabilitySkillSessionType.CIAG_REVIEW
+  ApiEmployabilitySkillSessionType.EDUCATION_REVIEW -> DomainEmployabilitySkillSessionType.EDUCATION_REVIEW
+  ApiEmployabilitySkillSessionType.INDUSTRIES_REVIEW -> DomainEmployabilitySkillSessionType.INDUSTRIES_REVIEW
+}
+
+private fun ApiEmployabilitySkillRating.toDomain(): DomainEmployabilitySkillRating = when (this) {
+  ApiEmployabilitySkillRating.NOT_CONFIDENT -> DomainEmployabilitySkillRating.NOT_CONFIDENT
+  ApiEmployabilitySkillRating.LITTLE_CONFIDENCE -> DomainEmployabilitySkillRating.LITTLE_CONFIDENCE
+  ApiEmployabilitySkillRating.QUITE_CONFIDENT -> DomainEmployabilitySkillRating.QUITE_CONFIDENT
+  ApiEmployabilitySkillRating.VERY_CONFIDENT -> DomainEmployabilitySkillRating.VERY_CONFIDENT
+}
