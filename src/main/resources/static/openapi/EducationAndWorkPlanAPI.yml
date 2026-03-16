@@ -2243,6 +2243,7 @@ components:
         - PRISON_RELEASE
         - PRISON_TRANSFER
         - EMPLOYABILITY_SKILL_TYPE
+        - EDUCATION_ASSESSMENT_EVENT_CREATED
     ReasonToArchiveGoal:
       title: ReasonToArchiveGoal
       description: Enum describing the various reasons a goal might be archived
