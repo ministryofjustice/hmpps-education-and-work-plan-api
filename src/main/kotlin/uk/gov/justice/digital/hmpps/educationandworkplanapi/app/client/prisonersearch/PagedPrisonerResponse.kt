@@ -27,6 +27,7 @@ data class Prisoner(
   val sentenceStartDate: LocalDate?,
   val allConvictedOffences: List<ConvictedOffence>? = emptyList<ConvictedOffence>(),
   val inOutStatus: String?,
+  val gender: String
 )
 
 data class ConvictedOffence(

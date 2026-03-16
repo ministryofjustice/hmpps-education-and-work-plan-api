@@ -75,6 +75,14 @@ spring:
     error:
       include-message: always
 
+  ai:
+    google:
+      genai:
+        api-key: ${GOOGLE_GENAI_API_KEY:}
+        chat:
+          options:
+            model: gemini-3-flash-preview
+
 server:
   port: 8080
   servlet:

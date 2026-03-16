@@ -51,6 +51,8 @@ dependencies {
   implementation(project("domain:personallearningplan"))
   implementation(project("domain:timeline"))
 
+  implementation("org.springframework.ai:spring-ai-starter-model-google-genai:1.1.2")
+
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:$hmppsKotlinSpringBootStarterVersion")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
