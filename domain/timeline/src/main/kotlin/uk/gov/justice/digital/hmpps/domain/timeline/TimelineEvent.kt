@@ -101,6 +101,9 @@ enum class TimelineEventType(val isReview: Boolean, val isGoal: Boolean, val isI
   PRISON_ADMISSION(false, false, false, true),
   PRISON_RELEASE(false, false, false, true),
   PRISON_TRANSFER(false, false, false, true),
+
+  // Education assessment events
+  EDUCATION_ASSESSMENT_EVENT_CREATED(false, false, false, false),
 }
 
 enum class TimelineEventContext {
@@ -134,4 +137,5 @@ enum class TimelineEventContext {
   INDUCTION_SCHEDULE_DEADLINE_NEW,
   INDUCTION_SCHEDULE_EXEMPTION_REASON,
   EMPLOYABILITY_SKILL_TYPE,
+  EDUCATION_ASSESSMENT_STATUS,
 }

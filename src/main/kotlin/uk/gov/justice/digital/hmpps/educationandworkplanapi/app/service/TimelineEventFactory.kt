@@ -33,6 +33,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext.STEP_TI
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
+import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.GOAL_UNARCHIVED
@@ -337,4 +338,17 @@ class TimelineEventFactory(private val userService: ManageUserService) {
       ),
     )
   }
+
+  fun educationAssessmentEventCreatedEvent(
+    sourceReference: String,
+    prisonId: String,
+  ) = TimelineEvent.newTimelineEvent(
+    sourceReference = sourceReference,
+    eventType = EDUCATION_ASSESSMENT_EVENT_CREATED,
+    prisonId = prisonId,
+    actionedBy = "system",
+    contextualInfo = mapOf(
+      TimelineEventContext.EDUCATION_ASSESSMENT_STATUS to "ALL_RELEVANT_ASSESSMENTS_COMPLETE",
+    ),
+  )
 }
