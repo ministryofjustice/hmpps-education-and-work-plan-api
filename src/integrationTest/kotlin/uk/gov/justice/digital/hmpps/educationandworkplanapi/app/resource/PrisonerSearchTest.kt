@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.FluxExchangeResult
@@ -19,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.search.assertThat
 import java.time.LocalDate
 
 class PrisonerSearchTest : IntegrationTestBase() {
@@ -75,8 +75,16 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isZero()
+    assertThat(actual)
+      .hasNoPersonResponses()
+      .pagination {
+        it
+          .isPage(1)
+          .hasTotalPages(0)
+          .hasTotalElements(0)
+          .isFirstPage()
+          .isLastPage()
+      }
   }
 
   @Test
@@ -94,9 +102,16 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(6)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(6)
+      .pagination {
+        it
+          .isPage(1)
+          .hasTotalPages(1)
+          .hasTotalElements(6)
+          .isFirstPage()
+          .isLastPage()
+      }
   }
 
   @Test
@@ -114,10 +129,11 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(6)
-    assertThat(actual.people[5].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(6)
+      .personResponse(6, {
+        it.hasPrisonNumber(prisoner1.prisonerNumber)
+      })
   }
 
   @Test
@@ -135,10 +151,26 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(6)
-    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(6)
+      .personResponse(1, {
+        it.hasPrisonNumber(prisoner1.prisonerNumber)
+      })
+      .personResponse(2, {
+        it.hasPrisonNumber(prisoner2.prisonerNumber)
+      })
+      .personResponse(3, {
+        it.hasPrisonNumber(prisoner3.prisonerNumber)
+      })
+      .personResponse(4, {
+        it.hasPrisonNumber(prisoner4.prisonerNumber)
+      })
+      .personResponse(5, {
+        it.hasPrisonNumber(prisoner5.prisonerNumber)
+      })
+      .personResponse(6, {
+        it.hasPrisonNumber(prisoner6.prisonerNumber)
+      })
   }
 
   @Test
@@ -156,10 +188,11 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(1)
-    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(1)
+      .personResponse(1, {
+        it.hasPrisonNumber(prisoner1.prisonerNumber)
+      })
   }
 
   @Test
@@ -177,10 +210,11 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(1)
-    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(1)
+      .personResponse(1, {
+        it.hasPrisonNumber(prisoner6.prisonerNumber)
+      })
   }
 
   @Test
@@ -198,9 +232,33 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(5)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(5)
+      .personResponse(1, {
+        it
+          .hasSurname("Smith")
+          .hasPrisonNumber(prisoner1.prisonerNumber)
+      })
+      .personResponse(2, {
+        it
+          .hasSurname("Smith")
+          .hasPrisonNumber(prisoner2.prisonerNumber)
+      })
+      .personResponse(3, {
+        it
+          .hasSurname("Smith")
+          .hasPrisonNumber(prisoner3.prisonerNumber)
+      })
+      .personResponse(4, {
+        it
+          .hasSurname("Smith")
+          .hasPrisonNumber(prisoner4.prisonerNumber)
+      })
+      .personResponse(5, {
+        it
+          .hasSurname("Smith")
+          .hasPrisonNumber(prisoner5.prisonerNumber)
+      })
   }
 
   @Test
@@ -218,10 +276,13 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-    assertThat(actual!!.people.size).isEqualTo(1)
-    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(1)
+      .personResponse(1, {
+        it
+          .hasPrisonNumber(prisoner1.prisonerNumber)
+          .hasPlanStatus(PlanStatus.ACTIVE_PLAN)
+      })
   }
 
   @Test
@@ -239,13 +300,23 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-
-    assertThat(actual!!.people.size).isEqualTo(3)
-    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner2.prisonerNumber)
-    assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
-    assertThat(actual.people[2].prisonNumber).isEqualTo(prisoner5.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(3)
+      .personResponse(1, {
+        it
+          .hasPrisonNumber(prisoner2.prisonerNumber)
+          .hasPlanStatus(PlanStatus.NEEDS_PLAN)
+      })
+      .personResponse(2, {
+        it
+          .hasPrisonNumber(prisoner4.prisonerNumber)
+          .hasPlanStatus(PlanStatus.NEEDS_PLAN)
+      })
+      .personResponse(3, {
+        it
+          .hasPrisonNumber(prisoner5.prisonerNumber)
+          .hasPlanStatus(PlanStatus.NEEDS_PLAN)
+      })
   }
 
   @Test
@@ -263,12 +334,18 @@ class PrisonerSearchTest : IntegrationTestBase() {
 
     // Then
     val actual = response.responseBody.blockFirst()
-
-    assertThat(actual).isNotNull
-
-    assertThat(actual!!.people.size).isEqualTo(2)
-    assertThat(actual.people[0].prisonNumber).isEqualTo(prisoner3.prisonerNumber)
-    assertThat(actual.people[1].prisonNumber).isEqualTo(prisoner6.prisonerNumber)
+    assertThat(actual)
+      .hasNumberOfPersonResponses(2)
+      .personResponse(1, {
+        it
+          .hasPrisonNumber(prisoner3.prisonerNumber)
+          .hasPlanStatus(PlanStatus.EXEMPT)
+      })
+      .personResponse(2, {
+        it
+          .hasPrisonNumber(prisoner6.prisonerNumber)
+          .hasPlanStatus(PlanStatus.EXEMPT)
+      })
   }
 
   private fun searchPeople(): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams()
