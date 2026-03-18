@@ -8,9 +8,14 @@ import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
+import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.LocalDate
 
@@ -55,6 +60,7 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       assessmentEventQueueClient.countMessagesOnQueue(assessmentEventQueue.queueUrl).get()
     } matches { it == 0 }
 
+    // Verify record persisted in database
     await untilAsserted {
       val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
       assertThat(events).hasSize(1)
@@ -67,6 +73,27 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
         assertThat(createdAtPrison).isEqualTo("BXI")
         assertThat(updatedAtPrison).isEqualTo("BXI")
       }
+    }
+
+    // Verify timeline event created
+    await untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline.events).anyMatch { it.eventType == TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED }
+    }
+
+    // Verify App Insights telemetry event sent
+    await untilAsserted {
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient).trackEvent(
+        eq("EDUCATION_ASSESSMENT_EVENT_CREATED"),
+        capture(eventPropertiesCaptor),
+        isNull(),
+      )
+      val eventProperties = eventPropertiesCaptor.value
+      assertThat(eventProperties)
+        .containsEntry("prisonNumber", prisonNumber)
+        .containsEntry("status", "ALL_RELEVANT_ASSESSMENTS_COMPLETE")
+        .containsEntry("source", "CURIOUS")
     }
   }
 

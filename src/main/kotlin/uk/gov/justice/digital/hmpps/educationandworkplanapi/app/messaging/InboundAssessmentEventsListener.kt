@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.educationassessment.EducationAssessmentEventEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EducationAssessmentEventRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 
 private val log = KotlinLogging.logger {}
@@ -20,6 +21,7 @@ class InboundAssessmentEventsListener(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val timelineService: TimelineService,
   private val timelineEventFactory: TimelineEventFactory,
+  private val telemetryService: TelemetryService,
 ) {
 
   @SqsListener("assessmentevents", factory = "hmppsQueueContainerFactoryProxy")
@@ -35,6 +37,8 @@ class InboundAssessmentEventsListener(
 
     val timelineEvent = timelineEventFactory.educationAssessmentEventCreatedEvent(entity.reference.toString(), prisonId)
     timelineService.recordTimelineEvent(prisonNumber, timelineEvent)
+
+    telemetryService.trackEducationAssessmentEventCreated(entity)
 
     log.info { "Saved education assessment event [${entity.reference}] for prisoner [$prisonNumber]" }
   }
