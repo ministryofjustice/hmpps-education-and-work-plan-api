@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.FluxExchangeResult
@@ -8,6 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
@@ -15,9 +18,13 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonSearchResult
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.ACTIVE_PLAN
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.EXEMPT
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.NEEDS_PLAN
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.search.assertThat
 import java.time.LocalDate
 
@@ -25,14 +32,30 @@ class PrisonerSearchTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/search/prisons/{prisonId}/people"
     private const val PRISON_ID = "BXI"
+
+    private val today = LocalDate.now()
+
+    private val prisoner1 =
+      aValidPrisoner(prisonerNumber = randomValidPrisonNumber(), releaseDate = today.plusYears(30))
+    private val prisoner2 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
+    private val prisoner3 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
+    private val prisoner4 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
+    private val prisoner5 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
+    private val prisoner6 =
+      aValidPrisoner(prisonerNumber = randomValidPrisonNumber(), firstName = "Bruce", lastName = "Wayne")
+    private val prisoners = listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6)
   }
 
-  val prisoner1 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber(), releaseDate = LocalDate.now().plusYears(30))
-  val prisoner2 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
-  val prisoner3 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
-  val prisoner4 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
-  val prisoner5 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
-  val prisoner6 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber(), firstName = "Bruce", lastName = "Wayne")
+  @BeforeEach
+  fun setupWiremock() {
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      prisoners,
+    )
+    prisoners.forEach {
+      wiremockService.stubGetPrisonerFromPrisonerSearchApi(it.prisonerNumber, it)
+    }
+  }
 
   @Test
   fun `should return unauthorized given no bearer token`() {
@@ -63,15 +86,11 @@ class PrisonerSearchTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return zero results`() {
+  fun `should return zero results given searching for a prisoner that doesnt exist`() {
     // Given
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(),
-    )
 
     // When
-    val response = searchPeople()
+    val response = searchPeopleWithParams("prisonerNameOrNumber" to "a name that matches nobody")
 
     // Then
     val actual = response.responseBody.blockFirst()
@@ -88,14 +107,8 @@ class PrisonerSearchTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return 6 people`() {
+  fun `should return all 6 people`() {
     // Given
-    setUpData()
-
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
 
     // When
     val response = searchPeople()
@@ -114,249 +127,344 @@ class PrisonerSearchTest : IntegrationTestBase() {
       }
   }
 
-  @Test
-  fun `sort by release date ascending`() {
-    // Given
-    setUpData()
+  @Nested
+  inner class Sorting {
+    @Test
+    fun `sort by release date ascending`() {
+      // Given
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
+      // When
+      val response = searchPeopleWithSort(SearchSortField.RELEASE_DATE.name)
 
-    // When
-    val response = searchPeopleWithSort(SearchSortField.RELEASE_DATE.name)
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(6)
+        .personResponse(
+          6,
+          {
+            it.hasPrisonNumber(prisoner1.prisonerNumber)
+          },
+        )
+    }
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(6)
-      .personResponse(6, {
-        it.hasPrisonNumber(prisoner1.prisonerNumber)
-      })
+    @Test
+    fun `sort by release date descending`() {
+      // Given
+
+      // When
+      val response = searchPeopleWithSort(SearchSortField.RELEASE_DATE.name, SearchSortDirection.DESC.name)
+
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(6)
+        .personResponse(
+          1,
+          {
+            it.hasPrisonNumber(prisoner1.prisonerNumber)
+          },
+        )
+        .personResponse(
+          2,
+          {
+            it.hasPrisonNumber(prisoner2.prisonerNumber)
+          },
+        )
+        .personResponse(
+          3,
+          {
+            it.hasPrisonNumber(prisoner3.prisonerNumber)
+          },
+        )
+        .personResponse(
+          4,
+          {
+            it.hasPrisonNumber(prisoner4.prisonerNumber)
+          },
+        )
+        .personResponse(
+          5,
+          {
+            it.hasPrisonNumber(prisoner5.prisonerNumber)
+          },
+        )
+        .personResponse(
+          6,
+          {
+            it.hasPrisonNumber(prisoner6.prisonerNumber)
+          },
+        )
+    }
   }
 
-  @Test
-  fun `sort by release date descending`() {
-    // Given
-    setUpData()
+  @Nested
+  inner class FilterOnNameOrPrisonNumber {
+    @Test
+    fun `filter on prisonerNumber`() {
+      // Given
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
+      // When
+      val response = searchPeopleWithPrisonNameNumberFilter(prisoner1.prisonerNumber)
 
-    // When
-    val response = searchPeopleWithSort(SearchSortField.RELEASE_DATE.name, SearchSortDirection.DESC.name)
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(1)
+        .personResponse(
+          1,
+          {
+            it.hasPrisonNumber(prisoner1.prisonerNumber)
+          },
+        )
+    }
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(6)
-      .personResponse(1, {
-        it.hasPrisonNumber(prisoner1.prisonerNumber)
-      })
-      .personResponse(2, {
-        it.hasPrisonNumber(prisoner2.prisonerNumber)
-      })
-      .personResponse(3, {
-        it.hasPrisonNumber(prisoner3.prisonerNumber)
-      })
-      .personResponse(4, {
-        it.hasPrisonNumber(prisoner4.prisonerNumber)
-      })
-      .personResponse(5, {
-        it.hasPrisonNumber(prisoner5.prisonerNumber)
-      })
-      .personResponse(6, {
-        it.hasPrisonNumber(prisoner6.prisonerNumber)
-      })
+    @Test
+    fun `filter on prisoner name given filter results in one result`() {
+      // Given
+
+      // When
+      val response = searchPeopleWithPrisonNameNumberFilter("bruce")
+
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(1)
+        .personResponse(
+          1,
+          {
+            it.hasPrisonNumber(prisoner6.prisonerNumber)
+          },
+        )
+    }
+
+    @Test
+    fun `filter on prisoner name given filter results in many results`() {
+      // Given
+
+      // When
+      val response = searchPeopleWithPrisonNameNumberFilter("smith")
+
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(5)
+        .personResponse(
+          1,
+          {
+            it
+              .hasSurname("Smith")
+              .hasPrisonNumber(prisoner1.prisonerNumber)
+          },
+        )
+        .personResponse(
+          2,
+          {
+            it
+              .hasSurname("Smith")
+              .hasPrisonNumber(prisoner2.prisonerNumber)
+          },
+        )
+        .personResponse(
+          3,
+          {
+            it
+              .hasSurname("Smith")
+              .hasPrisonNumber(prisoner3.prisonerNumber)
+          },
+        )
+        .personResponse(
+          4,
+          {
+            it
+              .hasSurname("Smith")
+              .hasPrisonNumber(prisoner4.prisonerNumber)
+          },
+        )
+        .personResponse(
+          5,
+          {
+            it
+              .hasSurname("Smith")
+              .hasPrisonNumber(prisoner5.prisonerNumber)
+          },
+        )
+    }
   }
 
-  @Test
-  fun `filter on prisonerNumber`() {
-    // Given
-    setUpData()
+  @Nested
+  inner class FilterOnPlanStatus {
 
-    wiremockService.stubGetPrisonerFromPrisonerSearchApi(
-      prisoner1.prisonerNumber,
-      prisoner1,
-    )
+    @BeforeEach
+    fun setupDatabase() {
+      clearDatabase()
+    }
 
-    // When
-    val response = searchPeopleWithPrisonNameNumberFilter(prisoner1.prisonerNumber)
+    @Test
+    fun `filter on prisoners with active plans`() {
+      // Given
+      // Prisoners are considered as having an active plan if they have an Induction and an Action Plan record with at least 1 goal
+      // and that their Review schedule is not exempt.
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(1)
-      .personResponse(1, {
-        it.hasPrisonNumber(prisoner1.prisonerNumber)
-      })
-  }
+      // setup prisoner 1 with a due induction and an action plan with goals - is not considered an ACTIVE_PLAN
+      createInductionSchedule(prisoner1.prisonerNumber, deadlineDate = today.plusDays(1), status = SCHEDULED)
+      createActionPlan(prisoner1.prisonerNumber)
 
-  @Test
-  fun `filter on prisoner name one result`() {
-    // Given
-    setUpData()
+      // setup prisoner 2 with an overdue induction - is not considered an ACTIVE_PLAN
+      createInductionSchedule(prisoner2.prisonerNumber, deadlineDate = today.minusDays(1), status = SCHEDULED)
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
+      // setup prisoner 6 with an exempt review - is not considered an ACTIVE_PLAN
+      createReviewScheduleRecord(
+        prisoner6.prisonerNumber,
+        latestDate = today.plusDays(1),
+        earliestDate = today.minusDays(10),
+        status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
+      )
 
-    // When
-    val response = searchPeopleWithPrisonNameNumberFilter("bruce")
+      // setup the other prisoners as having plans - they are considered ACTIVE_PLAN's
+      listOf(prisoner3, prisoner4, prisoner5).forEachIndexed { idx, it ->
+        createInductionSchedule(it.prisonerNumber, deadlineDate = today.plusDays(1), status = COMPLETED)
+        createActionPlan(it.prisonerNumber)
+        createInduction(it.prisonerNumber, aValidCreateInductionRequest())
+      }
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(1)
-      .personResponse(1, {
-        it.hasPrisonNumber(prisoner6.prisonerNumber)
-      })
-  }
+      // When
+      val response = searchPeopleWithActionPlanStatus(ACTIVE_PLAN)
 
-  @Test
-  fun `filter on prisoner name many result`() {
-    // Given
-    setUpData()
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(3)
+        .personResponse(
+          1,
+          {
+            it
+              .hasPrisonNumber(prisoner3.prisonerNumber)
+              .hasPlanStatus(ACTIVE_PLAN)
+          },
+        )
+        .personResponse(
+          2,
+          {
+            it
+              .hasPrisonNumber(prisoner4.prisonerNumber)
+              .hasPlanStatus(ACTIVE_PLAN)
+          },
+        )
+        .personResponse(
+          3,
+          {
+            it
+              .hasPrisonNumber(prisoner5.prisonerNumber)
+              .hasPlanStatus(ACTIVE_PLAN)
+          },
+        )
+    }
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
+    @Test
+    fun `filter on prisoners who need plans`() {
+      // Given
+      // Prisoners are considered as needing a plan if they have an Induction Schedule that is not exempt, even if they
+      // have an Action Plan record with at least 1 goal (ie. they have had their goals created before their Induction)
 
-    // When
-    val response = searchPeopleWithPrisonNameNumberFilter("smith")
+      // setup prisoner 1 with a due induction and an action plan with goals
+      createInductionSchedule(prisoner1.prisonerNumber, deadlineDate = today.plusDays(1), status = SCHEDULED)
+      createActionPlan(prisoner1.prisonerNumber)
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(5)
-      .personResponse(1, {
-        it
-          .hasSurname("Smith")
-          .hasPrisonNumber(prisoner1.prisonerNumber)
-      })
-      .personResponse(2, {
-        it
-          .hasSurname("Smith")
-          .hasPrisonNumber(prisoner2.prisonerNumber)
-      })
-      .personResponse(3, {
-        it
-          .hasSurname("Smith")
-          .hasPrisonNumber(prisoner3.prisonerNumber)
-      })
-      .personResponse(4, {
-        it
-          .hasSurname("Smith")
-          .hasPrisonNumber(prisoner4.prisonerNumber)
-      })
-      .personResponse(5, {
-        it
-          .hasSurname("Smith")
-          .hasPrisonNumber(prisoner5.prisonerNumber)
-      })
-  }
+      // setup prisoner 2 with an overdue induction
+      createInductionSchedule(prisoner2.prisonerNumber, deadlineDate = today.minusDays(1), status = SCHEDULED)
 
-  @Test
-  fun `filter on prisoner has action plan`() {
-    // Given
-    setUpData()
+      // setup the other prisoners as having plans
+      listOf(prisoner3, prisoner4, prisoner5, prisoner6).forEachIndexed { idx, it ->
+        createInductionSchedule(it.prisonerNumber, deadlineDate = today.plusDays(1), status = COMPLETED)
+        createActionPlan(it.prisonerNumber)
+        createInduction(it.prisonerNumber, aValidCreateInductionRequest())
+      }
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
+      // When
+      val response = searchPeopleWithActionPlanStatus(NEEDS_PLAN)
 
-    // When
-    val response = searchPeopleWithActionPlanStatus(PlanStatus.ACTIVE_PLAN.name)
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(2)
+        .personResponse(
+          1,
+          {
+            it
+              .hasPrisonNumber(prisoner1.prisonerNumber)
+              .hasPlanStatus(NEEDS_PLAN)
+          },
+        )
+        .personResponse(
+          2,
+          {
+            it
+              .hasPrisonNumber(prisoner2.prisonerNumber)
+              .hasPlanStatus(NEEDS_PLAN)
+          },
+        )
+    }
 
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(1)
-      .personResponse(1, {
-        it
-          .hasPrisonNumber(prisoner1.prisonerNumber)
-          .hasPlanStatus(PlanStatus.ACTIVE_PLAN)
-      })
-  }
+    @Test
+    fun `should filter by prisoners who are exempt`() {
+      // Given
+      // setup prisoner 3 with an exempt induction
+      createInductionSchedule(
+        prisoner3.prisonerNumber,
+        deadlineDate = today.plusDays(1),
+        status = EXEMPT_PRISONER_SAFETY_ISSUES,
+      )
+      // setup prisoner 6 with an exempt review
+      createReviewScheduleRecord(
+        prisoner6.prisonerNumber,
+        latestDate = today.plusDays(1),
+        earliestDate = today.minusDays(10),
+        status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
+      )
+      // setup the other prisoners as needing a plan
+      listOf(prisoner1, prisoner2, prisoner4, prisoner5).forEach {
+        createInductionSchedule(it.prisonerNumber, deadlineDate = today.plusDays(1), status = SCHEDULED)
+      }
 
-  @Test
-  fun `filter by needs plan`() {
-    // Given
-    setUpData()
+      // When
+      val response = searchPeopleWithActionPlanStatus(EXEMPT)
 
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
-
-    // When
-    val response = searchPeopleWithActionPlanStatus(PlanStatus.NEEDS_PLAN.name)
-
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(3)
-      .personResponse(1, {
-        it
-          .hasPrisonNumber(prisoner2.prisonerNumber)
-          .hasPlanStatus(PlanStatus.NEEDS_PLAN)
-      })
-      .personResponse(2, {
-        it
-          .hasPrisonNumber(prisoner4.prisonerNumber)
-          .hasPlanStatus(PlanStatus.NEEDS_PLAN)
-      })
-      .personResponse(3, {
-        it
-          .hasPrisonNumber(prisoner5.prisonerNumber)
-          .hasPlanStatus(PlanStatus.NEEDS_PLAN)
-      })
-  }
-
-  @Test
-  fun `filter by exempt`() {
-    // Given
-    setUpData()
-
-    wiremockService.stubPrisonersInAPrisonSearchApi(
-      PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
-    )
-
-    // When
-    val response = searchPeopleWithActionPlanStatus(PlanStatus.EXEMPT.name)
-
-    // Then
-    val actual = response.responseBody.blockFirst()
-    assertThat(actual)
-      .hasNumberOfPersonResponses(2)
-      .personResponse(1, {
-        it
-          .hasPrisonNumber(prisoner3.prisonerNumber)
-          .hasPlanStatus(PlanStatus.EXEMPT)
-      })
-      .personResponse(2, {
-        it
-          .hasPrisonNumber(prisoner6.prisonerNumber)
-          .hasPlanStatus(PlanStatus.EXEMPT)
-      })
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(2)
+        .personResponse(
+          1,
+          {
+            it
+              .hasPrisonNumber(prisoner3.prisonerNumber)
+              .hasPlanStatus(EXEMPT)
+          },
+        )
+        .personResponse(
+          2,
+          {
+            it
+              .hasPrisonNumber(prisoner6.prisonerNumber)
+              .hasPlanStatus(EXEMPT)
+          },
+        )
+    }
   }
 
   private fun searchPeople(): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams()
 
   private fun searchPeopleWithPrisonNameNumberFilter(prisonNameNumber: String): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("prisonerNameOrNumber" to prisonNameNumber)
 
-  private fun searchPeopleWithActionPlanStatus(planStatus: String): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("planStatus" to planStatus)
+  private fun searchPeopleWithActionPlanStatus(planStatus: PlanStatus): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("planStatus" to planStatus)
 
-  private fun searchPeopleWithSort(sortBy: String, sortDirection: String = SearchSortDirection.ASC.name): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("sortBy" to sortBy, "sortDirection" to sortDirection)
+  private fun searchPeopleWithSort(
+    sortBy: String,
+    sortDirection: String = SearchSortDirection.ASC.name,
+  ): FluxExchangeResult<PersonSearchResult> = searchPeopleWithParams("sortBy" to sortBy, "sortDirection" to sortDirection)
 
-  private fun searchPeopleWithParams(vararg params: Pair<String, String>): FluxExchangeResult<PersonSearchResult> {
+  private fun searchPeopleWithParams(vararg params: Pair<String, Any>): FluxExchangeResult<PersonSearchResult> {
     val uri = URI_TEMPLATE + params.joinToString("&", prefix = "?") { "${it.first}=${it.second}" }
 
     return webTestClient.get()
@@ -371,40 +479,5 @@ class PrisonerSearchTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .returnResult(PersonSearchResult::class.java)
-  }
-
-  fun setUpData() {
-    createActionPlan(prisoner1.prisonerNumber)
-    // due induction
-    createInductionSchedule(prisoner1.prisonerNumber, deadlineDate = LocalDate.now().plusDays(1), status = SCHEDULED)
-    // overdue induction
-    createInductionSchedule(prisoner2.prisonerNumber, deadlineDate = LocalDate.now().minusDays(1), status = SCHEDULED)
-    // exempt induction
-    createInductionSchedule(
-      prisoner3.prisonerNumber,
-      deadlineDate = LocalDate.now().plusDays(1),
-      status = EXEMPT_PRISONER_SAFETY_ISSUES,
-    )
-    // due review
-    createReviewScheduleRecord(
-      prisoner4.prisonerNumber,
-      latestDate = LocalDate.now().plusDays(1),
-      earliestDate = LocalDate.now().minusDays(10),
-      status = ReviewScheduleStatus.SCHEDULED,
-    )
-    // overdue review
-    createReviewScheduleRecord(
-      prisoner5.prisonerNumber,
-      latestDate = LocalDate.now().minusDays(1),
-      earliestDate = LocalDate.now().minusDays(10),
-      status = ReviewScheduleStatus.SCHEDULED,
-    )
-    // exempt review
-    createReviewScheduleRecord(
-      prisoner6.prisonerNumber,
-      latestDate = LocalDate.now().plusDays(1),
-      earliestDate = LocalDate.now().minusDays(10),
-      status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
-    )
   }
 }
