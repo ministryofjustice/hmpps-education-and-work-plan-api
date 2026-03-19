@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Update
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.trackEvent
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_ARCHIVED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.GoalTelemetryEventType.GOAL_CREATED
@@ -149,6 +150,13 @@ class TelemetryService(
     telemetryClient.trackEvent(
       UpdatedInductionScheduleStatusTelemetryEventType.INDUCTION_SCHEDULE_STATUS_UPDATED.value,
       UpdatedInductionScheduleStatusTelemetryEventType.INDUCTION_SCHEDULE_STATUS_UPDATED.customDimensions(updatedInductionScheduleStatus),
+    )
+  }
+
+  fun trackEducationAssessmentEventCreated(entity: EducationAssessmentEventEntity) {
+    telemetryClient.trackEvent(
+      EducationAssessmentEventTelemetryEventType.EDUCATION_ASSESSMENT_EVENT_CREATED.value,
+      EducationAssessmentEventTelemetryEventType.EDUCATION_ASSESSMENT_EVENT_CREATED.customDimensions(entity),
     )
   }
 

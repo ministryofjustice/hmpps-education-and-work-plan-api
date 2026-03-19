@@ -44,6 +44,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.Companion.STATUSES_FOR_ACTIVE_REVIEWS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EducationAssessmentEventRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EmployabilitySkillRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleHistoryRepository
@@ -200,6 +201,9 @@ abstract class IntegrationTestBase {
   lateinit var inductionScheduleHistoryRepository: InductionScheduleHistoryRepository
 
   @Autowired
+  lateinit var educationAssessmentEventRepository: EducationAssessmentEventRepository
+
+  @Autowired
   lateinit var hmppsQueueService: HmppsQueueService
 
   val domainEventQueue by lazy {
@@ -250,6 +254,7 @@ abstract class IntegrationTestBase {
     noteRepository.deleteAll()
     inductionScheduleRepository.deleteAll()
     inductionScheduleHistoryRepository.deleteAll()
+    educationAssessmentEventRepository.deleteAll()
   }
 
   fun clearQueues() {

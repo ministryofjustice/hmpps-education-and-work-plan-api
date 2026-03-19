@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.educationassessment.EducationAssessmentEventEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EducationAssessmentEventRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TelemetryService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.TimelineEventFactory
 import java.time.LocalDate
 import java.util.UUID
@@ -39,6 +40,9 @@ class InboundAssessmentEventsListenerTest {
 
   @Mock
   private lateinit var timelineEventFactory: TimelineEventFactory
+
+  @Mock
+  private lateinit var telemetryService: TelemetryService
 
   @InjectMocks
   private lateinit var inboundAssessmentEventsListener: InboundAssessmentEventsListener
@@ -96,6 +100,7 @@ class InboundAssessmentEventsListenerTest {
     verify(educationAssessmentEventRepository).saveAndFlush(expectedEntity)
     verify(timelineEventFactory).educationAssessmentEventCreatedEvent(entityReference.toString(), "BXI")
     verify(timelineService).recordTimelineEvent(prisonNumber, expectedTimelineEvent)
+    verify(telemetryService).trackEducationAssessmentEventCreated(expectedEntity)
   }
 
   @Test
@@ -147,5 +152,6 @@ class InboundAssessmentEventsListenerTest {
     verify(educationAssessmentEventRepository).saveAndFlush(expectedEntity)
     verify(timelineEventFactory).educationAssessmentEventCreatedEvent(entityReference.toString(), "N/A")
     verify(timelineService).recordTimelineEvent(prisonNumber, expectedTimelineEvent)
+    verify(telemetryService).trackEducationAssessmentEventCreated(expectedEntity)
   }
 }
