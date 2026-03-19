@@ -40,6 +40,11 @@ interface PersonSearchRepository : JpaRepository<ActionPlanEntity, String> {
                   from goal g
                   where g.action_plan_id = ap.id
                 )
+                and exists (
+                  select 1
+                  from induction i
+                  where i.prison_number = p.prison_number
+                )
             ) then 'ACTIVE_PLAN'
         
             else 'NEEDS_PLAN'
