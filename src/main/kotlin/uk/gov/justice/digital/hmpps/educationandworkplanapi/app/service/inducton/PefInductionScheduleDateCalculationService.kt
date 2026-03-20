@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import java.time.Clock
 import java.time.LocalDate
@@ -23,7 +24,11 @@ private val log = KotlinLogging.logger {}
 @Service
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
-class PefInductionScheduleDateCalculationService(private val inductionExtensionConfig: InductionExtensionConfig, private val clock: Clock) : InductionScheduleDateCalculationService() {
+class PefInductionScheduleDateCalculationService(
+  private val inductionExtensionConfig: InductionExtensionConfig,
+  private val clock: Clock,
+  private val exemptionProperties: ExemptionProperties,
+) : InductionScheduleDateCalculationService() {
 
   companion object {
     private const val DAYS_AFTER_ADMISSION = 20L
@@ -60,6 +65,8 @@ class PefInductionScheduleDateCalculationService(private val inductionExtensionC
       prisonId = prisonId,
     )
   }
+
+  override fun onlyExtendDeadlinesWhenNotOverdue(): Boolean = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
 
   private fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long = when (calculationRule) {
     InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> {

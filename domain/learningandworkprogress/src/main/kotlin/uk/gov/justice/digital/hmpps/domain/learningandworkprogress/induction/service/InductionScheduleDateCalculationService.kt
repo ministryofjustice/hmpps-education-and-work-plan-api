@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import java.time.LocalDate
+import java.time.ZoneId
 
 /**
  * Abstract service class exposing methods that implement the business rules for calculating Induction Schedule dates.
@@ -29,13 +30,22 @@ abstract class InductionScheduleDateCalculationService(
    */
   abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean = true, releaseDate: LocalDate? = null): CreateInductionScheduleDto
 
+  /**
+   * Implementations to return true if Induction deadlines should only be extended/recalculated if the Induction is not already overdue at the point of exemption/exclusion being applied.
+   */
+  abstract fun onlyExtendDeadlinesWhenNotOverdue(): Boolean
+
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
-    if (inductionSchedule.scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
-      return baseScheduleDate().plusDays(TWENTY_DAYS)
+    if (onlyExtendDeadlinesWhenNotOverdue() && hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue()) {
+      deadlineDate
+    } else {
+      if (scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
+        return baseScheduleDate().plusDays(TWENTY_DAYS)
+      }
+      val additionalDays = getExtensionDays(scheduleStatus)
+      val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
+      maxOf(baseDatePlusAdditionalDays, deadlineDate)
     }
-    val additionalDays = getExtensionDays(scheduleStatus)
-    val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
-    maxOf(baseDatePlusAdditionalDays, deadlineDate)
   }
 
   private fun getExtensionDays(status: InductionScheduleStatus): Long = when {
@@ -56,4 +66,6 @@ abstract class InductionScheduleDateCalculationService(
       today
     }
   }
+
+  private fun InductionSchedule.hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue(): Boolean = scheduleStatus.isExemptionOrExclusion() && deadlineDate.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
 }

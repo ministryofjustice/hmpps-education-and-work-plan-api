@@ -91,3 +91,6 @@ pes:
 
 induction-extension:
   periods: "2024-12-20:2025-01-01"
+
+exemption:
+  extend-deadline: "ONLY_WHEN_NOT_OVERDUE"

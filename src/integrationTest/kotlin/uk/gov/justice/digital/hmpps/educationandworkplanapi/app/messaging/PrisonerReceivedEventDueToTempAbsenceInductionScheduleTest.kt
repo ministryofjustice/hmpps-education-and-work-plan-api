@@ -23,15 +23,22 @@ import java.time.OffsetDateTime
 
 @Isolated
 class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTestBase() {
+  companion object {
+    private val today = LocalDate.now()
+  }
 
   @Test
-  fun `should update Induction Schedule and send outbound message given 'prisoner received' (temp absence) event for prisoner that has an active Induction Schedule`() {
+  fun `should add 5 days to the latest induction date and send outbound message when TAP Return event is processed given the induction was not overdue`() {
     // Given
     // an induction Schedule exists
     val prisonNumber = randomValidPrisonNumber()
     val earliestDateTime = OffsetDateTime.now()
 
-    createInductionSchedule(prisonNumber, status = InductionScheduleStatus.SCHEDULED, deadlineDate = LocalDate.now().plusDays(1))
+    createInductionSchedule(
+      prisonNumber,
+      status = InductionScheduleStatus.SCHEDULED,
+      deadlineDate = today.plusDays(1), // induction is not overdue
+    )
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
@@ -41,6 +48,9 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
         reason = TEMPORARY_ABSENCE_RETURN,
       ),
     )
+
+    val expectedDeadlineDate = today.plusDays(5)
+
     // When
     sendDomainEvent(sqsMessage)
 
@@ -59,7 +69,68 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
       .wasUpdatedBy("system")
       .wasUpdatedByDisplayName("system")
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .hasDeadlineDate(LocalDate.now().plusDays(5))
+      .hasDeadlineDate(expectedDeadlineDate)
+      .wasStatus(SCHEDULED)
+
+    val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
+    assertThat(inductionScheduleHistories.inductionSchedules.size).isEqualTo(2)
+    assertThat(inductionScheduleHistories.inductionSchedules[1].scheduleStatus).isEqualTo(EXEMPT_TEMP_ABSENCE)
+    assertThat(inductionScheduleHistories.inductionSchedules[0].scheduleStatus).isEqualTo(SCHEDULED)
+
+    val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
+
+    await.untilAsserted {
+      assertThat(inductionScheduleEvents).hasSize(2)
+      assertThat(inductionScheduleEvents).allSatisfy {
+        assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+        assertThat(it.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+      }
+    }
+  }
+
+  @Test
+  fun `should not add 5 days to the latest induction date and send outbound message when TAP Return event is processed given the induction was already overdue`() {
+    // Given
+    // an induction Schedule exists
+    val prisonNumber = randomValidPrisonNumber()
+    val earliestDateTime = OffsetDateTime.now()
+
+    createInductionSchedule(
+      prisonNumber,
+      status = InductionScheduleStatus.SCHEDULED,
+      deadlineDate = today.minusDays(1), // induction is already overdue
+    )
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = TEMPORARY_ABSENCE_RETURN,
+      ),
+    )
+
+    val expectedDeadlineDate = today.minusDays(1)
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val inductionSchedule = getInductionSchedule(prisonNumber)
+    assertThat(inductionSchedule)
+      .wasCreatedAtOrAfter(earliestDateTime)
+      .wasUpdatedAtOrAfter(earliestDateTime)
+      .wasCreatedBy("system")
+      .wasCreatedByDisplayName("system")
+      .wasUpdatedBy("system")
+      .wasUpdatedByDisplayName("system")
+      .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+      .hasDeadlineDate(expectedDeadlineDate)
       .wasStatus(SCHEDULED)
 
     val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
@@ -204,7 +275,7 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
       .wasUpdatedByDisplayName("system")
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
       // basically this message was treat like a new admission
-      .hasDeadlineDate(LocalDate.now().plusDays(20))
+      .hasDeadlineDate(today.plusDays(20))
       .wasStatus(SCHEDULED)
 
     val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
@@ -231,7 +302,7 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
     val prisonNumber = randomValidPrisonNumber()
     val earliestDateTime = OffsetDateTime.now()
 
-    createInductionSchedule(prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_RELEASE, deadlineDate = LocalDate.now().plusDays(1))
+    createInductionSchedule(prisonNumber, status = InductionScheduleStatus.EXEMPT_PRISONER_RELEASE, deadlineDate = today.plusDays(1))
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
@@ -259,7 +330,7 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
       .wasUpdatedBy("system")
       .wasUpdatedByDisplayName("system")
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .hasDeadlineDate(LocalDate.now().plusDays(5))
+      .hasDeadlineDate(today.plusDays(5))
       .wasStatus(SCHEDULED)
 
     val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)

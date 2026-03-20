@@ -27,6 +27,8 @@ class InductionScheduleDateCalculationServiceTest {
     ): CreateInductionScheduleDto {
       TODO("Not implemented here")
     }
+
+    override fun onlyExtendDeadlinesWhenNotOverdue(): Boolean = true
   }
 
   @Nested

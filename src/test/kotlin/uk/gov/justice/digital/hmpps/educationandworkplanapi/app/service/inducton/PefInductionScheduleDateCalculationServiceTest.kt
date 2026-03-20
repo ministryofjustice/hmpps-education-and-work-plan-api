@@ -6,6 +6,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.DeadlineExtensionRule
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import java.time.Clock
 import java.time.LocalDate
@@ -15,7 +17,11 @@ class PefInductionScheduleDateCalculationServiceTest {
 
   private val fixedDate = LocalDate.now()
   private val clock = Clock.fixed(fixedDate.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
-  private val service = PefInductionScheduleDateCalculationService(InductionExtensionConfig("2024-12-20:2025-01-01"), clock)
+  private val service = PefInductionScheduleDateCalculationService(
+    InductionExtensionConfig("2024-12-20:2025-01-01"),
+    clock,
+    ExemptionProperties(DeadlineExtensionRule.ONLY_WHEN_NOT_OVERDUE),
+  )
 
   @Test
   fun `should determine CreateInductionScheduleDto`() {

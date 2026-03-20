@@ -6,10 +6,14 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.DeadlineExtensionRule
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
 import java.time.LocalDate
 
 class PesInductionScheduleDateCalculationServiceTest {
-  private val service = PesInductionScheduleDateCalculationService()
+  private val service = PesInductionScheduleDateCalculationService(
+    ExemptionProperties(DeadlineExtensionRule.ONLY_WHEN_NOT_OVERDUE),
+  )
 
   @Test
   fun `should determine CreateInductionScheduleDto`() {
