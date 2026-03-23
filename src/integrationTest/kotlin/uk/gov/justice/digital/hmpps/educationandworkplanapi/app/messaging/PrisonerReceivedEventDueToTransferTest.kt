@@ -271,7 +271,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
       domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
     } matches { it == 0 }
 
-    val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber).sortedBy { it.updatedBy }
     assertThat(reviewSchedulesAfter.size).isEqualTo(2)
     assertThat(reviewSchedulesAfter.first().scheduleStatus).isEqualTo(COMPLETED)
     assertThat(reviewSchedulesAfter.last().scheduleStatus).isEqualTo(SCHEDULED)

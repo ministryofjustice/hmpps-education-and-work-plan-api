@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servic
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleDateCalculationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewSchedulePropertiesProvider
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
@@ -128,5 +129,10 @@ class DomainConfiguration {
   )
 
   @Bean
-  fun reviewScheduleDateCalculationService() = ReviewScheduleDateCalculationService()
+  fun reviewScheduleDateCalculationService(exemptionProperties: ExemptionProperties) = ReviewScheduleDateCalculationService(
+    propertiesProvider = object : ReviewSchedulePropertiesProvider {
+      override val onlyExtendDeadlinesWhenNotOverdue: Boolean
+        get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
+    },
+  )
 }

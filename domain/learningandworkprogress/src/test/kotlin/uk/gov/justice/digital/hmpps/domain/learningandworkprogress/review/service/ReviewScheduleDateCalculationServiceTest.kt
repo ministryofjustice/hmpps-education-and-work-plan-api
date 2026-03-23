@@ -17,7 +17,11 @@ import java.time.LocalDate
 import java.util.stream.Stream
 
 class ReviewScheduleDateCalculationServiceTest {
-  private val dateCalculationService = ReviewScheduleDateCalculationService()
+  private val dateCalculationService = ReviewScheduleDateCalculationService(
+    propertiesProvider = object : ReviewSchedulePropertiesProvider {
+      override val onlyExtendDeadlinesWhenNotOverdue = true
+    },
+  )
 
   @Nested
   inner class CalculateAdjustedReviewDueDate {
@@ -224,6 +228,42 @@ class ReviewScheduleDateCalculationServiceTest {
       )
 
       val expectedReviewDate = TODAY.plusDays(5)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        // exemptions
+        "EXEMPT_PRISONER_FAILED_TO_ENGAGE",
+        "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
+        "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
+        "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
+        "EXEMPT_PRISONER_RELEASE",
+        "EXEMPT_PRISONER_RELEASE_HOSPITAL",
+        "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
+        // exclusions
+        "EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY",
+        "EXEMPT_PRISONER_OTHER_HEALTH_ISSUES",
+        "EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF",
+        "EXEMPT_PRISONER_SAFETY_ISSUES",
+        "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
+      ],
+    )
+    fun `should not calculate an adjusted review date given review schedule was overdue when it was exempted`(scheduleStatus: ReviewScheduleStatus) {
+      // Given
+      val reviewSchedule = aValidReviewSchedule(
+        latestReviewDate = TODAY.minusDays(1),
+        scheduleStatus = scheduleStatus,
+      )
+
+      val expectedReviewDate = TODAY.minusDays(1)
 
       // When
       val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)

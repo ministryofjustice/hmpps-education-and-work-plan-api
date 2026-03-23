@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Senten
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.INDETERMINATE_SENTENCE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.REMAND
 import java.time.LocalDate
+import java.time.ZoneId
 
 private val log = KotlinLogging.logger {}
 
@@ -31,7 +32,9 @@ private val log = KotlinLogging.logger {}
  * This class is deliberately final so that it cannot be subclassed, ensuring that the business rules stay within the
  * domain.
  */
-class ReviewScheduleDateCalculationService {
+class ReviewScheduleDateCalculationService(
+  private val propertiesProvider: ReviewSchedulePropertiesProvider,
+) {
   companion object {
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
     private const val EXCLUSION_ADDITIONAL_DAYS = 10L
@@ -108,9 +111,8 @@ class ReviewScheduleDateCalculationService {
   }
 
   /**
-   * When clearing an exemption on a [ReviewSchedule] the Review Due date might need to be adjusted. This is to allow for
-   * clearing the exemption of a [ReviewSchedule] after it's original Review Due date. IE. it would immediately become
-   * overdue.
+   * When clearing an exemption on a [ReviewSchedule] the Review Due date might need to be adjusted.
+   *
    * Exemptions are classed as either "exemptions" or "exclusions" (via the [ReviewScheduleStatus] enum), and the amount
    * of time to adjust a Review Due date by is different for "exemptions" and "exclusions".
    * If the original due date is later than the calculated date, then the original due date should be used, and the
@@ -126,12 +128,16 @@ class ReviewScheduleDateCalculationService {
    * due date.
    */
   fun calculateAdjustedReviewDueDate(reviewSchedule: ReviewSchedule): LocalDate = with(reviewSchedule) {
-    if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
-      return LocalDate.now().plusDays(TEN_DAYS)
+    if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadExemptionOrExclusionAppliedWhenReviewAlreadyOverdue()) {
+      reviewScheduleWindow.dateTo
+    } else {
+      if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
+        return LocalDate.now().plusDays(TEN_DAYS)
+      }
+      val additionalDays = getExtensionDays(scheduleStatus)
+      val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
+      maxOf(todayPlusAdditionalDays, reviewScheduleWindow.dateTo)
     }
-    val additionalDays = getExtensionDays(scheduleStatus)
-    val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
-    maxOf(todayPlusAdditionalDays, reviewScheduleWindow.dateTo)
   }
 
   private fun getExtensionDays(status: ReviewScheduleStatus): Long = when {
@@ -160,7 +166,13 @@ class ReviewScheduleDateCalculationService {
   }
 
   /**
-   * Returns the base date from which all Induction Schedule dates are calculated
+   * Returns the base date from which all Review Schedule dates are calculated
    */
   private fun baseScheduleDate() = LocalDate.now()
+
+  private fun ReviewSchedule.hadExemptionOrExclusionAppliedWhenReviewAlreadyOverdue(): Boolean = scheduleStatus.isExemptionOrExclusion() && reviewScheduleWindow.dateTo.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
+}
+
+interface ReviewSchedulePropertiesProvider {
+  val onlyExtendDeadlinesWhenNotOverdue: Boolean
 }
