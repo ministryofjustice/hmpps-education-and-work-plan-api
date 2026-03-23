@@ -17,7 +17,11 @@ class InductionScheduleDateCalculationServiceTest {
 
   // New up an anonymous instance of the abstract class to test the methods implemented in the abstract class
   // The implementations of determineCreateInductionScheduleDto are tested in the concrete implementations of InductionScheduleDateCalculationService
-  private val dateCalculationService = object : InductionScheduleDateCalculationService() {
+  private val dateCalculationService = object : InductionScheduleDateCalculationService(
+    propertiesProvider = object : InductionSchedulePropertiesProvider {
+      override val onlyExtendDeadlinesWhenNotOverdue = true
+    },
+  ) {
     override fun determineCreateInductionScheduleDto(
       prisonNumber: String,
       admissionDate: LocalDate,
@@ -27,8 +31,6 @@ class InductionScheduleDateCalculationServiceTest {
     ): CreateInductionScheduleDto {
       TODO("Not implemented here")
     }
-
-    override fun onlyExtendDeadlinesWhenNotOverdue(): Boolean = true
   }
 
   @Nested
@@ -238,6 +240,44 @@ class InductionScheduleDateCalculationServiceTest {
       )
 
       val expectedReviewDate = TODAY.plusDays(5)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        // exemptions
+        "EXEMPT_PRISONER_FAILED_TO_ENGAGE",
+        "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
+        "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
+        "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
+        "EXEMPT_PRISONER_RELEASE",
+        "EXEMPT_PRISONER_RELEASE_HOSPITAL",
+        "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
+        "EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS",
+        "EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE",
+        // exclusions
+        "EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY",
+        "EXEMPT_PRISONER_OTHER_HEALTH_ISSUES",
+        "EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF",
+        "EXEMPT_PRISONER_SAFETY_ISSUES",
+        "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
+      ],
+    )
+    fun `should not calculate a new induction due date given induction schedule was overdue when it was exempted`(scheduleStatus: InductionScheduleStatus) {
+      // Given
+      val inductionSchedule = aValidInductionSchedule(
+        deadlineDate = TODAY.minusDays(1), // induction is already overdue
+        scheduleStatus = scheduleStatus,
+      )
+
+      val expectedReviewDate = TODAY.minusDays(1)
 
       // When
       val actual = dateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)

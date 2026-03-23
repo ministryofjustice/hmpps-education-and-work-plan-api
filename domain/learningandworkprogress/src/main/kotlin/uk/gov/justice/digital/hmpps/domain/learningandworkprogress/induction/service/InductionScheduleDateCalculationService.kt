@@ -15,6 +15,7 @@ import java.time.ZoneId
  */
 abstract class InductionScheduleDateCalculationService(
   private val scheduleDateNotBefore: LocalDate? = null,
+  private val propertiesProvider: InductionSchedulePropertiesProvider,
 ) {
   companion object {
     private const val EXEMPTION_ADDITIONAL_DAYS = 5L
@@ -30,13 +31,8 @@ abstract class InductionScheduleDateCalculationService(
    */
   abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean = true, releaseDate: LocalDate? = null): CreateInductionScheduleDto
 
-  /**
-   * Implementations to return true if Induction deadlines should only be extended/recalculated if the Induction is not already overdue at the point of exemption/exclusion being applied.
-   */
-  abstract fun onlyExtendDeadlinesWhenNotOverdue(): Boolean
-
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
-    if (onlyExtendDeadlinesWhenNotOverdue() && hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue()) {
+    if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue()) {
       deadlineDate
     } else {
       if (scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
@@ -68,4 +64,8 @@ abstract class InductionScheduleDateCalculationService(
   }
 
   private fun InductionSchedule.hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue(): Boolean = scheduleStatus.isExemptionOrExclusion() && deadlineDate.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
+}
+
+interface InductionSchedulePropertiesProvider {
+  val onlyExtendDeadlinesWhenNotOverdue: Boolean
 }
