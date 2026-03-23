@@ -9,6 +9,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePropertiesProvider
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import java.time.Clock
 import java.time.LocalDate
@@ -23,7 +25,16 @@ private val log = KotlinLogging.logger {}
 @Service
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
-class PefInductionScheduleDateCalculationService(private val inductionExtensionConfig: InductionExtensionConfig, private val clock: Clock) : InductionScheduleDateCalculationService() {
+class PefInductionScheduleDateCalculationService(
+  private val inductionExtensionConfig: InductionExtensionConfig,
+  private val clock: Clock,
+  exemptionProperties: ExemptionProperties,
+) : InductionScheduleDateCalculationService(
+  propertiesProvider = object : InductionSchedulePropertiesProvider {
+    override val onlyExtendDeadlinesWhenNotOverdue: Boolean
+      get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
+  },
+) {
 
   companion object {
     private const val DAYS_AFTER_ADMISSION = 20L

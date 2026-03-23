@@ -7,6 +7,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePropertiesProvider
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
 import java.time.LocalDate
 
 /**
@@ -17,7 +19,13 @@ import java.time.LocalDate
  */
 @Service
 @ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PES")
-class PesInductionScheduleDateCalculationService : InductionScheduleDateCalculationService() {
+class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionProperties) :
+  InductionScheduleDateCalculationService(
+    propertiesProvider = object : InductionSchedulePropertiesProvider {
+      override val onlyExtendDeadlinesWhenNotOverdue: Boolean
+        get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
+    },
+  ) {
 
   /**
    * Returns a [CreateInductionScheduleDto] suitable for creating the specified prisoner's initial [InductionSchedule].
