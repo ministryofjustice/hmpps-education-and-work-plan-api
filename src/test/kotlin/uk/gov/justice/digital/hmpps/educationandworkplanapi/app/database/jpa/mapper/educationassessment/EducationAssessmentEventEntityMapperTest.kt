@@ -3,9 +3,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EducationAssessmentStatus
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.MessageAttributes
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsAssessmentEventMessage
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.AssessmentEventDto
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.AssessmentEventStatus
 import java.time.LocalDate
 
 class EducationAssessmentEventEntityMapperTest {
@@ -13,24 +12,19 @@ class EducationAssessmentEventEntityMapperTest {
   private val mapper = EducationAssessmentEventEntityMapper()
 
   @Test
-  fun `should map from SQS message to entity`() {
+  fun `should map from DTO to entity`() {
     // Given
     val statusChangeDate = LocalDate.of(2026, 3, 15)
-    val message = SqsAssessmentEventMessage(
-      messageId = "14e2865f-1e4b-43b0-87e8-874e7e238dd9",
-      eventType = "EducationAssessmentEventCreated",
-      messageAttributes = MessageAttributes(
-        prisonNumber = "A1234AB",
-        status = EducationAssessmentStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
-        statusChangeDate = statusChangeDate,
-        detailUrl = "https://example.com/learnerAssessments/v2/A1234AB",
-        requestId = "0650ba37-a977-4fbe-9000-4715aaecadba",
-      ),
+    val dto = AssessmentEventDto(
+      prisonNumber = "A1234AB",
+      status = AssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+      statusChangeDate = statusChangeDate,
+      detailUrl = "https://example.com/learnerAssessments/v2/A1234AB",
     )
     val prisonId = "BXI"
 
     // When
-    val entity = mapper.fromMessageToEntity(message, prisonId)
+    val entity = mapper.fromDtoToEntity(dto, prisonId)
 
     // Then
     assertThat(entity.reference).isNotNull()
@@ -50,22 +44,17 @@ class EducationAssessmentEventEntityMapperTest {
   }
 
   @Test
-  fun `should map from SQS message to entity with null detail URL`() {
+  fun `should map from DTO to entity with null detail URL`() {
     // Given
-    val message = SqsAssessmentEventMessage(
-      messageId = "14e2865f-1e4b-43b0-87e8-874e7e238dd9",
-      eventType = "EducationAssessmentEventCreated",
-      messageAttributes = MessageAttributes(
-        prisonNumber = "A1234AB",
-        status = EducationAssessmentStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
-        statusChangeDate = LocalDate.now(),
-        detailUrl = null,
-        requestId = "0650ba37-a977-4fbe-9000-4715aaecadba",
-      ),
+    val dto = AssessmentEventDto(
+      prisonNumber = "A1234AB",
+      status = AssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+      statusChangeDate = LocalDate.now(),
+      detailUrl = null,
     )
 
     // When
-    val entity = mapper.fromMessageToEntity(message, "BXI")
+    val entity = mapper.fromDtoToEntity(dto, "BXI")
 
     // Then
     assertThat(entity.detailUrl).isNull()
