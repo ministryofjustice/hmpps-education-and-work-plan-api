@@ -22,13 +22,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAutho
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillSessionType.CIAG_INDUCTION
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreatePersonalSkillsAndInterestsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -540,22 +541,20 @@ class CreateInductionTest : IntegrationTestBase() {
 
     // Then
     val induction = getInduction(prisonNumber)
-    assertThat(induction).isNotNull
-
-    assertThat(induction.personalSkillsAndInterests?.skills).isEmpty()
-
-    val skills = employabilitySkillRepository.findByPrisonNumber(prisonNumber)
-    assertThat(skills).hasSize(1)
-    assertThat(skills[0].skillType).isEqualTo(EmployabilitySkillType.COMMUNICATION)
-    assertThat(skills[0].evidence).isEqualTo("evidence")
-    assertThat(skills[0].rating?.code).isEqualTo("VERY_CONFIDENT")
-    assertThat(skills[0].rating?.description).isEqualTo("very confident")
-    assertThat(skills[0].rating?.score).isEqualTo(4)
-    assertThat(skills[0].createdAtPrison).isEqualTo("BXI")
-    assertThat(skills[0].prisonNumber).isEqualTo(prisonNumber)
-    assertThat(skills[0].updatedAtPrison).isEqualTo("BXI")
-    assertThat(skills[0].sessionTypeDescription).isEqualTo("Maths class")
-    assertThat(skills[0].sessionType).isEqualTo(CIAG_INDUCTION)
+    assertThat(induction)
+      .personalSkillsAndInterests {
+        it.hasNumberOfPersonalSkills(0)
+      }
+      .hasNumberOfEmployabilitySkills(1)
+      .employabilitySkill(1) {
+        it.hasSkillType(EmployabilitySkillType.COMMUNICATION)
+          .hasEvidence("evidence")
+          .hasSkillRating(EmployabilitySkillRating.VERY_CONFIDENT)
+          .hasSessionType(EmployabilitySkillSessionType.CIAG_INDUCTION)
+          .hasSessionTypeDescription("Maths class")
+          .wasCreatedAtPrison("BXI")
+          .wasUpdatedAtPrison("BXI")
+      }
   }
 
   @Nested

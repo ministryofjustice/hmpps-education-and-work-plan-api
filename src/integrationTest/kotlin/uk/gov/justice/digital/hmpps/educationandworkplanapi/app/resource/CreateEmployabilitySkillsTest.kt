@@ -13,13 +13,15 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillSessionType.CIAG_INDUCTION
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class CreateEmployabilitySkillsTest : IntegrationTestBase() {
@@ -93,18 +95,18 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
       .isCreated()
 
     // Then
-    val skills = employabilitySkillRepository.findByPrisonNumber(prisonNumber)
-    assertThat(skills).hasSize(1)
-    assertThat(skills[0].skillType).isEqualTo(EmployabilitySkillType.COMMUNICATION)
-    assertThat(skills[0].evidence).isEqualTo("evidence")
-    assertThat(skills[0].rating?.code).isEqualTo("VERY_CONFIDENT")
-    assertThat(skills[0].rating?.description).isEqualTo("very confident")
-    assertThat(skills[0].rating?.score).isEqualTo(4)
-    assertThat(skills[0].createdAtPrison).isEqualTo("BXI")
-    assertThat(skills[0].prisonNumber).isEqualTo(prisonNumber)
-    assertThat(skills[0].updatedAtPrison).isEqualTo("BXI")
-    assertThat(skills[0].sessionTypeDescription).isEqualTo("Maths class")
-    assertThat(skills[0].sessionType).isEqualTo(CIAG_INDUCTION)
+    val skills = getEmployabilitySkills(prisonNumber)
+    assertThat(skills)
+      .hasNumberOfEmployabilitySkills(1)
+      .employabilitySkill(1) {
+        it.hasSkillType(EmployabilitySkillType.COMMUNICATION)
+          .hasEvidence("evidence")
+          .hasSkillRating(EmployabilitySkillRating.VERY_CONFIDENT)
+          .hasSessionType(EmployabilitySkillSessionType.CIAG_INDUCTION)
+          .hasSessionTypeDescription("Maths class")
+          .wasCreatedAtPrison("BXI")
+          .wasUpdatedAtPrison("BXI")
+      }
 
     await.untilAsserted {
       val eventPropertiesCaptor = createCaptor<Map<String, String>>()

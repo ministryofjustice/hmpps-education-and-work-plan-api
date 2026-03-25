@@ -2,9 +2,11 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 import java.util.function.Consumer
 
 fun assertThat(actual: InductionResponse?) = InductionResponseAssert(actual)
@@ -31,7 +33,7 @@ class InductionResponseAssert(actual: InductionResponse?) :
   fun wasCreatedAt(expected: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
-      if (createdAt != expected) {
+      if (!createdAt.isEqual(expected)) {
         failWithMessage("Expected createdAt to be $expected, but was $createdAt")
       }
     }
@@ -51,7 +53,7 @@ class InductionResponseAssert(actual: InductionResponse?) :
   fun wasUpdatedAt(expected: OffsetDateTime): InductionResponseAssert {
     isNotNull
     with(actual!!) {
-      if (updatedAt != expected) {
+      if (!updatedAt.isEqual(expected)) {
         failWithMessage("Expected updatedAt to be $expected, but was $updatedAt")
       }
     }
@@ -215,6 +217,43 @@ class InductionResponseAssert(actual: InductionResponse?) :
     isNotNull
     with(actual!!) {
       consumer.accept(assertThat(inPrisonInterests))
+    }
+    return this
+  }
+
+  fun hasNoEmployabilitySkills(): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (employabilitySkills?.isEmpty() == false) {
+        failWithMessage("Expected no employability skills, but was ${employabilitySkills.size}")
+      }
+    }
+    return this
+  }
+
+  fun hasNumberOfEmployabilitySkills(expected: Int): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (employabilitySkills?.size != expected) {
+        failWithMessage("Expected number of employability skills to be $expected, but was ${employabilitySkills?.size ?: "null"}")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [GetEmployabilitySkillsResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [EmployabilitySkillAssert].
+   * Returns this [InductionResponseAssert] to allow further chained assertions on the parent [InductionResponse]
+   *
+   * The `skillNumber` parameter is not zero indexed to make for better readability in tests. IE. the first skill
+   * should be referenced as `.employabilitySkill(1) { .... }`
+   */
+  fun employabilitySkill(skillNumber: Int, consumer: Consumer<EmployabilitySkillAssert>): InductionResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val personalSkill = employabilitySkills?.get(skillNumber - 1)
+      consumer.accept(assertThat(personalSkill))
     }
     return this
   }

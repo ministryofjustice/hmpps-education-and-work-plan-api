@@ -83,6 +83,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Creat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionSchedulesResponse
@@ -124,6 +125,7 @@ abstract class IntegrationTestBase {
     const val EDUCATION_URI_TEMPLATE = "/person/{prisonNumber}/education"
     const val GET_INDUCTION_SCHEDULE_URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule"
     const val GET_INDUCTION_SCHEDULE_HISTORY_URI_TEMPLATE = "/inductions/{prisonNumber}/induction-schedule/history"
+    const val EMPLOYABILITY_SKILLS_URI_TEMPLATE = "/action-plans/{prisonNumber}/employability-skills"
 
     private val postgresContainer = PostgresContainer.instance
 
@@ -415,6 +417,20 @@ abstract class IntegrationTestBase {
     .expectStatus()
     .isOk
     .returnResult(InductionResponse::class.java)
+    .responseBody.blockFirst()!!
+
+  fun getEmployabilitySkills(prisonNumber: String): GetEmployabilitySkillResponses = webTestClient.get()
+    .uri(EMPLOYABILITY_SKILLS_URI_TEMPLATE, prisonNumber)
+    .bearerToken(
+      aValidTokenWithAuthority(
+        ACTIONPLANS_RO,
+        privateKey = keyPair.private,
+      ),
+    )
+    .exchange()
+    .expectStatus()
+    .isOk
+    .returnResult(GetEmployabilitySkillResponses::class.java)
     .responseBody.blockFirst()!!
 
   fun archiveGoal(

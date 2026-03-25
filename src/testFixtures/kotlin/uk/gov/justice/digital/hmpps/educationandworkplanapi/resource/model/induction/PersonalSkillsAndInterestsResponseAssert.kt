@@ -2,9 +2,12 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.indu
 
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.isBeforeRounded
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
 import java.time.OffsetDateTime
 import java.util.UUID
+import java.util.function.Consumer
 
 fun assertThat(actual: PersonalSkillsAndInterestsResponse?) = PersonalSkillsAndInterestsResponseAssert(actual)
 
@@ -123,6 +126,84 @@ class PersonalSkillsAndInterestsResponseAssert(actual: PersonalSkillsAndInterest
       if (updatedAtPrison != expected) {
         failWithMessage("Expected updatedAtPrison to be $expected, but was $updatedAtPrison")
       }
+    }
+    return this
+  }
+
+  fun hasNoPersonalInterests(): PersonalSkillsAndInterestsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (interests.isNotEmpty()) {
+        failWithMessage("Expected no personal interests, but was ${interests.size}")
+      }
+    }
+    return this
+  }
+
+  fun hasNumberOfPersonalInterests(expected: Int): PersonalSkillsAndInterestsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (interests.size != expected) {
+        failWithMessage("Expected number of personal interests to be $expected, but was ${interests.size}")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [PersonalInterest]. Takes a lambda as the method argument
+   * to call assertion methods provided by [PersonalInterestAssert].
+   * Returns this [PersonalSkillsAndInterestsResponseAssert] to allow further chained assertions on the parent [PersonalSkillsAndInterestsResponse]
+   *
+   * The `interestNumber` parameter is not zero indexed to make for better readability in tests. IE. the first interest
+   * should be referenced as `.personalInterest(1) { .... }`
+   */
+  fun personalInterest(interestNumber: Int, consumer: Consumer<PersonalInterestAssert>): PersonalSkillsAndInterestsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val personalInterest = interests[interestNumber - 1]
+      consumer.accept(assertThat(personalInterest))
+    }
+    return this
+  }
+
+  fun hasNoPersonalSkills(): PersonalSkillsAndInterestsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if (skills?.isEmpty() == false) {
+        failWithMessage("Expected no personal skills, but was ${skills.size}")
+      }
+    }
+    return this
+  }
+
+  fun hasNumberOfPersonalSkills(expected: Int): PersonalSkillsAndInterestsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      if ((skills == null || skills.size == 0) && expected == 0) {
+        return@with
+      }
+
+      if (skills?.size != expected) {
+        failWithMessage("Expected number of personal skills to be $expected, but was ${skills?.size ?: "null"}")
+      }
+    }
+    return this
+  }
+
+  /**
+   * Allows for assertion chaining into the specified child [PersonalSkill]. Takes a lambda as the method argument
+   * to call assertion methods provided by [PersonalSkillAssert].
+   * Returns this [PersonalSkillsAndInterestsResponseAssert] to allow further chained assertions on the parent [PersonalSkillsAndInterestsResponse]
+   *
+   * The `skillNumber` parameter is not zero indexed to make for better readability in tests. IE. the first skill
+   * should be referenced as `.personalSkill(1) { .... }`
+   */
+  fun personalSkill(skillNumber: Int, consumer: Consumer<PersonalSkillAssert>): PersonalSkillsAndInterestsResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val personalSkill = skills?.get(skillNumber - 1)
+      consumer.accept(assertThat(personalSkill))
     }
     return this
   }
