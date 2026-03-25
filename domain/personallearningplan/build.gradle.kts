@@ -23,8 +23,8 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testImplementation("org.assertj:assertj-core:3.27.7")
-  testImplementation("org.mockito:mockito-junit-jupiter:5.22.0")
-  testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
+  testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
 }
 
 extensions.getByType(JacocoPluginExtension::class).apply {
