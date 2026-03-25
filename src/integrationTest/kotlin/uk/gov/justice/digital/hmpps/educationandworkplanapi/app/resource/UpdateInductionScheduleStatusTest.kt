@@ -201,38 +201,12 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should update induction schedule from Scheduled to technical issue`() {
-    // Given
-    createInductionSchedule(prisonNumber, status = InductionScheduleStatusEntity.SCHEDULED)
-
-    // When
-    webTestClient.put()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(
-        aValidUpdateInductionScheduleStatusRequest(
-          prisonId = "MDI",
-          status = InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
-        ),
-      )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isNoContent
-
-    // Then
-    val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
-    assertThat(inductionSchedule).isNotNull
-    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED.name)
-  }
-
-  @Test
-  fun `when technical issue should add 5 days to latest induction date `() {
+  fun `should add 5 days to latest induction date when technical issue exemption given the induction was not overdue when the exemption was applied`() {
     // Given
     createInductionSchedule(
       prisonNumber,
       status = InductionScheduleStatusEntity.SCHEDULED,
-      deadlineDate = today,
+      deadlineDate = today, // induction is not overdue
     )
 
     // When
@@ -255,6 +229,39 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     assertThat(inductionSchedule).isNotNull
     assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED.name)
     assertThat(inductionSchedule?.deadlineDate).isEqualTo(today.plusDays(5))
+  }
+
+  @Test
+  fun `should not add 5 days to latest induction date when technical issue exemption given the induction was already overdue when the exemption was applied`() {
+    // Given
+    createInductionSchedule(
+      prisonNumber,
+      status = InductionScheduleStatusEntity.SCHEDULED,
+      deadlineDate = today.minusDays(1), // induction is already overdue
+    )
+
+    val expectedDeadlineDate = today.minusDays(1)
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidUpdateInductionScheduleStatusRequest(
+          prisonId = "MDI",
+          status = InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val inductionSchedule = inductionScheduleRepository.findByPrisonNumber(prisonNumber)
+    assertThat(inductionSchedule).isNotNull
+    assertThat(inductionSchedule?.scheduleStatus?.name).isEqualTo(InductionScheduleStatus.SCHEDULED.name)
+    assertThat(inductionSchedule?.deadlineDate).isEqualTo(expectedDeadlineDate)
   }
 
   @Test

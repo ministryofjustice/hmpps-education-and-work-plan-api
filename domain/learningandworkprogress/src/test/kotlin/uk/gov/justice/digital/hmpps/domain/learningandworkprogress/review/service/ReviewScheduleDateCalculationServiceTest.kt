@@ -92,6 +92,7 @@ class ReviewScheduleDateCalculationServiceTest {
         "EXEMPT_PRISONER_RELEASE_HOSPITAL",
         "EXEMPT_PRISONER_DEATH",
         "EXEMPT_PRISONER_MERGE",
+        "EXEMPT_SYSTEM_TECHNICAL_ISSUE",
       ],
     )
     fun `should calculate adjusted review due date given an exemption status that is classed as an exemption and the review due date is later than the calculated date`(
@@ -104,6 +105,38 @@ class ReviewScheduleDateCalculationServiceTest {
       )
 
       val expectedReviewDate = TODAY.plusDays(6)
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
+
+      // Then
+      assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        "EXEMPT_PRISONER_FAILED_TO_ENGAGE",
+        "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
+        "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
+        "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
+        "EXEMPT_PRISONER_RELEASE",
+        "EXEMPT_PRISONER_RELEASE_HOSPITAL",
+        "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
+        "EXEMPT_SYSTEM_TECHNICAL_ISSUE",
+      ],
+    )
+    fun `should calculate adjusted review due date given an exemption status that is classed as an exemption and the review due date is earlier than the calculated date`(
+      scheduleStatus: ReviewScheduleStatus,
+    ) {
+      // Given
+      val reviewSchedule = aValidReviewSchedule(
+        latestReviewDate = TODAY.plusDays(4),
+        scheduleStatus = scheduleStatus,
+      )
+
+      val expectedReviewDate = TODAY.plusDays(5)
 
       // When
       val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
@@ -138,37 +171,6 @@ class ReviewScheduleDateCalculationServiceTest {
       )
 
       val expectedReviewDate = TODAY.plusDays(10)
-
-      // When
-      val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)
-
-      // Then
-      assertThat(actual).isEqualTo(expectedReviewDate)
-    }
-
-    @ParameterizedTest
-    @CsvSource(
-      value = [
-        "EXEMPT_PRISONER_FAILED_TO_ENGAGE",
-        "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
-        "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
-        "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
-        "EXEMPT_PRISONER_RELEASE",
-        "EXEMPT_PRISONER_RELEASE_HOSPITAL",
-        "EXEMPT_PRISONER_DEATH",
-        "EXEMPT_PRISONER_MERGE",
-      ],
-    )
-    fun `should calculate adjusted review due date given an exemption status that is classed as an exemption and the review due date is earlier than the calculated date`(
-      scheduleStatus: ReviewScheduleStatus,
-    ) {
-      // Given
-      val reviewSchedule = aValidReviewSchedule(
-        latestReviewDate = TODAY.plusDays(4),
-        scheduleStatus = scheduleStatus,
-      )
-
-      val expectedReviewDate = TODAY.plusDays(5)
 
       // When
       val actual = dateCalculationService.calculateAdjustedReviewDueDate(reviewSchedule)

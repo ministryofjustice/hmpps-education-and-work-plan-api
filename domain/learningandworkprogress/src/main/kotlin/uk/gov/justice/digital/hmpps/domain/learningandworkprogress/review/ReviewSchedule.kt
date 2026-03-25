@@ -54,7 +54,7 @@ enum class ReviewScheduleStatus(
   EXEMPT_PRISON_STAFF_REDEPLOYMENT(isExemption = true, includeExemptionOnSummary = true),
   EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE(isExemption = true, includeExemptionOnSummary = true),
   EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF(isExclusion = true, includeExemptionOnSummary = true),
-  EXEMPT_SYSTEM_TECHNICAL_ISSUE(includeExemptionOnSummary = true), // system down
+  EXEMPT_SYSTEM_TECHNICAL_ISSUE(isExemption = true, includeExemptionOnSummary = true), // system down
   EXEMPT_PRISONER_TRANSFER(isExemption = true),
   EXEMPT_PRISONER_RELEASE(isExemption = true),
   EXEMPT_PRISONER_RELEASE_HOSPITAL(isExemption = true),

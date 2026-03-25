@@ -45,9 +45,9 @@ abstract class InductionScheduleDateCalculationService(
   }
 
   private fun getExtensionDays(status: InductionScheduleStatus): Long = when {
+    status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
     status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
     status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
-    status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
     else -> 0 // Default case, if no condition matches
   }
 
