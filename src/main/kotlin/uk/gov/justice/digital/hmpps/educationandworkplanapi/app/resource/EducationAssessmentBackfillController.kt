@@ -36,18 +36,13 @@ class EducationAssessmentBackfillController(
   fun backfillAssessmentEvents(
     @RequestBody request: BackfillRequest,
   ): BackfillResponse {
-    val totalReceived = request.events.size
-    log.info { "Received backfill request with $totalReceived events" }
-
-    // Deduplicate input by PRN + date
-    val uniqueEvents = request.events.distinctBy { it.prisonNumber to it.statusChangeDate }
-    log.info { "Deduplicated to ${uniqueEvents.size} unique events (removed ${totalReceived - uniqueEvents.size} duplicates)" }
+    log.info { "Received backfill request with ${request.events.size} events" }
 
     // Process each event through the same service the listener uses
     var successCount = 0
     val failures = mutableListOf<BackfillFailure>()
 
-    uniqueEvents.forEach { event ->
+    request.events.forEach { event ->
       try {
         educationAssessmentEventService.process(
           AssessmentEventDto(
@@ -64,11 +59,10 @@ class EducationAssessmentBackfillController(
       }
     }
 
-    log.info { "Backfill complete: $successCount saved, ${failures.size} failed out of ${uniqueEvents.size} unique events" }
+    log.info { "Backfill complete: $successCount saved, ${failures.size} failed out of ${request.events.size} events" }
 
     return BackfillResponse(
-      totalReceived = totalReceived,
-      totalDeduplicatedInput = uniqueEvents.size,
+      totalReceived = request.events.size,
       totalSaved = successCount,
       failures = failures,
     )
@@ -86,7 +80,6 @@ class EducationAssessmentBackfillController(
 
   data class BackfillResponse(
     val totalReceived: Int,
-    val totalDeduplicatedInput: Int,
     val totalSaved: Int,
     val failures: List<BackfillFailure>,
   )

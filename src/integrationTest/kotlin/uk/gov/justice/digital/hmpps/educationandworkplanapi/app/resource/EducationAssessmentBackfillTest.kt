@@ -96,7 +96,6 @@ class EducationAssessmentBackfillTest : IntegrationTestBase() {
 
     // Then - verify response
     assertThat(response.totalReceived).isEqualTo(1)
-    assertThat(response.totalDeduplicatedInput).isEqualTo(1)
     assertThat(response.totalSaved).isEqualTo(1)
     assertThat(response.failures).isEmpty()
 
@@ -131,49 +130,6 @@ class EducationAssessmentBackfillTest : IntegrationTestBase() {
       .containsEntry("prisonNumber", prisonNumber)
       .containsEntry("status", "ALL_RELEVANT_ASSESSMENTS_COMPLETE")
       .containsEntry("source", "CURIOUS")
-  }
-
-  @Test
-  fun `should deduplicate events within request`() {
-    // Given
-    val prisonNumber = "A1234BC"
-    wiremockService.stubGetPrisonerFromPrisonerSearchApi(
-      prisonNumber,
-      aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "BXI"),
-    )
-
-    val request = EducationAssessmentBackfillController.BackfillRequest(
-      events = listOf(
-        EducationAssessmentBackfillController.BackfillEvent(
-          prisonNumber = prisonNumber,
-          statusChangeDate = LocalDate.of(2025, 11, 15),
-        ),
-        EducationAssessmentBackfillController.BackfillEvent(
-          prisonNumber = prisonNumber,
-          statusChangeDate = LocalDate.of(2025, 11, 15),
-        ),
-      ),
-    )
-
-    // When
-    val response = webTestClient.post()
-      .uri(BACKFILL_URI)
-      .withBody(request)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isCreated
-      .returnResult(EducationAssessmentBackfillController.BackfillResponse::class.java)
-      .responseBody.blockFirst()!!
-
-    // Then
-    assertThat(response.totalReceived).isEqualTo(2)
-    assertThat(response.totalDeduplicatedInput).isEqualTo(1)
-    assertThat(response.totalSaved).isEqualTo(1)
-
-    val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-    assertThat(events).hasSize(1)
   }
 
   @Test

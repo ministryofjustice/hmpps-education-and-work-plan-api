@@ -51,39 +51,7 @@ class EducationAssessmentBackfillControllerTest {
       ),
     )
     assertThat(response.totalReceived).isEqualTo(1)
-    assertThat(response.totalDeduplicatedInput).isEqualTo(1)
     assertThat(response.totalSaved).isEqualTo(1)
-    assertThat(response.failures).isEmpty()
-  }
-
-  @Test
-  fun `should deduplicate events with same prison number and date`() {
-    // Given
-    val request = EducationAssessmentBackfillController.BackfillRequest(
-      events = listOf(
-        EducationAssessmentBackfillController.BackfillEvent(
-          prisonNumber = "A1234BC",
-          statusChangeDate = LocalDate.of(2025, 11, 15),
-        ),
-        EducationAssessmentBackfillController.BackfillEvent(
-          prisonNumber = "A1234BC",
-          statusChangeDate = LocalDate.of(2025, 11, 15),
-        ),
-        EducationAssessmentBackfillController.BackfillEvent(
-          prisonNumber = "A1234BC",
-          statusChangeDate = LocalDate.of(2025, 12, 1),
-        ),
-      ),
-    )
-
-    // When
-    val response = controller.backfillAssessmentEvents(request)
-
-    // Then
-    verify(educationAssessmentEventService, times(2)).process(any())
-    assertThat(response.totalReceived).isEqualTo(3)
-    assertThat(response.totalDeduplicatedInput).isEqualTo(2)
-    assertThat(response.totalSaved).isEqualTo(2)
     assertThat(response.failures).isEmpty()
   }
 
@@ -98,7 +66,6 @@ class EducationAssessmentBackfillControllerTest {
     // Then
     verify(educationAssessmentEventService, never()).process(any())
     assertThat(response.totalReceived).isEqualTo(0)
-    assertThat(response.totalDeduplicatedInput).isEqualTo(0)
     assertThat(response.totalSaved).isEqualTo(0)
     assertThat(response.failures).isEmpty()
   }
@@ -135,7 +102,6 @@ class EducationAssessmentBackfillControllerTest {
     // Then
     verify(educationAssessmentEventService, times(3)).process(any())
     assertThat(response.totalReceived).isEqualTo(3)
-    assertThat(response.totalDeduplicatedInput).isEqualTo(3)
     assertThat(response.totalSaved).isEqualTo(2)
     assertThat(response.failures).hasSize(1)
     assertThat(response.failures[0].prisonNumber).isEqualTo("B9999ZZ")
