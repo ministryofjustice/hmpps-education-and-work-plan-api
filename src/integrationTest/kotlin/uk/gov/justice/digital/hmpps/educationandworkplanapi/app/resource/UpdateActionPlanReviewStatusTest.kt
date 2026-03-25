@@ -239,39 +239,13 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should update review schedule from Scheduled to technical issue`() {
-    // Given
-    createReviewScheduleRecord(prisonNumber, status = ReviewScheduleStatusEntity.SCHEDULED)
-
-    // When
-    webTestClient.put()
-      .uri(URI_TEMPLATE, prisonNumber)
-      .withBody(
-        aValidUpdateReviewScheduleStatusRequest(
-          prisonId = "MDI",
-          status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
-        ),
-      )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
-      .contentType(APPLICATION_JSON)
-      .exchange()
-      .expectStatus()
-      .isNoContent
-
-    // Then
-    val reviewSchedule = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
-    assertThat(reviewSchedule.size).isEqualTo(1)
-    assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
-  }
-
-  @Test
-  fun `when technical issue should add 5 days to latest review date `() {
+  fun `should add 5 days to latest review date when technical issue exemption given the review was not overdue when the exemption was applied`() {
     // Given
     createReviewScheduleRecord(
       prisonNumber,
       status = ReviewScheduleStatusEntity.SCHEDULED,
       earliestDate = today.minusDays(5),
-      latestDate = today,
+      latestDate = today, // review is not overdue
     )
 
     // When
@@ -294,6 +268,40 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     assertThat(reviewSchedule.size).isEqualTo(1)
     assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
     assertThat(reviewSchedule[0].latestReviewDate).isEqualTo(today.plusDays(5))
+  }
+
+  @Test
+  fun `should not add 5 days to latest review date when technical issue exemption given the review was already overdue when the exemption was applied`() {
+    // Given
+    createReviewScheduleRecord(
+      prisonNumber,
+      status = ReviewScheduleStatusEntity.SCHEDULED,
+      earliestDate = today.minusDays(5),
+      latestDate = today.minusDays(1), // review is already overdue
+    )
+
+    val expectedDeadlineDate = today.minusDays(1)
+
+    // When
+    webTestClient.put()
+      .uri(URI_TEMPLATE, prisonNumber)
+      .withBody(
+        aValidUpdateReviewScheduleStatusRequest(
+          prisonId = "MDI",
+          status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
+        ),
+      )
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .contentType(APPLICATION_JSON)
+      .exchange()
+      .expectStatus()
+      .isNoContent
+
+    // Then
+    val reviewSchedule = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+    assertThat(reviewSchedule.size).isEqualTo(1)
+    assertThat(reviewSchedule[0].scheduleStatus.name).isEqualTo(ReviewScheduleStatus.SCHEDULED.name)
+    assertThat(reviewSchedule[0].latestReviewDate).isEqualTo(expectedDeadlineDate)
   }
 
   @Test
