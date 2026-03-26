@@ -84,6 +84,9 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
+  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.39") {
+    exclude(group = "io.swagger.core.v3")
+  }
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core:3.27.7")
