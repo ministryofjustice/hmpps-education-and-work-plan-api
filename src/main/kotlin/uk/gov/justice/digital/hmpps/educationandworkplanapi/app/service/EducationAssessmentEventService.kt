@@ -26,8 +26,8 @@ class EducationAssessmentEventService(
     val prisonNumber = assessmentEvent.prisonNumber
     log.info { "Processing assessment event for prisoner [$prisonNumber]" }
 
-    val prisoner = prisonerSearchApiService.getPrisoner(prisonNumber)
-    val prisonId = prisoner.prisonId ?: "N/A"
+    val prisoner = runCatching { prisonerSearchApiService.getPrisoner(prisonNumber) }.getOrNull()
+    val prisonId = prisoner?.prisonId ?: "N/A"
 
     val entity = educationAssessmentEventEntityMapper.fromDtoToEntity(assessmentEvent, prisonId)
     educationAssessmentEventRepository.saveAndFlush(entity)
