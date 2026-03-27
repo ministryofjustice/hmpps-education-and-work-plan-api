@@ -14,14 +14,12 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.Note
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.NoteType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.dto.aValidNoteDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateGoalDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidActionPlanResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidActionPlanSummaryResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
@@ -116,29 +114,5 @@ internal class ActionPlanResourceMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expectedActionPlan)
     verify(goalMapper).fromDomainToModel(actionPlan.goals[0], emptyList())
-  }
-
-  @Test
-  fun `should map from domain summaries to model summaries`() {
-    // Given
-    val summary1 = aValidActionPlanSummary(prisonNumber = randomValidPrisonNumber())
-    val summary2 = aValidActionPlanSummary(prisonNumber = randomValidPrisonNumber())
-    val expected = listOf(
-      aValidActionPlanSummaryResponse(
-        prisonNumber = summary1.prisonNumber,
-        reference = summary1.reference,
-      ),
-      aValidActionPlanSummaryResponse(
-        prisonNumber = summary2.prisonNumber,
-        reference = summary2.reference,
-      ),
-    )
-
-    // When
-    val actual = mapper.fromDomainToModel(listOf(summary1, summary2))
-
-    // Then
-    assertThat(actual).hasSize(2)
-    assertThat(actual).isEqualTo(expected)
   }
 }

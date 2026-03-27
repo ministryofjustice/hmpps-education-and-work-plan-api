@@ -10,12 +10,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.ActionPlanEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ActionPlanRepository
 
@@ -69,24 +67,5 @@ class JpaActionPlanPersistenceAdapterTest {
     assertThat(actual).isEqualTo(expectedActionPlanDomain)
     verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
     verify(actionPlanMapper).fromEntityToDomain(actionPlanEntity)
-  }
-
-  @Test
-  fun `should retrieve Action Plan Summaries`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    val prisonNumbers = listOf(prisonNumber)
-    val actionPlanSummaryProjections = listOf(aValidActionPlanSummaryProjection(prisonNumber = prisonNumber))
-    val expectedActionPlanSummaries = listOf(aValidActionPlanSummary(prisonNumber = prisonNumber))
-    given(actionPlanRepository.findByPrisonNumberIn(any())).willReturn(actionPlanSummaryProjections)
-    given(actionPlanMapper.fromEntitySummariesToDomainSummaries(any())).willReturn(expectedActionPlanSummaries)
-
-    // When
-    val actual = persistenceAdapter.getActionPlanSummaries(prisonNumbers)
-
-    // Then
-    assertThat(actual).isEqualTo(expectedActionPlanSummaries)
-    verify(actionPlanRepository).findByPrisonNumberIn(prisonNumbers)
-    verify(actionPlanMapper).fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections)
   }
 }
