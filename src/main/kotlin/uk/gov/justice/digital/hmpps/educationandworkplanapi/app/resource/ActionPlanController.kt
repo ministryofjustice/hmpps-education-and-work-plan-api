@@ -23,9 +23,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanSummaryListResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetActionPlanSummariesRequest
 
 private val log = KotlinLogging.logger {}
 
@@ -67,16 +65,5 @@ class ActionPlanController(
       noteService.getNotes(it.reference, EntityType.GOAL)
     }.groupBy { it.entityReference }
     return actionPlanMapper.fromDomainToModel(actionPlan, goalNotesByGoalReference)
-  }
-
-  @PostMapping
-  @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_ACTIONPLANS)
-  fun getActionPlanSummaries(
-    @Valid
-    @RequestBody
-    request: GetActionPlanSummariesRequest,
-  ): ActionPlanSummaryListResponse = with(actionPlanService.getActionPlanSummaries(request.prisonNumbers)) {
-    ActionPlanSummaryListResponse(actionPlanMapper.fromDomainToModel(this))
   }
 }

@@ -14,9 +14,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
@@ -112,43 +110,6 @@ class ActionPlanServiceTest {
       assertThat(exception)
         .hasMessage("ActionPlan for prisoner [$prisonNumber] not found")
       verify(persistenceAdapter).getActionPlan(prisonNumber)
-    }
-  }
-
-  @Nested
-  inner class GetActionPlanSummaries {
-    @Test
-    fun `should get action plan summaries given one or more prison numbers`() {
-      // Given
-      val prisonNumbers = listOf(randomValidPrisonNumber(), randomValidPrisonNumber())
-
-      val expectedActionPlanSummaries = listOf(
-        aValidActionPlanSummary(prisonNumber = prisonNumbers[0]),
-        aValidActionPlanSummary(prisonNumber = prisonNumbers[1]),
-      )
-      given(persistenceAdapter.getActionPlanSummaries(any())).willReturn(expectedActionPlanSummaries)
-
-      // When
-      val actual = service.getActionPlanSummaries(prisonNumbers)
-
-      // Then
-      assertThat(actual).isEqualTo(expectedActionPlanSummaries)
-      verify(persistenceAdapter).getActionPlanSummaries(prisonNumbers)
-    }
-
-    @Test
-    fun `should get action plan summaries given no prison numbers`() {
-      // Given
-      val prisonNumbers: List<String> = emptyList()
-
-      val expectedActionPlanSummaries: List<ActionPlanSummary> = emptyList()
-
-      // When
-      val actual = service.getActionPlanSummaries(prisonNumbers)
-
-      // Then
-      assertThat(actual).isEqualTo(expectedActionPlanSummaries)
-      verifyNoInteractions(persistenceAdapter)
     }
   }
 }

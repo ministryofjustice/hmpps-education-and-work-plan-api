@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
 
@@ -32,10 +31,4 @@ interface InductionPersistenceAdapter {
    * Updates an [Induction] identified by its `prisonNumber`.
    */
   fun updateInduction(updateInductionDto: UpdateInductionDto): Induction?
-
-  /**
-   * Returns a [List] of [InductionSummary]s for each matching prisoner (in the provided [List] of prison numbers)
-   * that has an Induction. The list can be empty, but not null.
-   */
-  fun getInductionSummaries(prisonNumbers: List<String>): List<InductionSummary>
 }

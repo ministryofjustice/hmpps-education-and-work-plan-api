@@ -10,12 +10,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.aValidCreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidActionPlanSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.aValidGoalEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.assertThat
 
@@ -82,29 +80,5 @@ class ActionPlanEntityMapperTest {
     // Then
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     verify(goalMapper).fromEntityToDomain(actionPlanEntity.goals[0])
-  }
-
-  @Test
-  fun `should map from entity summaries to domain summaries`() {
-    // Given
-    val summaryProjection1 = aValidActionPlanSummaryProjection(prisonNumber = randomValidPrisonNumber())
-    val summaryProjection2 = aValidActionPlanSummaryProjection(prisonNumber = randomValidPrisonNumber())
-    val expected = listOf(
-      aValidActionPlanSummary(
-        prisonNumber = summaryProjection1.prisonNumber,
-        reference = summaryProjection1.reference,
-      ),
-      aValidActionPlanSummary(
-        prisonNumber = summaryProjection2.prisonNumber,
-        reference = summaryProjection2.reference,
-      ),
-    )
-
-    // When
-    val actual = mapper.fromEntitySummariesToDomainSummaries(listOf(summaryProjection1, summaryProjection2))
-
-    // Then
-    assertThat(actual).hasSize(2)
-    assertThat(actual).isEqualTo(expected)
   }
 }

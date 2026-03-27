@@ -2,10 +2,8 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.ActionPlanSummaryProjection
 import java.util.UUID
 
 @Component
@@ -28,13 +26,6 @@ class ActionPlanEntityMapper(
       reference = reference,
       prisonNumber = prisonNumber,
       goals = goals.map { goalEntityMapper.fromEntityToDomain(it) },
-    )
-  }
-
-  fun fromEntitySummariesToDomainSummaries(actionPlanSummaryProjections: List<ActionPlanSummaryProjection>): List<ActionPlanSummary> = actionPlanSummaryProjections.map {
-    ActionPlanSummary(
-      reference = it.reference,
-      prisonNumber = it.prisonNumber,
     )
   }
 }

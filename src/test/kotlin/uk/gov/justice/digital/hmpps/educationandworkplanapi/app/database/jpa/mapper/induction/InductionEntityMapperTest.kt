@@ -13,7 +13,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aVa
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidFutureWorkInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInPrisonInterests
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPersonalSkillsAndInterests
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousTraining
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidPreviousWorkExperiences
@@ -27,7 +26,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInPrisonInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntityWithJpaFieldsPopulated
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPersonalSkillsAndInterestsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousTrainingEntity
@@ -238,38 +236,5 @@ class InductionEntityMapperTest {
       existingInductionEntity.workOnRelease,
       updateInductionDto.workOnRelease!!,
     )
-  }
-
-  @Test
-  fun `should map from entity summaries to domain summaries`() {
-    // Given
-    val summaryProjection1 = aValidInductionSummaryProjection(prisonNumber = randomValidPrisonNumber())
-    val summaryProjection2 = aValidInductionSummaryProjection(prisonNumber = randomValidPrisonNumber())
-
-    val expected = listOf(
-      aValidInductionSummary(
-        prisonNumber = summaryProjection1.prisonNumber,
-        reference = summaryProjection1.reference,
-        createdBy = summaryProjection1.createdBy,
-        createdAt = summaryProjection1.createdAt,
-        lastUpdatedBy = summaryProjection1.updatedBy,
-        lastUpdatedAt = summaryProjection1.updatedAt,
-      ),
-      aValidInductionSummary(
-        prisonNumber = summaryProjection2.prisonNumber,
-        reference = summaryProjection2.reference,
-        createdBy = summaryProjection2.createdBy,
-        createdAt = summaryProjection2.createdAt,
-        lastUpdatedBy = summaryProjection2.updatedBy,
-        lastUpdatedAt = summaryProjection2.updatedAt,
-      ),
-    )
-
-    // When
-    val actual = mapper.fromEntitySummariesToDomainSummaries(listOf(summaryProjection1, summaryProjection2))
-
-    // Then
-    assertThat(actual).hasSize(2)
-    assertThat(actual).isEqualTo(expected)
   }
 }

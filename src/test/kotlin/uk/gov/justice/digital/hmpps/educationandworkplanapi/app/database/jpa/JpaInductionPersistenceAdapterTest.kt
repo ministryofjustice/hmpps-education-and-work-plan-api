@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidWorkOnRelease
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
@@ -30,7 +29,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionEntityWithJpaFieldsPopulated
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidInductionSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidPreviousQualificationsEntityWithJpaFieldsPopulated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.aValidWorkOnReleaseEntity
@@ -39,7 +37,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.InductionEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.induction.PreviousQualificationsEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionSummaryProjectionRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.NoteRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.PreviousQualificationsRepository
 import java.util.UUID
@@ -53,9 +50,6 @@ class JpaInductionPersistenceAdapterTest {
 
   @Mock
   private lateinit var inductionRepository: InductionRepository
-
-  @Mock
-  private lateinit var inductionSummaryProjectionRepository: InductionSummaryProjectionRepository
 
   @Mock
   private lateinit var inductionMapper: InductionEntityMapper
@@ -528,24 +522,5 @@ class JpaInductionPersistenceAdapterTest {
       verifyNoInteractions(previousQualificationsRepository)
       verifyNoInteractions(previousQualificationsMapper)
     }
-  }
-
-  @Test
-  fun `should retrieve Induction Summaries`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    val prisonNumbers = listOf(prisonNumber)
-    val inductionSummaryProjections = listOf(aValidInductionSummaryProjection(prisonNumber = prisonNumber))
-    val expectedInductionSummaries = listOf(aValidInductionSummary(prisonNumber = prisonNumber))
-    given(inductionSummaryProjectionRepository.findByPrisonNumberIn(any())).willReturn(inductionSummaryProjections)
-    given(inductionMapper.fromEntitySummariesToDomainSummaries(any())).willReturn(expectedInductionSummaries)
-
-    // When
-    val actual = persistenceAdapter.getInductionSummaries(prisonNumbers)
-
-    // Then
-    assertThat(actual).isEqualTo(expectedInductionSummaries)
-    verify(inductionSummaryProjectionRepository).findByPrisonNumberIn(prisonNumbers)
-    verify(inductionMapper).fromEntitySummariesToDomainSummaries(inductionSummaryProjections)
   }
 }
