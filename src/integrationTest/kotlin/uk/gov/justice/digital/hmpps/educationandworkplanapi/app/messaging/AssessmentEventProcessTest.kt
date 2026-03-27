@@ -152,4 +152,71 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       )
     }
   }
+
+  @Test
+  fun `should process assessment event message and persist record given prisoner retrieval fails`() {
+    // Given
+    val prisonNumber = "G0378GI"
+    val statusChangeDate = LocalDate.now()
+
+    wiremockService.stubGetPrisonerNotFound(prisonNumber)
+
+    val sqsMessage = SqsAssessmentEventMessage(
+      messageId = "14e2865f-1e4b-43b0-87e8-874e7e238dd9",
+      eventType = "EducationAssessmentEventCreated",
+      description = null,
+      who = null,
+      messageAttributes = MessageAttributes(
+        prisonNumber = prisonNumber,
+        status = EducationAssessmentStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+        statusChangeDate = statusChangeDate,
+        detailUrl = "https://example.com/sequation-virtual-campus2-api/learnerAssessments/v2/$prisonNumber",
+        requestId = "0650ba37-a977-4fbe-9000-4715aaecadba",
+      ),
+    )
+
+    // When
+    sendAssessmentEvent(sqsMessage)
+
+    // Then
+    await untilCallTo {
+      assessmentEventQueueClient.countMessagesOnQueue(assessmentEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // Verify record persisted in database
+    await untilAsserted {
+      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
+      assertThat(events).hasSize(1)
+      with(events[0]) {
+        assertThat(prisonNumber).isEqualTo("G0378GI")
+        assertThat(status).isEqualTo(EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE)
+        assertThat(statusChangeDate).isEqualTo(statusChangeDate)
+        assertThat(source).isEqualTo("CURIOUS")
+        assertThat(detailUrl).isEqualTo("https://example.com/sequation-virtual-campus2-api/learnerAssessments/v2/$prisonNumber")
+        assertThat(createdAtPrison).isEqualTo("N/A")
+        assertThat(updatedAtPrison).isEqualTo("N/A")
+      }
+    }
+
+    // Verify timeline event created
+    await untilAsserted {
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline.events).anyMatch { it.eventType == TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED }
+    }
+
+    // Verify App Insights telemetry event sent
+    await untilAsserted {
+      val eventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient).trackEvent(
+        eq("EDUCATION_ASSESSMENT_EVENT_CREATED"),
+        capture(eventPropertiesCaptor),
+        isNull(),
+      )
+      val eventProperties = eventPropertiesCaptor.value
+      assertThat(eventProperties)
+        .containsEntry("prisonNumber", prisonNumber)
+        .containsEntry("status", "ALL_RELEVANT_ASSESSMENTS_COMPLETE")
+        .containsEntry("source", "CURIOUS")
+    }
+  }
 }

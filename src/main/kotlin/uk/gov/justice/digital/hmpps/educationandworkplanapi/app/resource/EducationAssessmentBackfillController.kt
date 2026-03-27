@@ -61,11 +61,19 @@ class EducationAssessmentBackfillController(
 
     log.info { "Backfill complete: $successCount saved, ${failures.size} failed out of ${request.events.size} events" }
 
-    return BackfillResponse(
-      totalReceived = request.events.size,
-      totalSaved = successCount,
-      failures = failures,
-    )
+    with(
+      BackfillResponse(
+        totalReceived = request.events.size,
+        totalSaved = successCount,
+        failures = failures,
+      ),
+    ) {
+      if (totalReceived > 0 && successCount == 0) {
+        // if successCount is zero then no records in the request were processed successfully
+        throw RuntimeException(this.toString())
+      }
+      return this
+    }
   }
 
   data class BackfillRequest(
