@@ -15,8 +15,6 @@ import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
@@ -407,8 +405,8 @@ class UpdateGoalTest : IntegrationTestBase() {
 
     await.untilAsserted {
       val timeline = getTimeline(prisonNumber)
-      assertThat(timeline.events.size).isEqualTo(7)
       assertThat(timeline)
+        .hasNumberOfEvents(7)
         .anyOfEventNumber(5, 6, 7) {
           // either the 5th or 6th Timeline event will be the GOAL_UPDATED event
           it.hasEventType(TimelineEventType.GOAL_UPDATED)
@@ -539,14 +537,6 @@ class UpdateGoalTest : IntegrationTestBase() {
           .wasActionedBy("buser_gen")
           .hasActionedByDisplayName("Bernie User")
       }
-
-    val notes = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
-      actual.goals[0].goalReference,
-      EntityType.GOAL,
-      NoteType.GOAL,
-    )
-    assertThat(notes.size).isGreaterThan(0)
-    assertThat(notes[0].content).isEqualTo("Updated goal text")
 
     // Currently no telemetry events are sent for when Steps are added/edited but no changes to the parent Goal
     // The only telemetry events sent are GOAL_UPDATED (which does not cover this scenario) or STEP_REMOVED

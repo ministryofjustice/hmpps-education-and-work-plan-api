@@ -15,8 +15,6 @@ import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -145,6 +143,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
           .hasStatus(GoalStatus.ARCHIVED)
           .hasArchiveReason(ReasonToArchiveGoal.OTHER)
           .hasArchiveReasonOther(reasonOther)
+          .hasArchiveNote(noteText)
       }
 
     await.untilAsserted {
@@ -169,13 +168,6 @@ class ArchiveGoalTest : IntegrationTestBase() {
       val goalArchivedEventProperties = eventPropertiesCaptor.firstValue
       assertThat(goalArchivedEventProperties)
         .containsEntry("reference", goalReference.toString())
-
-      val note = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(
-        goalReference,
-        EntityType.GOAL,
-        NoteType.GOAL_ARCHIVAL,
-      ).firstOrNull()
-      assertThat(note!!.content).isEqualTo(noteText)
     }
   }
 

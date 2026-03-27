@@ -14,8 +14,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.EntityType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
@@ -152,6 +150,12 @@ class CreateGoalsTest : IntegrationTestBase() {
     assertThat(actual)
       .isForPrisonNumber(prisonNumber)
       .hasNumberOfGoals(2)
+      .goal(1) {
+        it.hasGoalNote("a second note")
+      }
+      .goal(2) {
+        it.hasGoalNote("Chris would like to improve his listening skills, not just his verbal communication")
+      }
 
     val goal = actual.goals[0]
     await.untilAsserted {
@@ -169,14 +173,6 @@ class CreateGoalsTest : IntegrationTestBase() {
         .containsEntry("reference", goal.goalReference.toString())
         .containsKey("correlationId")
     }
-
-    val notes1 = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[0].goalReference, EntityType.GOAL, NoteType.GOAL)
-    assertThat(notes1.size).isGreaterThan(0)
-    assertThat(notes1[0].content).isEqualTo("a second note")
-
-    val notes2 = noteRepository.findAllByEntityReferenceAndEntityTypeAndNoteType(actual.goals[1].goalReference, EntityType.GOAL, NoteType.GOAL)
-    assertThat(notes2.size).isGreaterThan(0)
-    assertThat(notes2[0].content).isEqualTo("Chris would like to improve his listening skills, not just his verbal communication")
   }
 
   @Test
