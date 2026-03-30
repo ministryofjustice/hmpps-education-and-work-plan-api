@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ma
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInPrisonInterestsDto
@@ -12,7 +11,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdatePreviousWorkExperiencesDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateWorkOnReleaseDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionSummaryProjection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.PreviousQualificationsEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.note.NoteEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.note.NoteMapper
@@ -79,17 +77,6 @@ class InductionEntityMapper(
     completedDate = inductionEntity.completedDate,
     note = noteEntity?.let { NoteMapper.fromEntityToDomain(it) },
   )
-
-  fun fromEntitySummariesToDomainSummaries(inductionSummaryProjections: List<InductionSummaryProjection>): List<InductionSummary> = inductionSummaryProjections.map {
-    InductionSummary(
-      reference = it.reference,
-      prisonNumber = it.prisonNumber,
-      createdBy = it.createdBy,
-      createdAt = it.createdAt,
-      lastUpdatedBy = it.updatedBy,
-      lastUpdatedAt = it.updatedAt,
-    )
-  }
 
   fun updateEntityFromDto(entity: InductionEntity, dto: UpdateInductionDto) = with(entity) {
     updatedAtPrison = dto.prisonId

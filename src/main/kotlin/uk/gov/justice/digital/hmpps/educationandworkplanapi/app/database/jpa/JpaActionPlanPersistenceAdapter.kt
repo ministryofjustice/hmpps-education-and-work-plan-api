@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.actionplan.ActionPlanEntityMapper
@@ -24,10 +23,5 @@ class JpaActionPlanPersistenceAdapter(
   @Transactional(readOnly = true)
   override fun getActionPlan(prisonNumber: String): ActionPlan? = actionPlanRepository.findByPrisonNumber(prisonNumber)?.let {
     actionPlanMapper.fromEntityToDomain(it)
-  }
-
-  @Transactional(readOnly = true)
-  override fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> = actionPlanRepository.findByPrisonNumberIn(prisonNumbers).let {
-    actionPlanMapper.fromEntitySummariesToDomainSummaries(it)
   }
 }

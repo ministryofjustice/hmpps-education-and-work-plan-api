@@ -14,12 +14,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSummary
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidUpdateInductionDto
-import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 
 @ExtendWith(MockitoExtension::class)
 class InductionServiceTest {
@@ -141,43 +138,6 @@ class InductionServiceTest {
       assertThat(exception).hasMessage("Induction not found for prisoner [$PRISON_NUMBER]")
       verify(persistenceAdapter).updateInduction(updateInductionDto)
       verifyNoInteractions(inductionEventService)
-    }
-  }
-
-  @Nested
-  inner class GetInductionSummaries {
-    @Test
-    fun `should get induction summaries given one or more prison numbers`() {
-      // Given
-      val prisonNumbers = listOf(randomValidPrisonNumber(), randomValidPrisonNumber())
-
-      val expectedInductionSummaries = listOf(
-        aValidInductionSummary(prisonNumber = prisonNumbers[0]),
-        aValidInductionSummary(prisonNumber = prisonNumbers[1]),
-      )
-      given(persistenceAdapter.getInductionSummaries(any())).willReturn(expectedInductionSummaries)
-
-      // When
-      val actual = service.getInductionSummaries(prisonNumbers)
-
-      // Then
-      assertThat(actual).isEqualTo(expectedInductionSummaries)
-      verify(persistenceAdapter).getInductionSummaries(prisonNumbers)
-    }
-
-    @Test
-    fun `should get induction summaries given no prison numbers`() {
-      // Given
-      val prisonNumbers: List<String> = emptyList()
-
-      val expectedInductionSummaries: List<InductionSummary> = emptyList()
-
-      // When
-      val actual = service.getInductionSummaries(prisonNumbers)
-
-      // Then
-      assertThat(actual).isEqualTo(expectedInductionSummaries)
-      verifyNoInteractions(persistenceAdapter)
     }
   }
 }

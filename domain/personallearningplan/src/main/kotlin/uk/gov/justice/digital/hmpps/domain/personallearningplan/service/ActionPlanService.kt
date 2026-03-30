@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanSummary
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateActionPlanDto
 
 private val log = KotlinLogging.logger {}
@@ -52,10 +51,5 @@ class ActionPlanService(
         goals.onEach { it.notes = goalNotesService.getNotes(it.reference) }
       }
       ?: throw ActionPlanNotFoundException(prisonNumber)
-  }
-
-  fun getActionPlanSummaries(prisonNumbers: List<String>): List<ActionPlanSummary> {
-    log.debug { "Retrieving Action Plan Summaries for ${prisonNumbers.size} prisoners" }
-    return if (prisonNumbers.isNotEmpty()) persistenceAdapter.getActionPlanSummaries(prisonNumbers) else emptyList()
   }
 }
