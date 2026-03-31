@@ -4,7 +4,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.1.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.1.2"
   id("org.openapi.generator") version "7.21.0"
   kotlin("plugin.spring") version "2.3.20"
   kotlin("plugin.jpa") version "2.3.20"
