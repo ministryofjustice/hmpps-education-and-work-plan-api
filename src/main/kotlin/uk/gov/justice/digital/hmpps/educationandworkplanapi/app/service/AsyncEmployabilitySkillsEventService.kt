@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillsEventService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -21,20 +22,22 @@ class AsyncEmployabilitySkillsEventService(
   private val timelineService: TimelineService,
 ) : EmployabilitySkillsEventService {
   override fun employabilitySkillsCreated(employabilitySkills: List<EmployabilitySkill>) {
-    log.info { "Employability skills created event for ${employabilitySkills.size} prisoners" }
+    if (employabilitySkills.isNotEmpty()) {
+      val correlationId = UUID.randomUUID()
+      val prisonNumber = employabilitySkills.first().prisonNumber
 
-    if (employabilitySkills.isEmpty()) return
+      log.debug {
+        "Employability skills created event for prisoner [$prisonNumber]"
+      }
 
-    employabilitySkills.forEach {
-      log.info {
-        "Employability skill created event for prisoner [${it.prisonNumber}]"
+      timelineService.recordTimelineEvents(
+        prisonNumber,
+        timelineEventFactory.employabilitySkillsCreatedTimelineEvents(employabilitySkills, correlationId),
+      )
+
+      employabilitySkills.forEach {
         telemetryService.trackEmployabilitySkillCreated(it)
       }
     }
-
-    val prisonNumber = employabilitySkills.first().prisonNumber
-
-    val timelineEvents = timelineEventFactory.employabilitySkillsCreatedEvent(employabilitySkills)
-    timelineService.recordTimelineEvents(prisonNumber, timelineEvents)
   }
 }
