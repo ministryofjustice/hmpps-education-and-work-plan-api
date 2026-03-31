@@ -19,9 +19,11 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Emplo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 
 class CreateEmployabilitySkillsTest : IntegrationTestBase() {
@@ -109,6 +111,7 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
       }
 
     await.untilAsserted {
+      // Assert telemetry events
       val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("EMPLOYABILITY_SKILL_CREATED"),
@@ -120,6 +123,11 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
         .containsEntry("prisonId", "BXI")
         .containsEntry("userId", "auser_gen")
         .containsKey("reference")
+
+      // Assert timeline events
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .anyEvent { it.hasEventType(TimelineEventType.EMPLOYABILITY_SKILL_CREATED) }
     }
   }
 }

@@ -33,6 +33,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Emplo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.HasWorkedBefore
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -43,6 +44,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.LocalDate
 
@@ -187,6 +189,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .wasUpdatedAtPrison(createRequest.prisonId)
 
     await.untilAsserted {
+      // Assert telemetry events
       val eventPropertiesCaptor = createCaptor<Map<String, String>>()
       verify(telemetryClient, times(1)).trackEvent(
         eq("INDUCTION_CREATED"),
@@ -198,6 +201,12 @@ class CreateInductionTest : IntegrationTestBase() {
         .containsEntry("prisonId", createRequest.prisonId)
         .containsEntry("userId", dpsUsername)
         .containsKey("reference")
+
+      // Assert timeline events
+      val timeline = getTimeline(prisonNumber)
+      assertThat(timeline)
+        .hasNumberOfEvents(1)
+        .event(1) { it.hasEventType(TimelineEventType.INDUCTION_CREATED) }
     }
   }
 
@@ -555,6 +564,42 @@ class CreateInductionTest : IntegrationTestBase() {
           .wasCreatedAtPrison("BXI")
           .wasUpdatedAtPrison("BXI")
       }
+
+    await.untilAsserted {
+      // Assert telemetry events
+      val inductionCreateEventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("INDUCTION_CREATED"),
+        capture(inductionCreateEventPropertiesCaptor),
+        isNull(),
+      )
+      val createInductionEventProperties = inductionCreateEventPropertiesCaptor.firstValue
+      assertThat(createInductionEventProperties)
+        .containsEntry("prisonId", createRequest.prisonId)
+        .containsEntry("reference", induction.reference.toString())
+
+      val employabilitySkillsCreateEventPropertiesCaptor = createCaptor<Map<String, String>>()
+      verify(telemetryClient, times(1)).trackEvent(
+        eq("EMPLOYABILITY_SKILL_CREATED"),
+        capture(employabilitySkillsCreateEventPropertiesCaptor),
+        isNull(),
+      )
+      val createEmployabilitySkillsEventProperties = inductionCreateEventPropertiesCaptor.firstValue
+      assertThat(createEmployabilitySkillsEventProperties)
+        .containsEntry("prisonId", createRequest.prisonId)
+        .containsKey("reference")
+    }
+
+    // Assert timeline events
+    val timeline = getTimeline(prisonNumber)
+    assertThat(timeline)
+      .hasNumberOfEvents(5)
+      // The exact order of timeline events is undetermined
+      .anyEvent { it.hasEventType(TimelineEventType.INDUCTION_CREATED) }
+      .anyEvent { it.hasEventType(TimelineEventType.ACTION_PLAN_CREATED) }
+      .anyEvent { it.hasEventType(TimelineEventType.GOAL_CREATED) }
+      .anyEvent { it.hasEventType(TimelineEventType.EMPLOYABILITY_SKILL_CREATED) }
+      .anyEvent { it.hasEventType(TimelineEventType.ACTION_PLAN_REVIEW_SCHEDULE_CREATED) }
   }
 
   @Nested

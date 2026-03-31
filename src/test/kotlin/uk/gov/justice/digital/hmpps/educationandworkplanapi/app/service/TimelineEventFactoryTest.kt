@@ -10,6 +10,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep
@@ -337,5 +338,22 @@ class TimelineEventFactoryTest {
       .hasPrisonId(goal.createdAtPrison)
       .wasActionedBy(goal.lastUpdatedBy!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
+  }
+
+  @Test
+  fun `should create an employability skill created event`() {
+    // Given
+    val employabilitySkill = aValidEmployabilitySkill()
+
+    // When
+    val actual = timelineEventFactory.employabilitySkillCreatedTimelineEvent(employabilitySkill)
+
+    // Then
+    assertThat(actual)
+      .hasSourceReference(employabilitySkill.reference.toString())
+      .hasEventType(TimelineEventType.EMPLOYABILITY_SKILL_CREATED)
+      .hasPrisonId(employabilitySkill.createdAtPrison)
+      .wasActionedBy(employabilitySkill.updatedBy)
+      .hasContextualInfo(mapOf(TimelineEventContext.EMPLOYABILITY_SKILL_TYPE to employabilitySkill.employabilitySkillType.name))
   }
 }

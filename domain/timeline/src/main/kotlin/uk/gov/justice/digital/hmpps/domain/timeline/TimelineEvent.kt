@@ -90,7 +90,7 @@ enum class TimelineEventType(val isReview: Boolean, val isGoal: Boolean, val isI
   STEP_COMPLETED(false, true, false, false),
 
   // Employability Skill Type events
-  EMPLOYABILITY_SKILL_TYPE(false, false, false, false),
+  EMPLOYABILITY_SKILL_CREATED(false, false, false, false),
 
   // Action Plan Review events
   ACTION_PLAN_REVIEW_COMPLETED(true, false, false, false),

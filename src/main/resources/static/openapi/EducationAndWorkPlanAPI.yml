@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.30.0'
+  version: '1.31.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -2074,7 +2074,7 @@ components:
         - PRISON_ADMISSION
         - PRISON_RELEASE
         - PRISON_TRANSFER
-        - EMPLOYABILITY_SKILL_TYPE
+        - EMPLOYABILITY_SKILL_CREATED
         - EDUCATION_ASSESSMENT_EVENT_CREATED
     ReasonToArchiveGoal:
       title: ReasonToArchiveGoal

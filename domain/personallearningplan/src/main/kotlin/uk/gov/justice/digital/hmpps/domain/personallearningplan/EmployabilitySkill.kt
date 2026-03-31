@@ -20,7 +20,6 @@ class EmployabilitySkill(
   val createdAt: Instant,
   val updatedBy: String,
   val updatedAt: Instant,
-
 )
 
 enum class EmployabilitySkillType {

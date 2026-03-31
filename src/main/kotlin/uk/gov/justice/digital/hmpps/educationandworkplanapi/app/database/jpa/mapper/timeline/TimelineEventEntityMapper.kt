@@ -62,7 +62,7 @@ class TimelineEventEntityMapper {
     TimelineEventTypeEntity.PRISON_ADMISSION -> TimelineEventTypeDomain.PRISON_ADMISSION
     TimelineEventTypeEntity.PRISON_RELEASE -> TimelineEventTypeDomain.PRISON_RELEASE
     TimelineEventTypeEntity.PRISON_TRANSFER -> TimelineEventTypeDomain.PRISON_TRANSFER
-    TimelineEventTypeEntity.EMPLOYABILITY_SKILL_TYPE -> TimelineEventTypeDomain.EMPLOYABILITY_SKILL_TYPE
+    TimelineEventTypeEntity.EMPLOYABILITY_SKILL_TYPE -> TimelineEventTypeDomain.EMPLOYABILITY_SKILL_CREATED
     TimelineEventTypeEntity.EDUCATION_ASSESSMENT_EVENT_CREATED -> TimelineEventTypeDomain.EDUCATION_ASSESSMENT_EVENT_CREATED
   }
 
@@ -88,7 +88,7 @@ class TimelineEventEntityMapper {
     TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_STATUS_UPDATED
     TimelineEventTypeDomain.ACTION_PLAN_REVIEW_SCHEDULE_CREATED -> TimelineEventTypeEntity.ACTION_PLAN_REVIEW_SCHEDULE_CREATED
     TimelineEventTypeDomain.INDUCTION_SCHEDULE_STATUS_UPDATED -> TimelineEventTypeEntity.INDUCTION_SCHEDULE_STATUS_UPDATED
-    TimelineEventTypeDomain.EMPLOYABILITY_SKILL_TYPE -> TimelineEventTypeEntity.EMPLOYABILITY_SKILL_TYPE
+    TimelineEventTypeDomain.EMPLOYABILITY_SKILL_CREATED -> TimelineEventTypeEntity.EMPLOYABILITY_SKILL_TYPE
     TimelineEventTypeDomain.EDUCATION_ASSESSMENT_EVENT_CREATED -> TimelineEventTypeEntity.EDUCATION_ASSESSMENT_EVENT_CREATED
   }
 
