@@ -53,7 +53,7 @@ class TimelineEventResourceMapper(
     TimelineEventTypeDomain.PRISON_ADMISSION -> TimelineEventTypeApi.PRISON_ADMISSION
     TimelineEventTypeDomain.PRISON_RELEASE -> TimelineEventTypeApi.PRISON_RELEASE
     TimelineEventTypeDomain.PRISON_TRANSFER -> TimelineEventTypeApi.PRISON_TRANSFER
-    TimelineEventTypeDomain.EMPLOYABILITY_SKILL_TYPE -> TimelineEventTypeApi.EMPLOYABILITY_SKILL_TYPE
+    TimelineEventTypeDomain.EMPLOYABILITY_SKILL_CREATED -> TimelineEventTypeApi.EMPLOYABILITY_SKILL_CREATED
     TimelineEventTypeDomain.EDUCATION_ASSESSMENT_EVENT_CREATED -> TimelineEventTypeApi.EDUCATION_ASSESSMENT_EVENT_CREATED
   }
 }

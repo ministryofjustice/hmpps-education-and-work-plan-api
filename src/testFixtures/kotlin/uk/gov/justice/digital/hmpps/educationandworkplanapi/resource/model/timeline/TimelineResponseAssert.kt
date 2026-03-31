@@ -81,6 +81,33 @@ class TimelineResponseAssert(actual: TimelineResponse?) : AbstractObjectAssert<T
   }
 
   /**
+   * Allows for assertion chaining into the specified child [TimelineEventResponse]. Takes a lambda as the method argument
+   * to call assertion methods provided by [TimelineEventResponseAssert].
+   * Returns this [TimelineResponseAssert] to allow further chained assertions on the parent [TimelineResponse]
+   */
+  fun anyEvent(
+    consumer: Consumer<TimelineEventResponseAssert>,
+  ): TimelineResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val assertionErrors = mutableListOf<String>()
+      val assertionPassed = events.any {
+        try {
+          consumer.accept(assertThat(it))
+          true
+        } catch (e: AssertionError) {
+          assertionErrors.add(e.message ?: "Assertion failed")
+          false
+        }
+      }
+      if (!assertionPassed) {
+        failWithMessage("None of the events matched the assertion.\nErrors:\n${assertionErrors.joinToString("\n")}")
+      }
+    }
+    return this
+  }
+
+  /**
    * Allows for assertion chaining into all child [TimelineEventResponse]s. Takes a lambda as the method argument
    * to call assertion methods provided by [TimelineEventResponseAssert].
    * Returns this [TimelineResponseAssert] to allow further chained assertions on the parent [TimelineResponse]

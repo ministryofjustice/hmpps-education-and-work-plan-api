@@ -78,20 +78,12 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     correlationId = correlationId,
   )
 
-  fun employabilitySkillsCreatedEvent(employabilitySkills: List<EmployabilitySkill>): List<TimelineEvent> {
-    val events = mutableListOf<TimelineEvent>()
-
-    val correlationId = UUID.randomUUID()
-    employabilitySkills.forEach {
-      events.add(employabilitySkillCreatedTimelineEvent(it, correlationId))
-    }
-    return events
+  fun employabilitySkillsCreatedTimelineEvents(employabilitySkills: List<EmployabilitySkill>, correlationId: UUID = UUID.randomUUID()): List<TimelineEvent> = employabilitySkills.map {
+    employabilitySkillCreatedTimelineEvent(it, correlationId)
   }
 
   fun employabilitySkillCreatedTimelineEvent(employabilitySkill: EmployabilitySkill, correlationId: UUID = UUID.randomUUID()) = employabilitySkillTimelineEvent(
     employabilitySkill = employabilitySkill,
-    sourceReference = employabilitySkill.reference,
-    eventType = TimelineEventType.GOAL_CREATED,
     contextualInfo = mapOf(TimelineEventContext.EMPLOYABILITY_SKILL_TYPE to employabilitySkill.employabilitySkillType.name),
     correlationId = correlationId,
   )
@@ -252,13 +244,11 @@ class TimelineEventFactory(private val userService: ManageUserService) {
 
   private fun employabilitySkillTimelineEvent(
     employabilitySkill: EmployabilitySkill,
-    sourceReference: UUID,
-    eventType: TimelineEventType,
     contextualInfo: Map<TimelineEventContext, String>,
     correlationId: UUID = UUID.randomUUID(),
   ) = TimelineEvent.newTimelineEvent(
-    sourceReference = sourceReference.toString(),
-    eventType = eventType,
+    sourceReference = employabilitySkill.reference.toString(),
+    eventType = TimelineEventType.EMPLOYABILITY_SKILL_CREATED,
     prisonId = employabilitySkill.updatedAtPrison,
     actionedBy = employabilitySkill.updatedBy,
     contextualInfo = contextualInfo,
