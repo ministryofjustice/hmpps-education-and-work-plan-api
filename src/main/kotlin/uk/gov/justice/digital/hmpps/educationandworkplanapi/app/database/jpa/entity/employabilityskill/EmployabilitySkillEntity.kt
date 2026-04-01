@@ -25,32 +25,29 @@ import java.util.UUID
 @Entity
 @EntityListeners(AuditingEntityListener::class)
 data class EmployabilitySkillEntity(
-
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  @Column
-  val id: UUID? = null,
-
-  @Column
+  @Column(updatable = false)
   val reference: UUID = UUID.randomUUID(),
 
-  @Column
+  @Column(updatable = false)
   val prisonNumber: String,
 
   @Enumerated(EnumType.STRING)
-  @Column
+  @Column(updatable = false)
   val skillType: EmployabilitySkillType,
-  @Column
+
+  @Column(updatable = false)
   val evidence: String,
-  @Column(name = "rating_code")
+
+  @Column(updatable = false, name = "rating_code")
   val ratingCode: String,
 
-  @Column
+  @Enumerated(EnumType.STRING)
+  @Column(updatable = false)
   val sessionType: EmployabilitySkillSessionType?,
 
-  @Column
+  @Column(updatable = false)
   val sessionTypeDescription: String?,
+
   /**
    * Convenience association to the rating lookup table.
    */
@@ -63,28 +60,33 @@ data class EmployabilitySkillEntity(
   )
   val rating: EmployabilitySkillRatingEntity? = null,
 
-  @CreatedBy
-  @Column
-  var createdBy: String? = null,
-
-  @CreationTimestamp
-  @Column
-  var createdAt: Instant? = null,
-
-  @Column
-  var createdAtPrison: String? = null,
-
-  @LastModifiedBy
-  @Column
-  var updatedBy: String? = null,
-
-  @UpdateTimestamp
-  @Column
-  var updatedAt: Instant? = null,
+  @Column(updatable = false)
+  val createdAtPrison: String? = null,
 
   @Column
   var updatedAtPrison: String? = null,
 ) {
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  var id: UUID? = null
+
+  @Column(updatable = false)
+  @CreationTimestamp
+  var createdAt: Instant? = null
+
+  @Column(updatable = false)
+  @CreatedBy
+  var createdBy: String? = null
+
+  @Column
+  @UpdateTimestamp
+  var updatedAt: Instant? = null
+
+  @Column
+  @LastModifiedBy
+  var updatedBy: String? = null
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
