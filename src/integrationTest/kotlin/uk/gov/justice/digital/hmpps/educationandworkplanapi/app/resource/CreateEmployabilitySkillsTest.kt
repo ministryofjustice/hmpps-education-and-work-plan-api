@@ -11,7 +11,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
@@ -47,7 +46,7 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .withBody(CreateEmployabilitySkillsRequest(listOf(aValidCreateEmployabilitySkillRequest())))
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -66,7 +65,7 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -90,7 +89,7 @@ class CreateEmployabilitySkillsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createEmployabilitySkillsRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

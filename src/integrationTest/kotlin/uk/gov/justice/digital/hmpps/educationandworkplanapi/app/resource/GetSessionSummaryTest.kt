@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
@@ -45,7 +43,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, PRISON_ID)
-      .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithNoAuthorities())
       .exchange()
       .expectStatus()
       .isForbidden
@@ -259,12 +257,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
   private fun getSessionSummary(): FluxExchangeResult<SessionSummaryResponse> {
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, PRISON_ID)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .exchange()
       .expectStatus()
       .isOk

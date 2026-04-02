@@ -6,7 +6,6 @@ import org.junit.jupiter.api.parallel.Isolated
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.INDUCTIONS_RW
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -46,7 +45,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -79,7 +78,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -112,7 +111,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -145,7 +144,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

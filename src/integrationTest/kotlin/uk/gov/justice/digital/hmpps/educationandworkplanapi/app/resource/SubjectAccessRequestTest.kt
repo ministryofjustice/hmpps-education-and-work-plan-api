@@ -8,11 +8,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.util.UriBuilder
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.buildAccessToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -53,7 +51,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
           .queryParam("prn", randomValidPrisonNumber())
           .build()
       }
-      .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithNoAuthorities())
       .exchange()
       .expectStatus()
       .isForbidden
@@ -75,12 +73,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
           .path(URI_TEMPLATE)
           .queryParam("prn", randomValidPrisonNumber())
           .build()
-      }.bearerToken(
-        buildAccessToken(
-          roles = listOf("ROLE_SAR_DATA_ACCESS"),
-          privateKey = keyPair.private,
-        ),
-      )
+      }
+      .bearerToken(aValidTokenWithAuthority("ROLE_SAR_DATA_ACCESS"))
       .exchange()
       .expectStatus()
       .isNoContent
@@ -95,12 +89,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
           .path(URI_TEMPLATE)
           .queryParam("crn", randomValidPrisonNumber())
           .build()
-      }.bearerToken(
-        buildAccessToken(
-          roles = listOf("ROLE_SAR_DATA_ACCESS"),
-          privateKey = keyPair.private,
-        ),
-      )
+      }
+      .bearerToken(aValidTokenWithAuthority("ROLE_SAR_DATA_ACCESS"))
       .exchange()
       .expectStatus()
       .isEqualTo(209)
@@ -114,12 +104,8 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
         uriBuilder
           .path(URI_TEMPLATE)
           .build()
-      }.bearerToken(
-        buildAccessToken(
-          roles = listOf("ROLE_SAR_DATA_ACCESS"),
-          privateKey = keyPair.private,
-        ),
-      )
+      }
+      .bearerToken(aValidTokenWithAuthority("ROLE_SAR_DATA_ACCESS"))
       .exchange()
       .expectStatus()
       .isBadRequest
@@ -303,12 +289,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
       toDate?.also { uriBuilder.queryParam("toDate", it) }
       uriBuilder.build()
     }
-    .bearerToken(
-      buildAccessToken(
-        roles = listOf("ROLE_SAR_DATA_ACCESS"),
-        privateKey = keyPair.private,
-      ),
-    )
+    .bearerToken(aValidTokenWithAuthority("ROLE_SAR_DATA_ACCESS"))
     .contentType(MediaType.APPLICATION_JSON)
     .exchange()
 }

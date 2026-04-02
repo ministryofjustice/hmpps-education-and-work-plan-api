@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
@@ -73,12 +72,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidUpdateInductionRequest())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -97,12 +91,7 @@ class UpdateInductionTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -127,12 +116,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -260,13 +244,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          username = updateUsername,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = updateUsername))
       .exchange()
       .expectStatus()
       .isNoContent
@@ -412,13 +390,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          username = updateUsername,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = updateUsername))
       .exchange()
       .expectStatus()
       .isNoContent
@@ -514,12 +486,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .exchange()
       .expectStatus()
       .isNoContent
@@ -575,12 +542,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .exchange()
       .expectStatus()
       .isNoContent
@@ -639,13 +601,7 @@ class UpdateInductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-          username = "buser_gen",
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "buser_gen"))
       .exchange()
       .expectStatus()
       .isNoContent

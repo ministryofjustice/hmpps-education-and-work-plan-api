@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
@@ -39,12 +38,7 @@ class GetEducationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RO))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -80,12 +74,7 @@ class GetEducationTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RO))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()

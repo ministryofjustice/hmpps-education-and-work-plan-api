@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -41,7 +39,7 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithNoAuthorities())
       .exchange()
       .expectStatus()
       .isForbidden
@@ -63,12 +61,7 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
       .exchange()
       .expectStatus()
       .isNotFound
@@ -92,12 +85,7 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
       .exchange()
       .expectStatus()
       .isOk
@@ -130,12 +118,7 @@ class GetInductionScheduleTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, randomPrisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
       .exchange()
       .expectStatus()
       .isOk

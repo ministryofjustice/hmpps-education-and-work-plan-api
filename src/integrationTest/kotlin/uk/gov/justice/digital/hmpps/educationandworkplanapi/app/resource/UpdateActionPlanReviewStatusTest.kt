@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -59,7 +58,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .contentType(APPLICATION_JSON)
       .withBody(aValidUpdateReviewScheduleStatusRequest())
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO))
       .exchange()
       .expectStatus()
       .isForbidden
@@ -85,7 +84,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -109,7 +108,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidUpdateReviewScheduleStatusRequest())
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -137,7 +136,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -166,7 +165,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -195,7 +194,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -225,7 +224,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.COMPLETED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -257,7 +256,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -291,7 +290,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -325,7 +324,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -359,7 +358,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -393,7 +392,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -427,7 +426,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -471,7 +470,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           exemptionReason = "Something happened in the prison which meant we could not do the review today",
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -517,7 +516,7 @@ class UpdateActionPlanReviewStatusTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

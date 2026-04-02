@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonPeriod
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
@@ -56,7 +54,7 @@ class GetTimelineTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithNoAuthorities())
       .exchange()
       .expectStatus()
       .isForbidden
@@ -79,12 +77,7 @@ class GetTimelineTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          TIMELINE_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
       .exchange()
       .expectStatus()
       .isNotFound
@@ -137,12 +130,7 @@ class GetTimelineTest : IntegrationTestBase() {
     await.untilAsserted {
       val response = webTestClient.get()
         .uri(URI_TEMPLATE, prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
+        .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
         .exchange()
         .expectStatus()
         .isOk
@@ -275,12 +263,7 @@ class GetTimelineTest : IntegrationTestBase() {
     await.untilAsserted {
       val response = webTestClient.get()
         .uri(URI_TEMPLATE, prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
+        .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
         .exchange()
         .expectStatus()
         .isOk
@@ -396,12 +379,7 @@ class GetTimelineTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          TIMELINE_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
       .exchange()
       .expectStatus()
       .isOk
@@ -434,12 +412,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?reviews=true&inductions=false&goals=false&prisonEvents=false", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -462,12 +435,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?reviews=false&inductions=true&goals=false&prisonEvents=false", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -490,12 +458,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?reviews=false&inductions=false&goals=true&prisonEvents=false", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -518,12 +481,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?reviews=false&inductions=false&goals=false&prisonEvents=true", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -546,12 +504,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?reviews=true&inductions=true&goals=true&prisonEvents=true", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -574,12 +527,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?reviews=false&inductions=false&goals=false&prisonEvents=false", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -602,12 +550,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri(URI_TEMPLATE, prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -630,12 +573,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?prisonId=BXI&reviews=false&inductions=false&goals=false&prisonEvents=false", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -658,12 +596,7 @@ class GetTimelineTest : IntegrationTestBase() {
       await.untilAsserted {
         val response = webTestClient.get()
           .uri("${URI_TEMPLATE}?prisonId=XXX&reviews=false&inductions=false&goals=false&prisonEvents=false", prisonNumber)
-          .bearerToken(
-            aValidTokenWithAuthority(
-              TIMELINE_RO,
-              privateKey = keyPair.private,
-            ),
-          )
+          .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
           .exchange()
           .expectStatus()
           .isOk
@@ -682,12 +615,7 @@ class GetTimelineTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -698,12 +626,7 @@ class GetTimelineTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(UPDATE_GOAL_URI_TEMPLATE, prisonNumber, updateGoalRequest.goalReference)
       .withBody(updateGoalRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -761,12 +684,7 @@ class GetTimelineTest : IntegrationTestBase() {
     await.untilAsserted {
       val response = webTestClient.get()
         .uri(URI_TEMPLATE, prisonNumber)
-        .bearerToken(
-          aValidTokenWithAuthority(
-            TIMELINE_RO,
-            privateKey = keyPair.private,
-          ),
-        )
+        .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
         .exchange()
         .expectStatus()
         .isOk
