@@ -26,7 +26,7 @@ val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val jsonWebTokenVersion = "0.13.0"
 val nimbusJwtVersion = "10.8"
-val testContainersVersion = "1.21.4"
+val testContainersVersion = "2.0.3"
 val awsSdkVersion = "1.12.797"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
@@ -78,8 +78,8 @@ dependencies {
   // Integration test dependencies
   integrationTestImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   integrationTestImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
-  integrationTestImplementation("org.testcontainers:postgresql:$testContainersVersion")
-  integrationTestImplementation("org.testcontainers:testcontainers-localstack:2.0.3")
+  integrationTestImplementation("org.testcontainers:testcontainers-postgresql:$testContainersVersion")
+  integrationTestImplementation("org.testcontainers:testcontainers-localstack:$testContainersVersion")
   integrationTestApi("com.amazonaws:aws-java-sdk-core:$awsSdkVersion") // Needed so Localstack has access to the AWS SDK V1 API
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
