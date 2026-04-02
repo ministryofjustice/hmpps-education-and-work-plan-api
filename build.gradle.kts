@@ -79,7 +79,7 @@ dependencies {
   integrationTestImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   integrationTestImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
   integrationTestImplementation("org.testcontainers:postgresql:$testContainersVersion")
-  integrationTestImplementation("org.testcontainers:localstack:$testContainersVersion")
+  integrationTestImplementation("org.testcontainers:testcontainers-localstack:2.0.3")
   integrationTestApi("com.amazonaws:aws-java-sdk-core:$awsSdkVersion") // Needed so Localstack has access to the AWS SDK V1 API
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
