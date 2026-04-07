@@ -81,6 +81,11 @@ hmpps:
   auth:
     url: http://localhost:9093/auth
 
+  sar:
+    tests:
+      expected-render-result:
+        path: /sar/expected-report.html
+
 ciag-kpi-processing-rule: PEF
 
 

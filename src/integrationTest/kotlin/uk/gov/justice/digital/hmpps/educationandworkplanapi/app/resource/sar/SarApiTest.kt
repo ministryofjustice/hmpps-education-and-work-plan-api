@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.sar
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
 
-class SubjectAccessRequestTest : IntegrationTestBase() {
+class SarApiTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/subject-access-request"
   }
@@ -280,7 +280,7 @@ class SubjectAccessRequestTest : IntegrationTestBase() {
     responseLastWeek.expectStatus().isNoContent
   }
 
-  private fun WebTestClient.sarRequest(prisonNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec = webTestClient.get()
+  private fun WebTestClient.sarRequest(prisonNumber: String, fromDate: LocalDate?, toDate: LocalDate?): WebTestClient.ResponseSpec = get()
     .uri { uriBuilder: UriBuilder ->
       uriBuilder
         .path(URI_TEMPLATE)

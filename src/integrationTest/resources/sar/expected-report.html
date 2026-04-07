@@ -1,0 +1,400 @@
+<style>
+  * {
+    font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    color: #0b0c0c;
+  }
+  /* --- HEADINGS --- */
+
+  .title {
+    font-size: 20pt;
+    text-align: center;
+  }
+
+  h1, h2, h3 {
+    color: #0b0c0c;
+    font-weight: 700;
+    display: block;
+    margin-top: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  h1 {
+    font-size: 18pt;
+    line-height: 1.09375;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+  }
+
+  h2 {
+    font-size: 17pt;
+    line-height: 1.0416666667;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+  }
+
+  h3 {
+    font-size: 16pt;
+    line-height: 1.0416666667;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+  }
+
+  h4 {
+    font-size: 15pt;
+    line-height: 1.0416666667;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+  }
+
+  h5 {
+    font-size: 14pt;
+    line-height: 1.0416666667;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+  }
+
+  /* --- SUMMARY LIST --- */
+
+  table.summary-list {
+    display: table;
+    width: 700px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 0 0 5px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  table.summary-list tr {
+    display: table-row;
+    margin: 0 0 20px;
+  }
+
+  table.summary-list tr td {
+    border-bottom: 1px solid #b1b4b6;
+    /*margin-bottom: 5px;*/
+    overflow-wrap: break-word;
+    display: table-cell;
+    /*padding-top: 2px;*/
+    /*padding-bottom: 2px;*/
+    /*padding-right: 0;*/
+    margin-inline-start: 40px;
+    width: 70%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    line-height: 1.25;
+    font-weight: 400;
+    white-space: normal;
+    vertical-align: top;
+  }
+
+  table.summary-list tr td:first-child {
+    font-size: 12pt;
+    width: 30%;
+    font-weight: 700;
+    padding-right: 20px;
+    vertical-align: top;
+  }
+
+  /* --- DATA TABLE --- */
+
+  table.data-table {
+    display: table;
+    width: 700px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 0 0 5px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  table.data-table tr {
+    display: table-row;
+    margin: 0 0 20px;
+  }
+
+  table.data-table tr td {
+    border-bottom: 1px solid #b1b4b6;
+    margin-bottom: 5px;
+    overflow-wrap: break-word;
+    display: table-cell;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 0;
+    margin-inline-start: 40px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    line-height: 1.25;
+    font-weight: 400;
+    white-space: pre-wrap;
+    vertical-align: top;
+  }
+
+  table.data-table tr:first-child td {
+    font-size: 12pt;
+    width: 30%;
+    font-weight: 700;
+    padding-right: 20px;
+    border-bottom: none;
+    vertical-align: top;
+  }
+
+  table.data-table tr td.data-column-5 { width: 5% }
+  table.data-table tr td.data-column-10 { width: 10% }
+  table.data-table tr td.data-column-15 { width: 15% }
+  table.data-table tr td.data-column-20 { width: 20% }
+  table.data-table tr td.data-column-25 { width: 25% }
+  table.data-table tr td.data-column-30 { width: 30% }
+  table.data-table tr td.data-column-35 { width: 35% }
+  table.data-table tr td.data-column-40 { width: 40% }
+  table.data-table tr td.data-column-45 { width: 45% }
+  table.data-table tr td.data-column-50 { width: 50% }
+  table.data-table tr td.data-column-55 { width: 55% }
+  table.data-table tr td.data-column-60 { width: 60% }
+  table.data-table tr td.data-column-65 { width: 65% }
+  table.data-table tr td.data-column-70 { width: 70% }
+  table.data-table tr td.data-column-75 { width: 75% }
+  table.data-table tr td.data-column-80 { width: 80% }
+  table.data-table tr td.data-column-85 { width: 85% }
+  table.data-table tr td.data-column-90 { width: 90% }
+  table.data-table tr td.data-column-95 { width: 95% }
+
+  table tr td.data-column-5 { width: 5% }
+  table tr td.data-column-10 { width: 10% }
+  table tr td.data-column-15 { width: 15% }
+  table tr td.data-column-20 { width: 20% }
+  table tr td.data-column-25 { width: 25% }
+  table tr td.data-column-30 { width: 30% }
+  table tr td.data-column-35 { width: 35% }
+  table tr td.data-column-40 { width: 40% }
+  table tr td.data-column-45 { width: 45% }
+  table tr td.data-column-50 { width: 50% }
+  table tr td.data-column-55 { width: 55% }
+  table tr td.data-column-60 { width: 60% }
+  table tr td.data-column-65 { width: 65% }
+  table tr td.data-column-70 { width: 70% }
+  table tr td.data-column-75 { width: 75% }
+  table tr td.data-column-80 { width: 80% }
+  table tr td.data-column-85 { width: 85% }
+  table tr td.data-column-90 { width: 90% }
+  table tr td.data-column-95 { width: 95% }
+
+  table.summary-list tr td.data-column-5 { width: 5% }
+  table.summary-list tr td.data-column-10 { width: 10% }
+  table.summary-list tr td.data-column-15 { width: 15% }
+  table.summary-list tr td.data-column-20 { width: 20% }
+  table.summary-list tr td.data-column-25 { width: 25% }
+  table.summary-list tr td.data-column-30 { width: 30% }
+  table.summary-list tr td.data-column-35 { width: 35% }
+  table.summary-list tr td.data-column-40 { width: 40% }
+  table.summary-list tr td.data-column-45 { width: 45% }
+  table.summary-list tr td.data-column-50 { width: 50% }
+  table.summary-list tr td.data-column-55 { width: 55% }
+  table.summary-list tr td.data-column-60 { width: 60% }
+  table.summary-list tr td.data-column-65 { width: 65% }
+  table.summary-list tr td.data-column-70 { width: 70% }
+  table.summary-list tr td.data-column-75 { width: 75% }
+  table.summary-list tr td.data-column-80 { width: 80% }
+  table.summary-list tr td.data-column-85 { width: 85% }
+  table.summary-list tr td.data-column-90 { width: 90% }
+  table.summary-list tr td.data-column-95 { width: 95% }
+
+  ul {
+    padding: 0 0 0 10px;
+  }
+
+</style>
+
+<h1 class="title">Personal Learning Plan</h1>
+
+<br>
+<h2>Induction</h2>
+<table class="summary-list">
+  <tr><td>Hoping to Work</td><td>NO</td></tr>
+  <tr><td>Factors affecting ability to work</td><td>OTHER</td></tr>
+  <tr><td>Other Factors</td><td>Employers aren&#x27;t interested</td></tr>
+  <tr><td>Previous training</td><td>OTHER</td></tr>
+  <tr><td>Other Training</td><td>Certified Kotlin Developer</td></tr>
+  <tr><td>Has worked before</td><td>YES</td></tr>
+  <tr><td>Has worked before Not Relevant reason</td><td>No Data Held</td></tr>
+</table>
+
+<h3>Previous work experiences</h3>
+<table class="data-table">
+  <tr>
+    <td class="data-column-20">Type</td>
+    <td class="data-column-15">Type Other</td>
+    <td class="data-column-25">Role</td>
+    <td class="data-column-40">Details</td>
+  </tr>
+
+  <tr>
+    <td>OTHER</td>
+    <td>Scientist</td>
+    <td>Lab Technician</td>
+    <td>Cleaning test tubes</td>
+  </tr>
+
+
+</table>
+
+<h3>Interests and skills</h3>
+<table class="summary-list">
+  <tr><td>In prison work interests</td><td>OTHER (Any in-prison work)</td></tr>
+  <tr><td>In prison training interests</td><td>OTHER (Any in-prison training)</td></tr>
+  <tr><td>Skills</td><td>No Data Held</td></tr>
+  <tr><td>Interests</td><td>COMMUNITY (Varied interests)<br>OTHER (Varied interests)</td></tr>
+  <tr><td>Future work interests</td><td>OTHER (Any job I can get) - Any role</td></tr>
+</table>
+
+
+<br>
+
+<h2>Goals</h2>
+
+<h3>Goal</h3>
+<table class="summary-list">
+  <tr><td>Title</td><td>Goal 1</td></tr>
+  <tr><td>Target completion date</td><td>07 October 2026</td></tr>
+  <tr><td>Status</td><td>ACTIVE</td></tr>
+</table>
+<table class="data-table">
+  <tr>
+    <td class="data-column-100">Notes</td>
+  </tr>
+  <tr>
+    <td>Chris would like to improve his listening skills, not just his verbal communication</td>
+  </tr>
+</table>
+
+<table class="data-table">
+  <tr>
+    <td class="data-column-15">Step</td>
+    <td class="data-column-25">Status</td>
+    <td class="data-column-60">Title</td>
+  </tr>
+
+  <tr>
+    <td>1</td>
+    <td>NOT_STARTED</td>
+    <td>Book communication skills course</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>NOT_STARTED</td>
+    <td>Complete communication skills course</td>
+  </tr>
+
+</table>
+
+
+
+<br/>
+
+<h2>Education</h2>
+
+<table class="summary-list">
+  <tr><td>Education level</td><td>SECONDARY_SCHOOL_TOOK_EXAMS</td></tr>
+</table>
+
+<h3>Qualifications</h3>
+<table class="data-table">
+  <tr>
+    <td class="data-column-50">Subject</td>
+    <td class="data-column-50">Level</td>
+  </tr>
+
+  <tr>
+    <td>English</td>
+    <td>A</td>
+  </tr>
+
+  <tr>
+    <td>Maths</td>
+    <td>B</td>
+  </tr>
+
+
+</table>
+
+
+<br/>
+
+<h2>Completed reviews</h2>
+
+<h3>Review</h3>
+<table class="data-table">
+  <tr>
+    <td class="data-column-30">Conducted by</td>
+    <td class="data-column-30">Conducted by role</td>
+    <td class="data-column-30">Is last review before release</td>
+  </tr>
+  <tr>
+    <td>Barnie Jones</td>
+    <td>Peer mentor</td>
+    <td>No</td>
+  </tr>
+</table>
+<table class="data-table">
+  <tr>
+    <td class="data-column-30">Deadline date</td>
+    <td class="data-column-30">Completed date</td>
+    <td class="data-column-30">Note type</td>
+  </tr>
+  <tr>
+    <td>05 January 2026</td>
+    <td>01 January 2026</td>
+    <td>REVIEW</td>
+  </tr>
+</table>
+<table class="summary-list">
+  <tr><td>Note content</td><td>Review went well</td></tr>
+</table>
+
+<h3>Review</h3>
+<table class="data-table">
+  <tr>
+    <td class="data-column-30">Conducted by</td>
+    <td class="data-column-30">Conducted by role</td>
+    <td class="data-column-30">Is last review before release</td>
+  </tr>
+  <tr>
+    <td>Johnson</td>
+    <td>No Data Held</td>
+    <td>No</td>
+  </tr>
+</table>
+<table class="data-table">
+  <tr>
+    <td class="data-column-30">Deadline date</td>
+    <td class="data-column-30">Completed date</td>
+    <td class="data-column-30">Note type</td>
+  </tr>
+  <tr>
+    <td>07 April 2027</td>
+    <td>29 March 2026</td>
+    <td>REVIEW</td>
+  </tr>
+</table>
+<table class="summary-list">
+  <tr><td>Note content</td><td>Second review went really well</td></tr>
+</table>
+
+

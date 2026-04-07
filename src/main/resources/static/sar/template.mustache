@@ -1,0 +1,157 @@
+<h1 class="title">Personal Learning Plan</h1>
+{{#induction}}
+    <br>
+    <h2>Induction</h2>
+    <table class="summary-list">
+        <tr><td>Hoping to Work</td><td>{{ optionalValue workOnRelease.hopingToWork }}</td></tr>
+        <tr><td>Factors affecting ability to work</td><td>{{#workOnRelease.affectAbilityToWork}}{{ . }}{{#unless @last}}<br>{{/unless}}{{/workOnRelease.affectAbilityToWork}}</td></tr>
+        <tr><td>Other Factors</td><td>{{ optionalValue workOnRelease.affectAbilityToWorkOther}}</td></tr>
+        <tr><td>Previous training</td><td>{{#previousTraining.trainingTypes}}{{ . }}{{#unless @last}}<br>{{/unless}}{{/previousTraining.trainingTypes}}</td></tr>
+        <tr><td>Other Training</td><td>{{ optionalValue previousTraining.trainingTypeOther }}</td></tr>
+        <tr><td>Has worked before</td><td>{{ optionalValue previousWorkExperiences.hasWorkedBefore }}</td></tr>
+        <tr><td>Has worked before Not Relevant reason</td><td>{{ optionalValue previousWorkExperiences.hasWorkedBeforeNotRelevantReason }}</td></tr>
+    </table>
+
+    <h3>Previous work experiences</h3>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-20">Type</td>
+            <td class="data-column-15">Type Other</td>
+            <td class="data-column-25">Role</td>
+            <td class="data-column-40">Details</td>
+        </tr>
+        {{#previousWorkExperiences.experiences}}
+            <tr>
+                <td>{{ optionalValue experienceType }}</td>
+                <td>{{ optionalValue experienceTypeOther }}</td>
+                <td>{{ optionalValue role }}</td>
+                <td>{{ optionalValue details }}</td>
+            </tr>
+        {{/previousWorkExperiences.experiences}}
+        {{^previousWorkExperiences.experiences}}
+            <tr>
+                <td>No Data Held</td>
+                <td>No Data Held</td>
+                <td>No Data Held</td>
+                <td>No Data Held</td>
+            </tr>
+        {{/previousWorkExperiences.experiences}}
+    </table>
+
+    <h3>Interests and skills</h3>
+    <table class="summary-list">
+        <tr><td>In prison work interests</td><td>{{#inPrisonInterests.inPrisonWorkInterests}}{{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/inPrisonInterests.inPrisonWorkInterests}}{{^inPrisonInterests.inPrisonWorkInterests}}No Data Held{{/inPrisonInterests.inPrisonWorkInterests}}</td></tr>
+        <tr><td>In prison training interests</td><td>{{#inPrisonInterests.inPrisonTrainingInterests}}{{ trainingType }}{{#if trainingTypeOther}} ({{ trainingTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/inPrisonInterests.inPrisonTrainingInterests}}{{^inPrisonInterests.inPrisonTrainingInterests}}No Data Held{{/inPrisonInterests.inPrisonTrainingInterests}}</td></tr>
+        <tr><td>Skills</td><td>{{#personalSkillsAndInterests.skills}}{{ skillType }}{{#if skillTypeOther}} ({{ skillTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/personalSkillsAndInterests.skills}}{{^personalSkillsAndInterests.skills}}No Data Held{{/personalSkillsAndInterests.skills}}</td></tr>
+        <tr><td>Interests</td><td>{{#personalSkillsAndInterests.interests}}{{ interestType }}{{#if interestTypeOther}} ({{ interestTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/personalSkillsAndInterests.interests}}{{^personalSkillsAndInterests.interests}}No Data Held{{/personalSkillsAndInterests.interests}}</td></tr>
+        <tr><td>Future work interests</td><td>{{#futureWorkInterests.interests}}{{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#if role}} - {{ role }}{{/if}}{{#unless @last}}<br>{{/unless}}{{/futureWorkInterests.interests}}{{^futureWorkInterests.interests}}No Data Held{{/futureWorkInterests.interests}}</td></tr>
+    </table>
+{{/induction}}
+{{^induction}}
+    <p>No Data Held</p>
+{{/induction}}
+<br>
+
+<h2>Goals</h2>
+{{#goals}}
+    <h3>Goal</h3>
+    <table class="summary-list">
+        <tr><td>Title</td><td>{{ optionalValue title }}</td></tr>
+        <tr><td>Target completion date</td><td>{{ optionalValue (formatDate targetCompletionDate) }}</td></tr>
+        <tr><td>Status</td><td>{{ optionalValue status }}</td></tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-100">Notes</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue notes }}</td>
+        </tr>
+    </table>
+
+    <table class="data-table">
+        <tr>
+            <td class="data-column-15">Step</td>
+            <td class="data-column-25">Status</td>
+            <td class="data-column-60">Title</td>
+        </tr>
+        {{#steps}}
+            <tr>
+                <td>{{ optionalValue sequenceNumber }}</td>
+                <td>{{ optionalValue status }}</td>
+                <td>{{ optionalValue title }}</td>
+            </tr>
+        {{/steps}}
+    </table>
+
+{{/goals}}
+{{^goals}}
+    <p>No Data Held</p>
+{{/goals}}
+<br/>
+
+<h2>Education</h2>
+{{#education}}
+    <table class="summary-list">
+        <tr><td>Education level</td><td>{{ optionalValue educationLevel }}</td></tr>
+    </table>
+
+    <h3>Qualifications</h3>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-50">Subject</td>
+            <td class="data-column-50">Level</td>
+        </tr>
+        {{#qualifications}}
+            <tr>
+                <td>{{ optionalValue subject }}</td>
+                <td>{{ optionalValue grade }}</td>
+            </tr>
+        {{/qualifications}}
+        {{^qualifications}}
+            <tr>
+                <td>No Data Held</td>
+                <td>No Data Held</td>
+            </tr>
+        {{/qualifications}}
+    </table>
+{{/education}}
+{{^education}}
+    <p>No Data Held</p>
+{{/education}}
+<br/>
+
+<h2>Completed reviews</h2>
+{{#completedReviews}}
+    <h3>Review</h3>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Conducted by</td>
+            <td class="data-column-30">Conducted by role</td>
+            <td class="data-column-30">Is last review before release</td>
+        </tr>
+        <tr>
+            <td>{{#conductedBy}}{{.}}{{/conductedBy}}{{^conductedBy}}{{ getUserLastName createdBy }}{{/conductedBy}}</td>
+            <td>{{ optionalValue conductedByRole }}</td>
+            <td>{{ convertBoolean preRelease }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Deadline date</td>
+            <td class="data-column-30">Completed date</td>
+            <td class="data-column-30">Note type</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue (formatDate deadlineDate) }}</td>
+            <td>{{ optionalValue (formatDate completedDate) }}</td>
+            <td>{{ optionalValue note.type }}</td>
+        </tr>
+    </table>
+    <table class="summary-list">
+        <tr><td>Note content</td><td>{{ optionalValue note.content }}</td></tr>
+    </table>
+{{/completedReviews}}
+{{^completedReviews}}
+    <p>No Data Held</p>
+{{/completedReviews}}

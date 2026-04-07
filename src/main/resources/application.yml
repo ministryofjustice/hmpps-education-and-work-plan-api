@@ -128,3 +128,8 @@ service:
 induction-extension:
   periods: ${INDUCTION_EXTENSION_PERIODS}
 
+hmpps:
+  sar:
+    template:
+      path: /static/sar/template.mustache
+      enabled: true
