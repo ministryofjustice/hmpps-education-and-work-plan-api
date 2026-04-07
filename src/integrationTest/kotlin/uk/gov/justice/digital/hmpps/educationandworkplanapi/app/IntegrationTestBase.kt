@@ -78,6 +78,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateInductionRequest
@@ -92,6 +94,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Updat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelperConfig
@@ -120,6 +123,7 @@ abstract class IntegrationTestBase {
     const val CREATE_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_URI_TEMPLATE = "/action-plans/{prisonNumber}"
     const val GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
+    const val CREATE_ACTION_PLAN_REVIEW_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews"
     const val GET_REVIEW_SCHEDULES_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/review-schedules"
     const val UPDATE_REVIEW_SCHEDULE_STATUS_URI_TEMPLATE = "/action-plans/{prisonNumber}/reviews/schedule-status"
     const val GET_TIMELINE_URI_TEMPLATE = "/timelines/{prisonNumber}"
@@ -472,6 +476,17 @@ abstract class IntegrationTestBase {
       .expectStatus()
       .isCreated
   }
+
+  fun createActionPlanReview(
+    prisonNumber: String,
+    createActionPlanReviewRequest: CreateActionPlanReviewRequest = aValidCreateActionPlanReviewRequest(),
+  ): CreateActionPlanReviewResponse = webTestClient.post()
+    .uri(CREATE_ACTION_PLAN_REVIEW_URI_TEMPLATE, prisonNumber)
+    .withBody(createActionPlanReviewRequest)
+    .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
+    .exchange()
+    .returnResult(CreateActionPlanReviewResponse::class.java)
+    .responseBody.blockFirst()!!
 
   fun getActionPlanReviews(prisonNumber: String): ActionPlanReviewsResponse = webTestClient.get()
     .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)

@@ -52,6 +52,7 @@ fun aValidCreateInductionRequestForPrisonerLookingToWork(
   inPrisonInterests: CreateInPrisonInterestsRequest? = null,
   personalSkillsAndInterests: CreatePersonalSkillsAndInterestsRequest? = aValidCreatePersonalSkillsAndInterestsRequest(),
   futureWorkInterests: CreateFutureWorkInterestsRequest? = aValidCreateFutureWorkInterestsRequest(),
+  employabilitySkills: List<CreateEmployabilitySkillRequest>? = null,
 ): CreateInductionRequest = CreateInductionRequest(
   prisonId = prisonId,
   workOnRelease = workOnRelease,
@@ -61,6 +62,7 @@ fun aValidCreateInductionRequestForPrisonerLookingToWork(
   inPrisonInterests = inPrisonInterests,
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
+  employabilitySkills = employabilitySkills,
 )
 
 fun aFullyPopulatedCreateInductionRequest(
@@ -76,6 +78,7 @@ fun aFullyPopulatedCreateInductionRequest(
   conductedByRole: String? = "Peer Mentor",
   conductedBy: String? = "John Smith",
   note: String? = "example note",
+  employabilitySkills: List<CreateEmployabilitySkillRequest>? = null,
 ): CreateInductionRequest = CreateInductionRequest(
   prisonId = prisonId,
   workOnRelease = workOnRelease,
@@ -89,5 +92,5 @@ fun aFullyPopulatedCreateInductionRequest(
   conductedByRole = conductedByRole,
   conductedBy = conductedBy,
   note = note,
-
+  employabilitySkills = employabilitySkills,
 )
