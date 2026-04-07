@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -41,7 +39,7 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(aValidTokenWithNoAuthorities(privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithNoAuthorities())
       .exchange()
       .expectStatus()
       .isForbidden
@@ -63,12 +61,7 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .exchange()
       .expectStatus()
       .isNotFound
@@ -96,12 +89,7 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .exchange()
       .expectStatus()
       .isNotFound
@@ -128,12 +116,7 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .exchange()
       .expectStatus()
       .isOk
@@ -172,12 +155,7 @@ class GetGoalTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, goalReference)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .exchange()
       .expectStatus()
       .isOk

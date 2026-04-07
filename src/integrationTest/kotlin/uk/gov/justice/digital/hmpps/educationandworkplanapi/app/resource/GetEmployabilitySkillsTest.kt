@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.returnResult
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
@@ -33,7 +32,7 @@ class GetEmployabilitySkillsTest : IntegrationTestBase() {
   fun `should return forbidden given bearer token with wrong role`() {
     webTestClient.get()
       .uri(URI_TEMPLATE, setUpRandomPrisoner())
-      .bearerToken(aValidTokenWithAuthority(GOALS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -50,7 +49,7 @@ class GetEmployabilitySkillsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createEmployabilitySkillsRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -59,7 +58,7 @@ class GetEmployabilitySkillsTest : IntegrationTestBase() {
     // Then
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

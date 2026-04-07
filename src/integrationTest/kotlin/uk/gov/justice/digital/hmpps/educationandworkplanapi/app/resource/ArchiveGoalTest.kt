@@ -13,7 +13,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
@@ -55,7 +54,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
       .withBody(aValidArchiveGoalRequest())
-      .bearerToken(aValidTokenWithAuthority(GOALS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -259,7 +258,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -328,13 +327,7 @@ class ArchiveGoalTest : IntegrationTestBase() {
   ): WebTestClient.ResponseSpec = webTestClient.put()
     .uri(URI_TEMPLATE, prisonNumber, goalReference)
     .withBody(archiveGoalRequest)
-    .bearerToken(
-      aValidTokenWithAuthority(
-        GOALS_RW,
-        username = "buser_gen",
-        privateKey = keyPair.private,
-      ),
-    )
+    .bearerToken(aValidTokenWithAuthority(GOALS_RW, username = "buser_gen"))
     .contentType(APPLICATION_JSON)
     .exchange()
 

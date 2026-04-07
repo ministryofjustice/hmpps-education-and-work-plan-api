@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
@@ -42,12 +41,7 @@ class UpdateEductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidUpdateEducationRequest())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -66,12 +60,7 @@ class UpdateEductionTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -98,12 +87,7 @@ class UpdateEductionTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateEducationRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -190,13 +174,7 @@ class UpdateEductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateEducationRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-          username = "buser_gen",
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW, username = "buser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -292,12 +270,7 @@ class UpdateEductionTest : IntegrationTestBase() {
     webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(updateEducationRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.LegalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
@@ -67,7 +66,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .contentType(APPLICATION_JSON)
       .withBody(aValidCreateActionPlanReviewRequest())
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO))
       .exchange()
       .expectStatus()
       .isForbidden
@@ -93,7 +92,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -117,7 +116,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidCreateActionPlanReviewRequest())
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -141,7 +140,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidCreateActionPlanReviewRequest())
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -180,7 +179,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           note = "A great review today; prisoner is making good progress towards his goals",
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -297,7 +296,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
           note = "A great review today; prisoner is making good progress towards his goals",
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -495,7 +494,7 @@ class CreateActionPlanReviewTest : IntegrationTestBase() {
   ) = createActionPlanReviewIsAsExpected(prisonNumber, createRequest, bearerToken = aReadWriteBearerToken(username))
     .expectStatus().isCreated
 
-  private fun aReadWriteBearerToken(username: String = "auser_gen") = aValidTokenWithAuthority(REVIEWS_RW, username = username, privateKey = keyPair.private)
+  private fun aReadWriteBearerToken(username: String = "auser_gen") = aValidTokenWithAuthority(REVIEWS_RW, username = username)
 
   private fun WebTestClient.ResponseSpec.returnCreationResponse() = this.returnResult(CreateActionPlanReviewResponse::class.java)
 }

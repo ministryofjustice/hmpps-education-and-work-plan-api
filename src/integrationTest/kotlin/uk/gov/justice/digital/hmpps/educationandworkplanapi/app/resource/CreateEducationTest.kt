@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -33,12 +32,7 @@ class CreateEducationTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .withBody(aValidCreateEducationRequest())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RO))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -57,12 +51,7 @@ class CreateEducationTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -88,12 +77,7 @@ class CreateEducationTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidCreateEducationRequest(prisonId = "MDI"))
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -121,12 +105,7 @@ class CreateEducationTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidCreateEducationRequest())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW))
       .contentType(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus()

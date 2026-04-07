@@ -10,7 +10,6 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus
@@ -56,7 +55,7 @@ class EducationAssessmentBackfillTest : IntegrationTestBase() {
           ),
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -86,7 +85,7 @@ class EducationAssessmentBackfillTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(BACKFILL_URI)
       .withBody(request)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -163,7 +162,7 @@ class EducationAssessmentBackfillTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(BACKFILL_URI)
       .withBody(request)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

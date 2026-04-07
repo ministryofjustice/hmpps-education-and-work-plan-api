@@ -24,10 +24,9 @@ val hmppsSqsStarterVersion = "7.3.0"
 val hmppsKotlinSpringBootStarterVersion = "2.1.0"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
-val jsonWebTokenVersion = "0.13.0"
-val nimbusJwtVersion = "10.8"
 val testContainersVersion = "2.0.3"
 val awsSdkVersion = "1.12.797"
+val sarTestSupportLibraryVersion = "2.1.3"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
@@ -87,16 +86,14 @@ dependencies {
   integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.39") {
     exclude(group = "io.swagger.core.v3")
   }
+  integrationTestApi("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:$hmppsKotlinSpringBootStarterVersion")
+  integrationTestImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:$sarTestSupportLibraryVersion")
 
   // Test fixtures dependencies
   testFixturesImplementation("org.assertj:assertj-core:3.27.7")
   testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
   testFixturesImplementation("io.projectreactor:reactor-core")
   testFixturesImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-  // Libraries to support creating JWTs in test fixtures
-  testFixturesImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebTokenVersion")
-  testFixturesImplementation("io.jsonwebtoken:jjwt-jackson:$jsonWebTokenVersion")
-  testFixturesImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusJwtVersion")
 
   integrationTestImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")
   testFixturesImplementation("org.wiremock:wiremock-standalone:$wiremockVersion")

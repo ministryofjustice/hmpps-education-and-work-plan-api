@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -39,7 +38,7 @@ class UpdateActionPlanReviewStatusHistoryTest : IntegrationTestBase() {
           status = ReviewScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

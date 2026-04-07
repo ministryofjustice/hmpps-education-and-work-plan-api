@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -47,7 +46,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -71,7 +70,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
     val response = webTestClient.put()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(aValidUpdateInductionScheduleStatusRequest())
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -99,7 +98,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -128,7 +127,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -157,7 +156,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -187,7 +186,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.COMPLETED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -218,7 +217,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -251,7 +250,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -284,7 +283,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -317,7 +316,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -350,7 +349,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -383,7 +382,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -422,7 +421,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           exemptionReason = "Something happened in the prison which meant we could not do the induction today",
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -468,7 +467,7 @@ class UpdateInductionScheduleStatusTest : IntegrationTestBase() {
           status = uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED,
         ),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

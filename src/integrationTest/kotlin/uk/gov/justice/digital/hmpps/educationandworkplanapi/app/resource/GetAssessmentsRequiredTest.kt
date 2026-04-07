@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithNoAuthorities
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aConvictedOffence
@@ -49,7 +47,7 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
   @Test
   fun `should return forbidden given bearer token without required role`() {
     // When
-    val bearerToken = aValidTokenWithNoAuthorities(privateKey = keyPair.private)
+    val bearerToken = aValidTokenWithNoAuthorities()
     val response = getAssessmentsRequired(prisonNumber, bearerToken)
       .expectStatus().isForbidden
       .returnError()
@@ -181,10 +179,7 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
   }
 
   private val aValidBearerToken
-    get() = aValidTokenWithAuthority(
-      ASSESSMENTS_RO,
-      privateKey = keyPair.private,
-    )
+    get() = aValidTokenWithAuthority(ASSESSMENTS_RO)
 
   private fun getAssessmentsRequired(
     prisonNumber: String,

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.aValidReference
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetGoalsResponse
@@ -58,12 +57,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumberWithNoGoals, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -77,12 +71,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -135,12 +124,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -202,12 +186,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=ACTIVE", prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -252,12 +231,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=ARCHIVED", prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -305,12 +279,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=ARCHIVED,ACTIVE", prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -361,12 +330,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=ARCHIVED&status=ACTIVE", prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -398,12 +362,7 @@ class GetGoalsTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri("$URI_TEMPLATE?status=COMPLETED", prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -420,12 +379,7 @@ class GetGoalsTest : IntegrationTestBase() {
   fun `Should return 400 if requested status is not recognised`() {
     webTestClient.get()
       .uri("$URI_TEMPLATE?status=FOO", prisonNumber, aValidReference())
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RO,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

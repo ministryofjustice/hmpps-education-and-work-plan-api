@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -42,7 +41,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, setUpRandomPrisoner())
       .withBody(aValidCreateActionPlanRequest())
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -58,7 +57,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -83,7 +82,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -110,7 +109,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -137,7 +136,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -169,13 +168,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          ACTIONPLANS_RW,
-          username = dpsUsername,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, username = dpsUsername))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -232,7 +225,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(ACTIONPLANS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -259,7 +252,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(ACTIONPLANS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -296,7 +289,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(ACTIONPLANS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -333,7 +326,7 @@ class CreateActionPlanTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createActionPlanRequest)
       .bearerToken(
-        aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(ACTIONPLANS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()

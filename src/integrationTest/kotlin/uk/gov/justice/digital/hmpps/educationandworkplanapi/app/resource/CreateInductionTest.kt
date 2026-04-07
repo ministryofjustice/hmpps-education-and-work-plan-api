@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
@@ -70,7 +69,7 @@ class CreateInductionTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidCreateInductionRequest())
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -89,7 +88,7 @@ class CreateInductionTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -116,7 +115,7 @@ class CreateInductionTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -142,7 +141,7 @@ class CreateInductionTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -168,13 +167,7 @@ class CreateInductionTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          username = dpsUsername,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = dpsUsername))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -221,13 +214,7 @@ class CreateInductionTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          username = dpsUsername,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = dpsUsername))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -273,7 +260,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -300,7 +287,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -313,7 +300,7 @@ class CreateInductionTest : IntegrationTestBase() {
     // assert that there are no Action Plan Reviews (ie. no Review Schedule)
     webTestClient.get()
       .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RO))
       .exchange()
       .expectStatus()
       .isNotFound
@@ -334,7 +321,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -370,7 +357,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -407,7 +394,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -444,7 +431,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -485,13 +472,7 @@ class CreateInductionTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          username = dpsUsername,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = dpsUsername))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -541,7 +522,7 @@ class CreateInductionTest : IntegrationTestBase() {
       .uri(URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
       .bearerToken(
-        aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private),
+        aValidTokenWithAuthority(INDUCTIONS_RW),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -725,5 +706,5 @@ class CreateInductionTest : IntegrationTestBase() {
     }
   }
 
-  private fun aReadWriteBearerToken() = aValidTokenWithAuthority(INDUCTIONS_RW, privateKey = keyPair.private)
+  private fun aReadWriteBearerToken() = aValidTokenWithAuthority(INDUCTIONS_RW)
 }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -30,7 +31,6 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
@@ -93,11 +93,12 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actio
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
+import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
+import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelperConfig
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
-import java.security.KeyPair
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -109,6 +110,7 @@ private val log = KotlinLogging.logger {}
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("integration-test")
 @AutoConfigureWebTestClient(timeout = "PT5M")
+@Import(SarIntegrationTestHelperConfig::class)
 abstract class IntegrationTestBase {
   protected val apiClientMaxRetryAttempts = 3
   protected val apiClientMaxAttempts = 1 + apiClientMaxRetryAttempts
@@ -191,7 +193,7 @@ abstract class IntegrationTestBase {
   protected lateinit var objectMapper: ObjectMapper
 
   @Autowired
-  lateinit var keyPair: KeyPair
+  lateinit var sarIntegrationTestHelper: SarIntegrationTestHelper
 
   @Autowired
   lateinit var noteRepository: NoteRepository
@@ -292,7 +294,7 @@ abstract class IntegrationTestBase {
 
   fun getActionPlan(prisonNumber: String): ActionPlanResponse = webTestClient.get()
     .uri(GET_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
-    .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO, privateKey = keyPair.private))
+    .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO))
     .exchange()
     .returnResult(ActionPlanResponse::class.java)
     .responseBody.blockFirst()!!
@@ -308,7 +310,7 @@ abstract class IntegrationTestBase {
       webTestClient.post()
         .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
         .withBody(createActionPlanRequest)
-        .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private, username = username))
+        .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, username = username))
         .contentType(APPLICATION_JSON)
         .exchange()
     } else {
@@ -318,7 +320,7 @@ abstract class IntegrationTestBase {
       webTestClient.post()
         .uri(CREATE_ACTION_PLAN_URI_TEMPLATE, prisonNumber)
         .withBody(createActionPlanRequest.copy(goals = listOf(goalsToCreate.first())))
-        .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, privateKey = keyPair.private, username = username))
+        .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RW, username = username))
         .contentType(APPLICATION_JSON)
         .exchange()
       // Then create the remaining goals one at a time in order
@@ -340,7 +342,7 @@ abstract class IntegrationTestBase {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private, username = username))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, username = username))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -354,7 +356,7 @@ abstract class IntegrationTestBase {
     )
     webTestClient.get()
       .uri(GET_TIMELINE_URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(TIMELINE_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(TIMELINE_RO))
       .exchange()
       .returnResult(TimelineResponse::class.java)
       .responseBody.blockFirst()!!
@@ -376,13 +378,7 @@ abstract class IntegrationTestBase {
     webTestClient.post()
       .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
       .withBody(createInductionRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          INDUCTIONS_RW,
-          privateKey = keyPair.private,
-          username = username,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RW, username = username))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -398,11 +394,7 @@ abstract class IntegrationTestBase {
       .uri(UPDATE_REVIEW_SCHEDULE_STATUS_URI_TEMPLATE, prisonNumber)
       .withBody(updateReviewScheduleStatusRequest)
       .bearerToken(
-        aValidTokenWithAuthority(
-          REVIEWS_RW,
-          privateKey = keyPair.private,
-          username = username,
-        ),
+        aValidTokenWithAuthority(REVIEWS_RW, username = username),
       )
       .contentType(APPLICATION_JSON)
       .exchange()
@@ -412,7 +404,7 @@ abstract class IntegrationTestBase {
 
   fun getInduction(prisonNumber: String): InductionResponse = webTestClient.get()
     .uri(INDUCTION_URI_TEMPLATE, prisonNumber)
-    .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
+    .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
     .exchange()
     .expectStatus()
     .isOk
@@ -421,12 +413,7 @@ abstract class IntegrationTestBase {
 
   fun getEmployabilitySkills(prisonNumber: String): GetEmployabilitySkillResponses = webTestClient.get()
     .uri(EMPLOYABILITY_SKILLS_URI_TEMPLATE, prisonNumber)
-    .bearerToken(
-      aValidTokenWithAuthority(
-        ACTIONPLANS_RO,
-        privateKey = keyPair.private,
-      ),
-    )
+    .bearerToken(aValidTokenWithAuthority(ACTIONPLANS_RO))
     .exchange()
     .expectStatus()
     .isOk
@@ -441,13 +428,7 @@ abstract class IntegrationTestBase {
     webTestClient.put()
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/archive", prisonNumber, archiveGoalRequest.goalReference)
       .withBody(archiveGoalRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RW,
-          privateKey = keyPair.private,
-          username = username,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, username = username))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -462,13 +443,7 @@ abstract class IntegrationTestBase {
     webTestClient.put()
       .uri("/action-plans/{prisonNumber}/goals/{goalReference}/complete", prisonNumber, completeGoalRequest.goalReference)
       .withBody(completeGoalRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          GOALS_RW,
-          privateKey = keyPair.private,
-          username = username,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW, username = username))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -477,12 +452,7 @@ abstract class IntegrationTestBase {
 
   fun getEducation(prisonNumber: String): EducationResponse = webTestClient.get()
     .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
-    .bearerToken(
-      aValidTokenWithAuthority(
-        EDUCATION_RO,
-        privateKey = keyPair.private,
-      ),
-    )
+    .bearerToken(aValidTokenWithAuthority(EDUCATION_RO))
     .exchange()
     .expectStatus()
     .isOk
@@ -497,13 +467,7 @@ abstract class IntegrationTestBase {
     webTestClient.post()
       .uri(EDUCATION_URI_TEMPLATE, prisonNumber)
       .withBody(createEducationRequest)
-      .bearerToken(
-        aValidTokenWithAuthority(
-          EDUCATION_RW,
-          username = username,
-          privateKey = keyPair.private,
-        ),
-      )
+      .bearerToken(aValidTokenWithAuthority(EDUCATION_RW, username = username))
       .exchange()
       .expectStatus()
       .isCreated
@@ -511,26 +475,21 @@ abstract class IntegrationTestBase {
 
   fun getActionPlanReviews(prisonNumber: String): ActionPlanReviewsResponse = webTestClient.get()
     .uri(GET_ACTION_PLAN_REVIEWS_URI_TEMPLATE, prisonNumber)
-    .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+    .bearerToken(aValidTokenWithAuthority(REVIEWS_RO))
     .exchange()
     .returnResult(ActionPlanReviewsResponse::class.java)
     .responseBody.blockFirst()!!
 
   fun getReviewSchedules(prisonNumber: String): ActionPlanReviewSchedulesResponse = webTestClient.get()
     .uri(GET_REVIEW_SCHEDULES_URI_TEMPLATE, prisonNumber)
-    .bearerToken(aValidTokenWithAuthority(REVIEWS_RO, privateKey = keyPair.private))
+    .bearerToken(aValidTokenWithAuthority(REVIEWS_RO))
     .exchange()
     .returnResult(ActionPlanReviewSchedulesResponse::class.java)
     .responseBody.blockFirst()!!
 
   fun getInductionSchedule(prisonNumber: String): InductionScheduleResponse = webTestClient.get()
     .uri(GET_INDUCTION_SCHEDULE_URI_TEMPLATE, prisonNumber)
-    .bearerToken(
-      aValidTokenWithAuthority(
-        INDUCTIONS_RO,
-        privateKey = keyPair.private,
-      ),
-    )
+    .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
     .exchange()
     .expectStatus()
     .isOk
@@ -539,12 +498,7 @@ abstract class IntegrationTestBase {
 
   fun getInductionScheduleHistory(prisonNumber: String): InductionSchedulesResponse = webTestClient.get()
     .uri(GET_INDUCTION_SCHEDULE_HISTORY_URI_TEMPLATE, prisonNumber)
-    .bearerToken(
-      aValidTokenWithAuthority(
-        INDUCTIONS_RO,
-        privateKey = keyPair.private,
-      ),
-    )
+    .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
     .exchange()
     .expectStatus()
     .isOk
@@ -761,6 +715,10 @@ abstract class IntegrationTestBase {
 
   protected fun WebTestClient.ResponseSpec.returnError() = this.returnResult(ErrorResponse::class.java)
   protected fun <T : Any> FluxExchangeResult<T>.body(): T = this.responseBody.blockFirst()!!
+
+  protected fun aValidTokenWithAuthority(vararg roles: String, username: String = "auser_gen"): String = sarIntegrationTestHelper.jwtAuthHelper.createJwtAccessToken(roles = roles.toList(), username = username)
+
+  protected fun aValidTokenWithNoAuthorities(username: String = "auser_gen"): String = sarIntegrationTestHelper.jwtAuthHelper.createJwtAccessToken(roles = emptyList(), username = username)
 }
 
 data class Notification(

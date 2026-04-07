@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY
@@ -40,7 +39,7 @@ class GetReviewSchedulesTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(INDUCTIONS_RO))
       .exchange()
       .expectStatus()
       .isForbidden
@@ -70,7 +69,7 @@ class GetReviewSchedulesTest : IntegrationTestBase() {
     // When
     val response = webTestClient.get()
       .uri(URI_TEMPLATE, prisonNumber)
-      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen", privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(REVIEWS_RW, username = "auser_gen"))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()

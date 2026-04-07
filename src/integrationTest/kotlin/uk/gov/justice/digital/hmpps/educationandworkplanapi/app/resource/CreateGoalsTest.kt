@@ -12,7 +12,6 @@ import org.mockito.kotlin.verify
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.aValidTokenWithAuthority
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ErrorResponse
@@ -42,7 +41,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, randomValidPrisonNumber())
       .withBody(aValidCreateGoalsRequest())
-      .bearerToken(aValidTokenWithAuthority(GOALS_RO, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RO))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -58,7 +57,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -82,7 +81,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -109,7 +108,7 @@ class CreateGoalsTest : IntegrationTestBase() {
           { }
         """.trimIndent(),
       )
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -139,7 +138,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -194,7 +193,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -247,7 +246,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -282,7 +281,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
@@ -315,7 +314,7 @@ class CreateGoalsTest : IntegrationTestBase() {
     val response = webTestClient.post()
       .uri(CREATE_GOALS_URI_TEMPLATE, prisonNumber)
       .withBody(createGoalsRequest)
-      .bearerToken(aValidTokenWithAuthority(GOALS_RW, privateKey = keyPair.private))
+      .bearerToken(aValidTokenWithAuthority(GOALS_RW))
       .contentType(APPLICATION_JSON)
       .exchange()
       .expectStatus()
