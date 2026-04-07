@@ -24,9 +24,9 @@ val hmppsSqsStarterVersion = "7.3.0"
 val hmppsKotlinSpringBootStarterVersion = "2.1.0"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
-val testContainersVersion = "2.0.3"
+val testContainersVersion = "2.0.4"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.1.3"
+val sarTestSupportLibraryVersion = "2.1.4"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
