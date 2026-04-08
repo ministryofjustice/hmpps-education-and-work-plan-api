@@ -32,7 +32,7 @@ abstract class InductionScheduleDateCalculationService(
   abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean = true, releaseDate: LocalDate? = null): CreateInductionScheduleDto
 
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
-    if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue()) {
+    if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadUserAppliedExemptionWhenInductionAlreadyOverdue()) {
       deadlineDate
     } else {
       if (scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
@@ -63,7 +63,8 @@ abstract class InductionScheduleDateCalculationService(
     }
   }
 
-  private fun InductionSchedule.hadExemptionOrExclusionAppliedWhenInductionAlreadyOverdue(): Boolean = scheduleStatus.isExemptionOrExclusion() && deadlineDate.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
+  private fun InductionSchedule.hadUserAppliedExemptionWhenInductionAlreadyOverdue(): Boolean = (scheduleStatus == InductionScheduleStatus.EXEMPT_TEMP_ABSENCE || scheduleStatus.canBeSetByUserAction) &&
+    deadlineDate.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
 }
 
 interface InductionSchedulePropertiesProvider {
