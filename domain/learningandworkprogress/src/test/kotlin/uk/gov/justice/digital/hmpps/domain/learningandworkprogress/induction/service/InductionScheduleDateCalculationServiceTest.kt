@@ -255,26 +255,22 @@ class InductionScheduleDateCalculationServiceTest {
     @ParameterizedTest
     @CsvSource(
       value = [
-        // exemptions
         "EXEMPT_PRISONER_FAILED_TO_ENGAGE",
         "EXEMPT_PRISONER_ESCAPED_OR_ABSCONDED",
         "EXEMPT_PRISON_STAFF_REDEPLOYMENT",
         "EXEMPT_PRISON_OPERATION_OR_SECURITY_ISSUE",
-        "EXEMPT_PRISONER_RELEASE",
-        "EXEMPT_PRISONER_RELEASE_HOSPITAL",
-        "EXEMPT_PRISONER_DEATH",
-        "EXEMPT_PRISONER_MERGE",
         "EXEMPT_SCREENING_AND_ASSESSMENT_IN_PROGRESS",
         "EXEMPT_SCREENING_AND_ASSESSMENT_INCOMPLETE",
-        // exclusions
         "EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY",
         "EXEMPT_PRISONER_OTHER_HEALTH_ISSUES",
         "EXEMPT_SECURITY_ISSUE_RISK_TO_STAFF",
         "EXEMPT_PRISONER_SAFETY_ISSUES",
         "EXEMPT_PRISON_REGIME_CIRCUMSTANCES",
+        "EXEMPT_SYSTEM_TECHNICAL_ISSUE",
+        "EXEMPT_TEMP_ABSENCE",
       ],
     )
-    fun `should not calculate a new induction due date given induction schedule was overdue when it was exempted`(scheduleStatus: InductionScheduleStatus) {
+    fun `should not calculate a new induction due date given induction schedule was overdue when it was manually exempted by a user action or temporary absence`(scheduleStatus: InductionScheduleStatus) {
       // Given
       val inductionSchedule = aValidInductionSchedule(
         deadlineDate = TODAY.minusDays(1), // induction is already overdue
@@ -288,6 +284,31 @@ class InductionScheduleDateCalculationServiceTest {
 
       // Then
       assertThat(actual).isEqualTo(expectedReviewDate)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      value = [
+        "EXEMPT_PRISONER_TRANSFER",
+        "EXEMPT_PRISONER_RELEASE",
+        "EXEMPT_PRISONER_RELEASE_HOSPITAL",
+        "EXEMPT_PRISONER_DEATH",
+        "EXEMPT_PRISONER_MERGE",
+      ],
+    )
+    fun `should calculate a new induction due date given induction schedule was overdue when it was exempted via system action`(scheduleStatus: InductionScheduleStatus) {
+      // Given
+      val currentDeadlineDate = TODAY.minusDays(1)
+      val inductionSchedule = aValidInductionSchedule(
+        deadlineDate = currentDeadlineDate, // induction is already overdue
+        scheduleStatus = scheduleStatus,
+      )
+
+      // When
+      val actual = dateCalculationService.calculateAdjustedInductionDueDate(inductionSchedule)
+
+      // Then
+      assertThat(actual).isAfter(currentDeadlineDate) // the exact date is dependant on the type of exemption. All we really care about is that it has changed and it is later than the original date
     }
   }
 }

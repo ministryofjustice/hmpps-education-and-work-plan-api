@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
@@ -37,6 +37,10 @@ class SarReportGenerationTest :
   override fun getPrn(): String = prisonNumber
 
   override fun setupTestData() {
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+    createInductionSchedule(prisonNumber)
     createInduction(
       prisonNumber,
       createInductionRequest = aFullyPopulatedCreateInductionRequest(
@@ -48,37 +52,62 @@ class SarReportGenerationTest :
           ),
         ),
         employabilitySkills = listOf(aValidCreateEmployabilitySkillRequest()),
+        conductedAt = LocalDate.parse("2025-06-01"),
+        conductedBy = "John Smith",
+        conductedByRole = "Peer mentor",
       ),
     )
     createActionPlan(
       prisonNumber,
       createActionPlanRequest = aValidCreateActionPlanRequest(
-        goals = listOf(aValidCreateGoalRequest(title = "Goal 1")),
+        goals = listOf(
+          aValidCreateGoalRequest(
+            title = "Goal 1",
+            targetCompletionDate = LocalDate.parse("2050-12-31"), // Target completion date MUST be in the future so set a very long date to prevent fragile test failure
+          ),
+        ),
       ),
     )
-    createReviewScheduleRecord(
+    // The next review date will have been calculated based on "today"; therefore it changes every day and the expected HTML output will not match
+    // manually set the next (first) review date to a fixed date to prevent fragile test failure
+    updateReviewScheduleReviewDates(
       prisonNumber,
-      status = ReviewScheduleStatus.SCHEDULED,
-      earliestDate = LocalDate.parse("2025-12-25"),
-      latestDate = LocalDate.parse("2026-01-05"),
+      earliestReviewDate = LocalDate.parse("2025-08-01"),
+      latestReviewDate = LocalDate.parse("2025-08-10"),
     )
+
+    // perform a couple of reviews
     createActionPlanReview(
       prisonNumber,
       createActionPlanReviewRequest = aValidCreateActionPlanReviewRequest(
         note = "Review went well",
-        conductedAt = LocalDate.parse("2026-01-01"),
+        conductedAt = LocalDate.parse("2025-08-05"),
         conductedBy = "Barnie Jones",
         conductedByRole = "Peer mentor",
       ),
+    )
+    // The last review will have calculated the next review date based on "today"; therefore it changes every day and the expected HTML output will not match
+    // manually set the next review date to a fixed date to prevent fragile test failure
+    updateReviewScheduleReviewDates(
+      prisonNumber,
+      earliestReviewDate = LocalDate.parse("2026-01-25"),
+      latestReviewDate = LocalDate.parse("2026-02-05"),
     )
     createActionPlanReview(
       prisonNumber,
       createActionPlanReviewRequest = aValidCreateActionPlanReviewRequest(
         note = "Second review went really well",
-        conductedAt = LocalDate.parse("2026-03-29"),
+        conductedAt = LocalDate.parse("2026-01-29"),
         conductedBy = null,
         conductedByRole = null,
       ),
+    )
+    // The last review will have calculated the next review date based on "today"; therefore it changes every day and the expected HTML output will not match
+    // manually set the next review date to a fixed date to prevent fragile test failure
+    updateReviewScheduleReviewDates(
+      prisonNumber,
+      earliestReviewDate = LocalDate.parse("2026-03-01"),
+      latestReviewDate = LocalDate.parse("2026-03-10"),
     )
   }
 }

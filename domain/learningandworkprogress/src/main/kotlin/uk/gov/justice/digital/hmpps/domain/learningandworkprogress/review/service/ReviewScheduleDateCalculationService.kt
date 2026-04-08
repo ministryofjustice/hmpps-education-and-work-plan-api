@@ -102,6 +102,7 @@ class ReviewScheduleDateCalculationService(
     MORE_THAN_60_MONTHS_TO_SERVE, ReviewScheduleCalculationRule.INDETERMINATE_SENTENCE -> ReviewScheduleWindow.fromTenToTwelveMonths(
       baseScheduleDate(),
     )
+
     PRISONER_TRANSFER_AFTER_FINAL_REVIEW -> ReviewScheduleWindow.fromTodayToTenDays(baseScheduleDate())
   }.also {
     when {
@@ -128,7 +129,7 @@ class ReviewScheduleDateCalculationService(
    * due date.
    */
   fun calculateAdjustedReviewDueDate(reviewSchedule: ReviewSchedule): LocalDate = with(reviewSchedule) {
-    if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadExemptionOrExclusionAppliedWhenReviewAlreadyOverdue()) {
+    if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadUserAppliedExemptionWhenInductionAlreadyOverdue()) {
       reviewScheduleWindow.dateTo
     } else {
       if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
@@ -170,7 +171,8 @@ class ReviewScheduleDateCalculationService(
    */
   private fun baseScheduleDate() = LocalDate.now()
 
-  private fun ReviewSchedule.hadExemptionOrExclusionAppliedWhenReviewAlreadyOverdue(): Boolean = scheduleStatus.isExemptionOrExclusion() && reviewScheduleWindow.dateTo.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
+  private fun ReviewSchedule.hadUserAppliedExemptionWhenInductionAlreadyOverdue(): Boolean = (scheduleStatus == ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE || scheduleStatus.canBeSetByUserAction) &&
+    reviewScheduleWindow.dateTo.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))
 }
 
 interface ReviewSchedulePropertiesProvider {
