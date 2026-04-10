@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.revi
 import org.assertj.core.api.AbstractObjectAssert
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ActionPlanReviewSchedulesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ScheduledActionPlanReviewResponse
+import java.util.UUID
 import java.util.function.Consumer
 
 fun assertThat(actual: ActionPlanReviewSchedulesResponse?) = ActionPlanReviewSchedulesResponseAssert(actual)
@@ -54,6 +55,15 @@ class ActionPlanReviewSchedulesResponseAssert(actual: ActionPlanReviewSchedulesR
       reviewSchedules.onEach {
         consumer.accept(assertThat(it))
       }
+    }
+    return this
+  }
+
+  fun schedulesForReviewReference(reference: UUID, consumer: Consumer<ActionPlanReviewSchedulesResponseAssert>): ActionPlanReviewSchedulesResponseAssert {
+    isNotNull
+    with(actual!!) {
+      val reviewSchedulesForReference = reviewSchedules.filter { it.reference == reference }
+      consumer.accept(assertThat(ActionPlanReviewSchedulesResponse(reviewSchedulesForReference)))
     }
     return this
   }

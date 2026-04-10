@@ -13,6 +13,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.ArgumentCaptor
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -30,6 +31,8 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonapi.aValidPrisonerInPrisonSummary
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
@@ -211,6 +214,12 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var educationAssessmentEventRepository: EducationAssessmentEventRepository
 
+  @MockitoSpyBean(reset = MockReset.BEFORE)
+  lateinit var inductionScheduleService: InductionScheduleService
+
+  @MockitoSpyBean(reset = MockReset.BEFORE)
+  lateinit var reviewScheduleService: ReviewScheduleService
+
   @Autowired
   lateinit var hmppsQueueService: HmppsQueueService
 
@@ -245,6 +254,7 @@ abstract class IntegrationTestBase {
   fun reset() {
     clearQueues()
     wiremockService.resetAllStubsAndMappings()
+    Mockito.reset(telemetryClient, inductionScheduleService, reviewScheduleService)
   }
 
   /**
@@ -613,9 +623,10 @@ abstract class IntegrationTestBase {
     exemptionReason: String? = null,
     earliestDate: LocalDate = LocalDate.now().minusMonths(1),
     latestDate: LocalDate = LocalDate.now().plusMonths(1),
+    reference: UUID = UUID.randomUUID(),
   ): ReviewScheduleEntity {
     val reviewScheduleEntity = ReviewScheduleEntity(
-      reference = UUID.randomUUID(),
+      reference = reference,
       prisonNumber = prisonNumber,
       earliestReviewDate = earliestDate,
       latestReviewDate = latestDate,

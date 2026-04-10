@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import mu.KotlinLogging
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewSchedule
@@ -37,10 +38,20 @@ class AsyncReviewScheduleEventService(
   override fun reviewScheduleStatusUpdated(updatedReviewScheduleStatus: UpdatedReviewScheduleStatus) = with(updatedReviewScheduleStatus) {
     log.debug { "Review schedule status updated event for prisoner [$prisonNumber]" }
 
-    timelineService.recordTimelineEvent(
-      prisonNumber,
-      timelineEventFactory.reviewScheduleStatusUpdatedTimelineEvent(this),
-    )
+    run {
+      repeat(3) { idx ->
+        try {
+          timelineService.recordTimelineEvent(
+            prisonNumber,
+            timelineEventFactory.reviewScheduleStatusUpdatedTimelineEvent(this),
+          )
+          return@run
+        } catch (e: DataIntegrityViolationException) {
+          log.warn { "DataIntegrityViolationException occurred writing timeline for prisoner [$prisonNumber]. Attempt ${idx + 1}" }
+        }
+      }
+    }
+
     telemetryService.trackReviewScheduleStatusUpdated(this)
     eventPublisher.createAndPublishReviewScheduleEvent(prisonNumber)
   }
