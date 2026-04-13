@@ -5,20 +5,16 @@ import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.InductionScheduleRepository
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PrisonerReceivedIntoPrisonEventService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
@@ -28,47 +24,74 @@ private val log = KotlinLogging.logger {}
 @Hidden
 @RestController
 class ScheduleEtlController(
-  private val prisonerSearchApiService: PrisonerSearchApiService,
-  private val reviewScheduleRepository: ReviewScheduleRepository,
-  private val inductionScheduleRepository: InductionScheduleRepository,
   private val eventPublisher: EventPublisher,
-  private val inductionRepository: InductionRepository,
-  private val goalPersistenceAdapter: GoalPersistenceAdapter,
-  private val prisonerReceivedIntoPrisonEventService: PrisonerReceivedIntoPrisonEventService,
+  private val inductionScheduleService: InductionScheduleService,
+  private val reviewScheduleService: ReviewScheduleService,
 ) {
-  @ResponseStatus(HttpStatus.OK)
+
+  @PostMapping("/action-plans/schedules/reschedule-inductions-following-transfer")
+  @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_EDIT_REVIEWS)
-  @GetMapping(value = ["/action-plans/schedules/etl-check/{prisonId}"])
   @Transactional
-  fun checkSchedulesForPrisonersInPrison(
-    @PathVariable("prisonId") prisonId: String,
-  ): CheckSchedulesEtlResponse {
-    log.info("Check ETL process for prison ID: $prisonId")
-
-    val allPrisoners = prisonerSearchApiService.getAllPrisonersInPrison(prisonId).also {
-      log.info("Total prisoners in prison $prisonId: ${it.size}")
+  fun rescheduleInductionsFollowingTransfer(
+    @RequestBody prisonNumbersRequest: PrisonNumbersRequest,
+  ) {
+    val featureWentLiveOn = LocalDate.parse("2026-04-01")
+    prisonNumbersRequest.prisonNumbers.distinct().onEach { prisonNumber ->
+      val schedules = inductionScheduleService.getInductionScheduleHistoryForPrisoner(prisonNumber)
+      if (schedules.size > 1 &&
+        with(schedules.first()) {
+          scheduleStatus == InductionScheduleStatus.SCHEDULED && deadlineDate.isBefore(featureWentLiveOn)
+        } &&
+        with(schedules[1]) {
+          scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER
+        }
+      ) {
+        val prisonId = schedules.first().lastUpdatedAtPrison
+        log.info { "Rescheduling induction for prisoner $prisonNumber following transfer to $prisonId" }
+        inductionScheduleService.exemptAndReScheduleActiveInductionScheduleDueToPrisonerTransfer(
+          prisonNumber = prisonNumber,
+          prisonTransferredTo = prisonId,
+        )
+      } else {
+        log.info { "Induction schedule for prisoner $prisonNumber is not in a state by which it should be rescheduled" }
+      }
     }
-
-    val prisonersWithSchedules = prisonersWithAnySchedule(allPrisoners)
-
-    // filter out the prisoners with either a review schedule or an induction schedule
-    val allPrisonersWithoutSchedules = allPrisoners.map { it.prisonerNumber }
-      .filterNot { it in prisonersWithSchedules }
-
-    // Prepare response data
-    val response = CheckSchedulesEtlResponse(
-      prisonId = prisonId,
-      totalNumberOfPrisoners = allPrisoners.size,
-      prisonersWithoutPLPData = allPrisonersWithoutSchedules,
-    )
-
-    log.info("ETL check process completed for prison ID: $prisonId. Response: ${response.prisonersWithoutPLPData.size}")
-    return response
   }
 
-  data class PrisonNumbersRequest(
-    val prisonNumbers: List<String>,
-  )
+  @PostMapping("/action-plans/schedules/reschedule-reviews-following-transfer")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(HAS_EDIT_REVIEWS)
+  @Transactional
+  fun rescheduleReviewsFollowingTransfer(
+    @RequestBody prisonNumbersRequest: PrisonNumbersRequest,
+  ) {
+    val featureWentLiveOn = LocalDate.parse("2026-04-01")
+    prisonNumbersRequest.prisonNumbers.distinct().onEach { prisonNumber ->
+      runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber) }.getOrNull()
+        ?.run {
+          val scheduleHistoryForActiveReview = reviewScheduleService.getReviewSchedulesForPrisoner(prisonNumber).filter { it.reference == reference }
+
+          if (scheduleHistoryForActiveReview.size > 1 &&
+            with(scheduleHistoryForActiveReview.first()) {
+              scheduleStatus == ReviewScheduleStatus.SCHEDULED && latestReviewDate.isBefore(featureWentLiveOn)
+            } &&
+            with(scheduleHistoryForActiveReview[1]) {
+              scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
+            }
+          ) {
+            val prisonId = scheduleHistoryForActiveReview.first().lastUpdatedAtPrison
+            log.info { "Rescheduling review for prisoner $prisonNumber following transfer to $prisonId" }
+            reviewScheduleService.exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(
+              prisonNumber = prisonNumber,
+              prisonTransferredTo = prisonId,
+            )
+          } else {
+            log.info { "Review schedule for prisoner $prisonNumber is not in a state by which it should be rescheduled" }
+          }
+        } ?: run { log.info { "Review schedule for prisoner $prisonNumber not found" } }
+    }
+  }
 
   @PostMapping("/action-plans/schedules/publish-review-messages")
   @ResponseStatus(HttpStatus.CREATED)
@@ -91,31 +114,8 @@ class ScheduleEtlController(
     val inductionPrisonNumbers = prisonNumbersRequest.prisonNumbers.distinct()
     inductionPrisonNumbers.forEach(eventPublisher::createAndPublishInductionEvent)
   }
-
-  private fun prisonersWithAnySchedule(prisoners: List<Prisoner>): List<String> {
-    val prisonNumbers = prisoners.map { it.prisonerNumber }
-    val prisonersWithReviewSchedules =
-      reviewScheduleRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
-    val prisonersWithInductionSchedules =
-      inductionScheduleRepository.findByPrisonNumberIn(prisonNumbers).map { it.prisonNumber }.toSet()
-    return (prisonersWithReviewSchedules + prisonersWithInductionSchedules).toSet().toList()
-  }
 }
 
-data class CheckSchedulesEtlResponse(
-  val prisonId: String,
-  val prisonersWithoutPLPData: List<String> = listOf(),
-  val totalNumberOfPrisoners: Int,
-) {
-
-  val summary: String
-    get() =
-      (
-        """
-          Prison ID: $prisonId
-          Total number of prisoners: $totalNumberOfPrisoners
-          Number of prisoners with no PLP schedule: ${prisonersWithoutPLPData.size}
-          Prison IDs: $prisonersWithoutPLPData 
-        """.trimIndent()
-        )
-}
+data class PrisonNumbersRequest(
+  val prisonNumbers: List<String>,
+)

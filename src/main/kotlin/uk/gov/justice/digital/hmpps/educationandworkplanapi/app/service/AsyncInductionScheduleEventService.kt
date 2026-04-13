@@ -38,19 +38,20 @@ class AsyncInductionScheduleEventService(
   override fun inductionScheduleStatusUpdated(updatedInductionScheduleStatus: UpdatedInductionScheduleStatus) = with(updatedInductionScheduleStatus) {
     log.debug { "Induction schedule status updated event for prisoner [$prisonNumber]" }
 
-    try {
-      timelineService.recordTimelineEvent(
-        prisonNumber,
-        timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
-      )
-    } catch (e: DataIntegrityViolationException) {
-      log.warn(e) { "DataIntegrityViolationException occurred, retrying recordTimelineEvent once more for prisoner [$prisonNumber]" }
-      // Retry once
-      timelineService.recordTimelineEvent(
-        prisonNumber,
-        timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
-      )
+    run {
+      repeat(3) { idx ->
+        try {
+          timelineService.recordTimelineEvent(
+            prisonNumber,
+            timelineEventFactory.inductionScheduleStatusUpdatedEvent(this),
+          )
+          return@run
+        } catch (e: DataIntegrityViolationException) {
+          log.warn { "DataIntegrityViolationException occurred writing timeline for prisoner [$prisonNumber]. Attempt ${idx + 1}" }
+        }
+      }
     }
+
     telemetryService.trackInductionScheduleStatusUpdated(this)
     eventPublisher.createAndPublishInductionEvent(prisonNumber)
   }
