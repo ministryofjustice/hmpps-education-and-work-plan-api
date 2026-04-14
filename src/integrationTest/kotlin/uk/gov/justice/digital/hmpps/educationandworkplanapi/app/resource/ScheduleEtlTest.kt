@@ -255,7 +255,7 @@ class ScheduleEtlTest : IntegrationTestBase() {
       createReviewScheduleHistoryRecord(
         prisonNumber = prisonNumber,
         status = ReviewScheduleStatus.SCHEDULED,
-        latestDate = LocalDate.parse("2026-03-31"),
+        latestDate = LocalDate.parse("2026-04-06"),
         reference = activeReviewScheduleReference,
         version = 3,
       )
@@ -263,7 +263,7 @@ class ScheduleEtlTest : IntegrationTestBase() {
         prisonNumber = prisonNumber,
         status = ReviewScheduleStatus.SCHEDULED,
         reference = activeReviewScheduleReference,
-        latestDate = LocalDate.parse("2026-03-31"),
+        latestDate = LocalDate.parse("2026-04-06"),
       )
 
       clearQueues()
@@ -314,7 +314,7 @@ class ScheduleEtlTest : IntegrationTestBase() {
               }
               .reviewScheduleAtVersion(3) {
                 it.hasStatus(ReviewScheduleStatusApi.SCHEDULED)
-                  .hasReviewDateTo(LocalDate.parse("2026-03-31")) // The original incorrect deadline date
+                  .hasReviewDateTo(LocalDate.parse("2026-04-06")) // The original incorrect deadline date
               }
               .reviewScheduleAtVersion(4) {
                 it.hasStatus(ReviewScheduleStatusApi.EXEMPT_PRISONER_TRANSFER)

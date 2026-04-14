@@ -36,12 +36,13 @@ class ScheduleEtlController(
   fun rescheduleInductionsFollowingTransfer(
     @RequestBody prisonNumbersRequest: PrisonNumbersRequest,
   ) {
-    val featureWentLiveOn = LocalDate.parse("2026-04-01")
+    val featureFixedOn = LocalDate.parse("2026-04-08")
+
     prisonNumbersRequest.prisonNumbers.distinct().onEach { prisonNumber ->
       val schedules = inductionScheduleService.getInductionScheduleHistoryForPrisoner(prisonNumber)
       if (schedules.size > 1 &&
         with(schedules.first()) {
-          scheduleStatus == InductionScheduleStatus.SCHEDULED && deadlineDate.isBefore(featureWentLiveOn)
+          scheduleStatus == InductionScheduleStatus.SCHEDULED && !deadlineDate.isAfter(featureFixedOn)
         } &&
         with(schedules[1]) {
           scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER
@@ -66,7 +67,8 @@ class ScheduleEtlController(
   fun rescheduleReviewsFollowingTransfer(
     @RequestBody prisonNumbersRequest: PrisonNumbersRequest,
   ) {
-    val featureWentLiveOn = LocalDate.parse("2026-04-01")
+    val featureFixedOn = LocalDate.parse("2026-04-08")
+
     prisonNumbersRequest.prisonNumbers.distinct().onEach { prisonNumber ->
       runCatching { reviewScheduleService.getActiveReviewScheduleForPrisoner(prisonNumber) }.getOrNull()
         ?.run {
@@ -74,7 +76,7 @@ class ScheduleEtlController(
 
           if (scheduleHistoryForActiveReview.size > 1 &&
             with(scheduleHistoryForActiveReview.first()) {
-              scheduleStatus == ReviewScheduleStatus.SCHEDULED && latestReviewDate.isBefore(featureWentLiveOn)
+              scheduleStatus == ReviewScheduleStatus.SCHEDULED && !latestReviewDate.isAfter(featureFixedOn)
             } &&
             with(scheduleHistoryForActiveReview[1]) {
               scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER
