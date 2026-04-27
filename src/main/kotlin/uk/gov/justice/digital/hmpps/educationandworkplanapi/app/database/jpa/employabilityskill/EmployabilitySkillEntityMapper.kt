@@ -2,13 +2,16 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.em
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillEntity
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillRating as DomainEmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillSessionType as DomainEmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillType as DomainEmployabilitySkillType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillRating as EntityEmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillSessionType as EntityEmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType as EntityEmployabilitySkillType
 
@@ -24,7 +27,7 @@ class EmployabilitySkillEntityMapper {
       employabilitySkillType = skillType.toDomain(),
       sessionType = sessionType?.toDomain(),
       sessionTypeDescription = sessionTypeDescription,
-      ratingCode = ratingCode,
+      rating = rating.toDomain(),
       evidence = evidence,
       createdAtPrison = createdAtPrison!!,
       updatedAtPrison = updatedAtPrison!!,
@@ -40,7 +43,7 @@ class EmployabilitySkillEntityMapper {
       prisonNumber = prisonNumber,
       skillType = employabilitySkillType.toEntity(),
       evidence = evidence,
-      ratingCode = employabilitySkillRating.name,
+      rating = employabilitySkillRating.toEntity(),
       sessionType = sessionType?.toEntity(),
       sessionTypeDescription = sessionTypeDescription,
       createdAtPrison = prisonId,
@@ -87,4 +90,18 @@ private fun DomainEmployabilitySkillSessionType.toEntity(): EntityEmployabilityS
   DomainEmployabilitySkillSessionType.CIAG_REVIEW -> EntityEmployabilitySkillSessionType.CIAG_REVIEW
   DomainEmployabilitySkillSessionType.EDUCATION_REVIEW -> EntityEmployabilitySkillSessionType.EDUCATION_REVIEW
   DomainEmployabilitySkillSessionType.INDUSTRIES_REVIEW -> EntityEmployabilitySkillSessionType.INDUSTRIES_REVIEW
+}
+
+private fun EntityEmployabilitySkillRating.toDomain(): EmployabilitySkillRating = when (this) {
+  EntityEmployabilitySkillRating.NOT_CONFIDENT -> EmployabilitySkillRating.NOT_CONFIDENT
+  EntityEmployabilitySkillRating.LITTLE_CONFIDENCE -> EmployabilitySkillRating.LITTLE_CONFIDENCE
+  EntityEmployabilitySkillRating.QUITE_CONFIDENT -> EmployabilitySkillRating.QUITE_CONFIDENT
+  EntityEmployabilitySkillRating.VERY_CONFIDENT -> EmployabilitySkillRating.VERY_CONFIDENT
+}
+
+private fun DomainEmployabilitySkillRating.toEntity(): EntityEmployabilitySkillRating = when (this) {
+  DomainEmployabilitySkillRating.NOT_CONFIDENT -> EntityEmployabilitySkillRating.NOT_CONFIDENT
+  DomainEmployabilitySkillRating.LITTLE_CONFIDENCE -> EntityEmployabilitySkillRating.LITTLE_CONFIDENCE
+  DomainEmployabilitySkillRating.QUITE_CONFIDENT -> EntityEmployabilitySkillRating.QUITE_CONFIDENT
+  DomainEmployabilitySkillRating.VERY_CONFIDENT -> EntityEmployabilitySkillRating.VERY_CONFIDENT
 }
