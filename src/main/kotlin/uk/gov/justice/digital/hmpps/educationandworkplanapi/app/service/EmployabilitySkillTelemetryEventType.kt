@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
 
 /**
  * An enumeration of the types of Induction events that can be sent to the Telemetry Service, where each item has:

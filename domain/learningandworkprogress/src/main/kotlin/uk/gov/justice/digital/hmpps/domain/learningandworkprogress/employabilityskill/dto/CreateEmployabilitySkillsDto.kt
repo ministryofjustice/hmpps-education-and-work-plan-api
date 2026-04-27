@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.domain.personallearningplan.dto
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto
 
 data class CreateEmployabilitySkillsDto(
   val employabilitySkills: List<EmployabilitySkillDto>,

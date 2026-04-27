@@ -7,10 +7,10 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.verifyNoInteractions
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidStep
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.anotherValidStep

@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillsEventService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
@@ -24,9 +27,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servic
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillPersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillsEventService
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalEventService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalNotesService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalPersistenceAdapter

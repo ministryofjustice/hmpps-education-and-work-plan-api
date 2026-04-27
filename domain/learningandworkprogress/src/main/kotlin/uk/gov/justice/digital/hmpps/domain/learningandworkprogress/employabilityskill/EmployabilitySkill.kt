@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.domain.personallearningplan
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill
 
 import java.time.Instant
 import java.util.UUID

@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillNotFoundException
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.EmployabilitySkillPersistenceAdapter
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.CreateEmployabilitySkillsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.employabilityskill.EmployabilitySkillEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EmployabilitySkillRepository
 import java.util.UUID
