@@ -21,7 +21,7 @@ fun aValidEmployabilitySkill(
   reference = reference,
   prisonNumber = prisonNumber,
   employabilitySkillType = employabilitySkillType,
-  ratingCode = rating.name,
+  rating = rating,
   evidence = evidence,
   sessionType = sessionType,
   sessionTypeDescription = sessionTypeDescription,

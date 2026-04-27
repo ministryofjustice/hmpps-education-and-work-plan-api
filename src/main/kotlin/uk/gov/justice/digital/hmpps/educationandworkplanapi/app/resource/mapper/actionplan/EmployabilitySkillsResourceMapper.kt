@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
@@ -58,7 +59,7 @@ class EmployabilitySkillsResourceMapper(
       updatedBy = updatedBy,
       updatedAtPrison = updatedAtPrison,
       employabilitySkillType = employabilitySkillType.toApi(),
-      employabilitySkillRating = ratingCodeToApi(ratingCode),
+      employabilitySkillRating = rating.toApi(),
       sessionType = sessionType?.toApi(),
       sessionTypeDescription = sessionTypeDescription,
       evidence = evidence,
@@ -80,12 +81,11 @@ private fun EmployabilitySkillType.toApi(): ApiEmployabilitySkillType = when (th
   EmployabilitySkillType.CREATIVITY -> ApiEmployabilitySkillType.CREATIVITY
 }
 
-private fun ratingCodeToApi(ratingCode: String): ApiEmployabilitySkillRating = when (ratingCode) {
-  "NOT_CONFIDENT" -> ApiEmployabilitySkillRating.NOT_CONFIDENT
-  "LITTLE_CONFIDENCE" -> ApiEmployabilitySkillRating.LITTLE_CONFIDENCE
-  "QUITE_CONFIDENT" -> ApiEmployabilitySkillRating.QUITE_CONFIDENT
-  "VERY_CONFIDENT" -> ApiEmployabilitySkillRating.VERY_CONFIDENT
-  else -> throw IllegalArgumentException("Unknown ratingCode: $ratingCode")
+private fun EmployabilitySkillRating.toApi(): ApiEmployabilitySkillRating = when (this) {
+  EmployabilitySkillRating.NOT_CONFIDENT -> ApiEmployabilitySkillRating.NOT_CONFIDENT
+  EmployabilitySkillRating.LITTLE_CONFIDENCE -> ApiEmployabilitySkillRating.LITTLE_CONFIDENCE
+  EmployabilitySkillRating.QUITE_CONFIDENT -> ApiEmployabilitySkillRating.QUITE_CONFIDENT
+  EmployabilitySkillRating.VERY_CONFIDENT -> ApiEmployabilitySkillRating.VERY_CONFIDENT
 }
 
 private fun EmployabilitySkillSessionType.toApi(): ApiEmployabilitySkillSessionType = when (this) {

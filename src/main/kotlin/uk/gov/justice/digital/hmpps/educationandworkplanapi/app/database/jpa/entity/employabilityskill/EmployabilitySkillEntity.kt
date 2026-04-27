@@ -5,11 +5,8 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
 import org.hibernate.annotations.CreationTimestamp
@@ -38,8 +35,9 @@ data class EmployabilitySkillEntity(
   @Column(updatable = false)
   val evidence: String,
 
+  @Enumerated(EnumType.STRING)
   @Column(updatable = false, name = "rating_code")
-  val ratingCode: String,
+  val rating: EmployabilitySkillRating,
 
   @Enumerated(EnumType.STRING)
   @Column(updatable = false)
@@ -47,18 +45,6 @@ data class EmployabilitySkillEntity(
 
   @Column(updatable = false)
   val sessionTypeDescription: String?,
-
-  /**
-   * Convenience association to the rating lookup table.
-   */
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(
-    name = "rating_code",
-    referencedColumnName = "code",
-    insertable = false,
-    updatable = false,
-  )
-  val rating: EmployabilitySkillRatingEntity? = null,
 
   @Column(updatable = false)
   val createdAtPrison: String? = null,
@@ -97,7 +83,7 @@ data class EmployabilitySkillEntity(
 
   override fun hashCode(): Int = javaClass.hashCode()
 
-  override fun toString(): String = this::class.simpleName + "(id=$id, prisonNumber=$prisonNumber, skillType=$skillType, ratingCode=$ratingCode)"
+  override fun toString(): String = this::class.simpleName + "(id=$id, prisonNumber=$prisonNumber, skillType=$skillType, rating=$rating)"
 }
 
 enum class EmployabilitySkillType {
@@ -111,6 +97,13 @@ enum class EmployabilitySkillType {
   ADAPTABILITY,
   RELIABILITY,
   CREATIVITY,
+}
+
+enum class EmployabilitySkillRating {
+  NOT_CONFIDENT,
+  LITTLE_CONFIDENCE,
+  QUITE_CONFIDENT,
+  VERY_CONFIDENT,
 }
 
 enum class EmployabilitySkillSessionType {
