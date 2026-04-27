@@ -14,9 +14,9 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidEmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext

@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.employabilityskill
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillRating
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillSessionType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.CreateEmployabilitySkillsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillEntity
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillRating as DomainEmployabilitySkillRating
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillSessionType as DomainEmployabilitySkillSessionType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillType as DomainEmployabilitySkillType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillRating as DomainEmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillSessionType as DomainEmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillType as DomainEmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillRating as EntityEmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillSessionType as EntityEmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.employabilityskill.EmployabilitySkillType as EntityEmployabilitySkillType

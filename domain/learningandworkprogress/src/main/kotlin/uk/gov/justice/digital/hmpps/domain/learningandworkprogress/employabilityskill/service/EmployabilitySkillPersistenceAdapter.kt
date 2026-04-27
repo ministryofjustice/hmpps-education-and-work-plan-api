@@ -1,7 +1,7 @@
-package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service
 
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.CreateEmployabilitySkillsDto
 import java.util.UUID
 
 /**

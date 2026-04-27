@@ -1,20 +1,20 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan
 
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillRating
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillSessionType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkillType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.CreateEmployabilitySkillsDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkillType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.CreateEmployabilitySkillsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillDto
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CreateEmployabilitySkillsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillsResponse
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillRating as DomainEmployabilitySkillRating
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillSessionType as DomainEmployabilitySkillSessionType
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.EmployabilitySkillType as DomainEmployabilitySkillType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillRating as DomainEmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillSessionType as DomainEmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.dto.EmployabilitySkillType as DomainEmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating as ApiEmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType as ApiEmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType as ApiEmployabilitySkillType

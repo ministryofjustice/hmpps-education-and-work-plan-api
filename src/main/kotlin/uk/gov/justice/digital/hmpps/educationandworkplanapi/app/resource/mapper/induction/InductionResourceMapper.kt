@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Induction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionDto
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.InstantMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.EmployabilitySkillsResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUserService

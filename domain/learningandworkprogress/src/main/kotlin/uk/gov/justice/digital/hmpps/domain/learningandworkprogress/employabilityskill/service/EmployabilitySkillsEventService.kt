@@ -1,6 +1,6 @@
-package uk.gov.justice.digital.hmpps.domain.personallearningplan.service
+package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service
 
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.EmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.EmployabilitySkill
 
 /**
  * Interface for defining [EmployabilitySkill] related lifecycle events.
