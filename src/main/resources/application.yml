@@ -110,7 +110,6 @@ springdoc:
   swagger-ui:
     url: '/openapi/EducationAndWorkPlanAPI.yml'
     tags-sorter: alpha
-    version: 5.32.1
 
 apis:
   prison-api:
