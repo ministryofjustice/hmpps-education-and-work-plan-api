@@ -9,6 +9,10 @@ import java.time.format.DateTimeFormatter
 
 @Component
 class PrisonApiMapper {
+  companion object {
+    private const val ADMINISTRATIVE = "Administrative"
+  }
+
   fun toPrisonMovementEvents(
     prisonerNumber: String,
     prisonerInPrisonSummary: PrisonerInPrisonSummary,
@@ -27,14 +31,16 @@ class PrisonApiMapper {
 
   private fun buildAdmissionsAndReleases(movements: List<SignificantMovement>): List<PrisonMovementEvent> {
     val admissionsAndReleases = mutableListOf<PrisonMovementEvent>()
-    movements.forEach {
-      if (isAdmissionIntoPrison(it)) {
-        admissionsAndReleases.add(toPrisonAdmissionEvent(it))
+    movements
+      .filter { it.isNotAnAdministrativeRecord() }
+      .forEach {
+        if (isAdmissionIntoPrison(it)) {
+          admissionsAndReleases.add(toPrisonAdmissionEvent(it))
+        }
+        if (isReleaseFromPrison(it)) {
+          admissionsAndReleases.add(toPrisonReleaseEvent(it))
+        }
       }
-      if (isReleaseFromPrison(it)) {
-        admissionsAndReleases.add(toPrisonReleaseEvent(it))
-      }
-    }
 
     return admissionsAndReleases
   }
@@ -69,4 +75,6 @@ class PrisonApiMapper {
   private fun isReleaseFromPrison(it: SignificantMovement) = it.outwardType == SignificantMovement.OutwardType.REL
 
   private fun String?.toLocalDate() = LocalDate.parse(this, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+
+  private fun SignificantMovement.isNotAnAdministrativeRecord(): Boolean = this.reasonInToPrison != ADMINISTRATIVE
 }
