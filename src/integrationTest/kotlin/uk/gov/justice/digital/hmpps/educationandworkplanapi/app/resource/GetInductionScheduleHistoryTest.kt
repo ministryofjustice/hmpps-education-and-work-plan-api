@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
@@ -55,46 +54,43 @@ class GetInductionScheduleHistoryTest : IntegrationTestBase() {
     // Then
     val inductionSchedulesResponse = response.responseBody.blockFirst()
 
-    assertThat(inductionSchedulesResponse).isNotNull
-    val inductionSchedules = inductionSchedulesResponse?.inductionSchedules
-    assertThat(inductionSchedules).size().isEqualTo(3)
-    assertThat(inductionSchedules?.get(0)).isNotNull
-    assertThat(inductionSchedules?.get(0))
-      .wasCreatedAtOrAfter(initialDateTime)
-      .wasUpdatedAtOrAfter(initialDateTime)
-      .wasCreatedBy("auser_gen")
-      .wasCreatedByDisplayName("Albert User")
-      .wasUpdatedBy("auser_gen")
-      .wasUpdatedByDisplayName("Albert User")
-      .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .wasStatus(InductionScheduleStatus.COMPLETED)
-      .wasVersion(3)
-      .wasInductionPerformedBy("Bob Smith")
-      .wasInductionPerformedByRole("Peer Mentor")
-      .wasInductionPerformedAt(LocalDate.now())
-
-    assertThat(inductionSchedules?.get(1)).isNotNull
-    assertThat(inductionSchedules?.get(1))
-      .wasCreatedAtOrAfter(initialDateTime)
-      .wasUpdatedAtOrAfter(initialDateTime)
-      .wasCreatedBy("auser_gen")
-      .wasCreatedByDisplayName("Albert User")
-      .wasUpdatedBy("auser_gen")
-      .wasUpdatedByDisplayName("Albert User")
-      .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .wasStatus(InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES)
-      .wasVersion(2)
-
-    assertThat(inductionSchedules?.get(2)).isNotNull
-    assertThat(inductionSchedules?.get(2))
-      .wasCreatedAtOrAfter(initialDateTime)
-      .wasUpdatedAtOrAfter(initialDateTime)
-      .wasCreatedBy("auser_gen")
-      .wasCreatedByDisplayName("Albert User")
-      .wasUpdatedBy("auser_gen")
-      .wasUpdatedByDisplayName("Albert User")
-      .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
-      .wasStatus(InductionScheduleStatus.SCHEDULED)
-      .wasVersion(1)
+    assertThat(inductionSchedulesResponse)
+      .hasNumberOfInductionScheduleVersions(3)
+      .inductionScheduleVersion(3) {
+        it.wasCreatedAtOrAfter(initialDateTime)
+          .wasUpdatedAtOrAfter(initialDateTime)
+          .wasCreatedBy("auser_gen")
+          .wasCreatedByDisplayName("Albert User")
+          .wasUpdatedBy("auser_gen")
+          .wasUpdatedByDisplayName("Albert User")
+          .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+          .wasStatus(InductionScheduleStatus.COMPLETED)
+          .wasVersion(3)
+          .wasInductionPerformedBy("Bob Smith")
+          .wasInductionPerformedByRole("Peer Mentor")
+          .wasInductionPerformedAt(LocalDate.now())
+      }
+      .inductionScheduleVersion(2) {
+        it.wasCreatedAtOrAfter(initialDateTime)
+          .wasUpdatedAtOrAfter(initialDateTime)
+          .wasCreatedBy("auser_gen")
+          .wasCreatedByDisplayName("Albert User")
+          .wasUpdatedBy("auser_gen")
+          .wasUpdatedByDisplayName("Albert User")
+          .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+          .wasStatus(InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES)
+          .wasVersion(2)
+      }
+      .inductionScheduleVersion(1) {
+        it.wasCreatedAtOrAfter(initialDateTime)
+          .wasUpdatedAtOrAfter(initialDateTime)
+          .wasCreatedBy("auser_gen")
+          .wasCreatedByDisplayName("Albert User")
+          .wasUpdatedBy("auser_gen")
+          .wasUpdatedByDisplayName("Albert User")
+          .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+          .wasStatus(InductionScheduleStatus.SCHEDULED)
+          .wasVersion(1)
+      }
   }
 }

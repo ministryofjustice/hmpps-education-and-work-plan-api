@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.specialtests
 
-import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
@@ -14,6 +13,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidHmppsDomainEventsSqsMessage
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidPrisonerReceivedAdditionalInformation
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.events.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.EXEMPT_TEMP_ABSENCE
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
@@ -75,18 +75,21 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
       .wasStatus(SCHEDULED)
 
     val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
-    assertThat(inductionScheduleHistories.inductionSchedules.size).isEqualTo(2)
-    assertThat(inductionScheduleHistories.inductionSchedules[1].scheduleStatus).isEqualTo(EXEMPT_TEMP_ABSENCE)
-    assertThat(inductionScheduleHistories.inductionSchedules[0].scheduleStatus).isEqualTo(SCHEDULED)
+    assertThat(inductionScheduleHistories)
+      .hasNumberOfInductionScheduleVersions(2)
+      .inductionScheduleVersion(1) { it.wasStatus(EXEMPT_TEMP_ABSENCE) }
+      .inductionScheduleVersion(2) { it.wasStatus(SCHEDULED) }
 
     val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
 
     await.untilAsserted {
-      assertThat(inductionScheduleEvents).hasSize(2)
-      assertThat(inductionScheduleEvents).allSatisfy {
-        assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-        assertThat(it.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
-      }
+      assertThat(inductionScheduleEvents)
+        .hasNumberOfEvents(2)
+        .allEvents {
+          it.hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+            .hasNumberOfPersonReferenceIdentifiers(1)
+            .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
+        }
     }
   }
 
@@ -136,18 +139,21 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
       .wasStatus(SCHEDULED)
 
     val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
-    assertThat(inductionScheduleHistories.inductionSchedules.size).isEqualTo(2)
-    assertThat(inductionScheduleHistories.inductionSchedules[1].scheduleStatus).isEqualTo(EXEMPT_TEMP_ABSENCE)
-    assertThat(inductionScheduleHistories.inductionSchedules[0].scheduleStatus).isEqualTo(SCHEDULED)
+    assertThat(inductionScheduleHistories)
+      .hasNumberOfInductionScheduleVersions(2)
+      .inductionScheduleVersion(1) { it.wasStatus(EXEMPT_TEMP_ABSENCE) }
+      .inductionScheduleVersion(2) { it.wasStatus(SCHEDULED) }
 
     val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
 
     await.untilAsserted {
-      assertThat(inductionScheduleEvents).hasSize(2)
-      assertThat(inductionScheduleEvents).allSatisfy {
-        assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-        assertThat(it.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
-      }
+      assertThat(inductionScheduleEvents)
+        .hasNumberOfEvents(2)
+        .allEvents {
+          it.hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+            .hasNumberOfPersonReferenceIdentifiers(1)
+            .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
+        }
     }
   }
 }
