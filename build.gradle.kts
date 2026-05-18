@@ -26,7 +26,7 @@ val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val testContainersVersion = "2.0.5"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.4.1"
+val sarTestSupportLibraryVersion = "2.4.2"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
