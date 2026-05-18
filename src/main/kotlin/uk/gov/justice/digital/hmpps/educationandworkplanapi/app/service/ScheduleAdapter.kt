@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.ser
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanPersistenceAdapter
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
+import java.time.Clock
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
@@ -20,6 +21,7 @@ class ScheduleAdapter(
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
   private val reviewScheduleService: ReviewScheduleService,
   private val inductionScheduleService: InductionScheduleService,
+  private val clock: Clock,
 ) {
 
   fun requiresInductionSchedule(prisonNumber: String): Boolean {
@@ -41,7 +43,7 @@ class ScheduleAdapter(
       // Create the induction schedule for this person:
       inductionScheduleService.createInductionSchedule(
         prisonNumber = prisonNumber,
-        prisonerAdmissionDate = LocalDate.now(),
+        prisonerAdmissionDate = LocalDate.now(clock),
         prisonId = prisonId,
       )
     }

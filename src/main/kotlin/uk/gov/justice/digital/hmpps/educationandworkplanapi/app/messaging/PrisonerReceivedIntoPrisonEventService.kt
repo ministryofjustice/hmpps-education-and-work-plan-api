@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -44,6 +45,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private val reviewService: ReviewService,
   private val actionPlanService: ActionPlanService,
   private val scheduleAdapter: ScheduleAdapter,
+  private val clock: Clock,
 ) {
   fun process(
     inboundEvent: InboundEvent,
@@ -162,7 +164,7 @@ class PrisonerReceivedIntoPrisonEventService(
     val mostRecentReview = reviews.maxByOrNull { it.completedDate }
     if (mostRecentReview != null && mostRecentReview.preRelease) {
       val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
-      if (prisoner.releaseDate != null && prisoner.releaseDate.isAfter(LocalDate.now().plusDays(16))) {
+      if (prisoner.releaseDate != null && prisoner.releaseDate.isAfter(LocalDate.now(clock).plusDays(16))) {
         reviewScheduleService.handle17DayTransferRule(
           prisonNumber = nomsNumber,
           prisonTransferredTo = prisonId,

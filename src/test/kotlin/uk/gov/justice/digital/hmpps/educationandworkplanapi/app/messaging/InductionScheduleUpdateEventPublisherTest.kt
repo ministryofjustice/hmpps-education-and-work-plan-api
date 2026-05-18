@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.sns.model.PublishResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventPublisher.HmppsDomainEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
+import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.CompletableFuture
@@ -24,7 +25,9 @@ class InductionScheduleUpdateEventPublisherTest {
   private val hmppsQueueService: HmppsQueueService = mock()
   private val snsClient: SnsAsyncClient = mock()
   private val objectMapper: ObjectMapper = mock()
-  private val service = EventPublisher(hmppsQueueService, objectMapper, "http://localhost:8080")
+  private val fixedTimestamp = Instant.parse("2026-04-17T09:13:22.123Z")
+  private val clock = Clock.fixed(fixedTimestamp, ZoneId.of("UTC"))
+  private val service = EventPublisher(hmppsQueueService, objectMapper, "http://localhost:8080", clock)
 
   @Test
   fun `send event converts to induction schedule event update event`() {

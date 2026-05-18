@@ -41,6 +41,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -73,6 +74,9 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
   @Mock
   private lateinit var scheduleAdapter: ScheduleAdapter
+
+  @Mock
+  private lateinit var clock: Clock
 
   private val objectMapper = ObjectMapper()
 

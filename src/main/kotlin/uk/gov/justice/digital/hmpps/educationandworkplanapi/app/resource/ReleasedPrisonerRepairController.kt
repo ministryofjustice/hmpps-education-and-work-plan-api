@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Inboun
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.InboundEventsService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PersonReference
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import java.time.Clock
 import java.time.Instant
 
 private val log = KotlinLogging.logger {}
@@ -32,6 +33,7 @@ class ReleasedPrisonerRepairController(
   private val inboundEventsService: InboundEventsService,
   private val objectMapper: ObjectMapper,
   private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val clock: Clock,
 ) {
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize(HAS_EDIT_REVIEWS)
@@ -72,8 +74,8 @@ class ReleasedPrisonerRepairController(
           additionalInformation = objectMapper.writeValueAsString(
             additionalInformation(prisonNumber, releasedToHospital),
           ),
-          occurredAt = Instant.now(),
-          publishedAt = Instant.now(),
+          occurredAt = Instant.now(clock),
+          publishedAt = Instant.now(clock),
           description = "Test message to correct data",
           version = "1",
         ),

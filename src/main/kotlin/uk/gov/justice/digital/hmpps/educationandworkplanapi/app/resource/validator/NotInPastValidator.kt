@@ -4,6 +4,8 @@ import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
+import org.springframework.stereotype.Component
+import java.time.Clock
 import java.time.LocalDate
 import kotlin.reflect.KClass
 
@@ -17,7 +19,10 @@ annotation class NotInPast(
   val payload: Array<KClass<out Payload>> = [],
 )
 
-class NotInPastValidator : ConstraintValidator<NotInPast, LocalDate> {
+@Component
+class NotInPastValidator(
+  private val clock: Clock,
+) : ConstraintValidator<NotInPast, LocalDate> {
   private lateinit var constraintAnnotation: NotInPast
 
   override fun initialize(constraintAnnotation: NotInPast) {
@@ -26,5 +31,5 @@ class NotInPastValidator : ConstraintValidator<NotInPast, LocalDate> {
 
   override fun isValid(date: LocalDate?, context: ConstraintValidatorContext): Boolean = date?.isNotInThePast() ?: true
 
-  private fun LocalDate.isNotInThePast() = !this.isBefore(LocalDate.now())
+  private fun LocalDate.isNotInThePast() = !this.isBefore(LocalDate.now(clock))
 }

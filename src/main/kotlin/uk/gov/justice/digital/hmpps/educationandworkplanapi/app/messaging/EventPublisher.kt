@@ -9,6 +9,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
 import uk.gov.justice.hmpps.sqs.eventTypeMessageAttributes
 import java.net.URI
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -20,11 +21,12 @@ class EventPublisher(
   private val hmppsQueueService: HmppsQueueService,
   private val objectMapper: ObjectMapper,
   @param:Value("\${service.base-url}") private val serviceBaseUrl: String,
+  private val clock: Clock,
 ) {
 
   internal val eventTopic by lazy { hmppsQueueService.findByTopicId("domainevents") as HmppsTopic }
 
-  fun createAndPublishInductionEvent(prisonNumber: String, occurredAt: Instant = Instant.now()) {
+  fun createAndPublishInductionEvent(prisonNumber: String, occurredAt: Instant = Instant.now(clock)) {
     log.info { "Publishing induction schedule for prisoner [$prisonNumber]" }
     createAndPublishEvent(
       prisonNumber = prisonNumber,
@@ -39,7 +41,7 @@ class EventPublisher(
     log.info { "Publishing review schedule for prisoner [$prisonNumber]" }
     createAndPublishEvent(
       prisonNumber = prisonNumber,
-      occurredAt = Instant.now(),
+      occurredAt = Instant.now(clock),
       eventType = "plp.review-schedule.updated",
       description = "A prisoner learning plan review schedule created or amended",
       detailPath = "reviews/{prisonerNumber}/review-schedule",
