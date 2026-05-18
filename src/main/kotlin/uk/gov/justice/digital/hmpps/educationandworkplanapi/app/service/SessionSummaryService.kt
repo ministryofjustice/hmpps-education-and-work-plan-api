@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Sessi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionResponses
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionStatusType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSummaryResponse
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -24,6 +25,7 @@ class SessionSummaryService(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val reviewScheduleService: ReviewScheduleService,
   private val inductionScheduleService: InductionScheduleService,
+  private val clock: Clock,
 ) {
 
   /**
@@ -106,7 +108,7 @@ class SessionSummaryService(
   private fun getSessionSummaries(
     prisonerNumbers: List<String>,
   ): SessionSummaries {
-    val today = LocalDate.now()
+    val today = LocalDate.now(clock)
 
     val sessionSummaries = SessionSummaries()
     val inductionSchedules = inductionScheduleService.getInCompleteInductionSchedules(prisonerNumbers)

@@ -6,11 +6,14 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito.mock
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 
 class NotInPastValidatorTest {
 
-  private val validator = NotInPastValidator()
+  private val validator = NotInPastValidator(clock)
 
   @ParameterizedTest
   @MethodSource("dates")
@@ -26,9 +29,12 @@ class NotInPastValidatorTest {
   }
 
   companion object {
+    private val fixedTimestamp = Instant.parse("2026-04-17T09:13:22.123Z")
+    private val clock = Clock.fixed(fixedTimestamp, ZoneId.of("UTC"))
+
     @JvmStatic
     fun dates(): List<Arguments> {
-      val now = LocalDate.now()
+      val now = LocalDate.now(clock)
       return listOf(
         Arguments.of(now, true),
         Arguments.of(now.plusDays(1), true),

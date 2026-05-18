@@ -8,23 +8,29 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.DeadlineExtensionRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 
 class PesInductionScheduleDateCalculationServiceTest {
+  private val fixedTimestamp = Instant.parse("2026-04-17T09:13:22.123Z")
+  private val clock = Clock.fixed(fixedTimestamp, ZoneId.of("UTC"))
   private val service = PesInductionScheduleDateCalculationService(
     ExemptionProperties(DeadlineExtensionRule.ONLY_WHEN_NOT_OVERDUE),
+    clock,
   )
 
   @Test
   fun `should determine CreateInductionScheduleDto`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
-    val admissionDate = LocalDate.now().minusDays(1)
+    val admissionDate = LocalDate.now(clock).minusDays(1)
     val prisonId = "BXI"
 
     val expected = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,
-      deadlineDate = LocalDate.now(),
+      deadlineDate = LocalDate.parse("2026-04-17"),
       scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
       scheduleStatus = InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     )

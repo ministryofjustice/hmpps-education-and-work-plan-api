@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePropertiesProvider
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
+import java.time.Clock
 import java.time.LocalDate
 
 /**
@@ -19,7 +20,7 @@ import java.time.LocalDate
  */
 @Service
 @ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PES")
-class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionProperties) :
+class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionProperties, private val clock: Clock) :
   InductionScheduleDateCalculationService(
     propertiesProvider = object : InductionSchedulePropertiesProvider {
       override val onlyExtendDeadlinesWhenNotOverdue: Boolean
@@ -38,7 +39,7 @@ class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionP
    */
   override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String, newAdmission: Boolean, releaseDate: LocalDate?): CreateInductionScheduleDto = CreateInductionScheduleDto(
     prisonNumber = prisonNumber,
-    deadlineDate = LocalDate.now(),
+    deadlineDate = LocalDate.now(clock),
     scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
     scheduleStatus = InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     prisonId = prisonId,

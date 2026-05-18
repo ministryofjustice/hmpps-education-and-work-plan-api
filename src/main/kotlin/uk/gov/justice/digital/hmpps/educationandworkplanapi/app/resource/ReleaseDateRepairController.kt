@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.rep
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.ReviewScheduleRepository
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.PrisonerReceivedIntoPrisonEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 
@@ -30,6 +31,7 @@ class ReleaseDateRepairController(
   private val inductionRepository: InductionRepository,
   private val goalPersistenceAdapter: GoalPersistenceAdapter,
   private val prisonerReceivedIntoPrisonEventService: PrisonerReceivedIntoPrisonEventService,
+  private val clock: Clock,
 ) {
 
   @ResponseStatus(HttpStatus.OK)
@@ -44,7 +46,7 @@ class ReleaseDateRepairController(
       log.info("Total prisoners in prison $prisonId: ${it.size}")
     }
 
-    val tomorrow = LocalDate.now().plusDays(1)
+    val tomorrow = LocalDate.now(clock).plusDays(1)
 
     // we are only interested in prisoners with no release date or ones with the date < tomorrow
     val prisonerReleaseDates: List<PrisonerReleaseDate> = allPrisoners.mapNotNull { prisoner ->
@@ -82,7 +84,7 @@ class ReleaseDateRepairController(
     // we are only interested in prisoners with no release date or ones with the date < tomorrow
     val prisonerReleaseDates: List<PrisonerReleaseDate> = allPrisoners.mapNotNull { prisoner ->
       val date = prisoner.releaseDate
-      if (date != null && date.isBefore(LocalDate.now())) {
+      if (date != null && date.isBefore(LocalDate.now(clock))) {
         PrisonerReleaseDate(
           prisoner.prisonerNumber,
           date,
@@ -102,7 +104,7 @@ class ReleaseDateRepairController(
         log.debug("Creating review schedule for prisoner: ${it.prisonerNumber} at prison $prisonId")
         prisonerReceivedIntoPrisonEventService.processPrisonerAdmissionEvent(
           nomsNumber = it.prisonerNumber,
-          eventOccurredAt = Instant.now(),
+          eventOccurredAt = Instant.now(clock),
         )
         Thread.sleep(500) // have a rest between each one so it doesn't kill the database
       }

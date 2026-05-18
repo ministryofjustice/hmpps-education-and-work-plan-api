@@ -3,12 +3,15 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionType
+import java.time.Clock
 import java.time.LocalDate
 
 @Service
-class ReviewTypeService {
+class ReviewTypeService(
+  private val clock: Clock,
+) {
   fun reviewType(releaseDate: LocalDate?, scheduleCalculationRule: String, scheduleStatus: String? = null, followingTransfer: Boolean = false): ReviewType {
-    val now = LocalDate.now()
+    val now = LocalDate.now(clock)
     val threeMonthsFromNow = now.plusMonths(3)
 
     return when {

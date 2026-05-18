@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
@@ -13,7 +14,8 @@ class ClockConfig(
 ) {
 
   @Bean
-  fun clock(): Clock = if (fixedDate.isNullOrBlank()) {
+  @Primary
+  fun testClock(): Clock = if (fixedDate.isNullOrBlank()) {
     Clock.systemDefaultZone()
   } else {
     val date = LocalDate.parse(fixedDate)
