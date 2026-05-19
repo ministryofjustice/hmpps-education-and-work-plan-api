@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import mu.KotlinLogging
+import org.springframework.data.auditing.AuditingHandler
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
@@ -28,6 +29,7 @@ class JpaInductionPersistenceAdapter(
   private val previousQualificationsRepository: PreviousQualificationsRepository,
   private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
   private val noteRepository: NoteRepository,
+  private val auditingHandler: AuditingHandler,
 ) : InductionPersistenceAdapter {
 
   @Transactional
@@ -71,7 +73,7 @@ class JpaInductionPersistenceAdapter(
     val inductionEntity = inductionRepository.findByPrisonNumber(prisonNumber)
     return if (inductionEntity != null) {
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
-      inductionEntity.updateLastUpdatedAt() // force the main Induction's JPA managed fields to update
+      auditingHandler.markModified(inductionEntity) // force the main Induction's JPA managed fields to update
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
       val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto)
       val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
