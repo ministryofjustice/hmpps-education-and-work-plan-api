@@ -18,7 +18,6 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -58,7 +57,7 @@ data class GoalEntity(
 
   @Column
   var archiveReasonOther: String? = null,
-) : ParentEntity {
+) {
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -80,8 +79,15 @@ data class GoalEntity(
   @LastModifiedBy
   var updatedBy: String? = null
 
-  override fun childEntityUpdated() {
+  fun childEntityUpdated() {
     updatedAt = Instant.now()
+  }
+
+  fun addChildren(newChildren: List<StepEntity>) {
+    newChildren.forEach {
+      it.associateWithParent(this)
+      steps.add(it)
+    }
   }
 
   override fun equals(other: Any?): Boolean {
