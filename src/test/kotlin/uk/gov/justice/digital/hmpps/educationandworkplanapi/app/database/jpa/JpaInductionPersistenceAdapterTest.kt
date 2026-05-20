@@ -14,6 +14,7 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.springframework.data.auditing.AuditingHandler
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.CreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
@@ -62,6 +63,9 @@ class JpaInductionPersistenceAdapterTest {
 
   @Mock
   private lateinit var noteRepository: NoteRepository
+
+  @Mock
+  private lateinit var auditingHandler: AuditingHandler
 
   @Nested
   inner class CreateInduction {
@@ -387,6 +391,7 @@ class JpaInductionPersistenceAdapterTest {
       verify(previousQualificationsMapper).fromCreateDtoToEntity(expectedCreatePreviousQualificationsDto)
       verify(previousQualificationsRepository).saveAndFlush(newPreviousQualificationsEntity)
       verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, persistedPreviousQualificationsEntity, null)
+      verify(auditingHandler).markModified(inductionEntity)
     }
 
     @Test
@@ -445,6 +450,7 @@ class JpaInductionPersistenceAdapterTest {
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
       verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, null, null)
+      verify(auditingHandler).markModified(inductionEntity)
     }
 
     @Test
@@ -504,6 +510,7 @@ class JpaInductionPersistenceAdapterTest {
       verifyNoInteractions(previousQualificationsMapper)
       verifyNoMoreInteractions(previousQualificationsRepository)
       verify(inductionMapper).fromEntityToDomain(persistedInductionEntity, previousQualificationsEntity, null)
+      verify(auditingHandler).markModified(inductionEntity)
     }
 
     @Test
@@ -521,6 +528,7 @@ class JpaInductionPersistenceAdapterTest {
       verifyNoInteractions(inductionMapper)
       verifyNoInteractions(previousQualificationsRepository)
       verifyNoInteractions(previousQualificationsMapper)
+      verifyNoMoreInteractions(auditingHandler)
     }
   }
 }
