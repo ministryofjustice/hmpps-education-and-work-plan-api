@@ -20,6 +20,7 @@ fun aValidGoalEntity(
   updatedBy: String? = "bjones_gen",
   archiveReason: ReasonToArchiveGoal? = null,
   archiveReasonOther: String? = null,
+  notes: String? = null,
 ): GoalEntity = GoalEntity(
   reference = reference,
   title = title,
@@ -30,6 +31,7 @@ fun aValidGoalEntity(
   updatedAtPrison = updatedAtPrison,
   archiveReason = archiveReason,
   archiveReasonOther = archiveReasonOther,
+  notes = notes,
 ).apply {
   this.id = id
   this.createdAt = createdAt

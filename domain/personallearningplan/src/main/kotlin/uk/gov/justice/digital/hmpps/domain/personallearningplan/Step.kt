@@ -13,9 +13,7 @@ data class Step(
   val title: String,
   val status: StepStatus = StepStatus.NOT_STARTED,
   val sequenceNumber: Int,
-) : KeyAwareDomain {
-  override fun key(): String = reference.toString()
-}
+)
 
 enum class StepStatus {
   NOT_STARTED,
