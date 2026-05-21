@@ -14,6 +14,7 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.springframework.data.auditing.AuditingHandler
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
@@ -46,6 +47,9 @@ class JpaGoalPersistenceAdapterTest {
 
   @Mock
   private lateinit var goalMapper: GoalEntityMapper
+
+  @Mock
+  private lateinit var auditingHandler: AuditingHandler
 
   @Nested
   inner class CreateGoals {
@@ -213,6 +217,7 @@ class JpaGoalPersistenceAdapterTest {
       verify(goalRepository).saveAndFlush(goalEntity)
       verify(goalMapper).updateEntityFromDto(goalEntity, goalWithProposedUpdates)
       verify(goalMapper).fromEntityToDomain(persistedGoalEntity)
+      verify(auditingHandler).markModified(goalEntity)
     }
 
     @Test
@@ -234,6 +239,7 @@ class JpaGoalPersistenceAdapterTest {
       assertThat(actual).isNull()
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(goalMapper)
+      verifyNoMoreInteractions(auditingHandler)
     }
 
     @Test
@@ -253,6 +259,7 @@ class JpaGoalPersistenceAdapterTest {
       assertThat(actual).isNull()
       verify(actionPlanRepository).findByPrisonNumber(prisonNumber)
       verifyNoInteractions(goalMapper)
+      verifyNoMoreInteractions(auditingHandler)
     }
   }
 

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import mu.KotlinLogging
+import org.springframework.data.auditing.AuditingHandler
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
@@ -27,6 +28,7 @@ class JpaGoalPersistenceAdapter(
   private val goalRepository: GoalRepository,
   private val actionPlanRepository: ActionPlanRepository,
   private val goalMapper: GoalEntityMapper,
+  private val auditingHandler: AuditingHandler,
 ) : GoalPersistenceAdapter {
 
   @Transactional
@@ -75,6 +77,7 @@ class JpaGoalPersistenceAdapter(
     val goalEntity = getGoalEntityByPrisonNumberAndGoalReference(prisonNumber, updatedGoalDto.reference)
     return if (goalEntity != null) {
       goalMapper.updateEntityFromDto(goalEntity, updatedGoalDto)
+      auditingHandler.markModified(goalEntity) // force the Goal's JPA managed fields to update
       val persistedEntity = goalRepository.saveAndFlush(goalEntity)
       goalMapper.fromEntityToDomain(persistedEntity)
     } else {
