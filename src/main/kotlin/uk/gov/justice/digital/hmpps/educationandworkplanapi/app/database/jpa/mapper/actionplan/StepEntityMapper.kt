@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus as St
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.actionplan.StepStatus as StepStatusEntity
 
 @Component
-class StepEntityMapper : KeyAwareEntityMapper<StepEntity, Step> {
+class StepEntityMapper {
 
   /**
    * Maps the supplied [CreateStepDto] into a new un-persisted [StepEntity].
@@ -67,7 +67,7 @@ class StepEntityMapper : KeyAwareEntityMapper<StepEntity, Step> {
     )
   }
 
-  override fun fromDomainToEntity(domain: Step): StepEntity = with(domain) {
+  fun fromDomainToEntity(domain: Step): StepEntity = with(domain) {
     StepEntity(
       reference = reference,
       title = title,
@@ -76,7 +76,7 @@ class StepEntityMapper : KeyAwareEntityMapper<StepEntity, Step> {
     )
   }
 
-  override fun updateEntityFromDomain(entity: StepEntity, domain: Step) = with(entity) {
+  fun updateEntityFromDomain(entity: StepEntity, domain: Step) = with(entity) {
     title = domain.title
     sequenceNumber = domain.sequenceNumber
     status = toStepStatus(domain.status)

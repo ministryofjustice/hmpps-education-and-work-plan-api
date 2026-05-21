@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 @Component
 class GoalEntityMapper(
   private val stepEntityMapper: StepEntityMapper,
-  private val entityListManager: GoalEntityListManager<StepEntity, Step>,
 ) {
 
   /**
@@ -98,9 +97,9 @@ class GoalEntityMapper(
     val existingSteps = entity.steps
     val updatedSteps = dto.steps.map { stepEntityMapper.fromDtoToDomain(it) }
 
-    entityListManager.updateExisting(existingSteps, updatedSteps, stepEntityMapper)
-    entityListManager.addNew(entity, existingSteps, updatedSteps, stepEntityMapper)
-    entityListManager.deleteRemoved(existingSteps, updatedSteps)
+    updateExistingSteps(existingSteps, updatedSteps)
+    addNewSteps(entity, existingSteps, updatedSteps)
+    deleteRemovedSteps(existingSteps, updatedSteps)
 
     existingSteps.sortBy { it.sequenceNumber }
 
@@ -108,12 +107,7 @@ class GoalEntityMapper(
   }
 
   private fun addNewStepsToEntity(steps: List<CreateStepDto>, entity: GoalEntity) {
-    steps.forEach {
-      entity.addChild(
-        stepEntityMapper.fromDtoToEntity(it),
-        entity.steps,
-      )
-    }
+    entity.addChildren(steps.map { stepEntityMapper.fromDtoToEntity(it) })
   }
 
   private fun toGoalStatus(goalStatus: GoalStatusDomain): GoalStatusEntity = when (goalStatus) {
@@ -126,5 +120,46 @@ class GoalEntityMapper(
     GoalStatusEntity.ACTIVE -> GoalStatusDomain.ACTIVE
     GoalStatusEntity.ARCHIVED -> GoalStatusDomain.ARCHIVED
     GoalStatusEntity.COMPLETED -> GoalStatusDomain.COMPLETED
+  }
+
+  private fun updateExistingSteps(
+    existingEntities: MutableList<StepEntity>,
+    updatedDomain: List<Step>,
+  ) {
+    val updatedDomainKeys = updatedDomain.map { it.reference }
+    existingEntities
+      .filter { entity -> updatedDomainKeys.contains(entity.reference) }
+      .onEach { entity ->
+        stepEntityMapper.updateEntityFromDomain(
+          entity,
+          updatedDomain.first { dto -> dto.reference == entity.reference },
+        )
+      }
+  }
+
+  private fun addNewSteps(
+    goal: GoalEntity,
+    existingEntities: MutableList<StepEntity>,
+    updatedDomain: List<Step>,
+  ) {
+    val currentIdentifiers = existingEntities.map { it.reference }
+
+    val newEntities = updatedDomain
+      .filter { dto -> !currentIdentifiers.contains(dto.reference) }
+      .map { newDto -> stepEntityMapper.fromDomainToEntity(newDto) }
+
+    goal.addChildren(newEntities)
+  }
+
+  private fun deleteRemovedSteps(
+    existingEntities: MutableList<StepEntity>,
+    updatedDomain: List<Step>,
+  ) {
+    val updatedIdentifiers = updatedDomain.map { it.reference }
+
+    val removedEntities = existingEntities.filter { entity -> !updatedIdentifiers.contains(entity.reference) }
+    if (removedEntities.isNotEmpty()) {
+      existingEntities.removeAll(removedEntities)
+    }
   }
 }

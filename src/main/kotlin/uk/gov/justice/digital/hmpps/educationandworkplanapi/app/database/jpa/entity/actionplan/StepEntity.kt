@@ -21,8 +21,6 @@ import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.util.UUID
 
@@ -43,7 +41,7 @@ data class StepEntity(
   @Column
   var sequenceNumber: Int,
 
-) : KeyAwareChildEntity {
+) {
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -76,11 +74,9 @@ data class StepEntity(
     parent?.childEntityUpdated()
   }
 
-  override fun associateWithParent(parent: ParentEntity) {
-    this.parent = parent as GoalEntity
+  fun associateWithParent(parent: GoalEntity) {
+    this.parent = parent
   }
-
-  override fun key(): String = reference.toString()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
