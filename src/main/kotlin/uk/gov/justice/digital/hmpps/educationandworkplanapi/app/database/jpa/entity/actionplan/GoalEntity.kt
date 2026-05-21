@@ -79,10 +79,6 @@ data class GoalEntity(
   @LastModifiedBy
   var updatedBy: String? = null
 
-  fun childEntityUpdated() {
-    updatedAt = Instant.now()
-  }
-
   fun addChildren(newChildren: List<StepEntity>) {
     newChildren.forEach {
       it.associateWithParent(this)
