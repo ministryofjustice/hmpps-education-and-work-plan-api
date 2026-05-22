@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.educa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidCreateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidUpdateEducationRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.assertThat
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.isEquivalentTo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.withBody
 import java.time.OffsetDateTime
 
@@ -279,6 +280,6 @@ class UpdateEductionTest : IntegrationTestBase() {
     // Then
     val updatedEducationRecord = getEducation(prisonNumber)
     // assert no changes on the education record after the update vs. the one before the update
-    assertThat(updatedEducationRecord).isEqualTo(prisonerEducationRecord)
+    assertThat(updatedEducationRecord).isEquivalentTo(prisonerEducationRecord)
   }
 }
