@@ -12,11 +12,11 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import java.util.UUID
@@ -45,7 +45,7 @@ data class StepEntity(
   var id: UUID? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column(updatable = false)
@@ -53,7 +53,7 @@ data class StepEntity(
   var createdBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   @Column
