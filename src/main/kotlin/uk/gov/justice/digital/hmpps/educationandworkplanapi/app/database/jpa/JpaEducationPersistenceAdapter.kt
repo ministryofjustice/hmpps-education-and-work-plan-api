@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa
 
 import mu.KotlinLogging
+import org.springframework.data.auditing.AuditingHandler
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.PreviousQualifications
@@ -16,6 +17,7 @@ private val log = KotlinLogging.logger {}
 class JpaEducationPersistenceAdapter(
   private val previousQualificationsRepository: PreviousQualificationsRepository,
   private val previousQualificationsMapper: PreviousQualificationsEntityMapper,
+  private val auditingHandler: AuditingHandler,
 ) : EducationPersistenceAdapter {
   @Transactional(readOnly = true)
   override fun getPreviousQualifications(prisonNumber: String): PreviousQualifications? = previousQualificationsRepository.findByPrisonNumber(prisonNumber)?.let {
@@ -38,8 +40,9 @@ class JpaEducationPersistenceAdapter(
 
     return if (previousQualificationsEntity != null) {
       previousQualificationsMapper.updateExistingEntityFromDto(previousQualificationsEntity, updatePreviousQualificationsDto)
+      auditingHandler.markModified(previousQualificationsEntity) // force the Previous Qualifications's JPA managed fields to update
       val persistedEntity = previousQualificationsRepository.saveAndFlush(previousQualificationsEntity)
-      return previousQualificationsMapper.fromEntityToDomain(persistedEntity)
+      previousQualificationsMapper.fromEntityToDomain(persistedEntity)
     } else {
       null
     }
