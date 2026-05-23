@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 @Component
 class FutureWorkInterestsEntityMapper(
   private val workInterestEntityMapper: WorkInterestEntityMapper,
-  private val entityListManager: InductionEntityListManager<WorkInterestEntity, WorkInterest>,
 ) {
   fun fromCreateDtoToEntity(dto: CreateFutureWorkInterestsDto): FutureWorkInterestsEntity = with(dto) {
     FutureWorkInterestsEntity(
@@ -44,9 +43,9 @@ class FutureWorkInterestsEntityMapper(
 
     val existingInterests = entity.interests
     val updatedInterests = dto.interests
-    entityListManager.updateExisting(existingInterests, updatedInterests, workInterestEntityMapper)
-    entityListManager.addNew(entity, existingInterests, updatedInterests, workInterestEntityMapper)
-    entityListManager.deleteRemoved(existingInterests, updatedInterests)
+    updateExistingWorkInterests(existingInterests, updatedInterests)
+    addNewWorkInterests(entity, existingInterests, updatedInterests)
+    deleteRemovedWorkInterests(existingInterests, updatedInterests)
   }
 
   fun fromUpdateDtoToNewEntity(dto: UpdateFutureWorkInterestsDto): FutureWorkInterestsEntity = with(dto) {
@@ -60,18 +59,54 @@ class FutureWorkInterestsEntityMapper(
   }
 
   private fun addNewInterests(interests: List<WorkInterest>, entity: FutureWorkInterestsEntity) {
-    interests.forEach {
-      entity.addChild(
-        workInterestEntityMapper.fromDomainToEntity(it),
-        entity.interests,
-      )
+    entity.addChildren(interests.map { workInterestEntityMapper.fromDomainToEntity(it) })
+  }
+
+  private fun updateExistingWorkInterests(
+    existingEntities: MutableList<WorkInterestEntity>,
+    updatedDomain: List<WorkInterest>,
+  ) {
+    val updatedDomainKeys = updatedDomain.map { it.workType.name }
+    existingEntities
+      .filter { entity -> updatedDomainKeys.contains(entity.workType.name) }
+      .onEach { entity ->
+        workInterestEntityMapper.updateEntityFromDomain(
+          entity,
+          updatedDomain.first { dto -> dto.workType.name == entity.workType.name },
+        )
+      }
+  }
+
+  private fun addNewWorkInterests(
+    futureWorkInterests: FutureWorkInterestsEntity,
+    existingEntities: MutableList<WorkInterestEntity>,
+    updatedDomain: List<WorkInterest>,
+  ) {
+    val currentIdentifiers = existingEntities.map { it.workType.name }
+
+    val newEntities = updatedDomain
+      .filter { dto -> !currentIdentifiers.contains(dto.workType.name) }
+      .map { newDto -> workInterestEntityMapper.fromDomainToEntity(newDto) }
+
+    futureWorkInterests.addChildren(newEntities)
+  }
+
+  private fun deleteRemovedWorkInterests(
+    existingEntities: MutableList<WorkInterestEntity>,
+    updatedDomain: List<WorkInterest>,
+  ) {
+    val updatedIdentifiers = updatedDomain.map { it.workType.name }
+
+    val removedEntities = existingEntities.filter { entity -> !updatedIdentifiers.contains(entity.workType.name) }
+    if (removedEntities.isNotEmpty()) {
+      existingEntities.removeAll(removedEntities)
     }
   }
 }
 
 @Component
-class WorkInterestEntityMapper : KeyAwareEntityMapper<WorkInterestEntity, WorkInterest> {
-  override fun fromDomainToEntity(domain: WorkInterest): WorkInterestEntity = with(domain) {
+class WorkInterestEntityMapper {
+  fun fromDomainToEntity(domain: WorkInterest): WorkInterestEntity = with(domain) {
     WorkInterestEntity(
       reference = UUID.randomUUID(),
       workType = toWorkType(workType),
@@ -88,7 +123,7 @@ class WorkInterestEntityMapper : KeyAwareEntityMapper<WorkInterestEntity, WorkIn
     )
   }
 
-  override fun updateEntityFromDomain(entity: WorkInterestEntity, domain: WorkInterest) = with(entity) {
+  fun updateEntityFromDomain(entity: WorkInterestEntity, domain: WorkInterest) = with(entity) {
     workType = toWorkType(domain.workType)
     workTypeOther = domain.workTypeOther
     role = domain.role

@@ -26,9 +26,7 @@ data class WorkInterest(
   val workType: WorkInterestType,
   val workTypeOther: String?,
   val role: String?,
-) : KeyAwareDomain {
-  override fun key(): String = workType.name
-}
+)
 
 enum class WorkInterestType {
   OUTDOOR,
