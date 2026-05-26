@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -121,6 +122,40 @@ class GetAssessmentsRequiredTest : IntegrationTestBase() {
     // Then
     val actual = response.body()
     assertThat(actual.basicSkillsAssessmentRequired).isTrue()
+  }
+
+  @Test
+  fun `should return BSA eligibility for prisoner given prisoner-search-api response omits 'indeterminateSentence'`() {
+    // Given
+    val jsonBody = prisonerJsonWithoutField(knownPrisoner, "indeterminateSentence")
+    wiremockService.stubGetPrisonerFromPrisonerSearchApiWithRawJsonBody(prisonNumber, jsonBody)
+
+    // When
+    val response = getAssessmentsRequiredIsOk(prisonNumber)
+
+    // Then
+    val actual = response.body()
+    assertThat(actual.basicSkillsAssessmentRequired).isTrue()
+  }
+
+  @Test
+  fun `should return BSA eligibility for prisoner given prisoner-search-api response omits 'recall'`() {
+    // Given
+    val jsonBody = prisonerJsonWithoutField(knownPrisoner, "recall")
+    wiremockService.stubGetPrisonerFromPrisonerSearchApiWithRawJsonBody(prisonNumber, jsonBody)
+
+    // When
+    val response = getAssessmentsRequiredIsOk(prisonNumber)
+
+    // Then
+    val actual = response.body()
+    assertThat(actual.basicSkillsAssessmentRequired).isTrue()
+  }
+
+  private fun prisonerJsonWithoutField(prisoner: Prisoner, fieldName: String): String {
+    val node = objectMapper.valueToTree<ObjectNode>(prisoner)
+    node.remove(fieldName)
+    return objectMapper.writeValueAsString(node)
   }
 
   @Nested

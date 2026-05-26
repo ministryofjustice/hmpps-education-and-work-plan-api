@@ -72,6 +72,18 @@ class WiremockService(private val wireMockServer: WireMockServer) {
     )
   }
 
+  fun stubGetPrisonerFromPrisonerSearchApiWithRawJsonBody(prisonNumber: String, jsonBody: String) {
+    wireMockServer.stubFor(
+      get(urlPathMatching("/prisoner/$prisonNumber"))
+        .willReturn(
+          responseDefinition()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(jsonBody),
+        ),
+    )
+  }
+
   fun stubPrisonersInAPrisonSearchApi(prisonId: String, response: List<Prisoner>) {
     wireMockServer.stubFor(
       get(urlPathMatching("/prisoner-search/prison/$prisonId"))
