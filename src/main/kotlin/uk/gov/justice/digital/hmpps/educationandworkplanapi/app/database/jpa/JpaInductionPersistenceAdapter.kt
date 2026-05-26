@@ -75,9 +75,21 @@ class JpaInductionPersistenceAdapter(
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
 
       if (updateInductionDto.hasAnyChanges()) {
+        updateInductionDto.futureWorkInterests?.also {
+          inductionEntity.futureWorkInterests?.also {
+            auditingHandler.markModified(it).also {
+              log.debug { "FutureWorkInterestsEntity marked as modified" }
+            }
+          }
+        }
+        updateInductionDto.previousWorkExperiences?.also {
+          inductionEntity.previousWorkExperiences?.also {
+            auditingHandler.markModified(it).also {
+              log.debug { "PreviousWorkExperiencesEntity marked as modified" }
+            }
+          }
+        }
         auditingHandler.markModified(inductionEntity) // force the main Induction's JPA managed fields to update
-        updateInductionDto.futureWorkInterests?.run { auditingHandler.markModified(inductionEntity.futureWorkInterests!!) }
-        updateInductionDto.previousWorkExperiences?.run { auditingHandler.markModified(inductionEntity.previousWorkExperiences!!) }
       }
 
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
