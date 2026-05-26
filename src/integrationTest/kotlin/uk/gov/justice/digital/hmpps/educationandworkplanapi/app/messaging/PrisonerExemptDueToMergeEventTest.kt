@@ -10,6 +10,7 @@ import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
@@ -58,9 +59,8 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
     val rootNode = objectMapper.readTree(sqsMessage.Message)
     val newNomisNumber = rootNode["additionalInformation"]["nomsNumber"].asText()
 
-    assertThat(
-      inductionScheduleRepository.findByPrisonNumber(newNomisNumber)!!.scheduleStatus == SCHEDULED,
-    )
+    assertThat(inductionScheduleRepository.findByPrisonNumber(newNomisNumber))
+      .hasScheduleStatus(SCHEDULED)
   }
 
   @Test

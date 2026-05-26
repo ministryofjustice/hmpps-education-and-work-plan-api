@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_RECEIVED_INTO_PRISON
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.events.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
@@ -108,8 +109,10 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
       // test that outbound event is also created:
       val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
-      assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+      assertThat(inductionScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
   }
 
@@ -182,8 +185,10 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
       // test that outbound event is also created:
       val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.REVIEW)
-      assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+      assertThat(reviewScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
   }
 
@@ -245,40 +250,49 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
     await untilAsserted {
       val reviewSchedules = getReviewSchedules(prisonNumber)
       // Expect 3 Review Schedule versions - the original one, the exempted one, and the new one
-      assertThat(reviewSchedules).hasNumberOfReviewSchedules(3)
-      // The first in the list should be the newly created and scheduled Review Schedule - it is version 1 (because it is a new Review Schedule)
-      assertThat(reviewSchedules.reviewSchedules[0])
-        .hasStatus(ReviewScheduleStatus.SCHEDULED)
-        .hasCalculationRule(ReviewScheduleCalculationRule.PRISONER_READMISSION)
-        .wasCreatedAtPrison("MDI")
-        .wasUpdatedAtPrison("MDI")
-        .isVersion(1)
-      // And it should have a different reference to the next one
-      assertThat(reviewSchedules.reviewSchedules[0].reference).isNotEqualTo(reviewSchedules.reviewSchedules[1].reference)
-      // The next one is the exempted Review Schedule - it is version 2
-      assertThat(reviewSchedules.reviewSchedules[1])
-        .hasStatus(ReviewScheduleStatus.EXEMPT_UNKNOWN)
-        .hasCalculationRule(ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE)
-        .wasCreatedAtPrison("BXI")
-        .wasUpdatedAtPrison("MDI")
-        .isVersion(2)
-      // And the last in the list should be the original scheduled Review Schedule - it is version 1
-      assertThat(reviewSchedules.reviewSchedules[2])
-        .hasStatus(ReviewScheduleStatus.SCHEDULED)
-        .hasCalculationRule(ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE)
-        .wasCreatedAtPrison("BXI")
-        .wasUpdatedAtPrison("BXI")
-        .isVersion(1)
-      // The originally scheduled Review Schedule and the exempted Review Schedule should have the same reference because they represent the same Review Schedule
-      assertThat(reviewSchedules.reviewSchedules[1].reference).isEqualTo(reviewSchedules.reviewSchedules[2].reference)
+      val newReviewScheduleReference = reviewSchedules.reviewSchedules[0].reference
+      val originalReviewScheduleReference = reviewSchedules.reviewSchedules[1].reference
+      assertThat(reviewSchedules)
+        .hasNumberOfReviewSchedules(3)
+        // The first in the list should be the newly created and scheduled Review Schedule - it is version 1 (because it is a new Review Schedule)
+        .reviewScheduleAtIndex(1) {
+          it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+            .hasCalculationRule(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+            .wasCreatedAtPrison("MDI")
+            .wasUpdatedAtPrison("MDI")
+            .isVersion(1)
+            .hasReference(newReviewScheduleReference)
+        }
+        // The next one is the exempted Review Schedule - it is version 2
+        .reviewScheduleAtIndex(2) {
+          it.hasStatus(ReviewScheduleStatus.EXEMPT_UNKNOWN)
+            .hasCalculationRule(ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE)
+            .wasCreatedAtPrison("BXI")
+            .wasUpdatedAtPrison("MDI")
+            .isVersion(2)
+            .hasReference(originalReviewScheduleReference)
+        }
+        // And the last in the list should be the original scheduled Review Schedule - it is version 1
+        // The originally scheduled Review Schedule and the exempted Review Schedule should have the same reference because they represent the same Review Schedule
+        .reviewScheduleAtIndex(3) {
+          it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+            .hasCalculationRule(ReviewScheduleCalculationRule.BETWEEN_6_AND_12_MONTHS_TO_SERVE)
+            .wasCreatedAtPrison("BXI")
+            .wasUpdatedAtPrison("BXI")
+            .isVersion(1)
+            .hasReference(originalReviewScheduleReference)
+        }
+      assertThat(newReviewScheduleReference).isNotEqualTo(originalReviewScheduleReference)
 
       // test that outbound events are also created (there would have been 3 in total, but we cleared the queue after the first one in the given block above). The 2 new ones are the ones we are really interested in though)
       val reviewScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.REVIEW)
-      assertThat(reviewScheduleEvents).hasSize(2)
-      assertThat(reviewScheduleEvents).allSatisfy {
-        assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-        assertThat(it.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
-      }
+      assertThat(reviewScheduleEvents)
+        .hasNumberOfEvents(2)
+        .allEvents {
+          it.hasDetailUrl("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+            .hasNumberOfPersonReferenceIdentifiers(1)
+            .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
+        }
     }
   }
 
@@ -316,7 +330,7 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
     )
 
     val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule.scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.EXISTING_PRISONER)
+    assertThat(inductionSchedule).wasScheduleCalculationRule(InductionScheduleCalculationRule.EXISTING_PRISONER)
 
     with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
       createPrisonerAPIStub(prisonNumber, this)
@@ -351,12 +365,14 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
         }
 
       val inductionSchedule = getInductionSchedule(prisonNumber)
-      assertThat(inductionSchedule.scheduleCalculationRule).isEqualTo(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+      assertThat(inductionSchedule).wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
 
       // test that outbound event is also created:
       val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
-      assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+      assertThat(inductionScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
   }
 
@@ -439,8 +455,8 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
     reviewScheduleRepository.deleteAll()
     reviewScheduleHistoryRepository.deleteAll()
 
-    assertThat(getInductionScheduleHistory(prisonNumber).inductionSchedules).hasSize(0)
-    assertThat(getReviewSchedules(prisonNumber).reviewSchedules).hasSize(0)
+    assertThat(getInductionScheduleHistory(prisonNumber)).hasNumberOfInductionScheduleVersions(0)
+    assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
@@ -462,19 +478,23 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
     await untilAsserted {
       // assert that no induction schedules exist or were created for this prisoner, and that no outbound induction events were created
-      assertThat(getInductionScheduleHistory(prisonNumber).inductionSchedules).hasSize(0)
+      assertThat(getInductionScheduleHistory(prisonNumber)).hasNumberOfInductionScheduleVersions(0)
       assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
 
       // assert that there is a correctly setup ReviewSchedule
-      val reviewSchedules = getReviewSchedules(prisonNumber)
-      assertThat(reviewSchedules.reviewSchedules).hasSize(1)
-      assertThat(reviewSchedules.reviewSchedules[0].status).isEqualTo(ReviewScheduleStatus.SCHEDULED)
-      assertThat(reviewSchedules.reviewSchedules[0].calculationRule).isEqualTo(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+      assertThat(getReviewSchedules(prisonNumber))
+        .hasNumberOfReviewSchedules(1)
+        .reviewScheduleAtIndex(1) {
+          it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+            .hasCalculationRule(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+        }
 
       // test that outbound event is also created:
       val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.REVIEW)
-      assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+      assertThat(reviewScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
   }
 
@@ -509,8 +529,8 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
     reviewScheduleRepository.deleteAll()
     reviewScheduleHistoryRepository.deleteAll()
 
-    assertThat(getInductionScheduleHistory(prisonNumber).inductionSchedules).hasSize(1)
-    assertThat(getReviewSchedules(prisonNumber).reviewSchedules).hasSize(0)
+    assertThat(getInductionScheduleHistory(prisonNumber)).hasNumberOfInductionScheduleVersions(1)
+    assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
@@ -543,19 +563,25 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
       // test that outbound event is also created:
       val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
-      assertThat(inductionScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(inductionScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+      assertThat(inductionScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
 
       // assert that there is a correctly setup ReviewSchedule
-      val reviewSchedules = getReviewSchedules(prisonNumber)
-      assertThat(reviewSchedules.reviewSchedules).hasSize(1)
-      assertThat(reviewSchedules.reviewSchedules[0].status).isEqualTo(ReviewScheduleStatus.SCHEDULED)
-      assertThat(reviewSchedules.reviewSchedules[0].calculationRule).isEqualTo(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+      assertThat(getReviewSchedules(prisonNumber))
+        .hasNumberOfReviewSchedules(1)
+        .reviewScheduleAtIndex(1) {
+          it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+            .hasCalculationRule(ReviewScheduleCalculationRule.PRISONER_READMISSION)
+        }
 
       // test that outbound event is also created:
       val reviewScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.REVIEW)
-      assertThat(reviewScheduleEvent.personReference.identifiers[0].value).isEqualTo(prisonNumber)
-      assertThat(reviewScheduleEvent.detailUrl).isEqualTo("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+      assertThat(reviewScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/reviews/$prisonNumber/review-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
   }
 }
