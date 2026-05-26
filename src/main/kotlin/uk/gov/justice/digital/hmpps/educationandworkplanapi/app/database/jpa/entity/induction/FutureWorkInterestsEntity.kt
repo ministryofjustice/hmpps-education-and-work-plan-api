@@ -12,19 +12,14 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
-import jakarta.persistence.PrePersist
-import jakarta.persistence.PreRemove
-import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.util.UUID
 
@@ -46,14 +41,14 @@ data class FutureWorkInterestsEntity(
 
   @Column
   var updatedAtPrison: String,
-) : ParentEntity {
+) {
   @Id
   @GeneratedValue
   @UuidGenerator
   var id: UUID? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column(updatable = false)
@@ -61,15 +56,18 @@ data class FutureWorkInterestsEntity(
   var createdBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
   var updatedBy: String? = null
 
-  override fun childEntityUpdated() {
-    this.updatedAt = Instant.now()
+  fun addChildren(newChildren: List<WorkInterestEntity>) {
+    newChildren.forEach {
+      it.associateWithParent(this)
+      interests.add(it)
+    }
   }
 
   override fun equals(other: Any?): Boolean {
@@ -101,7 +99,7 @@ data class WorkInterestEntity(
 
   @Column
   var role: String? = null,
-) : KeyAwareChildEntity {
+) {
   @Id
   @GeneratedValue
   @UuidGenerator
@@ -112,7 +110,7 @@ data class WorkInterestEntity(
   var parent: FutureWorkInterestsEntity? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column(updatable = false)
@@ -120,25 +118,16 @@ data class WorkInterestEntity(
   var createdBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
   var updatedBy: String? = null
 
-  @PrePersist
-  @PreUpdate
-  @PreRemove
-  fun onChange() {
-    parent?.childEntityUpdated()
+  fun associateWithParent(parent: FutureWorkInterestsEntity) {
+    this.parent = parent
   }
-
-  override fun associateWithParent(parent: ParentEntity) {
-    this.parent = parent as FutureWorkInterestsEntity
-  }
-
-  override fun key(): String = workType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

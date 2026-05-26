@@ -50,13 +50,24 @@ fun aValidFutureWorkInterestsEntityWithJpaFieldsPopulated(
 }
 
 fun aValidWorkInterestEntity(
+  id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   workType: WorkInterestType = WorkInterestType.OTHER,
   workTypeOther: String? = "Any job I can get",
   role: String? = "Any role",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) = WorkInterestEntity(
   reference = reference,
   workType = workType,
   workTypeOther = workTypeOther,
   role = role,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
