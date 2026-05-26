@@ -15,7 +15,9 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.TimelineEventType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.timeline.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.LocalDate
 
@@ -63,22 +65,23 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Verify record persisted in database
     await untilAsserted {
       val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assertThat(events).hasSize(1)
-      with(events[0]) {
-        assertThat(prisonNumber).isEqualTo("G0378GI")
-        assertThat(status).isEqualTo(EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE)
-        assertThat(statusChangeDate).isEqualTo(statusChangeDate)
-        assertThat(source).isEqualTo("CURIOUS")
-        assertThat(detailUrl).isEqualTo("https://example.com/sequation-virtual-campus2-api/learnerAssessments/v2/$prisonNumber")
-        assertThat(createdAtPrison).isEqualTo("BXI")
-        assertThat(updatedAtPrison).isEqualTo("BXI")
-      }
+      assertThat(events)
+        .hasNumberOfEvents(1)
+        .event(1) {
+          it.hasPrisonNumber("G0378GI")
+            .hasStatus(EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE)
+            .hasStatusChangeDate(statusChangeDate)
+            .hasSource("CURIOUS")
+            .hasDetailUrl("https://example.com/sequation-virtual-campus2-api/learnerAssessments/v2/$prisonNumber")
+            .wasCreatedAtPrison("BXI")
+            .wasUpdatedAtPrison("BXI")
+        }
     }
 
     // Verify timeline event created
     await untilAsserted {
       val timeline = getTimeline(prisonNumber)
-      assertThat(timeline.events).anyMatch { it.eventType == TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED }
+      assertThat(timeline).anyEvent { it.hasEventType(TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED) }
     }
 
     // Verify App Insights telemetry event sent
@@ -145,11 +148,12 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Then
     await untilAsserted {
       val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assertThat(events).hasSize(2)
-      assertThat(events.map { it.statusChangeDate }).containsExactlyInAnyOrder(
-        LocalDate.of(2026, 3, 10),
-        LocalDate.of(2026, 3, 15),
-      )
+      assertThat(events)
+        .hasNumberOfEvents(2)
+        .hasStatusChangeDatesInAnyOrder(
+          LocalDate.of(2026, 3, 10),
+          LocalDate.of(2026, 3, 15),
+        )
     }
   }
 
@@ -186,22 +190,23 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Verify record persisted in database
     await untilAsserted {
       val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assertThat(events).hasSize(1)
-      with(events[0]) {
-        assertThat(prisonNumber).isEqualTo("G0378GI")
-        assertThat(status).isEqualTo(EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE)
-        assertThat(statusChangeDate).isEqualTo(statusChangeDate)
-        assertThat(source).isEqualTo("CURIOUS")
-        assertThat(detailUrl).isEqualTo("https://example.com/sequation-virtual-campus2-api/learnerAssessments/v2/$prisonNumber")
-        assertThat(createdAtPrison).isEqualTo("N/A")
-        assertThat(updatedAtPrison).isEqualTo("N/A")
-      }
+      assertThat(events)
+        .hasNumberOfEvents(1)
+        .event(1) {
+          it.hasPrisonNumber("G0378GI")
+            .hasStatus(EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE)
+            .hasStatusChangeDate(statusChangeDate)
+            .hasSource("CURIOUS")
+            .hasDetailUrl("https://example.com/sequation-virtual-campus2-api/learnerAssessments/v2/$prisonNumber")
+            .wasCreatedAtPrison("N/A")
+            .wasUpdatedAtPrison("N/A")
+        }
     }
 
     // Verify timeline event created
     await untilAsserted {
       val timeline = getTimeline(prisonNumber)
-      assertThat(timeline.events).anyMatch { it.eventType == TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED }
+      assertThat(timeline).anyEvent { it.hasEventType(TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED) }
     }
 
     // Verify App Insights telemetry event sent

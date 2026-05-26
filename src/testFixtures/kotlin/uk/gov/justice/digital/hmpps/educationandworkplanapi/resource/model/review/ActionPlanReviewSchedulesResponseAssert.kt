@@ -44,6 +44,22 @@ class ActionPlanReviewSchedulesResponseAssert(actual: ActionPlanReviewSchedulesR
   }
 
   /**
+   * Allows for assertion chaining into the specified child [ScheduledActionPlanReviewResponse] by its position in the list.
+   * Takes a lambda as the method argument to call assertion methods provided by [ScheduledActionPlanReviewResponseAssert].
+   * Returns this [ActionPlanReviewSchedulesResponseAssert] to allow further chained assertions on the parent [ActionPlanReviewSchedulesResponse]
+   *
+   * The `index` parameter is not zero indexed to make for better readability in tests. IE. the first review schedule
+   * should be referenced as `.reviewScheduleAtIndex(1) { .... }`
+   */
+  fun reviewScheduleAtIndex(index: Int, consumer: Consumer<ScheduledActionPlanReviewResponseAssert>): ActionPlanReviewSchedulesResponseAssert {
+    isNotNull
+    with(actual!!) {
+      consumer.accept(assertThat(reviewSchedules[index - 1]))
+    }
+    return this
+  }
+
+  /**
    * Allows for assertion chaining into all child [ScheduledActionPlanReviewResponse]s. Takes a lambda as the method argument
    * to call assertion methods provided by [ScheduledActionPlanReviewResponseAssert].
    * Returns this [ActionPlanReviewSchedulesResponseAssert] to allow further chained assertions on the parent [ActionPlanReviewSchedulesResponse]
