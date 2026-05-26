@@ -73,25 +73,7 @@ class JpaInductionPersistenceAdapter(
     val inductionEntity = inductionRepository.findByPrisonNumber(prisonNumber)
     return if (inductionEntity != null) {
       inductionMapper.updateEntityFromDto(inductionEntity, updateInductionDto)
-
-      if (updateInductionDto.hasAnyChanges()) {
-        updateInductionDto.futureWorkInterests?.also {
-          inductionEntity.futureWorkInterests?.also {
-            auditingHandler.markModified(it).also {
-              log.debug { "FutureWorkInterestsEntity marked as modified" }
-            }
-          }
-        }
-        updateInductionDto.previousWorkExperiences?.also {
-          inductionEntity.previousWorkExperiences?.also {
-            auditingHandler.markModified(it).also {
-              log.debug { "PreviousWorkExperiencesEntity marked as modified" }
-            }
-          }
-        }
-        auditingHandler.markModified(inductionEntity) // force the main Induction's JPA managed fields to update
-      }
-
+      auditingHandler.markModified(inductionEntity) // force the main Induction's JPA managed fields to update
       val updatedInductionEntity = inductionRepository.saveAndFlush(inductionEntity)
       val previousQualificationsEntity = createOrUpdatePreviousQualifications(updateInductionDto)
       val noteEntity = noteRepository.findAllByEntityReferenceAndEntityType(
@@ -188,6 +170,4 @@ class JpaInductionPersistenceAdapter(
       )
     }
   }
-
-  private fun UpdateInductionDto.hasAnyChanges(): Boolean = workOnRelease != null || previousTraining != null || futureWorkInterests != null || inPrisonInterests != null || personalSkillsAndInterests != null || previousWorkExperiences != null
 }
