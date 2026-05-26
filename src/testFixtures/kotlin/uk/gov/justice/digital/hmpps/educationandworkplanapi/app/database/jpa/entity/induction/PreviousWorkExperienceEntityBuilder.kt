@@ -56,15 +56,26 @@ fun aValidPreviousWorkExperiencesEntityWithJpaFieldsPopulated(
 }
 
 fun aValidWorkExperienceEntity(
+  id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   experienceType: WorkExperienceType = WorkExperienceType.OTHER,
   experienceTypeOther: String? = "Warehouse work",
   role: String = "Chief Forklift Truck Driver",
   details: String = "Forward, pick stuff up, reverse etc",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) = WorkExperienceEntity(
   reference = reference,
   experienceType = experienceType,
   experienceTypeOther = experienceTypeOther,
   role = role,
   details = details,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
