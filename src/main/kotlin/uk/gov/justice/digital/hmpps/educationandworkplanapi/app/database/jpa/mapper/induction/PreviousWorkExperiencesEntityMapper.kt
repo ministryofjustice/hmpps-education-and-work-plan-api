@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 @Component
 class PreviousWorkExperiencesEntityMapper(
   private val workExperienceEntityMapper: WorkExperienceEntityMapper,
-  private val entityListManager: InductionEntityListManager<WorkExperienceEntity, WorkExperience>,
 ) {
 
   fun fromCreateDtoToEntity(dto: CreatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity = with(dto) {
@@ -53,9 +52,9 @@ class PreviousWorkExperiencesEntityMapper(
 
     val existingExperiences = experiences
     val updatedExperiences = dto.experiences
-    entityListManager.updateExisting(existingExperiences, updatedExperiences, workExperienceEntityMapper)
-    entityListManager.addNew(entity, existingExperiences, updatedExperiences, workExperienceEntityMapper)
-    entityListManager.deleteRemoved(existingExperiences, updatedExperiences)
+    updateExistingWorkExperiences(existingExperiences, updatedExperiences)
+    addNewWorkExperiences(entity, existingExperiences, updatedExperiences)
+    deleteRemovedWorkExperiences(existingExperiences, updatedExperiences)
   }
 
   fun fromUpdateDtoToNewEntity(dto: UpdatePreviousWorkExperiencesDto): PreviousWorkExperiencesEntity = with(dto) {
@@ -71,12 +70,7 @@ class PreviousWorkExperiencesEntityMapper(
   }
 
   private fun addNewExperiences(experiences: List<WorkExperience>, entity: PreviousWorkExperiencesEntity) {
-    experiences.forEach {
-      entity.addChild(
-        workExperienceEntityMapper.fromDomainToEntity(it),
-        entity.experiences,
-      )
-    }
+    entity.addChildren(experiences.map { workExperienceEntityMapper.fromDomainToEntity(it) })
   }
 
   private fun toHasWorkedBefore(hasWorkedBefore: HasWorkedBeforeEntity): HasWorkedBeforeDomain = when (hasWorkedBefore) {
@@ -90,11 +84,52 @@ class PreviousWorkExperiencesEntityMapper(
     HasWorkedBeforeDomain.NO -> HasWorkedBeforeEntity.NO
     HasWorkedBeforeDomain.NOT_RELEVANT -> HasWorkedBeforeEntity.NOT_RELEVANT
   }
+
+  fun updateExistingWorkExperiences(
+    existingEntities: MutableList<WorkExperienceEntity>,
+    updatedDomain: List<WorkExperience>,
+  ) {
+    val updatedDomainKeys = updatedDomain.map { it.experienceType.name }
+    existingEntities
+      .filter { entity -> updatedDomainKeys.contains(entity.experienceType.name) }
+      .onEach { entity ->
+        workExperienceEntityMapper.updateEntityFromDomain(
+          entity,
+          updatedDomain.first { dto -> dto.experienceType.name == entity.experienceType.name },
+        )
+      }
+  }
+
+  fun addNewWorkExperiences(
+    previousWorkExperiencesEntity: PreviousWorkExperiencesEntity,
+    existingEntities: MutableList<WorkExperienceEntity>,
+    updatedDomain: List<WorkExperience>,
+  ) {
+    val currentIdentifiers = existingEntities.map { it.experienceType.name }
+
+    val newEntities = updatedDomain
+      .filter { dto -> !currentIdentifiers.contains(dto.experienceType.name) }
+      .map { newDto -> workExperienceEntityMapper.fromDomainToEntity(newDto) }
+
+    previousWorkExperiencesEntity.addChildren(newEntities)
+  }
+
+  fun deleteRemovedWorkExperiences(
+    existingEntities: MutableList<WorkExperienceEntity>,
+    updatedDomain: List<WorkExperience>,
+  ) {
+    val updatedIdentifiers = updatedDomain.map { it.experienceType.name }
+
+    val removedEntities = existingEntities.filter { entity -> !updatedIdentifiers.contains(entity.experienceType.name) }
+    if (removedEntities.isNotEmpty()) {
+      existingEntities.removeAll(removedEntities)
+    }
+  }
 }
 
 @Component
-class WorkExperienceEntityMapper : KeyAwareEntityMapper<WorkExperienceEntity, WorkExperience> {
-  override fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity = with(domain) {
+class WorkExperienceEntityMapper {
+  fun fromDomainToEntity(domain: WorkExperience): WorkExperienceEntity = with(domain) {
     WorkExperienceEntity(
       reference = UUID.randomUUID(),
       experienceType = toExperienceType(experienceType),
@@ -113,7 +148,7 @@ class WorkExperienceEntityMapper : KeyAwareEntityMapper<WorkExperienceEntity, Wo
     )
   }
 
-  override fun updateEntityFromDomain(entity: WorkExperienceEntity, domain: WorkExperience) = with(entity) {
+  fun updateEntityFromDomain(entity: WorkExperienceEntity, domain: WorkExperience) = with(entity) {
     experienceType = toExperienceType(domain.experienceType)
     experienceTypeOther = domain.experienceTypeOther
     role = domain.role

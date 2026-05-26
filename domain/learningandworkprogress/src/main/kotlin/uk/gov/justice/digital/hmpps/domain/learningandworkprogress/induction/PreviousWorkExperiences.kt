@@ -27,9 +27,7 @@ data class WorkExperience(
   val experienceTypeOther: String?,
   val role: String?,
   val details: String?,
-) : KeyAwareDomain {
-  override fun key(): String = experienceType.name
-}
+)
 
 enum class WorkExperienceType {
   OUTDOOR,
