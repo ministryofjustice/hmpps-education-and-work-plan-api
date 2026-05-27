@@ -12,6 +12,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreRemove
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
 import org.hibernate.annotations.UuidGenerator
@@ -71,6 +74,10 @@ data class PreviousWorkExperiencesEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null
+
+  fun childEntityUpdated() {
+    this.updatedAt = Instant.now()
+  }
 
   fun addChildren(newChildren: List<WorkExperienceEntity>) {
     newChildren.forEach {
@@ -136,6 +143,13 @@ data class WorkExperienceEntity(
   @Column
   @LastModifiedBy
   var updatedBy: String? = null
+
+  @PrePersist
+  @PreUpdate
+  @PreRemove
+  fun onChange() {
+    parent?.childEntityUpdated()
+  }
 
   fun associateWithParent(parent: PreviousWorkExperiencesEntity) {
     this.parent = parent
