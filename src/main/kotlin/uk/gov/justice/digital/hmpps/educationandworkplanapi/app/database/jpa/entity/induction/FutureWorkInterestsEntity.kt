@@ -22,6 +22,7 @@ import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import java.util.UUID
@@ -66,9 +67,9 @@ data class FutureWorkInterestsEntity(
   @LastModifiedBy
   var updatedBy: String? = null
 
-  fun childEntityUpdated() {
-    this.updatedAt = Instant.now()
-  }
+  @Column
+  @Version
+  var version: Long = 0
 
   fun addChildren(newChildren: List<WorkInterestEntity>) {
     newChildren.forEach {
@@ -135,8 +136,8 @@ data class WorkInterestEntity(
   @PrePersist
   @PreUpdate
   @PreRemove
-  fun onChange() {
-    parent?.childEntityUpdated()
+  fun onChangeTouchParentToUpdateItsTimestamp() {
+    parent?.run { ++version } // Increment the parent's version field which will dirty the entity, forcing JPA to update the updated_at timestamp of the parent entity
   }
 
   fun associateWithParent(parent: FutureWorkInterestsEntity) {
