@@ -21,12 +21,12 @@ val postgresqlVersion = "42.7.11"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "3.0.3"
 val hmppsSqsStarterVersion = "7.3.2"
-val hmppsKotlinSpringBootStarterVersion = "2.4.0"
+val hmppsKotlinSpringBootStarterVersion = "2.5.0"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val testContainersVersion = "2.0.5"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.4.2"
+val sarTestSupportLibraryVersion = "2.5.0"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
@@ -83,7 +83,7 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
-  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.42") {
+  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.43") {
     exclude(group = "io.swagger.core.v3")
   }
   integrationTestApi("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:$hmppsKotlinSpringBootStarterVersion")
