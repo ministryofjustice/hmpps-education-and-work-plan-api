@@ -26,16 +26,12 @@ data class InPrisonInterests(
 data class InPrisonWorkInterest(
   val workType: InPrisonWorkType,
   val workTypeOther: String?,
-) : KeyAwareDomain {
-  override fun key(): String = workType.name
-}
+)
 
 data class InPrisonTrainingInterest(
   val trainingType: InPrisonTrainingType,
   val trainingTypeOther: String?,
-) : KeyAwareDomain {
-  override fun key(): String = trainingType.name
-}
+)
 
 enum class InPrisonWorkType {
   CLEANING_AND_HYGIENE,

@@ -127,272 +127,272 @@ class FutureWorkInterestsEntityMapperTest {
       // Then
       assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     }
+  }
 
-    @Nested
-    inner class UpdateEntityFromDto {
-      @Test
-      fun `should update existing work interests`() {
-        // Given
-        val futureWorkInterestsReference = UUID.randomUUID()
-        val futureWorkInterestsId = UUID.randomUUID()
-        val workInterestReference = UUID.randomUUID()
-        val workInterestId = UUID.randomUUID()
-        val createdAt = Instant.now()
-        val updatedAt = Instant.now()
+  @Nested
+  inner class UpdateEntityFromDto {
+    @Test
+    fun `should update existing work interests`() {
+      // Given
+      val futureWorkInterestsReference = UUID.randomUUID()
+      val futureWorkInterestsId = UUID.randomUUID()
+      val workInterestReference = UUID.randomUUID()
+      val workInterestId = UUID.randomUUID()
+      val createdAt = Instant.now()
+      val updatedAt = Instant.now()
 
-        val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
-          reference = futureWorkInterestsReference,
-          interests = mutableListOf(
-            aValidWorkInterestEntity(
-              reference = workInterestReference,
-              workType = WorkInterestType.OTHER,
-              workTypeOther = "Any job I can get",
-              role = "Any role",
-              id = workInterestId,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
+      val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
+        reference = futureWorkInterestsReference,
+        interests = mutableListOf(
+          aValidWorkInterestEntity(
+            reference = workInterestReference,
+            workType = WorkInterestType.OTHER,
+            workTypeOther = "Any job I can get",
+            role = "Any role",
+            id = workInterestId,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
           ),
-          id = futureWorkInterestsId,
-          createdAtPrison = "BXI",
-          updatedAtPrison = "BXI",
-          createdAt = createdAt,
-          createdBy = "asmith_gen",
-          updatedAt = updatedAt,
-          updatedBy = "bjones_gen",
-        )
+        ),
+        id = futureWorkInterestsId,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+        createdAt = createdAt,
+        createdBy = "asmith_gen",
+        updatedAt = updatedAt,
+        updatedBy = "bjones_gen",
+      )
 
-        val updatedInterestsDto = aValidUpdateFutureWorkInterestsDto(
-          reference = futureWorkInterestsReference,
-          interests = listOf(
-            aValidWorkInterest(
-              workType = OTHER,
-              workTypeOther = "Any job that pays ok",
-              role = null,
-            ),
+      val updatedInterestsDto = aValidUpdateFutureWorkInterestsDto(
+        reference = futureWorkInterestsReference,
+        interests = listOf(
+          aValidWorkInterest(
+            workType = OTHER,
+            workTypeOther = "Any job that pays ok",
+            role = null,
           ),
-          prisonId = "MDI",
-        )
+        ),
+        prisonId = "MDI",
+      )
 
-        val expectedEntity = aValidFutureWorkInterestsEntity(
-          reference = futureWorkInterestsReference,
-          interests = mutableListOf(
-            aValidWorkInterestEntity(
-              reference = workInterestReference,
-              workType = WorkInterestType.OTHER,
-              workTypeOther = "Any job that pays ok",
-              role = null,
-              id = workInterestId,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
+      val expectedEntity = aValidFutureWorkInterestsEntity(
+        reference = futureWorkInterestsReference,
+        interests = mutableListOf(
+          aValidWorkInterestEntity(
+            reference = workInterestReference,
+            workType = WorkInterestType.OTHER,
+            workTypeOther = "Any job that pays ok",
+            role = null,
+            id = workInterestId,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
           ),
-          id = futureWorkInterestsId,
-          createdAtPrison = "BXI",
-          updatedAtPrison = "MDI",
-          createdAt = createdAt,
-          createdBy = "asmith_gen",
-          updatedAt = updatedAt,
-          updatedBy = "bjones_gen",
-        )
+        ),
+        id = futureWorkInterestsId,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "MDI",
+        createdAt = createdAt,
+        createdBy = "asmith_gen",
+        updatedAt = updatedAt,
+        updatedBy = "bjones_gen",
+      )
 
-        // When
-        mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
+      // When
+      mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
 
-        // Then
-        assertThat(existingFutureWorkInterestsEntity).isEqualToComparingAllFields(expectedEntity)
-      }
+      // Then
+      assertThat(existingFutureWorkInterestsEntity).isEqualToComparingAllFields(expectedEntity)
+    }
 
-      @Test
-      fun `should add new work interest`() {
-        // Given
-        val futureWorkInterestsReference = UUID.randomUUID()
-        val futureWorkInterestsId = UUID.randomUUID()
-        val workInterestReference = UUID.randomUUID()
-        val workInterestId = UUID.randomUUID()
-        val createdAt = Instant.now()
-        val updatedAt = Instant.now()
+    @Test
+    fun `should add new work interest`() {
+      // Given
+      val futureWorkInterestsReference = UUID.randomUUID()
+      val futureWorkInterestsId = UUID.randomUUID()
+      val workInterestReference = UUID.randomUUID()
+      val workInterestId = UUID.randomUUID()
+      val createdAt = Instant.now()
+      val updatedAt = Instant.now()
 
-        val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
-          reference = futureWorkInterestsReference,
-          interests = mutableListOf(
-            aValidWorkInterestEntity(
-              reference = workInterestReference,
-              workType = WorkInterestType.OTHER,
-              workTypeOther = "Any job I can get",
-              role = "Any role",
-              id = workInterestId,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
+      val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
+        reference = futureWorkInterestsReference,
+        interests = mutableListOf(
+          aValidWorkInterestEntity(
+            reference = workInterestReference,
+            workType = WorkInterestType.OTHER,
+            workTypeOther = "Any job I can get",
+            role = "Any role",
+            id = workInterestId,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
           ),
-          id = futureWorkInterestsId,
-          createdAtPrison = "BXI",
-          updatedAtPrison = "BXI",
-          createdAt = createdAt,
-          createdBy = "asmith_gen",
-          updatedAt = updatedAt,
-          updatedBy = "bjones_gen",
-        )
+        ),
+        id = futureWorkInterestsId,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+        createdAt = createdAt,
+        createdBy = "asmith_gen",
+        updatedAt = updatedAt,
+        updatedBy = "bjones_gen",
+      )
 
-        val updatedInterestsDto = aValidUpdateFutureWorkInterestsDto(
-          reference = futureWorkInterestsReference,
-          interests = listOf(
-            aValidWorkInterest(
-              workType = OTHER,
-              workTypeOther = "Any job that pays ok",
-              role = null,
-            ),
-            aValidWorkInterest(
-              workType = SPORTS,
-              workTypeOther = null,
-              role = "Professional football player",
-            ),
+      val updatedInterestsDto = aValidUpdateFutureWorkInterestsDto(
+        reference = futureWorkInterestsReference,
+        interests = listOf(
+          aValidWorkInterest(
+            workType = OTHER,
+            workTypeOther = "Any job that pays ok",
+            role = null,
           ),
-          prisonId = "MDI",
-        )
-
-        val expectedEntity = aValidFutureWorkInterestsEntity(
-          reference = futureWorkInterestsReference,
-          interests = mutableListOf(
-            aValidWorkInterestEntity(
-              reference = workInterestReference,
-              workType = WorkInterestType.OTHER,
-              workTypeOther = "Any job that pays ok",
-              role = null,
-              id = workInterestId,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
-            aValidWorkInterestEntity(
-              workType = WorkInterestType.SPORTS,
-              workTypeOther = null,
-              role = "Professional football player",
-              // JPA managed fields - expect these all to be null, implying a new db entity
-              id = null,
-              createdAt = null,
-              createdBy = null,
-              updatedAt = null,
-              updatedBy = null,
-            ),
+          aValidWorkInterest(
+            workType = SPORTS,
+            workTypeOther = null,
+            role = "Professional football player",
           ),
-          id = futureWorkInterestsId,
-          createdAtPrison = "BXI",
-          updatedAtPrison = "MDI",
-          createdAt = createdAt,
-          createdBy = "asmith_gen",
-          updatedAt = updatedAt,
-          updatedBy = "bjones_gen",
-        )
+        ),
+        prisonId = "MDI",
+      )
 
-        // When
-        mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
-
-        // Then
-        assertThat(existingFutureWorkInterestsEntity)
-          .usingRecursiveComparison()
-          .ignoringFieldsMatchingRegexes(".*parent") // Ignore the parent field as this is set to establish the bidirectional relationship between FutureWorkInterestsEntity and WorkInterestEntity and is not mapped from the source DTO
-          .ignoringFields("interests.reference") // Ignore the generated reference field for the new interest as we cannot predict its value in the expected object
-          .isEqualTo(expectedEntity)
-      }
-
-      @Test
-      fun `should remove work interests`() {
-        // Given
-        val futureWorkInterestsReference = UUID.randomUUID()
-        val futureWorkInterestsId = UUID.randomUUID()
-        val workInterest1Reference = UUID.randomUUID()
-        val workInterest1Id = UUID.randomUUID()
-        val workInterest2Reference = UUID.randomUUID()
-        val workInterest2Id = UUID.randomUUID()
-        val createdAt = Instant.now()
-        val updatedAt = Instant.now()
-
-        val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
-          reference = futureWorkInterestsReference,
-          interests = mutableListOf(
-            aValidWorkInterestEntity(
-              reference = workInterest1Reference,
-              workType = WorkInterestType.OTHER,
-              workTypeOther = "Any job I can get",
-              role = "Any role",
-              id = workInterest1Id,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
-            aValidWorkInterestEntity(
-              reference = workInterest2Reference,
-              workType = WorkInterestType.CONSTRUCTION,
-              workTypeOther = null,
-              role = "Bricklaying",
-              id = workInterest2Id,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
+      val expectedEntity = aValidFutureWorkInterestsEntity(
+        reference = futureWorkInterestsReference,
+        interests = mutableListOf(
+          aValidWorkInterestEntity(
+            reference = workInterestReference,
+            workType = WorkInterestType.OTHER,
+            workTypeOther = "Any job that pays ok",
+            role = null,
+            id = workInterestId,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
           ),
-          id = futureWorkInterestsId,
-          createdAtPrison = "BXI",
-          updatedAtPrison = "BXI",
-          createdAt = createdAt,
-          createdBy = "asmith_gen",
-          updatedAt = updatedAt,
-          updatedBy = "bjones_gen",
-        )
-
-        val updatedInterestsDto = aValidUpdateFutureWorkInterestsDto(
-          reference = futureWorkInterestsReference,
-          interests = listOf(
-            aValidWorkInterest(
-              workType = OTHER,
-              workTypeOther = "Any job that pays ok",
-              role = null,
-            ),
+          aValidWorkInterestEntity(
+            workType = WorkInterestType.SPORTS,
+            workTypeOther = null,
+            role = "Professional football player",
+            // JPA managed fields - expect these all to be null, implying a new db entity
+            id = null,
+            createdAt = null,
+            createdBy = null,
+            updatedAt = null,
+            updatedBy = null,
           ),
-          prisonId = "MDI",
-        )
+        ),
+        id = futureWorkInterestsId,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "MDI",
+        createdAt = createdAt,
+        createdBy = "asmith_gen",
+        updatedAt = updatedAt,
+        updatedBy = "bjones_gen",
+      )
 
-        val expectedEntity = aValidFutureWorkInterestsEntity(
-          reference = futureWorkInterestsReference,
-          interests = mutableListOf(
-            aValidWorkInterestEntity(
-              reference = workInterest1Reference,
-              workType = WorkInterestType.OTHER,
-              workTypeOther = "Any job that pays ok",
-              role = null,
-              id = workInterest1Id,
-              createdAt = createdAt,
-              createdBy = "asmith_gen",
-              updatedAt = updatedAt,
-              updatedBy = "bjones_gen",
-            ),
+      // When
+      mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
+
+      // Then
+      assertThat(existingFutureWorkInterestsEntity)
+        .usingRecursiveComparison()
+        .ignoringFieldsMatchingRegexes(".*parent") // Ignore the parent field as this is set to establish the bidirectional relationship between FutureWorkInterestsEntity and WorkInterestEntity and is not mapped from the source DTO
+        .ignoringFields("interests.reference") // Ignore the generated reference field for the new interest as we cannot predict its value in the expected object
+        .isEqualTo(expectedEntity)
+    }
+
+    @Test
+    fun `should remove work interests`() {
+      // Given
+      val futureWorkInterestsReference = UUID.randomUUID()
+      val futureWorkInterestsId = UUID.randomUUID()
+      val workInterest1Reference = UUID.randomUUID()
+      val workInterest1Id = UUID.randomUUID()
+      val workInterest2Reference = UUID.randomUUID()
+      val workInterest2Id = UUID.randomUUID()
+      val createdAt = Instant.now()
+      val updatedAt = Instant.now()
+
+      val existingFutureWorkInterestsEntity = aValidFutureWorkInterestsEntity(
+        reference = futureWorkInterestsReference,
+        interests = mutableListOf(
+          aValidWorkInterestEntity(
+            reference = workInterest1Reference,
+            workType = WorkInterestType.OTHER,
+            workTypeOther = "Any job I can get",
+            role = "Any role",
+            id = workInterest1Id,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
           ),
-          id = futureWorkInterestsId,
-          createdAtPrison = "BXI",
-          updatedAtPrison = "MDI",
-          createdAt = createdAt,
-          createdBy = "asmith_gen",
-          updatedAt = updatedAt,
-          updatedBy = "bjones_gen",
-        )
+          aValidWorkInterestEntity(
+            reference = workInterest2Reference,
+            workType = WorkInterestType.CONSTRUCTION,
+            workTypeOther = null,
+            role = "Bricklaying",
+            id = workInterest2Id,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
+          ),
+        ),
+        id = futureWorkInterestsId,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+        createdAt = createdAt,
+        createdBy = "asmith_gen",
+        updatedAt = updatedAt,
+        updatedBy = "bjones_gen",
+      )
 
-        // When
-        mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
+      val updatedInterestsDto = aValidUpdateFutureWorkInterestsDto(
+        reference = futureWorkInterestsReference,
+        interests = listOf(
+          aValidWorkInterest(
+            workType = OTHER,
+            workTypeOther = "Any job that pays ok",
+            role = null,
+          ),
+        ),
+        prisonId = "MDI",
+      )
 
-        // Then
-        assertThat(existingFutureWorkInterestsEntity).isEqualToComparingAllFields(expectedEntity)
-      }
+      val expectedEntity = aValidFutureWorkInterestsEntity(
+        reference = futureWorkInterestsReference,
+        interests = mutableListOf(
+          aValidWorkInterestEntity(
+            reference = workInterest1Reference,
+            workType = WorkInterestType.OTHER,
+            workTypeOther = "Any job that pays ok",
+            role = null,
+            id = workInterest1Id,
+            createdAt = createdAt,
+            createdBy = "asmith_gen",
+            updatedAt = updatedAt,
+            updatedBy = "bjones_gen",
+          ),
+        ),
+        id = futureWorkInterestsId,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "MDI",
+        createdAt = createdAt,
+        createdBy = "asmith_gen",
+        updatedAt = updatedAt,
+        updatedBy = "bjones_gen",
+      )
+
+      // When
+      mapper.updateExistingEntityFromDto(existingFutureWorkInterestsEntity, updatedInterestsDto)
+
+      // Then
+      assertThat(existingFutureWorkInterestsEntity).isEqualToComparingAllFields(expectedEntity)
     }
   }
 }

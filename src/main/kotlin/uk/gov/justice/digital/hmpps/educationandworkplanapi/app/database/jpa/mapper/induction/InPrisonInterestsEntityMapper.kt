@@ -19,8 +19,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 class InPrisonInterestsEntityMapper(
   private val workInterestEntityMapper: InPrisonWorkInterestEntityMapper,
   private val trainingInterestEntityMapper: InPrisonTrainingInterestEntityMapper,
-  private val workInterestEntityListManager: InductionEntityListManager<InPrisonWorkInterestEntity, InPrisonWorkInterest>,
-  private val trainingInterestEntityListManager: InductionEntityListManager<InPrisonTrainingInterestEntity, InPrisonTrainingInterest>,
 ) {
 
   fun fromCreateDtoToEntity(dto: CreateInPrisonInterestsDto): InPrisonInterestsEntity = with(dto) {
@@ -53,15 +51,15 @@ class InPrisonInterestsEntityMapper(
 
     val existingWorkInterests = entity.inPrisonWorkInterests
     val updatedWorkInterests = dto.inPrisonWorkInterests
-    workInterestEntityListManager.updateExisting(existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
-    workInterestEntityListManager.addNew(entity, existingWorkInterests, updatedWorkInterests, workInterestEntityMapper)
-    workInterestEntityListManager.deleteRemoved(existingWorkInterests, updatedWorkInterests)
+    updateExistingWorkInterests(existingWorkInterests, updatedWorkInterests)
+    addNewWorkInterests(entity, existingWorkInterests, updatedWorkInterests)
+    deleteRemovedWorkInterests(existingWorkInterests, updatedWorkInterests)
 
     val existingTrainingInterests = entity.inPrisonTrainingInterests
     val updatedTrainingInterests = dto.inPrisonTrainingInterests
-    trainingInterestEntityListManager.updateExisting(existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
-    trainingInterestEntityListManager.addNew(entity, existingTrainingInterests, updatedTrainingInterests, trainingInterestEntityMapper)
-    trainingInterestEntityListManager.deleteRemoved(existingTrainingInterests, updatedTrainingInterests)
+    updateExistingTrainingInterests(existingTrainingInterests, updatedTrainingInterests)
+    addNewTrainingInterests(entity, existingTrainingInterests, updatedTrainingInterests)
+    deleteRemovedTrainingInterests(existingTrainingInterests, updatedTrainingInterests)
   }
 
   fun fromUpdateDtoToNewEntity(dto: UpdateInPrisonInterestsDto): InPrisonInterestsEntity = with(dto) {
@@ -76,27 +74,99 @@ class InPrisonInterestsEntityMapper(
   }
 
   private fun addNewWorkInterests(workInterests: List<InPrisonWorkInterest>, entity: InPrisonInterestsEntity) {
-    workInterests.forEach {
-      entity.addChild(
-        workInterestEntityMapper.fromDomainToEntity(it),
-        entity.inPrisonWorkInterests,
-      )
+    entity.addWorkInterestChildren(workInterests.map { workInterestEntityMapper.fromDomainToEntity(it) })
+  }
+
+  private fun addNewTrainingInterests(trainingInterests: List<InPrisonTrainingInterest>, entity: InPrisonInterestsEntity) {
+    entity.addTrainingInterestChildren(trainingInterests.map { trainingInterestEntityMapper.fromDomainToEntity(it) })
+  }
+
+  private fun updateExistingWorkInterests(
+    existingEntities: MutableList<InPrisonWorkInterestEntity>,
+    updatedDomain: List<InPrisonWorkInterest>,
+  ) {
+    val updatedDomainKeys = updatedDomain.map { it.workType.name }
+    existingEntities
+      .filter { entity -> updatedDomainKeys.contains(entity.workType.name) }
+      .onEach { entity ->
+        workInterestEntityMapper.updateEntityFromDomain(
+          entity,
+          updatedDomain.first { dto -> dto.workType.name == entity.workType.name },
+        )
+      }
+  }
+
+  private fun addNewWorkInterests(
+    inPrisonInterestsEntity: InPrisonInterestsEntity,
+    existingEntities: MutableList<InPrisonWorkInterestEntity>,
+    updatedDomain: List<InPrisonWorkInterest>,
+  ) {
+    val currentIdentifiers = existingEntities.map { it.workType.name }
+
+    val newEntities = updatedDomain
+      .filter { dto -> !currentIdentifiers.contains(dto.workType.name) }
+      .map { newDto -> workInterestEntityMapper.fromDomainToEntity(newDto) }
+
+    inPrisonInterestsEntity.addWorkInterestChildren(newEntities)
+  }
+
+  private fun deleteRemovedWorkInterests(
+    existingEntities: MutableList<InPrisonWorkInterestEntity>,
+    updatedDomain: List<InPrisonWorkInterest>,
+  ) {
+    val updatedIdentifiers = updatedDomain.map { it.workType.name }
+
+    val removedEntities = existingEntities.filter { entity -> !updatedIdentifiers.contains(entity.workType.name) }
+    if (removedEntities.isNotEmpty()) {
+      existingEntities.removeAll(removedEntities)
     }
   }
 
-  private fun addNewTrainingInterests(workInterests: List<InPrisonTrainingInterest>, entity: InPrisonInterestsEntity) {
-    workInterests.forEach {
-      entity.addChild(
-        trainingInterestEntityMapper.fromDomainToEntity(it),
-        entity.inPrisonTrainingInterests,
-      )
+  private fun updateExistingTrainingInterests(
+    existingEntities: MutableList<InPrisonTrainingInterestEntity>,
+    updatedDomain: List<InPrisonTrainingInterest>,
+  ) {
+    val updatedDomainKeys = updatedDomain.map { it.trainingType.name }
+    existingEntities
+      .filter { entity -> updatedDomainKeys.contains(entity.trainingType.name) }
+      .onEach { entity ->
+        trainingInterestEntityMapper.updateEntityFromDomain(
+          entity,
+          updatedDomain.first { dto -> dto.trainingType.name == entity.trainingType.name },
+        )
+      }
+  }
+
+  private fun addNewTrainingInterests(
+    inPrisonInterestsEntity: InPrisonInterestsEntity,
+    existingEntities: MutableList<InPrisonTrainingInterestEntity>,
+    updatedDomain: List<InPrisonTrainingInterest>,
+  ) {
+    val currentIdentifiers = existingEntities.map { it.trainingType.name }
+
+    val newEntities = updatedDomain
+      .filter { dto -> !currentIdentifiers.contains(dto.trainingType.name) }
+      .map { newDto -> trainingInterestEntityMapper.fromDomainToEntity(newDto) }
+
+    inPrisonInterestsEntity.addTrainingInterestChildren(newEntities)
+  }
+
+  private fun deleteRemovedTrainingInterests(
+    existingEntities: MutableList<InPrisonTrainingInterestEntity>,
+    updatedDomain: List<InPrisonTrainingInterest>,
+  ) {
+    val updatedIdentifiers = updatedDomain.map { it.trainingType.name }
+
+    val removedEntities = existingEntities.filter { entity -> !updatedIdentifiers.contains(entity.trainingType.name) }
+    if (removedEntities.isNotEmpty()) {
+      existingEntities.removeAll(removedEntities)
     }
   }
 }
 
 @Component
-class InPrisonWorkInterestEntityMapper : KeyAwareEntityMapper<InPrisonWorkInterestEntity, InPrisonWorkInterest> {
-  override fun fromDomainToEntity(domain: InPrisonWorkInterest): InPrisonWorkInterestEntity = with(domain) {
+class InPrisonWorkInterestEntityMapper {
+  fun fromDomainToEntity(domain: InPrisonWorkInterest): InPrisonWorkInterestEntity = with(domain) {
     InPrisonWorkInterestEntity(
       reference = UUID.randomUUID(),
       workType = toWorkType(workType),
@@ -111,7 +181,7 @@ class InPrisonWorkInterestEntityMapper : KeyAwareEntityMapper<InPrisonWorkIntere
     )
   }
 
-  override fun updateEntityFromDomain(entity: InPrisonWorkInterestEntity, domain: InPrisonWorkInterest) = with(entity) {
+  fun updateEntityFromDomain(entity: InPrisonWorkInterestEntity, domain: InPrisonWorkInterest) = with(entity) {
     workType = toWorkType(domain.workType)
     workTypeOther = domain.workTypeOther
   }
@@ -146,9 +216,9 @@ class InPrisonWorkInterestEntityMapper : KeyAwareEntityMapper<InPrisonWorkIntere
 }
 
 @Component
-class InPrisonTrainingInterestEntityMapper : KeyAwareEntityMapper<InPrisonTrainingInterestEntity, InPrisonTrainingInterest> {
+class InPrisonTrainingInterestEntityMapper {
 
-  override fun fromDomainToEntity(domain: InPrisonTrainingInterest): InPrisonTrainingInterestEntity = with(domain) {
+  fun fromDomainToEntity(domain: InPrisonTrainingInterest): InPrisonTrainingInterestEntity = with(domain) {
     InPrisonTrainingInterestEntity(
       reference = UUID.randomUUID(),
       trainingType = toTrainingType(trainingType),
@@ -163,7 +233,7 @@ class InPrisonTrainingInterestEntityMapper : KeyAwareEntityMapper<InPrisonTraini
     )
   }
 
-  override fun updateEntityFromDomain(entity: InPrisonTrainingInterestEntity, domain: InPrisonTrainingInterest) = with(entity) {
+  fun updateEntityFromDomain(entity: InPrisonTrainingInterestEntity, domain: InPrisonTrainingInterest) = with(entity) {
     trainingType = toTrainingType(domain.trainingType)
     trainingTypeOther = domain.trainingTypeOther
   }

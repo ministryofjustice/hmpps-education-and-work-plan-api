@@ -54,21 +54,43 @@ fun aValidInPrisonInterestsEntityWithJpaFieldsPopulated(
 }
 
 fun aValidInPrisonWorkInterestEntity(
+  id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   workType: InPrisonWorkType = InPrisonWorkType.OTHER,
   workTypeOther: String? = "Any work type",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) = InPrisonWorkInterestEntity(
   reference = reference,
   workType = workType,
   workTypeOther = workTypeOther,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidInPrisonTrainingInterestEntity(
+  id: UUID? = UUID.randomUUID(),
   reference: UUID = UUID.randomUUID(),
   trainingType: InPrisonTrainingType = InPrisonTrainingType.OTHER,
   trainingTypeOther: String? = "Any training type",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) = InPrisonTrainingInterestEntity(
   reference = reference,
   trainingType = trainingType,
   trainingTypeOther = trainingTypeOther,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
