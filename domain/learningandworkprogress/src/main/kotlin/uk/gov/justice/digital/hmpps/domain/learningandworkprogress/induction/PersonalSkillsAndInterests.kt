@@ -23,16 +23,12 @@ data class PersonalSkillsAndInterests(
 data class PersonalSkill(
   val skillType: SkillType,
   val skillTypeOther: String?,
-) : KeyAwareDomain {
-  override fun key(): String = skillType.name
-}
+)
 
 data class PersonalInterest(
   val interestType: InterestType,
   val interestTypeOther: String?,
-) : KeyAwareDomain {
-  override fun key(): String = interestType.name
-}
+)
 
 enum class SkillType {
   COMMUNICATION,

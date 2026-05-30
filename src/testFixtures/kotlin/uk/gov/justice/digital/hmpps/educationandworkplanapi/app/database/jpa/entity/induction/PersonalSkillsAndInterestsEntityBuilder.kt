@@ -54,21 +54,43 @@ fun aValidPersonalSkillsAndInterestsEntityWithJpaFieldsPopulated(
 }
 
 fun aValidPersonalSkillEntity(
+  id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
   skillType: SkillType = SkillType.OTHER,
   skillTypeOther: String? = "None come to mind",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) = PersonalSkillEntity(
   reference = reference,
   skillType = skillType,
   skillTypeOther = skillTypeOther,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
 
 fun aValidPersonalInterestEntity(
+  id: UUID? = null,
   reference: UUID = UUID.randomUUID(),
   interestType: InterestType = InterestType.OTHER,
   interestTypeOther: String? = "None come to mind",
+  createdAt: Instant? = Instant.now(),
+  createdBy: String? = "asmith_gen",
+  updatedAt: Instant? = Instant.now(),
+  updatedBy: String? = "bjones_gen",
 ) = PersonalInterestEntity(
   reference = reference,
   interestType = interestType,
   interestTypeOther = interestTypeOther,
-)
+).apply {
+  this.id = id
+  this.createdAt = createdAt
+  this.createdBy = createdBy
+  this.updatedAt = updatedAt
+  this.updatedBy = updatedBy
+}
