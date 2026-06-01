@@ -17,14 +17,13 @@ import jakarta.persistence.PreRemove
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.KeyAwareChildEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.ParentEntity
 import java.time.Instant
 import java.util.UUID
 
@@ -51,7 +50,7 @@ data class PersonalSkillsAndInterestsEntity(
 
   @Column
   var updatedAtPrison: String,
-) : ParentEntity {
+) {
 
   @Id
   @GeneratedValue
@@ -59,7 +58,7 @@ data class PersonalSkillsAndInterestsEntity(
   var id: UUID? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column(updatable = false)
@@ -67,15 +66,29 @@ data class PersonalSkillsAndInterestsEntity(
   var createdBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   @Column
   @LastModifiedBy
   var updatedBy: String? = null
 
-  override fun childEntityUpdated() {
-    this.updatedAt = Instant.now()
+  @Column
+  @Version
+  var version: Long = 0
+
+  fun addInterestsChildren(newChildren: List<PersonalInterestEntity>) {
+    newChildren.forEach {
+      it.associateWithParent(this)
+      interests.add(it)
+    }
+  }
+
+  fun addSkillsChildren(newChildren: List<PersonalSkillEntity>) {
+    newChildren.forEach {
+      it.associateWithParent(this)
+      skills.add(it)
+    }
   }
 
   override fun equals(other: Any?): Boolean {
@@ -104,7 +117,7 @@ data class PersonalSkillEntity(
 
   @Column
   var skillTypeOther: String? = null,
-) : KeyAwareChildEntity {
+) {
 
   @Id
   @GeneratedValue
@@ -116,7 +129,7 @@ data class PersonalSkillEntity(
   var parent: PersonalSkillsAndInterestsEntity? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column(updatable = false)
@@ -124,7 +137,7 @@ data class PersonalSkillEntity(
   var createdBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   @Column
@@ -134,15 +147,13 @@ data class PersonalSkillEntity(
   @PrePersist
   @PreUpdate
   @PreRemove
-  fun onChange() {
-    parent?.childEntityUpdated()
+  fun onChangeTouchParentToUpdateItsTimestamp() {
+    parent?.run { ++version } // Increment the parent's version field which will dirty the entity, forcing JPA to update the updated_at timestamp of the parent entity
   }
 
-  override fun associateWithParent(parent: ParentEntity) {
-    this.parent = parent as PersonalSkillsAndInterestsEntity
+  fun associateWithParent(parent: PersonalSkillsAndInterestsEntity) {
+    this.parent = parent
   }
-
-  override fun key(): String = skillType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -170,7 +181,7 @@ data class PersonalInterestEntity(
 
   @Column
   var interestTypeOther: String? = null,
-) : KeyAwareChildEntity {
+) {
 
   @Id
   @GeneratedValue
@@ -182,7 +193,7 @@ data class PersonalInterestEntity(
   var parent: PersonalSkillsAndInterestsEntity? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column(updatable = false)
@@ -190,7 +201,7 @@ data class PersonalInterestEntity(
   var createdBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   @Column
@@ -200,15 +211,13 @@ data class PersonalInterestEntity(
   @PrePersist
   @PreUpdate
   @PreRemove
-  fun onChange() {
-    parent?.childEntityUpdated()
+  fun onChangeTouchParentToUpdateItsTimestamp() {
+    parent?.run { ++version } // Increment the parent's version field which will dirty the entity, forcing JPA to update the updated_at timestamp of the parent entity
   }
 
-  override fun associateWithParent(parent: ParentEntity) {
-    this.parent = parent as PersonalSkillsAndInterestsEntity
+  fun associateWithParent(parent: PersonalSkillsAndInterestsEntity) {
+    this.parent = parent
   }
-
-  override fun key(): String = interestType.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
