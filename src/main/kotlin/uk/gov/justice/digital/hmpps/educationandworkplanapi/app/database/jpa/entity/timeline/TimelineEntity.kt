@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.en
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
@@ -11,14 +12,16 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import java.util.UUID
 
 @Table(name = "timeline")
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 data class TimelineEntity(
   @Column(updatable = false)
   val reference: UUID,
@@ -37,11 +40,11 @@ data class TimelineEntity(
   var id: UUID? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   companion object {

@@ -105,6 +105,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -162,6 +163,9 @@ abstract class IntegrationTestBase {
     Awaitility.setDefaultPollInterval(500, MILLISECONDS)
     Awaitility.setDefaultTimeout(5, SECONDS)
   }
+
+  @Autowired
+  lateinit var clock: Clock
 
   @Autowired
   lateinit var webTestClient: WebTestClient

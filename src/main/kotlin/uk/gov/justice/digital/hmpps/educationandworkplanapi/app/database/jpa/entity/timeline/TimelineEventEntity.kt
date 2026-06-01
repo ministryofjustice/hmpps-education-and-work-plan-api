@@ -4,6 +4,7 @@ import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
@@ -13,13 +14,15 @@ import jakarta.persistence.MapKeyColumn
 import jakarta.persistence.MapKeyEnumerated
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UuidGenerator
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import java.util.UUID
 
 @Table(name = "timeline_event")
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 data class TimelineEventEntity(
   @Column(updatable = false)
   val reference: UUID,
@@ -71,7 +74,7 @@ data class TimelineEventEntity(
   var id: UUID? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   override fun equals(other: Any?): Boolean {

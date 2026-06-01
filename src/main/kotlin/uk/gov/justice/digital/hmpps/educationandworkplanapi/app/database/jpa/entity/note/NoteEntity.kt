@@ -9,11 +9,11 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.Instant
 import java.util.UUID
@@ -58,7 +58,7 @@ data class NoteEntity(
   var createdBy: String? = null
 
   @Column(updatable = false)
-  @CreationTimestamp
+  @CreatedDate
   var createdAt: Instant? = null
 
   @Column
@@ -66,7 +66,7 @@ data class NoteEntity(
   var updatedBy: String? = null
 
   @Column
-  @UpdateTimestamp
+  @LastModifiedDate
   var updatedAt: Instant? = null
 
   override fun equals(other: Any?): Boolean {
