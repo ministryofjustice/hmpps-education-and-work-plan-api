@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestB
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.ACTIVE_PLAN
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.EXEMPT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.NEEDS_PLAN
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PlanStatus.PENDING_SCREENING_AND_ASSESSMENTS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -446,6 +448,43 @@ class PrisonerSearchTest : IntegrationTestBase() {
             it
               .hasPrisonNumber(prisoner6.prisonerNumber)
               .hasPlanStatus(EXEMPT)
+          },
+        )
+    }
+
+    @Test
+    fun `should filter by prisoners who are pending their screenings and assessments`() {
+      // Given
+      // setup prisoners 3 and 6 with schedules that are pending screenings and assessments
+      listOf(prisoner3, prisoner6).forEach {
+        createInductionSchedule(it.prisonerNumber, status = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+      }
+      // setup the other prisoners as needing a plan
+      listOf(prisoner1, prisoner2, prisoner4, prisoner5).forEach {
+        createInductionSchedule(it.prisonerNumber, deadlineDate = today.plusDays(1), status = SCHEDULED)
+      }
+
+      // When
+      val response = searchPeopleWithActionPlanStatus(PENDING_SCREENING_AND_ASSESSMENTS)
+
+      // Then
+      val actual = response.responseBody.blockFirst()
+      assertThat(actual)
+        .hasNumberOfPersonResponses(2)
+        .personResponse(
+          1,
+          {
+            it
+              .hasPrisonNumber(prisoner3.prisonerNumber)
+              .hasPlanStatus(PENDING_SCREENING_AND_ASSESSMENTS)
+          },
+        )
+        .personResponse(
+          2,
+          {
+            it
+              .hasPrisonNumber(prisoner6.prisonerNumber)
+              .hasPlanStatus(PENDING_SCREENING_AND_ASSESSMENTS)
           },
         )
     }
