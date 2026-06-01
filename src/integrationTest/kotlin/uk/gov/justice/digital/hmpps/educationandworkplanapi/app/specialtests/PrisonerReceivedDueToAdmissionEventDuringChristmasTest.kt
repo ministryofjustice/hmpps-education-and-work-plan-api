@@ -36,7 +36,7 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
     assertThat(runCatching { getInduction(prisonNumber) }.getOrNull()).isNull()
     assertThat(runCatching { getInductionSchedule(prisonNumber) }.getOrNull()).isNull()
 
-    val earliestDateTime = OffsetDateTime.now()
+    val earliestDateTime = OffsetDateTime.now(clock)
 
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
