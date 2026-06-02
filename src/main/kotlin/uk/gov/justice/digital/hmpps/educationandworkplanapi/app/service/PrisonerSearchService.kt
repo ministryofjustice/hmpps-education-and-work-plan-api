@@ -93,6 +93,7 @@ class PrisonerSearchService(
   }
 
   private fun mapStatus(planStatus: String?): PlanStatus = when (planStatus) {
+    "PENDING_SCREENING_AND_ASSESSMENTS" -> PlanStatus.PENDING_SCREENING_AND_ASSESSMENTS
     "ACTIVE_PLAN" -> PlanStatus.ACTIVE_PLAN
     "EXEMPT" -> PlanStatus.EXEMPT
     else -> PlanStatus.NEEDS_PLAN

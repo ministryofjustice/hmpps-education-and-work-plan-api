@@ -30,7 +30,14 @@ interface PersonSearchRepository : JpaRepository<ActionPlanEntity, String> {
               order by rs.created_at desc
               limit 1
             ) ilike '%EXEMPT%' then 'EXEMPT'
-        
+
+            when exists (
+              select 1
+              from induction_schedule isch
+              where isch.prison_number = p.prison_number
+                and isch.schedule_status = 'PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS'
+            ) then 'PENDING_SCREENING_AND_ASSESSMENTS'
+
             when exists (
               select 1
               from action_plan ap
