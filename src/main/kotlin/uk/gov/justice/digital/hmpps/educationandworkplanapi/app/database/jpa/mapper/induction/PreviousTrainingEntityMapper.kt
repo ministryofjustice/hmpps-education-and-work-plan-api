@@ -37,7 +37,12 @@ class PreviousTrainingEntityMapper {
   }
 
   fun updateExistingEntityFromDto(entity: PreviousTrainingEntity, dto: UpdatePreviousTrainingDto) = with(entity) {
-    trainingTypes = dto.trainingTypes.map { toTrainingType(it) }
+    val updatedTrainingTypes = dto.trainingTypes.map { toTrainingType(it) }
+    if (trainingTypes.toSet() != updatedTrainingTypes.toSet()) {
+      // Only update (replace) the training types list instance on the entity if there are any changes to be made
+      // (otherwise JPA sees the replaced list instance as a change to the entity even though there were no changes to it, so marks it as Dirty which in turn updates the updated_at fields)
+      trainingTypes = updatedTrainingTypes
+    }
     trainingTypeOther = dto.trainingTypeOther
     updatedAtPrison = dto.prisonId
   }
