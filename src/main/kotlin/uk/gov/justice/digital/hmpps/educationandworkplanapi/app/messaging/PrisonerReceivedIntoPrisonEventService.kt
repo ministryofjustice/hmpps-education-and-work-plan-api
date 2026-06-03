@@ -108,7 +108,6 @@ class PrisonerReceivedIntoPrisonEventService(
         prisonNumber = nomsNumber,
         prisonerAdmissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
-        releaseDate = prisoner.releaseDate,
       )
     } catch (e: InductionScheduleAlreadyExistsException) {
       // Prisoner already has an Induction Schedule
@@ -125,7 +124,6 @@ class PrisonerReceivedIntoPrisonEventService(
             nomsNumber,
             prisonerAdmissionDate = prisonerAdmissionDate,
             prisonId = prisonId,
-            releaseDate = prisoner.releaseDate,
             calculationRule = NEW_PRISON_ADMISSION,
           )
         }

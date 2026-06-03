@@ -9,7 +9,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -155,7 +154,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(null)
 
       val createInductionScheduleDto = aValidCreateInductionScheduleDto(prisonNumber = prisonNumber)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull())).willReturn(createInductionScheduleDto)
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any())).willReturn(createInductionScheduleDto)
 
       val expectedInductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber)
       given(inductionSchedulePersistenceAdapter.createInductionSchedule(any())).willReturn(expectedInductionSchedule)
@@ -166,7 +165,7 @@ class InductionScheduleServiceTest {
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId, true, null)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, admissionDate, prisonId)
       verify(inductionSchedulePersistenceAdapter).createInductionSchedule(createInductionScheduleDto)
       verify(inductionScheduleEventService).inductionScheduleCreated(actual)
     }
@@ -215,7 +214,7 @@ class InductionScheduleServiceTest {
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
 
       val expectedDueDate = prisonerAdmissionDate.plusDays(20)
-      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any(), any(), anyOrNull())).willReturn(
+      given(inductionScheduleDateCalculationService.determineCreateInductionScheduleDto(any(), any(), any())).willReturn(
         aValidCreateInductionScheduleDto(
           prisonNumber = prisonNumber,
           deadlineDate = expectedDueDate,
@@ -251,12 +250,12 @@ class InductionScheduleServiceTest {
       )
 
       // When
-      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, PRISON_ID, null)
+      val actual = service.reschedulePrisonersInductionSchedule(prisonNumber, prisonerAdmissionDate, PRISON_ID)
 
       // Then
       assertThat(actual).isEqualTo(expectedInductionSchedule)
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate, PRISON_ID, true)
+      verify(inductionScheduleDateCalculationService).determineCreateInductionScheduleDto(prisonNumber, prisonerAdmissionDate, PRISON_ID)
       verify(inductionSchedulePersistenceAdapter).updateInductionScheduleStatus(expectedUpdateInductionScheduleStatusDto)
       verify(inductionScheduleEventService).inductionScheduleStatusUpdated(expectedUpdatedInductionScheduleStatus)
     }
@@ -271,7 +270,7 @@ class InductionScheduleServiceTest {
 
       // When
       val exception = catchThrowableOfType(InvalidInductionScheduleStatusException::class.java) {
-        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID, null)
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID)
       }
 
       // Then
@@ -290,7 +289,7 @@ class InductionScheduleServiceTest {
 
       // When
       val exception = catchThrowableOfType(InductionScheduleNotFoundException::class.java) {
-        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID, null)
+        service.reschedulePrisonersInductionSchedule(prisonNumber, TODAY, PRISON_ID)
       }
 
       // Then
