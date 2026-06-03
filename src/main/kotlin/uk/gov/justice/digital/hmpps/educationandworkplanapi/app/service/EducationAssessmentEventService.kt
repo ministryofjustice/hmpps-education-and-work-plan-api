@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.educationassessment.EducationAssessmentEventEntityMapper
@@ -19,6 +20,7 @@ class EducationAssessmentEventService(
   private val timelineService: TimelineService,
   private val timelineEventFactory: TimelineEventFactory,
   private val telemetryService: TelemetryService,
+  private val inductionScheduleService: InductionScheduleService,
 ) {
 
   @Transactional
@@ -31,6 +33,10 @@ class EducationAssessmentEventService(
 
     val entity = educationAssessmentEventEntityMapper.fromDtoToEntity(assessmentEvent, prisonId)
     educationAssessmentEventRepository.saveAndFlush(entity)
+
+    // Under the PES contract, completing the prisoner's S&As schedules their Induction if it was awaiting them.
+    // This is a no-op under PEF (no Induction Schedule is ever in the pending-S&As state).
+    inductionScheduleService.schedulePendingInductionSchedule(prisonNumber, prisonId)
 
     performFollowOnEvents(entity)
 

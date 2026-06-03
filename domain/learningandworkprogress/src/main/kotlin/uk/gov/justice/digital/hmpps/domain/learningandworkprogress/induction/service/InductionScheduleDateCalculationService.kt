@@ -31,6 +31,14 @@ abstract class InductionScheduleDateCalculationService(
    */
   abstract fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String): CreateInductionScheduleDto
 
+  /**
+   * Returns the deadline date for a prisoner's Induction once their Screening & Assessments have been completed in Curious.
+   *
+   * Only applicable under contracts where the Induction is scheduled following completion of the prisoner's S&As (the PES
+   * contract); implementations for contracts that do not schedule Inductions this way are not expected to support it.
+   */
+  abstract fun determineDeadlineDateForCompletedAssessments(): LocalDate
+
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
     if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadUserAppliedExemptionWhenInductionAlreadyOverdue()) {
       deadlineDate

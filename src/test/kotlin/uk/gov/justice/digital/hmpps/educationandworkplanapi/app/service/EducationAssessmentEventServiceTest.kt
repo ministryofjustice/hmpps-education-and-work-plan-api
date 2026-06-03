@@ -9,6 +9,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
@@ -40,6 +41,9 @@ class EducationAssessmentEventServiceTest {
 
   @Mock
   private lateinit var telemetryService: TelemetryService
+
+  @Mock
+  private lateinit var inductionScheduleService: InductionScheduleService
 
   @InjectMocks
   private lateinit var service: EducationAssessmentEventService
@@ -88,6 +92,7 @@ class EducationAssessmentEventServiceTest {
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
     verify(educationAssessmentEventEntityMapper).fromDtoToEntity(dto, "BXI")
     verify(educationAssessmentEventRepository).saveAndFlush(expectedEntity)
+    verify(inductionScheduleService).schedulePendingInductionSchedule(prisonNumber, "BXI")
     verify(timelineEventFactory).educationAssessmentEventCreatedEvent(entityReference.toString(), "BXI")
     verify(timelineService).recordTimelineEvent(prisonNumber, expectedTimelineEvent)
     verify(telemetryService).trackEducationAssessmentEventCreated(expectedEntity)
