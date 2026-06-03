@@ -32,8 +32,6 @@ class InductionScheduleService(
     prisonNumber: String,
     prisonerAdmissionDate: LocalDate,
     prisonId: String,
-    newAdmission: Boolean = true,
-    releaseDate: LocalDate? = null,
   ): InductionSchedule {
     // Check for an existing Induction Schedule
     val inductionSchedule = runCatching {
@@ -48,8 +46,6 @@ class InductionScheduleService(
       prisonNumber = prisonNumber,
       admissionDate = prisonerAdmissionDate,
       prisonId = prisonId,
-      newAdmission = newAdmission,
-      releaseDate = releaseDate,
     )
     return inductionSchedulePersistenceAdapter.createInductionSchedule(createInductionScheduleDto)
       .also {
@@ -70,7 +66,6 @@ class InductionScheduleService(
     prisonNumber: String,
     prisonerAdmissionDate: LocalDate,
     prisonId: String,
-    releaseDate: LocalDate?,
     calculationRule: InductionScheduleCalculationRule? = null,
   ): InductionSchedule {
     val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
@@ -85,7 +80,6 @@ class InductionScheduleService(
         prisonNumber = prisonNumber,
         admissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
-        releaseDate = releaseDate,
       )
       updateInductionSchedule(
         inductionSchedule = this,

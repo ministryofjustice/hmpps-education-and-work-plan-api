@@ -110,7 +110,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonNumber,
       prisonerAdmissionDate,
       prisonId,
-      releaseDate = prisoner.releaseDate,
     )
     verifyNoInteractions(reviewScheduleService)
     verifyNoInteractions(scheduleAdapter)
@@ -181,7 +180,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
     given(inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)).willReturn(inductionSchedule)
 
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -205,7 +204,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonNumber,
       prisonerAdmissionDate,
       prisonId,
-      releaseDate = prisoner.releaseDate,
     )
     verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
@@ -239,7 +237,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = COMPLETED)
     given(inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)).willReturn(inductionSchedule)
 
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -263,7 +261,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonNumber,
       prisonerAdmissionDate,
       prisonId,
-      releaseDate = prisoner.releaseDate,
     )
     verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
@@ -295,7 +292,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     given(inductionService.getInductionForPrisoner(prisonNumber)).willThrow(InductionNotFoundException(prisonNumber))
 
     val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = SCHEDULED)
-    given(inductionScheduleService.createInductionSchedule(any(), any(), any(), any(), anyOrNull())).willThrow(
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
       InductionScheduleAlreadyExistsException(inductionSchedule),
     )
 
@@ -307,13 +304,11 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonNumber,
       prisonerAdmissionDate,
       prisonId,
-      releaseDate = prisoner.releaseDate,
     )
     verify(inductionScheduleService).reschedulePrisonersInductionSchedule(
       prisonNumber,
       prisonerAdmissionDate,
       prisonId,
-      releaseDate = prisoner.releaseDate,
       InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
     )
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
