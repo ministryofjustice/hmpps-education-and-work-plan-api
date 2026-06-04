@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
@@ -23,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TEMPORARY_ABSENCE_RETURN
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.EducationAssessmentEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import java.time.Clock
@@ -45,6 +47,7 @@ class PrisonerReceivedIntoPrisonEventService(
   private val reviewService: ReviewService,
   private val actionPlanService: ActionPlanService,
   private val scheduleAdapter: ScheduleAdapter,
+  private val educationAssessmentEventService: EducationAssessmentEventService,
   private val clock: Clock,
 ) {
   fun process(
@@ -115,6 +118,14 @@ class PrisonerReceivedIntoPrisonEventService(
         COMPLETED -> {
           // The Induction was completed so we need to reschedule their active Review Schedule if they have one, or create a new Review Schedule.
           rescheduleOrCreatePrisonersReviewSchedule(prisoner, prisonId)
+        }
+
+        PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> {
+          // PES: the Induction is awaiting the prisoner's Screening & Assessments. If they are now complete, schedule it;
+          // otherwise leave it pending and wait for the Curious "S&As completed" message.
+          if (educationAssessmentEventService.hasCompletedAllAssessments(nomsNumber)) {
+            inductionScheduleService.schedulePendingInductionSchedule(nomsNumber, prisonId)
+          }
         }
 
         else -> {
