@@ -99,4 +99,54 @@ class PrisonerReceivedDueToAdmissionEventPesTest : IntegrationTestBase() {
         .hasDeadlineDate(LocalDate.now().plusDays(10))
     }
   }
+
+  @Test
+  fun `should create and schedule induction on admission given prisoner has no Induction Schedule but their assessments are already complete`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+
+    // The prisoner's Screening & Assessments have been completed in Curious, but they have no Induction Schedule yet
+    // (the assessments-complete message arrived before this admission)
+    educationAssessmentEventRepository.save(
+      EducationAssessmentEventEntity(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        status = EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+        statusChangeDate = LocalDate.now().minusDays(2),
+        source = "CURIOUS",
+        detailUrl = null,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+      ),
+    )
+
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // A new Induction Schedule is created and immediately scheduled (today + 10 days) rather than left pending
+    await untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
+        .hasDeadlineDate(LocalDate.now().plusDays(10))
+    }
+  }
 }
