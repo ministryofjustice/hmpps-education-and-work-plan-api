@@ -28,6 +28,10 @@ class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionP
     },
   ) {
 
+  companion object {
+    private const val DAYS_AFTER_ASSESSMENTS_COMPLETE = 10L
+  }
+
   /**
    * Returns a [CreateInductionScheduleDto] suitable for creating the specified prisoner's initial [InductionSchedule].
    *
@@ -44,4 +48,11 @@ class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionP
     scheduleStatus = InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     prisonId = prisonId,
   )
+
+  /**
+   * Under the PES contract the Induction is due 10 days after the prisoner's Screening & Assessments are completed in
+   * Curious. As Screening & Assessments cannot be completed in the future, the deadline is calculated from today,
+   * meaning it can never fall in the past.
+   */
+  override fun determineDeadlineDateForCompletedAssessments(): LocalDate = LocalDate.now(clock).plusDays(DAYS_AFTER_ASSESSMENTS_COMPLETE)
 }

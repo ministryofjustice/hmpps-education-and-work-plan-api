@@ -41,4 +41,13 @@ class PesInductionScheduleDateCalculationServiceTest {
     // Then
     assertThat(actual).isEqualTo(expected)
   }
+
+  @Test
+  fun `should determine deadline date for completed assessments as today plus 10 days`() {
+    // When
+    val actual = service.determineDeadlineDateForCompletedAssessments()
+
+    // Then
+    assertThat(actual).isEqualTo(LocalDate.parse("2026-04-27")) // fixed clock is 2026-04-17, plus 10 days
+  }
 }

@@ -62,6 +62,14 @@ class PefInductionScheduleDateCalculationService(
     )
   }
 
+  /**
+   * Not supported under the PEF contract: a prisoner's Induction is scheduled on prison admission, not following the
+   * completion of their Screening & Assessments, so there is no S&A based deadline to calculate.
+   */
+  override fun determineDeadlineDateForCompletedAssessments(): LocalDate = throw UnsupportedOperationException(
+    "Induction Schedules are not scheduled following Screening & Assessment completion under the PEF contract",
+  )
+
   private fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long = when (calculationRule) {
     InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> {
       DAYS_AFTER_ADMISSION_EXTENDED

@@ -29,6 +29,10 @@ class InductionScheduleDateCalculationServiceTest {
     ): CreateInductionScheduleDto {
       TODO("Not implemented here")
     }
+
+    override fun determineDeadlineDateForCompletedAssessments(): LocalDate {
+      TODO("Not implemented here")
+    }
   }
 
   @Nested

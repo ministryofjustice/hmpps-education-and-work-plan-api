@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducto
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
@@ -43,5 +44,12 @@ class PefInductionScheduleDateCalculationServiceTest {
 
     // Then
     assertThat(actual).isEqualTo(expected)
+  }
+
+  @Test
+  fun `should not support determining a deadline date for completed assessments under the PEF contract`() {
+    assertThrows<UnsupportedOperationException> {
+      service.determineDeadlineDateForCompletedAssessments()
+    }
   }
 }

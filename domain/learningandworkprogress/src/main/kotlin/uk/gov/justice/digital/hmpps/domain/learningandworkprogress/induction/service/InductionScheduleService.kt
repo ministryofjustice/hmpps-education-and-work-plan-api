@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.UpdatedInductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.UpdateInductionScheduleStatusDto
@@ -93,6 +94,30 @@ class InductionScheduleService(
 
   fun getInductionScheduleForPrisoner(prisonNumber: String): InductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
     ?: throw InductionScheduleNotFoundException(prisonNumber)
+
+  /**
+   * Schedules a prisoner's Induction if it is currently awaiting their Screening & Assessments
+   * (PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS): the Induction Schedule moves to SCHEDULED with its
+   * deadline date calculated by the [InductionScheduleDateCalculationService]. The schedule's calculation rule is left
+   * unchanged. Used under the PES contract once we are notified that the prisoner's S&As are complete.
+   *
+   * Does nothing if the prisoner has no Induction Schedule, or if it is in any other status (it has either already been
+   * scheduled, or should not be scheduled via this route).
+   */
+  fun schedulePendingInductionSchedule(prisonNumber: String, prisonId: String) {
+    val inductionSchedule = inductionSchedulePersistenceAdapter.getInductionSchedule(prisonNumber)
+    if (inductionSchedule == null || inductionSchedule.scheduleStatus != PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS) {
+      log.info { "Prisoner [$prisonNumber] has no Induction Schedule pending Screening & Assessments; nothing to schedule" }
+      return
+    }
+
+    updateInductionSchedule(
+      inductionSchedule = inductionSchedule,
+      newStatus = SCHEDULED,
+      prisonId = prisonId,
+      adjustedInductionDate = inductionScheduleDateCalculationService.determineDeadlineDateForCompletedAssessments(),
+    )
+  }
 
   fun getInductionScheduleHistoryForPrisoner(prisonNumber: String): List<InductionScheduleHistory> {
     val responses = inductionSchedulePersistenceAdapter.getInductionScheduleHistory(prisonNumber)
