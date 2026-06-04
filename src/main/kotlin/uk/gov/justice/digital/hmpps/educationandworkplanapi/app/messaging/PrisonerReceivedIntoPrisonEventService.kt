@@ -112,6 +112,9 @@ class PrisonerReceivedIntoPrisonEventService(
         prisonerAdmissionDate = prisonerAdmissionDate,
         prisonId = prisonId,
       )
+      // PES: the Induction is created awaiting the prisoner's Screening & Assessments. If they have already been
+      // completed (e.g. the Curious message arrived before this admission), schedule the Induction straight away.
+      schedulePendingInductionScheduleIfAssessmentsComplete(nomsNumber, prisonId)
     } catch (e: InductionScheduleAlreadyExistsException) {
       // Prisoner already has an Induction Schedule
       when (e.inductionSchedule.scheduleStatus) {
@@ -123,9 +126,7 @@ class PrisonerReceivedIntoPrisonEventService(
         PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS -> {
           // PES: the Induction is awaiting the prisoner's Screening & Assessments. If they are now complete, schedule it;
           // otherwise leave it pending and wait for the Curious "S&As completed" message.
-          if (educationAssessmentEventService.hasCompletedAllAssessments(nomsNumber)) {
-            inductionScheduleService.schedulePendingInductionSchedule(nomsNumber, prisonId)
-          }
+          schedulePendingInductionScheduleIfAssessmentsComplete(nomsNumber, prisonId)
         }
 
         else -> {
@@ -139,6 +140,17 @@ class PrisonerReceivedIntoPrisonEventService(
           )
         }
       }
+    }
+  }
+
+  /**
+   * Schedules the prisoner's Induction if it is awaiting their Screening & Assessments and those S&As have already been
+   * completed in Curious. No-op otherwise (under the PEF contract the Induction is never in the pending-S&As state, so
+   * this never does anything).
+   */
+  private fun schedulePendingInductionScheduleIfAssessmentsComplete(nomsNumber: String, prisonId: String) {
+    if (educationAssessmentEventService.hasCompletedAllAssessments(nomsNumber)) {
+      inductionScheduleService.schedulePendingInductionSchedule(nomsNumber, prisonId)
     }
   }
 

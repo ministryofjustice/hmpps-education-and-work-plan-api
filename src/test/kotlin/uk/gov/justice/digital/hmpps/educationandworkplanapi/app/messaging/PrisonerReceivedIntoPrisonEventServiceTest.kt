@@ -122,6 +122,66 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   }
 
   @Test
+  fun `should schedule induction on admission given prisoner has no Induction Schedule and their assessments are already complete`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "BXI"
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = prisonId,
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    val prisoner = aValidPrisoner(prisonNumber)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(prisoner)
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willThrow(InductionNotFoundException(prisonNumber))
+    given(educationAssessmentEventService.hasCompletedAllAssessments(prisonNumber)).willReturn(true)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService).schedulePendingInductionSchedule(prisonNumber, prisonId)
+  }
+
+  @Test
+  fun `should not schedule induction on admission given prisoner has no Induction Schedule and their assessments are not complete`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "BXI"
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = prisonId,
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    val prisoner = aValidPrisoner(prisonNumber)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(prisoner)
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willThrow(InductionNotFoundException(prisonNumber))
+    given(educationAssessmentEventService.hasCompletedAllAssessments(prisonNumber)).willReturn(false)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService).createInductionSchedule(prisonNumber, prisonerAdmissionDate, prisonId)
+    verify(inductionScheduleService, never()).schedulePendingInductionSchedule(any(), any())
+  }
+
+  @Test
   fun `should process event given reason is prisoner admission and prisoner already has an Induction and Action Plan but no Induction Schedule`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
