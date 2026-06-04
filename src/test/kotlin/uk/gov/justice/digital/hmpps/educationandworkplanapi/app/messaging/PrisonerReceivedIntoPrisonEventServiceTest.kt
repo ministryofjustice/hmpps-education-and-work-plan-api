@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.given
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.Ind
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
@@ -39,6 +41,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.Additi
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CreateInitialReviewScheduleMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.EducationAssessmentEventService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
 import java.time.Clock
@@ -74,6 +77,9 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
   @Mock
   private lateinit var scheduleAdapter: ScheduleAdapter
+
+  @Mock
+  private lateinit var educationAssessmentEventService: EducationAssessmentEventService
 
   @Mock
   private lateinit var clock: Clock
@@ -312,6 +318,78 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
     )
     verify(prisonerSearchApiService).getPrisoner(prisonNumber)
+  }
+
+  @Test
+  fun `should schedule pending induction given prisoner admission and prisoner already has a PENDING Induction Schedule and their assessments are complete`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "MDI"
+
+    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber, prisonId = prisonId)
+    given(prisonerSearchApiService.getPrisoner(any())).willReturn(prisoner)
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = "BXI",
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willThrow(InductionNotFoundException(prisonNumber))
+
+    val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
+      InductionScheduleAlreadyExistsException(inductionSchedule),
+    )
+    given(educationAssessmentEventService.hasCompletedAllAssessments(prisonNumber)).willReturn(true)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService).schedulePendingInductionSchedule(prisonNumber, prisonId)
+    verify(inductionScheduleService, never()).reschedulePrisonersInductionSchedule(any(), any(), any(), anyOrNull())
+  }
+
+  @Test
+  fun `should leave induction pending given prisoner admission and prisoner already has a PENDING Induction Schedule and their assessments are not complete`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "MDI"
+
+    val prisoner = aValidPrisoner(prisonerNumber = prisonNumber, prisonId = prisonId)
+    given(prisonerSearchApiService.getPrisoner(any())).willReturn(prisoner)
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = "BXI",
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willThrow(InductionNotFoundException(prisonNumber))
+
+    val inductionSchedule = aValidInductionSchedule(prisonNumber = prisonNumber, scheduleStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+    given(inductionScheduleService.createInductionSchedule(any(), any(), any())).willThrow(
+      InductionScheduleAlreadyExistsException(inductionSchedule),
+    )
+    given(educationAssessmentEventService.hasCompletedAllAssessments(prisonNumber)).willReturn(false)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(inductionScheduleService, never()).schedulePendingInductionSchedule(any(), any())
+    verify(inductionScheduleService, never()).reschedulePrisonersInductionSchedule(any(), any(), any(), anyOrNull())
   }
 
   @Test

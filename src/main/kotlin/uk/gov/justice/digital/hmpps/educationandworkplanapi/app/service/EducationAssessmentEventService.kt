@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.educationassessment.EducationAssessmentEventEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EducationAssessmentEventRepository
 
@@ -42,6 +43,15 @@ class EducationAssessmentEventService(
 
     log.info { "Saved education assessment event [${entity.reference}] for prisoner [$prisonNumber]" }
   }
+
+  /**
+   * Returns true if the prisoner has completed all of their relevant Education Screening & Assessments (i.e. we have
+   * received an "all relevant assessments complete" event for them from the external assessment system).
+   */
+  fun hasCompletedAllAssessments(prisonNumber: String): Boolean = educationAssessmentEventRepository.existsByPrisonNumberAndStatus(
+    prisonNumber,
+    EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+  )
 
   @Async
   fun performFollowOnEvents(entity: EducationAssessmentEventEntity) = with(entity) {

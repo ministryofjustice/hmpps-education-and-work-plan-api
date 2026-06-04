@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -143,5 +144,35 @@ class EducationAssessmentEventServiceTest {
     verify(timelineEventFactory).educationAssessmentEventCreatedEvent(entityReference.toString(), "N/A")
     verify(timelineService).recordTimelineEvent(prisonNumber, expectedTimelineEvent)
     verify(telemetryService).trackEducationAssessmentEventCreated(expectedEntity)
+  }
+
+  @Test
+  fun `should return true given prisoner has completed all relevant assessments`() {
+    // Given
+    val prisonNumber = "G0378GI"
+    given(
+      educationAssessmentEventRepository.existsByPrisonNumberAndStatus(
+        prisonNumber,
+        EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+      ),
+    ).willReturn(true)
+
+    // When / Then
+    assertThat(service.hasCompletedAllAssessments(prisonNumber)).isTrue()
+  }
+
+  @Test
+  fun `should return false given prisoner has not completed all relevant assessments`() {
+    // Given
+    val prisonNumber = "G0378GI"
+    given(
+      educationAssessmentEventRepository.existsByPrisonNumberAndStatus(
+        prisonNumber,
+        EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+      ),
+    ).willReturn(false)
+
+    // When / Then
+    assertThat(service.hasCompletedAllAssessments(prisonNumber)).isFalse()
   }
 }
