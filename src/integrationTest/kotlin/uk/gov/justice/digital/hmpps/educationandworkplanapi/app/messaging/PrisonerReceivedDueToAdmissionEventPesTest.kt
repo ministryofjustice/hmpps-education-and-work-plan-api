@@ -149,4 +149,40 @@ class PrisonerReceivedDueToAdmissionEventPesTest : IntegrationTestBase() {
         .hasDeadlineDate(LocalDate.now().plusDays(10))
     }
   }
+
+  @Test
+  fun `should create a pending induction on admission given prisoner has no Induction Schedule and their assessments are not complete`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+
+    // The prisoner has no Induction Schedule and no Screening & Assessments completion record
+
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // A new Induction Schedule is created awaiting the prisoner's Screening & Assessments
+    await untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+    }
+  }
 }
