@@ -185,4 +185,122 @@ class PrisonerReceivedDueToAdmissionEventPesTest : IntegrationTestBase() {
         .wasStatus(InductionScheduleStatusResponse.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
     }
   }
+
+  @Test
+  fun `should set induction back to pending on admission given an automatically exempt Induction Schedule and assessments are not complete`() {
+    // Given
+    // A prisoner with an Induction Schedule that was automatically exempted (e.g. previously released), and no
+    // Screening & Assessments completion record - i.e. a re-admission / transfer scenario.
+    val prisonNumber = randomValidPrisonNumber()
+    val inductionScheduleReference = UUID.randomUUID()
+
+    createInductionSchedule(
+      reference = inductionScheduleReference,
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE,
+      deadlineDate = LocalDate.now(),
+      createdAtPrison = "BXI",
+    )
+    createInductionScheduleHistory(
+      reference = inductionScheduleReference,
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE,
+      deadlineDate = LocalDate.now(),
+      createdAtPrison = "BXI",
+    )
+
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // The Induction Schedule is set back to pending, awaiting the prisoner's Screening & Assessments
+    await untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+    }
+  }
+
+  @Test
+  fun `should schedule induction on admission given an automatically exempt Induction Schedule and assessments are complete`() {
+    // Given
+    // A prisoner with an Induction Schedule that was automatically exempted (e.g. previously released), whose
+    // Screening & Assessments have since been completed in Curious - i.e. a re-admission / transfer scenario.
+    val prisonNumber = randomValidPrisonNumber()
+    val inductionScheduleReference = UUID.randomUUID()
+
+    createInductionSchedule(
+      reference = inductionScheduleReference,
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE,
+      deadlineDate = LocalDate.now(),
+      createdAtPrison = "BXI",
+    )
+    createInductionScheduleHistory(
+      reference = inductionScheduleReference,
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatusEntity.EXEMPT_PRISONER_RELEASE,
+      deadlineDate = LocalDate.now(),
+      createdAtPrison = "BXI",
+    )
+
+    educationAssessmentEventRepository.save(
+      EducationAssessmentEventEntity(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        status = EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+        statusChangeDate = LocalDate.now().minusDays(2),
+        source = "CURIOUS",
+        detailUrl = null,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+      ),
+    )
+
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // The Induction Schedule is scheduled (today + 10 days) rather than left exempt or pending
+    await untilAsserted {
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
+        .hasDeadlineDate(LocalDate.now().plusDays(10))
+    }
+  }
 }

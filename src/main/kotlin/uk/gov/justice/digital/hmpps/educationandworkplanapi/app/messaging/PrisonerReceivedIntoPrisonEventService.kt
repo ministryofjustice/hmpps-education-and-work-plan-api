@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
@@ -49,7 +50,10 @@ class PrisonerReceivedIntoPrisonEventService(
   private val scheduleAdapter: ScheduleAdapter,
   private val educationAssessmentEventService: EducationAssessmentEventService,
   private val clock: Clock,
+  @param:Value("\${ciag-kpi-processing-rule:PEF}") private val ciagKpiProcessingRule: String,
 ) {
+  private val isPesContract: Boolean get() = ciagKpiProcessingRule == "PES"
+
   fun process(
     inboundEvent: InboundEvent,
     additionalInformation: PrisonerReceivedAdditionalInformation,
@@ -130,14 +134,25 @@ class PrisonerReceivedIntoPrisonEventService(
         }
 
         else -> {
-          // The Induction was not completed so need to reschedule it with a new deadline date
-          // and update the calculation rule to be NEW_ADMISSION.
-          inductionScheduleService.reschedulePrisonersInductionSchedule(
-            nomsNumber,
-            prisonerAdmissionDate = prisonerAdmissionDate,
-            prisonId = prisonId,
-            calculationRule = NEW_PRISON_ADMISSION,
-          )
+          if (isPesContract && e.inductionSchedule.scheduleStatus.isAutomaticExemption()) {
+            // PES re-admission/transfer of an automatically-exempt Induction: re-gate it on the prisoner's S&As.
+            // Set it back to pending, then schedule it immediately if their S&As are already complete.
+            inductionScheduleService.updateInductionSchedule(
+              inductionSchedule = e.inductionSchedule,
+              newStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+              prisonId = prisonId,
+            )
+            schedulePendingInductionScheduleIfAssessmentsComplete(nomsNumber, prisonId)
+          } else {
+            // The Induction was not completed so need to reschedule it with a new deadline date
+            // and update the calculation rule to be NEW_ADMISSION.
+            inductionScheduleService.reschedulePrisonersInductionSchedule(
+              nomsNumber,
+              prisonerAdmissionDate = prisonerAdmissionDate,
+              prisonId = prisonId,
+              calculationRule = NEW_PRISON_ADMISSION,
+            )
+          }
         }
       }
     }

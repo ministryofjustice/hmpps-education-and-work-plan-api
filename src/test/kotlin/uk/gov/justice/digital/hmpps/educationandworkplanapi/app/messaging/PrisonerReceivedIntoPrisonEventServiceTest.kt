@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -51,7 +51,6 @@ import java.time.ZoneOffset
 
 @ExtendWith(MockitoExtension::class)
 class PrisonerReceivedIntoPrisonEventServiceTest {
-  @InjectMocks
   private lateinit var eventService: PrisonerReceivedIntoPrisonEventService
 
   @Mock
@@ -85,6 +84,23 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   private lateinit var clock: Clock
 
   private val objectMapper = ObjectMapper()
+
+  @BeforeEach
+  fun setUp() {
+    eventService = PrisonerReceivedIntoPrisonEventService(
+      inductionScheduleService = inductionScheduleService,
+      reviewScheduleService = reviewScheduleService,
+      prisonerSearchApiService = prisonerSearchApiService,
+      createInitialReviewScheduleMapper = createInitialReviewScheduleMapper,
+      inductionService = inductionService,
+      reviewService = reviewService,
+      actionPlanService = actionPlanService,
+      scheduleAdapter = scheduleAdapter,
+      educationAssessmentEventService = educationAssessmentEventService,
+      clock = clock,
+      ciagKpiProcessingRule = "PEF",
+    )
+  }
 
   @Test
   fun `should process event given reason is prisoner admission and prisoner does not already have an Induction and Induction Schedule`() {
