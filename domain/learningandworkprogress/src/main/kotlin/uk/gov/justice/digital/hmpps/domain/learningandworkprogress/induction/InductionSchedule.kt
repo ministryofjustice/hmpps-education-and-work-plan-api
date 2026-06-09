@@ -73,4 +73,13 @@ enum class InductionScheduleStatus(
   ;
 
   fun isExemptionOrExclusion(): Boolean = isExemption || isExclusion
+
+  /**
+   * True for exemptions applied automatically by the system in response to a prisoner lifecycle event - i.e.
+   * EXEMPT_PRISONER_TRANSFER, EXEMPT_TEMP_ABSENCE, EXEMPT_PRISONER_RELEASE, EXEMPT_PRISONER_RELEASE_HOSPITAL,
+   * EXEMPT_PRISONER_DEATH and EXEMPT_PRISONER_MERGE - as opposed to exemptions a user applies manually.
+   * Used to decide whether, on re-admission under the PES contract, the Induction should be re-gated on the
+   * prisoner's Screening & Assessments.
+   */
+  fun isAutomaticExemption(): Boolean = isExemptionOrExclusion() && !canBeSetByUserAction
 }
