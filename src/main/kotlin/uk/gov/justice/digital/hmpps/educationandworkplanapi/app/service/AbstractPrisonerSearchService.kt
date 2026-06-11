@@ -7,6 +7,9 @@ abstract class AbstractPrisonerSearchService(
   protected val prisonerSearchApiService: PrisonerSearchApiService,
 ) {
 
+  // TODO (OOM mitigation follow-up): in-memory pagination — `this` is the full prison roster and all but
+  //  one page is discarded via drop()/take(). Should be replaced by pushing pagination to the data source
+  //  so the full list is never materialised. See PrisonerSearchService.searchPrisoners.
   protected fun <T> List<T>.paginate(
     page: Int,
     pageSize: Int,
