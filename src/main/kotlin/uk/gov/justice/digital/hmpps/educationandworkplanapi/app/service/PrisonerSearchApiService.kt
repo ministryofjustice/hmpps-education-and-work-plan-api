@@ -14,6 +14,10 @@ class PrisonerSearchApiService(
   private val pageSize: Int = 9999,
 ) {
 
+  // TODO (OOM mitigation follow-up): this pulls every prisoner in the prison into memory in a single
+  //  pageSize=9999 call and accumulates full Prisoner objects. It is the main heap consumer behind the
+  //  search-endpoint OOMs. Once prisoner-search paging is trusted (see comment below) this should fetch
+  //  only the requested page rather than the whole roster. See PrisonerSearchService.searchPrisoners.
   fun getAllPrisonersInPrison(prisonId: String): List<Prisoner> {
     var page = 0
 

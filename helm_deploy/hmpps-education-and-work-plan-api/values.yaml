@@ -23,9 +23,36 @@ generic-service:
   # Used to access resources like SQS queues and SNS topics
   serviceAccountName: hmpps-education-and-work-plan
 
+  # Container resources.
+  # Sized from the live prod JVM (jcmd on the highest pod): non-heap committed is large and steady —
+  # ~250Mi metaspace, ~150-290Mi thread stacks (~290 threads), ~240Mi reserved code cache, plus the
+  # Application Insights agent's native memory and Netty direct buffers — giving a ~700Mi non-heap
+  # baseline before any heap. With the now-effective 768m heap (see JAVA_TOOL_OPTIONS) worst-case RSS is
+  # ~768m + ~700Mi ≈ 1.45Gi, so the limit is set to 1800Mi to leave real headroom; request matches the
+  # observed ~950Mi steady-state RSS so the scheduler reserves enough and the pod isn't evicted under
+  # node memory pressure. Revisit once the proper search-endpoint fix (TODOs in PrisonerSearchService)
+  # shrinks the per-request footprint — the heap (and these numbers) can then come back down.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 1024Mi
+    limits:
+      cpu: "1"
+      memory: 1800Mi
+
   # Environment variables to load into the deployment
   env:
-    JAVA_OPTS: "-Xmx512m"
+    # IMPORTANT: the Docker ENTRYPOINT is exec-form (`["java", ...]`), which does NOT expand $JAVA_OPTS,
+    # and the bare `java` binary does not read JAVA_OPTS itself. Heap settings therefore have to go via
+    # JAVA_TOOL_OPTIONS, which the JVM reads natively at startup.
+    # Previously `JAVA_OPTS: "-Xmx512m"` was silently ignored: the JVM fell back to its container default
+    # of 25% of the memory limit (~250Mi heap on a 1000Mi limit) — roughly half the intended heap, and
+    # the direct cause of how easily the prison search endpoint exhausted heap and threw OutOfMemoryError.
+    # NOTE: no -XX:+HeapDumpOnOutOfMemoryError here on purpose — main already sets -XX:+ExitOnOutOfMemoryError
+    # (RR-2675) so the container restarts immediately on OOM, which would lose a dump written to the
+    # ephemeral fs (and a ~768Mi dump risks an ephemeral-storage eviction). Capturing dumps properly needs
+    # a pod-scoped emptyDir volume mounted for -XX:HeapDumpPath — left as a follow-up.
+    JAVA_TOOL_OPTIONS: "-Xmx768m"
     SERVER_PORT: "8080"
     SPRING_PROFILES_ACTIVE: "logstash"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
