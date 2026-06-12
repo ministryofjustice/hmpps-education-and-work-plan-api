@@ -13,7 +13,7 @@ generic-service:
     shutdown: '00 21 * * 1-5' # Stop at 9.00pm UTC Monday-Friday
 
   env:
-    JAVA_TOOL_OPTIONS: "-Xmx512m -XX:+ExitOnOutOfMemoryError"
+    JAVA_TOOL_OPTIONS: "-Xmx250m -XX:+ExitOnOutOfMemoryError"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
     HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
     PRISON_API_URL: https://prison-api-dev.prison.service.justice.gov.uk
