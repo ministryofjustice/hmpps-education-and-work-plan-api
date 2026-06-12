@@ -19,7 +19,7 @@ class PrisonerSearchService(
   //  prison roster (see getPrisonersBySearchCriteria -> getAllPrisonersInPrison, pageSize=9999), builds
   //  a full List<PersonResponse>, then sorts/filters/paginates in memory and discards all but one page.
   //  For a large prison that's a heavy per-request allocation that drives GC pressure under load — a
-  //  suspected contributor to the June 2026 OOM incident, though reproduction was inconclusive so the
+  //  suspected contributor to the June 11 2026 OOM incident RR-2691, though reproduction was inconclusive so the
   //  exact root cause remains unconfirmed. Worth fixing regardless: push filtering, sorting and
   //  pagination down to the data sources so only one page (~pageSize) is ever held in memory. Non-trivial
   //  because the result spans two sources (prisoner-search-api for the roster + the local DB for
