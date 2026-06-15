@@ -105,6 +105,32 @@ class GetSessionSummaryTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should still calculate counts when prisoner-search returns only the roster fields`() {
+    // RR-2692 guard: the summary only needs prisonNumber. Simulate prisoner-search returning ONLY the
+    // roster fields (the 5 fields proposed for dropping are absent) and assert the counts are unchanged.
+    // Expected green BEFORE the RESPONSE_FIELDS trim.
+    // Given
+    setUpData()
+    wiremockService.stubPrisonersInAPrisonSearchApiReturningOnlyRosterFields(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = getSessionSummary()
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual).isNotNull
+    assertThat(actual!!.dueReviews).isEqualTo(1)
+    assertThat(actual.dueInductions).isEqualTo(1)
+    assertThat(actual.overdueReviews).isEqualTo(1)
+    assertThat(actual.overdueInductions).isEqualTo(1)
+    assertThat(actual.exemptReviews).isEqualTo(1)
+    assertThat(actual.exemptInductions).isEqualTo(1)
+  }
+
+  @Test
   fun `should return 1 count in due induction section`() {
     // Given
     setUpData()

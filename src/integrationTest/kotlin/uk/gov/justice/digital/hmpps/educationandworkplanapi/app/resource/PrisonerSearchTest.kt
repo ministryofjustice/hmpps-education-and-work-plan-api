@@ -127,6 +127,59 @@ class PrisonerSearchTest : IntegrationTestBase() {
       }
   }
 
+  @Test
+  fun `should map all display fields when prisoner-search returns only the roster fields`() {
+    // RR-2692 guard: simulate prisoner-search returning ONLY the fields the roster path uses (the 5
+    // fields proposed for dropping are absent). Proves the endpoint still maps correctly, so trimming
+    // PrisonerSearchApiClient.RESPONSE_FIELDS is safe. Expected green BEFORE the trim.
+    // Given
+    val prisoner = aValidPrisoner(
+      prisonerNumber = "A1234BC",
+      firstName = "Alice",
+      lastName = "Anderson",
+      cellLocation = "A-1-001",
+      dateOfBirth = LocalDate.parse("1990-01-15"),
+      releaseDate = LocalDate.parse("2030-06-01"),
+      receptionDate = LocalDate.parse("2020-02-02"),
+    )
+    wiremockService.stubPrisonersInAPrisonSearchApiReturningOnlyRosterFields(PRISON_ID, listOf(prisoner))
+
+    // When
+    val response = searchPeople()
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual)
+      .hasNumberOfPersonResponses(1)
+      .personResponse(
+        1,
+        {
+          it
+            .hasPrisonNumber("A1234BC")
+            .hasForename("Alice")
+            .hasSurname("Anderson")
+            .hasCellLocation("A-1-001")
+            .hasDateOfBirth(LocalDate.parse("1990-01-15"))
+            .hasReleaseDate(LocalDate.parse("2030-06-01"))
+            .enteredPrisonOn(LocalDate.parse("2020-02-02"))
+        },
+      )
+  }
+
+  @Test
+  fun `should request the expected responseFields from prisoner-search`() {
+    // RR-2692 guard: pin the exact responseFields requested from prisoner-search. If RESPONSE_FIELDS
+    // changes (e.g. the trim), this fails and forces a conscious update of the expected list below.
+    // When
+    searchPeople()
+
+    // Then
+    wiremockService.verifyPrisonersInAPrisonSearchApiCalledWithResponseFields(
+      PRISON_ID,
+      "prisonerNumber,legalStatus,releaseDate,receptionDate,prisonId,indeterminateSentence,recall,lastName,firstName,dateOfBirth,cellLocation,nonDtoReleaseDateType",
+    )
+  }
+
   @Nested
   inner class Sorting {
     @Test
