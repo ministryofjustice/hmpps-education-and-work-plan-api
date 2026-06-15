@@ -8,7 +8,7 @@ generic-service:
   postgresDatabaseRestore:
     jobName: lwp-prod-to-preprod-restore
     enabled: true
-    timeout: 900
+    timeout: 1200
     namespace_secrets:
       rds-postgresql-instance-output:
         DB_NAME: "database_name"
