@@ -64,7 +64,7 @@ class InductionResourceMapper(
     }
   }
 
-  fun toInductionResponse(induction: Induction, employabilitySkills: List<EmployabilitySkill> = emptyList()): InductionResponse {
+  fun toInductionResponse(induction: Induction, employabilitySkills: List<EmployabilitySkill>): InductionResponse {
     with(induction) {
       return InductionResponse(
         reference = reference,

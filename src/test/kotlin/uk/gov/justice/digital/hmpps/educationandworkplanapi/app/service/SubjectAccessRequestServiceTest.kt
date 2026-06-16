@@ -11,6 +11,8 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.aValidEmployabilitySkill
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
@@ -37,7 +39,9 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Educa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidEducationResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEmployabilitySkillResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponseForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidReviewScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
@@ -55,6 +59,9 @@ class SubjectAccessRequestServiceTest {
 
   @Mock
   private lateinit var inductionService: InductionService
+
+  @Mock
+  private lateinit var employabilitySkillsService: EmployabilitySkillsService
 
   @Mock
   private lateinit var actionPlanService: ActionPlanService
@@ -102,7 +109,14 @@ class SubjectAccessRequestServiceTest {
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
     )
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
-    val expectedInductionResponse = aValidInductionResponse()
+
+    val employabilitySkills = listOf(aValidEmployabilitySkill())
+    given(employabilitySkillsService.getEmployabilitySkills(any())).willReturn(employabilitySkills)
+
+    val expectedEmployabilitySkills = listOf(aValidEmployabilitySkillResponse())
+    val expectedInductionResponse = aValidInductionResponseForPrisonerNotLookingToWork(
+      employabilitySkills = expectedEmployabilitySkills,
+    )
     given(inductionMapper.toInductionResponse(any(), any())).willReturn(expectedInductionResponse)
 
     val goal1 = aValidGoal(title = "Goal 1", createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
@@ -132,7 +146,8 @@ class SubjectAccessRequestServiceTest {
 
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
-    verify(inductionMapper).toInductionResponse(induction)
+    verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
+    verify(inductionMapper).toInductionResponse(induction, employabilitySkills)
 
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(goalMapper).fromDomainToModel(goal1, listOf(note1ForGoal1))
@@ -203,6 +218,11 @@ class SubjectAccessRequestServiceTest {
       prisonNumber = prisonNumber,
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
     )
+    given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
+
+    val employabilitySkills = listOf(aValidEmployabilitySkill())
+    given(employabilitySkillsService.getEmployabilitySkills(any())).willReturn(employabilitySkills)
+
     val completedReview = aValidCompletedReview()
     val expectedInductionResponse = aValidInductionResponse()
     val expectedEducationResponse = aValidEducationResponse(
@@ -212,7 +232,6 @@ class SubjectAccessRequestServiceTest {
     val expectedInductionScheduleResponse = aValidInductionScheduleResponse()
     val expectedReviewScheduleResponse = aValidReviewScheduleResponse()
 
-    given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
     given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
     given(inductionMapper.toInductionResponse(any(), any())).willReturn(expectedInductionResponse)
     given(educationResourceMapper.toEducationResponse(any())).willReturn(expectedEducationResponse)
@@ -251,7 +270,9 @@ class SubjectAccessRequestServiceTest {
 
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
-    verify(inductionMapper).toInductionResponse(induction)
+    verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
+
+    verify(inductionMapper).toInductionResponse(induction, employabilitySkills)
 
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(goalMapper).fromDomainToModel(goal1, emptyList())
@@ -299,6 +320,7 @@ class SubjectAccessRequestServiceTest {
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(educationService).getPreviousQualificationsForPrisoner(prisonNumber)
+    verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
     verify(inductionMapper, never()).toInductionResponse(any(), any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)
@@ -327,6 +349,8 @@ class SubjectAccessRequestServiceTest {
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(inductionMapper, never()).toInductionResponse(any(), any())
+
+    verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
 
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(goalMapper, never()).fromDomainToModel(any(), any())

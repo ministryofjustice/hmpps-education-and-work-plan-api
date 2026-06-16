@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
@@ -27,6 +28,7 @@ import java.time.ZoneOffset
 @Service
 class SubjectAccessRequestService(
   private val inductionService: InductionService,
+  private val employabilitySkillsService: EmployabilitySkillsService,
   private val actionPlanService: ActionPlanService,
   private val noteService: NoteService,
   private val inductionMapper: InductionResourceMapper,
@@ -75,10 +77,12 @@ class SubjectAccessRequestService(
 
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prn)
 
+    val employabilitySkills = employabilitySkillsService.getEmployabilitySkills(prn)
+
     if (goals.isEmpty() && induction == null) return null
     return HmppsSubjectAccessRequestContent(
       content = SubjectAccessRequestContent(
-        induction = induction?.let { inductionMapper.toInductionResponse(induction) },
+        induction = induction?.let { inductionMapper.toInductionResponse(induction, employabilitySkills) },
         goals = goals.map {
           val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
           goalMapper.fromDomainToModel(it, goalNotes)
