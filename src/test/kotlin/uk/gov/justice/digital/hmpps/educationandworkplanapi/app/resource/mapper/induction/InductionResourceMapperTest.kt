@@ -10,6 +10,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidCreatePreviousQualificationsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.dto.aValidUpdatePreviousQualificationsDto
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateFutureWorkInterestsDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInPrisonInterestsDto
@@ -33,6 +34,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ManageUs
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedCreateInductionRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aFullyPopulatedUpdateInductionRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEmployabilitySkillResponse
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -127,10 +129,12 @@ class InductionResourceMapperTest {
       induction.createdAt!!.atOffset(ZoneOffset.UTC),
       induction.lastUpdatedAt!!.atOffset(ZoneOffset.UTC),
     )
+    val employabilitySkills = listOf(aValidEmployabilitySkill())
 
     val expectedInduction = aFullyPopulatedInductionResponse(
       reference = induction.reference,
       prisonNumber = induction.prisonNumber,
+      employabilitySkills = listOf(aValidEmployabilitySkillResponse()),
       createdBy = "asmith_gen",
       createdByDisplayName = "Alex Smith",
       createdAt = induction.createdAt!!.atOffset(ZoneOffset.UTC),
@@ -146,9 +150,10 @@ class InductionResourceMapperTest {
     given(inPrisonInterestsMapper.toInPrisonInterestsResponse(any())).willReturn(expectedInduction.inPrisonInterests)
     given(skillsAndInterestsMapper.toPersonalSkillsAndInterestsResponse(any())).willReturn(expectedInduction.personalSkillsAndInterests)
     given(workInterestsMapper.toFutureWorkInterestsResponse(any())).willReturn(expectedInduction.futureWorkInterests)
+    given(employabilitySkillsResourceMapper.fromModelToResponse(any())).willReturn(expectedInduction.employabilitySkills!!.first())
 
     // When
-    val actual = mapper.toInductionResponse(induction)
+    val actual = mapper.toInductionResponse(induction, employabilitySkills)
 
     // Then
     assertThat(actual).isEqualTo(expectedInduction)

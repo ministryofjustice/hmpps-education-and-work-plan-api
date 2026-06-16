@@ -6,6 +6,9 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
@@ -53,7 +56,32 @@ class SarReportGenerationTest :
             aValidPersonalInterest(interestType = PersonalInterestType.OTHER, interestTypeOther = "Varied interests"),
           ),
         ),
-        employabilitySkills = listOf(aValidCreateEmployabilitySkillRequest()),
+        employabilitySkills = listOf(
+          aValidCreateEmployabilitySkillRequest(
+            prisonId = "BXI",
+            employabilitySkillType = EmployabilitySkillType.COMMUNICATION,
+            employabilitySkillRating = EmployabilitySkillRating.QUITE_CONFIDENT,
+            evidence = "Spoke confidently during the CIAG Induction",
+            sessionType = EmployabilitySkillSessionType.CIAG_INDUCTION,
+            sessionTypeDescription = null,
+          ),
+          aValidCreateEmployabilitySkillRequest(
+            prisonId = "MDI",
+            employabilitySkillType = EmployabilitySkillType.COMMUNICATION,
+            employabilitySkillRating = EmployabilitySkillRating.VERY_CONFIDENT,
+            evidence = "Spoke confidently and with clarity during the Metal Working Workshop",
+            sessionType = EmployabilitySkillSessionType.INDUSTRIES_REVIEW,
+            sessionTypeDescription = "Metal Working Workshop",
+          ),
+          aValidCreateEmployabilitySkillRequest(
+            prisonId = "MDI",
+            employabilitySkillType = EmployabilitySkillType.ADAPTABILITY,
+            employabilitySkillRating = EmployabilitySkillRating.NOT_CONFIDENT,
+            evidence = "Struggled to adapt to the new working environment during the Metal Working Industry Workshop",
+            sessionType = EmployabilitySkillSessionType.INDUSTRIES_REVIEW,
+            sessionTypeDescription = "Metal Working Workshop",
+          ),
+        ),
         conductedAt = LocalDate.parse("2025-06-01"),
         conductedBy = "John Smith",
         conductedByRole = "Peer mentor",
