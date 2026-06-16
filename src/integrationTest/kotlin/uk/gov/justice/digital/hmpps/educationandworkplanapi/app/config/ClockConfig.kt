@@ -5,21 +5,21 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import java.time.Clock
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 @Configuration
 class ClockConfig(
-  @param:Value("\${app.clock.fixed-date:}") private val fixedDate: String?,
+  @param:Value("\${app.clock.fixed-date-time:}") private val fixedDateTime: String?,
 ) {
 
   @Bean
   @Primary
-  fun testClock(): Clock = if (fixedDate.isNullOrBlank()) {
+  fun testClock(): Clock = if (fixedDateTime.isNullOrBlank()) {
     Clock.systemDefaultZone()
   } else {
-    val date = LocalDate.parse(fixedDate)
+    val dateTime = LocalDateTime.parse(fixedDateTime)
     val zone = ZoneId.systemDefault()
-    Clock.fixed(date.atStartOfDay(zone).toInstant(), zone)
+    Clock.fixed(dateTime.atZone(zone).toInstant(), zone)
   }
 }
