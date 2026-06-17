@@ -4,12 +4,14 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Educa
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.FutureWorkInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GetEmployabilitySkillsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InPrisonInterestsResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionCompletionMetadataResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalSkillsAndInterestsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousQualificationsResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousTrainingResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PreviousWorkExperiencesResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.WorkOnReleaseResponse
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -28,6 +30,10 @@ fun aValidInductionResponseForPrisonerNotLookingToWork(
   personalSkillsAndInterests: PersonalSkillsAndInterestsResponse? = null,
   futureWorkInterests: FutureWorkInterestsResponse? = null,
   employabilitySkills: List<GetEmployabilitySkillsResponse>? = null,
+  conductedBy: String? = "Alex Smith",
+  conductedByJobRole: String? = "CIAG",
+  completedAt: LocalDate? = LocalDate.now(),
+  notes: String? = "Induction completed and John is positive about education prospects",
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
@@ -47,6 +53,12 @@ fun aValidInductionResponseForPrisonerNotLookingToWork(
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
   employabilitySkills = employabilitySkills,
+  inductionCompletionMetadata = InductionCompletionMetadataResponse(
+    conductedBy = conductedBy,
+    conductedByRole = conductedByJobRole,
+    completedDate = completedAt,
+    notes = notes,
+  ),
   createdBy = createdBy,
   createdByDisplayName = createdByDisplayName,
   createdAt = createdAt,
@@ -68,6 +80,10 @@ fun aFullyPopulatedInductionResponse(
   personalSkillsAndInterests: PersonalSkillsAndInterestsResponse? = aValidPersonalSkillsAndInterestsResponse(),
   futureWorkInterests: FutureWorkInterestsResponse? = aValidFutureWorkInterestsResponse(),
   employabilitySkills: List<GetEmployabilitySkillsResponse> = emptyList(),
+  conductedBy: String? = "Alex Smith",
+  conductedByJobRole: String? = "CIAG",
+  completedAt: LocalDate? = LocalDate.now(),
+  notes: String? = "Induction completed and John is positive about education prospects",
   createdBy: String = "asmith_gen",
   createdByDisplayName: String = "Alex Smith",
   createdAt: OffsetDateTime = OffsetDateTime.now(),
@@ -87,6 +103,12 @@ fun aFullyPopulatedInductionResponse(
   personalSkillsAndInterests = personalSkillsAndInterests,
   futureWorkInterests = futureWorkInterests,
   employabilitySkills = employabilitySkills,
+  inductionCompletionMetadata = InductionCompletionMetadataResponse(
+    conductedBy = conductedBy,
+    conductedByRole = conductedByJobRole,
+    completedDate = completedAt,
+    notes = notes,
+  ),
   createdBy = createdBy,
   createdByDisplayName = createdByDisplayName,
   createdAt = createdAt,

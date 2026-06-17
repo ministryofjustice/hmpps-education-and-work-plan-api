@@ -1,5 +1,43 @@
 <h1 class="title">Personal Learning Plan</h1>
 
+<h2>Completed induction</h2>
+{{#induction}}
+    <table class="summary-list">
+        <tr>
+            <td class="data-column-30">Conducted by name</td>
+            <td>{{#inductionCompletionMetadata.conductedBy}}{{.}}{{/inductionCompletionMetadata.conductedBy}}{{^inductionCompletionMetadata.conductedBy}}{{ getUserLastName createdBy }}{{/inductionCompletionMetadata.conductedBy}}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Conducted by role</td>
+            <td>{{ optionalValue inductionCompletionMetadata.conductedByRole }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Induction completed date</td>
+            <td>{{ optionalValue inductionCompletionMetadata.completedDate }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Learning plan created date</td>
+            <td>{{ optionalValue (formatDate createdAt) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Learning plan created by</td>
+            <td>{{ getUserLastName createdBy }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Learning plan created at prison</td>
+            <td>{{ getPrisonName createdAtPrison }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Note content</td>
+            <td>{{ optionalValue inductionCompletionMetadata.notes }}</td>
+        </tr>
+    </table>
+{{/induction}}
+{{^induction}}
+    <p>No Data Held</p>
+{{/induction}}
+<br>
+
 <h2>Completed reviews</h2>
 {{#completedReviews}}
     <h3>Review</h3>
@@ -35,10 +73,6 @@
         <tr>
             <td class="data-column-30">Deadline date</td>
             <td>{{ optionalValue (formatDate deadlineDate) }}</td>
-        </tr>
-        <tr>
-            <td class="data-column-30">Note type</td>
-            <td>{{ optionalValue note.type }}</td>
         </tr>
         <tr>
             <td class="data-column-30">Note content</td>
