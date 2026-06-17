@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.32.0'
+  version: '1.33.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -1215,6 +1215,8 @@ components:
           description: A List of employability skills.
           items:
             $ref: '#/components/schemas/GetEmployabilitySkillsResponse'
+        inductionCompletionMetadata:
+          $ref: '#/components/schemas/InductionCompletionMetadataResponse'
         createdBy:
           type: string
           description: The DPS username of the person who created the Induction.
@@ -1253,6 +1255,7 @@ components:
         - reference
         - prisonNumber
         - workOnRelease
+        - inductionCompletionMetadata
         - createdBy
         - createdByDisplayName
         - createdAt
@@ -1261,6 +1264,29 @@ components:
         - updatedByDisplayName
         - updatedAt
         - updatedAtPrison
+
+    InductionCompletionMetadataResponse:
+      title: InductionCompletionMetadataResponse
+      type: object
+      description: Metadata about the completion of the Induction.
+      properties:
+        conductedBy:
+          type: string
+          description: The name of the person who conducted the Induction.
+          example: 'Alex Smith'
+        conductedByRole:
+          type: string
+          description: The job role of the person who conducted the Induction.
+          example: 'CIAG'
+        completedDate:
+          type: string
+          format: date
+          description: An ISO-8601 date representing the date that the Induction was completed on.
+          example: '2023-12-19'
+        notes:
+          type: string
+          description: The notes recorded as part of the Induction.
+          example: 'The induction was conducted successfully and the prisoner is interested in pursuing further education.'
 
     WorkOnReleaseResponse:
       title: WorkOnReleaseResponse
