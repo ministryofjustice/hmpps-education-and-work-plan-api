@@ -24,7 +24,7 @@ class PrisonApiClient(
   fun getPrisonMovementEvents(prisonNumber: String): PrisonMovementEvents {
     val prisonerInPrisonSummary = prisonApiWebClient
       .get()
-      .uri("/api/offenders/$prisonNumber/prison-timeline")
+      .uri("/api/offenders/{prisonNumber}/prison-timeline", prisonNumber)
       .retrieve()
       .bodyToMono(PrisonerInPrisonSummary::class.java)
       .onErrorResume {

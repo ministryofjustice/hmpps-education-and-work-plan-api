@@ -50,11 +50,11 @@ class PrisonerSearchApiClient(
   ): PagedPrisonerResponse = prisonerSearchApiWebClient
     .get()
     .uri {
-      it.path("/prisoner-search/prison/$prisonId")
+      it.path("/prisoner-search/prison/{prisonId}")
         .queryParam("page", page)
         .queryParam("size", pageSize)
         .queryParam("responseFields", RESPONSE_FIELDS)
-        .build()
+        .build(prisonId)
     }
     .headers {
       it.contentType = MediaType.APPLICATION_JSON
