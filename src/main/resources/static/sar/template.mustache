@@ -1,4 +1,55 @@
 <h1 class="title">Personal Learning Plan</h1>
+
+<h2>Completed reviews</h2>
+{{#completedReviews}}
+    <h3>Review</h3>
+    <table class="summary-list">
+        <tr>
+            <td class="data-column-30">Conducted by name</td>
+            <td>{{#conductedBy}}{{.}}{{/conductedBy}}{{^conductedBy}}{{ getUserLastName createdBy }}{{/conductedBy}}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Conducted by role</td>
+            <td>{{ optionalValue conductedByRole }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Completed date</td>
+            <td>{{ optionalValue (formatDate completedDate) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Review entered by</td>
+            <td>{{ getUserLastName createdBy }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Review entered on</td>
+            <td>{{ optionalValue (formatDate createdAt) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Learning plan reviewed at prison</td>
+            <td>{{ getPrisonName createdAtPrison }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Is last review before release</td>
+            <td>{{ convertBoolean preRelease }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Deadline date</td>
+            <td>{{ optionalValue (formatDate deadlineDate) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Note type</td>
+            <td>{{ optionalValue note.type }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Note content</td>
+            <td>{{ optionalValue note.content }}</td>
+        </tr>
+    </table>
+{{/completedReviews}}
+{{^completedReviews}}
+    <p>No Data Held</p>
+{{/completedReviews}}
+
 {{#induction}}
     <br>
     <h2>Induction</h2>
@@ -47,8 +98,9 @@
         <tr><td>Future work interests</td><td>{{#futureWorkInterests.interests}}{{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#if role}} - {{ role }}{{/if}}{{#unless @last}}<br>{{/unless}}{{/futureWorkInterests.interests}}{{^futureWorkInterests.interests}}No Data Held{{/futureWorkInterests.interests}}</td></tr>
     </table>
 
-    <h3>Employability skills</h3>
+    <h2>Employability skills</h2>
     {{#employabilitySkills}}
+        <h3>Employability skill</h3>
         <table class="summary-list">
             <tr><td>Skill name</td><td>{{ employabilitySkillType }}</td></tr>
             <tr><td>Skill rating</td><td>{{ employabilitySkillRating }}</td></tr>
@@ -148,37 +200,3 @@
 {{/education}}
 <br/>
 
-<h2>Completed reviews</h2>
-{{#completedReviews}}
-    <h3>Review</h3>
-    <table class="data-table">
-        <tr>
-            <td class="data-column-30">Conducted by</td>
-            <td class="data-column-30">Conducted by role</td>
-            <td class="data-column-30">Is last review before release</td>
-        </tr>
-        <tr>
-            <td>{{#conductedBy}}{{.}}{{/conductedBy}}{{^conductedBy}}{{ getUserLastName createdBy }}{{/conductedBy}}</td>
-            <td>{{ optionalValue conductedByRole }}</td>
-            <td>{{ convertBoolean preRelease }}</td>
-        </tr>
-    </table>
-    <table class="data-table">
-        <tr>
-            <td class="data-column-30">Deadline date</td>
-            <td class="data-column-30">Completed date</td>
-            <td class="data-column-30">Note type</td>
-        </tr>
-        <tr>
-            <td>{{ optionalValue (formatDate deadlineDate) }}</td>
-            <td>{{ optionalValue (formatDate completedDate) }}</td>
-            <td>{{ optionalValue note.type }}</td>
-        </tr>
-    </table>
-    <table class="summary-list">
-        <tr><td>Note content</td><td>{{ optionalValue note.content }}</td></tr>
-    </table>
-{{/completedReviews}}
-{{^completedReviews}}
-    <p>No Data Held</p>
-{{/completedReviews}}
