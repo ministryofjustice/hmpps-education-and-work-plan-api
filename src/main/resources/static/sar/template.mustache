@@ -178,7 +178,27 @@
             <td class="data-column-100">Notes</td>
         </tr>
         <tr>
-            <td>{{ optionalValue notes }}</td>
+            <td>{{ optionalValue goalNote }}</td>
+        </tr>
+    </table>
+    <table class="summary-list">
+        <tr><td>Reason for archiving</td><td>{{ optionalValue archiveReason }}</td></tr>
+        <tr><td>Archive reason Other</td><td>{{ optionalValue archiveReasonOther }}</td></tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-100">Archived goal note</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue goalArchiveNote }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-100">Goal completion note</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue goalCompletionNote }}</td>
         </tr>
     </table>
 
@@ -197,6 +217,31 @@
         {{/steps}}
     </table>
 
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Created by</td>
+            <td class="data-column-35">Created at</td>
+            <td class="data-column-30">Created at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName createdBy }}</td>
+            <td>{{ optionalValue (formatDate createdAt) }}</td>
+            <td>{{ getPrisonName createdAtPrison }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Updated by</td>
+            <td class="data-column-35">Updated at</td>
+            <td class="data-column-30">Updated at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName updatedBy }}</td>
+            <td>{{ optionalValue (formatDate updatedAt) }}</td>
+            <td>{{ getPrisonName updatedAtPrison }}</td>
+        </tr>
+    </table>
+    <br>
 {{/goals}}
 {{^goals}}
     <p>No Data Held</p>

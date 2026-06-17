@@ -1,0 +1,18 @@
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan
+
+import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal as ReasonToArchiveGoalDomain
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal as ReasonToArchiveGoalApi
+
+fun toReasonToArchiveGoal(reason: ReasonToArchiveGoalApi): ReasonToArchiveGoalDomain = when (reason) {
+  ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
+  ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
+  ReasonToArchiveGoalApi.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoalDomain.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
+  ReasonToArchiveGoalApi.OTHER -> ReasonToArchiveGoalDomain.OTHER
+}
+
+fun toReasonToArchiveGoal(reason: ReasonToArchiveGoalDomain): ReasonToArchiveGoalApi = when (reason) {
+  ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
+  ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
+  ReasonToArchiveGoalDomain.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoalApi.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
+  ReasonToArchiveGoalDomain.OTHER -> ReasonToArchiveGoalApi.OTHER
+}

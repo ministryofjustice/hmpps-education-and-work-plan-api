@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.Goal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.GetGoalsDto
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.GoalService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.toGoalStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.GoalReferenceMatchesReferenceInUpdateGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.validator.PRISON_NUMBER_FORMAT
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.ScheduleAdapter
@@ -185,5 +186,5 @@ class GoalController(
   }
 
   // convert from the generated enum to the one we use in persistence
-  private fun convertStatuses(statuses: Set<GoalStatus>?) = statuses?.map { status -> goalResourceMapper.toGoalStatus(status) }?.toSet()
+  private fun convertStatuses(statuses: Set<GoalStatus>?) = statuses?.map { status -> toGoalStatus(status) }?.toSet()
 }

@@ -29,23 +29,22 @@ import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidGoal
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education.EducationResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionHistoryScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ReviewScheduleHistoryResponseMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.sar.SarGoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EducationLevel
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidGoalResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.education.aValidEducationResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidEmployabilitySkillResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionResponseForPrisonerNotLookingToWork
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidInductionScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidReviewScheduleResponse
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.note.aValidNoteResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCompletedActionPlanReviewResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.sar.aValidSarGoalResponse
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -73,7 +72,7 @@ class SubjectAccessRequestServiceTest {
   private lateinit var inductionMapper: InductionResourceMapper
 
   @Mock
-  private lateinit var goalMapper: GoalResourceMapper
+  private lateinit var sarGoalMapper: SarGoalResourceMapper
 
   @Mock
   private lateinit var educationService: EducationService
@@ -130,15 +129,15 @@ class SubjectAccessRequestServiceTest {
     given(noteService.getNotes(goal1.reference, EntityType.GOAL)).willReturn(listOf(note1ForGoal1))
     given(noteService.getNotes(goal2.reference, EntityType.GOAL)).willReturn(listOf(note1ForGoal2, note2ForGoal2))
 
-    val expectedGoalResponse1 = aValidGoalResponse(
+    val expectedGoalResponse1 = aValidSarGoalResponse(
       title = "Goal 1",
-      goalNotes = listOf(aValidNoteResponse(content = "Note 1 for Goal 1")),
+      goalNote = "Note 1 for Goal 1",
     )
-    val expectedGoalResponse2 = aValidGoalResponse(
+    val expectedGoalResponse2 = aValidSarGoalResponse(
       title = "Goal 2",
-      goalNotes = listOf(aValidNoteResponse(content = "Note 1 for Goal 2"), aValidNoteResponse(content = "Note 2 for Goal 2")),
+      goalNote = "Note 2 for Goal 2",
     )
-    given(goalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse1, expectedGoalResponse2)
+    given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse1, expectedGoalResponse2)
 
     // When
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
@@ -150,15 +149,15 @@ class SubjectAccessRequestServiceTest {
     verify(inductionMapper).toInductionResponse(induction, employabilitySkills)
 
     verify(actionPlanService).getActionPlan(prisonNumber)
-    verify(goalMapper).fromDomainToModel(goal1, listOf(note1ForGoal1))
-    verify(goalMapper).fromDomainToModel(goal2, listOf(note1ForGoal2, note2ForGoal2))
+    verify(sarGoalMapper).fromDomainToModel(goal1, listOf(note1ForGoal1))
+    verify(sarGoalMapper).fromDomainToModel(goal2, listOf(note1ForGoal2, note2ForGoal2))
 
     verify(noteService).getNotes(goal1.reference, EntityType.GOAL)
     verify(noteService).getNotes(goal2.reference, EntityType.GOAL)
 
     with(sarContent) {
       assertThat(this.induction).isEqualTo(expectedInductionResponse)
-      assertThat(goals).isEqualTo(setOf(expectedGoalResponse1, expectedGoalResponse2))
+      assertThat(goals).isEqualTo(listOf(expectedGoalResponse1, expectedGoalResponse2))
     }
   }
 
@@ -181,11 +180,11 @@ class SubjectAccessRequestServiceTest {
     val note1ForGoal2 = aValidNoteDto(content = "Note 1 for Goal 2", entityReference = goal2.reference, entityType = EntityType.GOAL)
     given(noteService.getNotes(goal2.reference, EntityType.GOAL)).willReturn(listOf(note1ForGoal2))
 
-    val expectedGoalResponse2 = aValidGoalResponse(
+    val expectedGoalResponse2 = aValidSarGoalResponse(
       title = "Goal 2",
-      goalNotes = listOf(aValidNoteResponse(content = "Note 1 for Goal 2")),
+      goalNote = "Note 1 for Goal 2",
     )
-    given(goalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse2)
+    given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse2)
 
     // When
     val fromDate = LocalDate.parse("2024-01-15")
@@ -197,7 +196,7 @@ class SubjectAccessRequestServiceTest {
     verify(inductionMapper, never()).toInductionResponse(any(), any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)
-    verify(goalMapper).fromDomainToModel(goal2, listOf(note1ForGoal2))
+    verify(sarGoalMapper).fromDomainToModel(goal2, listOf(note1ForGoal2))
 
     verify(noteService).getNotes(goal2.reference, EntityType.GOAL)
 
@@ -205,7 +204,7 @@ class SubjectAccessRequestServiceTest {
 
     with(sarContent) {
       assertThat(this.induction).isNull()
-      assertThat(goals).isEqualTo(setOf(expectedGoalResponse2))
+      assertThat(goals).isEqualTo(listOf(expectedGoalResponse2))
     }
   }
 
@@ -246,8 +245,8 @@ class SubjectAccessRequestServiceTest {
 
     given(noteService.getNotes(any(), any())).willReturn(emptyList())
 
-    val expectedGoalResponse1 = aValidGoalResponse(goalNotes = emptyList())
-    given(goalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse1)
+    val expectedGoalResponse1 = aValidSarGoalResponse(goalNote = null)
+    given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse1)
 
     val inductionScheduleHistory = aValidInductionScheduleHistory()
     given(inductionScheduleService.getInductionScheduleHistoryForPrisoner(prisonNumber)).willReturn(
@@ -275,13 +274,13 @@ class SubjectAccessRequestServiceTest {
     verify(inductionMapper).toInductionResponse(induction, employabilitySkills)
 
     verify(actionPlanService).getActionPlan(prisonNumber)
-    verify(goalMapper).fromDomainToModel(goal1, emptyList())
+    verify(sarGoalMapper).fromDomainToModel(goal1, emptyList())
 
     verify(noteService).getNotes(goal1.reference, EntityType.GOAL)
 
     with(sarContent) {
       assertThat(this.induction).isEqualTo(expectedInductionResponse)
-      assertThat(goals).isEqualTo(setOf(expectedGoalResponse1))
+      assertThat(goals).isEqualTo(listOf(expectedGoalResponse1))
       assertThat(education).isEqualTo(expectedEducationResponse)
       assertThat(this.inductionScheduleHistory?.size).isEqualTo(1)
       assertThat(this.reviewScheduleHistory?.size).isEqualTo(1)
@@ -308,8 +307,8 @@ class SubjectAccessRequestServiceTest {
 
     given(noteService.getNotes(any(), any())).willReturn(emptyList())
 
-    val expectedGoalResponse2 = aValidGoalResponse(title = "Goal 2", goalNotes = emptyList())
-    given(goalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse2)
+    val expectedGoalResponse2 = aValidSarGoalResponse(title = "Goal 2", goalNote = null)
+    given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse2)
 
     // When
     val fromDate = LocalDate.parse("2024-02-01")
@@ -324,13 +323,13 @@ class SubjectAccessRequestServiceTest {
     verify(inductionMapper, never()).toInductionResponse(any(), any())
 
     verify(actionPlanService).getActionPlan(prisonNumber)
-    verify(goalMapper).fromDomainToModel(goal2, emptyList())
+    verify(sarGoalMapper).fromDomainToModel(goal2, emptyList())
 
     verify(noteService).getNotes(goal2.reference, EntityType.GOAL)
 
     with(sarContent) {
       assertThat(this.induction).isNull()
-      assertThat(goals).isEqualTo(setOf(expectedGoalResponse2))
+      assertThat(goals).isEqualTo(listOf(expectedGoalResponse2))
     }
   }
 
@@ -353,7 +352,7 @@ class SubjectAccessRequestServiceTest {
     verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
 
     verify(actionPlanService).getActionPlan(prisonNumber)
-    verify(goalMapper, never()).fromDomainToModel(any(), any())
+    verify(sarGoalMapper, never()).fromDomainToModel(any(), any())
 
     verify(noteService, never()).getNotes(any(), any())
 
