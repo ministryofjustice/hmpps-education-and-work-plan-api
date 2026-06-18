@@ -83,86 +83,264 @@
 {{^completedReviews}}
     <p>No Data Held</p>
 {{/completedReviews}}
+<br>
 
+<h2>Work and training</h2>
 {{#induction}}
-    <br>
-    <h2>Induction</h2>
-    <table class="summary-list">
-        <tr><td>Hoping to Work</td><td>{{ optionalValue workOnRelease.hopingToWork }}</td></tr>
-        <tr><td>Factors affecting ability to work</td><td>{{#workOnRelease.affectAbilityToWork}}{{ . }}{{#unless @last}}<br>{{/unless}}{{/workOnRelease.affectAbilityToWork}}</td></tr>
-        <tr><td>Other Factors</td><td>{{ optionalValue workOnRelease.affectAbilityToWorkOther}}</td></tr>
-        <tr><td>Previous training</td><td>{{#previousTraining.trainingTypes}}{{ . }}{{#unless @last}}<br>{{/unless}}{{/previousTraining.trainingTypes}}</td></tr>
-        <tr><td>Other Training</td><td>{{ optionalValue previousTraining.trainingTypeOther }}</td></tr>
-        <tr><td>Has worked before</td><td>{{ optionalValue previousWorkExperiences.hasWorkedBefore }}</td></tr>
-        <tr><td>Has worked before Not Relevant reason</td><td>{{ optionalValue previousWorkExperiences.hasWorkedBeforeNotRelevantReason }}</td></tr>
-    </table>
-
-    <h3>Previous work experiences</h3>
-    <table class="data-table">
-        <tr>
-            <td class="data-column-20">Type</td>
-            <td class="data-column-15">Type Other</td>
-            <td class="data-column-25">Role</td>
-            <td class="data-column-40">Details</td>
-        </tr>
-        {{#previousWorkExperiences.experiences}}
-            <tr>
-                <td>{{ optionalValue experienceType }}</td>
-                <td>{{ optionalValue experienceTypeOther }}</td>
-                <td>{{ optionalValue role }}</td>
-                <td>{{ optionalValue details }}</td>
-            </tr>
-        {{/previousWorkExperiences.experiences}}
-        {{^previousWorkExperiences.experiences}}
-            <tr>
-                <td>No Data Held</td>
-                <td>No Data Held</td>
-                <td>No Data Held</td>
-                <td>No Data Held</td>
-            </tr>
-        {{/previousWorkExperiences.experiences}}
-    </table>
-
-    <h3>Interests and skills</h3>
-    <table class="summary-list">
-        <tr><td>In prison work interests</td><td>{{#inPrisonInterests.inPrisonWorkInterests}}{{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/inPrisonInterests.inPrisonWorkInterests}}{{^inPrisonInterests.inPrisonWorkInterests}}No Data Held{{/inPrisonInterests.inPrisonWorkInterests}}</td></tr>
-        <tr><td>In prison training interests</td><td>{{#inPrisonInterests.inPrisonTrainingInterests}}{{ trainingType }}{{#if trainingTypeOther}} ({{ trainingTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/inPrisonInterests.inPrisonTrainingInterests}}{{^inPrisonInterests.inPrisonTrainingInterests}}No Data Held{{/inPrisonInterests.inPrisonTrainingInterests}}</td></tr>
-        <tr><td>Skills</td><td>{{#personalSkillsAndInterests.skills}}{{ skillType }}{{#if skillTypeOther}} ({{ skillTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/personalSkillsAndInterests.skills}}{{^personalSkillsAndInterests.skills}}No Data Held{{/personalSkillsAndInterests.skills}}</td></tr>
-        <tr><td>Interests</td><td>{{#personalSkillsAndInterests.interests}}{{ interestType }}{{#if interestTypeOther}} ({{ interestTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}{{/personalSkillsAndInterests.interests}}{{^personalSkillsAndInterests.interests}}No Data Held{{/personalSkillsAndInterests.interests}}</td></tr>
-        <tr><td>Future work interests</td><td>{{#futureWorkInterests.interests}}{{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#if role}} - {{ role }}{{/if}}{{#unless @last}}<br>{{/unless}}{{/futureWorkInterests.interests}}{{^futureWorkInterests.interests}}No Data Held{{/futureWorkInterests.interests}}</td></tr>
-    </table>
-
-    <h2>Employability skills</h2>
-    {{#employabilitySkills}}
-        <h3>Employability skill</h3>
+    {{#workOnRelease}}
         <table class="summary-list">
-            <tr><td>Skill name</td><td>{{ employabilitySkillType }}</td></tr>
-            <tr><td>Skill rating</td><td>{{ employabilitySkillRating }}</td></tr>
-            <tr><td>Skill activity or session</td><td>{{ optionalValue sessionType }}</td></tr>
-            <tr><td>Skill activity or session description</td><td>{{ optionalValue sessionTypeDescription }}</td></tr>
-            <tr><td>Skill rating evidence</td><td>{{ evidence }}</td></tr>
+            <tr>
+                <td class="data-column-30">Hoping to work</td>
+                <td>{{ optionalValue hopingToWork }}</td>
+            </tr>
+            <tr>
+                <td class="data-column-30">Factors affecting ability to work</td>
+                <td>{{#affectAbilityToWork}}{{ . }}{{#unless @last}}<br>{{/unless}}{{/affectAbilityToWork}}</td>
+            </tr>
+            <tr>
+                <td class="data-column-30">Other Factors</td>
+                <td>{{ optionalValue affectAbilityToWorkOther}}</td>
+            </tr>
         </table>
         <table class="data-table">
             <tr>
-                <td class="data-column-30">Created by</td>
-                <td class="data-column-35">Created at</td>
-                <td class="data-column-30">Created at prison</td>
+                <td class="data-column-30">Updated by</td>
+                <td class="data-column-35">Updated at</td>
+                <td class="data-column-30">Updated at prison</td>
             </tr>
             <tr>
-                <td>{{ getUserLastName createdBy }}</td>
-                <td>{{ optionalValue (formatDate createdAt) }}</td>
-                <td>{{ getPrisonName createdAtPrison }}</td>
+                <td>{{ getUserLastName updatedBy }}</td>
+                <td>{{ optionalValue (formatDate updatedAt) }}</td>
+                <td>{{ getPrisonName updatedAtPrison }}</td>
             </tr>
         </table>
-    {{/employabilitySkills}}
-    {{^employabilitySkills}}
-        <p>No Data Held</p>
-    {{/employabilitySkills}}
-
+    {{/workOnRelease}}
+    <br>
+    {{#previousTraining}}
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">Previous training</td>
+                <td>{{#trainingTypes}}{{ . }}{{#unless @last}}<br>{{/unless}}{{/trainingTypes}}</td>
+            </tr>
+            <tr>
+                <td class="data-column-30">Other Training</td>
+                <td>{{ optionalValue trainingTypeOther }}</td>
+            </tr>
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-30">Updated by</td>
+                <td class="data-column-35">Updated at</td>
+                <td class="data-column-30">Updated at prison</td>
+            </tr>
+            <tr>
+                <td>{{ getUserLastName updatedBy }}</td>
+                <td>{{ optionalValue (formatDate updatedAt) }}</td>
+                <td>{{ getPrisonName updatedAtPrison }}</td>
+            </tr>
+        </table>
+    {{/previousTraining}}
 {{/induction}}
 {{^induction}}
     <p>No Data Held</p>
 {{/induction}}
+<br>
+
+<h2>Previous work experience</h2>
+{{#induction}}
+    {{#previousWorkExperiences}}
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">Has worked before</td>
+                <td>{{ optionalValue hasWorkedBefore }}</td>
+            </tr>
+            <tr>
+                <td class="data-column-30">Has worked before Not Relevant reason</td>
+                <td>{{ optionalValue hasWorkedBeforeNotRelevantReason }}</td>
+            </tr>
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-20">Type</td>
+                <td class="data-column-15">Type Other</td>
+                <td class="data-column-25">Role</td>
+                <td class="data-column-40">Details</td>
+            </tr>
+            {{#experiences}}
+                <tr>
+                    <td>{{ optionalValue experienceType }}</td>
+                    <td>{{ optionalValue experienceTypeOther }}</td>
+                    <td>{{ optionalValue role }}</td>
+                    <td>{{ optionalValue details }}</td>
+                </tr>
+            {{/experiences}}
+            {{^experiences}}
+                <tr>
+                    <td>No Data Held</td>
+                    <td>No Data Held</td>
+                    <td>No Data Held</td>
+                    <td>No Data Held</td>
+                </tr>
+            {{/experiences}}
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-30">Updated by</td>
+                <td class="data-column-35">Updated at</td>
+                <td class="data-column-30">Updated at prison</td>
+            </tr>
+            <tr>
+                <td>{{ getUserLastName updatedBy }}</td>
+                <td>{{ optionalValue (formatDate updatedAt) }}</td>
+                <td>{{ getPrisonName updatedAtPrison }}</td>
+            </tr>
+        </table>
+    {{/previousWorkExperiences}}
+{{/induction}}
+{{^induction}}
+    <p>No Data Held</p>
+{{/induction}}
+<br>
+
+<h2>Interests and skills</h2>
+{{#induction}}
+    {{#inPrisonInterests}}
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">In prison work interests</td>
+                <td>
+                    {{#inPrisonWorkInterests}}
+                        {{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}
+                    {{/inPrisonWorkInterests}}
+                    {{^inPrisonWorkInterests}}
+                        No Data Held
+                    {{/inPrisonWorkInterests}}
+                </td>
+            </tr>
+            <tr>
+                <td class="data-column-30">In prison training interests</td>
+                <td>
+                    {{#inPrisonTrainingInterests}}
+                        {{ trainingType }}{{#if trainingTypeOther}} ({{ trainingTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}
+                    {{/inPrisonTrainingInterests}}
+                    {{^inPrisonTrainingInterests}}
+                        No Data Held
+                    {{/inPrisonTrainingInterests}}
+                </td>
+            </tr>
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-30">Updated by</td>
+                <td class="data-column-35">Updated at</td>
+                <td class="data-column-30">Updated at prison</td>
+            </tr>
+            <tr>
+                <td>{{ getUserLastName updatedBy }}</td>
+                <td>{{ optionalValue (formatDate updatedAt) }}</td>
+                <td>{{ getPrisonName updatedAtPrison }}</td>
+            </tr>
+        </table>
+    {{/inPrisonInterests}}
+    <br>
+    {{#personalSkillsAndInterests}}
+        <table class="summary-list">
+            <tr>
+                <td>Skills</td>
+                <td>
+                    {{#skills}}
+                        {{ skillType }}{{#if skillTypeOther}} ({{ skillTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}
+                    {{/skills}}
+                    {{^skills}}
+                        No Data Held
+                    {{/skills}}
+                </td>
+            </tr>
+            <tr>
+                <td>Interests</td>
+                <td>
+                    {{#interests}}
+                        {{ interestType }}{{#if interestTypeOther}} ({{ interestTypeOther }}){{/if}}{{#unless @last}}<br>{{/unless}}
+                    {{/interests}}
+                    {{^interests}}
+                        No Data Held
+                    {{/interests}}
+                </td>
+            </tr>
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-30">Updated by</td>
+                <td class="data-column-35">Updated at</td>
+                <td class="data-column-30">Updated at prison</td>
+            </tr>
+            <tr>
+                <td>{{ getUserLastName updatedBy }}</td>
+                <td>{{ optionalValue (formatDate updatedAt) }}</td>
+                <td>{{ getPrisonName updatedAtPrison }}</td>
+            </tr>
+        </table>
+    {{/personalSkillsAndInterests}}
+    <br>
+    {{#futureWorkInterests}}
+        <table class="summary-list">
+            <tr>
+                <td>Future work interests</td>
+                <td>
+                    {{#interests}}
+                        {{ workType }}{{#if workTypeOther}} ({{ workTypeOther }}){{/if}}{{#if role}} - {{ role }}{{/if}}{{#unless @last}}<br>{{/unless}}
+                    {{/interests}}
+                    {{^interests}}
+                        No Data Held
+                    {{/interests}}
+                </td>
+            </tr>
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-30">Updated by</td>
+                <td class="data-column-35">Updated at</td>
+                <td class="data-column-30">Updated at prison</td>
+            </tr>
+            <tr>
+                <td>{{ getUserLastName updatedBy }}</td>
+                <td>{{ optionalValue (formatDate updatedAt) }}</td>
+                <td>{{ getPrisonName updatedAtPrison }}</td>
+            </tr>
+        </table>
+    {{/futureWorkInterests}}
+{{/induction}}
+{{^induction}}
+    <p>No Data Held</p>
+{{/induction}}
+<br>
+
+<h2>Employability skills</h2>
+{{#induction.employabilitySkills}}
+    <h3>Employability skill</h3>
+    <table class="summary-list">
+        <tr><td>Skill name</td><td>{{ employabilitySkillType }}</td></tr>
+        <tr><td>Skill rating</td><td>{{ employabilitySkillRating }}</td></tr>
+        <tr><td>Skill activity or session</td><td>{{ optionalValue sessionType }}</td></tr>
+        <tr><td>Skill activity or session description</td><td>{{ optionalValue sessionTypeDescription }}</td></tr>
+        <tr><td>Skill rating evidence</td><td>{{ evidence }}</td></tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Created by</td>
+            <td class="data-column-35">Created at</td>
+            <td class="data-column-30">Created at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName createdBy }}</td>
+            <td>{{ optionalValue (formatDate createdAt) }}</td>
+            <td>{{ getPrisonName createdAtPrison }}</td>
+        </tr>
+    </table>
+{{/induction.employabilitySkills}}
+{{^induction.employabilitySkills}}
+    <p>No Data Held</p>
+{{/induction.employabilitySkills}}
 <br>
 
 <h2>Goals</h2>
