@@ -55,7 +55,7 @@ class SarReportGenerationTest :
         personalSkillsAndInterests = aValidCreatePersonalSkillsAndInterestsRequest(
           skills = null,
           interests = listOf(
-            aValidPersonalInterest(interestType = PersonalInterestType.COMMUNITY),
+            aValidPersonalInterest(interestType = PersonalInterestType.COMMUNITY, interestTypeOther = null),
             aValidPersonalInterest(interestType = PersonalInterestType.OTHER, interestTypeOther = "Varied interests"),
           ),
         ),
