@@ -6,10 +6,13 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ArchiveGoalRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.CompleteGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillRating
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillSessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
@@ -95,9 +98,38 @@ class SarReportGenerationTest :
             title = "Goal 1",
             targetCompletionDate = LocalDate.parse("2050-12-31"), // Target completion date MUST be in the future so set a very long date to prevent fragile test failure
           ),
+          aValidCreateGoalRequest(
+            title = "Goal 2",
+            targetCompletionDate = LocalDate.parse("2050-12-31"),
+          ),
+          aValidCreateGoalRequest(
+            title = "Goal 3",
+            targetCompletionDate = LocalDate.parse("2050-12-31"),
+          ),
         ),
       ),
     )
+
+    val goals = getActionPlan(prisonNumber).goals
+    completeGoal(
+      prisonNumber,
+      CompleteGoalRequest(
+        goalReference = goals.find { it.title == "Goal 2" }!!.goalReference,
+        prisonId = "MDI",
+        note = "Goal completed on time",
+      ),
+    )
+    archiveGoal(
+      prisonNumber,
+      ArchiveGoalRequest(
+        goalReference = goals.find { it.title == "Goal 3" }!!.goalReference,
+        prisonId = "MDI",
+        reason = ReasonToArchiveGoal.OTHER,
+        reasonOther = "Staff can no longer support him to achieve this goal",
+        note = "Goal archived as no longer appropriate",
+      ),
+    )
+
     // The next review date will have been calculated based on "today"; therefore it changes every day and the expected HTML output will not match
     // manually set the next (first) review date to a fixed date to prevent fragile test failure
     updateReviewScheduleReviewDates(

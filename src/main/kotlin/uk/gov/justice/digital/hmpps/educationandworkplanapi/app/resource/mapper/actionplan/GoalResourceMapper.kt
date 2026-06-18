@@ -18,9 +18,6 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalR
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UnarchiveGoalRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.UpdateGoalRequest
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus as GoalStatusDomain
-import uk.gov.justice.digital.hmpps.domain.personallearningplan.dto.ReasonToArchiveGoal as ReasonToArchiveGoalDomain
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.GoalStatus as GoalStatusApi
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal as ReasonToArchiveGoalApi
 
 @Component
 class GoalResourceMapper(
@@ -85,30 +82,4 @@ class GoalResourceMapper(
   fun fromModelToDto(unarchiveGoalRequest: UnarchiveGoalRequest): UnarchiveGoalDto = UnarchiveGoalDto(reference = unarchiveGoalRequest.goalReference, prisonId = unarchiveGoalRequest.prisonId)
 
   fun fromModelToDto(completeGoalRequest: CompleteGoalRequest): CompleteGoalDto = CompleteGoalDto(reference = completeGoalRequest.goalReference, prisonId = completeGoalRequest.prisonId)
-
-  fun toGoalStatus(status: GoalStatusApi): GoalStatusDomain = when (status) {
-    GoalStatusApi.ACTIVE -> GoalStatusDomain.ACTIVE
-    GoalStatusApi.COMPLETED -> GoalStatusDomain.COMPLETED
-    GoalStatusApi.ARCHIVED -> GoalStatusDomain.ARCHIVED
-  }
-
-  private fun toGoalStatus(status: GoalStatusDomain): GoalStatusApi = when (status) {
-    GoalStatusDomain.ACTIVE -> GoalStatusApi.ACTIVE
-    GoalStatusDomain.COMPLETED -> GoalStatusApi.COMPLETED
-    GoalStatusDomain.ARCHIVED -> GoalStatusApi.ARCHIVED
-  }
-
-  private fun toReasonToArchiveGoal(reason: ReasonToArchiveGoalApi): ReasonToArchiveGoalDomain = when (reason) {
-    ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
-    ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
-    ReasonToArchiveGoalApi.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoalDomain.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
-    ReasonToArchiveGoalApi.OTHER -> ReasonToArchiveGoalDomain.OTHER
-  }
-
-  private fun toReasonToArchiveGoal(reason: ReasonToArchiveGoalDomain): ReasonToArchiveGoalApi = when (reason) {
-    ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL -> ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_TOWARDS_GOAL
-    ReasonToArchiveGoalDomain.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG -> ReasonToArchiveGoalApi.PRISONER_NO_LONGER_WANTS_TO_WORK_WITH_CIAG
-    ReasonToArchiveGoalDomain.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON -> ReasonToArchiveGoalApi.SUITABLE_ACTIVITIES_NOT_AVAILABLE_IN_THIS_PRISON
-    ReasonToArchiveGoalDomain.OTHER -> ReasonToArchiveGoalApi.OTHER
-  }
 }

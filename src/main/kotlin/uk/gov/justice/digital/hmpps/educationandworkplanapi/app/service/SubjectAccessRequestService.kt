@@ -13,12 +13,12 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.servic
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.ActionPlanNotFoundException
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.actionplan.GoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.education.EducationResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionHistoryScheduleResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.induction.InductionResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.CompletedActionPlanReviewResponseMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.review.ReviewScheduleHistoryResponseMapper
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.sar.SarGoalResourceMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -32,7 +32,7 @@ class SubjectAccessRequestService(
   private val actionPlanService: ActionPlanService,
   private val noteService: NoteService,
   private val inductionMapper: InductionResourceMapper,
-  private val goalMapper: GoalResourceMapper,
+  private val sarGoalMapper: SarGoalResourceMapper,
   private val educationService: EducationService,
   private val educationResourceMapper: EducationResourceMapper,
   private val reviewService: ReviewService,
@@ -85,8 +85,8 @@ class SubjectAccessRequestService(
         induction = induction?.let { inductionMapper.toInductionResponse(induction, employabilitySkills) },
         goals = goals.map {
           val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
-          goalMapper.fromDomainToModel(it, goalNotes)
-        }.toSet(),
+          sarGoalMapper.fromDomainToModel(it, goalNotes)
+        },
         education = education?.let {
           educationResourceMapper.toEducationResponse(it)
         },

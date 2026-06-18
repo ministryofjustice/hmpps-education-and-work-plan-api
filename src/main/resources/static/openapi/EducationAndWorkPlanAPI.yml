@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.33.0'
+  version: '1.34.0'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -998,7 +998,7 @@ components:
         targetCompletionDate:
           type: string
           format: date
-          description: An optional ISO-8601 date representing the target completion date of the Goal.
+          description: An ISO-8601 date representing the target completion date of the Goal.
           example: '2023-12-19'
         status:
           $ref: '#/components/schemas/GoalStatus'
@@ -2769,10 +2769,9 @@ components:
         induction:
           $ref: '#/components/schemas/InductionResponse'
         goals:
-          uniqueItems: true
           type: array
           items:
-            $ref: '#/components/schemas/GoalResponse'
+            $ref: '#/components/schemas/SarGoalResponse'
         education:
           $ref: '#/components/schemas/EducationResponse'
         completedReviews:
@@ -2790,6 +2789,61 @@ components:
           description: A List containing zero or more Review Schedule Records.
           items:
             $ref: '#/components/schemas/ScheduledActionPlanReviewResponse'
+
+    SarGoalResponse:
+      title: SarGoalResponse
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AuditedResource'
+      description: An individual Goal that a Prisoner aims to complete as part of their Action Plan. Modelled specifically for the Subject Access Request endpoint.
+      properties:
+        title:
+          type: string
+          description: A title explaining the aim of the goal.
+          example: Improve communication skills
+        targetCompletionDate:
+          type: string
+          format: date
+          description: An ISO-8601 date representing the target completion date of the Goal.
+          example: '2023-12-19'
+        status:
+          $ref: '#/components/schemas/GoalStatus'
+        steps:
+          type: array
+          minItems: 1
+          description: A List of at least one Step.
+          items:
+            $ref: '#/components/schemas/StepResponse'
+        goalNote:
+          type: string
+          description: Some additional notes related to the Goal. This is an optional field and may not be present for all Goals.
+          example: Pay close attention to Peter's behaviour.
+        goalCompletionNote:
+          type: string
+          description: Notes entered at the time the Goal was completed. This field is only present for Goals that have been completed (see status field).
+          example: Peter has completed this goal.
+        goalArchiveReason:
+          $ref: '#/components/schemas/ReasonToArchiveGoal'
+        goalArchiveReasonOther:
+          type: string
+          description: Describes the reason for archiving if 'OTHER' is selected. This field it is only present in this scenario.
+        goalArchiveNote:
+          type: string
+          description: Notes entered at the time the Goal was archived. This field is only present for Goals that have been archived (see status field).
+          example: This goal is no longer appropriate or achievable now that Peter has been transferred.
+      required:
+        - title
+        - targetCompletionDate
+        - status
+        - steps
+        - createdBy
+        - createdByDisplayName
+        - createdAt
+        - createdAtPrison
+        - updatedBy
+        - updatedByDisplayName
+        - updatedAt
+        - updatedAtPrison
 
     SarSuccessResponse:
       properties:
