@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Education and Work Plan API
-  version: '1.34.0'
+  version: '1.34.1'
   description: Education and Work Plan API
   contact:
     name: Learning and Work Progress team
@@ -271,60 +271,6 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-action-plan-review-schedules
-
-  #
-  # Induction schedule status update
-  # --------------------------------------------------------------------------------
-  '/inductions/{prisonerNumber}/induction-schedule':
-    parameters:
-      - $ref: "#/components/parameters/prisonNumberPathParameter"
-    put:
-      summary: updates the status for the induction schedule.
-      description: |
-        This is used to exempt or remove an exemption from a induction schedule.
-
-        **Role Requirements:**
-        Access to this endpoint requires the following role:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
-
-      tags:
-        - Action Plan Inductions
-      responses:
-        '204':
-          description: The induction schedule status update request was processed successfully.
-        '409':
-          description: Invalid induction schedule status change.
-        '404':
-          $ref: '#/components/responses/404ErrorResponse'
-      operationId: update-induction-schedule-status
-      requestBody:
-        $ref: '#/components/requestBodies/UpdateInductionScheduleStatus'
-
-  #
-  # induction schedule history
-  # --------------------------------------------------------------------------------
-  '/inductions/{prisonerNumber}/induction-schedule/history':
-    parameters:
-      - $ref: "#/components/parameters/prisonNumberPathParameter"
-    get:
-      summary: Lists Induction Schedule history for a prisoner
-      description: |
-        It is possible for an induction schedule to be updated therefore this endpoint will return all versions of a
-        induction schedule - the highest version number will be the most recent. 
-
-        **Role Requirements:**
-        Access to this endpoint requires one of the following roles:
-          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
-          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
-
-      tags:
-        - Action Plan Inductions
-      responses:
-        '200':
-          $ref: '#/components/responses/GetInductionSchedules'
-        '404':
-          $ref: '#/components/responses/404ErrorResponse'
-      operationId: get-induction-schedule-history
 
   #
   # Goals
@@ -660,6 +606,53 @@ paths:
         '404':
           $ref: '#/components/responses/404ErrorResponse'
       operationId: get-prisoner-induction-schedule
+    put:
+      summary: updates the status for the induction schedule.
+      description: |
+        This is used to exempt or remove an exemption from a induction schedule.
+
+        **Role Requirements:**
+        Access to this endpoint requires the following role:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__INDUCTIONS__RW` (Read-Write)
+
+      tags:
+        - Inductions
+      responses:
+        '204':
+          description: The induction schedule status update request was processed successfully.
+        '409':
+          description: Invalid induction schedule status change.
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: update-induction-schedule-status
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateInductionScheduleStatus'
+
+  #
+  # induction schedule history
+  # --------------------------------------------------------------------------------
+  '/inductions/{prisonerNumber}/induction-schedule/history':
+    parameters:
+      - $ref: "#/components/parameters/prisonNumberPathParameter"
+    get:
+      summary: Lists Induction Schedule history for a prisoner
+      description: |
+        It is possible for an induction schedule to be updated therefore this endpoint will return all versions of a
+        induction schedule - the highest version number will be the most recent. 
+
+        **Role Requirements:**
+        Access to this endpoint requires one of the following roles:
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RO` (Read-Only)
+          - `ROLE_EDUCATION_AND_WORK_PLAN__REVIEWS__RW` (Read-Write)
+
+      tags:
+        - Inductions
+      responses:
+        '200':
+          $ref: '#/components/responses/GetInductionSchedules'
+        '404':
+          $ref: '#/components/responses/404ErrorResponse'
+      operationId: get-induction-schedule-history
 
   #
   # Subject access request

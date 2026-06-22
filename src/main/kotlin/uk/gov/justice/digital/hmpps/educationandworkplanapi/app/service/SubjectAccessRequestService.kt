@@ -91,7 +91,9 @@ class SubjectAccessRequestService(
           educationResourceMapper.toEducationResponse(it)
         },
         completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
-        inductionScheduleHistory = inductionScheduleHistory.map { inductionScheduleMapper.toInductionResponse(it, induction) },
+        inductionScheduleHistory = inductionScheduleHistory
+          .map { inductionScheduleMapper.toInductionResponse(it, induction) }
+          .sortedBy { it.version },
         reviewScheduleHistory = reviewScheduleHistory.map { reviewScheduleMapper.fromDomainToModel(it) },
       ),
     )
