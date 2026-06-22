@@ -315,15 +315,89 @@
 {{/induction}}
 <br>
 
+<h2>Education</h2>
+{{#education}}
+    <table class="summary-list">
+        <tr>
+            <td class="data-column-30">Education level</td>
+            <td>{{ optionalValue educationLevel }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Updated by</td>
+            <td class="data-column-35">Updated at</td>
+            <td class="data-column-30">Updated at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName updatedBy }}</td>
+            <td>{{ optionalValue (formatDate updatedAt) }}</td>
+            <td>{{ getPrisonName updatedAtPrison }}</td>
+        </tr>
+    </table>
+{{/education}}
+{{^education}}
+    <p>No Data Held</p>
+{{/education}}
+<br>
+
+<h2>Qualifications</h2>
+{{#education.qualifications}}
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Subject</td>
+            <td class="data-column-35">Level</td>
+            <td class="data-column-30">Grade</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue subject }}</td>
+            <td>{{ optionalValue level }}</td>
+            <td>{{ optionalValue grade }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Updated by</td>
+            <td class="data-column-35">Updated at</td>
+            <td class="data-column-30">Updated at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName updatedBy }}</td>
+            <td>{{ optionalValue (formatDate updatedAt) }}</td>
+            <td>{{ getPrisonName updatedAtPrison }}</td>
+        </tr>
+    </table>
+    <br>
+{{/education.qualifications}}
+{{^education.qualifications}}
+    <p>No Data Held</p>
+    <br>
+{{/education.qualifications}}
+
 <h2>Employability skills</h2>
 {{#induction.employabilitySkills}}
     <h3>Employability skill</h3>
     <table class="summary-list">
-        <tr><td>Skill name</td><td>{{ employabilitySkillType }}</td></tr>
-        <tr><td>Skill rating</td><td>{{ employabilitySkillRating }}</td></tr>
-        <tr><td>Skill activity or session</td><td>{{ optionalValue sessionType }}</td></tr>
-        <tr><td>Skill activity or session description</td><td>{{ optionalValue sessionTypeDescription }}</td></tr>
-        <tr><td>Skill rating evidence</td><td>{{ evidence }}</td></tr>
+        <tr>
+            <td class="data-column-30">Skill name</td>
+            <td>{{ employabilitySkillType }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Skill rating</td>
+            <td>{{ employabilitySkillRating }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Skill activity or session</td>
+            <td>{{ optionalValue sessionType }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Skill activity or session description</td>
+            <td>{{ optionalValue sessionTypeDescription }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Skill rating evidence</td>
+            <td>{{ evidence }}</td>
+        </tr>
     </table>
     <table class="data-table">
         <tr>
@@ -424,36 +498,3 @@
 {{^goals}}
     <p>No Data Held</p>
 {{/goals}}
-<br/>
-
-<h2>Education</h2>
-{{#education}}
-    <table class="summary-list">
-        <tr><td>Education level</td><td>{{ optionalValue educationLevel }}</td></tr>
-    </table>
-
-    <h3>Qualifications</h3>
-    <table class="data-table">
-        <tr>
-            <td class="data-column-50">Subject</td>
-            <td class="data-column-50">Level</td>
-        </tr>
-        {{#qualifications}}
-            <tr>
-                <td>{{ optionalValue subject }}</td>
-                <td>{{ optionalValue grade }}</td>
-            </tr>
-        {{/qualifications}}
-        {{^qualifications}}
-            <tr>
-                <td>No Data Held</td>
-                <td>No Data Held</td>
-            </tr>
-        {{/qualifications}}
-    </table>
-{{/education}}
-{{^education}}
-    <p>No Data Held</p>
-{{/education}}
-<br/>
-
