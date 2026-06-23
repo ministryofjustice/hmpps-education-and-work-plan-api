@@ -52,27 +52,32 @@ class SarReportGenerationTest :
       createPrisonerAPIStub(prisonNumber, this)
     }
     val inductionScheduleReference = UUID.randomUUID()
+    val inductionDeadlineDate = LocalDate.parse("2026-06-20")
     createInductionSchedule(
       prisonNumber,
       reference = inductionScheduleReference,
+      deadlineDate = inductionDeadlineDate,
       status = InductionScheduleStatus.SCHEDULED,
       inductionScheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
     )
     createInductionScheduleHistory(
       prisonNumber,
       reference = inductionScheduleReference,
+      deadlineDate = inductionDeadlineDate,
       status = InductionScheduleStatus.SCHEDULED,
       version = 1,
     )
     createInductionScheduleHistory(
       prisonNumber,
       reference = inductionScheduleReference,
+      deadlineDate = inductionDeadlineDate,
       status = InductionScheduleStatus.EXEMPT_TEMP_ABSENCE,
       version = 2,
     )
     createInductionScheduleHistory(
       prisonNumber,
       reference = inductionScheduleReference,
+      deadlineDate = inductionDeadlineDate,
       status = InductionScheduleStatus.SCHEDULED,
       version = 3,
     )
