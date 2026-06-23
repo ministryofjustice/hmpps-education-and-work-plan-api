@@ -597,8 +597,8 @@ abstract class IntegrationTestBase {
     deadlineDate: LocalDate = LocalDate.now().plusMonths(1),
     version: Int = 1,
     exemptionReason: String? = null,
-    createdAt: Instant = Instant.now(),
-    updatedAt: Instant = Instant.now(),
+    createdAt: Instant = Instant.now(clock),
+    updatedAt: Instant = Instant.now(clock),
     createdAtPrison: String = "BXI",
     updatedAtPrison: String = "BXI",
   ) {

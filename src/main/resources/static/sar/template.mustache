@@ -85,6 +85,61 @@
 {{/completedReviews}}
 <br>
 
+<h2>Induction Schedules</h2>
+{{#inductionScheduleHistory}}
+    <h3>Schedule</h3>
+    <table class="summary-list">
+        <tr>
+            <td class="data-column-30">Version</td>
+            <td>{{ optionalValue version }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Deadline date</td>
+            <td>{{ optionalValue (formatDate deadlineDate) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Schedule calculation rule</td>
+            <td>{{ optionalValue scheduleCalculationRule }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Status</td>
+            <td>{{ optionalValue scheduleStatus }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Exemption reason</td>
+            <td>{{ optionalValue exemptionReason }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Created by</td>
+            <td class="data-column-35">Created at</td>
+            <td class="data-column-30">Created at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName createdBy }}</td>
+            <td>{{ optionalValue (formatDate createdAt) }}</td>
+            <td>{{ getPrisonName createdAtPrison }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Updated by</td>
+            <td class="data-column-35">Updated at</td>
+            <td class="data-column-30">Updated at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName updatedBy }}</td>
+            <td>{{ optionalValue (formatDate updatedAt) }}</td>
+            <td>{{ getPrisonName updatedAtPrison }}</td>
+        </tr>
+    </table>
+{{/inductionScheduleHistory}}
+{{^inductionScheduleHistory}}
+    <p>No Data Held</p>
+{{/inductionScheduleHistory}}
+<br>
+
 <h2>Work and training</h2>
 {{#induction}}
     {{#workOnRelease}}
