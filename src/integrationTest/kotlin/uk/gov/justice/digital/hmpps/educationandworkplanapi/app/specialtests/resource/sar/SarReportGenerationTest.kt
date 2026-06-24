@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Emplo
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.EmployabilitySkillType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.PersonalInterestType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReasonToArchiveGoal
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateActionPlanRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateEmployabilitySkillRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.actionplan.aValidCreateGoalRequest
@@ -23,6 +24,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreatePersonalSkillsAndInterestsRequest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidPersonalInterest
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCreateActionPlanReviewRequest
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidUpdateReviewScheduleStatusRequest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarReportTest
 import java.time.LocalDate
@@ -214,6 +216,13 @@ class SarReportGenerationTest :
       prisonNumber,
       earliestReviewDate = LocalDate.parse("2026-03-01"),
       latestReviewDate = LocalDate.parse("2026-03-10"),
+    )
+    updateReviewStatus(
+      prisonNumber,
+      updateReviewScheduleStatusRequest = aValidUpdateReviewScheduleStatusRequest(
+        status = ReviewScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
+        exemptionReason = "Prisoner is currently in a drug and alcohol rehabilitation programme and not able to participate in a review at this time",
+      ),
     )
   }
 }
