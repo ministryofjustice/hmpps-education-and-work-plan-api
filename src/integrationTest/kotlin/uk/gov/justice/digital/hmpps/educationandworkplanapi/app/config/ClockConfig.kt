@@ -10,6 +10,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.concurrent.atomic.AtomicLong
 
 @Configuration
 class ClockConfig(
@@ -45,8 +46,13 @@ class ClockConfig(
 class MillisecondTickingClock(
   private var initialTime: Instant,
   private var zone: ZoneId,
-  private var currentTick: Long = 0,
+  currentTick: Long = 0,
 ) : Clock() {
+  private val currentTick = AtomicLong(currentTick)
+
+  init {
+    resetMilliSecondsTick(currentTick)
+  }
 
   override fun getZone() = zone
 
@@ -60,9 +66,9 @@ class MillisecondTickingClock(
   override fun millis(): Long = instant().toEpochMilli()
 
   fun resetMilliSecondsTick(tick: Long = 0L) {
-    currentTick = tick
+    currentTick.set(tick)
     initialTime = initialTime.truncatedTo(ChronoUnit.SECONDS).plusMillis(tick)
   }
 
-  private fun getNextTick() = Duration.ofMillis(currentTick++).toMillis()
+  private fun getNextTick() = Duration.ofMillis(currentTick.getAndIncrement()).toMillis()
 }
