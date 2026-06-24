@@ -140,6 +140,65 @@
 {{/inductionScheduleHistory}}
 <br>
 
+<h2>Review schedules</h2>
+{{#reviewScheduleHistory}}
+    <h3>Schedule</h3>
+    <table class="summary-list">
+        <tr>
+            <td class="data-column-30">Version</td>
+            <td>{{ optionalValue version }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Earliest review date</td>
+            <td>{{ optionalValue (formatDate reviewDateFrom) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Latest review date</td>
+            <td>{{ optionalValue (formatDate reviewDateTo) }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Schedule calculation rule</td>
+            <td>{{ optionalValue calculationRule }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Status</td>
+            <td>{{ optionalValue status }}</td>
+        </tr>
+        <tr>
+            <td class="data-column-30">Exemption reason</td>
+            <td>{{ optionalValue exemptionReason }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Created by</td>
+            <td class="data-column-35">Created at</td>
+            <td class="data-column-30">Created at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName createdBy }}</td>
+            <td>{{ optionalValue (formatDate createdAt) }}</td>
+            <td>{{ getPrisonName createdAtPrison }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Updated by</td>
+            <td class="data-column-35">Updated at</td>
+            <td class="data-column-30">Updated at prison</td>
+        </tr>
+        <tr>
+            <td>{{ getUserLastName updatedBy }}</td>
+            <td>{{ optionalValue (formatDate updatedAt) }}</td>
+            <td>{{ getPrisonName updatedAtPrison }}</td>
+        </tr>
+    </table>
+{{/reviewScheduleHistory}}
+{{^reviewScheduleHistory}}
+    <p>No Data Held</p>
+{{/reviewScheduleHistory}}
+<br>
+
 <h2>Work and training</h2>
 {{#induction}}
     {{#workOnRelease}}
