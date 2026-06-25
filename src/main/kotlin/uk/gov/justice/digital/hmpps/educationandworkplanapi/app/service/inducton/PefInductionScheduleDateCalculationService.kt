@@ -30,6 +30,7 @@ class PefInductionScheduleDateCalculationService(
   private val clock: Clock,
   exemptionProperties: ExemptionProperties,
 ) : InductionScheduleDateCalculationService(
+  clock = clock,
   propertiesProvider = object : InductionSchedulePropertiesProvider {
     override val onlyExtendDeadlinesWhenNotOverdue: Boolean
       get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue

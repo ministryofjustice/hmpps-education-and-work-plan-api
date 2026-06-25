@@ -13,11 +13,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import java.time.Clock
 import java.time.LocalDate
 import java.util.stream.Stream
 
 class ReviewScheduleDateCalculationServiceTest {
   private val dateCalculationService = ReviewScheduleDateCalculationService(
+    clock = Clock.systemDefaultZone(),
     propertiesProvider = object : ReviewSchedulePropertiesProvider {
       override val onlyExtendDeadlinesWhenNotOverdue = true
     },

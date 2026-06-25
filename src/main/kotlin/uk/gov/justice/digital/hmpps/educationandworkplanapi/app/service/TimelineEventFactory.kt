@@ -43,13 +43,15 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.INDUCTION_
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.STEP_COMPLETED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.STEP_NOT_STARTED
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType.STEP_STARTED
+import java.time.Clock
+import java.time.Instant
 import java.util.UUID
 
 /**
  * Responsible for identifying which [TimelineEvent]s have occurred, for example following an update to a [Goal].
  */
 @Component
-class TimelineEventFactory(private val userService: ManageUserService) {
+class TimelineEventFactory(private val clock: Clock) {
 
   fun actionPlanCreatedEvent(actionPlan: ActionPlan): List<TimelineEvent> {
     val events = mutableListOf<TimelineEvent>()
@@ -240,6 +242,7 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     actionedBy = goal.lastUpdatedBy!!,
     contextualInfo = contextualInfo,
     correlationId = correlationId,
+    timestamp = Instant.now(clock),
   )
 
   private fun employabilitySkillTimelineEvent(
@@ -253,6 +256,7 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     actionedBy = employabilitySkill.updatedBy,
     contextualInfo = contextualInfo,
     correlationId = correlationId,
+    timestamp = Instant.now(clock),
   )
 
   fun inductionScheduleCreatedTimelineEvent(
@@ -269,6 +273,7 @@ class TimelineEventFactory(private val userService: ManageUserService) {
         INDUCTION_SCHEDULE_DEADLINE_DATE to deadlineDate.toString(),
       ),
       correlationId = correlationId,
+      timestamp = Instant.now(clock),
     )
   }
 
@@ -340,5 +345,6 @@ class TimelineEventFactory(private val userService: ManageUserService) {
     contextualInfo = mapOf(
       TimelineEventContext.EDUCATION_ASSESSMENT_STATUS to "ALL_RELEVANT_ASSESSMENTS_COMPLETE",
     ),
+    timestamp = Instant.now(clock),
   )
 }

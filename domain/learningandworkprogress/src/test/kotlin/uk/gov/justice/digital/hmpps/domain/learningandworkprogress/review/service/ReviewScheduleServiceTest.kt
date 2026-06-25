@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.Cr
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit.DAYS
@@ -54,14 +55,16 @@ class ReviewScheduleServiceTest {
   private lateinit var reviewService: ReviewService
 
   companion object {
+    private val clock = Clock.systemDefaultZone()
     private val PRISON_NUMBER = randomValidPrisonNumber()
-    private val TODAY = LocalDate.now()
-    private val NOW = Instant.now()
+    private val TODAY = LocalDate.now(clock)
+    private val NOW = Instant.now(clock)
   }
 
   @BeforeEach
   fun setupService() {
     reviewScheduleService = ReviewScheduleService(
+      clock = clock,
       reviewSchedulePersistenceAdapter = reviewSchedulePersistenceAdapter,
       reviewScheduleEventService = reviewScheduleEventService,
       reviewScheduleDateCalculationService = reviewScheduleDateCalculationService,

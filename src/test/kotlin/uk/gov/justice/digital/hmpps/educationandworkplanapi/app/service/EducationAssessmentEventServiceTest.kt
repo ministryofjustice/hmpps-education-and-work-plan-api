@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.ent
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.mapper.educationassessment.EducationAssessmentEventEntityMapper
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.repository.EducationAssessmentEventRepository
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -83,6 +84,7 @@ class EducationAssessmentEventServiceTest {
       eventType = TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED,
       prisonId = "BXI",
       actionedBy = "system",
+      timestamp = Instant.now(),
     )
     given(timelineEventFactory.educationAssessmentEventCreatedEvent(any(), any())).willReturn(expectedTimelineEvent)
 
@@ -132,6 +134,7 @@ class EducationAssessmentEventServiceTest {
       eventType = TimelineEventType.EDUCATION_ASSESSMENT_EVENT_CREATED,
       prisonId = "N/A",
       actionedBy = "system",
+      timestamp = Instant.now(),
     )
     given(timelineEventFactory.educationAssessmentEventCreatedEvent(any(), any())).willReturn(expectedTimelineEvent)
 

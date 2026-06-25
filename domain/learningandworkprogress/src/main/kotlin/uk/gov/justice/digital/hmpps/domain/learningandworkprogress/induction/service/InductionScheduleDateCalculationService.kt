@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.se
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
+import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -14,6 +15,7 @@ import java.time.ZoneId
  * The only exception to this are the abstract methods which are intended to be implemented by subclasses.
  */
 abstract class InductionScheduleDateCalculationService(
+  private val clock: Clock,
   private val scheduleDateNotBefore: LocalDate? = null,
   private val propertiesProvider: InductionSchedulePropertiesProvider,
 ) {
@@ -63,7 +65,7 @@ abstract class InductionScheduleDateCalculationService(
    * Returns the base date from which all Induction Schedule dates are calculated
    */
   protected fun baseScheduleDate(): LocalDate {
-    val today = LocalDate.now()
+    val today = LocalDate.now(clock)
     return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
       scheduleDateNotBefore
     } else {
