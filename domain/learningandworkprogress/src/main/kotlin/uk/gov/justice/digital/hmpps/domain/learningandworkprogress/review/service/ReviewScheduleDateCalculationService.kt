@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Senten
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.CONVICTED_UNSENTENCED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.INDETERMINATE_SENTENCE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.SentenceType.REMAND
+import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -33,6 +34,7 @@ private val log = KotlinLogging.logger {}
  * domain.
  */
 class ReviewScheduleDateCalculationService(
+  private val clock: Clock,
   private val propertiesProvider: ReviewSchedulePropertiesProvider,
 ) {
   companion object {
@@ -133,10 +135,10 @@ class ReviewScheduleDateCalculationService(
       reviewScheduleWindow.dateTo
     } else {
       if (reviewSchedule.scheduleStatus == ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
-        return LocalDate.now().plusDays(TEN_DAYS)
+        return baseScheduleDate().plusDays(TEN_DAYS)
       }
       val additionalDays = getExtensionDays(scheduleStatus)
-      val todayPlusAdditionalDays = LocalDate.now().plusDays(additionalDays)
+      val todayPlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
       maxOf(todayPlusAdditionalDays, reviewScheduleWindow.dateTo)
     }
   }
@@ -153,7 +155,7 @@ class ReviewScheduleDateCalculationService(
     val timeLeftToServe = from(baseScheduleDate()).until(releaseDate)
 
     return when {
-      releaseDate < LocalDate.now() -> RELEASE_DATE_IN_PAST
+      releaseDate < baseScheduleDate() -> RELEASE_DATE_IN_PAST
       timeLeftToServe.isNoMoreThan3Months() -> BETWEEN_RELEASE_AND_3_MONTHS_TO_SERVE
       timeLeftToServe.isBetween3MonthsAnd3Months7Days() -> BETWEEN_3_MONTHS_AND_3_MONTHS_7_DAYS_TO_SERVE
       timeLeftToServe.isBetween3Months8DaysAnd6Months() -> BETWEEN_3_MONTHS_8_DAYS_AND_6_MONTHS_TO_SERVE
@@ -169,7 +171,7 @@ class ReviewScheduleDateCalculationService(
   /**
    * Returns the base date from which all Review Schedule dates are calculated
    */
-  private fun baseScheduleDate() = LocalDate.now()
+  private fun baseScheduleDate() = LocalDate.now(clock)
 
   private fun ReviewSchedule.hadUserAppliedExemptionWhenInductionAlreadyOverdue(): Boolean = (scheduleStatus == ReviewScheduleStatus.EXEMPT_TEMP_ABSENCE || scheduleStatus.canBeSetByUserAction) &&
     reviewScheduleWindow.dateTo.isBefore(LocalDate.ofInstant(lastUpdatedAt, ZoneId.systemDefault()))

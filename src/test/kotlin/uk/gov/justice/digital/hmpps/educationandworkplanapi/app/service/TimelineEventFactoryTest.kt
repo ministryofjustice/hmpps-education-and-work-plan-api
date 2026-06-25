@@ -2,11 +2,6 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.GoalStatus
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.StepStatus
@@ -19,20 +14,21 @@ import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEvent.Companion.newT
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventContext
 import uk.gov.justice.digital.hmpps.domain.timeline.TimelineEventType
 import uk.gov.justice.digital.hmpps.domain.timeline.assertThat
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.UUID
 
-@ExtendWith(MockitoExtension::class)
 class TimelineEventFactoryTest {
 
   companion object {
     val IGNORED_FIELDS = arrayOf("reference", "timestamp", "correlationId")
   }
 
-  @InjectMocks
-  private lateinit var timelineEventFactory: TimelineEventFactory
-
-  @Mock
-  private lateinit var userService: ManageUserService
+  private val clock = Clock.fixed(LocalDateTime.parse("2026-03-21T09:43:27.000").toInstant(ZoneOffset.UTC), ZoneId.of("UTC"))
+  private val timelineEventFactory = TimelineEventFactory(clock)
 
   @Test
   fun `should create action plan created event`() {
@@ -61,8 +57,6 @@ class TimelineEventFactoryTest {
       .wasActionedBy(goal.lastUpdatedBy!!)
       .hasContextualInfo(mapOf(TimelineEventContext.GOAL_TITLE to goal.title))
       .hasCorrelationId(actionPlanCreatedEvent.correlationId)
-
-    verifyNoInteractions(userService)
   }
 
   @Test
@@ -95,6 +89,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to updatedGoal.title),
+        timestamp = Instant.now(clock),
       ),
     )
 
@@ -133,6 +128,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
+        timestamp = Instant.now(clock),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -140,6 +136,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
+        timestamp = Instant.now(clock),
       ),
     )
 
@@ -176,6 +173,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to previousGoal.title),
+        timestamp = Instant.now(clock),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -183,6 +181,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book course"),
+        timestamp = Instant.now(clock),
       ),
     )
 
@@ -235,6 +234,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.GOAL_TITLE to "Learn Spanish"),
+        timestamp = Instant.now(clock),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -242,6 +242,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
+        timestamp = Instant.now(clock),
       ),
       newTimelineEvent(
         sourceReference = step1Reference.toString(),
@@ -249,6 +250,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Book Spanish course"),
+        timestamp = Instant.now(clock),
       ),
       newTimelineEvent(
         sourceReference = step2Reference.toString(),
@@ -256,6 +258,7 @@ class TimelineEventFactoryTest {
         prisonId = updatedGoal.lastUpdatedAtPrison,
         actionedBy = updatedGoal.lastUpdatedBy!!,
         contextualInfo = mapOf(TimelineEventContext.STEP_TITLE to "Complete course"),
+        timestamp = Instant.now(clock),
       ),
     )
 

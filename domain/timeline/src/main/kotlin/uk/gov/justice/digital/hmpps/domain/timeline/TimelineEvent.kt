@@ -51,7 +51,7 @@ data class TimelineEvent(
       contextualInfo: Map<TimelineEventContext, String> = emptyMap(),
       prisonId: String,
       actionedBy: String,
-      timestamp: Instant = Instant.now(),
+      timestamp: Instant,
       correlationId: UUID = UUID.randomUUID(),
     ) = TimelineEvent(
       reference = UUID.randomUUID(),

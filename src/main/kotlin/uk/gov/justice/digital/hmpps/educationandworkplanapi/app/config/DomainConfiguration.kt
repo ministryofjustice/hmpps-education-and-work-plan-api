@@ -35,6 +35,7 @@ import uk.gov.justice.digital.hmpps.domain.timeline.service.PrisonTimelineServic
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelinePersistenceAdapter
 import uk.gov.justice.digital.hmpps.domain.timeline.service.TimelineService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.JpaNotePersistenceAdapter
+import java.time.Clock
 
 /**
  * Configuration class responsible for providing domain bean implementations
@@ -119,17 +120,23 @@ class DomainConfiguration {
 
   @Bean
   fun reviewScheduleDomainService(
+    clock: Clock,
     reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
     reviewScheduleEventService: ReviewScheduleEventService,
     reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
   ): ReviewScheduleService = ReviewScheduleService(
+    clock,
     reviewSchedulePersistenceAdapter,
     reviewScheduleEventService,
     reviewScheduleDateCalculationService,
   )
 
   @Bean
-  fun reviewScheduleDateCalculationService(exemptionProperties: ExemptionProperties) = ReviewScheduleDateCalculationService(
+  fun reviewScheduleDateCalculationService(
+    clock: Clock,
+    exemptionProperties: ExemptionProperties,
+  ) = ReviewScheduleDateCalculationService(
+    clock,
     propertiesProvider = object : ReviewSchedulePropertiesProvider {
       override val onlyExtendDeadlinesWhenNotOverdue: Boolean
         get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
