@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.resource.mapper.
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SubjectAccessRequestContent
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -52,32 +53,44 @@ class SubjectAccessRequestService(
 
     val goals = try {
       actionPlanService.getActionPlan(prn).goals
-        .filter { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
-        .filter { toDateInstance == null || it.createdAt?.isBefore(toDateInstance) ?: true }
+        .filter { it.createdAt?.inRange(fromDateInstance, toDateInstance) ?: true }
     } catch (e: ActionPlanNotFoundException) {
       emptyList()
     }
 
     val induction = try {
       inductionService.getInductionForPrisoner(prn)
-        .takeIf { fromDateInstance == null || it.createdAt?.isAfter(fromDateInstance) ?: true }
-        .takeIf { toDateInstance == null || it?.createdAt?.isBefore(toDateInstance) ?: true }
+        .takeIf { it.createdAt?.inRange(fromDateInstance, toDateInstance) ?: true }
     } catch (e: InductionNotFoundException) {
       null
     }
 
     val education = try {
       educationService.getPreviousQualificationsForPrisoner(prn)
+        // only return the education record if it between the dates if specified
+        .takeIf { it.createdAt.inRange(fromDateInstance, toDateInstance) }
+        ?.let { education ->
+          education.copy(
+            // only return the individual qualifications within the education if they are between the dates if specified
+            qualifications = education.qualifications
+              .filter { it.createdAt.inRange(fromDateInstance, toDateInstance) },
+          )
+        }
     } catch (e: EducationNotFoundException) {
       null
     }
 
     val inductionScheduleHistory = inductionScheduleService.getInductionScheduleHistoryForPrisoner(prn)
+      .filter { it.createdAt.inRange(fromDateInstance, toDateInstance) }
+
     val reviewScheduleHistory = reviewScheduleService.getReviewSchedulesForPrisoner(prn)
+      .filter { it.createdAt.inRange(fromDateInstance, toDateInstance) }
 
     val completedReviews = reviewService.getCompletedReviewsForPrisoner(prn)
+      .filter { it.createdAt.inRange(fromDateInstance, toDateInstance) }
 
     val employabilitySkills = employabilitySkillsService.getEmployabilitySkills(prn)
+      .filter { it.createdAt.inRange(fromDateInstance, toDateInstance) }
 
     if (goals.isEmpty() && induction == null) return null
     return HmppsSubjectAccessRequestContent(
@@ -99,3 +112,6 @@ class SubjectAccessRequestService(
     )
   }
 }
+
+private fun Instant.inRange(from: Instant?, to: Instant?): Boolean = (from == null || !this.isBefore(from)) &&
+  (to == null || this.isBefore(to))
