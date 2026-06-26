@@ -1,8 +1,8 @@
 version: "3"
 services:
   hmpps-education-and-work-plan-api:
-    build:
-      context: .
+    image: ghcr.io/ministryofjustice/hmpps-education-and-work-plan-api:latest
+    profiles: [api]
     networks:
       - hmpps
     container_name: hmpps-education-and-work-plan-api
@@ -26,8 +26,12 @@ services:
       - MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
       - CIAG_KPI_PROCESSING_RULE=PEF
       - PRISONER_SEARCH_API_URL=https://prisoner-search-dev.prison.service.justice.gov.uk
-      - SERVICE_BASE_URL=http://localhost:8081"
+      - SERVICE_BASE_URL=http://localhost:8081
       - PES_CONTRACT_START_DATE=2025-10-01
+      - INDUCTION_EXTENSION_PERIODS=2025-12-20:2026-01-01
+      - EXEMPTION_EXTEND_DEADLINE=ONLY_WHEN_NOT_OVERDUE
+      - HMPPS_SQS_ENABLED=false
+    env_file: .env.docker
 
   db:
     image: postgres:latest

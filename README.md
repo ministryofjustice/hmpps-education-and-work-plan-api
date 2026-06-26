@@ -16,6 +16,80 @@ The application has a health endpoint found at `/health` which indicates if the 
 ### Ping
 The application has a ping endpoint found at `/ping` which indicates that the app is responding to requests.
 
+# Development and maintenance
+
+## Running the app locally
+
+### Preparation
+Obtain API client credentials
+- populate those value from kubernetes secrets `hmpps-education-and-work-plan-api`.
+  ```shell
+  kubectl -n hmpps-education-and-work-plan-dev get secret hmpps-education-and-work-plan-api -o json | jq '.data | map_values(@base64d)' 
+  ```
+- fill in the API client credentials in these files: `*_CLIENT_ID` and `*_CLIENT_SECRET`
+  - `.env` for running outside docker
+  - `.env.docker` for running in docker
+
+---
+### Running with docker compose
+The easiest way to run the app is to use docker compose to create the service and all dependencies.
+1. Prepare `.env.docker` (from `.env.docker.sample`)
+    ```shell
+    cp .env.docker.sample .env.docker
+    ```
+   - fill in the API client credentials in `.env.docker`
+     see above to obtain these
+2. Then run
+   ```shell
+   docker compose --profile api up
+   ```
+   will run the application (from latest image) and PostgreSQL within a local docker instance.
+3. Check if application is up and running 
+   * See `http://localhost:8081/health` to check the app is running.
+   * See `http://localhost:8081/swagger-ui/index.html?configUrl=/v3/api-docs` to explore the OpenAPI spec document.
+   * See `http://localhost:8081/info` to check the app info
+
+It connects HMPPS Auth and other upstream APIs in `dev` environment. Thus, a set of valid dev API clients are required to run the application.
+
+---
+### Running the application in IntelliJ
+1. Prepare `.env` (from `.env.local.sample`)
+    ```shell
+    cp .env.local.sample .env
+    ```
+    - fill in the API client credentials in `.env`:
+      see above to obtain these
+2. Run this
+    ```shell
+   docker compose up -d 
+    ```
+    * will start dependencies only without the API application
+    * `-d` for detached run
+3. Run `bootRun` with  `.env` file prepared above
+    * either IntelliJ
+      - run `bootRun` with `EnvFile` plugin
+      - add `.env`
+      - enable integrations
+    * or Gradle wrapper
+      ```shell
+      export $(grep -v '^#' .env | xargs)
+      ./gradlew bootRun
+      ```
+
+---
+## Running tests
+### Running the test suite
+To run the test suite (unit and integration):
+```shell
+./gradlew clean check
+```
+
+### Integration test dependencies
+The integration tests spin up the following docker containers, therefore a docker runtime is required on local
+development environments in order to run the tests.
+
+* postgres - A real postgres instance is used rather than h2 in order to properly test various constraints etc. (h2 is more forgiving that postgres in this respect)
+
 ## Configuring the project
 
 ### JDK
@@ -35,16 +109,6 @@ Or to apply to all Intellij projects:
 
 #### Run ktlint formatter on git commit
 `./gradlew addKtlintFormatGitPreCommitHook`
-
-## Running the app
-The easiest (and slowest) way to run the app is to use docker compose to create the service and all dependencies.
-
-`docker-compose pull`
-
-`docker-compose up`
-
-* See `http://localhost:8081/health` to check the app is running.
-* See `http://localhost:8081/swagger-ui/index.html?configUrl=/v3/api-docs` to explore the OpenAPI spec document.
 
 ## Environment variables
 The following environment variables are required in order for the app to start:
@@ -86,21 +150,6 @@ The following environment variables are required in order for the app to start:
 | MANAGE_USERS_API_URL              | The URL of the Manage Users API                                           |
 | MANAGE_USERS_API_CLIENT_ID        | hmpps-auth oauth2 client-id for connecting to the Manage Users API        |
 | MANAGE_USERS_API_CLIENT_SECRET    | hmpps-auth oauth2 client-secret for connecting to the Manage Users API    |
-
-## Development and maintenance
-
-### Running the tests
-To run the test suite (unit and integration):
-```shell
-./gradle clean check
-```
-
-### Integration test dependencies
-The integration tests spin up the following docker containers, therefore a docker runtime is required on local
-development environments in order to run the tests.
-
-* postgres - A real postgres instance is used rather than h2 in order to properly test various constraints etc. (h2 is more forgiving that postgres in this respect)
-
 
 ## Monitoring, tracing and event reporting
 The API is instrumented with the opentelemetry and Application Insights java agent. Useful data can be found and reported
