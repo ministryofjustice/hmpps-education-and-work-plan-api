@@ -22,6 +22,7 @@ import java.time.LocalDate
 @ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PES")
 class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionProperties, private val clock: Clock) :
   InductionScheduleDateCalculationService(
+    clock = clock,
     propertiesProvider = object : InductionSchedulePropertiesProvider {
       override val onlyExtendDeadlinesWhenNotOverdue: Boolean
         get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue

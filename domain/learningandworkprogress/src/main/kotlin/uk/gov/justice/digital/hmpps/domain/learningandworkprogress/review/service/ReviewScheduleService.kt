@@ -13,11 +13,13 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.Cr
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.CreateReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.UpdateReviewScheduleStatusDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.effectiveSentenceType
+import java.time.Clock
 import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
 class ReviewScheduleService(
+  private val clock: Clock,
   private val reviewSchedulePersistenceAdapter: ReviewSchedulePersistenceAdapter,
   private val reviewScheduleEventService: ReviewScheduleEventService,
   private val reviewScheduleDateCalculationService: ReviewScheduleDateCalculationService,
@@ -329,7 +331,7 @@ class ReviewScheduleService(
 
       // Then update the review schedule to be SCHEDULED with an adjusted review date
       val adjustedReviewDate = reviewScheduleDateCalculationService.calculateAdjustedReviewDueDate(updatedReviewScheduleFirst)
-      val adjustedEarliestReviewDate = LocalDate.now()
+      val adjustedEarliestReviewDate = LocalDate.now(clock)
       val updatedReviewScheduleSecond = reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(
         UpdateReviewScheduleStatusDto(
           reference = reference,

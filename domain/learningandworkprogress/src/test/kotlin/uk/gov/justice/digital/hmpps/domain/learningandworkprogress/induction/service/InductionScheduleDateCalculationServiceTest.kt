@@ -8,16 +8,19 @@ import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
+import java.time.Clock
 import java.time.LocalDate
 
 class InductionScheduleDateCalculationServiceTest {
   companion object {
-    private val TODAY = LocalDate.now()
+    private val clock = Clock.systemDefaultZone()
+    private val TODAY = LocalDate.now(clock)
   }
 
   // New up an anonymous instance of the abstract class to test the methods implemented in the abstract class
   // The implementations of determineCreateInductionScheduleDto are tested in the concrete implementations of InductionScheduleDateCalculationService
   private val dateCalculationService = object : InductionScheduleDateCalculationService(
+    clock = clock,
     propertiesProvider = object : InductionSchedulePropertiesProvider {
       override val onlyExtendDeadlinesWhenNotOverdue = true
     },
