@@ -10,9 +10,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.EducationNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.aValidPreviousQualifications
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.education.service.EducationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.aValidEmployabilitySkill
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillsService
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aFullyPopulatedInduction
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionScheduleHistory
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
@@ -99,7 +102,7 @@ class SubjectAccessRequestServiceTest {
   private lateinit var reviewScheduleMapper: ReviewScheduleHistoryResponseMapper
 
   @Test
-  fun `should return induction and action plan data for a prisoner without date filtering`() {
+  fun `should return SAR content data for a prisoner without date filtering`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
 
@@ -108,6 +111,7 @@ class SubjectAccessRequestServiceTest {
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
     )
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
+    given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
 
     val employabilitySkills = listOf(aValidEmployabilitySkill())
     given(employabilitySkillsService.getEmployabilitySkills(any())).willReturn(employabilitySkills)
@@ -162,15 +166,31 @@ class SubjectAccessRequestServiceTest {
   }
 
   @Test
-  fun `should return induction and action plan data for a prisoner filtered by from date`() {
+  fun `should return SAR content for a prisoner filtered by from date`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
 
     val induction = aFullyPopulatedInduction(
       prisonNumber = prisonNumber,
       createdAt = Instant.parse("2024-01-01T10:00:00.000Z"),
+      previousQualifications = aValidPreviousQualifications(
+        createdAt = Instant.parse("2024-01-01T10:00:00.000Z"),
+      ),
     )
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
+    given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
+
+    val employabilitySkills = listOf(
+      aValidEmployabilitySkill(
+        createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+      ),
+    )
+    given(employabilitySkillsService.getEmployabilitySkills(any())).willReturn(employabilitySkills)
+
+    val completedReview = aValidCompletedReview(
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
+    given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(listOf(completedReview))
 
     val goal1 = aValidGoal(title = "Goal 1", createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
     val goal2 = aValidGoal(title = "Goal 2", createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
@@ -209,20 +229,39 @@ class SubjectAccessRequestServiceTest {
   }
 
   @Test
-  fun `should return induction and action plan data for a prisoner filtered by to date`() {
+  fun `should return SAR content for a prisoner filtered by to date`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
 
     val induction = aFullyPopulatedInduction(
       prisonNumber = prisonNumber,
       createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+      previousQualifications = aValidPreviousQualifications(
+        createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+      ),
     )
     given(inductionService.getInductionForPrisoner(any())).willReturn(induction)
+    given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
 
-    val employabilitySkills = listOf(aValidEmployabilitySkill())
+    val employabilitySkills = listOf(
+      aValidEmployabilitySkill(
+        createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+      ),
+    )
     given(employabilitySkillsService.getEmployabilitySkills(any())).willReturn(employabilitySkills)
 
-    val completedReview = aValidCompletedReview()
+    val completedReview = aValidCompletedReview(
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
+    given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(listOf(completedReview))
+
+    val goal1 = aValidGoal(createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
+    val goal2 = aValidGoal(createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
+    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal1, goal2))
+    given(actionPlanService.getActionPlan(any())).willReturn(actionPlan)
+
+    given(noteService.getNotes(any(), any())).willReturn(emptyList())
+
     val expectedInductionResponse = aValidInductionResponse()
     val expectedEducationResponse = aValidEducationResponse(
       educationLevel = EducationLevel.NOT_SURE,
@@ -231,31 +270,27 @@ class SubjectAccessRequestServiceTest {
     val expectedInductionScheduleResponse = aValidInductionScheduleResponse()
     val expectedReviewScheduleResponse = aValidReviewScheduleResponse()
 
-    given(educationService.getPreviousQualificationsForPrisoner(any())).willReturn(induction.previousQualifications)
     given(inductionMapper.toInductionResponse(any(), any())).willReturn(expectedInductionResponse)
     given(educationResourceMapper.toEducationResponse(any())).willReturn(expectedEducationResponse)
-    given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(listOf(completedReview))
     given(completedActionPlanReviewResponseMapper.fromDomainToModel(any())).willReturn(expectedCompletedActionPlanReviewResponse)
     given(inductionScheduleMapper.toInductionResponse(any(), any())).willReturn(expectedInductionScheduleResponse)
     given(reviewScheduleMapper.fromDomainToModel(any())).willReturn(expectedReviewScheduleResponse)
-    val goal1 = aValidGoal(createdAt = Instant.parse("2024-01-01T10:00:00.000Z"))
-    val goal2 = aValidGoal(createdAt = Instant.parse("2024-02-15T10:00:00.000Z"))
-    val actionPlan = aValidActionPlan(prisonNumber = prisonNumber, goals = listOf(goal1, goal2))
-    given(actionPlanService.getActionPlan(any())).willReturn(actionPlan)
-
-    given(noteService.getNotes(any(), any())).willReturn(emptyList())
 
     val expectedGoalResponse1 = aValidSarGoalResponse(goalNote = null)
     given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse1)
 
-    val inductionScheduleHistory = aValidInductionScheduleHistory()
+    val inductionScheduleHistory = aValidInductionScheduleHistory(
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
     given(inductionScheduleService.getInductionScheduleHistoryForPrisoner(prisonNumber)).willReturn(
       listOf(
         inductionScheduleHistory,
       ),
     )
 
-    val reviewScheduleHistory = aValidReviewScheduleHistory()
+    val reviewScheduleHistory = aValidReviewScheduleHistory(
+      createdAt = LocalDateTime.parse("2024-01-01T10:00:00").toInstant(ZoneOffset.UTC),
+    )
     given(reviewScheduleService.getReviewSchedulesForPrisoner(prisonNumber)).willReturn(
       listOf(
         reviewScheduleHistory,
@@ -338,9 +373,13 @@ class SubjectAccessRequestServiceTest {
     // Given
     val prisonNumber = randomValidPrisonNumber()
 
-    given(inductionService.getInductionForPrisoner(any())).willReturn(null)
-
+    given(inductionService.getInductionForPrisoner(any())).willThrow(InductionNotFoundException(prisonNumber))
     given(actionPlanService.getActionPlan(any())).willThrow(ActionPlanNotFoundException(prisonNumber))
+    given(educationService.getPreviousQualificationsForPrisoner(any())).willThrow(EducationNotFoundException(prisonNumber))
+    given(inductionScheduleService.getInductionScheduleHistoryForPrisoner(any())).willReturn(emptyList())
+    given(reviewScheduleService.getReviewSchedulesForPrisoner(any())).willReturn(emptyList())
+    given(reviewService.getCompletedReviewsForPrisoner(any())).willReturn(emptyList())
+    given(employabilitySkillsService.getEmployabilitySkills(any())).willReturn(emptyList())
 
     // When
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
@@ -348,12 +387,17 @@ class SubjectAccessRequestServiceTest {
     // Then
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(inductionMapper, never()).toInductionResponse(any(), any())
-
-    verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
-
     verify(actionPlanService).getActionPlan(prisonNumber)
     verify(sarGoalMapper, never()).fromDomainToModel(any(), any())
-
+    verify(educationService).getPreviousQualificationsForPrisoner(prisonNumber)
+    verify(educationResourceMapper, never()).toEducationResponse(any())
+    verify(inductionScheduleService).getInductionScheduleHistoryForPrisoner(prisonNumber)
+    verify(inductionScheduleMapper, never()).toInductionResponse(any(), any())
+    verify(reviewScheduleService).getReviewSchedulesForPrisoner(prisonNumber)
+    verify(reviewScheduleMapper, never()).fromDomainToModel(any())
+    verify(reviewService).getCompletedReviewsForPrisoner(prisonNumber)
+    verify(completedActionPlanReviewResponseMapper, never()).fromDomainToModel(any())
+    verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
     verify(noteService, never()).getNotes(any(), any())
 
     assertThat(sarResponse).isNull()
