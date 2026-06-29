@@ -24,6 +24,8 @@ import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneOffset
 
 @Service
@@ -49,7 +51,7 @@ class SubjectAccessRequestService(
     toDate: LocalDate?,
   ): HmppsSubjectAccessRequestContent? {
     val fromDateInstance = fromDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
-    val toDateInstance = toDate?.atStartOfDay()?.toInstant(ZoneOffset.UTC)
+    val toDateInstance = toDate?.atEndOfDay()?.toInstant(ZoneOffset.UTC)
 
     val goals = try {
       actionPlanService.getActionPlan(prn).goals
@@ -92,26 +94,42 @@ class SubjectAccessRequestService(
     val employabilitySkills = employabilitySkillsService.getEmployabilitySkills(prn)
       .filter { it.createdAt.inRange(fromDateInstance, toDateInstance) }
 
-    if (goals.isEmpty() && induction == null) return null
-    return HmppsSubjectAccessRequestContent(
-      content = SubjectAccessRequestContent(
-        induction = induction?.let { inductionMapper.toInductionResponse(induction, employabilitySkills) },
-        goals = goals.map {
-          val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
-          sarGoalMapper.fromDomainToModel(it, goalNotes)
-        },
-        education = education?.let {
-          educationResourceMapper.toEducationResponse(it)
-        },
-        completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
-        inductionScheduleHistory = inductionScheduleHistory
-          .map { inductionScheduleMapper.toInductionResponse(it, induction) }
-          .sortedBy { it.version },
-        reviewScheduleHistory = reviewScheduleHistory.map { reviewScheduleMapper.fromDomainToModel(it) },
-      ),
-    )
+    return if (goals.isEmpty() &&
+      induction == null &&
+      education == null &&
+      inductionScheduleHistory.isEmpty() &&
+      reviewScheduleHistory.isEmpty() &&
+      completedReviews.isEmpty() &&
+      employabilitySkills.isEmpty()
+    ) {
+      null
+    } else {
+      HmppsSubjectAccessRequestContent(
+        content = SubjectAccessRequestContent(
+          induction = induction?.let { inductionMapper.toInductionResponse(induction, employabilitySkills) },
+          goals = goals.map {
+            val goalNotes = noteService.getNotes(it.reference, EntityType.GOAL)
+            sarGoalMapper.fromDomainToModel(it, goalNotes)
+          },
+          education = education?.let {
+            educationResourceMapper.toEducationResponse(it)
+          },
+          completedReviews = completedReviews.map { completedActionPlanReviewResponseMapper.fromDomainToModel(it) },
+          inductionScheduleHistory = inductionScheduleHistory
+            .map { inductionScheduleMapper.toInductionResponse(it, induction) }
+            .sortedBy { it.version },
+          reviewScheduleHistory = reviewScheduleHistory.map { reviewScheduleMapper.fromDomainToModel(it) },
+        ),
+      )
+    }
   }
 }
 
-private fun Instant.inRange(from: Instant?, to: Instant?): Boolean = (from == null || !this.isBefore(from)) &&
-  (to == null || this.isBefore(to))
+private fun Instant.inRange(from: Instant?, to: Instant?): Boolean = (from == null || this.isEqualOrAfter(from)) &&
+  (to == null || this.isEqualOrBefore(to))
+
+private fun Instant.isEqualOrAfter(other: Instant): Boolean = (this == other || isAfter(other))
+
+private fun Instant.isEqualOrBefore(other: Instant): Boolean = (this == other || this.isBefore(other))
+
+private fun LocalDate.atEndOfDay(): LocalDateTime = LocalDateTime.of(this, LocalTime.parse("23:59:59.999"))

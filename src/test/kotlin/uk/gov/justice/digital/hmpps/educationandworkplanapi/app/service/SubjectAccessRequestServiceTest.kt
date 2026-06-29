@@ -48,6 +48,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidReviewScheduleResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.aValidCompletedActionPlanReviewResponse
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.sar.aValidSarGoalResponse
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.sar.assertThat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -148,6 +149,12 @@ class SubjectAccessRequestServiceTest {
     val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
+    assertThat(sarContent)
+      .induction { it.isEqualTo(expectedInductionResponse) }
+      .hasNumberOfGoals(2)
+      .goal(1) { it.isEqualTo(expectedGoalResponse1) }
+      .goal(2) { it.isEqualTo(expectedGoalResponse2) }
+
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
     verify(inductionMapper).toInductionResponse(induction, employabilitySkills)
@@ -158,16 +165,13 @@ class SubjectAccessRequestServiceTest {
 
     verify(noteService).getNotes(goal1.reference, EntityType.GOAL)
     verify(noteService).getNotes(goal2.reference, EntityType.GOAL)
-
-    with(sarContent) {
-      assertThat(this.induction).isEqualTo(expectedInductionResponse)
-      assertThat(goals).isEqualTo(listOf(expectedGoalResponse1, expectedGoalResponse2))
-    }
   }
 
   @Test
   fun `should return SAR content for a prisoner filtered by from date`() {
     // Given
+    val fromDate = LocalDate.parse("2024-01-15")
+
     val prisonNumber = randomValidPrisonNumber()
 
     val induction = aFullyPopulatedInduction(
@@ -207,11 +211,15 @@ class SubjectAccessRequestServiceTest {
     given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse2)
 
     // When
-    val fromDate = LocalDate.parse("2024-01-15")
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, fromDate, null)
     val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
+    assertThat(sarContent)
+      .hasNoInduction() // Expect the Induction to be null because it was created before the "fromDate"
+      .hasNumberOfGoals(1)
+      .goal(1) { it.isEqualTo(expectedGoalResponse2) }
+
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(inductionMapper, never()).toInductionResponse(any(), any())
 
@@ -221,16 +229,13 @@ class SubjectAccessRequestServiceTest {
     verify(noteService).getNotes(goal2.reference, EntityType.GOAL)
 
     verify(inductionScheduleService).getInductionScheduleHistoryForPrisoner(prisonNumber)
-
-    with(sarContent) {
-      assertThat(this.induction).isNull()
-      assertThat(goals).isEqualTo(listOf(expectedGoalResponse2))
-    }
   }
 
   @Test
   fun `should return SAR content for a prisoner filtered by to date`() {
     // Given
+    val toDate = LocalDate.parse("2024-01-10")
+
     val prisonNumber = randomValidPrisonNumber()
 
     val induction = aFullyPopulatedInduction(
@@ -298,11 +303,19 @@ class SubjectAccessRequestServiceTest {
     )
 
     // When
-    val toDate = LocalDate.parse("2024-01-10")
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, toDate)
     val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
+    assertThat(sarContent)
+      .induction { it.isEqualTo(expectedInductionResponse) }
+      .hasNumberOfGoals(1)
+      .goal(1) { it.isEqualTo(expectedGoalResponse1) }
+      .education { it.isEqualTo(expectedEducationResponse) }
+      .hasNumberOfInductionScheduleRecords(1)
+      .hasNumberOfReviewScheduleRecords(1)
+      .hasNumberOfCompletedReviews(1)
+
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
 
@@ -312,19 +325,14 @@ class SubjectAccessRequestServiceTest {
     verify(sarGoalMapper).fromDomainToModel(goal1, emptyList())
 
     verify(noteService).getNotes(goal1.reference, EntityType.GOAL)
-
-    with(sarContent) {
-      assertThat(this.induction).isEqualTo(expectedInductionResponse)
-      assertThat(goals).isEqualTo(listOf(expectedGoalResponse1))
-      assertThat(education).isEqualTo(expectedEducationResponse)
-      assertThat(this.inductionScheduleHistory?.size).isEqualTo(1)
-      assertThat(this.reviewScheduleHistory?.size).isEqualTo(1)
-    }
   }
 
   @Test
   fun `should return induction and action plan data for a prisoner filtered by from date and to date`() {
     // Given
+    val fromDate = LocalDate.parse("2024-02-01")
+    val toDate = LocalDate.parse("2024-03-01")
+
     val prisonNumber = randomValidPrisonNumber()
 
     val induction = aFullyPopulatedInduction(
@@ -346,12 +354,15 @@ class SubjectAccessRequestServiceTest {
     given(sarGoalMapper.fromDomainToModel(any(), any())).willReturn(expectedGoalResponse2)
 
     // When
-    val fromDate = LocalDate.parse("2024-02-01")
-    val toDate = LocalDate.parse("2024-03-01")
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, fromDate, toDate)
     val sarContent = sarResponse!!.content as SubjectAccessRequestContent
 
     // Then
+    assertThat(sarContent)
+      .hasNoInduction()
+      .hasNumberOfGoals(1)
+      .goal(1) { it.isEqualTo(expectedGoalResponse2) }
+
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(educationService).getPreviousQualificationsForPrisoner(prisonNumber)
     verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
@@ -361,11 +372,6 @@ class SubjectAccessRequestServiceTest {
     verify(sarGoalMapper).fromDomainToModel(goal2, emptyList())
 
     verify(noteService).getNotes(goal2.reference, EntityType.GOAL)
-
-    with(sarContent) {
-      assertThat(this.induction).isNull()
-      assertThat(goals).isEqualTo(listOf(expectedGoalResponse2))
-    }
   }
 
   @Test
@@ -385,6 +391,8 @@ class SubjectAccessRequestServiceTest {
     val sarResponse = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
 
     // Then
+    assertThat(sarResponse).isNull()
+
     verify(inductionService).getInductionForPrisoner(prisonNumber)
     verify(inductionMapper, never()).toInductionResponse(any(), any())
     verify(actionPlanService).getActionPlan(prisonNumber)
@@ -399,7 +407,5 @@ class SubjectAccessRequestServiceTest {
     verify(completedActionPlanReviewResponseMapper, never()).fromDomainToModel(any())
     verify(employabilitySkillsService).getEmployabilitySkills(prisonNumber)
     verify(noteService, never()).getNotes(any(), any())
-
-    assertThat(sarResponse).isNull()
   }
 }

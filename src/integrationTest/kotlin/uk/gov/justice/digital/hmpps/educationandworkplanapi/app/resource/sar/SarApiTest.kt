@@ -25,6 +25,7 @@ import java.time.LocalDate
 class SarApiTest : IntegrationTestBase() {
   companion object {
     private const val URI_TEMPLATE = "/subject-access-request"
+    private val today = LocalDate.now()
   }
 
   @Test
@@ -175,8 +176,8 @@ class SarApiTest : IntegrationTestBase() {
     }
 
     // When
-    val responseFromLastWeek = webTestClient.sarRequest(prisoner1, LocalDate.now().minusWeeks(1), null)
-    val responseFromTomorrow = webTestClient.sarRequest(prisoner2, LocalDate.now().plusDays(1), null)
+    val responseFromLastWeek = webTestClient.sarRequest(prisoner1, today.minusWeeks(1), null)
+    val responseFromTomorrow = webTestClient.sarRequest(prisoner2, today.plusDays(1), null)
 
     // Then
     val responseBody = responseFromLastWeek
@@ -215,8 +216,8 @@ class SarApiTest : IntegrationTestBase() {
     }
 
     // When
-    val responseToLastWeek = webTestClient.sarRequest(prisoner1, null, LocalDate.now().minusWeeks(1))
-    val responseToTomorrow = webTestClient.sarRequest(prisoner2, null, LocalDate.now().plusDays(1))
+    val responseToLastWeek = webTestClient.sarRequest(prisoner1, null, today.minusWeeks(1))
+    val responseToTomorrow = webTestClient.sarRequest(prisoner2, null, today.plusDays(1))
 
     // Then
     responseToLastWeek.expectStatus().isNoContent
@@ -259,8 +260,8 @@ class SarApiTest : IntegrationTestBase() {
     }
 
     // When
-    val responseThisWeek = webTestClient.sarRequest(prisoner1, LocalDate.now(), LocalDate.now().plusWeeks(1))
-    val responseLastWeek = webTestClient.sarRequest(prisoner2, LocalDate.now().minusWeeks(1), LocalDate.now())
+    val responseThisWeek = webTestClient.sarRequest(prisoner1, today, today.plusWeeks(1))
+    val responseLastWeek = webTestClient.sarRequest(prisoner2, today.minusWeeks(1), today.minusDays(1))
 
     // Then
     val responseBody = responseThisWeek
