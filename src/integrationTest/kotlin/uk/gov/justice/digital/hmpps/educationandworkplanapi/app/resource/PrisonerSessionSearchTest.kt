@@ -110,6 +110,33 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should map prisoner fields when prisoner-search returns only the roster fields`() {
+    // RR-2692 guard: simulate prisoner-search returning ONLY the roster fields (the 5 fields proposed
+    // for dropping are absent) and assert the sessions still resolve with correct prisoner detail.
+    // Expected green BEFORE the RESPONSE_FIELDS trim.
+    // Given
+    setUpData()
+    wiremockService.stubPrisonersInAPrisonSearchApiReturningOnlyRosterFields(
+      PRISON_ID,
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+    )
+
+    // When
+    val response = searchPeople()
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+    assertThat(actual).isNotNull
+    assertThat(actual!!.sessions.size).isEqualTo(2)
+    assertThat(actual.sessions[0].sessionType).isEqualTo(SessionType.INDUCTION)
+    assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner1.prisonerNumber)
+    assertThat(actual.sessions[0].forename).isEqualTo("John")
+    assertThat(actual.sessions[0].surname).isEqualTo("Rambo")
+    assertThat(actual.sessions[1].sessionType).isEqualTo(SessionType.REVIEW)
+    assertThat(actual.sessions[1].prisonNumber).isEqualTo(prisoner4.prisonerNumber)
+  }
+
+  @Test
   fun `sort by release date ascending`() {
     // Given
     setUpData()
