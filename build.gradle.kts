@@ -4,8 +4,8 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.4"
-  id("org.openapi.generator") version "7.23.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.3.1"
+  id("org.openapi.generator") version "7.22.0"
   kotlin("plugin.spring") version "2.4.0"
   kotlin("plugin.jpa") version "2.4.0"
 
@@ -202,7 +202,9 @@ tasks.register<GenerateTask>("buildEducationAndWorkPlanModel") {
       "dateLibrary" to "java8",
       "serializationLibrary" to "jackson",
       "useBeanValidation" to "true",
-      "useSpringBoot3" to "true",
+      "useSpringBoot4" to "true",
+      "useJackson3" to "true",
+      "openApiNullable" to "false",
       "enumPropertyNaming" to "UPPERCASE",
     ),
   )
@@ -224,7 +226,9 @@ tasks.register<GenerateTask>("buildPrisonApiModel") {
       "dateLibrary" to "java8",
       "serializationLibrary" to "jackson",
       "useBeanValidation" to "true",
-      "useSpringBoot3" to "true",
+      "useSpringBoot4" to "true",
+      "useJackson3" to "true",
+      "openApiNullable" to "false",
       "enumPropertyNaming" to "UPPERCASE",
     ),
   )
