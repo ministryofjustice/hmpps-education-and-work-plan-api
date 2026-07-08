@@ -4,8 +4,8 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.3.1"
-  id("org.openapi.generator") version "7.22.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.7"
+  id("org.openapi.generator") version "7.23.0"
   kotlin("plugin.spring") version "2.4.0"
   kotlin("plugin.jpa") version "2.4.0"
 
@@ -17,7 +17,7 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val postgresqlVersion = "42.7.12"
+val postgresqlVersion = "42.7.13"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "3.0.3"
 val hmppsSqsStarterVersion = "7.4.0"
