@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.specialtests
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.specialtests.pef
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
@@ -18,16 +18,16 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValid
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidPrisonerReceivedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.events.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleCalculationRule
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
+import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
 @Isolated
-@ActiveProfiles("integration-test", "christmas-clock")
+@ActiveProfiles("integration-test", "ciag-kpi-pef-rules", "christmas-clock")
 class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBase() {
   @Test
   fun `should create new Induction Schedule given prisoner does not already have an Induction and has not had their Screenings and Assessments`() {
@@ -47,6 +47,7 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
       eventType = PRISONER_RECEIVED_INTO_PRISON,
+      occurredAt = Instant.now(clock).minusSeconds(10),
       additionalInformation = aValidPrisonerReceivedAdditionalInformation(
         prisonNumber = prisonNumber,
         reason = ADMISSION,
@@ -73,8 +74,8 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
         .wasUpdatedByDisplayName("system")
         .wasUpdatedAtPrison("MDI")
         .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
-        .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
-        .hasDeadlineDate(today)
+        .wasStatus(SCHEDULED)
+        .hasDeadlineDate(today.plusDays(25))
 
       val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
       assertThat(inductionScheduleHistories)
@@ -89,8 +90,8 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
             .wasUpdatedByDisplayName("system")
             .wasUpdatedAtPrison("MDI")
             .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
-            .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
-            .hasDeadlineDate(today)
+            .wasStatus(SCHEDULED)
+            .hasDeadlineDate(today.plusDays(25))
             .wasVersion(1)
         }
 
@@ -133,6 +134,7 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
       eventType = PRISONER_RECEIVED_INTO_PRISON,
+      occurredAt = Instant.now(clock).minusSeconds(10),
       additionalInformation = aValidPrisonerReceivedAdditionalInformation(
         prisonNumber = prisonNumber,
         reason = ADMISSION,
@@ -160,11 +162,11 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
         .wasUpdatedAtPrison("MDI")
         .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
         .wasStatus(SCHEDULED)
-        .hasDeadlineDate(today.plusDays(10))
+        .hasDeadlineDate(today.plusDays(25))
 
       val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
       assertThat(inductionScheduleHistories)
-        .hasNumberOfInductionScheduleVersions(2)
+        .hasNumberOfInductionScheduleVersions(1)
         .inductionScheduleVersion(1) {
           it.wasCreatedAtOrAfter(earliestDateTime)
             .wasUpdatedAtOrAfter(earliestDateTime)
@@ -175,33 +177,16 @@ class PrisonerReceivedDueToAdmissionEventDuringChristmasTest : IntegrationTestBa
             .wasUpdatedByDisplayName("system")
             .wasUpdatedAtPrison("MDI")
             .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
-            .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
-            .hasDeadlineDate(today)
+            .wasStatus(SCHEDULED)
+            .hasDeadlineDate(today.plusDays(25))
             .wasVersion(1)
         }
-        .inductionScheduleVersion(2) {
-          it.wasCreatedAtOrAfter(earliestDateTime)
-            .wasUpdatedAtOrAfter(earliestDateTime)
-            .wasCreatedBy("system")
-            .wasCreatedByDisplayName("system")
-            .wasCreatedAtPrison("MDI")
-            .wasUpdatedBy("system")
-            .wasUpdatedByDisplayName("system")
-            .wasUpdatedAtPrison("MDI")
-            .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
-            .wasStatus(SCHEDULED)
-            .hasDeadlineDate(today.plusDays(10))
-            .wasVersion(2)
-        }
 
-      val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
-      assertThat(inductionScheduleEvents)
-        .hasNumberOfEvents(2)
-        .allEvents {
-          it.hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
-            .hasNumberOfPersonReferenceIdentifiers(1)
-            .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
-        }
+      val inductionScheduleEvent = inductionScheduleEventQueue.receiveEvent(QueueType.INDUCTION)
+      assertThat(inductionScheduleEvent)
+        .hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+        .hasNumberOfPersonReferenceIdentifiers(1)
+        .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
   }
 }

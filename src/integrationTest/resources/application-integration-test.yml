@@ -86,7 +86,7 @@ hmpps:
       expected-render-result:
         path: /sar/expected-report.html
 
-ciag-kpi-processing-rule: PEF
+ciag-kpi-processing-rule: PES
 
 
 service.base-url: http://localhost:8080

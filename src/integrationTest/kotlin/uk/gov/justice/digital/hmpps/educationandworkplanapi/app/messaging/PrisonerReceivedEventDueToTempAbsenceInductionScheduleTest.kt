@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Induc
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.EXEMPT_PRISON_REGIME_CIRCUMSTANCES
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.EXEMPT_TEMP_ABSENCE
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
@@ -282,21 +283,22 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
       .wasUpdatedByDisplayName("system")
       .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
       // basically this message was treat like a new admission
-      .hasDeadlineDate(today.plusDays(20))
+      .hasDeadlineDate(today.plusDays(10)) // PES rules for new admissions are today + 10 days
       .wasStatus(SCHEDULED)
 
     val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
     assertThat(inductionScheduleHistories)
-      .hasNumberOfInductionScheduleVersions(3)
-      .inductionScheduleVersion(1) { it.wasStatus(SCHEDULED) }
-      .inductionScheduleVersion(2) { it.wasStatus(EXEMPT_TEMP_ABSENCE) }
-      .inductionScheduleVersion(3) { it.wasStatus(SCHEDULED) }
+      .hasNumberOfInductionScheduleVersions(4)
+      .inductionScheduleVersion(1) { it.wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS) }
+      .inductionScheduleVersion(2) { it.wasStatus(SCHEDULED) }
+      .inductionScheduleVersion(3) { it.wasStatus(EXEMPT_TEMP_ABSENCE) }
+      .inductionScheduleVersion(4) { it.wasStatus(SCHEDULED) }
 
     val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
 
     await.untilAsserted {
       assertThat(inductionScheduleEvents)
-        .hasNumberOfEvents(3)
+        .hasNumberOfEvents(4)
         .allEvents {
           it.hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
             .hasNumberOfPersonReferenceIdentifiers(1)

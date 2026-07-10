@@ -1,0 +1,4 @@
+# Properties specifically for tests using the CIAG KPI PEF rules set.
+# Once the PES rules are enabled in production (after 01/09/2026) this file and all tests that use it can be deleted.
+
+ciag-kpi-processing-rule: PEF

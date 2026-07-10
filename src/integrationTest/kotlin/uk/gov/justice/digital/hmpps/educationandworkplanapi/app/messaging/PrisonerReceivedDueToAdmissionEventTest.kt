@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleCalculationRule.EXISTING_PRISONER
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.ADMISSION
@@ -44,7 +46,7 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
   // New prison admission, prisoner has never had a PLP
   @Test
-  fun `should create new Induction Schedule given prisoner does not already have an Induction`() {
+  fun `should create new Induction Schedule given prisoner does not already have an Induction and has not had their Screenings and Assessments`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
@@ -87,7 +89,8 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
         .wasUpdatedByDisplayName("system")
         .wasUpdatedAtPrison("MDI")
         .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
-        .wasStatus(SCHEDULED)
+        .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+        .hasDeadlineDate(TODAY)
 
       // test induction schedule history is created
       val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
@@ -103,7 +106,8 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
             .wasUpdatedByDisplayName("system")
             .wasUpdatedAtPrison("MDI")
             .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
-            .wasStatus(SCHEDULED)
+            .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+            .hasDeadlineDate(TODAY)
             .wasVersion(1)
         }
 
@@ -114,6 +118,111 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
         .hasNumberOfPersonReferenceIdentifiers(1)
         .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
     }
+  }
+
+  @Test
+  fun `should create new Induction Schedule given prisoner does not already have an Induction and has had their Screenings and Assessments completed`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    assertThat(runCatching { getInduction(prisonNumber) }.getOrNull()).isNull()
+    assertThat(runCatching { getInductionSchedule(prisonNumber) }.getOrNull()).isNull()
+
+    val earliestDateTime = OffsetDateTime.now()
+
+    educationAssessmentEventRepository.save(
+      EducationAssessmentEventEntity(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        status = ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+        statusChangeDate = LocalDate.now().minusDays(2),
+        source = "CURIOUS",
+        detailUrl = null,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+      ),
+    )
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilAsserted {
+      // test induction schedule was created
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasCreatedAtOrAfter(earliestDateTime)
+        .wasUpdatedAtOrAfter(earliestDateTime)
+        .wasCreatedBy("system")
+        .wasCreatedByDisplayName("system")
+        .wasCreatedAtPrison("MDI")
+        .wasUpdatedBy("system")
+        .wasUpdatedByDisplayName("system")
+        .wasUpdatedAtPrison("MDI")
+        .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
+        .wasStatus(SCHEDULED)
+        .hasDeadlineDate(TODAY.plusDays(10))
+
+      // test induction schedule history is created
+      val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
+      assertThat(inductionScheduleHistories)
+        .hasNumberOfInductionScheduleVersions(2)
+        .inductionScheduleVersion(1) {
+          it.wasCreatedAtOrAfter(earliestDateTime)
+            .wasUpdatedAtOrAfter(earliestDateTime)
+            .wasCreatedBy("system")
+            .wasCreatedByDisplayName("system")
+            .wasCreatedAtPrison("MDI")
+            .wasUpdatedBy("system")
+            .wasUpdatedByDisplayName("system")
+            .wasUpdatedAtPrison("MDI")
+            .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
+            .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+            .hasDeadlineDate(TODAY)
+            .wasVersion(1)
+        }
+        .inductionScheduleVersion(2) {
+          it.wasCreatedAtOrAfter(earliestDateTime)
+            .wasUpdatedAtOrAfter(earliestDateTime)
+            .wasCreatedBy("system")
+            .wasCreatedByDisplayName("system")
+            .wasCreatedAtPrison("MDI")
+            .wasUpdatedBy("system")
+            .wasUpdatedByDisplayName("system")
+            .wasUpdatedAtPrison("MDI")
+            .wasScheduleCalculationRule(InductionScheduleCalculationRuleResponse.NEW_PRISON_ADMISSION)
+            .wasStatus(SCHEDULED)
+            .hasDeadlineDate(TODAY.plusDays(10))
+            .wasVersion(2)
+        }
+    }
+
+    // test that outbound events are also created:
+    val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
+    assertThat(inductionScheduleEvents)
+      .hasNumberOfEvents(2)
+      .allEvents {
+        it.hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+          .hasNumberOfPersonReferenceIdentifiers(1)
+          .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
+      }
   }
 
   // Re-offending prisoner, re-admitted to prison. Prisoner previously had a PLP Induction that was completed and Review Schedule that is not active
@@ -298,7 +407,108 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
 
   // Re-offending prisoner, re-admitted to prison. Prisoner previously had a PLP Induction Schedule but it was never completed
   @Test
-  fun `should re-schedule the Induction Schedule given prisoner that already has an incomplete Induction Schedule`() {
+  fun `should re-schedule the Induction Schedule given prisoner that already has an incomplete Induction Schedule and has had their Screenings and Assessments completed`() {
+    // Given
+    // an induction schedule is created
+    val prisonNumber = randomValidPrisonNumber()
+    val originalInductionDueDate = TODAY.minusWeeks(10)
+    val inductionScheduleReference = UUID.randomUUID()
+    createInductionSchedule(
+      reference = inductionScheduleReference,
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatus.SCHEDULED,
+      deadlineDate = originalInductionDueDate,
+      createdAtPrison = "BXI",
+      inductionScheduleCalculationRule = EXISTING_PRISONER,
+    )
+    createInductionScheduleHistory(
+      reference = inductionScheduleReference,
+      prisonNumber = prisonNumber,
+      status = InductionScheduleStatus.SCHEDULED,
+      deadlineDate = originalInductionDueDate,
+      createdAtPrison = "BXI",
+    )
+
+    educationAssessmentEventRepository.save(
+      EducationAssessmentEventEntity(
+        reference = UUID.randomUUID(),
+        prisonNumber = prisonNumber,
+        status = ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+        statusChangeDate = LocalDate.now().minusDays(2),
+        source = "CURIOUS",
+        detailUrl = null,
+        createdAtPrison = "BXI",
+        updatedAtPrison = "BXI",
+      ),
+    )
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = ADMISSION,
+      ),
+    )
+
+    val inductionSchedule = getInductionSchedule(prisonNumber)
+    assertThat(inductionSchedule).wasScheduleCalculationRule(InductionScheduleCalculationRule.EXISTING_PRISONER)
+
+    with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI")) {
+      createPrisonerAPIStub(prisonNumber, this)
+    }
+
+    val expectedInductionDueDate = TODAY.plusDays(10) // based on PES rules
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilAsserted {
+      val inductionSchedules = getInductionScheduleHistory(prisonNumber)
+      assertThat(inductionSchedules)
+        .hasNumberOfInductionScheduleVersions(3)
+        .inductionScheduleVersion(1) {
+          it.wasStatus(SCHEDULED)
+            .hasDeadlineDate(originalInductionDueDate)
+            .wasCreatedAtPrison("BXI")
+            .wasUpdatedAtPrison("BXI")
+        }
+        .inductionScheduleVersion(2) {
+          it.wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+            .hasDeadlineDate(TODAY)
+            .wasCreatedAtPrison("BXI")
+            .wasUpdatedAtPrison("MDI")
+        }
+        .inductionScheduleVersion(3) {
+          it.wasStatus(SCHEDULED)
+            .hasDeadlineDate(expectedInductionDueDate)
+            .wasCreatedAtPrison("BXI")
+            .wasUpdatedAtPrison("MDI")
+        }
+
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule).wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+
+      // test that outbound events are also created:
+      val inductionScheduleEvents = inductionScheduleEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
+      assertThat(inductionScheduleEvents)
+        .hasNumberOfEvents(2)
+        .allEvents {
+          it.hasDetailUrl("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+            .hasNumberOfPersonReferenceIdentifiers(1)
+            .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
+        }
+    }
+  }
+
+  @Test
+  fun `should re-schedule the Induction Schedule given prisoner that already has an incomplete Induction Schedule and has not had their Screenings and Assessments completed`() {
     // Given
     // an induction schedule is created
     val prisonNumber = randomValidPrisonNumber()
@@ -336,8 +546,6 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
       createPrisonerAPIStub(prisonNumber, this)
     }
 
-    val expectedInductionDueDate = TODAY.plusDays(20) // based on PEF rules as currently set in  application-integration-test.yml
-
     // When
     sendDomainEvent(sqsMessage)
 
@@ -358,8 +566,8 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
             .wasUpdatedAtPrison("BXI")
         }
         .inductionScheduleVersion(2) {
-          it.wasStatus(SCHEDULED)
-            .hasDeadlineDate(expectedInductionDueDate)
+          it.wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+            .hasDeadlineDate(TODAY)
             .wasCreatedAtPrison("BXI")
             .wasUpdatedAtPrison("MDI")
         }

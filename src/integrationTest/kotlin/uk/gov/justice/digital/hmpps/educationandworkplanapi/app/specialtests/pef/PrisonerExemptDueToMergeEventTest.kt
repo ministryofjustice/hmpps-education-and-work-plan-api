@@ -1,31 +1,30 @@
-package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging
+package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.specialtests.pef
 
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
-import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
-import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
+import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventEntity
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.assertThat
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType.PRISONER_MERGED
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.InductionScheduleStatus
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.EventType
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.SqsMessage
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidHmppsDomainEventsSqsMessage
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.aValidPrisonerMergedAdditionalInformation
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.aValidCreateInductionRequestForPrisonerNotLookingToWork
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.review.assertThat
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.time.LocalDate
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus as InductionScheduleStatusEntity
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus as ReviewScheduleStatusEntity
 
 @Isolated
+@ActiveProfiles("integration-test", "ciag-kpi-pef-rules")
 class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
   @Test
   fun `should update Review Schedule given merged prisoner had an active Review Schedule and new PRN does not completed Screenings and Assessments`() {
@@ -64,8 +63,10 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
 
     // assert that the other prison number is processed as a new admission with the correct induction schedule status
     assertThat(inductionScheduleRepository.findByPrisonNumber(newNomisNumber))
-      .hasScheduleStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS) // PES rules will set the initial status to PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
-      .hasDeadlineDate(LocalDate.now()) // Deadline will have been set to "today", and will be rescheduled when the prisoner has their S&As completed
+      .hasScheduleStatus(InductionScheduleStatus.SCHEDULED) // PEF rules will set the initial status to SCHEDULED
+      .hasDeadlineDate(
+        LocalDate.now().plusDays(20),
+      ) // Deadline date will have been set to today + 20 days as per PEF rules
   }
 
   @Test
@@ -118,116 +119,16 @@ class PrisonerExemptDueToMergeEventTest : IntegrationTestBase() {
 
     // assert that the other prison number is processed as a new admission with the correct induction schedule status
     assertThat(inductionScheduleRepository.findByPrisonNumber(newNomisNumber))
-      .hasScheduleStatus(SCHEDULED) // PES rules will set the initial status to SCHEDULED because the victor in the merge event already has their S&As completed
-      .hasDeadlineDate(LocalDate.now().plusDays(10)) // Deadline date will have been set to today + 10 days as per PES rules
-  }
-
-  @Test
-  fun `should not update Review Schedule given merged prisoner does not have an active Review Schedule`() {
-    // Given
-    val prisonNumber = setUpRandomPrisoner()
-    // an induction and action plan are created. This will have created the initial Review Schedule with the status SCHEDULED
-    createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork())
-    createActionPlan(prisonNumber)
-    // Before updating the status of the Review Schedule we need to wait until 1 "plp.review-schedule.updated" event on the REVIEW queue is received (which is the creation of the initial Review Schedule)
-    await untilCallTo {
-      reviewScheduleEventQueue.countAllMessagesOnQueue()
-    } matches { it != null && it > 0 }
-    // Update the status of the Review Schedule to Completed, which means the prisoner no longer has an active Review Schedule
-    updateReviewScheduleRecordStatus(prisonNumber, ReviewScheduleStatusEntity.COMPLETED)
-
-    clearQueues()
-
-    val sqsMessage = prisonerMergedSqsMessage(prisonNumber)
-
-    // When
-    sendDomainEvent(sqsMessage)
-
-    // Then
-    // wait until the queue is drained / message is processed
-    await untilCallTo {
-      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
-    } matches { it == 0 }
-
-    val actionPlanReviews = getActionPlanReviews(prisonNumber)
-    assertThat(actionPlanReviews)
-      .latestReviewSchedule {
-        it.hasStatus(ReviewScheduleStatus.COMPLETED)
-      }
-  }
-
-  @Test
-  fun `should not create or update Review Schedule given merged prisoner does not have a Review Schedule at all`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    assertThat(runCatching { getActionPlanReviews(prisonNumber) }.getOrNull()).isNull()
-
-    val sqsMessage = prisonerMergedSqsMessage(prisonNumber)
-
-    // When
-    sendDomainEvent(sqsMessage)
-
-    // Then
-    // wait until the queue is drained / message is processed
-    await untilCallTo {
-      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
-    } matches { it == 0 }
-
-    assertThat(runCatching { getActionPlanReviews(prisonNumber) }.getOrNull()).isNull()
-  }
-
-  @Test
-  fun `should update Induction Schedule given merged prisoner had an active Induction Schedule`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    createInductionSchedule(prisonNumber)
-
-    val sqsMessage = prisonerMergedSqsMessage(prisonNumber)
-
-    // When
-    sendDomainEvent(sqsMessage)
-
-    // Then
-    // wait until the queue is drained / message is processed
-    await untilCallTo {
-      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
-    } matches { it == 0 }
-
-    await untilAsserted {
-      val inductionSchedule = getInductionSchedule(prisonNumber)
-      assertThat(inductionSchedule)
-        .wasStatus(InductionScheduleStatus.EXEMPT_PRISONER_MERGE)
-    }
-  }
-
-  @Test
-  fun `should not update Induction Schedule given merged prisoner had a completed Induction Schedule`() {
-    // Given
-    val prisonNumber = randomValidPrisonNumber()
-    createInductionSchedule(prisonNumber, status = InductionScheduleStatusEntity.COMPLETED)
-
-    val sqsMessage = prisonerMergedSqsMessage(prisonNumber)
-
-    // When
-    sendDomainEvent(sqsMessage)
-
-    // Then
-    // wait until the queue is drained / message is processed
-    await untilCallTo {
-      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
-    } matches { it == 0 }
-
-    await untilAsserted {
-      val inductionSchedule = getInductionSchedule(prisonNumber)
-      assertThat(inductionSchedule)
-        .wasStatus(InductionScheduleStatus.COMPLETED)
-    }
+      .hasScheduleStatus(InductionScheduleStatus.SCHEDULED) // PEF rules will set the initial status to SCHEDULED
+      .hasDeadlineDate(
+        LocalDate.now().plusDays(20),
+      ) // Deadline date will have been set to today + 20 days as per PEF rules
   }
 
   private fun prisonerMergedSqsMessage(prisonNumber: String): SqsMessage {
     val sqsMessage = aValidHmppsDomainEventsSqsMessage(
       prisonNumber = prisonNumber,
-      eventType = PRISONER_MERGED,
+      eventType = EventType.PRISONER_MERGED,
       additionalInformation = aValidPrisonerMergedAdditionalInformation(
         removedNomsNumber = prisonNumber,
         reason = AdditionalInformation.PrisonerMergedAdditionalInformation.Reason.MERGE,

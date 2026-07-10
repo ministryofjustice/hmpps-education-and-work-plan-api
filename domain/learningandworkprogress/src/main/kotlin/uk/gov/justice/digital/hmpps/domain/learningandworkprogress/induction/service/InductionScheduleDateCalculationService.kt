@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service
 
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
 import java.time.Clock
@@ -20,10 +21,10 @@ abstract class InductionScheduleDateCalculationService(
   private val propertiesProvider: InductionSchedulePropertiesProvider,
 ) {
   companion object {
-    private const val EXEMPTION_ADDITIONAL_DAYS = 5L
-    private const val EXCLUSION_ADDITIONAL_DAYS = 10L
-    private const val TWENTY_DAYS = 20L
-    private const val SYSTEM_OUTAGE_ADDITIONAL_DAYS = 5L
+    const val FIVE_DAYS = 5L
+    const val TEN_DAYS = 10L
+    const val TWENTY_DAYS = 20L
+    const val TWENTY_FIVE_DAYS = 25L
   }
 
   /**
@@ -39,7 +40,7 @@ abstract class InductionScheduleDateCalculationService(
    * Only applicable under contracts where the Induction is scheduled following completion of the prisoner's S&As (the PES
    * contract); implementations for contracts that do not schedule Inductions this way are not expected to support it.
    */
-  abstract fun determineDeadlineDateForCompletedAssessments(): LocalDate
+  abstract fun determineDeadlineDateForCompletedAssessments(calculationRule: InductionScheduleCalculationRule): LocalDate
 
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
     if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadUserAppliedExemptionWhenInductionAlreadyOverdue()) {
@@ -54,17 +55,19 @@ abstract class InductionScheduleDateCalculationService(
     }
   }
 
+  abstract fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long
+
   private fun getExtensionDays(status: InductionScheduleStatus): Long = when {
-    status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> SYSTEM_OUTAGE_ADDITIONAL_DAYS
-    status.isExclusion -> EXCLUSION_ADDITIONAL_DAYS
-    status.isExemption -> EXEMPTION_ADDITIONAL_DAYS
+    status == InductionScheduleStatus.EXEMPT_SYSTEM_TECHNICAL_ISSUE -> FIVE_DAYS
+    status.isExclusion -> TEN_DAYS
+    status.isExemption -> FIVE_DAYS
     else -> 0 // Default case, if no condition matches
   }
 
   /**
    * Returns the base date from which all Induction Schedule dates are calculated
    */
-  protected fun baseScheduleDate(): LocalDate {
+  private fun baseScheduleDate(): LocalDate {
     val today = LocalDate.now(clock)
     return if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(today)) {
       scheduleDateNotBefore

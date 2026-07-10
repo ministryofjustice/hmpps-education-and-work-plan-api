@@ -115,7 +115,7 @@ class InductionScheduleService(
       inductionSchedule = inductionSchedule,
       newStatus = SCHEDULED,
       prisonId = prisonId,
-      adjustedInductionDate = inductionScheduleDateCalculationService.determineDeadlineDateForCompletedAssessments(),
+      adjustedInductionDate = inductionScheduleDateCalculationService.determineDeadlineDateForCompletedAssessments(inductionSchedule.scheduleCalculationRule),
     )
   }
 

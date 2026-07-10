@@ -14,7 +14,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
@@ -235,7 +235,7 @@ class InductionScheduleServiceTest {
         exemptionReason = null,
         latestDeadlineDate = expectedDueDate,
         updatedAtPrison = PRISON_ID,
-        calculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+        calculationRule = NEW_PRISON_ADMISSION,
       )
       val expectedUpdatedInductionScheduleStatus = UpdatedInductionScheduleStatus(
         reference = inductionSchedule.reference,
@@ -311,10 +311,11 @@ class InductionScheduleServiceTest {
       val inductionSchedule = aValidInductionSchedule(
         prisonNumber = prisonNumber,
         scheduleStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+        scheduleCalculationRule = NEW_PRISON_ADMISSION,
         deadlineDate = originalDueDate,
       )
       given(inductionSchedulePersistenceAdapter.getInductionSchedule(any())).willReturn(inductionSchedule)
-      given(inductionScheduleDateCalculationService.determineDeadlineDateForCompletedAssessments()).willReturn(deadlineDate)
+      given(inductionScheduleDateCalculationService.determineDeadlineDateForCompletedAssessments(any())).willReturn(deadlineDate)
 
       val expectedInductionSchedule = inductionSchedule.copy(
         scheduleStatus = SCHEDULED,
@@ -349,7 +350,7 @@ class InductionScheduleServiceTest {
 
       // Then
       verify(inductionSchedulePersistenceAdapter).getInductionSchedule(prisonNumber)
-      verify(inductionScheduleDateCalculationService).determineDeadlineDateForCompletedAssessments()
+      verify(inductionScheduleDateCalculationService).determineDeadlineDateForCompletedAssessments(NEW_PRISON_ADMISSION)
       verify(inductionSchedulePersistenceAdapter).updateInductionScheduleStatus(expectedUpdateInductionScheduleStatusDto)
       verify(inductionScheduleEventService).inductionScheduleStatusUpdated(expectedUpdatedInductionScheduleStatus)
     }

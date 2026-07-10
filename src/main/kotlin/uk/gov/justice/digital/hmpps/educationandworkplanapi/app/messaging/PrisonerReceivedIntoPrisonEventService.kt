@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_RELEASE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNoReleaseDateForSentenceTypeException
@@ -134,13 +134,16 @@ class PrisonerReceivedIntoPrisonEventService(
         }
 
         else -> {
-          if (isPesContract && e.inductionSchedule.scheduleStatus.isAutomaticExemption()) {
-            // PES re-admission/transfer of an automatically-exempt Induction: re-gate it on the prisoner's S&As.
+          if (isPesContract && e.inductionSchedule.scheduleStatus.let { it.isAutomaticExemption() || it == SCHEDULED }) {
+            // PES re-admission/transfer of an automatically-exempt Induction or one that is still scheduled (edge case where we've not processed a previous release message)
+            // re-gate it on the prisoner's S&As.
             // Set it back to pending, then schedule it immediately if their S&As are already complete.
             inductionScheduleService.updateInductionSchedule(
               inductionSchedule = e.inductionSchedule,
               newStatus = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+              adjustedInductionDate = LocalDate.now(clock),
               prisonId = prisonId,
+              calculationRule = NEW_PRISON_ADMISSION,
             )
             schedulePendingInductionScheduleIfAssessmentsComplete(nomsNumber, prisonId)
           } else {
@@ -227,6 +230,9 @@ class PrisonerReceivedIntoPrisonEventService(
     if (prisonerHasCorrectStatusForTAPReturnProcessing(nomsNumber)) {
       // If we received this message but didn't get the Admission message then we need to create an induction schedule
       scheduleAdapter.createInductionScheduleIfRequired(prisonNumber = nomsNumber, prisonId = prisonId)
+      if (isPesContract) {
+        inductionScheduleService.schedulePendingInductionSchedule(nomsNumber, prisonId)
+      }
 
       /**
        * It is possible that we can receive a temporary release return message without receiving a prisoner ADMISSION event.
@@ -285,7 +291,7 @@ class PrisonerReceivedIntoPrisonEventService(
       return true
     }
 
-    if (inductionSchedule?.scheduleStatus == EXEMPT_PRISONER_RELEASE || inductionSchedule?.scheduleStatus == InductionScheduleStatus.SCHEDULED) {
+    if (inductionSchedule?.scheduleStatus == EXEMPT_PRISONER_RELEASE || inductionSchedule?.scheduleStatus == SCHEDULED) {
       return true
     }
 
