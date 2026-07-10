@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.aValidInductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.CreateInductionScheduleDto
@@ -33,7 +34,11 @@ class InductionScheduleDateCalculationServiceTest {
       TODO("Not implemented here")
     }
 
-    override fun determineDeadlineDateForCompletedAssessments(): LocalDate {
+    override fun determineDeadlineDateForCompletedAssessments(calculationRule: InductionScheduleCalculationRule): LocalDate {
+      TODO("Not implemented here")
+    }
+
+    override fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long {
       TODO("Not implemented here")
     }
   }

@@ -2,13 +2,14 @@ package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducto
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.given
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto.aValidCreateInductionScheduleDto
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.DeadlineExtensionRule
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
@@ -18,13 +19,11 @@ class PefInductionScheduleExtensionDateCalculationServiceTest {
   private val fixedDate = LocalDate.now()
   private val clock = Clock.fixed(fixedDate.atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
 
-  private val inductionExtensionConfig = InductionExtensionConfig(
-    "${LocalDate.now().minusDays(1)}:${LocalDate.now().plusDays(1)}",
-  )
+  private val inductionScheduleCalculationService = mock<InductionScheduleCalculationService>()
 
   private val service = PefInductionScheduleDateCalculationService(
-    inductionExtensionConfig,
     clock,
+    inductionScheduleCalculationService,
     ExemptionProperties(DeadlineExtensionRule.ONLY_WHEN_NOT_OVERDUE),
   )
 
@@ -34,6 +33,9 @@ class PefInductionScheduleExtensionDateCalculationServiceTest {
     val prisonNumber = randomValidPrisonNumber()
     val admissionDate = LocalDate.now()
     val prisonId = "BXI"
+
+    given(inductionScheduleCalculationService.getCalculationRuleForNewPrisonAdmission())
+      .willReturn(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD)
 
     val expected = aValidCreateInductionScheduleDto(
       prisonNumber = prisonNumber,

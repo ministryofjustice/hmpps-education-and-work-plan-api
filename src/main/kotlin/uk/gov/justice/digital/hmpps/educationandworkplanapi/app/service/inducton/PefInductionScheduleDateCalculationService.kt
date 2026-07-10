@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.educationandworkplanapi.app.service.inducton
 
-import mu.KotlinLogging
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
@@ -11,11 +10,8 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.dto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePropertiesProvider
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.ExemptionProperties
-import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.config.InductionExtensionConfig
 import java.time.Clock
 import java.time.LocalDate
-
-private val log = KotlinLogging.logger {}
 
 /**
  * Implementation of [InductionScheduleDateCalculationService] with implemented behaviours specific to the CIAG PEF contracts.
@@ -26,8 +22,8 @@ private val log = KotlinLogging.logger {}
 @Primary
 @ConditionalOnMissingBean(PesInductionScheduleDateCalculationService::class)
 class PefInductionScheduleDateCalculationService(
-  private val inductionExtensionConfig: InductionExtensionConfig,
   private val clock: Clock,
+  private val inductionScheduleCalculationService: InductionScheduleCalculationService,
   exemptionProperties: ExemptionProperties,
 ) : InductionScheduleDateCalculationService(
   clock = clock,
@@ -36,11 +32,6 @@ class PefInductionScheduleDateCalculationService(
       get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
   },
 ) {
-
-  companion object {
-    private const val DAYS_AFTER_ADMISSION = 20L
-    private const val DAYS_AFTER_ADMISSION_EXTENDED = 25L
-  }
 
   /**
    * Returns a [CreateInductionScheduleDto] suitable for creating the specified prisoner's initial [InductionSchedule].
@@ -53,7 +44,7 @@ class PefInductionScheduleDateCalculationService(
     admissionDate: LocalDate,
     prisonId: String,
   ): CreateInductionScheduleDto {
-    val calculationRule = getNewAdmissionCalculationRule()
+    val calculationRule = inductionScheduleCalculationService.getCalculationRuleForNewPrisonAdmission()
     return CreateInductionScheduleDto(
       prisonNumber = prisonNumber,
       deadlineDate = latestOf(admissionDate, LocalDate.now(clock)).plusDays(getNewAdmissionAdditionalDays(calculationRule)),
@@ -64,37 +55,21 @@ class PefInductionScheduleDateCalculationService(
   }
 
   /**
+   * PEF implementation. When scheduling the Induction the deadline date should be today + 20 days, unless it is the
+   * "extended deadline period" in which case it is + 25 days.
+   */
+  override fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long = when (calculationRule) {
+    InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> TWENTY_FIVE_DAYS
+    else -> TWENTY_DAYS
+  }
+
+  /**
    * Not supported under the PEF contract: a prisoner's Induction is scheduled on prison admission, not following the
    * completion of their Screening & Assessments, so there is no S&A based deadline to calculate.
    */
-  override fun determineDeadlineDateForCompletedAssessments(): LocalDate = throw UnsupportedOperationException(
+  override fun determineDeadlineDateForCompletedAssessments(calculationRule: InductionScheduleCalculationRule): LocalDate = throw UnsupportedOperationException(
     "Induction Schedules are not scheduled following Screening & Assessment completion under the PEF contract",
   )
-
-  private fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long = when (calculationRule) {
-    InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> {
-      DAYS_AFTER_ADMISSION_EXTENDED
-    }
-    else -> DAYS_AFTER_ADMISSION
-  }
-
-  // This is to check whether today's date is during a period when the deadline is extended.
-  // e.g. during a special holiday like Christmas
-  fun getNewAdmissionCalculationRule(): InductionScheduleCalculationRule {
-    val today = LocalDate.now(clock)
-
-    val inHolidayPeriod = inductionExtensionConfig.periods.any { period ->
-      !today.isBefore(period.start) && !today.isAfter(period.end)
-    }
-
-    log.debug("Holiday periods: {}", inductionExtensionConfig.periods)
-    log.debug("today: {}, inHolidayPeriod: {}", today, inHolidayPeriod)
-    return if (inHolidayPeriod) {
-      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD
-    } else {
-      InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
-    }
-  }
 
   private fun latestOf(admissionDate: LocalDate, scheduleDateNotBefore: LocalDate?): LocalDate = if (scheduleDateNotBefore != null && scheduleDateNotBefore.isAfter(admissionDate)) {
     scheduleDateNotBefore

@@ -20,18 +20,17 @@ import java.time.LocalDate
  */
 @Service
 @ConditionalOnProperty(name = ["ciag-kpi-processing-rule"], havingValue = "PES")
-class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionProperties, private val clock: Clock) :
-  InductionScheduleDateCalculationService(
-    clock = clock,
-    propertiesProvider = object : InductionSchedulePropertiesProvider {
-      override val onlyExtendDeadlinesWhenNotOverdue: Boolean
-        get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
-    },
-  ) {
-
-  companion object {
-    private const val DAYS_AFTER_ASSESSMENTS_COMPLETE = 10L
-  }
+class PesInductionScheduleDateCalculationService(
+  private val clock: Clock,
+  private val inductionScheduleCalculationService: InductionScheduleCalculationService,
+  exemptionProperties: ExemptionProperties,
+) : InductionScheduleDateCalculationService(
+  clock = clock,
+  propertiesProvider = object : InductionSchedulePropertiesProvider {
+    override val onlyExtendDeadlinesWhenNotOverdue: Boolean
+      get() = exemptionProperties.onlyExtendDeadlinesWhenNotOverdue
+  },
+) {
 
   /**
    * Returns a [CreateInductionScheduleDto] suitable for creating the specified prisoner's initial [InductionSchedule].
@@ -45,7 +44,7 @@ class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionP
   override fun determineCreateInductionScheduleDto(prisonNumber: String, admissionDate: LocalDate, prisonId: String): CreateInductionScheduleDto = CreateInductionScheduleDto(
     prisonNumber = prisonNumber,
     deadlineDate = LocalDate.now(clock),
-    scheduleCalculationRule = InductionScheduleCalculationRule.NEW_PRISON_ADMISSION,
+    scheduleCalculationRule = inductionScheduleCalculationService.getCalculationRuleForNewPrisonAdmission(),
     scheduleStatus = InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     prisonId = prisonId,
   )
@@ -55,5 +54,14 @@ class PesInductionScheduleDateCalculationService(exemptionProperties: ExemptionP
    * Curious. As Screening & Assessments cannot be completed in the future, the deadline is calculated from today,
    * meaning it can never fall in the past.
    */
-  override fun determineDeadlineDateForCompletedAssessments(): LocalDate = LocalDate.now(clock).plusDays(DAYS_AFTER_ASSESSMENTS_COMPLETE)
+  override fun determineDeadlineDateForCompletedAssessments(calculationRule: InductionScheduleCalculationRule): LocalDate = LocalDate.now(clock).plusDays(getNewAdmissionAdditionalDays(calculationRule))
+
+  /**
+   * PES implementation. When scheduling the Induction the deadline date should be today + 10 days, unless it is the
+   * "extended deadline period" in which case it is + <TBC> days.
+   */
+  override fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long = when (calculationRule) {
+    InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> TEN_DAYS // TODO - update here if the business decide they want a longer deadline over extended deadline periods such as Christmas
+    else -> TEN_DAYS
+  }
 }
