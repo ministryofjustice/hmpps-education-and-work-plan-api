@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
@@ -24,6 +25,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 
 @Isolated
+@DisplayName("Tests for when the prisoner is re-admitted from TAP, where we expect the Induction Schedule to be created or updated")
 class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTestBase() {
   companion object {
     private val today = LocalDate.now()
