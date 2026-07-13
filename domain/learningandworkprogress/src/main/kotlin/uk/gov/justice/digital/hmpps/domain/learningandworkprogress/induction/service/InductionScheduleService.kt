@@ -16,13 +16,30 @@ import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
-class InductionScheduleService(
+/**
+ * Abstract service class exposing methods that implement the business rules for updating a prisoner's [InductionSchedule]
+ *
+ * This implemented methods are deliberately final so that they cannot be subclassed, ensuring that the business rules stay within the
+ * domain.
+ * The only exception to this are the abstract methods which are intended to be implemented by subclasses.
+ */
+abstract class InductionScheduleService(
   private val inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
   private val inductionScheduleEventService: InductionScheduleEventService,
   private val inductionScheduleDateCalculationService: InductionScheduleDateCalculationService,
 ) {
 
   private val inductionScheduleStatusTransitionValidator = InductionScheduleStatusTransitionValidator()
+
+  /**
+   * Returns the new deadline date for the [InductionSchedule] when it is being updated as part of a transfer
+   */
+  abstract fun updatedInductionDeadlineForProcessingTransfer(inductionSchedule: InductionSchedule): LocalDate
+
+  /**
+   * Returns the new status  for the [InductionSchedule] when it is being updated as part of a transfer
+   */
+  abstract fun updatedStatusForProcessingTransfer(inductionSchedule: InductionSchedule): InductionScheduleStatus
 
   /**
    * Creates the prisoner's [InductionSchedule].
@@ -204,11 +221,11 @@ class InductionScheduleService(
     )
 
     // Step 2: Adjust induction date and reschedule
-    val adjustedInductionDate = inductionScheduleDateCalculationService
-      .calculateAdjustedInductionDueDate(updatedSchedule)
+    val adjustedInductionDate = updatedInductionDeadlineForProcessingTransfer(updatedSchedule)
+    val newStatus = updatedStatusForProcessingTransfer(updatedSchedule)
     return updateInductionSchedule(
       inductionSchedule = updatedSchedule,
-      newStatus = SCHEDULED,
+      newStatus = newStatus,
       adjustedInductionDate = adjustedInductionDate,
       prisonId = prisonTransferredTo,
     )

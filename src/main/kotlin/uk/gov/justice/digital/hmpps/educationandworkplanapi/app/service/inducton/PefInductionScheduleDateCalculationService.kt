@@ -64,6 +64,11 @@ class PefInductionScheduleDateCalculationService(
   }
 
   /**
+   * PEF implementation. Induction Schedules are extended by 20 days when a prisoner is transferred
+   */
+  override fun extensionDaysForTransfer(): Long = TWENTY_DAYS
+
+  /**
    * Not supported under the PEF contract: a prisoner's Induction is scheduled on prison admission, not following the
    * completion of their Screening & Assessments, so there is no S&A based deadline to calculate.
    */

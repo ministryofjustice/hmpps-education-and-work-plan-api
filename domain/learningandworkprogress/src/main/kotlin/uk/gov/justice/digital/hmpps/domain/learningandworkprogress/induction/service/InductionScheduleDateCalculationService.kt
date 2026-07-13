@@ -42,12 +42,17 @@ abstract class InductionScheduleDateCalculationService(
    */
   abstract fun determineDeadlineDateForCompletedAssessments(calculationRule: InductionScheduleCalculationRule): LocalDate
 
+  /**
+   * Returns the number of days that are added to the Induction deadline date when processing a transfer
+   */
+  abstract fun extensionDaysForTransfer(): Long
+
   fun calculateAdjustedInductionDueDate(inductionSchedule: InductionSchedule): LocalDate = with(inductionSchedule) {
     if (propertiesProvider.onlyExtendDeadlinesWhenNotOverdue && hadUserAppliedExemptionWhenInductionAlreadyOverdue()) {
       deadlineDate
     } else {
       if (scheduleStatus == InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER) {
-        return baseScheduleDate().plusDays(TWENTY_DAYS)
+        return baseScheduleDate().plusDays(extensionDaysForTransfer())
       }
       val additionalDays = getExtensionDays(scheduleStatus)
       val baseDatePlusAdditionalDays = baseScheduleDate().plusDays(additionalDays)
