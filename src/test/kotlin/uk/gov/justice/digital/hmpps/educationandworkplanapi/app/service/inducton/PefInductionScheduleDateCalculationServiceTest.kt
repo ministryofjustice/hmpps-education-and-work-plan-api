@@ -58,4 +58,15 @@ class PefInductionScheduleDateCalculationServiceTest {
       service.determineDeadlineDateForCompletedAssessments(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
     }
   }
+
+  @Test
+  fun `should get the number of extension days for a transfer`() {
+    // Given
+
+    // When
+    val actual = service.extensionDaysForTransfer()
+
+    // Then
+    assertThat(actual).isEqualTo(20)
+  }
 }

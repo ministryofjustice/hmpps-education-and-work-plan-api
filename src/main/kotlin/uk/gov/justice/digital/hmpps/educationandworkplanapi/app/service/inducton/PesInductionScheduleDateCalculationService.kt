@@ -64,4 +64,9 @@ class PesInductionScheduleDateCalculationService(
     InductionScheduleCalculationRule.NEW_PRISON_ADMISSION_EXTENDED_DEADLINE_PERIOD -> TEN_DAYS // TODO - update here if the business decide they want a longer deadline over extended deadline periods such as Christmas
     else -> TEN_DAYS
   }
+
+  /**
+   * PES implementation. Induction Schedules are extended by 10 days when a prisoner is transferred
+   */
+  override fun extensionDaysForTransfer(): Long = TEN_DAYS
 }

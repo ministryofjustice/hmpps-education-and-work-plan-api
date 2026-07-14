@@ -10,10 +10,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employability
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.employabilityskill.service.EmployabilitySkillsService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionEventService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionPersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleDateCalculationService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleEventService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionSchedulePersistenceAdapter
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionScheduleService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.service.InductionService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.note.service.NoteService
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewEventService
@@ -85,17 +81,6 @@ class DomainConfiguration {
     inductionPersistenceAdapter: InductionPersistenceAdapter,
     inductionEventService: InductionEventService,
   ): InductionService = InductionService(inductionPersistenceAdapter, inductionEventService)
-
-  @Bean
-  fun inductionScheduleDomainService(
-    inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter,
-    inductionScheduleEventService: InductionScheduleEventService,
-    inductionScheduleDateCalculationService: InductionScheduleDateCalculationService,
-  ): InductionScheduleService = InductionScheduleService(
-    inductionSchedulePersistenceAdapter,
-    inductionScheduleEventService,
-    inductionScheduleDateCalculationService,
-  )
 
   @Bean
   fun educationDomainService(

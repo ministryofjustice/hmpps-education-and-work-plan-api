@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -194,7 +193,6 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
     }
   }
 
-  @Disabled("Disabled until PES implementation is written which will allow this test to to pass")
   @Test
   fun `should update Induction Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has a SCHEDULED induction and does not have completed Screenings and Assessments`() {
     // Given
@@ -263,7 +261,6 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
     }
   }
 
-  @Disabled("Disabled until PES implementation is written which will allow this test to to pass")
   @Test
   fun `should update Induction Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has a SCHEDULED induction and already has completed Screenings and Assessments`() {
     // Given
@@ -347,7 +344,6 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
     }
   }
 
-  @Disabled("Disabled until PES implementation is written which will allow this test to to pass")
   @Test
   fun `should update Induction Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has an EXEMPT induction and does not have completed Screenings and Assessments`() {
     // Given
@@ -396,7 +392,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
 
     val inductionSchedules = getInductionScheduleHistory(prisonNumber)
     assertThat(inductionSchedules)
-      // Expect 4 schedules - 1 is the initial scheduled, 2 is exemption, 4 is exemption due to transfer, 4 is the pending S&A
+      // Expect 4 schedules - 1 is the initial scheduled, 2 is exemption, 3 is exemption due to transfer, 4 is the pending S&A
       .hasNumberOfInductionScheduleVersions(4)
       .inductionScheduleVersion(1) {
         // Induction Schedule version 1 is the original schedule
@@ -429,7 +425,6 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
     }
   }
 
-  @Disabled("Disabled until PES implementation is written which will allow this test to to pass")
   @Test
   fun `should update Induction Schedule and send outbound message given 'prisoner received' (transfer) event for prisoner that has an EXEMPT induction and already has completed Screenings and Assessments`() {
     // Given
@@ -493,7 +488,7 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
 
     val inductionSchedules = getInductionScheduleHistory(prisonNumber)
     assertThat(inductionSchedules)
-      // Expect 4 schedules - 1 is the initial scheduled, 2 is exemption, 4 is exemption due to transfer, 4 is the rescheduled
+      // Expect 4 schedules - 1 is the initial scheduled, 2 is exemption, 3 is exemption due to transfer, 4 is the rescheduled
       .hasNumberOfInductionScheduleVersions(4)
       .inductionScheduleVersion(1) {
         // Induction Schedule version 1 is the original schedule
