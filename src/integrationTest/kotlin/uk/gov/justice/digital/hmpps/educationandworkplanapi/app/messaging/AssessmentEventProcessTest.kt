@@ -8,6 +8,7 @@ import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.events.assertThat
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.induction.assertThat
@@ -47,6 +48,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(
         prisonNumber = prisonNumber,
@@ -68,6 +72,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       assertThat(inductionSchedule)
         .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
         .hasDeadlineDate(LocalDate.now().plusDays(10))
+
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+        .hasNumberOfEvents(1)
     }
 
     // test that outbound event is also created:
@@ -93,6 +100,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
     )
@@ -107,14 +117,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // The assessment event is recorded, but the already-scheduled Induction is left unchanged
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assert(events.size == 1)
-    }
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+        .hasNumberOfEvents(1)
 
-    val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule)
-      .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
-      .hasDeadlineDate(existingDeadlineDate)
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
+        .hasDeadlineDate(existingDeadlineDate)
+    }
 
     // assert no Induction or Review messages were sent to MN
     assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
@@ -136,6 +146,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
     )
@@ -150,14 +163,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // The assessment event is recorded, but the already-scheduled Induction is left unchanged
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assert(events.size == 1)
-    }
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+        .hasNumberOfEvents(1)
 
-    val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule)
-      .wasStatus(InductionScheduleStatusResponse.COMPLETED)
-      .hasDeadlineDate(existingDeadlineDate)
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.COMPLETED)
+        .hasDeadlineDate(existingDeadlineDate)
+    }
 
     // assert no Induction or Review messages were sent to MN
     assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
@@ -179,6 +192,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       createdAtPrison = "BXI",
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
     )
@@ -193,14 +209,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // The assessment event is recorded, but the already-scheduled Induction is left unchanged
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assert(events.size == 1)
-    }
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+        .hasNumberOfEvents(1)
 
-    val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule)
-      .wasStatus(InductionScheduleStatusResponse.EXEMPT_PRISONER_SAFETY_ISSUES)
-      .hasDeadlineDate(existingDeadlineDate)
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(InductionScheduleStatusResponse.EXEMPT_PRISONER_SAFETY_ISSUES)
+        .hasDeadlineDate(existingDeadlineDate)
+    }
 
     // assert no Induction or Review messages were sent to MN
     assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
@@ -212,6 +228,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Given
     val prisonNumber = setUpRandomPrisoner()
     // The prisoner has no Induction Schedule (messages out of sequence - the S&A Complete arrived before any admission)
+
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
 
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
@@ -227,10 +246,11 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // The assessment event is recorded, but no Induction Schedule is created
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assert(events.size == 1)
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+        .hasNumberOfEvents(1)
+
+      assertThat(getInductionScheduleHistory(prisonNumber)).hasNumberOfInductionScheduleVersions(0)
     }
-    assertThat(getInductionScheduleHistory(prisonNumber)).hasNumberOfInductionScheduleVersions(0)
   }
 
   @Test
@@ -253,6 +273,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       deadlineDate = LocalDate.now(),
       createdAtPrison = "BXI",
     )
+
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
 
     val firstMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(
@@ -280,10 +303,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Then the Induction Schedule is scheduled exactly once (today + 10); the second message is a no-op as it is no
     // longer pending, so no further history version is created (version 1 = seeded PENDING, version 2 = SCHEDULED)
     await untilAsserted {
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+        .hasNumberOfEvents(2)
+
+      assertThat(getInductionSchedule(prisonNumber))
+        .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
+        .hasDeadlineDate(LocalDate.now().plusDays(10))
+
       assertThat(getInductionScheduleHistory(prisonNumber)).hasNumberOfInductionScheduleVersions(2)
     }
-    assertThat(getInductionSchedule(prisonNumber))
-      .wasStatus(InductionScheduleStatusResponse.SCHEDULED)
-      .hasDeadlineDate(LocalDate.now().plusDays(10))
   }
 }

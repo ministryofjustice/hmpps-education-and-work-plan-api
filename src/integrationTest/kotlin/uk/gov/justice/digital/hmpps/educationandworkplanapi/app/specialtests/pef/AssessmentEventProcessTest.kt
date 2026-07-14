@@ -40,6 +40,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       status = InductionScheduleStatus.SCHEDULED,
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
     )
@@ -54,15 +57,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // Verify record persisted in database
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assertThat(events)
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
         .hasNumberOfEvents(1)
-    }
 
-    // assert that the induction schedule is still SCHEDULED
-    val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule)
-      .wasStatus(SCHEDULED)
+      // assert that the induction schedule is still SCHEDULED
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(SCHEDULED)
+    }
   }
 
   @Test
@@ -74,6 +76,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       status = InductionScheduleStatus.EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY,
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
     )
@@ -88,15 +93,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // Verify record persisted in database
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assertThat(events)
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
         .hasNumberOfEvents(1)
-    }
 
-    // assert that the induction schedule is still SCHEDULED
-    val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule)
-      .wasStatus(EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY)
+      // assert that the induction schedule is still SCHEDULED
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(EXEMPT_PRISONER_DRUG_OR_ALCOHOL_DEPENDENCY)
+    }
   }
 
   @Test
@@ -108,6 +112,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
       status = InductionScheduleStatus.COMPLETED,
     )
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(prisonNumber = prisonNumber),
     )
@@ -122,15 +129,14 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
 
     // Verify record persisted in database
     await untilAsserted {
-      val events = educationAssessmentEventRepository.findByPrisonNumber(prisonNumber)
-      assertThat(events)
+      assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
         .hasNumberOfEvents(1)
-    }
 
-    // assert that the induction schedule is still SCHEDULED
-    val inductionSchedule = getInductionSchedule(prisonNumber)
-    assertThat(inductionSchedule)
-      .wasStatus(COMPLETED)
+      // assert that the induction schedule is still SCHEDULED
+      val inductionSchedule = getInductionSchedule(prisonNumber)
+      assertThat(inductionSchedule)
+        .wasStatus(COMPLETED)
+    }
   }
 
   @Test
@@ -138,6 +144,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Given
     val prisonNumber = setUpRandomPrisoner()
     val statusChangeDate = LocalDate.now()
+
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
 
     val sqsMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(
@@ -198,6 +207,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
     // Given
     val prisonNumber = setUpRandomPrisoner()
 
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
+
     val firstMessage = aValidSqsAssessmentEventMessage(
       messageAttributes = validMessageAttributes(
         prisonNumber = prisonNumber,
@@ -238,6 +250,9 @@ class AssessmentEventProcessTest : IntegrationTestBase() {
   fun `should process assessment event message and persist record given prisoner retrieval fails`() {
     // Given
     val prisonNumber = setUpRandomPrisoner()
+
+    assertThat(educationAssessmentEventRepository.findByPrisonNumber(prisonNumber))
+      .hasNumberOfEvents(0)
 
     wiremockService.stubGetPrisonerNotFound(prisonNumber)
 
