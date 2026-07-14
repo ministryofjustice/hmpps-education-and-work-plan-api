@@ -57,4 +57,15 @@ class PesInductionScheduleDateCalculationServiceTest {
     // Then
     assertThat(actual).isEqualTo(LocalDate.parse("2026-04-27")) // fixed clock is 2026-04-17, plus 10 days
   }
+
+  @Test
+  fun `should get the number of extension days for a transfer`() {
+    // Given
+
+    // When
+    val actual = service.extensionDaysForTransfer()
+
+    // Then
+    assertThat(actual).isEqualTo(10)
+  }
 }

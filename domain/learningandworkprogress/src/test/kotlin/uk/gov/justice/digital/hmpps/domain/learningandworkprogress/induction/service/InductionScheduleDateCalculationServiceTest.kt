@@ -19,7 +19,7 @@ class InductionScheduleDateCalculationServiceTest {
   }
 
   // New up an anonymous instance of the abstract class to test the methods implemented in the abstract class
-  // The implementations of determineCreateInductionScheduleDto are tested in the concrete implementations of InductionScheduleDateCalculationService
+  // The implementations of the abstract methods are tested in the concrete implementations of InductionScheduleDateCalculationService
   private val dateCalculationService = object : InductionScheduleDateCalculationService(
     clock = clock,
     propertiesProvider = object : InductionSchedulePropertiesProvider {
@@ -41,6 +41,8 @@ class InductionScheduleDateCalculationServiceTest {
     override fun getNewAdmissionAdditionalDays(calculationRule: InductionScheduleCalculationRule): Long {
       TODO("Not implemented here")
     }
+
+    override fun extensionDaysForTransfer(): Long = TWENTY_DAYS
   }
 
   @Nested

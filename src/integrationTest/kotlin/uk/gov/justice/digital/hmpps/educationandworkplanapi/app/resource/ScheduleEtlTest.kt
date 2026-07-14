@@ -13,6 +13,8 @@ import org.mockito.kotlin.verify
 import org.springframework.http.MediaType.APPLICATION_JSON
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventEntity
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.educationassessment.EducationAssessmentEventStatus.ALL_RELEVANT_ASSESSMENTS_COMPLETE
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -27,6 +29,8 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Revie
 @Isolated
 class ScheduleEtlTest : IntegrationTestBase() {
 
+  private val today = LocalDate.now()
+
   @BeforeEach
   fun setup() {
     clearDatabase()
@@ -37,7 +41,7 @@ class ScheduleEtlTest : IntegrationTestBase() {
     val uri = "/action-plans/schedules/reschedule-inductions-following-transfer"
 
     @Test
-    fun `should correct induction schedule`() {
+    fun `should correct induction schedule given prisoner does not have completed Screenings and Assessments`() {
       // Given
       val prisonNumber = randomValidPrisonNumber()
 
@@ -87,10 +91,113 @@ class ScheduleEtlTest : IntegrationTestBase() {
         val inductionSchedule = getInductionSchedule(prisonNumber)
         assertThat(inductionSchedule)
           .hasReference(inductionScheduleReference)
+          .wasStatus(InductionScheduleStatusApi.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+          .hasDeadlineDate(today)
+
+        val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
+        assertThat(inductionScheduleHistories)
+          .hasNumberOfInductionScheduleVersions(5)
+          .inductionScheduleVersion(1) {
+            it.hasReference(inductionScheduleReference)
+              .wasStatus(InductionScheduleStatusApi.SCHEDULED)
+          }
+          .inductionScheduleVersion(2) {
+            it.hasReference(inductionScheduleReference)
+              .wasStatus(InductionScheduleStatusApi.EXEMPT_PRISONER_TRANSFER)
+          }
+          .inductionScheduleVersion(3) {
+            it.hasReference(inductionScheduleReference)
+              .wasStatus(InductionScheduleStatusApi.SCHEDULED)
+              .hasDeadlineDate(LocalDate.parse("2026-03-31")) // The original incorrect deadline date
+          }
+          .inductionScheduleVersion(4) {
+            it.hasReference(inductionScheduleReference)
+              .wasStatus(InductionScheduleStatusApi.EXEMPT_PRISONER_TRANSFER)
+          }
+          .inductionScheduleVersion(5) {
+            it.hasReference(inductionScheduleReference)
+              .wasStatus(InductionScheduleStatusApi.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+              .hasDeadlineDate(today)
+          }
+
+        // test that outbound events are also created:
+        val inductionScheduleEvents = domainEventQueue.receiveEventsOnQueue(QueueType.INDUCTION)
+        assertThat(inductionScheduleEvents).hasSize(2)
+        inductionScheduleEvents.onEach {
+          assertThat(it.personReference.identifiers[0].value).isEqualTo(prisonNumber)
+          assertThat(it.detailUrl).isEqualTo("http://localhost:8080/inductions/$prisonNumber/induction-schedule")
+        }
+      }
+    }
+
+    @Test
+    fun `should correct induction schedule given prisoner alrwady has completed Screenings and Assessments`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+
+      val inductionScheduleReference = UUID.randomUUID()
+      createInductionScheduleHistory(
+        prisonNumber = prisonNumber,
+        status = InductionScheduleStatus.SCHEDULED,
+        reference = inductionScheduleReference,
+        version = 1,
+      )
+      createInductionScheduleHistory(
+        prisonNumber = prisonNumber,
+        status = InductionScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+        reference = inductionScheduleReference,
+        version = 2,
+      )
+      createInductionScheduleHistory(
+        prisonNumber = prisonNumber,
+        status = InductionScheduleStatus.SCHEDULED,
+        deadlineDate = LocalDate.parse("2026-03-31"),
+        reference = inductionScheduleReference,
+        version = 3,
+      )
+      createInductionSchedule(
+        prisonNumber = prisonNumber,
+        status = InductionScheduleStatus.SCHEDULED,
+        reference = inductionScheduleReference,
+        deadlineDate = LocalDate.parse("2026-03-31"),
+      )
+
+      educationAssessmentEventRepository.save(
+        EducationAssessmentEventEntity(
+          reference = UUID.randomUUID(),
+          prisonNumber = prisonNumber,
+          status = ALL_RELEVANT_ASSESSMENTS_COMPLETE,
+          statusChangeDate = LocalDate.now().minusDays(2),
+          source = "CURIOUS",
+          detailUrl = null,
+          createdAtPrison = "BXI",
+          updatedAtPrison = "BXI",
+        ),
+      )
+
+      clearQueues()
+
+      val requestBody = PrisonNumbersRequest(prisonNumbers = listOf(prisonNumber))
+
+      // When
+      webTestClient.post()
+        .uri(uri)
+        .withBody(requestBody)
+        .bearerToken(aValidTokenWithAuthority(REVIEWS_RW))
+        .contentType(APPLICATION_JSON)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+
+      // Then
+      await untilAsserted {
+        val inductionSchedule = getInductionSchedule(prisonNumber)
+        assertThat(inductionSchedule)
+          .hasReference(inductionScheduleReference)
           .wasStatus(InductionScheduleStatusApi.SCHEDULED)
           .hasDeadlineDate(
-            LocalDate.now().plusDays(20),
-          ) // Deadline should have been extended to date of admission + 20 days, as per standard induction rules for a transfer
+            today.plusDays(10),
+          ) // Deadline should have been extended to date of admission + 10 days, as per PES induction rules for a transfer
 
         val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
         assertThat(inductionScheduleHistories)
@@ -116,8 +223,8 @@ class ScheduleEtlTest : IntegrationTestBase() {
             it.hasReference(inductionScheduleReference)
               .wasStatus(InductionScheduleStatusApi.SCHEDULED)
               .hasDeadlineDate(
-                LocalDate.now().plusDays(20),
-              ) // Deadline should have been extended to date of admission + 20 days, as per standard induction rules for a transfer
+                today.plusDays(10),
+              ) // Deadline should have been extended to date of admission + 10 days, as per PES induction rules for a transfer
           }
 
         // test that outbound events are also created:
@@ -288,7 +395,7 @@ class ScheduleEtlTest : IntegrationTestBase() {
             it.hasReference(activeReviewScheduleReference)
               .hasStatus(ReviewScheduleStatusApi.SCHEDULED)
               .hasReviewDateTo(
-                LocalDate.now().plusDays(10),
+                today.plusDays(10),
               ) // Deadline should have been extended to date of admission + 10 days, as per standard review rules for a transfer
           }
 
@@ -322,7 +429,7 @@ class ScheduleEtlTest : IntegrationTestBase() {
               .reviewScheduleAtVersion(5) {
                 it.hasStatus(ReviewScheduleStatusApi.SCHEDULED)
                   .hasReviewDateTo(
-                    LocalDate.now().plusDays(10),
+                    today.plusDays(10),
                   ) // Deadline should have been extended to date of admission + 10 days, as per standard induction rules for a transfer
               }
           }

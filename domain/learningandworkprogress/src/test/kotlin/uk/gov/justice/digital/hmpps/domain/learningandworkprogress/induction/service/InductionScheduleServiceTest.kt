@@ -4,18 +4,17 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleAlreadyExistsException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleCalculationRule.NEW_PRISON_ADMISSION
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleNotFoundException
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.COMPLETED
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.EXEMPT_PRISONER_FAILED_TO_ENGAGE
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
@@ -33,20 +32,24 @@ import java.time.temporal.ChronoUnit.MINUTES
 import java.time.temporal.ChronoUnit.SECONDS
 import java.util.UUID
 
-@ExtendWith(MockitoExtension::class)
 class InductionScheduleServiceTest {
 
-  @InjectMocks
-  private lateinit var service: InductionScheduleService
+  private val inductionSchedulePersistenceAdapter = mock<InductionSchedulePersistenceAdapter>()
 
-  @Mock
-  private lateinit var inductionSchedulePersistenceAdapter: InductionSchedulePersistenceAdapter
+  private val inductionScheduleEventService = mock<InductionScheduleEventService>()
 
-  @Mock
-  private lateinit var inductionScheduleEventService: InductionScheduleEventService
+  private val inductionScheduleDateCalculationService = mock<InductionScheduleDateCalculationService>()
 
-  @Mock
-  private lateinit var inductionScheduleDateCalculationService: InductionScheduleDateCalculationService
+  // New up an anonymous instance of the abstract class to test the methods implemented in the abstract class
+  private val service = object : InductionScheduleService(
+    inductionSchedulePersistenceAdapter,
+    inductionScheduleEventService,
+    inductionScheduleDateCalculationService,
+  ) {
+    override fun updatedInductionDeadlineForProcessingTransfer(inductionSchedule: InductionSchedule): LocalDate = LocalDate.now()
+
+    override fun updatedStatusForProcessingTransfer(inductionSchedule: InductionSchedule): InductionScheduleStatus = InductionScheduleStatus.SCHEDULED
+  }
 
   companion object {
     private val PRISON_NUMBER = randomValidPrisonNumber()
