@@ -249,6 +249,51 @@ class PrisonerReceivedEventDueToTempAbsenceInductionScheduleTest : IntegrationTe
     }
   }
 
+  @Test
+  fun `should not update Induction Schedule and send outbound message given 'prisoner received' (temp absence) event for prisoner that has an induction schedule that is pending screenings and assessents`() {
+    // Given
+    // an induction Schedule exists
+    val prisonNumber = randomValidPrisonNumber()
+    val earliestDateTime = OffsetDateTime.now()
+
+    createInductionSchedule(prisonNumber, status = InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+
+    val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+      prisonNumber = prisonNumber,
+      eventType = PRISONER_RECEIVED_INTO_PRISON,
+      additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+        prisonNumber = prisonNumber,
+        reason = TEMPORARY_ABSENCE_RETURN,
+      ),
+    )
+
+    // When
+    sendDomainEvent(sqsMessage)
+
+    // Then
+    // wait until the queue is drained / message is processed
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    val inductionSchedule = getInductionSchedule(prisonNumber)
+    assertThat(inductionSchedule)
+      .wasCreatedAtOrAfter(earliestDateTime)
+      .wasUpdatedAtOrAfter(earliestDateTime)
+      .wasCreatedBy("system")
+      .wasCreatedByDisplayName("system")
+      .wasUpdatedBy("system")
+      .wasUpdatedByDisplayName("system")
+      .wasScheduleCalculationRule(InductionScheduleCalculationRule.NEW_PRISON_ADMISSION)
+      .wasStatus(PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS)
+
+    await.untilAsserted {
+      val inductionScheduleHistories = getInductionScheduleHistory(prisonNumber)
+      assertThat(inductionScheduleHistories).hasNumberOfInductionScheduleVersions(0)
+      assertThat(inductionScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+    }
+  }
+
   // NOTE: this test is to test the scenario where we did not get the admission message for this person.
   // so for all intents and purposes this is the admission message
   @Test
