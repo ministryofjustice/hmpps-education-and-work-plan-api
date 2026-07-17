@@ -8,6 +8,13 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non major Gradle dependencies",
       "groupSlug": "all-gradle-minor-patch"
+    },
+    {
+      "description": "Skip broken openApi plugin version",
+      "matchPackageNames": [
+        "org.openapitools:openapi-generator-gradle-plugin"
+      ],
+      "allowedVersions": "!/7.23.0/"
     }
   ]
 }
