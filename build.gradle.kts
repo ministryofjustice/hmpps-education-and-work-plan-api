@@ -5,12 +5,12 @@ import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.7"
-  id("org.openapi.generator") version "7.22.0"
-  kotlin("plugin.spring") version "2.4.0"
-  kotlin("plugin.jpa") version "2.4.0"
+  id("org.openapi.generator") version "7.24.0"
+  kotlin("plugin.spring") version "2.4.10"
+  kotlin("plugin.jpa") version "2.4.10"
 
   id("jacoco")
-  id("name.remal.integration-tests") version "5.0.6"
+  id("name.remal.integration-tests") version "5.0.7"
 
   `java-test-fixtures`
 }
@@ -26,7 +26,7 @@ val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val testContainersVersion = "2.0.5"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.6.0"
+val sarTestSupportLibraryVersion = "2.6.2"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
