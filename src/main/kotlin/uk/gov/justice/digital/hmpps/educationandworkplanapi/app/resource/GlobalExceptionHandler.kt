@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.ElementKind
 import mu.KotlinLogging
-import org.hibernate.validator.internal.engine.path.PathImpl
+import org.hibernate.validator.path.Path
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -282,12 +282,12 @@ class GlobalExceptionHandler(
   }
 
   /**
-   * Returns true is this [ConstraintViolation] relates to a named parameter such as a constraint annotation on a
+   * Returns true if this [ConstraintViolation] relates to a named parameter such as a constraint annotation on a
    * property in the request body, or a constraint annotation on the method argument.
    * Knowing whether the constraint relates to a named parameter means we can use the name in the error response.
    */
-  private fun ConstraintViolation<*>.relatesToNamedParameter(): Boolean = propertyPath is PathImpl &&
-    when ((propertyPath as PathImpl).leafNode.kind) {
+  private fun ConstraintViolation<*>.relatesToNamedParameter(): Boolean = propertyPath is Path &&
+    when ((propertyPath as Path).leafNode.kind) {
       ElementKind.PROPERTY, ElementKind.PARAMETER -> true
       else -> false
     }
