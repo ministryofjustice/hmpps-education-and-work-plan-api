@@ -1133,6 +1133,127 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
       val schedule = reviewSchedulesAfter.findLast { it.scheduleStatus == SCHEDULED }
       assertThat(schedule!!.latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
     }
+
+    @Test
+    fun `prisoner who never had a review but has completed their induction is transferred with 17 or more days left to serve new review schedule should be created`() {
+      // Given
+      // Induction is completed within the last 3 months so no initial Review Schedule is ever created (RR-2711 scenario)
+      val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(60))
+      createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+      createActionPlan(prisonNumber)
+
+      // the prisoner has no review schedule at all and has never had a review
+      assertThat(reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+      assertThat(reviewRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+      clearQueues()
+
+      val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+        prisonNumber = prisonNumber,
+        eventType = PRISONER_RECEIVED_INTO_PRISON,
+        additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+          prisonNumber = prisonNumber,
+          prisonId = PRISON_TRANSFERRING_TO,
+          reason = TRANSFERRED,
+        ),
+      )
+
+      // When
+      sendDomainEvent(sqsMessage)
+
+      // Then
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // a new review schedule is created with a deadline of today + 10 days
+      val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+      assertThat(reviewSchedulesAfter.size).isEqualTo(1)
+      assertThat(reviewSchedulesAfter.last().scheduleStatus).isEqualTo(SCHEDULED)
+      assertThat(reviewSchedulesAfter.last().latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
+    }
+
+    @Test
+    fun `prisoner who never had a review but has completed their induction is transferred with less than 17 days left to serve NO new review schedule should be created`() {
+      // Given
+      // Induction is completed within the last 3 months so no initial Review Schedule is ever created
+      val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(16))
+      createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+      createActionPlan(prisonNumber)
+
+      // the prisoner has no review schedule at all and has never had a review
+      assertThat(reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+      assertThat(reviewRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+      clearQueues()
+
+      val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+        prisonNumber = prisonNumber,
+        eventType = PRISONER_RECEIVED_INTO_PRISON,
+        additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+          prisonNumber = prisonNumber,
+          prisonId = PRISON_TRANSFERRING_TO,
+          reason = TRANSFERRED,
+        ),
+      )
+
+      // When
+      sendDomainEvent(sqsMessage)
+
+      // Then
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // no review schedule is created (a deadline of today + 10 would fall inside the last 7 days before release)
+      assertThat(reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+      assertThat(reviewScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+    }
+
+    @Test
+    fun `prisoner who never had a review but has completed their induction is transferred with a release date in the past new review schedule should be created`() {
+      // Given
+      // Induction is completed within the last 3 months so no initial Review Schedule is ever created
+      val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(60))
+      createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+      createActionPlan(prisonNumber)
+
+      // the prisoner has no review schedule at all and has never had a review
+      assertThat(reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+      assertThat(reviewRepository.getAllByPrisonNumber(prisonNumber)).isEmpty()
+
+      // the prisoner's release date has since moved into the past
+      wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+        prisonNumber,
+        aValidPrisoner(
+          prisonerNumber = prisonNumber,
+          legalStatus = LegalStatus.SENTENCED,
+          releaseDate = LocalDate.now().minusDays(1),
+        ),
+      )
+      clearQueues()
+
+      val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+        prisonNumber = prisonNumber,
+        eventType = PRISONER_RECEIVED_INTO_PRISON,
+        additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+          prisonNumber = prisonNumber,
+          prisonId = PRISON_TRANSFERRING_TO,
+          reason = TRANSFERRED,
+        ),
+      )
+
+      // When
+      sendDomainEvent(sqsMessage)
+
+      // Then
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // a new review schedule is created with a deadline of today + 10 days
+      val reviewSchedulesAfter = reviewScheduleRepository.getAllByPrisonNumber(prisonNumber)
+      val schedule = reviewSchedulesAfter.findLast { it.scheduleStatus == SCHEDULED }
+      assertThat(schedule!!.latestReviewDate).isEqualTo(LocalDate.now().plusDays(10))
+    }
   }
 
   private fun completeReview(prisonNumber: String) {

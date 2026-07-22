@@ -31,7 +31,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.aValidReviewSchedule
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.dto.aValidCreateInitialReviewScheduleDto
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.aValidActionPlan
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
@@ -58,9 +57,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
   @Mock
   private lateinit var reviewScheduleService: ReviewScheduleService
-
-  @Mock
-  private lateinit var reviewService: ReviewService
 
   @Mock
   private lateinit var prisonerSearchApiService: PrisonerSearchApiService
@@ -93,7 +89,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonerSearchApiService = prisonerSearchApiService,
       createInitialReviewScheduleMapper = createInitialReviewScheduleMapper,
       inductionService = inductionService,
-      reviewService = reviewService,
       actionPlanService = actionPlanService,
       scheduleAdapter = scheduleAdapter,
       educationAssessmentEventService = educationAssessmentEventService,
@@ -531,7 +526,6 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
       prisonId = "BXI",
     )
     val inboundEvent = anInboundEvent(additionalInformation)
-    given(reviewService.getCompletedReviewsForPrisoner(prisonNumber)).willReturn(emptyList())
 
     // When
     eventService.process(inboundEvent, additionalInformation)
