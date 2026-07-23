@@ -196,7 +196,7 @@ class ReviewScheduleService(
     }
     ?: throw ReviewScheduleNotFoundException(prisonNumber)
 
-  fun handle17DayTransferRule(prisonNumber: String, prisonTransferredTo: String, releaseDate: LocalDate) {
+  fun handle17DayTransferRule(prisonNumber: String, prisonTransferredTo: String, releaseDate: LocalDate?) {
     if (reviewSchedulePersistenceAdapter.getActiveReviewSchedule(prisonNumber) == null) {
       val reviewScheduleWindow =
         reviewScheduleDateCalculationService.calculateReviewWindow(PRISONER_TRANSFER_AFTER_FINAL_REVIEW, releaseDate)

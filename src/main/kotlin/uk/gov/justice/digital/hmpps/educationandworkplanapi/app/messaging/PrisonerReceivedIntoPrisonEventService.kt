@@ -196,23 +196,22 @@ class PrisonerReceivedIntoPrisonEventService(
 
     // RR-2767: On transfer, if the prisoner has completed their induction but has no active review
     // schedule, apply the "17 day rule" regardless of whether a pre-release review was ever recorded.
-    //   - 17+ days left to serve   -> new review schedule, deadline today + 10 days
-    //   - release date in the past -> new review schedule, deadline today + 10 days
-    //   - less than 17 days left    -> no new review schedule (the deadline would fall in the 7-day pre-release window)
+    // A review is only skipped when the release date is known and falls within the next 17 days, because
+    // a today + 10 day deadline would then land inside the last 7 days before release. In every other case
+    // (17+ days left to serve, a release date in the past, or no release date at all) a new review schedule
+    // is created with a deadline of today + 10 days.
     if (scheduleAdapter.isInductionComplete(nomsNumber)) {
-      val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
-      val releaseDate = prisoner.releaseDate
-      if (releaseDate != null) {
-        val today = LocalDate.now(clock)
-        val hasSeventeenOrMoreDaysLeftToServe = releaseDate.isAfter(today.plusDays(16))
-        val releaseDateInPast = releaseDate.isBefore(today)
-        if (hasSeventeenOrMoreDaysLeftToServe || releaseDateInPast) {
-          reviewScheduleService.handle17DayTransferRule(
-            prisonNumber = nomsNumber,
-            prisonTransferredTo = prisonId,
-            releaseDate = releaseDate,
-          )
-        }
+      val releaseDate = prisonerSearchApiService.getPrisoner(nomsNumber).releaseDate
+      val today = LocalDate.now(clock)
+      val hasLessThan17DaysLeftToServe = releaseDate != null &&
+        !releaseDate.isBefore(today) &&
+        releaseDate.isBefore(today.plusDays(17))
+      if (!hasLessThan17DaysLeftToServe) {
+        reviewScheduleService.handle17DayTransferRule(
+          prisonNumber = nomsNumber,
+          prisonTransferredTo = prisonId,
+          releaseDate = releaseDate,
+        )
       }
     }
 

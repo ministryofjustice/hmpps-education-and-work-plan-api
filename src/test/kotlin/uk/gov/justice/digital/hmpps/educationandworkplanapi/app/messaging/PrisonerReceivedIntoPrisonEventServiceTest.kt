@@ -585,7 +585,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   }
 
   @Test
-  fun `should not apply 17 day transfer rule given prisoner has completed their induction but has no release date`() {
+  fun `should apply 17 day transfer rule given prisoner has completed their induction but has no release date`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()
     val additionalInformation = aValidPrisonerReceivedAdditionalInformation(prisonNumber = prisonNumber, reason = TRANSFERRED, prisonId = "BXI")
@@ -597,7 +597,7 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
     eventService.process(inboundEvent, additionalInformation)
 
     // Then
-    verify(reviewScheduleService, never()).handle17DayTransferRule(any(), any(), any())
+    verify(reviewScheduleService).handle17DayTransferRule(prisonNumber, "BXI", null)
   }
 
   @Test
