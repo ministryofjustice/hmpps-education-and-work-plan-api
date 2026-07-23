@@ -76,8 +76,8 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   @Mock
   private lateinit var educationAssessmentEventService: EducationAssessmentEventService
 
-  @Mock
-  private lateinit var clock: Clock
+  private val clock: Clock = Clock.fixed(Instant.parse("2026-07-23T00:00:00Z"), ZoneOffset.UTC)
+  private val today: LocalDate = LocalDate.now(clock)
 
   private val objectMapper = ObjectMapper()
 
@@ -532,6 +532,88 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
 
     // Then
     verify(reviewScheduleService).exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(prisonNumber, "BXI")
+  }
+
+  @Test
+  fun `should apply 17 day transfer rule given prisoner has completed their induction and has 17 or more days left to serve`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val releaseDate = today.plusDays(18)
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(prisonNumber = prisonNumber, reason = TRANSFERRED, prisonId = "BXI")
+    val inboundEvent = anInboundEvent(additionalInformation)
+    given(scheduleAdapter.isInductionComplete(prisonNumber)).willReturn(true)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(aValidPrisoner(prisonerNumber = prisonNumber, releaseDate = releaseDate))
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService).handle17DayTransferRule(prisonNumber, "BXI", releaseDate)
+  }
+
+  @Test
+  fun `should apply 17 day transfer rule given prisoner has completed their induction and has a release date in the past`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val releaseDate = today.minusDays(1)
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(prisonNumber = prisonNumber, reason = TRANSFERRED, prisonId = "BXI")
+    val inboundEvent = anInboundEvent(additionalInformation)
+    given(scheduleAdapter.isInductionComplete(prisonNumber)).willReturn(true)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(aValidPrisoner(prisonerNumber = prisonNumber, releaseDate = releaseDate))
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService).handle17DayTransferRule(prisonNumber, "BXI", releaseDate)
+  }
+
+  @Test
+  fun `should not apply 17 day transfer rule given prisoner has completed their induction but has less than 17 days left to serve`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(prisonNumber = prisonNumber, reason = TRANSFERRED, prisonId = "BXI")
+    val inboundEvent = anInboundEvent(additionalInformation)
+    given(scheduleAdapter.isInductionComplete(prisonNumber)).willReturn(true)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(aValidPrisoner(prisonerNumber = prisonNumber, releaseDate = today.plusDays(16)))
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService, never()).handle17DayTransferRule(any(), any(), any())
+  }
+
+  @Test
+  fun `should not apply 17 day transfer rule given prisoner has completed their induction but has no release date`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(prisonNumber = prisonNumber, reason = TRANSFERRED, prisonId = "BXI")
+    val inboundEvent = anInboundEvent(additionalInformation)
+    given(scheduleAdapter.isInductionComplete(prisonNumber)).willReturn(true)
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(aValidPrisoner(prisonerNumber = prisonNumber, releaseDate = null))
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService, never()).handle17DayTransferRule(any(), any(), any())
+  }
+
+  @Test
+  fun `should not apply 17 day transfer rule given prisoner has not completed their induction`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(prisonNumber = prisonNumber, reason = TRANSFERRED, prisonId = "BXI")
+    val inboundEvent = anInboundEvent(additionalInformation)
+    given(scheduleAdapter.isInductionComplete(prisonNumber)).willReturn(false)
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService, never()).handle17DayTransferRule(any(), any(), any())
+    verify(prisonerSearchApiService, never()).getPrisoner(prisonNumber)
   }
 
   @ParameterizedTest
