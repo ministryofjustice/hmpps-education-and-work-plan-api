@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.Review
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleNotFoundException
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewScheduleService
-import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.review.service.ReviewService
 import uk.gov.justice.digital.hmpps.domain.personallearningplan.service.ActionPlanService
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.Prisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation
@@ -45,7 +44,6 @@ class PrisonerReceivedIntoPrisonEventService(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val createInitialReviewScheduleMapper: CreateInitialReviewScheduleMapper,
   private val inductionService: InductionService,
-  private val reviewService: ReviewService,
   private val actionPlanService: ActionPlanService,
   private val scheduleAdapter: ScheduleAdapter,
   private val educationAssessmentEventService: EducationAssessmentEventService,
@@ -196,18 +194,23 @@ class PrisonerReceivedIntoPrisonEventService(
       },
     )
 
-    val reviews = reviewService.getCompletedReviewsForPrisoner(nomsNumber)
-    // If the person has completed their final review
-    // AND they have 17 days or more left to serve AND they don't have an active review schedule,
-    // then create a new review schedule.
-    val mostRecentReview = reviews.maxByOrNull { it.completedDate }
-    if (mostRecentReview != null && mostRecentReview.preRelease) {
-      val prisoner = prisonerSearchApiService.getPrisoner(nomsNumber)
-      if (prisoner.releaseDate != null && prisoner.releaseDate.isAfter(LocalDate.now(clock).plusDays(16))) {
+    // RR-2767: On transfer, if the prisoner has completed their induction but has no active review
+    // schedule, apply the "17 day rule" regardless of whether a pre-release review was ever recorded.
+    // A review is only skipped when the release date is known and falls within the next 17 days, because
+    // a today + 10 day deadline would then land inside the last 7 days before release. In every other case
+    // (17+ days left to serve, a release date in the past, or no release date at all) a new review schedule
+    // is created with a deadline of today + 10 days.
+    if (scheduleAdapter.isInductionComplete(nomsNumber)) {
+      val releaseDate = prisonerSearchApiService.getPrisoner(nomsNumber).releaseDate
+      val today = LocalDate.now(clock)
+      val hasLessThan17DaysLeftToServe = releaseDate != null &&
+        !releaseDate.isBefore(today) &&
+        releaseDate.isBefore(today.plusDays(17))
+      if (!hasLessThan17DaysLeftToServe) {
         reviewScheduleService.handle17DayTransferRule(
           prisonNumber = nomsNumber,
           prisonTransferredTo = prisonId,
-          releaseDate = prisoner.releaseDate,
+          releaseDate = releaseDate,
         )
       }
     }
