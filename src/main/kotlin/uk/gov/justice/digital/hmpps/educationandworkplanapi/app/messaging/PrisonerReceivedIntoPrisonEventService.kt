@@ -184,28 +184,41 @@ class PrisonerReceivedIntoPrisonEventService(
       log.warn { "Exception thrown when completing induction or creating review schedule: ${e.message}" }
     }
 
-    handle(
-      scheduleType = REVIEW_SCHEDULE,
-      action = {
-        reviewScheduleService.exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(
-          prisonNumber = nomsNumber,
-          prisonTransferredTo = prisonId,
-        )
-      },
-    )
-
-    // RR-2767: On transfer, if the prisoner has completed their induction but has no active review
-    // schedule, apply the "17 day rule" regardless of whether a pre-release review was ever recorded.
-    // A review is only skipped when the release date is known and falls within the next 17 days, because
-    // a today + 10 day deadline would then land inside the last 7 days before release. In every other case
-    // (17+ days left to serve, a release date in the past, or no release date at all) a new review schedule
-    // is created with a deadline of today + 10 days.
+    // RR-2767: the "17 day rule" runs on every transfer, whether or not the prisoner already has
+    // a Review Schedule. A review is only withheld when the release date is known and falls within the next 17
+    // days, because a today + 10 day deadline would then land inside the last 7 days before release. In every
+    // other case (17+ days left to serve, a release date in the past, or no release date at all) the prisoner
+    // should have a review due today + 10.
+    // Only a prisoner who has completed their induction can have a Review Schedule, so gating the whole block on
+    // isInductionComplete also covers the "prisoner already has an active Review Schedule" case.
     if (scheduleAdapter.isInductionComplete(nomsNumber)) {
       val releaseDate = prisonerSearchApiService.getPrisoner(nomsNumber).releaseDate
       val today = LocalDate.now(clock)
       val hasLessThan17DaysLeftToServe = releaseDate != null &&
         !releaseDate.isBefore(today) &&
         releaseDate.isBefore(today.plusDays(17))
+
+      // If the prisoner already has an active Review Schedule, re-schedule it to today + 10 - or, when they now
+      // have less than 17 days left, exempt it without re-scheduling so that they have no review due.
+      handle(
+        scheduleType = REVIEW_SCHEDULE,
+        action = {
+          if (hasLessThan17DaysLeftToServe) {
+            reviewScheduleService.exemptActiveReviewScheduleDueToPrisonerTransfer(
+              prisonNumber = nomsNumber,
+              prisonId = prisonId,
+            )
+          } else {
+            reviewScheduleService.exemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer(
+              prisonNumber = nomsNumber,
+              prisonTransferredTo = prisonId,
+            )
+          }
+        },
+      )
+
+      // If the prisoner has no active Review Schedule, create one with a deadline of today + 10 (unless they
+      // have less than 17 days left to serve, in which case no review is due).
       if (!hasLessThan17DaysLeftToServe) {
         reviewScheduleService.handle17DayTransferRule(
           prisonNumber = nomsNumber,
