@@ -179,6 +179,15 @@ class ReviewScheduleService(
   fun exemptActiveReviewScheduleStatusDueToUnknownReason(prisonNumber: String, prisonId: String) = exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_UNKNOWN)
 
   /**
+   * Exempts the prisoner's active Review Schedule as EXEMPT_PRISONER_TRANSFER **without** re-scheduling it.
+   * Used on transfer when the prisoner has less than 17 days left to serve, so that they have no review due (a
+   * today + 10 deadline would fall inside the last 7 days before release). EXEMPT_PRISONER_TRANSFER is not an
+   * "active" review status, so the prisoner is left with no active Review Schedule. If they later transfer again
+   * with 17 or more days left, the normal transfer handling creates a fresh Review Schedule due in 10 days.
+   */
+  fun exemptActiveReviewScheduleDueToPrisonerTransfer(prisonNumber: String, prisonId: String) = exemptActiveReviewSchedule(prisonNumber, prisonId, ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
+
+  /**
    * Updates the prisoner's active Review Schedule by setting its status to EXEMPT_PRISONER_TRANSFER, then immediately
    * re-scheduling it.
    * Applying both status changes in quick succession (EXEMPT_PRISONER_TRANSFER, immediately followed by SCHEDULED) allows

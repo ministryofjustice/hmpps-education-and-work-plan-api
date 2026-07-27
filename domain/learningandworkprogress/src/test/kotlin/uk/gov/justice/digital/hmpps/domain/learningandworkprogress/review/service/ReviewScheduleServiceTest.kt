@@ -294,6 +294,61 @@ class ReviewScheduleServiceTest {
   }
 
   @Nested
+  inner class ExemptActiveReviewScheduleDueToPrisonerTransfer {
+    @Test
+    fun `should exempt active Review Schedule as EXEMPT_PRISONER_TRANSFER without re-scheduling`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val prisonId = "BXI"
+
+      val activeReviewSchedule = aValidReviewSchedule(
+        prisonNumber = prisonNumber,
+        scheduleStatus = ReviewScheduleStatus.SCHEDULED,
+      )
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(activeReviewSchedule)
+
+      val updatedReviewSchedule = activeReviewSchedule.copy(
+        scheduleStatus = ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER,
+      )
+      given(reviewSchedulePersistenceAdapter.updateReviewScheduleStatus(any())).willReturn(updatedReviewSchedule)
+
+      // When
+      reviewScheduleService.exemptActiveReviewScheduleDueToPrisonerTransfer(prisonNumber, prisonId)
+
+      // Then
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(prisonNumber)
+
+      val updateReviewScheduleStatusDtoCaptor = argumentCaptor<UpdateReviewScheduleStatusDto>()
+      // Exempt only - a single status update, with no follow-on re-schedule back to SCHEDULED
+      verify(reviewSchedulePersistenceAdapter).updateReviewScheduleStatus(updateReviewScheduleStatusDtoCaptor.capture())
+      val updateReviewScheduleStatusDto = updateReviewScheduleStatusDtoCaptor.firstValue
+      assertThat(updateReviewScheduleStatusDto.reference).isEqualTo(activeReviewSchedule.reference)
+      assertThat(updateReviewScheduleStatusDto.prisonNumber).isEqualTo(prisonNumber)
+      assertThat(updateReviewScheduleStatusDto.prisonId).isEqualTo(prisonId)
+      assertThat(updateReviewScheduleStatusDto.scheduleStatus).isEqualTo(ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
+    }
+
+    @Test
+    fun `should not exempt Review Schedule given prisoner does not have an active review schedule`() {
+      // Given
+      val prisonNumber = randomValidPrisonNumber()
+      val prisonId = "BXI"
+
+      given(reviewSchedulePersistenceAdapter.getActiveReviewSchedule(any())).willReturn(null)
+
+      // When
+      val exception = assertThrows(ReviewScheduleNotFoundException::class.java) {
+        reviewScheduleService.exemptActiveReviewScheduleDueToPrisonerTransfer(prisonNumber, prisonId)
+      }
+
+      // Then
+      assertThat(exception.prisonNumber).isEqualTo(prisonNumber)
+      verify(reviewSchedulePersistenceAdapter).getActiveReviewSchedule(prisonNumber)
+      verifyNoInteractions(reviewScheduleEventService)
+    }
+  }
+
+  @Nested
   inner class ExemptAndReScheduleActiveReviewScheduleDueToPrisonerTransfer {
     @Test
     fun `should exempt and re-schedule active Review Schedule for prisoner`() {

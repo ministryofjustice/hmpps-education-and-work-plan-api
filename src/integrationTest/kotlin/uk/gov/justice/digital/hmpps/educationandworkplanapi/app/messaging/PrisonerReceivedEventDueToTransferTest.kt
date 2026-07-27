@@ -1253,6 +1253,137 @@ class PrisonerReceivedEventDueToTransferTest : IntegrationTestBase() {
             .hasReviewDateTo(LocalDate.now().plusDays(10))
         }
     }
+
+    @Test
+    fun `prisoner with an active review schedule who transfers with less than 17 days left to serve has it exempted and NOT re-scheduled`() {
+      // Given
+      // an active SCHEDULED review schedule (created while the prisoner had more than 3 months left to serve)
+      val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(100))
+      createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+      createActionPlan(prisonNumber)
+
+      // their release date has since moved to within 17 days
+      wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+        prisonNumber,
+        aValidPrisoner(
+          prisonerNumber = prisonNumber,
+          legalStatus = LegalStatus.SENTENCED,
+          releaseDate = LocalDate.now().plusDays(16),
+        ),
+      )
+
+      await untilCallTo {
+        reviewScheduleEventQueue.countAllMessagesOnQueue()
+      } matches { it != null && it > 0 }
+      clearQueues()
+
+      val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+        prisonNumber = prisonNumber,
+        eventType = PRISONER_RECEIVED_INTO_PRISON,
+        additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+          prisonNumber = prisonNumber,
+          prisonId = PRISON_TRANSFERRING_TO,
+          reason = TRANSFERRED,
+        ),
+      )
+
+      // When
+      sendDomainEvent(sqsMessage)
+
+      // Then
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // the existing review schedule is exempted due to transfer and NOT re-scheduled, so no review is due
+      assertThat(getReviewSchedules(prisonNumber))
+        .hasNumberOfReviewSchedules(2)
+        .reviewScheduleAtVersion(1) {
+          it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+        }
+        .reviewScheduleAtVersion(2) {
+          it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
+        }
+    }
+
+    @Test
+    fun `prisoner exempted on transfer with less than 17 days left gets a review due in 10 days when they transfer again with more than 17 days left`() {
+      // Given
+      // an active SCHEDULED review schedule
+      val prisonNumber = setUpRandomPrisoner(releaseDate = LocalDate.now().plusDays(100))
+      createInduction(prisonNumber, aValidCreateInductionRequestForPrisonerNotLookingToWork(prisonId = ORIGINAL_PRISON))
+      createActionPlan(prisonNumber)
+
+      // When they transfer with less than 17 days left to serve
+      wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+        prisonNumber,
+        aValidPrisoner(
+          prisonerNumber = prisonNumber,
+          legalStatus = LegalStatus.SENTENCED,
+          releaseDate = LocalDate.now().plusDays(16),
+        ),
+      )
+      await untilCallTo {
+        reviewScheduleEventQueue.countAllMessagesOnQueue()
+      } matches { it != null && it > 0 }
+      clearQueues()
+
+      sendDomainEvent(
+        aValidHmppsDomainEventsSqsMessage(
+          prisonNumber = prisonNumber,
+          eventType = PRISONER_RECEIVED_INTO_PRISON,
+          additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+            prisonNumber = prisonNumber,
+            prisonId = PRISON_TRANSFERRING_TO,
+            reason = TRANSFERRED,
+          ),
+        ),
+      )
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // Then no review is due - the schedule is exempted, not re-scheduled
+      assertThat(getReviewSchedules(prisonNumber))
+        .hasNumberOfReviewSchedules(2)
+        .reviewScheduleAtVersion(2) {
+          it.hasStatus(ReviewScheduleStatus.EXEMPT_PRISONER_TRANSFER)
+        }
+
+      // When they transfer again and their release date has been pushed back beyond 17 days
+      wiremockService.stubGetPrisonerFromPrisonerSearchApi(
+        prisonNumber,
+        aValidPrisoner(
+          prisonerNumber = prisonNumber,
+          legalStatus = LegalStatus.SENTENCED,
+          releaseDate = LocalDate.now().plusDays(100),
+        ),
+      )
+      clearQueues()
+
+      sendDomainEvent(
+        aValidHmppsDomainEventsSqsMessage(
+          prisonNumber = prisonNumber,
+          eventType = PRISONER_RECEIVED_INTO_PRISON,
+          additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+            prisonNumber = prisonNumber,
+            prisonId = PRISON_TRANSFERRING_TO,
+            reason = TRANSFERRED,
+          ),
+        ),
+      )
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // Then their current review schedule is due in 10 days (a fresh schedule is created because the exempted
+      // one is no longer active)
+      assertThat(getActionPlanReviews(prisonNumber))
+        .latestReviewSchedule {
+          it.hasStatus(ReviewScheduleStatus.SCHEDULED)
+            .hasReviewDateTo(LocalDate.now().plusDays(10))
+        }
+    }
   }
 
   private fun completeReview(prisonNumber: String) {
