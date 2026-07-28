@@ -889,5 +889,49 @@ class PrisonerReceivedDueToAdmissionEventTest : IntegrationTestBase() {
           .personReferenceIdentifier(1) { it.hasValue(prisonNumber) }
       }
     }
+
+    @Test
+    fun `should NOT create Review Schedule on re-admission given prisoner has less than 17 days left to serve`() {
+      // Given
+      // prisoner has a PLP Action Plan (Induction + at least 1 Goal) but no Review Schedule, and is due for release in less than 17 days
+      val prisonNumber = randomValidPrisonNumber()
+
+      with(aValidPrisoner(prisonerNumber = prisonNumber, prisonId = "MDI", releaseDate = LocalDate.now().plusDays(16))) {
+        createPrisonerAPIStub(prisonNumber, this)
+      }
+
+      createInduction(prisonNumber, aValidCreateInductionRequest())
+      createActionPlan(prisonNumber)
+
+      // Ensure the prisoner has no Review Schedule going into the re-admission
+      clearQueues()
+      reviewScheduleRepository.deleteAll()
+      reviewScheduleHistoryRepository.deleteAll()
+      assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
+
+      val sqsMessage = aValidHmppsDomainEventsSqsMessage(
+        prisonNumber = prisonNumber,
+        eventType = PRISONER_RECEIVED_INTO_PRISON,
+        additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+          prisonNumber = prisonNumber,
+          reason = ADMISSION,
+        ),
+      )
+
+      // When
+      sendDomainEvent(sqsMessage)
+
+      // Then
+      // wait until the queue is drained / message is processed
+      await untilCallTo {
+        domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+      } matches { it == 0 }
+
+      // 17-day rule: fewer than 17 days left to serve, so no Review Schedule is created on re-admission
+      await untilAsserted {
+        assertThat(getReviewSchedules(prisonNumber)).hasNumberOfReviewSchedules(0)
+        assertThat(reviewScheduleEventQueue.countAllMessagesOnQueue()).isEqualTo(0)
+      }
+    }
   }
 }
