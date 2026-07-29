@@ -235,6 +235,41 @@ class PrisonerReceivedIntoPrisonEventServiceTest {
   }
 
   @Test
+  fun `should not create Review Schedule on re-admission given prisoner has less than 17 days left to serve`() {
+    // Given
+    val prisonNumber = randomValidPrisonNumber()
+    val prisonerAdmissionDate = LocalDate.now()
+    val prisonId = "BXI"
+
+    val additionalInformation = aValidPrisonerReceivedAdditionalInformation(
+      prisonNumber = prisonNumber,
+      reason = ADMISSION,
+      prisonId = prisonId,
+    )
+    val inboundEvent = anInboundEvent(
+      additionalInformation = additionalInformation,
+      eventOccurredAt = prisonerAdmissionDate.atTime(11, 47, 32).toInstant(ZoneOffset.UTC),
+    )
+
+    val prisoner = aValidPrisoner(prisonNumber, releaseDate = today.plusDays(16))
+    given(prisonerSearchApiService.getPrisoner(prisonNumber)).willReturn(prisoner)
+
+    given(inductionService.getInductionForPrisoner(prisonNumber)).willReturn(aFullyPopulatedInduction(prisonNumber = prisonNumber))
+    given(actionPlanService.getActionPlan(prisonNumber)).willReturn(aValidActionPlan(prisonNumber = prisonNumber))
+    given(inductionScheduleService.getInductionScheduleForPrisoner(prisonNumber)).willThrow(
+      InductionScheduleNotFoundException(prisonNumber),
+    )
+
+    // When
+    eventService.process(inboundEvent, additionalInformation)
+
+    // Then
+    verify(reviewScheduleService).getActiveReviewScheduleForPrisoner(prisonNumber)
+    verify(reviewScheduleService, never()).createInitialReviewSchedule(any())
+    verifyNoInteractions(createInitialReviewScheduleMapper)
+  }
+
+  @Test
   fun `should process event given reason is prisoner admission and prisoner already has an Induction Schedule that is COMPLETED but has no active Review Schedule`() {
     // Given
     val prisonNumber = randomValidPrisonNumber()

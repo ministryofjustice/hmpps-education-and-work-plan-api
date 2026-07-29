@@ -193,10 +193,7 @@ class PrisonerReceivedIntoPrisonEventService(
     // isInductionComplete also covers the "prisoner already has an active Review Schedule" case.
     if (scheduleAdapter.isInductionComplete(nomsNumber)) {
       val releaseDate = prisonerSearchApiService.getPrisoner(nomsNumber).releaseDate
-      val today = LocalDate.now(clock)
-      val hasLessThan17DaysLeftToServe = releaseDate != null &&
-        !releaseDate.isBefore(today) &&
-        releaseDate.isBefore(today.plusDays(17))
+      val hasLessThan17DaysLeftToServe = hasLessThan17DaysLeftToServe(releaseDate)
 
       // If the prisoner already has an active Review Schedule, re-schedule it to today + 10 - or, when they now
       // have less than 17 days left, exempt it without re-scheduling so that they have no review due.
@@ -325,20 +322,35 @@ class PrisonerReceivedIntoPrisonEventService(
       )
     }
 
-    val readmission = true
-    var transfer = false
-    if (treatAsTransfer) {
-      transfer = true
+    // The "17 day rule" applies on re-admission as well as on transfer: a review must not be scheduled within the
+    // last 7 days before release, so if the prisoner has less than 17 days left to serve (a today + 10 deadline
+    // would land inside that window) no new Review Schedule is created. In every other case (17+ days left to
+    // serve, a release date in the past, or no release date at all) a new Review Schedule is created.
+    if (hasLessThan17DaysLeftToServe(prisoner.releaseDate)) {
+      return
     }
 
     // Create a new Review Schedule for the prisoner
     val reviewScheduleDto = createInitialReviewScheduleMapper.fromPrisonerToDomain(
       prisoner = prisoner,
       // If the prisoner is being admitted (prisoner.admission event) and they already have an Induction Schedule, this MUST be a re-admission (re-offender)
-      isReadmission = readmission, // true
-      isTransfer = transfer, // false
+      isReadmission = true,
+      isTransfer = treatAsTransfer,
     )
     reviewScheduleService.createInitialReviewSchedule(reviewScheduleDto)
+  }
+
+  /**
+   * The "17 day rule": returns true when the prisoner's release date is known and falls within the next 17 days.
+   * A Review deadline of today + 10 days would then land inside the last 7 days before release, which is not allowed,
+   * so in that case no Review should be scheduled. Returns false when the release date is 17 or more days away, in the
+   * past, or not known - in all of which cases a Review should be scheduled.
+   */
+  private fun hasLessThan17DaysLeftToServe(releaseDate: LocalDate?): Boolean {
+    val today = LocalDate.now(clock)
+    return releaseDate != null &&
+      !releaseDate.isBefore(today) &&
+      releaseDate.isBefore(today.plusDays(17))
   }
 
   private fun handle(
