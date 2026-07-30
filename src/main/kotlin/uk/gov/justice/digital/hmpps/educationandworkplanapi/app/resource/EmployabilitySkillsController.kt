@@ -36,7 +36,7 @@ class EmployabilitySkillsController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(HAS_EDIT_ACTIONPLANS)
+  @PreAuthorize(HAS_EDIT_EMPLOYABILITY_SKILLS)
   @Transactional
   fun createEmployabilitySkills(
     @Valid @RequestBody request: CreateEmployabilitySkillsRequest,
@@ -52,7 +52,7 @@ class EmployabilitySkillsController(
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize(HAS_VIEW_ACTIONPLANS)
+  @PreAuthorize(HAS_VIEW_EMPLOYABILITY_SKILLS)
   fun getEmployabilitySkills(
     @PathVariable @Pattern(regexp = PRISON_NUMBER_FORMAT) prisonNumber: String,
   ): GetEmployabilitySkillResponses = GetEmployabilitySkillResponses(
