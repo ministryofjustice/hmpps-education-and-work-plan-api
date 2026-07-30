@@ -25,6 +25,9 @@ generic-service:
 generic-prometheus-alerts:
   alertSeverity: hmpps-support-additional-needs-preprod
   businessHoursOnly: true
+  sqsNumberAlertQueueNames:
+    - "hmpps-farsight-reduce-re-offend-preprod-eawp_domain_events_dlq"
+    - "hmpps-farsight-reduce-re-offend-preprod-eawp_assessment_events_dlq"
 
 generic-data-analytics-extractor:
   serviceAccountName: hmpps-education-and-work-plan-preprod-to-ap-s3
