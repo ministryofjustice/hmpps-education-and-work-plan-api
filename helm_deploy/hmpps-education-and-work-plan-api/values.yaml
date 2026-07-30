@@ -110,6 +110,7 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-education-and-work-plan-api
+  sqsAlertsTotalMessagesThreshold: "0"
 
 generic-data-analytics-extractor:
   cronJobNameOverride: export-database-to-analytical-platform-cronjob
