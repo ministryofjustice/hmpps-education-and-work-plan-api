@@ -33,6 +33,9 @@ generic-service:
 generic-prometheus-alerts:
   alertSeverity: hmpps-support-additional-needs-dev
   businessHoursOnly: true
+  sqsNumberAlertQueueNames:
+    - "hmpps-farsight-reduce-re-offend-development-eawp_domain_events_dlq"
+    - "hmpps-farsight-reduce-re-offend-development-eawp_assessment_events_dlq"
 
 generic-data-analytics-extractor:
   serviceAccountName: hmpps-education-and-work-plan-dev-to-ap-s3
