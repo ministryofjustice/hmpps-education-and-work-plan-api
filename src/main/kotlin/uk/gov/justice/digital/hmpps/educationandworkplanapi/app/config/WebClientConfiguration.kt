@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
+import uk.gov.justice.hmpps.kotlin.auth.ServletRequestResponseNonNullFilterFunction
 import java.time.Duration
 import kotlin.apply as kotlinApply
 
@@ -62,6 +63,7 @@ class WebClientConfiguration(
 
     return baseUrl(url)
       .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(timeout)))
+      .filter(ServletRequestResponseNonNullFilterFunction())
       .filter(oauth2Client)
       .build()
   }
