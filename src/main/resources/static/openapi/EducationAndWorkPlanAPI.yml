@@ -2022,6 +2022,7 @@ components:
         - ON_HOLD
         - DUE
         - OVERDUE
+        - SCREENER_PENDING
 
     NoteType:
       title: NoteType
@@ -3308,6 +3309,10 @@ components:
           type: integer
           example: 0
           description: Number of exempt inductions
+        screenerPendingInductions:
+          type: integer
+          example: 0
+          description: Number of inductions awaiting the prisoner's initial screening and assessments from Curious
 
     CompletedActionPlanReviewResponse:
       title: CompletedActionPlanReviewResponse

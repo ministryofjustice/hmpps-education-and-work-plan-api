@@ -16,6 +16,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS as INDUCTION_SCREENER_PENDING
 import uk.gov.justice.digital.hmpps.domain.learningandworkprogress.induction.InductionScheduleStatus.SCHEDULED as INDUCTION_SCHEDULED
 
 private val log = KotlinLogging.logger {}
@@ -29,7 +30,7 @@ class SessionSummaryService(
 ) {
 
   /**
-   * returns due, overdue and on hold counts for Inductions and Reviews
+   * returns due, overdue, on hold and screener pending counts for Inductions and Reviews
    * for all prisoners within a given prison.
    */
   fun getSessionSummaries(prisonId: String): SessionSummaryResponse {
@@ -50,13 +51,17 @@ class SessionSummaryService(
       dueInductions = sessionSummaries.dueInductions.size,
       overdueInductions = sessionSummaries.overdueInductions.size,
       exemptInductions = sessionSummaries.exemptInductions.size,
+      screenerPendingInductions = sessionSummaries.screenerPendingInductions.size,
     )
   }
 
   /**
    * returns a list of Induction and Review session information
    * for all prisoners from the given list. The list is filtered on SessionStatusType
-   * which can be DUE, OVERDUE and ON_HOLD
+   * which can be DUE, OVERDUE, ON_HOLD and SCREENER_PENDING
+   *
+   * Note that SCREENER_PENDING only ever applies to Inductions - a Review is never gated on the
+   * prisoner's Screening & Assessments - hence the empty list of Reviews for that status.
    */
   fun getSessions(status: SessionStatusType, requestIds: PrisonerIdsRequest): SessionResponses {
     val sessionSummaries = getSessionSummaries(requestIds.prisonNumbers)
@@ -65,6 +70,7 @@ class SessionSummaryService(
       SessionStatusType.DUE -> mapSessions(sessionSummaries.dueReviews, sessionSummaries.dueInductions)
       SessionStatusType.OVERDUE -> mapSessions(sessionSummaries.overdueReviews, sessionSummaries.overdueInductions)
       SessionStatusType.ON_HOLD -> mapSessions(sessionSummaries.exemptReviews, sessionSummaries.exemptInductions)
+      SessionStatusType.SCREENER_PENDING -> mapSessions(emptyList(), sessionSummaries.screenerPendingInductions)
     }
 
     return SessionResponses(sessions = sessions)
@@ -116,6 +122,7 @@ class SessionSummaryService(
 
     inductionSchedules.forEach { schedule ->
       when {
+        schedule.includeInScreenerPendingCount() -> sessionSummaries.screenerPendingInductions.add(schedule)
         schedule.includeInExemptCount() -> sessionSummaries.exemptInductions.add(schedule)
         schedule.includeInOverdueCount(today) -> sessionSummaries.overdueInductions.add(schedule)
         schedule.includeInDueCount(today) -> sessionSummaries.dueInductions.add(schedule)
@@ -140,7 +147,18 @@ class SessionSummaryService(
     val dueInductions: MutableList<InductionSchedule> = mutableListOf(),
     val overdueInductions: MutableList<InductionSchedule> = mutableListOf(),
     val exemptInductions: MutableList<InductionSchedule> = mutableListOf(),
+    val screenerPendingInductions: MutableList<InductionSchedule> = mutableListOf(),
   )
+
+  /**
+   * Returns true if the [InductionSchedule] is awaiting the prisoner's initial Screening & Assessments from Curious,
+   * for the purposes of the [SessionSummaries] counts.
+   *
+   * Under the PES contract an Induction is created in this state on prison admission and stays there until Curious
+   * reports that all relevant Screening & Assessments are complete. Such a schedule is neither exempt, due nor
+   * overdue, so it is bucketed first and separately.
+   */
+  private fun InductionSchedule.includeInScreenerPendingCount(): Boolean = scheduleStatus == INDUCTION_SCREENER_PENDING
 
   /**
    * Returns true if the [InductionSchedule] is considered exempt for the purposes of the [SessionSummaries] counts
