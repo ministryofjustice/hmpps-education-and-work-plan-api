@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.bearerToken
@@ -28,6 +29,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
   val prisoner4 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
   val prisoner5 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
   val prisoner6 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
+  val prisoner7 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
 
   @Test
   fun `should return unauthorized given no bearer token`() {
@@ -77,6 +79,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isZero()
     assertThat(actual.exemptReviews).isZero()
     assertThat(actual.exemptInductions).isZero()
+    assertThat(actual.screenerPendingInductions).isZero()
   }
 
   @Test
@@ -86,7 +89,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
 
     wiremockService.stubPrisonersInAPrisonSearchApi(
       PRISON_ID,
-      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6),
+      listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6, prisoner7),
     )
 
     // When
@@ -102,6 +105,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(1)
     assertThat(actual.exemptReviews).isEqualTo(1)
     assertThat(actual.exemptInductions).isEqualTo(1)
+    assertThat(actual.screenerPendingInductions).isEqualTo(1)
   }
 
   @Test
@@ -127,6 +131,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(0)
     assertThat(actual.exemptReviews).isEqualTo(0)
     assertThat(actual.exemptInductions).isEqualTo(0)
+    assertThat(actual.screenerPendingInductions).isEqualTo(0)
   }
 
   @Test
@@ -152,6 +157,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(1)
     assertThat(actual.exemptReviews).isEqualTo(0)
     assertThat(actual.exemptInductions).isEqualTo(0)
+    assertThat(actual.screenerPendingInductions).isEqualTo(0)
   }
 
   @Test
@@ -177,6 +183,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(0)
     assertThat(actual.exemptReviews).isEqualTo(0)
     assertThat(actual.exemptInductions).isEqualTo(0)
+    assertThat(actual.screenerPendingInductions).isEqualTo(0)
   }
 
   @Test
@@ -202,6 +209,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(0)
     assertThat(actual.exemptReviews).isEqualTo(0)
     assertThat(actual.exemptInductions).isEqualTo(0)
+    assertThat(actual.screenerPendingInductions).isEqualTo(0)
   }
 
   @Test
@@ -227,6 +235,7 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(0)
     assertThat(actual.exemptReviews).isEqualTo(1)
     assertThat(actual.exemptInductions).isEqualTo(0)
+    assertThat(actual.screenerPendingInductions).isEqualTo(0)
   }
 
   @Test
@@ -252,6 +261,35 @@ class GetSessionSummaryTest : IntegrationTestBase() {
     assertThat(actual.overdueInductions).isEqualTo(0)
     assertThat(actual.exemptReviews).isEqualTo(0)
     assertThat(actual.exemptInductions).isEqualTo(1)
+    assertThat(actual.screenerPendingInductions).isEqualTo(0)
+  }
+
+  @Test
+  fun `should return 1 count in screener pending induction section`() {
+    // Given
+    setUpData()
+
+    wiremockService.stubPrisonersInAPrisonSearchApi(
+      PRISON_ID,
+      listOf(prisoner7),
+    )
+
+    // When
+    val response = getSessionSummary()
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.dueReviews).isEqualTo(0)
+    assertThat(actual.dueInductions).isEqualTo(0)
+    assertThat(actual.overdueReviews).isEqualTo(0)
+    assertThat(actual.overdueInductions).isEqualTo(0)
+    assertThat(actual.exemptReviews).isEqualTo(0)
+    // a screener pending Induction must NOT also be counted as exempt, despite its
+    // includeExemptionOnSummary flag - see SessionSummaryService.includeInScreenerPendingCount
+    assertThat(actual.exemptInductions).isEqualTo(0)
+    assertThat(actual.screenerPendingInductions).isEqualTo(1)
   }
 
   private fun getSessionSummary(): FluxExchangeResult<SessionSummaryResponse> {
@@ -296,6 +334,12 @@ class GetSessionSummaryTest : IntegrationTestBase() {
       latestDate = LocalDate.now().plusDays(1),
       earliestDate = LocalDate.now().minusDays(10),
       status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
+    )
+    // screener pending induction
+    createInductionSchedule(
+      prisoner7.prisonerNumber,
+      deadlineDate = LocalDate.now().plusDays(1),
+      status = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     )
   }
 }

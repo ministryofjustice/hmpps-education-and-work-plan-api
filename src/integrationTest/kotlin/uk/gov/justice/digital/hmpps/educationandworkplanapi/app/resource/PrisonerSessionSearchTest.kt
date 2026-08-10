@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.domain.randomValidPrisonNumber
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.client.prisonersearch.aValidPrisoner
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.induction.InductionScheduleStatus.SCHEDULED
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.database.jpa.entity.review.ReviewScheduleStatus
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.app.messaging.AdditionalInformation.PrisonerReceivedAdditionalInformation.Reason.TRANSFERRED
@@ -22,6 +23,7 @@ import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.Error
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortDirection
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSearchResponses
+import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionSearchSortField
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionStatusType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.SessionType
 import uk.gov.justice.digital.hmpps.educationandworkplanapi.resource.model.assertThat
@@ -41,6 +43,23 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
   val prisoner4 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
   val prisoner5 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber())
   val prisoner6 = aValidPrisoner(prisonerNumber = randomValidPrisonNumber(), firstName = "Bruce", lastName = "Wayne")
+
+  // Two screener pending prisoners, deliberately given names, cell locations and release dates that sort
+  // in the opposite order to each other, so that each sortable column can be told apart from the others.
+  val prisoner7 = aValidPrisoner(
+    prisonerNumber = randomValidPrisonNumber(),
+    firstName = "Peter",
+    lastName = "Zimmerman",
+    cellLocation = "A-1-001",
+    releaseDate = LocalDate.now().plusYears(5),
+  )
+  val prisoner8 = aValidPrisoner(
+    prisonerNumber = randomValidPrisonNumber(),
+    firstName = "Clark",
+    lastName = "Adams",
+    cellLocation = "C-3-033",
+    releaseDate = LocalDate.now().plusYears(2),
+  )
 
   @Test
   fun `should return unauthorized given no bearer token`() {
@@ -309,6 +328,178 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
     assertThat(actual.sessions[0].sessionType).isEqualTo(SessionType.TRANSFER_REVIEW)
   }
 
+  @Test
+  fun `filter on screener pending sessions`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val response = searchPeopleWithActionSessionStatusType(SessionStatusType.SCREENER_PENDING.name)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.sessions.size).isEqualTo(2)
+    // default sort is by prisoner name ascending, so Adams comes before Zimmerman
+    assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner8.prisonerNumber)
+    assertThat(actual.sessions[1].prisonNumber).isEqualTo(prisoner7.prisonerNumber)
+    // screener pending only ever applies to Inductions, and such a session is not an exemption
+    assertThat(actual.sessions).allSatisfy {
+      assertThat(it.sessionType).isEqualTo(SessionType.INDUCTION)
+      assertThat(it.exemptionReason).isNull()
+      assertThat(it.exemptionDate).isNull()
+    }
+  }
+
+  @Test
+  fun `screener pending sessions do not appear in the on hold, due or overdue lists`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val onHold = searchPeopleWithActionSessionStatusType(SessionStatusType.ON_HOLD.name).responseBody.blockFirst()
+    val due = searchPeopleWithActionSessionStatusType(SessionStatusType.DUE.name).responseBody.blockFirst()
+    val overdue = searchPeopleWithActionSessionStatusType(SessionStatusType.OVERDUE.name).responseBody.blockFirst()
+
+    // Then
+    val screenerPendingPrisonNumbers = setOf(prisoner7.prisonerNumber, prisoner8.prisonerNumber)
+    assertThat(onHold!!.sessions.map { it.prisonNumber }).doesNotContainAnyElementsOf(screenerPendingPrisonNumbers)
+    assertThat(due!!.sessions.map { it.prisonNumber }).doesNotContainAnyElementsOf(screenerPendingPrisonNumbers)
+    assertThat(overdue!!.sessions.map { it.prisonNumber }).doesNotContainAnyElementsOf(screenerPendingPrisonNumbers)
+  }
+
+  @Test
+  fun `sort screener pending sessions by prisoner name`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val ascending = searchScreenerPendingWithSort(SessionSearchSortField.PRISONER_NAME.name, SearchSortDirection.ASC.name)
+    val descending = searchScreenerPendingWithSort(SessionSearchSortField.PRISONER_NAME.name, SearchSortDirection.DESC.name)
+
+    // Then
+    assertThat(ascending.map { it.prisonNumber }).containsExactly(prisoner8.prisonerNumber, prisoner7.prisonerNumber)
+    assertThat(descending.map { it.prisonNumber }).containsExactly(prisoner7.prisonerNumber, prisoner8.prisonerNumber)
+  }
+
+  @Test
+  fun `sort screener pending sessions by cell location`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val ascending = searchScreenerPendingWithSort(SessionSearchSortField.CELL_LOCATION.name, SearchSortDirection.ASC.name)
+    val descending = searchScreenerPendingWithSort(SessionSearchSortField.CELL_LOCATION.name, SearchSortDirection.DESC.name)
+
+    // Then
+    // prisoner7 is in A-1-001, prisoner8 is in C-3-033
+    assertThat(ascending.map { it.prisonNumber }).containsExactly(prisoner7.prisonerNumber, prisoner8.prisonerNumber)
+    assertThat(descending.map { it.prisonNumber }).containsExactly(prisoner8.prisonerNumber, prisoner7.prisonerNumber)
+  }
+
+  @Test
+  fun `sort screener pending sessions by release date`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val ascending = searchScreenerPendingWithSort(SessionSearchSortField.RELEASE_DATE.name, SearchSortDirection.ASC.name)
+    val descending = searchScreenerPendingWithSort(SessionSearchSortField.RELEASE_DATE.name, SearchSortDirection.DESC.name)
+
+    // Then
+    // prisoner8 is released in 2 years, prisoner7 in 5 years
+    assertThat(ascending.map { it.prisonNumber }).containsExactly(prisoner8.prisonerNumber, prisoner7.prisonerNumber)
+    assertThat(descending.map { it.prisonNumber }).containsExactly(prisoner7.prisonerNumber, prisoner8.prisonerNumber)
+  }
+
+  @Test
+  fun `filter screener pending sessions on prisoner name`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val response = searchPeopleWithSessionStatusTypeAndName("Zimmerman", SessionStatusType.SCREENER_PENDING.name)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.sessions.size).isEqualTo(1)
+    assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner7.prisonerNumber)
+  }
+
+  @Test
+  fun `filter screener pending sessions on prison number`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+    // searching by a valid prison number looks the prisoner up individually rather than filtering the
+    // prison roster, so that lookup needs stubbing too - see AbstractPrisonerSearchService.getPrisonerList
+    createPrisonerAPIStub(prisoner8.prisonerNumber, prisoner8)
+
+    // When
+    val response =
+      searchPeopleWithSessionStatusTypeAndName(prisoner8.prisonerNumber, SessionStatusType.SCREENER_PENDING.name)
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.sessions.size).isEqualTo(1)
+    assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner8.prisonerNumber)
+  }
+
+  @Test
+  fun `screener pending sessions are paginated`() {
+    // Given
+    setUpData()
+
+    stubAllPrisoners()
+
+    // When
+    val response = searchPeopleWithParams(
+      "sessionStatusType" to SessionStatusType.SCREENER_PENDING.name,
+      "pageSize" to "1",
+      "page" to "2",
+    )
+
+    // Then
+    val actual = response.responseBody.blockFirst()
+
+    assertThat(actual).isNotNull
+    assertThat(actual!!.sessions.size).isEqualTo(1)
+    // page 2 of the default (name ascending) sort is Zimmerman
+    assertThat(actual.sessions[0].prisonNumber).isEqualTo(prisoner7.prisonerNumber)
+    assertThat(actual.pagination!!.totalElements).isEqualTo(2)
+    assertThat(actual.pagination!!.totalPages).isEqualTo(2)
+    assertThat(actual.pagination!!.page).isEqualTo(2)
+  }
+
+  private fun stubAllPrisoners() = wiremockService.stubPrisonersInAPrisonSearchApi(
+    PRISON_ID,
+    listOf(prisoner1, prisoner2, prisoner3, prisoner4, prisoner5, prisoner6, prisoner7, prisoner8),
+  )
+
+  private fun searchScreenerPendingWithSort(sortBy: String, sortDirection: String) = searchPeopleWithParams(
+    "sessionStatusType" to SessionStatusType.SCREENER_PENDING.name,
+    "sortBy" to sortBy,
+    "sortDirection" to sortDirection,
+  ).responseBody.blockFirst()!!.sessions
+
   private fun searchPeople(): FluxExchangeResult<SessionSearchResponses> = searchPeopleWithParams()
 
   private fun searchPeopleWithPrisonNameNumberFilter(prisonNameNumber: String): FluxExchangeResult<SessionSearchResponses> = searchPeopleWithParams("prisonerNameOrNumber" to prisonNameNumber)
@@ -370,6 +561,17 @@ class PrisonerSessionSearchTest : IntegrationTestBase() {
       latestDate = LocalDate.now().plusDays(1),
       earliestDate = LocalDate.now().minusDays(10),
       status = ReviewScheduleStatus.EXEMPT_PRISONER_SAFETY_ISSUES,
+    )
+    // screener pending inductions
+    createInductionSchedule(
+      prisoner7.prisonerNumber,
+      deadlineDate = LocalDate.now().plusDays(1),
+      status = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
+    )
+    createInductionSchedule(
+      prisoner8.prisonerNumber,
+      deadlineDate = LocalDate.now().plusDays(1),
+      status = PENDING_INITIAL_SCREENING_AND_ASSESSMENTS_FROM_CURIOUS,
     )
   }
 }
