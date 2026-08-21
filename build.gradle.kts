@@ -4,7 +4,7 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.4"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.6"
   id("org.openapi.generator") version "7.24.0"
   kotlin("plugin.spring") version "2.4.10"
   kotlin("plugin.jpa") version "2.4.10"
@@ -83,7 +83,7 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
-  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.46") {
+  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.47") {
     exclude(group = "io.swagger.core.v3")
   }
   integrationTestApi("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:$hmppsKotlinSpringBootStarterVersion")
