@@ -4,8 +4,8 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.4"
-  id("org.openapi.generator") version "7.24.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.7"
+  id("org.openapi.generator") version "7.25.0"
   kotlin("plugin.spring") version "2.4.10"
   kotlin("plugin.jpa") version "2.4.10"
 
@@ -20,13 +20,13 @@ apply(plugin = "org.openapi.generator")
 val postgresqlVersion = "42.7.13"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "3.1.0"
-val hmppsSqsStarterVersion = "7.4.0"
-val hmppsKotlinSpringBootStarterVersion = "3.0.0"
+val hmppsSqsStarterVersion = "7.4.1"
+val hmppsKotlinSpringBootStarterVersion = "3.0.1"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val testContainersVersion = "2.0.5"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.8.0"
+val sarTestSupportLibraryVersion = "2.8.1"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
@@ -83,7 +83,7 @@ dependencies {
   integrationTestImplementation(testFixtures(project("domain:learningandworkprogress")))
   integrationTestImplementation(testFixtures(project("domain:personallearningplan")))
   integrationTestImplementation(testFixtures(project("domain:timeline")))
-  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.46") {
+  integrationTestImplementation("io.swagger.parser.v3:swagger-parser:2.1.48") {
     exclude(group = "io.swagger.core.v3")
   }
   integrationTestApi("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:$hmppsKotlinSpringBootStarterVersion")
