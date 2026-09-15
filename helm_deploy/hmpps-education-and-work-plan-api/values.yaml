@@ -108,6 +108,9 @@ generic-service:
     groups:
       - internal
 
+  readinessProbe:
+    initialDelaySeconds: 60
+
 generic-prometheus-alerts:
   targetApplication: hmpps-education-and-work-plan-api
   sqsAlertsTotalMessagesThreshold: "0"
