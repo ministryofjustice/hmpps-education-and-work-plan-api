@@ -18,19 +18,19 @@ spring:
             client-id: ${prison-api.client.id}
             client-secret: ${prison-api.client.secret}
             authorization-grant-type: client_credentials
-            scope: read
+            scope: [read]
           manage-users-api:
             provider: hmpps-auth
             client-id: ${manage-users-api.client.id}
             client-secret: ${manage-users-api.client.secret}
             authorization-grant-type: client_credentials
-            scope: read
+            scope: [read]
           prisoner-search-api:
             provider: hmpps-auth
             client-id: ${prisoner-search-api.client.id}
             client-secret: ${prisoner-search-api.client.secret}
             authorization-grant-type: client_credentials
-            scope: read
+            scope: [read]
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
@@ -108,7 +108,6 @@ management:
 springdoc:
   # swagger specification file served via /swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
   swagger-ui:
-    version: 5.32.11
     url: '/openapi/EducationAndWorkPlanAPI.yml'
     tags-sorter: alpha
 
