@@ -21,12 +21,12 @@ val postgresqlVersion = "42.7.13"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "3.1.1"
 val hmppsSqsStarterVersion = "7.4.1"
-val hmppsKotlinSpringBootStarterVersion = "3.0.2"
+val hmppsKotlinSpringBootStarterVersion = "3.0.3"
 val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val testContainersVersion = "2.0.5"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.8.1"
+val sarTestSupportLibraryVersion = "2.8.3"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
