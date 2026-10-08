@@ -4,10 +4,10 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.10"
-  id("org.openapi.generator") version "7.25.0"
-  kotlin("plugin.spring") version "2.4.20"
-  kotlin("plugin.jpa") version "2.4.20"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.12"
+  id("org.openapi.generator") version "7.26.0"
+  kotlin("plugin.spring") version "2.4.21"
+  kotlin("plugin.jpa") version "2.4.21"
 
   id("jacoco")
   id("name.remal.integration-tests") version "5.0.9"
@@ -17,7 +17,7 @@ plugins {
 
 apply(plugin = "org.openapi.generator")
 
-val postgresqlVersion = "42.7.13"
+val postgresqlVersion = "42.7.14"
 val kotlinLoggingVersion = "3.0.5"
 val springdocOpenapiVersion = "3.1.1"
 val hmppsSqsStarterVersion = "7.4.1"
@@ -26,7 +26,7 @@ val awaitilityVersion = "4.3.0"
 val wiremockVersion = "3.13.2"
 val testContainersVersion = "2.0.5"
 val awsSdkVersion = "1.12.797"
-val sarTestSupportLibraryVersion = "2.8.3"
+val sarTestSupportLibraryVersion = "2.8.4"
 val buildDirectory: Directory = layout.buildDirectory.get()
 
 allOpen {
