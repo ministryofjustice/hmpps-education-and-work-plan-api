@@ -47,21 +47,23 @@ class ClientTrackingInterceptor : HandlerInterceptor {
   override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
     val token = request.getHeader(HttpHeaders.AUTHORIZATION)
     val bearer = "Bearer "
-    if (token.startsWith(bearer, true)) {
-      try {
-        val jwtBody = getClaimsFromJWT(token)
+    token?.let {
+      if (it.startsWith(bearer, true)) {
+        try {
+          val jwtBody = getClaimsFromJWT(it)
 
-        // Add username to customDimensions if it exists in the JWT
-        jwtBody.getClaim("user_name")?.apply {
-          Span.current().setAttribute("username", this.toString())
-        }
+          // Add username to customDimensions if it exists in the JWT
+          jwtBody.getClaim("user_name")?.apply {
+            Span.current().setAttribute("username", this.toString())
+          }
 
-        // Add clientId to customDimensions if it exists in the JWT
-        jwtBody.getClaim("client_id")?.apply {
-          Span.current().setAttribute("clientId", this.toString())
+          // Add clientId to customDimensions if it exists in the JWT
+          jwtBody.getClaim("client_id")?.apply {
+            Span.current().setAttribute("clientId", this.toString())
+          }
+        } catch (e: ParseException) {
+          log.warn("problem decoding jwt public key for application insights", e)
         }
-      } catch (e: ParseException) {
-        log.warn("problem decoding jwt public key for application insights", e)
       }
     }
     return true
